@@ -58,6 +58,10 @@ import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
 
+  public static final String OUTPUT_EXT = ".html";
+
+  public static final String APP_NAME = "ApacheTika";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
   private Map<String, String> parameters;
@@ -151,8 +155,8 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
             Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "tika",
-              resource);
+            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + OUTPUT_EXT,
+              APP_NAME, resource);
             try {
               String fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(tikaResult);
               // System.out.println("FULLTEXT: " + fulltext);

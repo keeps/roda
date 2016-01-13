@@ -1425,7 +1425,8 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file, RepresentationFilePreservationObject premisFile) {
+  public static SolrInputDocument fileToSolrDocument(File file, RepresentationFilePreservationObject premisFile,
+    String fulltext) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1493,10 +1494,11 @@ public class SolrUtils {
         doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, premisFile.getDateCreatedByApplication());
       }
     }
-    // TODO add fulltext
-    // if (file.getFulltext() != null) {
-    // doc.addField(RodaConstants.FILE_FULLTEXT, file.getFulltext());
-    // }
+
+    if (fulltext != null) {
+      doc.addField(RodaConstants.FILE_FULLTEXT, fulltext);
+
+    }
 
     return doc;
   }

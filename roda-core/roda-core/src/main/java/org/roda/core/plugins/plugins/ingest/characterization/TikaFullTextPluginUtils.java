@@ -26,7 +26,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.ContentHandler;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPluginUtils {
@@ -44,11 +43,15 @@ public class TikaFullTextPluginUtils {
 
   public static String extractFullTextFromResult(Path tikaResult)
     throws ParserConfigurationException, IOException, SAXException {
+    return extractFullTextFromResult(Files.newInputStream(tikaResult));
+  }
+
+  public static String extractFullTextFromResult(InputStream tikaResultStream)
+    throws ParserConfigurationException, IOException, SAXException {
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder db = dbf.newDocumentBuilder();
-    InputSource source = new InputSource(Files.newInputStream(tikaResult));
 
-    Document doc = db.parse(source);
+    Document doc = db.parse(tikaResultStream);
     NodeList nodes = doc.getElementsByTagName("body");
     StringBuilder sb = new StringBuilder();
     for (int i = 0; i < nodes.getLength(); i++) {

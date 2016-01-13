@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
@@ -40,10 +42,13 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.OtherMetadata;
 import org.roda.core.model.PreservationMetadata;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -168,11 +173,26 @@ public class IndexModelObserver implements ModelObserver {
       // TODO remove file id PREMIS suffix
       premisFile = PremisUtils.getPremisFile(model.getStorage(), file.getAipId(), file.getRepresentationId(),
         file.getId() + ".premis.xml");
+    } catch (NotFoundException e) {
+      LOGGER.warn("On indexing representations, did not find PREMIS for file: " + file);
     } catch (PremisMetadataException | RODAException | IOException e) {
-      LOGGER.warn("On indexing representations, could not load PREMIS for file: " + file, e);
+      LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
     }
 
-    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile);
+    String fulltext = null;
+    try {
+      OtherMetadata fulltextMetadata = model.retrieveOtherMetadata(file.getAipId(), file.getRepresentationId(),
+        file.getId() + TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
+      Binary fulltextBinary = model.getStorage().getBinary(fulltextMetadata.getStoragePath());
+      fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(fulltextBinary.getContent().createInputStream());
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | ParserConfigurationException
+      | IOException | SAXException e) {
+      LOGGER.warn("Error getting fulltext for file: " + file, e);
+    } catch (NotFoundException e) {
+      LOGGER.debug("Fulltext not found for file: " + file);
+    }
+
+    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile, fulltext);
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
       if (commit) {

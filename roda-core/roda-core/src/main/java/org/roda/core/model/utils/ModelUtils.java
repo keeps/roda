@@ -327,6 +327,12 @@ public final class ModelUtils {
       descriptiveMetadataBinaryId);
   }
 
+  public static StoragePath getOtherMetadataPath(String aipId, String otherMetadataBinaryId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, otherMetadataBinaryId);
+  }
+
   public static StoragePath getRepresentationsPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA);
   }

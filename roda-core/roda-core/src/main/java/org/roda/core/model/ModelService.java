@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.RodaUtils;
@@ -1737,6 +1738,22 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public Binary retrieveOtherMetadataBinary(String aipId, String representationId, String fileId, String type)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    Binary binary;
+    StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileId, type);
+    binary = storage.getBinary(binaryPath);
+
+    return binary;
+  }
+
+  public OtherMetadata retrieveOtherMetadata(String aipId, String representationId, String fileId, String type)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileId, type);
+    return new OtherMetadata(type + "_" + aipId + "_" + representationId + "_" + fileId, aipId, type, binaryPath);
+  }
+
   public OtherMetadata createOtherMetadata(String aipID, String representationId, String fileName, String type,
     Binary binary) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     OtherMetadata otherMetadataBinary = null;
@@ -1814,6 +1831,7 @@ public class ModelService extends ModelObservable {
 
   public void updateFileFormats(List<SimpleFile> updatedFiles) throws ModelServiceException {
     for (SimpleFile file : updatedFiles) {
+      // update PREMIS
       try {
         RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),
           file.getRepresentationId(), file.getId() + ".premis.xml");
@@ -1831,7 +1849,6 @@ public class ModelService extends ModelObservable {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
       }
-      // notifyFileUpdated(file);
     }
     // TODO is any notify needed?
   }
