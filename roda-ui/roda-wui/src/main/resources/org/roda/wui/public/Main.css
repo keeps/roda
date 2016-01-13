@@ -2013,10 +2013,14 @@
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb {
 	padding-top: 5px;
-	margin-left: 40px;
+	margin-left: 20px;
 	float: left;
 	margin-top: 0px;
 	margin-bottom: 0px;
+}
+
+.viewRepresentationFilePreviewPanel.single .filePreviewToolbar .viewRepresentationBreadcrumb {
+	margin-left: 35px;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
@@ -2044,6 +2048,7 @@
 }
 
 .viewRepresentationFilePreview {
+	padding: 40px !important;
 	height: 650px;
 	display: inline-block;
 	vertical-align: top;

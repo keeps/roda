@@ -328,6 +328,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Search files...")
   String viewRepresentationSearchPlaceHolder();
   
+  @DefaultMessage("Details")
+  String viewRepresentationInfoTitle();
+  
   @DefaultMessage("Filename")
   String viewRepresentationInfoFilename();
   

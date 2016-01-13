@@ -62,7 +62,7 @@
 					<!-- INFO PANEL -->
 					<g:FlowPanel addStyleNames="infoFilePanel">
 						<g:Label styleName="h1" addStyleNames="infoFileTitle">
-							<ui:msg description="title">Details</ui:msg>
+							<ui:text from='{messages.viewRepresentationInfoTitle}' />
 						</g:Label>
 						<g:FlowPanel ui:field="infoFilePanel">
 						</g:FlowPanel>

@@ -550,10 +550,12 @@ public class ViewRepresentation extends Composite {
 
   private void showFilesPanel() {
     filesPanel.setVisible(true);
+    filePreviewPanel.removeStyleName("single");
   }
 
   private void hideFilesPanel() {
     filesPanel.setVisible(false);
+    filePreviewPanel.addStyleName("single");
   }
 
   private void showFilePreview() {
