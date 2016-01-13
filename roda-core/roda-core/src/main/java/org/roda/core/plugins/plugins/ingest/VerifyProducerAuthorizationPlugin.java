@@ -88,7 +88,7 @@ public class VerifyProducerAuthorizationPlugin implements Plugin<AIP> {
 
       // FIXME implement producer authorization logic
 
-      state = PluginState.OK;
+      state = PluginState.SUCCESS;
       reportItem.setItemId(aip.getId());
       reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
       LOGGER.debug("Done with checking producer authorization for AIP " + aip.getId());

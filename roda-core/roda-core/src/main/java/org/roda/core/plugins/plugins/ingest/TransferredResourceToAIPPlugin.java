@@ -155,13 +155,13 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
         aip = model.retrieveAIP(aip.getId());
 
-        state = PluginState.OK;
+        state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));

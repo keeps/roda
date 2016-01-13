@@ -110,14 +110,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
             createPremisForRepresentation(model, storage, temp, aip, representationID);
           }
 
-          state = PluginState.OK;
+          state = PluginState.SUCCESS;
           reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
             new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException | PremisMetadataException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
-          state = PluginState.ERROR;
+          state = PluginState.FAILURE;
           reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
             new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
             new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));

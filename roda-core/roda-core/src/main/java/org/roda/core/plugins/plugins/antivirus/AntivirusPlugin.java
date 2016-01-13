@@ -136,7 +136,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
         virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
 
-        state = virusCheckResult.isClean() ? PluginState.OK : PluginState.ERROR;
+        state = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
@@ -145,7 +145,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
       } catch (RuntimeException | IOException | RequestNotValidException | AlreadyExistsException | GenericException
         | NotFoundException | AuthorizationDeniedException e) {
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
@@ -183,7 +183,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
           EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
           "All the files from the SIP were verified against an antivirus.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), success ? "success" : "error", success ? "Report" : "Error",
+          Arrays.asList(representationID), state, success ? "Report" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage());
       }
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException

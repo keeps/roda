@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Fixity;
+import org.roda.core.data.v2.JobReport.PluginState;
 import org.roda.core.data.v2.PluginType;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
@@ -146,7 +147,7 @@ public class FixityPlugin implements Plugin<AIP> {
                   EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                   "Checksums recorded in PREMIS were compared with the files in the repository",
                   EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                  Arrays.asList(representationID), "error", "Reason", sb.toString());
+                  Arrays.asList(representationID), PluginState.FAILURE, "Reason", sb.toString());
                 notifyUserOfFixityCheckError(representationID, okFileIDS, koFileIDS, epo);
               } else {
                 LOGGER.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
@@ -154,7 +155,7 @@ public class FixityPlugin implements Plugin<AIP> {
                   EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                   "Checksums recorded in PREMIS were compared with the files in the repository",
                   EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                  Arrays.asList(representationID), "success", fileIDs.size() + " files checked successfully",
+                  Arrays.asList(representationID), PluginState.SUCCESS, fileIDs.size() + " files checked successfully",
                   fileIDs.toString());
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
@@ -167,7 +168,8 @@ public class FixityPlugin implements Plugin<AIP> {
                 EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
                 EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                Arrays.asList(representationID), "undetermined", "Reason", "<p>" + e.getMessage() + "</p>");
+                Arrays.asList(representationID), PluginState.PARTIAL_SUCCESS, "Reason",
+                "<p>" + e.getMessage() + "</p>");
               notifyUserOfFixityCheckUndetermined(representationID, epo, e.getMessage());
             } catch (PremisMetadataException | RODAException | IOException e1) {
               LOGGER

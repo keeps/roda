@@ -101,13 +101,13 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           validAIP.add(aip.getId());
           LOGGER.debug("Done with validating AIP {}: valid!", aip.getId());
 
-          state = PluginState.OK;
+          state = PluginState.SUCCESS;
           reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         } else {
           invalidAIP.add(aip.getId());
           LOGGER.debug("Done with validating AIP {}: invalid!", aip.getId());
 
-          state = PluginState.ERROR;
+          state = PluginState.FAILURE;
           reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         }
 
@@ -115,7 +115,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
@@ -140,7 +140,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
         PluginHelper.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), success ? "success" : "error", "Report", "");
+          Arrays.asList(representationID), success ? PluginState.SUCCESS : PluginState.FAILURE, "Report", "");
       }
     } catch (PremisMetadataException | IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

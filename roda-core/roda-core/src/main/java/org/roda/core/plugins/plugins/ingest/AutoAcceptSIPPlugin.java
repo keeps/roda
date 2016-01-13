@@ -98,14 +98,14 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
         ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE, true);
         storage.updateMetadata(aipPath, aipMetadata, true);
         model.updateAIP(aip.getId());
-        state = PluginState.OK;
+        state = PluginState.SUCCESS;
         reportItem.setItemId(aip.getId());
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
         LOGGER.debug("Done with auto accepting AIP " + aip.getId());
       } catch (RODAException e) {
         LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
         outcomeDetail = "Error updating AIP (metadata attribute active=true): " + e.getMessage();
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, outcomeDetail));
       }
@@ -124,13 +124,13 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     throws PluginException {
 
     try {
-      boolean success = (state == PluginState.OK);
+      boolean success = (state == PluginState.SUCCESS);
 
       for (String representationID : aip.getRepresentationIds()) {
         PluginHelper.createPluginEvent(aip.getId(), representationID, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error", outcomeDetail);
+          Arrays.asList(representationID), state, success ? "" : "Error", outcomeDetail);
       }
     } catch (PremisMetadataException | IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

@@ -176,7 +176,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           }
           model.updateFileFormats(updatedFiles);
 
-          PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.OK, agent,
+          PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS, agent,
             EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
             "The files of the representation were successfully identified.",
             EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, siegfriedOutput);
@@ -185,14 +185,14 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
         }
 
-        state = PluginState.OK;
+        state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
       } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
         | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
             "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));

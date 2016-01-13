@@ -143,10 +143,10 @@ public class JobReportList extends AsyncTableCell<JobReport> {
         if (jobReport != null) {
 
           switch (jobReport.getLastPluginRanState()) {
-            case OK:
+            case SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(STATUS_OK);
               break;
-            case ERROR:
+            case FAILURE:
             default:
               ret = SafeHtmlUtils.fromSafeConstant(STATUS_ERROR);
               break;

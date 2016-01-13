@@ -143,13 +143,13 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
           model.updateFileFormats(updatedFiles);
         }
 
-        state = PluginState.OK;
+        state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
       } catch (RODAException | SAXException | TikaException | ModelServiceException | IOException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
             "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));

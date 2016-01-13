@@ -96,7 +96,7 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(sip, earkSIPPath, model, storage);
 
-        state = PluginState.OK;
+        state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aipCreated.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
@@ -108,7 +108,7 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
-        state = PluginState.ERROR;
+        state = PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));

@@ -19,7 +19,7 @@ public class JobReport implements Serializable {
   private static final long serialVersionUID = -2028521062931876576L;
 
   public enum PluginState {
-    OK, ERROR
+    SUCCESS, PARTIAL_SUCCESS, FAILURE
   }
 
   private String id = null;

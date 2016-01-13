@@ -179,9 +179,9 @@ public final class PluginHelper {
   }
 
   public static EventPreservationObject createPluginEvent(String aipID, String representationID, ModelService model,
-    String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs, String outcome,
-    String detailNote, String detailExtension) throws PremisMetadataException, IOException, RequestNotValidException,
-      NotFoundException, GenericException, AuthorizationDeniedException {
+    String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs,
+    PluginState outcome, String detailNote, String detailExtension) throws PremisMetadataException, IOException,
+      RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     EventPreservationObject epo = new EventPreservationObject();
     epo.setDatetime(new Date());
     epo.setEventType(eventType);
@@ -191,7 +191,19 @@ public final class PluginHelper {
     epo.setId(name);
     epo.setAgentID(agentID);
     epo.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
-    epo.setOutcome(outcome);
+    switch (outcome) {
+      case SUCCESS:
+        epo.setOutcome("success");
+        break;
+      case PARTIAL_SUCCESS:
+        epo.setOutcome("partial success");
+        break;
+      case FAILURE:
+      default:
+        epo.setOutcome("failure");
+        break;
+    }
+
     epo.setOutcomeDetailNote(detailNote);
     epo.setOutcomeDetailExtension(detailExtension);
     byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
@@ -321,13 +333,12 @@ public final class PluginHelper {
       throws PluginException {
 
     try {
-      boolean success = (state == PluginState.OK);
+      boolean success = (state == PluginState.SUCCESS);
 
       for (String representationID : aip.getRepresentationIds()) {
 
         PluginHelper.createPluginEvent(aip.getId(), representationID, model, eventType, eventDetails, agentRole,
-          agent.getId(), Arrays.asList(representationID), success ? "success" : "error", success ? "" : "Error",
-          detailExtension);
+          agent.getId(), Arrays.asList(representationID), state, success ? "" : "Error", detailExtension);
       }
     } catch (PremisMetadataException | IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
