@@ -184,7 +184,8 @@ public class IndexModelObserver implements ModelObserver {
       OtherMetadata fulltextMetadata = model.retrieveOtherMetadata(file.getAipId(), file.getRepresentationId(),
         file.getId() + TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
       Binary fulltextBinary = model.getStorage().getBinary(fulltextMetadata.getStoragePath());
-      fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(fulltextBinary.getContent().createInputStream());
+      Map<String,String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(fulltextBinary.getContent().createInputStream());
+      fulltext = properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_FULLTEXT);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | ParserConfigurationException
       | IOException | SAXException e) {
       LOGGER.warn("Error getting fulltext for file: " + file, e);
