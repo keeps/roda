@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<metadata xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
-	<dc:title>Title</dc:title>
-	<dc:creator>Creator</dc:creator>
-	<dc:publisher>Publisher</dc:publisher>
-    <dc:identifier>Id</dc:identifier>
-    <dc:date>2016-01-01</dc:date>
-</metadata>
+<simpledc xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<title>Title</title>
+	<creator>Creator</creator>
+	<publisher>Publisher</publisher>
+    <identifier>Id</identifier>
+    <date>2016-01-01</date>
+</simpledc>

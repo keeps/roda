@@ -22,6 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -835,6 +836,9 @@ public class SolrUtils {
       representationIds, preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
   }
 
+  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
+    Arrays.asList("title", "level", "dateInitial", "dateFinal"));
+
   // FIXME see how to handle active and all the other that are not being put in
   // the indexedaip
   public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
@@ -889,6 +893,8 @@ public class SolrUtils {
     setPermissions(aip, ret);
 
     if (!safemode) {
+      // guarding against repeated fields
+      Set<String> usedNonRepeatableFields = new HashSet<>();
 
       for (String descId : aip.getDescriptiveMetadataIds()) {
         DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
@@ -897,7 +903,14 @@ public class SolrUtils {
         try {
           SolrInputDocument fields = getDescriptiveMetataFields(binary);
           for (SolrInputField field : fields) {
-            ret.addField(field.getName(), field.getValue(), field.getBoost());
+            if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
+              boolean added = usedNonRepeatableFields.add(field.getName());
+              if (added) {
+                ret.addField(field.getName(), field.getValue(), field.getBoost());
+              }
+            } else {
+              ret.addField(field.getName(), field.getValue(), field.getBoost());
+            }
           }
         } catch (GenericException ise) {
           // TODO index the index errors for later processing
