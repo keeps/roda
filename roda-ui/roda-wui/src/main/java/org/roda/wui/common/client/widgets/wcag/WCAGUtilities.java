@@ -68,7 +68,8 @@ public class WCAGUtilities {
     boolean warn) {
     if (element.getAttribute(attributeName) == null || element.getAttribute(attributeName).equalsIgnoreCase("")) {
       if (warn) {
-        GWT.log("Setting of " + element.getTagName() + " attribute " + attributeName + " to " + attributeValue);
+        // GWT.log("Setting of " + element.getTagName() + " attribute " +
+        // attributeName + " to " + attributeValue);
       }
       element.setAttribute(attributeName, attributeValue);
     }

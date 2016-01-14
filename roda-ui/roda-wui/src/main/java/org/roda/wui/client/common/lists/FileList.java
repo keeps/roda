@@ -114,7 +114,6 @@ public class FileList extends AsyncTableCell<SimpleFile> {
     display.setColumnWidth(filenameColumn, "100%");
 
     // define default sorting
-    GWT.log("Defining default sorting");
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
 
     addStyleName("my-files-table");
@@ -124,7 +123,6 @@ public class FileList extends AsyncTableCell<SimpleFile> {
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<SimpleFile>> callback) {
-    GWT.log("Getting data");
     Filter filter = getFilter();
     if (filter == null) {
       // search not yet ready, deliver empty result

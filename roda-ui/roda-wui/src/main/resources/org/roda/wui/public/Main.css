@@ -2183,24 +2183,24 @@
 
 .viewRepresentation .infoFileEntry {
 	margin-bottom: 0.5em;
-	display: inline-flex;
+/* 	display: inline-flex; */
 }
 
 .viewRepresentation .infoFileEntryKey {
-	vertical-align: top;
+/* 	vertical-align: top; */
 	font-size: 1.3rem;
-	display: inline-block;
-	width: 100px;
+/* 	display: inline-block; */
+/* 	width: 100px; */
 	line-height: 1.1em;
 	color: rgba(255, 255, 255, 0.8);
 }
 
 .viewRepresentation .infoFileEntryValue {
-	vertical-align: top;
+/* 	vertical-align: top; */
 	font-size: 1.3rem;
-	display: inline-block;
+/* 	display: inline-block; */
 	word-break: break-all;
-	width: 200px;
+/* 	width: 200px; */
 	line-height: 1.1em;
 }
 

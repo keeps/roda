@@ -314,7 +314,10 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
       CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
 
       pObject.setCreatingApplicationName(creatingApplication.getCreatingApplicationName());
-      pObject.setCreatingApplicationVersion(creatingApplication.getCreatingApplicationVersion());
+
+      if (creatingApplication.getCreatingApplicationVersion() != null) {
+        pObject.setCreatingApplicationVersion(creatingApplication.getCreatingApplicationVersion());
+      }
 
       if (creatingApplication.getDateCreatedByApplication() != null) {
         pObject.setDateCreatedByApplication(creatingApplication.getDateCreatedByApplication().toString());
@@ -420,6 +423,10 @@ public class PremisFileObjectHelper extends PremisObjectHelper {
 
       if (!StringUtils.isBlank(filePObject.getCreatingApplicationVersion())) {
         creatingApplication.setCreatingApplicationVersion(filePObject.getCreatingApplicationVersion());
+      }
+      
+      if (!StringUtils.isBlank(filePObject.getDateCreatedByApplication())) {
+        creatingApplication.setDateCreatedByApplication(filePObject.getDateCreatedByApplication());
       }
     }
 

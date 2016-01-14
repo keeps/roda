@@ -123,7 +123,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     display.setColumnWidth(titleColumn, "100%");
 
     // define default sorting
-    GWT.log("Defining default sorting");
     display.getColumnSortList().push(new ColumnSortInfo(dateInitialColumn, false));
 
     dateInitialColumn.setCellStyleNames("nowrap");

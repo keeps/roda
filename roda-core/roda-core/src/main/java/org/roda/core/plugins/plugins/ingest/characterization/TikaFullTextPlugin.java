@@ -134,16 +134,20 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
               SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
 
               Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
-              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_FULLTEXT)) {
-                f.setFulltext(properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_FULLTEXT));
+              if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {
+                f.setFulltext(properties.get(RodaConstants.FILE_FULLTEXT));
               }
-              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME)) {
-                f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME));
+              if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_NAME)) {
+                f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
               }
-              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION)) {
-                f.setCreatingApplicationVersion(
-                  properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION));
+              if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_VERSION)) {
+                f.setCreatingApplicationVersion(properties.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
               }
+              if (properties.containsKey(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION)) {
+                f.setDateCreatedByApplication(properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
+              }
+              LOGGER.info("Tika creating app name: " + f.getCreatingApplicationName() + " version: "
+                + f.getCreatingApplicationVersion() + " date: " + f.getDateCreatedByApplication());
               updatedFiles.add(f);
             } catch (ParserConfigurationException pce) {
 

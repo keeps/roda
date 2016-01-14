@@ -66,7 +66,7 @@ public class TikaFullTextPluginUtils {
     }
     String fulltext = sb.toString();
     if (!StringUtils.isBlank(fulltext)) {
-      properties.put("fulltext", fulltext);
+      properties.put(RodaConstants.FILE_FULLTEXT, fulltext);
     }
 
     NodeList metaNodes = doc.getElementsByTagName("meta");
@@ -74,10 +74,14 @@ public class TikaFullTextPluginUtils {
       Node node = metaNodes.item(i);
       Element e = (Element) node;
       if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Application-Name")) {
-        properties.put(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME, e.getTextContent());
+        properties.put(RodaConstants.FILE_CREATING_APPLICATION_NAME, e.getAttribute("content"));
       }
       if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Application-Version")) {
-        properties.put(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION, e.getTextContent());
+        properties.put(RodaConstants.FILE_CREATING_APPLICATION_VERSION, e.getAttribute("content"));
+      }
+      
+      if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Creation-Date")) {
+        properties.put(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, e.getAttribute("content"));
       }
     }
 

@@ -1835,7 +1835,7 @@ public class ModelService extends ModelObservable {
       try {
         RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),
           file.getRepresentationId(), file.getId() + ".premis.xml");
-        rfpo = PremisUtils.updateFileFormat(rfpo, file.getFileFormat());
+        rfpo = PremisUtils.updateFile(rfpo, file);
         Path premisFile = Files.createTempFile("file", ".premis.xml");
         PremisFileObjectHelper helper = new PremisFileObjectHelper(rfpo);
         helper.saveToFile(premisFile.toFile());

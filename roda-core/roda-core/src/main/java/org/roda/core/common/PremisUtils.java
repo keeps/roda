@@ -38,6 +38,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.File;
@@ -212,19 +213,37 @@ public class PremisUtils {
 
   }
 
-  public static RepresentationFilePreservationObject updateFileFormat(RepresentationFilePreservationObject rfpo,
-    FileFormat fileFormat) {
-    if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
-      rfpo.setFormatDesignationName(fileFormat.getFormatDesignationName());
+  public static RepresentationFilePreservationObject updateFile(RepresentationFilePreservationObject rfpo,
+    SimpleFile file) {
+
+    // file format
+    FileFormat fileFormat = file.getFileFormat();
+    if (fileFormat != null) {
+      if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
+        rfpo.setFormatDesignationName(fileFormat.getFormatDesignationName());
+      }
+      if (!StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
+        rfpo.setFormatDesignationVersion(fileFormat.getFormatDesignationVersion());
+      }
+      if (!StringUtils.isBlank(fileFormat.getMimeType())) {
+        rfpo.setMimetype(fileFormat.getMimeType());
+      }
+      if (!StringUtils.isBlank(fileFormat.getPronom())) {
+        rfpo.setPronomId(fileFormat.getPronom());
+      }
     }
-    if (!StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
-      rfpo.setFormatDesignationVersion(fileFormat.getFormatDesignationVersion());
+
+    // file characteristics
+    if (!StringUtils.isBlank(file.getCreatingApplicationName())) {
+      rfpo.setCreatingApplicationName(file.getCreatingApplicationName());
     }
-    if (!StringUtils.isBlank(fileFormat.getMimeType())) {
-      rfpo.setMimetype(fileFormat.getMimeType());
+
+    if (!StringUtils.isBlank(file.getCreatingApplicationVersion())) {
+      rfpo.setCreatingApplicationVersion(file.getCreatingApplicationVersion());
     }
-    if (!StringUtils.isBlank(fileFormat.getPronom())) {
-      rfpo.setPronomId(fileFormat.getPronom());
+
+    if (!StringUtils.isBlank(file.getDateCreatedByApplication())) {
+      rfpo.setDateCreatedByApplication(file.getDateCreatedByApplication());
     }
 
     return rfpo;

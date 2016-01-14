@@ -1487,7 +1487,7 @@ public class SolrUtils {
         doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, premisFile.getCreatingApplicationName());
       }
       if (premisFile.getCreatingApplicationVersion() != null) {
-        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, premisFile.getCreatingApplicationName());
+        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, premisFile.getCreatingApplicationVersion());
       }
       if (premisFile.getDateCreatedByApplication() != null) {
         doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, premisFile.getDateCreatedByApplication());
