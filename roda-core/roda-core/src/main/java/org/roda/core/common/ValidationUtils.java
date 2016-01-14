@@ -46,6 +46,97 @@ public class ValidationUtils {
 
   }
 
+  public static ValidationReport isAIPMetadataValid(boolean force, String metadataType, boolean validatePremis,
+    ModelService model, String aipID)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    ValidationReport report = new ValidationReport();
+    report.setValid(false);
+    ClosableIterable<DescriptiveMetadata> descriptiveMetadataBinaries = null;
+    try {
+      descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipID);
+      for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
+        StoragePath storagePath = descriptiveMetadata.getStoragePath();
+        Binary binary = model.getStorage().getBinary(storagePath);
+        if (force) { // FORCE
+          LOGGER.debug("FORCE");
+          try {
+            validateDescriptiveBinary(binary, metadataType, true);
+            model.updateDescriptiveMetadata(aipID, descriptiveMetadata.getId(), binary, metadataType);
+            report.setValid(true);
+            LOGGER.debug(storagePath + " valid for metadata type " + metadataType);
+          } catch (ValidationException ve) {
+            if (ve.getErrors() != null) {
+              for (SAXException se : ve.getErrors()) {
+                LOGGER.error(se.getMessage(), se);
+              }
+            }
+            LOGGER.debug("FORCE - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE " + metadataType);
+            report.addIssue("FORCE - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE " + metadataType);
+          }
+        } else {
+          if (metadataType != null) { // FALLBACK
+            LOGGER.debug("FALLBACK");
+            boolean definedOK = false;
+            if (descriptiveMetadata.getType() != null) {
+              try {
+                validateDescriptiveBinary(binary, descriptiveMetadata.getType(), true);
+                definedOK = true;
+                LOGGER
+                  .debug("FALLBACK1 - " + storagePath + " valid for metadata type " + descriptiveMetadata.getType());
+              } catch (ValidationException ve) {
+                LOGGER.debug("FALLBACK1 - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE "
+                  + descriptiveMetadata.getType());
+              }
+            }
+            if (!definedOK) { // defined not working... try fallback
+              try {
+                validateDescriptiveBinary(binary, metadataType, true);
+                model.updateDescriptiveMetadata(aipID, descriptiveMetadata.getId(), binary, metadataType);
+                LOGGER.debug("FALLBACK2 - " + storagePath + " valid for metadata type " + metadataType);
+              } catch (ValidationException ve) {
+                LOGGER.debug("FALLBACK2 - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE " + metadataType);
+                report.addIssue("FALLBACK2 - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE " + metadataType
+                  + " AND " + descriptiveMetadata.getType());
+                report.setValid(false);
+              }
+            }
+          } else { // NO FALLBACK
+            try {
+              LOGGER.debug("NO FALLBACK");
+              validateDescriptiveBinary(binary, descriptiveMetadata.getType(), true);
+              LOGGER
+                .debug("NO FALLBACK - " + storagePath + " valid for metadata type " + descriptiveMetadata.getType());
+            } catch (ValidationException ve) {
+              LOGGER.debug("NO FALLBACK - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE " + metadataType);
+              report.addIssue("NO FALLBACK - " + storagePath.asString() + " NOT VALID FOR METADATA TYPE "
+                + descriptiveMetadata.getType());
+              report.setValid(false);
+            } catch (NullPointerException npe) {
+              LOGGER
+                .debug("NO FALLBACK - " + storagePath.asString() + " DOES NOT CONTAINS ANY METADATA TYPE TO VALIDATE");
+              report.addIssue(
+                "NO FALLBACK - " + storagePath.asString() + " DOES NOT CONTAINS ANY METADATA TYPE TO VALIDATE");
+              report.setValid(false);
+            }
+          }
+        }
+
+      }
+    } catch (Throwable t) {
+      LOGGER.error(t.getMessage(), t);
+    } finally {
+      try {
+        if (descriptiveMetadataBinaries != null) {
+          descriptiveMetadataBinaries.close();
+        }
+      } catch (IOException e) {
+        LOGGER.error("Error while while freeing up resources", e);
+      }
+    }
+    // TODO handle premis...
+    return report;
+  }
+
   /**
    * Validates all descriptive metadata files contained in the AIP
    * 
@@ -209,7 +300,7 @@ public class ValidationUtils {
             throw new ValidationException("Error validating descriptive binary ", errorHandler.getErrors());
           }
         } catch (SAXException e) {
-          LOGGER.debug("Error validating descriptive binary " + descriptiveMetadataType, e);
+          LOGGER.error("Error validating descriptive binary " + descriptiveMetadataType, e);
           throw new ValidationException("Error validating descriptive binary ", errorHandler.getErrors());
         }
       } else {
@@ -218,6 +309,7 @@ public class ValidationUtils {
         }
       }
     } catch (SAXException | IOException e) {
+      LOGGER.error(e.getMessage(), e);
       throw new ValidationException("Error validating descriptive binary: " + e.getMessage());
     }
 
@@ -250,7 +342,7 @@ public class ValidationUtils {
             throw new ValidationException("Error validating preservation binary ", errorHandler.getErrors());
           }
         } catch (SAXException e) {
-          LOGGER.debug("Error validating preservation binary " + binary.getStoragePath().asString(), e);
+          LOGGER.error("Error validating preservation binary " + binary.getStoragePath().asString(), e);
           throw new ValidationException("Error validating preservation binary ", errorHandler.getErrors());
         }
       } else {

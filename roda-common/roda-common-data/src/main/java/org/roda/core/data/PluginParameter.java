@@ -38,7 +38,12 @@ public class PluginParameter implements Serializable {
      * String which will be translated into the canonical class name of sip to
      * aip plugin
      */
-    PLUGIN_SIP_TO_AIP;
+    PLUGIN_SIP_TO_AIP, 
+    
+    /*
+     * Metadata type select box
+     */
+    METADATA_TYPE;
   }
 
   /**

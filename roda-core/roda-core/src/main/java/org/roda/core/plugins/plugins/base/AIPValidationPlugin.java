@@ -13,13 +13,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.ValidationReport;
 import org.roda.core.common.ValidationUtils;
-import org.roda.core.data.Attribute;
 import org.roda.core.data.PluginParameter;
+import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.Report;
 import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.InvalidParameterException;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.JobReport.PluginState;
@@ -38,6 +38,17 @@ import org.slf4j.LoggerFactory;
 // FIXME rename this to SIPValidationPlugin
 public class AIPValidationPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
+
+  public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
+    "Validate Premis", PluginParameterType.BOOLEAN, "true", true, false, "Validate Premis");
+
+  public static final PluginParameter PARAMETER_VALIDATION_FORCE = new PluginParameter("parameter.validation_force",
+    "Enforce metadata type", PluginParameterType.BOOLEAN, "false", true, false,
+    "If true, bypass current metadata type with metadata type passed as parameter and validate. If false, if metadata type passed as parameter is defined, fallback, else no fallback ");
+
+  public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
+    "EAD-2002", PluginParameterType.METADATA_TYPE, "EAD-2002", false, false,
+    "Fall if no metadatatype defined or if definded metadata fails.");
 
   private Map<String, String> parameters;
 
@@ -68,7 +79,11 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
   @Override
   public List<PluginParameter> getParameters() {
-    return new ArrayList<PluginParameter>();
+    ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
+    pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
+    pluginParameters.add(PARAMETER_VALIDATION_FORCE);
+    pluginParameters.add(PARAMETER_METADATA_TYPE);
+    return pluginParameters;
   }
 
   @Override
@@ -84,49 +99,36 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    List<String> validAIP = new ArrayList<String>();
-    List<String> invalidAIP = new ArrayList<String>();
 
-    Report report = PluginHelper.createPluginReport(this);
-    PluginState state;
+    boolean validatePremis = Boolean.parseBoolean(
+      parameters.getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(), PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
+    boolean force = Boolean.parseBoolean(
+      parameters.getOrDefault(PARAMETER_VALIDATION_FORCE.getId(), PARAMETER_VALIDATION_FORCE.getDefaultValue()));
+    String metadataType = parameters.getOrDefault(PARAMETER_METADATA_TYPE.getId(),
+      PARAMETER_METADATA_TYPE.getDefaultValue());
 
+    List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, "SIP syntax check", aip.getId(), null);
 
       try {
-        LOGGER.debug("Validating AIP {}", aip.getId());
-        boolean descriptiveValid = ValidationUtils.isAIPDescriptiveMetadataValid(model, aip.getId(), true);
-        boolean preservationValid = ValidationUtils.isAIPPreservationMetadataValid(model, aip.getId(), true);
-        if (descriptiveValid && preservationValid) {
-          validAIP.add(aip.getId());
-          LOGGER.debug("Done with validating AIP {}: valid!", aip.getId());
-
-          state = PluginState.SUCCESS;
-          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-        } else {
-          invalidAIP.add(aip.getId());
-          LOGGER.debug("Done with validating AIP {}: invalid!", aip.getId());
-
-          state = PluginState.FAILURE;
-          reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-        }
-
-        createEvent(aip, model, descriptiveValid, preservationValid);
-
-      } catch (RODAException e) {
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-        state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        LOGGER.debug("VALIDATING AIP " + aip.getId());
+        ValidationReport report = ValidationUtils.isAIPMetadataValid(force, metadataType, validatePremis, model,
+          aip.getId());
+        reports.add(report);
+        // createEvent(aip, model, descriptiveValid, preservationValid);
+      } catch (RODAException mse) {
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
 
-      report.addItem(reportItem);
+      try {
+        PluginHelper.updateJobReport(model, index, this, reportItem, PluginState.SUCCESS,
+          PluginHelper.getJobId(parameters), aip.getId());
+      } catch (Throwable t) {
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+      }
     }
-    return report;
+    return null;
   }
 
   // TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"

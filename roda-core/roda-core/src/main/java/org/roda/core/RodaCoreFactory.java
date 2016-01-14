@@ -965,8 +965,17 @@ public class RodaCoreFactory {
   }
 
   private static void runValidationPlugin() {
-    Plugin<AIP> validationPlugin = new AIPValidationPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(validationPlugin);
+    try {
+      Plugin<AIP> validationPlugin = new AIPValidationPlugin();
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put("parameter.validate_premis", "false");
+      parameters.put("parameter.validation_force", "true");
+      parameters.put("parameter.metadata_type", "ead-c");
+      validationPlugin.setParameterValues(parameters);
+      getPluginOrchestrator().runPluginOnAllAIPs(validationPlugin);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private static void runLogCleanPlugin() {
