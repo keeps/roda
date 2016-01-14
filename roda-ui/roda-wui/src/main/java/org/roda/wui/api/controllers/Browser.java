@@ -40,6 +40,7 @@ import org.roda.core.storage.Binary;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -826,12 +827,12 @@ public class Browser extends RodaCoreService {
     return files;
   }
 
-  public static Map<String, String> getSupportedMetadata(RodaUser user, Locale locale)
+  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
 
     // delegate
-    Map<String, String> supportedMetadata = BrowserHelper.getSupportedMetadata(locale);
+    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

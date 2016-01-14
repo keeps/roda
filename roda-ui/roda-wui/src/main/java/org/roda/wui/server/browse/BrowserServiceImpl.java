@@ -60,6 +60,7 @@ import org.roda.wui.client.browse.MetadataParseException;
 import org.roda.wui.client.browse.ParseError;
 import org.roda.wui.client.browse.PreservationInfo;
 import org.roda.wui.client.browse.RepresentationInfo;
+import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.TimelineInfo;
 import org.roda.wui.client.browse.Viewer;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -714,7 +715,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Map<String, String> getSupportedMetadata(String localeString)
+  public List<SupportedMetadataTypeBundle> getSupportedMetadata(String localeString)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Locale locale = ServerTools.parseLocale(localeString);

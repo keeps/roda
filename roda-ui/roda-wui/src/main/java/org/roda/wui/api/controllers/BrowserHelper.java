@@ -85,6 +85,7 @@ import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.PreservationMetadataBundle;
+import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
@@ -896,18 +897,28 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);
   }
 
-  public static Map<String, String> getSupportedMetadata(Locale locale) throws GenericException {
+  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String[] types = RodaCoreFactory.getRodaConfiguration().getString("ui.browser.metadata.descriptive.types")
       .split(", ?");
 
-    Map<String, String> supportedMetadata = new HashMap<String, String>();
+    List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 
     if (types != null) {
       for (String type : types) {
         String label = messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type,
           type);
-        supportedMetadata.put(type, label);
+        String template = null;
+        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + type + ".xml");
+        if (templateStream != null) {
+          try {
+            template = IOUtils.toString(templateStream);
+          } catch (IOException e) {
+            LOGGER.warn("Could not load descriptive metadata type template", e);
+          }
+        }
+        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, label, template);
+        supportedMetadata.add(b);
       }
     }
     return supportedMetadata;

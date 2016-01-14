@@ -290,7 +290,7 @@ public interface BrowserService extends RemoteService {
 
   List<Viewer> getViewersProperties() throws GenericException;
 
-  Map<String, String> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
+  List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
 
   JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
 

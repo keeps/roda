@@ -11,7 +11,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
-import java.util.Map;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -136,7 +135,7 @@ public class EditDescriptiveMetadata extends Composite {
     id.setEnabled(false);
 
     BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Map<String, String>>() {
+      new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -144,13 +143,13 @@ public class EditDescriptiveMetadata extends Composite {
         }
 
         @Override
-        public void onSuccess(Map<String, String> metadataTypes) {
+        public void onSuccess(List<SupportedMetadataTypeBundle> metadataTypes) {
           // TODO sort by alphabetic order of value
           int selected = -1;
           int index = 0;
-          for (Map.Entry<String, String> entry : metadataTypes.entrySet()) {
-            type.addItem(entry.getValue(), entry.getKey());
-            if (entry.getKey().equals(bundle.getType().toLowerCase())) {
+          for (SupportedMetadataTypeBundle b : metadataTypes) {
+            type.addItem(b.getLabel(), b.getType());
+            if (b.getType().equals(bundle.getType().toLowerCase())) {
               selected = index;
             }
 

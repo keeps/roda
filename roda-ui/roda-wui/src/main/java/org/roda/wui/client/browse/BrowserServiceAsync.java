@@ -231,6 +231,6 @@ public interface BrowserServiceAsync {
 
   void getViewersProperties(AsyncCallback<List<Viewer>> callback);
 
-  void getSupportedMetadata(String locale, AsyncCallback<Map<String, String>> callback);
+  void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
 }

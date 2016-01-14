@@ -10,8 +10,8 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -90,6 +90,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
   private final boolean isNew;
 
+  private List<SupportedMetadataTypeBundle> metadataTypes = new ArrayList<SupportedMetadataTypeBundle>();
+
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -127,8 +129,23 @@ public class CreateDescriptiveMetadata extends Composite {
       @Override
       public void onChange(ChangeEvent event) {
         String value = type.getSelectedValue();
+
         if (value != null && value.length() > 0) {
+          SupportedMetadataTypeBundle selectedBundle = null;
+          for (SupportedMetadataTypeBundle bundle : metadataTypes) {
+            if (bundle.getType().equals(value)) {
+              selectedBundle = bundle;
+              break;
+            }
+          }
+
+          if (selectedBundle != null) {
+            // TODO only set text if it was not yet edited
+            xml.setText(selectedBundle.getTemplate() != null ? selectedBundle.getTemplate() : "");
+          }
+
           id.setText(value + ".xml");
+
         } else if (value != null) {
           id.setText("");
         }
@@ -136,7 +153,7 @@ public class CreateDescriptiveMetadata extends Composite {
     });
 
     BrowserService.Util.getInstance().getSupportedMetadata(LocaleInfo.getCurrentLocale().getLocaleName(),
-      new AsyncCallback<Map<String, String>>() {
+      new AsyncCallback<List<SupportedMetadataTypeBundle>>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -144,11 +161,12 @@ public class CreateDescriptiveMetadata extends Composite {
         }
 
         @Override
-        public void onSuccess(Map<String, String> metadataTypes) {
-          // TODO sort by alphabetic order of value
+        public void onSuccess(List<SupportedMetadataTypeBundle> metadataTypes) {
 
-          for (Map.Entry<String, String> entry : metadataTypes.entrySet()) {
-            type.addItem(entry.getValue(), entry.getKey());
+          CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
+
+          for (SupportedMetadataTypeBundle b : metadataTypes) {
+            type.addItem(b.getLabel(), b.getType());
           }
 
           type.addItem("Other", "");

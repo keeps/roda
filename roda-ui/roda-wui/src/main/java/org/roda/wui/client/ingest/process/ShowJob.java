@@ -20,6 +20,7 @@ import org.roda.core.data.PluginParameter.PluginParameterType;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.core.data.v2.JobReport;
@@ -69,7 +70,13 @@ public class ShowJob extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
+            if (caught instanceof NotFoundException) {
+              Toast.showError("Not found", "The job you requested was not found");
+            } else {
+              Toast.showError(caught.getClass().getName(), caught.getMessage());
+            }
+
+            Tools.newHistory(IngestProcess.RESOLVER);
           }
 
           @Override
