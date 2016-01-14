@@ -305,11 +305,11 @@ public class Browse extends Composite {
         });
     }
   }
-  
+
   private void clear() {
     browseTitle.setVisible(false);
     browseDescription.setVisible(false);
-    
+
     HTMLPanel itemIconHtmlPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
     itemIconHtmlPanel.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(itemIconHtmlPanel);
@@ -317,24 +317,24 @@ public class Browse extends Composite {
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
     itemDates.setText("");
-    
+
     breadcrumb.setVisible(false);
-    
+
     itemMetadata.setVisible(false);
     itemMetadata.clear();
     removeHandlerRegistrations();
-    
+
     viewingTop = false;
     fondsPanelTitle.setVisible(false);
     fondsPanel.setVisible(false);
-    
+
     downloadList.clear();
     sidebarData.setVisible(false);
-    
+
     preservationSidebar.setVisible(false);
     actionsSidebar.setVisible(false);
     permissionsSidebar.setVisible(false);
-    
+
     // Set button visibility
     createItem.setVisible(false);
     moveItem.setVisible(false);
@@ -370,7 +370,7 @@ public class Browse extends Composite {
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
       viewingTop = false;
-      
+
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
       final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
@@ -378,7 +378,7 @@ public class Browse extends Composite {
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
-      
+
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
@@ -389,7 +389,7 @@ public class Browse extends Composite {
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       for (DescriptiveMetadataViewBundle bundle : descMetadata) {
-        String title = bundle.getLabel();
+        String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
         HTML container = new HTML();
         container.addStyleName("metadataContent");
         itemMetadata.add(container, title);
@@ -435,10 +435,10 @@ public class Browse extends Composite {
             }
           }
         }
-      });      
+      });
       addTab.addStyleName("addTab");
       addTab.getParent().addStyleName("addTabWrapper");
-      
+
       handlers.add(tabHandler);
       handlers.add(addTabHandler);
 
@@ -456,7 +456,7 @@ public class Browse extends Composite {
       }
       actionsSidebar.setVisible(true);
       permissionsSidebar.setVisible(true);
-      
+
       for (Representation rep : representations) {
         downloadList.add(createRepresentationDownloadButton(rep));
       }
@@ -477,7 +477,7 @@ public class Browse extends Composite {
 
     browseTitle.setVisible(true);
     browseDescription.setVisible(true);
-    
+
     breadcrumb.updatePath(
       Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
 
