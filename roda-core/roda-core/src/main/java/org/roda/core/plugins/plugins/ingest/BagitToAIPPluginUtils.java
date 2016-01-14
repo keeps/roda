@@ -69,7 +69,7 @@ public class BagitToAIPPluginUtils {
     String representationID = "representation";
     PluginHelper.createDirectories(model, aip.getId(), representationID);
 
-    model.createDescriptiveMetadata(aip.getId(), metadataFilename, (Binary) descriptiveMetadataResource, "metadata");
+    model.createDescriptiveMetadata(aip.getId(), metadataFilename, (Binary) descriptiveMetadataResource, "key-value");
 
     Path tempFolder = Files.createTempDirectory("temp");
     if (bag.getPayload() != null) {
