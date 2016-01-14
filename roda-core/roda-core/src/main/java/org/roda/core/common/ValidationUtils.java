@@ -46,8 +46,8 @@ public class ValidationUtils {
 
   }
 
-  public static ValidationReport isAIPMetadataValid(boolean force, String metadataType, boolean validatePremis,
-    ModelService model, String aipID)
+  public static ValidationReport isAIPMetadataValid(boolean force, boolean forceOnly, String metadataType,
+    boolean validatePremis, ModelService model, String aipID)
       throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ValidationReport report = new ValidationReport();
     report.setValid(false);
@@ -60,7 +60,9 @@ public class ValidationUtils {
         if (force) { // FORCE
           LOGGER.debug("FORCE");
           try {
-            validateDescriptiveBinary(binary, metadataType, true);
+            if (!forceOnly) {
+              validateDescriptiveBinary(binary, metadataType, true);
+            }
             model.updateDescriptiveMetadata(aipID, descriptiveMetadata.getId(), binary, metadataType);
             report.setValid(true);
             LOGGER.debug(storagePath + " valid for metadata type " + metadataType);

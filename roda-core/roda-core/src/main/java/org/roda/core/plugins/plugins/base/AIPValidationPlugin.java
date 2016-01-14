@@ -46,6 +46,10 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     "Enforce metadata type", PluginParameterType.BOOLEAN, "false", true, false,
     "If true, bypass current metadata type with metadata type passed as parameter and validate. If false, if metadata type passed as parameter is defined, fallback, else no fallback ");
 
+  public static final PluginParameter PARAMETER_VALIDATION_FORCE_ONLY = new PluginParameter(
+    "parameter.validation_force_only", "Only enforce metadata type", PluginParameterType.BOOLEAN, "false", true, false,
+    "If true, the validation doesn't run");
+
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
     "EAD-2002", PluginParameterType.METADATA_TYPE, "EAD-2002", false, false,
     "Fall if no metadatatype defined or if definded metadata fails.");
@@ -83,6 +87,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
     pluginParameters.add(PARAMETER_VALIDATION_FORCE);
     pluginParameters.add(PARAMETER_METADATA_TYPE);
+    pluginParameters.add(PARAMETER_VALIDATION_FORCE_ONLY);
     return pluginParameters;
   }
 
@@ -104,6 +109,8 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       parameters.getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(), PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
     boolean force = Boolean.parseBoolean(
       parameters.getOrDefault(PARAMETER_VALIDATION_FORCE.getId(), PARAMETER_VALIDATION_FORCE.getDefaultValue()));
+    boolean forceOnly = Boolean.parseBoolean(parameters.getOrDefault(PARAMETER_VALIDATION_FORCE_ONLY.getId(),
+      PARAMETER_VALIDATION_FORCE_ONLY.getDefaultValue()));
     String metadataType = parameters.getOrDefault(PARAMETER_METADATA_TYPE.getId(),
       PARAMETER_METADATA_TYPE.getDefaultValue());
 
@@ -113,8 +120,8 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
-        ValidationReport report = ValidationUtils.isAIPMetadataValid(force, metadataType, validatePremis, model,
-          aip.getId());
+        ValidationReport report = ValidationUtils.isAIPMetadataValid(force, forceOnly, metadataType, validatePremis,
+          model, aip.getId());
         reports.add(report);
         // createEvent(aip, model, descriptiveValid, preservationValid);
       } catch (RODAException mse) {

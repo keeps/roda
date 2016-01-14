@@ -964,13 +964,14 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(premisUpdatePlugin);
   }
 
-  private static void runValidationPlugin() {
+  private static void runValidationPlugin(String force, String forceOnly, String premis, String metadataType) {
     try {
       Plugin<AIP> validationPlugin = new AIPValidationPlugin();
       Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("parameter.validate_premis", "false");
-      parameters.put("parameter.validation_force", "true");
-      parameters.put("parameter.metadata_type", "ead-c");
+      parameters.put("parameter.validation_force", force);
+      parameters.put("parameter.validation_force_only", forceOnly);
+      parameters.put("parameter.validate_premis", premis);
+      parameters.put("parameter.metadata_type", metadataType);
       validationPlugin.setParameterValues(parameters);
       getPluginOrchestrator().runPluginOnAllAIPs(validationPlugin);
     } catch (Exception e) {
@@ -1205,7 +1206,7 @@ public class RodaCoreFactory {
     } else if ("v2tov3".equals(args.get(0))) {
       runPremisV2toV3Plugin();
     } else if ("validation".equals(args.get(0))) {
-      runValidationPlugin();
+      runValidationPlugin(args.get(1), args.get(2), args.get(3), args.get(3));
     } else if ("logClean".equals(args.get(0))) {
       runLogCleanPlugin();
     } else if ("exifTool".equals(args.get(0))) {
