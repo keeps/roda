@@ -1,0 +1,43 @@
+package org.roda.wui.client.common.utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.gwt.user.client.ui.ListBox;
+
+public class ListboxUtils {
+
+  public static final void removeItemByValue(ListBox listbox, String value) {
+    List<Integer> indexesToRemove = new ArrayList<>();
+    // going from the end to the start so remove is easier
+    for (int i = listbox.getItemCount() - 1; i >= 0; i--) {
+      if (listbox.getValue(i).equals(value)) {
+        indexesToRemove.add(i);
+      }
+    }
+
+    for (Integer index : indexesToRemove) {
+      listbox.removeItem(index);
+    }
+  }
+
+  public static final int insertItemByAlphabeticOrder(ListBox listbox, String item, String value) {
+    int indexToInsert = -1;
+    for (int i = 0; i < listbox.getItemCount(); i++) {
+      String itemText = listbox.getItemText(i);
+      if (itemText.compareToIgnoreCase(item) > 0) {
+        indexToInsert = i;
+        break;
+      }
+    }
+    
+    if (indexToInsert < 0) {
+      indexToInsert = listbox.getItemCount();
+    }
+
+    listbox.insertItem(item, value, indexToInsert);
+    return indexToInsert;
+
+  }
+
+}

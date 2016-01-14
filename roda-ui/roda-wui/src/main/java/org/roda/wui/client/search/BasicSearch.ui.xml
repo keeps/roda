@@ -7,8 +7,11 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
+		.addlistbox {
+		margin-right: 10px;
+		}
 		.addbutton {
-		margin-left: 10px;
+		
 		}
 
 		.searchbutton {
@@ -75,13 +78,7 @@
 					<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
 						styleName="searchAdvancedFieldsPanel empty" />
 					<g:FlowPanel styleName="searchAdvancedFieldAdd">
-						<g:ListBox styleName="form-listbox" ui:field="searchAdvancedFieldOptions">
-							<g:item>Scope and content</g:item>
-							<g:item>Producer</g:item>
-							<g:item>Author</g:item>
-							<g:item>Physical location</g:item>
-							<g:item>Arrangement</g:item>
-						</g:ListBox>
+						<g:ListBox styleName="form-listbox {style.addlistbox}" ui:field="searchAdvancedFieldOptions"/>
 						<g:Button styleName="btn btn-plus {style.addbutton}"
 							ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
 						<g:Button styleName="btn btn-search {style.searchbutton}"

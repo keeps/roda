@@ -128,9 +128,13 @@ public class ShowJobReport extends Composite {
     // TODO fix link to transferred resource
     objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getObjectId()));
 
-    // TODO check if AIP exists
-    aip.setText(jobReport.getAipId());
-    aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getAipId()));
+    if (jobReport.getAipId() != null) {
+      aip.setText(jobReport.getAipId());
+      aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getAipId()));
+    } else {
+      // TODO show better message
+      aip.setText("No AIP created");
+    }
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));

@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -242,7 +243,8 @@ public class BasicSearch extends Composite {
           BasicSearch.this.searchFields.clear();
           searchAdvancedFieldOptions.clear();
           for (SearchField searchField : searchFields) {
-            searchAdvancedFieldOptions.addItem(searchField.getLabel(), searchField.getField());
+            ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(),
+              searchField.getField());
             BasicSearch.this.searchFields.put(searchField.getField(), searchField);
           }
         }
@@ -277,7 +279,7 @@ public class BasicSearch extends Composite {
 
     // basic query
     String basicQuery = searchInputBox.getText();
-    if (!"".equals(basicQuery)) {
+    if (basicQuery != null && basicQuery.trim().length() > 0) {
       parameters.add(new BasicSearchFilterParameter(RodaConstants.AIP__ALL, basicQuery));
     }
 
@@ -285,7 +287,7 @@ public class BasicSearch extends Composite {
       String field = entry.getKey();
       String text = entry.getValue().getText();
 
-      if (!"".equals(text)) {
+      if (text != null && text.trim().length() > 0) {
         parameters.add(new BasicSearchFilterParameter(field, text));
       }
     }
@@ -341,6 +343,10 @@ public class BasicSearch extends Composite {
 
     searchAdvancedFieldsPanel.add(panel);
     searchFieldTextBoxes.put(searchField.getField(), input);
+
+    ListboxUtils.removeItemByValue(searchAdvancedFieldOptions, searchField.getField());
+    searchAdvancedFieldOptions.setVisible(searchAdvancedFieldOptions.getItemCount() > 0);
+    searchAdvancedFieldOptionsAdd.setEnabled(searchAdvancedFieldOptions.getItemCount() > 0);
     searchAdvancedFieldsPanel.removeStyleName("empty");
     searchAdvancedGo.setEnabled(true);
 
@@ -354,6 +360,11 @@ public class BasicSearch extends Composite {
           searchAdvancedFieldsPanel.addStyleName("empty");
           searchAdvancedGo.setEnabled(false);
         }
+
+        ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(),
+          searchField.getField());
+        searchAdvancedFieldOptions.setVisible(searchAdvancedFieldOptions.getItemCount() > 0);
+        searchAdvancedFieldOptionsAdd.setEnabled(searchAdvancedFieldOptions.getItemCount() > 0);
       }
     });
 

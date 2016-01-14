@@ -884,6 +884,7 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
     ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
+    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
 
     setPermissions(aip, ret);
 

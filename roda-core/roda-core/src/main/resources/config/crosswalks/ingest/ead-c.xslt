@@ -26,6 +26,11 @@
 				<xsl:value-of select="eadc:scopecontent/eadc:p/text()" />
 			</field>
 		</xsl:if>
+		<xsl:if test="eadc:did/eadc:origination/text()">
+			<field name="origination_txt">
+				<xsl:value-of select="eadc:did/eadc:origination/text()" />
+			</field>
+		</xsl:if>
 		<xsl:if test="eadc:did/eadc:unitdate/@normal">
 			<xsl:choose>
 				<xsl:when test="contains(eadc:did/eadc:unitdate/@normal, '/')">	<!-- initial/final -->

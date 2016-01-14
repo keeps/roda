@@ -69,7 +69,7 @@ public class CreateJob extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              callback.onFailure(caught);
+              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
             }
 
             @Override

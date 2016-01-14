@@ -150,6 +150,8 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+      GWT.log("Filter: " + filter);
+
       BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
