@@ -11,18 +11,23 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.ToXMLContentHandler;
+import org.roda.core.data.common.RodaConstants;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.ContentHandler;
@@ -41,13 +46,14 @@ public class TikaFullTextPluginUtils {
     return p;
   }
 
-  public static String extractFullTextFromResult(Path tikaResult)
+  public static Map<String, String> extractPropertiesFromResult(Path tikaResult)
     throws ParserConfigurationException, IOException, SAXException {
-    return extractFullTextFromResult(Files.newInputStream(tikaResult));
+    return extractPropertiesFromResult(Files.newInputStream(tikaResult));
   }
 
-  public static String extractFullTextFromResult(InputStream tikaResultStream)
+  public static Map<String, String> extractPropertiesFromResult(InputStream tikaResultStream)
     throws ParserConfigurationException, IOException, SAXException {
+    Map<String, String> properties = new HashMap<String, String>();
     DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
     DocumentBuilder db = dbf.newDocumentBuilder();
 
@@ -58,6 +64,33 @@ public class TikaFullTextPluginUtils {
       Node node = nodes.item(i);
       sb.append(node.getTextContent());
     }
-    return sb.toString();
+    String fulltext = sb.toString();
+    if (!StringUtils.isBlank(fulltext)) {
+      properties.put("fulltext", fulltext);
+    }
+
+    NodeList metaNodes = doc.getElementsByTagName("meta");
+    for (int i = 0; i < metaNodes.getLength(); i++) {
+      Node node = metaNodes.item(i);
+      Element e = (Element) node;
+      if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Application-Name")) {
+        properties.put(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME, e.getTextContent());
+      }
+      if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Application-Version")) {
+        properties.put(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION, e.getTextContent());
+      }
+    }
+
+    return properties;
+  }
+
+  public static String extractApplicationNameFromResult(Path tikaResult) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  public static String extractApplicationVersionFromResult(Path tikaResult) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

@@ -131,9 +131,19 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + OUTPUT_EXT,
               APP_NAME, resource);
             try {
-              String fulltext = TikaFullTextPluginUtils.extractFullTextFromResult(tikaResult);
               SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
-              f.setFulltext(fulltext);
+
+              Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
+              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_FULLTEXT)) {
+                f.setFulltext(properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_FULLTEXT));
+              }
+              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME)) {
+                f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME));
+              }
+              if (properties.containsKey(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION)) {
+                f.setCreatingApplicationVersion(
+                  properties.get(RodaConstants.FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION));
+              }
               updatedFiles.add(f);
             } catch (ParserConfigurationException pce) {
 

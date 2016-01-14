@@ -416,4 +416,8 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
+  
+  public static final String FILE_CHARACTERISTICS_TIKA_FULLTEXT = "fullText";
+  public static final String FILE_CHARACTERISTICS_TIKA_APPLICATION_NAME = "applicationName";
+  public static final String FILE_CHARACTERISTICS_TIKA_APPLICATION_VERSION = "applicationVersion";
 }
