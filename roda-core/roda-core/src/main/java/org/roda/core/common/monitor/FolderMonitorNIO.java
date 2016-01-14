@@ -13,6 +13,7 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -135,7 +136,14 @@ public class FolderMonitorNIO {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
     tr.setBasePath(basePath.toString());
-    tr.setCreationDate(new Date());
+    try{
+      BasicFileAttributes attr = Files.readAttributes(basePath, BasicFileAttributes.class);
+      Date d = new Date(attr.creationTime().toMillis());
+      tr.setCreationDate(d);
+    }catch(IOException e){
+      LOGGER.warn("Error getting file creation time. Setting to current time.");
+      tr.setCreationDate(new Date());
+    }
     tr.setFile(!Files.isDirectory(resourcePath));
     tr.setFullPath(resourcePath.toString());
     tr.setId(relativeToBase.toString());
