@@ -389,6 +389,9 @@ public interface BrowseMessages extends Messages {
   String showJobStatusFailedDuringCreation(Date endDate);
 
   /************* Browse ****************/
+  @DefaultMessage("Loading...")
+  String browseLoading();
+  
   @DefaultMessage("Confirm remove items")
   String browseRemoveConfirmDialogTitle();
 

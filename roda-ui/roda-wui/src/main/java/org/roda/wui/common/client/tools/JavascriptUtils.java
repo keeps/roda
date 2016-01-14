@@ -76,6 +76,13 @@ public class JavascriptUtils {
 					}
 				});
   }-*/;
+  
+  public static native void smoothScrollSimple(JavaScriptObject parent) /*-{
+    var target = $wnd.jQuery(parent);
+    $wnd.jQuery('html, body').animate({
+      scrollTop : target.offset().top
+    }, 1000);
+  }-*/;
 
   public static native void runMiniUploadForm() /*-{
     $wnd.console.log("running mini upload form");

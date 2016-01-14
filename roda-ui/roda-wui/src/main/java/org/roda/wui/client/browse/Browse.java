@@ -36,6 +36,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -201,8 +202,12 @@ public class Browse extends Composite {
 
   private boolean viewingTop;
 
+  private List<HandlerRegistration> handlers;
+
   private Browse() {
     viewingTop = true;
+    handlers = new ArrayList<HandlerRegistration>();
+
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -241,6 +246,8 @@ public class Browse extends Composite {
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
+    clear();
+    JavascriptUtils.smoothScrollSimple(itemTitle.getElement());
     if (historyTokens.size() == 0) {
       viewAction();
       callback.onSuccess(this);
@@ -298,18 +305,51 @@ public class Browse extends Composite {
         });
     }
   }
+  
+  private void clear() {
+    browseTitle.setVisible(false);
+    browseDescription.setVisible(false);
+    
+    HTMLPanel itemIconHtmlPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
+    itemIconHtmlPanel.addStyleName("browseItemIcon-all");
+    itemIcon.setWidget(itemIconHtmlPanel);
+    itemTitle.setText(messages.browseLoading());
+    itemTitle.removeStyleName("browseTitle-allCollections");
+    itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
+    itemDates.setText("");
+    
+    breadcrumb.setVisible(false);
+    
+    itemMetadata.setVisible(false);
+    itemMetadata.clear();
+    removeHandlerRegistrations();
+    
+    viewingTop = false;
+    fondsPanelTitle.setVisible(false);
+    fondsPanel.setVisible(false);
+    
+    downloadList.clear();
+    sidebarData.setVisible(false);
+    
+    preservationSidebar.setVisible(false);
+    actionsSidebar.setVisible(false);
+    permissionsSidebar.setVisible(false);
+    
+    // Set button visibility
+    createItem.setVisible(false);
+    moveItem.setVisible(false);
+    editPermissions.setVisible(false);
+    remove.setVisible(false);
+  }
 
   protected void showError(String id, Throwable caught) {
     breadcrumb.updatePath(new ArrayList<BreadcrumbItem>());
-    breadcrumb.setVisible(false);
 
     HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(null);
     itemIconHtmlPanel.addStyleName("browseItemIcon-other");
     itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText(id);
-    itemDates.setText("");
 
-    itemMetadata.clear();
     SafeHtml title;
     SafeHtml message;
     if (caught instanceof NotFoundException) {
@@ -325,30 +365,12 @@ public class Browse extends Composite {
     itemMetadata.add(messageHTML, title.asString(), true);
     itemMetadata.selectTab(0);
     itemMetadata.setVisible(true);
-
-    viewingTop = false;
-    fondsPanelTitle.setVisible(false);
-    fondsPanel.setVisible(false);
-
-    downloadList.clear();
-    sidebarData.setVisible(false);
-
-    preservationSidebar.setVisible(false);
-    actionsSidebar.setVisible(false);
-    permissionsSidebar.setVisible(false);
-
-    // Set button visibility
-    createItem.setVisible(false);
-    moveItem.setVisible(false);
-    editPermissions.setVisible(false);
-    remove.setVisible(false);
   }
 
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
-      browseTitle.setVisible(false);
-      browseDescription.setVisible(false);
-
+      viewingTop = false;
+      
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
       final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
@@ -356,6 +378,7 @@ public class Browse extends Composite {
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
+      
       HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
       itemIconHtmlPanel.addStyleName("browseItemIcon-other");
       itemIcon.setWidget(itemIconHtmlPanel);
@@ -364,9 +387,7 @@ public class Browse extends Composite {
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
       itemDates.setText(getDatesText(aip));
 
-      itemMetadata.clear();
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
-
       for (DescriptiveMetadataViewBundle bundle : descMetadata) {
         String title = bundle.getLabel();
         HTML container = new HTML();
@@ -375,7 +396,7 @@ public class Browse extends Composite {
         descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
       }
 
-      itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+      HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
 
         @Override
         public void onSelection(SelectionEvent<Integer> event) {
@@ -399,14 +420,13 @@ public class Browse extends Composite {
             }
           }
         }
-
       });
 
       final int addTabIndex = itemMetadata.getWidgetCount();
       FlowPanel addTab = new FlowPanel();
       addTab.add(new HTML(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-plus-circle\"></i>")));
       itemMetadata.add(new Label(), addTab);
-      itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
+      HandlerRegistration addTabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
         @Override
         public void onSelection(SelectionEvent<Integer> event) {
           if (event.getSelectedItem() == addTabIndex) {
@@ -415,37 +435,31 @@ public class Browse extends Composite {
             }
           }
         }
-      });
+      });      
       addTab.addStyleName("addTab");
       addTab.getParent().addStyleName("addTabWrapper");
+      
+      handlers.add(tabHandler);
+      handlers.add(addTabHandler);
 
       if (!descMetadata.isEmpty()) {
         itemMetadata.setVisible(true);
         itemMetadata.selectTab(0);
-      } else {
-        itemMetadata.setVisible(false);
       }
 
-      viewingTop = false;
-      fondsPanelTitle.setVisible(true);
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
       fondsPanel.setFilter(filter);
 
-      downloadList.clear();
       sidebarData.setVisible(representations.size() > 0);
-
+      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
+        preservationSidebar.setVisible(true);
+      }
+      actionsSidebar.setVisible(true);
+      permissionsSidebar.setVisible(true);
+      
       for (Representation rep : representations) {
         downloadList.add(createRepresentationDownloadButton(rep));
       }
-
-      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-        preservationSidebar.setVisible(true);
-      } else {
-        preservationSidebar.setVisible(false);
-      }
-
-      actionsSidebar.setVisible(true);
-      permissionsSidebar.setVisible(true);
 
       // Set button visibility
       createItem.setVisible(true);
@@ -463,35 +477,30 @@ public class Browse extends Composite {
 
     browseTitle.setVisible(true);
     browseDescription.setVisible(true);
+    
+    breadcrumb.updatePath(
+      Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
 
     HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
-
-    breadcrumb.updatePath(
-      Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
-    breadcrumb.setVisible(false);
     itemTitle.setText(messages.allCollectionsTitle());
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
-    itemDates.setText("");
-    itemMetadata.clear();
-    itemMetadata.setVisible(false);
-    fondsPanelTitle.setVisible(false);
+
     fondsPanel.setFilter(COLLECTIONS_FILTER);
 
-    sidebarData.setVisible(false);
-    downloadList.clear();
-
-    preservationSidebar.setVisible(false);
     actionsSidebar.setVisible(true);
-    permissionsSidebar.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(true);
-    moveItem.setVisible(false);
-    editPermissions.setVisible(false);
-    remove.setVisible(false);
+  }
+
+  private void removeHandlerRegistrations() {
+    for (HandlerRegistration handlerRegistration : handlers) {
+      handlerRegistration.removeHandler();
+    }
+    handlers.clear();
   }
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
@@ -638,18 +647,18 @@ public class Browse extends Composite {
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink
-              + "' class='descriptiveMetadataLink'><i class='fa fa-edit'></a>";
+              + "' class='descriptiveMetadataLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
             // error message
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
             b.append(messages.descriptiveMetadataTranformToHTMLError());
             b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
             b.append(SafeHtmlUtils.fromString(message));
             b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
 
             callback.onSuccess(b.toSafeHtml());
           }
