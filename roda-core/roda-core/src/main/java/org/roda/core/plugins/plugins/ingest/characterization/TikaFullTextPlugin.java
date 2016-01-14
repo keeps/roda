@@ -171,8 +171,13 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
       report.addItem(reportItem);
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+      // TODO Remove try catch... only added to run tika plugin via sh script
+      try {
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+          aip.getId());
+      } catch (Throwable t) {
+
+      }
     }
 
     return report;

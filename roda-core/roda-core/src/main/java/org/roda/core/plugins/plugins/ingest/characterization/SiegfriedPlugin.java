@@ -200,8 +200,14 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
       report.addItem(reportItem);
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+      // TODO Remove try catch... only added to run siegfried plugin via sh
+      // script
+      try {
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+          aip.getId());
+      } catch (Throwable t) {
+
+      }
     }
     return report;
   }
