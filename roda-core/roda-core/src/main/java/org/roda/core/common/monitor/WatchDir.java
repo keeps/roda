@@ -19,6 +19,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrException;
+import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +36,9 @@ public class WatchDir implements Runnable {
   private Date indexDate;
   private SolrClient index;
   private List<FolderObserver> observers;
+  private Commiter commiter;
+  private Thread threadCommit;
+  private boolean running;
 
   public WatchDir(Path dir, boolean recursive, Date indexDate, SolrClient index, List<FolderObserver> observers)
     throws IOException {
@@ -44,6 +50,7 @@ public class WatchDir implements Runnable {
     this.index = index;
     this.observers = observers;
     this.executor = Executors.newSingleThreadExecutor();
+    this.commiter = new Commiter();
 
   }
 
@@ -62,6 +69,7 @@ public class WatchDir implements Runnable {
 
   @Override
   public void run() {
+    this.running = true;
     long startTime = System.currentTimeMillis();
     try {
       if (recursive) {
@@ -85,6 +93,7 @@ public class WatchDir implements Runnable {
   }
 
   public void stop() {
+    this.running = false;
     try {
       MonitorVariables.getInstance().getWatcher().close();
     } catch (IOException e) {
@@ -93,10 +102,15 @@ public class WatchDir implements Runnable {
     if (threadReindex != null) {
       threadReindex.interrupt();
     }
+    if (threadCommit != null) {
+      threadCommit.interrupt();
+    }
     executor.shutdownNow();
   }
 
   void processEvents() {
+    this.threadCommit = new Thread(commiter, "Commiter");
+    this.threadCommit.start();
     for (;;) {
       WatchKey key;
       try {
@@ -111,6 +125,7 @@ public class WatchDir implements Runnable {
       for (WatchEvent<?> event : key.pollEvents()) {
         WatchEvent.Kind<?> kind = event.kind();
         if (kind == OVERFLOW) {
+          LOGGER.debug("OVERFLOW...");
           continue;
         }
         WatchEvent<Path> ev = cast(event);
@@ -137,5 +152,23 @@ public class WatchDir implements Runnable {
 
   public void setObservers(List<FolderObserver> obs) {
     this.observers = obs;
+  }
+
+  class Commiter implements Runnable {
+    @Override
+    public void run() {
+      while (running) {
+        try {
+          Thread.sleep(5000);
+          index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
+        } catch (SolrException | SolrServerException | IOException e) {
+          LOGGER.error("Error commiting: " + e.getMessage(), e);
+        } catch (InterruptedException e) {
+          // interrupted... probably stopping watchdir...
+        }
+      }
+
+    }
+
   }
 }

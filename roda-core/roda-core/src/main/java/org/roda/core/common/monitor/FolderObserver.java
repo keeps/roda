@@ -12,7 +12,6 @@ import java.nio.file.Path;
 import org.roda.core.data.v2.TransferredResource;
 
 public interface FolderObserver {
-  public void transferredResourceAdded(TransferredResource resource, boolean commit);
 
   public void transferredResourceAdded(TransferredResource resource);
 

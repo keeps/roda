@@ -742,8 +742,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
       ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
@@ -1455,6 +1455,9 @@ public class SolrUtils {
       doc.addField(RodaConstants.FILE_SIZE, file.getSize());
     }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+    if (file.getStoragePath() != null) {
+      doc.addField(RodaConstants.FILE_STORAGEPATH, file.getStoragePath().asString());
+    }
 
     if (premisFile != null) {
       // Add information from PREMIS
@@ -1594,6 +1597,7 @@ public class SolrUtils {
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
     long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
     boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
+    String path = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
     // format
     String formatDesignationName = objectToString(doc.get(RodaConstants.FILE_FILEFORMAT));
@@ -1612,7 +1616,7 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
-    file = new SimpleFile(fileId, aipId, representationId, entryPoint, fileFormat, originalName, size, isFile,
+    file = new SimpleFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size, isFile,
       creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }

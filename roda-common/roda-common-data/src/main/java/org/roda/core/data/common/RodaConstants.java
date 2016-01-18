@@ -36,7 +36,6 @@ public final class RodaConstants {
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
 
-
   /*
    * API related
    */
@@ -390,6 +389,7 @@ public final class RodaConstants {
   public static final String FILE_STORAGE_PATH = "storagePath";
   public static final String FILE_ISENTRYPOINT = "isEntryPoint";
   public static final String FILE_FILEFORMAT = "fileFormat";
+  public static final String FILE_STORAGEPATH = "storagePath";
   public static final String FILE_UUID = "uuid";
   public static final String FILE_ORIGINALNAME = "originalName";
   public static final String FILE_SIZE = "size";
@@ -416,5 +416,5 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
-  
+
 }

@@ -110,6 +110,7 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="formatMimetype" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="formatVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="formatPronom" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 

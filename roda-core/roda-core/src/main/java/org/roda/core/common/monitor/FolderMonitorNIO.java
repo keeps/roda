@@ -75,7 +75,7 @@ public class FolderMonitorNIO {
     Path createdPath = Files.createDirectories(basePath.resolve(parent).resolve(folderName));
     TransferredResource tr = createTransferredResource(createdPath, basePath);
     for (FolderObserver observer : observers) {
-      observer.transferredResourceAdded(tr, true);
+      observer.transferredResourceAdded(tr);
     }
     return tr.getId();
   }
@@ -136,11 +136,11 @@ public class FolderMonitorNIO {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
     tr.setBasePath(basePath.toString());
-    try{
+    try {
       BasicFileAttributes attr = Files.readAttributes(basePath, BasicFileAttributes.class);
       Date d = new Date(attr.creationTime().toMillis());
       tr.setCreationDate(d);
-    }catch(IOException e){
+    } catch (IOException e) {
       LOGGER.warn("Error getting file creation time. Setting to current time.");
       tr.setCreationDate(new Date());
     }

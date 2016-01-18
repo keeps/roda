@@ -69,6 +69,7 @@ public class NotifierThread implements Runnable {
           }
         }
       } catch (IOException x) {
+        LOGGER.error("Error while registering all: " + x.getMessage(), x);
       }
       updateChildren(updatedPath, true);
     } else if (kind == ENTRY_DELETE) {
@@ -117,7 +118,7 @@ public class NotifierThread implements Runnable {
   protected void notifyTransferredResourceCreated(TransferredResource resource) {
     LOGGER.debug("CREATED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
-      observer.transferredResourceAdded(resource, true);
+      observer.transferredResourceAdded(resource);
     }
   }
 

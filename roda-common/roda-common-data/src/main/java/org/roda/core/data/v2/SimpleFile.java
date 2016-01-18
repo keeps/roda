@@ -29,14 +29,15 @@ public class SimpleFile extends RODAObject {
   private String dateCreatedByApplication;
   private List<String> hash;
   private String fulltext;
+  private String storagePath;
 
   public SimpleFile() {
     super(null, null);
   }
 
-  public SimpleFile(String id, String aipId, String representationId, boolean entryPoint, FileFormat fileFormat,
-    String originalName, long size, boolean isFile, String creatingApplicationName, String creatingApplicationVersion,
-    String dateCreatedByApplication, List<String> hash, String fulltext) {
+  public SimpleFile(String id, String aipId, String representationId, String storagePath, boolean entryPoint,
+    FileFormat fileFormat, String originalName, long size, boolean isFile, String creatingApplicationName,
+    String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext) {
     super();
     this.id = id;
     this.aipId = aipId;
@@ -51,6 +52,7 @@ public class SimpleFile extends RODAObject {
     this.dateCreatedByApplication = dateCreatedByApplication;
     this.hash = hash;
     this.fulltext = fulltext;
+    this.storagePath = storagePath;
   }
 
   public String getFulltext() {
@@ -154,20 +156,12 @@ public class SimpleFile extends RODAObject {
 
   @Override
   public String toString() {
-    return "File[\n"+
-      "id:"+id+"\n"+
-      "aipId:"+aipId+"\n"+
-      "representationId:"+representationId+"\n"+
-      "entryPoint:"+entryPoint+"\n"+
-      "fileFormat:"+fileFormat+"\n"+
-      "size:"+size+"\n"+
-      "entryPoint:"+entryPoint+"\n"+
-      "originalName:"+originalName+"\n"+
-      "isFile:"+isFile+"\n"+
-      "creatingApplicationName:"+creatingApplicationName+"\n"+
-      "creatingApplicationVersion:"+creatingApplicationVersion+"\n"+
-      "dateCreatedByApplication:"+dateCreatedByApplication+"\n"+
-      "fulltext:"+fulltext+"\n]";
+    return "File[\n" + "id:" + id + "\n" + "aipId:" + aipId + "\n" + "representationId:" + representationId + "\n"
+      + "entryPoint:" + entryPoint + "\n" + "fileFormat:" + fileFormat + "\n" + "size:" + size + "\n" + "entryPoint:"
+      + entryPoint + "\n" + "originalName:" + originalName + "\n" + "isFile:" + isFile + "\n"
+      + "creatingApplicationName:" + creatingApplicationName + "\n" + "creatingApplicationVersion:"
+      + creatingApplicationVersion + "\n" + "dateCreatedByApplication:" + dateCreatedByApplication + "\n" + "fulltext:"
+      + fulltext + "\n" + "StoragePath:" + storagePath + "\n]";
   }
 
   @Override
@@ -250,7 +244,19 @@ public class SimpleFile extends RODAObject {
 
   /* TODO get correct path */
   public List<String> getPath() {
-    return Arrays.asList(aipId, representationId, id);
+    if (storagePath != null) {
+      return Arrays.asList(storagePath.split("/"));
+    } else {
+      return Arrays.asList(aipId, representationId, id);
+    }
+  }
+
+  public String getStoragePath() {
+    return storagePath;
+  }
+
+  public void setStoragePath(String storagePath) {
+    this.storagePath = storagePath;
   }
 
 }

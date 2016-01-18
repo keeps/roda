@@ -36,10 +36,6 @@ public class IndexFolderObserver implements FolderObserver {
   }
 
   public void transferredResourceAdded(TransferredResource resource) {
-    transferredResourceAdded(resource, true);
-  }
-
-  public void transferredResourceAdded(TransferredResource resource, boolean commit) {
     try {
       if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
         for (String ancestor : resource.getAncestorsPaths()) {
@@ -51,7 +47,8 @@ public class IndexFolderObserver implements FolderObserver {
             LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
             LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
             LOGGER.debug("------------------------------------------------");
-            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+              SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
           } else {
             LOGGER.debug("---------------- NOT ADDED ----------------------");
             LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
@@ -75,9 +72,6 @@ public class IndexFolderObserver implements FolderObserver {
         LOGGER.debug("PARENT " + resource.getParentPath());
         LOGGER.debug("------------------------------------------------");
       }
-      if (commit) {
-        index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      }
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
     } catch (Throwable t) {
@@ -98,7 +92,6 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, resource.getId());
       index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + resource.getId() + "\"");
-      index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("ERROR DELETING RESOURCE " + resource.getId() + " : " + e.getMessage(), e);
     }
@@ -110,7 +103,6 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, deleted.toString());
       index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + deleted.toString() + "\"");
-      index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("ERROR DELETING PATH " + deleted.toString() + " : " + e.getMessage(), e);
     }
