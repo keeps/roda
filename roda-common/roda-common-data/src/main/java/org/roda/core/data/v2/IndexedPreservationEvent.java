@@ -14,6 +14,12 @@ public class IndexedPreservationEvent implements Serializable {
   private String eventType;
   private String eventOutcome;
   private String eventOutcomeDetailExtension;
+  private String agentIdentifierType;
+  private String agentIdentifierValue;
+  private String agentRole;
+  private String objectIdentifierType;
+  private String objectIdentifierValue;
+  private String objectRole;
 
   public String getAipId() {
     return aipId;
@@ -85,6 +91,54 @@ public class IndexedPreservationEvent implements Serializable {
 
   public void setEventOutcomeDetailExtension(String eventOutcomeDetailExtension) {
     this.eventOutcomeDetailExtension = eventOutcomeDetailExtension;
+  }
+
+  public String getAgentIdentifierType() {
+    return agentIdentifierType;
+  }
+
+  public void setAgentIdentifierType(String agentIdentifierType) {
+    this.agentIdentifierType = agentIdentifierType;
+  }
+
+  public String getAgentIdentifierValue() {
+    return agentIdentifierValue;
+  }
+
+  public void setAgentIdentifierValue(String agentIdentifierValue) {
+    this.agentIdentifierValue = agentIdentifierValue;
+  }
+
+  public String getAgentRole() {
+    return agentRole;
+  }
+
+  public void setAgentRole(String agentRole) {
+    this.agentRole = agentRole;
+  }
+
+  public String getObjectIdentifierType() {
+    return objectIdentifierType;
+  }
+
+  public void setObjectIdentifierType(String objectIdentifierType) {
+    this.objectIdentifierType = objectIdentifierType;
+  }
+
+  public String getObjectIdentifierValue() {
+    return objectIdentifierValue;
+  }
+
+  public void setObjectIdentifierValue(String objectIdentifierValue) {
+    this.objectIdentifierValue = objectIdentifierValue;
+  }
+
+  public String getObjectRole() {
+    return objectRole;
+  }
+
+  public void setObjectRole(String objectRole) {
+    this.objectRole = objectRole;
   }
 
   public String toString() {

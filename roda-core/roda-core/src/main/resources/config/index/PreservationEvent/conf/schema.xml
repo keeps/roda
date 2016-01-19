@@ -114,6 +114,12 @@
    <field name="eventType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventOutcome" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventOutcomeDetailExtension" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />   
+   <field name="agentIdentifierType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="agentIdentifierValue" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="agentRole" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectIdentifierType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectIdentifierValue" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectRole" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
