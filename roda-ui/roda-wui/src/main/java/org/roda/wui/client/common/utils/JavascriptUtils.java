@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.common.client.tools;
+package org.roda.wui.client.common.utils;
 
 import com.google.gwt.core.client.JavaScriptObject;
 
@@ -195,4 +195,13 @@ public class JavascriptUtils {
   public static native void historyGo(int n) /*-{
     $wnd.history.go(n);
   }-*/;
+  
+  public static native boolean isOnline() /*-{
+	if ($wnd.navigator.onLine != undefined) {
+		return $wnd.navigator.onLine;
+	}
+	return true;
+  }-*/;
+  
+  
 }

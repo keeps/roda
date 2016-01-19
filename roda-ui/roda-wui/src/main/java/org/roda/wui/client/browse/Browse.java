@@ -30,13 +30,14 @@ import org.roda.core.data.v2.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
-import org.roda.wui.common.client.tools.JavascriptUtils;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -295,7 +296,9 @@ public class Browse extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            showError(id, caught);
+            if (!AsyncRequestUtils.treatCommonFailures(caught)) {
+              showError(id, caught);
+            }
           }
 
           @Override
@@ -409,7 +412,9 @@ public class Browse extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+                  if (!AsyncRequestUtils.treatCommonFailures(caught)) {
+                    Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
+                  }
                 }
 
                 @Override
@@ -725,7 +730,7 @@ public class Browse extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError("Error creating item");
+        AsyncRequestUtils.defaultFailureTreatment(caught);
       }
 
       @Override
@@ -754,7 +759,7 @@ public class Browse extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  Toast.showError("Error deleteing item");
+                  AsyncRequestUtils.defaultFailureTreatment(caught);
                 }
 
                 @Override
