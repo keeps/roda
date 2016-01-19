@@ -111,7 +111,6 @@ public final class RodaConstants {
    */
   public static final String INDEX_AIP = "AIP";
   public static final String INDEX_PRESERVATION_EVENTS = "PreservationEvent";
-  public static final String INDEX_PRESERVATION_OBJECTS = "PreservationObject";
   public static final String INDEX_REPRESENTATION = "Representation";
   public static final String INDEX_PRESERVATION_AGENTS = "PreservationAgent";
   public static final String INDEX_ACTION_LOG = "ActionLog";
@@ -416,5 +415,16 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
+
+  /* Preservation events fields */
+  public static final String PRESERVATION_EVENT_ID = "id";
+  public static final String PRESERVATION_EVENT_AIP_ID = "aipID";
+  public static final String PRESERVATION_EVENT_REPRESENTATION_ID = "representationID";
+  public static final String PRESERVATION_EVENT_FILE_ID = "fileID";
+  public static final String PRESERVATION_EVENT_DATETIME = "eventDateTime";
+  public static final String PRESERVATION_EVENT_DETAIL = "eventDetail";
+  public static final String PRESERVATION_EVENT_TYPE = "eventType";
+  public static final String PRESERVATION_EVENT_OUTCOME = "eventOutcome";
+  public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION = "eventOutcomeDetailExtension";
 
 }

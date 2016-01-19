@@ -81,14 +81,13 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.AgentPreservationObject;
-import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.FacetFieldResult;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.Fixity;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.Job.JOB_STATE;
 import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
@@ -702,9 +701,7 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_AIP;
     } else if (resultClass.equals(Representation.class)) {
       indexName = RodaConstants.INDEX_REPRESENTATION;
-    } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
-      indexName = RodaConstants.INDEX_PRESERVATION_OBJECTS;
-    } else if (resultClass.equals(EventPreservationObject.class)) {
+    } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
     } else if (resultClass.equals(LogEntry.class)) {
       indexName = RodaConstants.INDEX_ACTION_LOG;
@@ -745,23 +742,18 @@ public class SolrUtils {
     } else
       if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
-    } else if (resultClass.equals(RepresentationFilePreservationObject.class)) {
-      ret = resultClass.cast(solrDocumentToRepresentationFilePreservationObject(doc));
-    } else if (resultClass.equals(EventPreservationObject.class)) {
-      ret = resultClass.cast(solrDocumentToEventPreservationObject(doc));
-    } else if (resultClass.equals(AgentPreservationObject.class)) {
-      ret = resultClass.cast(solrDocumentToAgentPreservationObject(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
     } else if (resultClass.equals(SimpleFile.class)) {
       ret = resultClass.cast(solrDocumentToSimpleFile(doc));
+    } else if (resultClass.equals(IndexedPreservationEvent.class)) {
+      ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc));
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
     return ret;
-
   }
 
   public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids)
@@ -1236,6 +1228,30 @@ public class SolrUtils {
     return index.query(collection, query);
   }
 
+  private static IndexedPreservationEvent solrDocumentToIndexedPreservationEvent(SolrDocument doc) {
+    final String id = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_ID));
+    final String aipID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_AIP_ID));
+    final String representationID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID));
+    final String fileID = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_FILE_ID));
+    final Date eventDateTime = objectToDate(doc.get(RodaConstants.PRESERVATION_EVENT_DATETIME));
+    final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL));
+    final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE));
+    final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
+    final String eventOutcomeDetailExtension = objectToString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
+    IndexedPreservationEvent ipe = new IndexedPreservationEvent();
+    ipe.setId(id);
+    ipe.setAipId(aipID);
+    ipe.setRepresentationId(representationID);
+    ipe.setFileId(fileID);
+    ipe.setEventDateTime(eventDateTime);
+    ipe.setEventDetail(eventDetail);
+    ipe.setEventType(eventType);
+    ipe.setEventOutcome(eventOutcome);
+    ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
+    return ipe;
+  }
+
   public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
     throws GenericException {
     SolrInputDocument doc;
@@ -1251,6 +1267,9 @@ public class SolrUtils {
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
+      stylesheetOpt.put("aipID", aipID);
+      stylesheetOpt.put("representationID", representationID);
+      stylesheetOpt.put("fileID", fileID);
       RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
       descMetadataReader.close();
 
@@ -1281,43 +1300,7 @@ public class SolrUtils {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " using xslt " + "crosswalks/ingest/other/premis.xslt", e);
     }
-    String id = SolrUtils.getId(aipID, representationID, fileID);
-    doc.setField("id", id);
-    doc.setField("aipId", aipID);
-    doc.setField("representationId", representationID);
-    doc.setField("fileId", fileID);
     return doc;
-  }
-
-  private static EventPreservationObject solrDocumentToEventPreservationObject(SolrDocument doc) {
-    EventPreservationObject epo = new EventPreservationObject();
-    String teste = "";
-    for (String s : doc.getFieldNames()) {
-      teste += (s + " - " + doc.getFieldValue(s) + "\n");
-    }
-    epo.setModel(teste);
-    return epo;
-  }
-
-  private static RepresentationFilePreservationObject solrDocumentToRepresentationFilePreservationObject(
-    SolrDocument doc) {
-    RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
-    String teste = "";
-    for (String s : doc.getFieldNames()) {
-      teste += (s + " - " + doc.getFieldValue(s) + "\n");
-    }
-    rfpo.setModel(teste);
-    return rfpo;
-  }
-
-  private static AgentPreservationObject solrDocumentToAgentPreservationObject(SolrDocument doc) {
-    AgentPreservationObject apo = new AgentPreservationObject();
-    String teste = "";
-    for (String s : doc.getFieldNames()) {
-      teste += (s + " - " + doc.getFieldValue(s) + "\n");
-    }
-    apo.setModel(teste);
-    return apo;
   }
 
   private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc) {

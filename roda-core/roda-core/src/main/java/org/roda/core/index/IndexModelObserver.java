@@ -79,15 +79,15 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationsEvents(final AIP aip) {
     final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
-    for (Map.Entry<String, List<String>> representationPreservationMap : preservationEventsIds.entrySet()) {
+    for (Map.Entry<String, List<String>> eventEntry : preservationEventsIds.entrySet()) {
       try {
-        for (String fileId : representationPreservationMap.getValue()) {
-          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), representationPreservationMap.getKey(),
-            fileId);
+        for (String fileId : eventEntry.getValue()) {
+          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventEntry.getKey(), fileId);
           Binary binary = model.getStorage().getBinary(filePath);
 
-          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(),
-            representationPreservationMap.getKey(), fileId, binary);
+          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), eventEntry.getKey(), fileId,
+            binary);
+          LOGGER.debug(premisEventDocument.toString());
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
         }
       } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
@@ -365,9 +365,8 @@ public class IndexModelObserver implements ModelObserver {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
       } else if (type.equalsIgnoreCase("agent")) {
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
-      } else if (type.equalsIgnoreCase("file")) {
-        index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
       }
+      // TODO reindex file...
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
     } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException

@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.RodaUtils;
@@ -1489,14 +1488,12 @@ public class ModelService extends ModelObservable {
   public PreservationMetadata createPreservationMetadata(String aipId, String preservationMetadataId, Binary binary)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     PreservationMetadata preservationMetadataBinary;
-
     StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, preservationMetadataId);
     boolean asReference = false;
     Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
     preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, null, binaryPath,
       ModelUtils.getPreservationType(updatedBinary));
     notifyPreservationMetadataCreated(preservationMetadataBinary);
-
     return preservationMetadataBinary;
   }
 

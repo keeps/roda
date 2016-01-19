@@ -47,7 +47,7 @@
 	</logger>
 
 	<logger name="org.roda.core" additivity="false">
-		<level value="INFO" />
+		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
 

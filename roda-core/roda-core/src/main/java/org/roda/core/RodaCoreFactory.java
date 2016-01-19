@@ -85,6 +85,7 @@ import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Group;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.RODAMember;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.SimpleFile;
@@ -389,7 +390,6 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
     System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
     System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
-    System.setProperty("solr.data.dir.preservationobject", indexPath.resolve("preservationobject").toString());
     System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
     System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
     System.setProperty("solr.data.dir.transferredresource", indexPath.resolve("transferredresource").toString());
@@ -1136,7 +1136,17 @@ public class RodaCoreFactory {
     for (SimpleFile sf : res.getResults()) {
       System.out.println(sf.toString());
     }
+  }
 
+  private static void printEvents(Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, "format identification"));
+    IndexResult<IndexedPreservationEvent> res = index.find(IndexedPreservationEvent.class, filter, sorter, sublist);
+
+    for (IndexedPreservationEvent ipe : res.getResults()) {
+      System.out.println(ipe.toString());
+    }
   }
 
   private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1169,6 +1179,8 @@ public class RodaCoreFactory {
         printCountSips(null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("file".equals(args.get(2)))) {
         printFiles(null, new Sublist(0, 10000), null);
+      } else if ("list".equals(args.get(1)) && ("event".equals(args.get(2)))) {
+        printEvents(null, new Sublist(0, 10000), null);
       } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
         runReindexAipsPlugin();
       } else if ("reindex".equals(args.get(1)) && args.size() >= 3) {

@@ -7,7 +7,10 @@
 	<xsl:preserve-space elements="*" />
 	<xsl:output method="xml" indent="yes" encoding="UTF-8"
 		omit-xml-declaration="yes" />
-
+	<xsl:param name="aipID" />
+	<xsl:param name="representationID" />
+	<xsl:param name="fileID" />
+	
 	<xsl:template match="/">
 		<doc>
 			<xsl:apply-templates />
@@ -23,33 +26,59 @@
 		</xsl:if>
 		<xsl:if
 			test='resolve-QName(@xsi:type, .) = QName("info:lc/xmlns/premis-v2", "file")'>
-			<xsl:if test="prem:originalName">
-				<field name="file_originalName_s">
-					<xsl:value-of select="normalize-space(prem:originalName/text())" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:objectCharacteristics/prem:size">
-				<field name="file_size_s">
-					<xsl:value-of select="prem:objectCharacteristics/prem:size/text()" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:objectCharacteristics/prem:format">
-				<xsl:choose>
-					<xsl:when
-						test="normalize-space(prem:objectCharacteristics/prem:format/prem:formatRegistry/prem:formatRegistryName/text())='pronom'">
-						<field name="file_pronom_s">
-							<xsl:value-of
-								select="prem:objectCharacteristics/prem:format/prem:formatDesignation/prem:formatName/text()" />
-						</field>
-					</xsl:when>
-					<xsl:otherwise>
-
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:if>
 		</xsl:if>
 	</xsl:template>
 	<xsl:template match="prem:event">
-		<!-- INDEX EVENT PROPERTIES -->
+		<xsl:if test="$aipID">
+			<field name="aipID">
+				<xsl:value-of select="$aipID" />
+			</field>
+		</xsl:if>
+		<xsl:if test="$representationID">
+			<field name="representationID">
+				<xsl:value-of select="$representationID" />
+			</field>
+		</xsl:if>
+		<xsl:if test="$fileID">
+			<field name="fileID">
+				<xsl:value-of select="$fileID" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:eventDateTime">
+			<field name="eventDateTime">
+				<xsl:value-of select="prem:eventDateTime/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:eventDetail">
+			<field name="eventDetail">
+				<xsl:value-of select="prem:eventDetail/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:eventType">
+			<field name="eventType">
+				<xsl:value-of select="prem:eventType/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:eventOutcomeInformation">
+			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcome">
+				<field name="eventOutcome">
+					<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcome/text()" />
+				</field>
+			</xsl:if>
+			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail">
+				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
+					<field name="eventOutcomeDetailExtension">
+						<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/text()" />
+					</field>
+				</xsl:if>
+			</xsl:if>
+		</xsl:if>
+		<xsl:if test="prem:eventIdentifier">
+			<xsl:if test="prem:eventIdentifier/prem:eventIdentifierValue">
+				<field name="id">
+					<xsl:value-of select="prem:eventIdentifier/prem:eventIdentifierValue/text()" />
+				</field>
+			</xsl:if>
+		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
