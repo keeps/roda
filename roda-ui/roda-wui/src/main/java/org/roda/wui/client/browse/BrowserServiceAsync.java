@@ -229,7 +229,7 @@ public interface BrowserServiceAsync {
 
   void retrieveJobReport(String jobReportId, AsyncCallback<JobReport> callback);
 
-  void getViewersProperties(AsyncCallback<List<Viewer>> callback);
+  void getViewersProperties(AsyncCallback<Viewers> callback);
 
   void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
   

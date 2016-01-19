@@ -63,7 +63,7 @@ import org.roda.wui.client.browse.PreservationInfo;
 import org.roda.wui.client.browse.RepresentationInfo;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.TimelineInfo;
-import org.roda.wui.client.browse.Viewer;
+import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -686,30 +686,33 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Jobs.retrieveJobReport(user, jobReportId);
   }
 
-  public List<Viewer> getViewersProperties() {
-    List<Viewer> viewers = new ArrayList<Viewer>();
+  public Viewers getViewersProperties() {
+    Viewers viewers = new Viewers();
     String viewersString = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers");
     if (viewersString != null) {
       String[] viewersSupported = viewersString.split(",");
       for (String type : viewersSupported) {
-        Viewer viewer = new Viewer();
-
         String fieldPronoms = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "pronoms");
         String fieldMimetypes = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "mimetypes");
         String fieldExtensions = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers", type, "extensions");
 
-        viewer.setType(type);
         if (fieldPronoms != null && !fieldPronoms.isEmpty()) {
-          viewer.setPronoms(Arrays.asList(fieldPronoms.split(",")));
-        }
-        if (fieldMimetypes != null && !fieldMimetypes.isEmpty()) {
-          viewer.setMimetypes(Arrays.asList(fieldMimetypes.split(",")));
-        }
-        if (fieldExtensions != null && !fieldExtensions.isEmpty()) {
-          viewer.setExtensions(Arrays.asList(fieldExtensions.split(",")));
+          for (String pronom : Arrays.asList(fieldPronoms.split(","))) {
+            viewers.addPronom(pronom, type);
+          }
         }
 
-        viewers.add(viewer);
+        if (fieldMimetypes != null && !fieldMimetypes.isEmpty()) {
+          for (String mimetype : Arrays.asList(fieldMimetypes.split(","))) {
+            viewers.addMimetype(mimetype, type);
+          }
+        }
+
+        if (fieldExtensions != null && !fieldExtensions.isEmpty()) {
+          for (String extension : Arrays.asList(fieldExtensions.split(","))) {
+            viewers.addExtension(extension, type);
+          }
+        }
       }
     }
     return viewers;

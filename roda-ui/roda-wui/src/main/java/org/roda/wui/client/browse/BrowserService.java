@@ -288,7 +288,7 @@ public interface BrowserService extends RemoteService {
   IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException;
 
-  List<Viewer> getViewersProperties() throws GenericException;
+  Viewers getViewersProperties() throws GenericException;
 
   List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
     throws AuthorizationDeniedException, GenericException;

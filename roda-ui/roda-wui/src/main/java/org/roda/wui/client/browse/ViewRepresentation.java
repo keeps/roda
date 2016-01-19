@@ -91,10 +91,10 @@ public class ViewRepresentation extends Composite {
 
     @Override
     public void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      BrowserService.Util.getInstance().getViewersProperties(new AsyncCallback<List<Viewer>>() {
+      BrowserService.Util.getInstance().getViewersProperties(new AsyncCallback<Viewers>() {
 
         @Override
-        public void onSuccess(List<Viewer> viewers) {
+        public void onSuccess(Viewers viewers) {
           load(viewers, historyTokens, callback);
         }
 
@@ -118,8 +118,7 @@ public class ViewRepresentation extends Composite {
       return "view";
     }
 
-    private void load(final List<Viewer> viewers, final List<String> historyTokens,
-      final AsyncCallback<Widget> callback) {
+    private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1) {
         final String aipId = historyTokens.get(0);
         final String representationId = historyTokens.get(1);
@@ -208,8 +207,7 @@ public class ViewRepresentation extends Composite {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
-  @SuppressWarnings("unused")
-  private List<Viewer> viewers;
+  private Viewers viewers;
   private String aipId;
   private BrowseItemBundle itemBundle;
   private String representationId;
@@ -267,7 +265,7 @@ public class ViewRepresentation extends Composite {
    * @param representationId
    * 
    */
-  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId) {
+  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId) {
     this(viewers, aipId, itemBundle, representationId, null, null);
   }
 
@@ -281,7 +279,7 @@ public class ViewRepresentation extends Composite {
    * @param fileId
    * 
    */
-  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
+  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
     String fileId) {
     this(viewers, aipId, itemBundle, representationId, fileId, null);
   }
@@ -297,7 +295,7 @@ public class ViewRepresentation extends Composite {
    * @param file
    * 
    */
-  public ViewRepresentation(List<Viewer> viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
+  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
     String fileId, SimpleFile file) {
     this.viewers = viewers;
     this.aipId = aipId;
@@ -309,9 +307,6 @@ public class ViewRepresentation extends Composite {
     defaultFilter = new Filter();
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
-    // if (fileId != null) {
-    // filter.add(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
-    // }
     /* TODO add fileId as a filter, should be parentId */
     filesList = new FileList(defaultFilter, null, null);
 
@@ -332,13 +327,6 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        // if (Window.getClientWidth() < WINDOW_WIDTH) {
-        // view();
-        // } else {
-        // changeURL();
-        // filePreview();
-        // panelsControl();
-        // }
         filePreview();
         panelsControl();
         changeInfoFile();
@@ -363,9 +351,7 @@ public class ViewRepresentation extends Composite {
             && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
             singleFileMode = true;
             filesList.nextItemSelection();
-          }
-
-          if (ViewRepresentation.this.file == null && results.size() >= 1 && results.get(0).isFile()
+          } else if (results.size() > 1 && results.get(0).isFile() && ViewRepresentation.this.file == null
             && Window.getClientWidth() > WINDOW_WIDTH) {
             filesList.nextItemSelection();
           }
@@ -587,18 +573,21 @@ public class ViewRepresentation extends Composite {
       downloadFileButton.setVisible(true);
       infoFileButton.setVisible(true);
 
-      /* TODO mimetypes */
-      if (file.getOriginalName().toLowerCase().contains(".png")
-        || file.getOriginalName().toLowerCase().contains(".jpg")) {
-        imagePreview(file);
-      } else if (file.getOriginalName().toLowerCase().contains(".pdf")) {
-        pdfPreview(file);
-      } else if (file.getOriginalName().toLowerCase().contains(".xml")) {
-        textPreview(file);
-      } else if (file.getOriginalName().toLowerCase().contains(".mp3")) {
-        audioPreview(file);
-      } else if (file.getOriginalName().toLowerCase().contains(".mp4")) {
-        videoPreview(file);
+      String type = viewerType(file);
+      if (type != null) {
+        if (type.equals("image")) {
+          imagePreview(file);
+        } else if (type.equals("pdf")) {
+          pdfPreview(file);
+        } else if (type.equals("text")) {
+          textPreview(file);
+        } else if (type.equals("audio")) {
+          audioPreview(file);
+        } else if (type.equals("video")) {
+          videoPreview(file);
+        } else {
+          notSupportedPreview();
+        }
       } else {
         notSupportedPreview();
       }
@@ -607,6 +596,26 @@ public class ViewRepresentation extends Composite {
     } else {
       errorPreview();
     }
+  }
+
+  private String viewerType(SimpleFile file) {
+    String type = null;
+    if (file.getFileFormat() != null) {
+      if (file.getFileFormat().getPronom() != null) {
+        type = viewers.getPronoms().get(file.getFileFormat().getPronom());
+      }
+
+      if (file.getFileFormat().getMimeType() != null && type == null) {
+        type = viewers.getMimetypes().get(file.getFileFormat().getMimeType());
+      }
+    }
+
+//    if (type == null && file.getOriginalName() != null && file.getOriginalName().lastIndexOf(".") != -1) {
+//      String extension = file.getOriginalName().substring(file.getOriginalName().lastIndexOf("."));
+//      type = viewers.getExtensions().get(extension);
+//    }
+
+    return type;
   }
 
   private void emptyPreview() {
@@ -627,7 +636,7 @@ public class ViewRepresentation extends Composite {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-triangle fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-circle fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationErrorPreview()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
@@ -641,7 +650,7 @@ public class ViewRepresentation extends Composite {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-triangle fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-circle fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreview()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
@@ -806,7 +815,7 @@ public class ViewRepresentation extends Composite {
         }
         values.put(messages.viewRepresentationInfoHash(), b.toString());
       }
-      
+
       if (file.getStoragePath() != null) {
         values.put(messages.viewRepresentationInfoStoragePath(), file.getStoragePath());
       }

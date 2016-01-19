@@ -304,7 +304,7 @@ public class BasicSearch extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      searchResultPanel.getSelectionModel().clear();
+      searchResultPanel.refresh();
       callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);
