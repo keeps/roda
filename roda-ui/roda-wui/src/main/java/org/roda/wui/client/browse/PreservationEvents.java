@@ -14,26 +14,23 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
-import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.JsonUtils;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -46,9 +43,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -111,11 +105,8 @@ public class PreservationEvents extends Composite {
   @UiField
   Label itemTitle;
 
-  @UiField
-  Label itemDates;
-
-  @UiField
-  FlowPanel premisContainer;
+  @UiField(provided = true)
+  PreservationEventList eventList;
 
   @UiField
   Button downloadButton;
@@ -136,9 +127,12 @@ public class PreservationEvents extends Composite {
   public PreservationEvents(String aipId) {
     this.aipId = aipId;
 
-    initWidget(uiBinder.createAndBindUi(this));
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
+    Facets facets = null;
 
-    downloadButton.setEnabled(false);
+    eventList = new PreservationEventList(filter, facets, "Preservation events");
+
+    initWidget(uiBinder.createAndBindUi(this));
 
     BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<BrowseItemBundle>() {
@@ -158,49 +152,24 @@ public class PreservationEvents extends Composite {
 
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
-    final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
+    // final PreservationMetadataBundle preservationMetadata =
+    // itemBundle.getPreservationMetadata();
 
     breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
 
-    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-    itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    itemIcon.setWidget(itemIconHtmlPanel);
-    itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-    itemTitle.removeStyleName("browseTitle-allCollections");
-    itemDates.setText(getDatesText(aip));
-
-    if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-      downloadButton.setEnabled(true);
-      
-      for (RepresentationPreservationMetadataBundle bundle : preservationMetadata.getRepresentationsMetadata()) {
-        String repId = bundle.getRepresentationID();
-        getPreservationMetadataHTML(aipId, repId, new AsyncCallback<SafeHtml>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            Toast.showError(messages.errorLoadingPreservationMetadata(caught.getMessage()));
-          }
-
-          @Override
-          public void onSuccess(SafeHtml result) {
-            HTML html = new HTML(result);
-            premisContainer.add(html);
-            JavascriptUtils.runHighlighter(html.getElement());
-            JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
-            JavascriptUtils.smoothScroll(html.getElement());
-          }
-        });
-      }
-
-      premisContainer.addStyleName("preservationMetadata");
-      premisContainer.addStyleName("metadataContent");
-    }
+    // HTMLPanel itemIconHtmlPanel =
+    // DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+    // itemIconHtmlPanel.addStyleName("browseItemIcon-other");
+    // itemIcon.setWidget(itemIconHtmlPanel);
+    // itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+    // itemTitle.removeStyleName("browseTitle-allCollections");
+    // itemDates.setText(getDatesText(aip));
   }
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), Browse.RESOLVER.getHistoryPath()));
     for (IndexedAIP ancestor : aipAncestors) {
       SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
       BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
@@ -238,54 +207,6 @@ public class PreservationEvents extends Composite {
     }
 
     return ret;
-  }
-
-  private void getPreservationMetadataHTML(final String aipId, final String repId,
-    final AsyncCallback<SafeHtml> callback) {
-    String uri = RestUtils.createPreservationMetadataHTMLUri(aipId, repId, 0, 10, 0, 10, 0, 10);
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
-    requestBuilder.setHeader("Authorization", "Custom");
-    try {
-      requestBuilder.sendRequest(null, new RequestCallback() {
-
-        @Override
-        public void onResponseReceived(Request request, Response response) {
-          if (200 == response.getStatusCode()) {
-            String html = response.getText();
-            SafeHtml safeHtml = SafeHtmlUtils.fromTrustedString(html);
-
-            callback.onSuccess(safeHtml);
-          } else {
-            String text = response.getText();
-            String message;
-            try {
-              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
-              message = error.getMessage();
-            } catch (IllegalArgumentException e) {
-              message = text;
-            }
-
-            SafeHtmlBuilder b = new SafeHtmlBuilder();
-
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
-            b.append(messages.preservationMetadataTranformToHTMLError());
-            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
-            b.append(SafeHtmlUtils.fromString(message));
-            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-
-            callback.onSuccess(b.toSafeHtml());
-          }
-        }
-
-        @Override
-        public void onError(Request request, Throwable exception) {
-          callback.onFailure(exception);
-        }
-      });
-    } catch (RequestException e) {
-      callback.onFailure(e);
-    }
   }
 
   @UiHandler("downloadButton")

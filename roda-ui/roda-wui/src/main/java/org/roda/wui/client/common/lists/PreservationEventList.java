@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedPreservationEvent;
+import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
@@ -44,20 +45,18 @@ import config.i18n.client.BrowseMessages;
  */
 public class PreservationEventList extends AsyncTableCell<IndexedPreservationEvent> {
 
-  private static final String OUTCOME_SUCESS = "<i class='fa fa-check-circle'></i>";
-
-  private static final String OUTCOME_FAILURE = "<i class='fa fa-exclamation-triangle error'></i>";
-
   private static final int PAGE_SIZE = 20;
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedPreservationEvent, Date> eventDateTimeColumn;
-  private TextColumn<IndexedPreservationEvent> eventDetail;
-  private Column<IndexedPreservationEvent, SafeHtml> eventOutcome;
+  private TextColumn<IndexedPreservationEvent> eventTypeColumn;
+  private TextColumn<IndexedPreservationEvent> eventDetailColumn;
+  private TextColumn<IndexedPreservationEvent> eventOutcomeColumn;
+  private TextColumn<IndexedPreservationEvent> eventTargetType;
   private Column<IndexedPreservationEvent, SafeHtml> eventTarget;
-  private Column<IndexedPreservationEvent, SafeHtml> eventAgent;
+  private Column<IndexedPreservationEvent, SafeHtml> eventAgentColumn;
 
   public PreservationEventList() {
     this(null, null, null);
@@ -78,7 +77,15 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       }
     };
 
-    eventDetail = new TextColumn<IndexedPreservationEvent>() {
+    eventTypeColumn = new TextColumn<IndexedPreservationEvent>() {
+
+      @Override
+      public String getValue(IndexedPreservationEvent event) {
+        return event != null ? event.getEventType() : null;
+      }
+    };
+
+    eventDetailColumn = new TextColumn<IndexedPreservationEvent>() {
 
       @Override
       public String getValue(IndexedPreservationEvent event) {
@@ -86,25 +93,15 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       }
     };
 
-    eventOutcome = new Column<IndexedPreservationEvent, SafeHtml>(new SafeHtmlCell()) {
-      @Override
-      public SafeHtml getValue(IndexedPreservationEvent event) {
-        SafeHtml ret = null;
-        if (event != null) {
+    eventOutcomeColumn = new TextColumn<IndexedPreservationEvent>() {
 
-          if (event.getEventOutcome().equalsIgnoreCase("success")) {
-            ret = SafeHtmlUtils.fromSafeConstant(OUTCOME_SUCESS);
-          } else if (event.getEventOutcome().equalsIgnoreCase("failure")) {
-            ret = SafeHtmlUtils.fromSafeConstant(OUTCOME_FAILURE);
-          } else {
-            ret = SafeHtmlUtils.fromString(event.getEventOutcome());
-          }
-        }
-        return ret;
+      @Override
+      public String getValue(IndexedPreservationEvent event) {
+        return event != null ? event.getEventOutcome() : null;
       }
     };
 
-    eventAgent = new Column<IndexedPreservationEvent, SafeHtml>(new SafeHtmlCell()) {
+    eventAgentColumn = new Column<IndexedPreservationEvent, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(IndexedPreservationEvent event) {
         SafeHtml ret = null;
@@ -117,6 +114,25 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       }
     };
 
+    eventTargetType = new TextColumn<IndexedPreservationEvent>() {
+
+      @Override
+      public String getValue(IndexedPreservationEvent event) {
+        String ret = null;
+        if (event != null) {
+          // TODO define link
+          if (event.getFileId() != null) {
+            ret = "File";
+          } else if (event.getRepresentationId() != null) {
+            ret = "Representation";
+          } else {
+            ret = "AIP";
+          }
+        }
+        return ret;
+      }
+    };
+
     eventTarget = new Column<IndexedPreservationEvent, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(IndexedPreservationEvent event) {
@@ -124,11 +140,11 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
         if (event != null) {
           // TODO define link
           if (event.getFileId() != null) {
-            ret = SafeHtmlUtils.fromString(event.getFileId());
+            ret = SafeHtmlUtils.fromSafeConstant("<a href='#browse/view/'>" + event.getFileId() + "</a>");
           } else if (event.getRepresentationId() != null) {
-            ret = SafeHtmlUtils.fromString(event.getRepresentationId());
+            ret = SafeHtmlUtils.fromSafeConstant("<a href='#browse/view/'>" + event.getRepresentationId() + "</a>");
           } else {
-            ret = SafeHtmlUtils.fromString(event.getAipId());
+            ret = SafeHtmlUtils.fromSafeConstant("<a href='#browse/'>" + event.getAipId() + "</a>");
           }
         }
         return ret;
@@ -136,18 +152,21 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     };
 
     eventDateTimeColumn.setSortable(true);
-    eventDetail.setSortable(true);
-    eventOutcome.setSortable(true);
-    eventAgent.setSortable(true);
+    eventTypeColumn.setSortable(true);
+    eventDetailColumn.setSortable(true);
+    eventOutcomeColumn.setSortable(true);
+    eventAgentColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(eventDateTimeColumn, "Date");
-    display.addColumn(eventDetail, "Detail");
-    display.addColumn(eventOutcome, "Outcome");
-    display.addColumn(eventTarget, "Target");
-    display.addColumn(eventAgent, "Agent");
+    display.addColumn(eventAgentColumn, "Agent");
+    display.addColumn(eventTypeColumn, "Type");
+    display.addColumn(eventDetailColumn, "Detail");
+    display.addColumn(eventTargetType, "Target type");
+    display.addColumn(eventTarget, "Target object");
+    display.addColumn(eventOutcomeColumn, "Outcome");
 
-    display.setColumnWidth(eventDetail, "100%");
+    display.setColumnWidth(eventDetailColumn, "100%");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -156,9 +175,10 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     display.getColumnSortList().push(new ColumnSortInfo(eventDateTimeColumn, false));
 
     eventDateTimeColumn.setCellStyleNames("nowrap");
-    eventOutcome.setCellStyleNames("nowrap");
+    eventTypeColumn.setCellStyleNames("nowrap");
+    eventOutcomeColumn.setCellStyleNames("nowrap");
     eventTarget.setCellStyleNames("nowrap");
-    eventAgent.setCellStyleNames("nowrap");
+    eventAgentColumn.setCellStyleNames("nowrap");
 
   }
 
@@ -170,17 +190,16 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     Map<Column<IndexedPreservationEvent, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, String>();
     columnSortingKeyMap.put(eventDateTimeColumn, RodaConstants.PRESERVATION_EVENT_DATETIME);
-    columnSortingKeyMap.put(eventDetail, RodaConstants.PRESERVATION_EVENT_DETAIL);
-    columnSortingKeyMap.put(eventOutcome, RodaConstants.PRESERVATION_EVENT_OUTCOME);
+    columnSortingKeyMap.put(eventTypeColumn, RodaConstants.PRESERVATION_EVENT_TYPE);
+    columnSortingKeyMap.put(eventDetailColumn, RodaConstants.PRESERVATION_EVENT_DETAIL);
+    columnSortingKeyMap.put(eventOutcomeColumn, RodaConstants.PRESERVATION_EVENT_OUTCOME);
     // TODO add agent
     // columnSortingKeyMap.put(eventAgent,
     // RodaConstants.PRESERVATION_EVENT_AGENT);
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    // BrowserService.Util.getInstance().findJobReports(filter, sorter, sublist,
-    // getFacets(), callback);
-    // TODO call service
+    BrowserService.Util.getInstance().findIndexedPreservationEvent(filter, sorter, sublist, getFacets(), callback);
   }
 
   @Override

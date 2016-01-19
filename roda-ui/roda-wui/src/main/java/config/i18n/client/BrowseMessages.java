@@ -85,38 +85,37 @@ public interface BrowseMessages extends Messages {
   /******************* NEW MESSAGES ***********************/
   /*********************************************************/
 
-  
   /******* SIDEBAR ******************************************/
   @DefaultMessage("Filters")
   String sidebarFiltersTitle();
-  
+
   @DefaultMessage("Dates")
   String sidebarFilterDates();
-  
+
   @DefaultMessage("From date")
   String sidebarFilterFromDate();
-  
+
   @DefaultMessage("To date")
   String sidebarFilterToDate();
-  
+
   @DefaultMessage("From date")
   String sidebarFilterFromDatePlaceHolder();
-  
+
   @DefaultMessage("To date")
   String sidebarFilterToDatePlaceHolder();
-  
+
   @DefaultMessage("Folders and files")
   String sidebarFoldersFilesTitle();
-  
+
   @DefaultMessage("Process")
   String sidebarProcessTitle();
-  
+
   @DefaultMessage("Ingest")
   String sidebarIngestTitle();
-  
+
   @DefaultMessage("Actions")
   String sidebarActionsTitle();
-  
+
   @DefaultMessage("Preservation")
   String sidebarPreservationTitle();
 
@@ -183,15 +182,15 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
   String titleDates(Date dateInitial, Date dateFinal);
-  
+
   /****** INGEST TRANSFER **********/
-  
+
   @DefaultMessage("Ingest transfer")
   String ingestTransferTitle();
 
   @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}, from {2}")
   String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
-  
+
   @DefaultMessage("Confirm remove folder")
   String ingestTransferRemoveFolderConfirmDialogTitle();
 
@@ -250,27 +249,27 @@ public interface BrowseMessages extends Messages {
   String ingestTransferCreateFolderMessage();
 
   /***** CREATE PROCESS JOB *********/
-  
+
   @DefaultMessage("New ingest process")
   String createJobTitle();
-  
+
   @DefaultMessage("Name")
   String createJobName();
-  
+
   @DefaultMessage("Selected submission information packages (SIP)")
   String createJobSelectedSIP();
-  
+
   @DefaultMessage("Ingest workflow")
   String createJobIngestWorkflow();
-  
+
   @DefaultMessage("Create")
   String createJobCreateTitle();
-  
+
   @DefaultMessage("Cancel")
   String createJobCancelTitle();
-  
+
   /****** INGEST TRANSFER UPLOAD *********/
-  
+
   @DefaultMessage("Ingest transfer upload")
   String ingestTransferUploadTitle();
 
@@ -279,10 +278,10 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Choose files...")
   String ingestTransferUploadBrowseFiles();
-  
+
   @DefaultMessage("Done")
   String ingestTransferUploadFinishButton();
-  
+
   /******** DIALOG GENERIC **************/
 
   @DefaultMessage("Cancel")
@@ -290,17 +289,20 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("OK")
   String dialogOk();
-  
+
   /*** Preservation events ***/
-  
+
   @DefaultMessage("Download")
   String preservationEventsDownloadButton();
-  
+
   @DefaultMessage("Back")
   String preservationEventsBackButton();
 
+  @DefaultMessage("Preservation events")
+  String preservationEventsTitle();
+
   /*** View representation ***/
-  
+
   @DefaultMessage("Back")
   String backButton();
 
@@ -312,89 +314,88 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Download file")
   String viewRepresentationDownloadFileButton();
-  
+
   @DefaultMessage("File info")
   String viewRepresentationInfoFileButton();
-  
+
   @DefaultMessage("Please select a file from the list on left panel")
   String viewRepresentationEmptyPreview();
 
   @DefaultMessage("An error occurred while trying to view the file")
   String viewRepresentationErrorPreview();
-  
+
   @DefaultMessage("File preview not supported")
   String viewRepresentationNotSupportedPreview();
-  
+
   @DefaultMessage("Search files...")
   String viewRepresentationSearchPlaceHolder();
-  
+
   @DefaultMessage("Details")
   String viewRepresentationInfoTitle();
-  
+
   @DefaultMessage("Filename")
   String viewRepresentationInfoFilename();
-  
+
   @DefaultMessage("Size")
   String viewRepresentationInfoSize();
-  
+
   @DefaultMessage("Mimetype")
   String viewRepresentationInfoMimetype();
-  
+
   @DefaultMessage("Format")
   String viewRepresentationInfoFormat();
-  
+
   @DefaultMessage("PRONOM")
   String viewRepresentationInfoPronom();
-  
+
   @DefaultMessage("Created date")
   String viewRepresentationInfoCreatedDate();
-  
+
   @DefaultMessage("Creating application name")
   String viewRepresentationInfoCreatingApplicationName();
-  
+
   @DefaultMessage("Creating application version")
   String viewRepresentationInfoCreatingApplicationVersion();
-  
+
   @DefaultMessage("Date created by application")
   String viewRepresentationInfoDateCreatedByApplication();
 
   @DefaultMessage("Fixity")
   String viewRepresentationInfoHash();
-  
+
   @DefaultMessage("Storage path")
   String viewRepresentationInfoStoragePath();
 
-  
   /************* Ingest process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
   String ingestProcessNewDefaultName(Date date);
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
-  
+
   @DefaultMessage("Missing mandatory information")
   String ingestProcessNewMissingMandatoryInfoDialogTitle();
-  
+
   @DefaultMessage("Please fill the following mandatory parameters: {0,list}")
   String ingestProcessNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
   @DefaultMessage("Waiting to start")
   String showJobStatusCreated();
-  
+
   @DefaultMessage("Processing ({0}%)")
   String showJobStatusStarted(int completionPercentage);
-  
+
   @DefaultMessage("Completed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusCompleted(Date endDate);
-  
+
   @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusFailedDuringCreation(Date endDate);
 
   /************* Browse ****************/
   @DefaultMessage("Loading...")
   String browseLoading();
-  
+
   @DefaultMessage("Confirm remove items")
   String browseRemoveConfirmDialogTitle();
 
@@ -404,7 +405,5 @@ public interface BrowseMessages extends Messages {
   /************* Search ****************/
   @DefaultMessage("Search records...")
   String searchPlaceHolder();
-
-  
 
 }

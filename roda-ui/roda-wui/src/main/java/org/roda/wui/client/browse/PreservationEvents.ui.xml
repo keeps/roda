@@ -6,7 +6,7 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -16,17 +16,18 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:FlowPanel styleName="browseItemPanel">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+					<g:HTML styleName="browseItemIcon-other">
+						<i class="fa fa-clock-o"></i>
+					</g:HTML>
 					<g:FlowPanel styleName="browseItemPanelText">
 						<g:Label styleName="h1" addStyleNames="browseItemText"
-							ui:field="itemTitle" />
+							ui:field="itemTitle"><ui:text from='{messages.preservationEventsTitle}' /></g:Label>
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:FlowPanel ui:field="premisContainer"
-					addStyleNames="preservationMetadata metadataContent">
-				</g:FlowPanel>
+
+				<lists:PreservationEventList ui:field="eventList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
