@@ -38,6 +38,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
@@ -720,5 +721,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getSupportedMetadata(user, locale);
+  }
+  
+  @Override
+  public IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.findIndexedPreservationEvents(user, filter, sorter, sublist, facets);
+  }
+
+  @Override
+  public IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveIndexedPreservationEvent(user, indexedPreservationEventId);
   }
 }

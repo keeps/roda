@@ -11,7 +11,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
@@ -22,6 +21,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RODAException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
@@ -232,5 +232,9 @@ public interface BrowserServiceAsync {
   void getViewersProperties(AsyncCallback<List<Viewer>> callback);
 
   void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
+  
+  void findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, AsyncCallback<IndexResult<IndexedPreservationEvent>> callback);
 
+  void retrieveIndexedPreservationEvent(String indexedPreservationEventId, AsyncCallback<IndexedPreservationEvent> callback);
 }

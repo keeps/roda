@@ -8,7 +8,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.PluginInfo;
@@ -24,6 +23,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.Job;
 import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.PluginType;
@@ -290,8 +290,15 @@ public interface BrowserService extends RemoteService {
 
   List<Viewer> getViewersProperties() throws GenericException;
 
-  List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale) throws AuthorizationDeniedException, GenericException;
+  List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
+    throws AuthorizationDeniedException, GenericException;
 
   JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
+
+  IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

@@ -59,6 +59,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationState;
 import org.roda.core.data.v2.RodaUser;
@@ -924,4 +925,13 @@ public class BrowserHelper {
     return supportedMetadata;
   }
 
+  public static IndexResult<IndexedPreservationEvent> findIndexedPreservationEvents(Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(IndexedPreservationEvent.class, filter, sorter, sublist, facets);
+  }
+
+  public static IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
+    throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, indexedPreservationEventId);
+  }
 }

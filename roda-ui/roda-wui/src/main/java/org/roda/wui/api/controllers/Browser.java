@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -30,6 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.SimpleFile;
 import org.roda.core.data.v2.TransferredResource;
@@ -57,6 +57,8 @@ public class Browser extends RodaCoreService {
   private static final String BROWSE_ROLE = "browse";
 
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
+
+  private static final String INDEX_PRESERVATION_EVENT_ID = "indexedPreservationEventId";
 
   private static final String PARENT_PARAM = "parent";
   private static final String FOLDERNAME_PARAM = "folderName";
@@ -838,6 +840,53 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getSupportedMetadata", null, duration, RodaConstants.LOCALE, locale);
     return supportedMetadata;
+  }
+
+  public static IndexResult<IndexedPreservationEvent> findIndexedPreservationEvents(RodaUser user, Filter filter,
+    Sorter sorter, Sublist sublist, Facets facets)
+      throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    IndexResult<IndexedPreservationEvent> resources = BrowserHelper.findIndexedPreservationEvents(filter, sorter,
+      sublist, facets);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "findIndexedPreservationEvents", null, duration,
+      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
+      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+
+    return resources;
+  }
+
+  public static IndexedPreservationEvent retrieveIndexedPreservationEvent(RodaUser user,
+    String indexedPreservationEventId) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    IndexedPreservationEvent resource = BrowserHelper.retrieveIndexedPreservationEvent(indexedPreservationEventId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveIndexedPreservationEvent", null, duration,
+      INDEX_PRESERVATION_EVENT_ID, indexedPreservationEventId);
+
+    return resource;
   }
 
 }
