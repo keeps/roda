@@ -806,6 +806,10 @@ public class ViewRepresentation extends Composite {
         }
         values.put(messages.viewRepresentationInfoHash(), b.toString());
       }
+      
+      if (file.getStoragePath() != null) {
+        values.put(messages.viewRepresentationInfoStoragePath(), file.getStoragePath());
+      }
     }
 
     for (String key : values.keySet()) {

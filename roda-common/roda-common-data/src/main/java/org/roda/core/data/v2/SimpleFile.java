@@ -244,11 +244,7 @@ public class SimpleFile extends RODAObject {
 
   /* TODO get correct path */
   public List<String> getPath() {
-    if (storagePath != null) {
-      return Arrays.asList(storagePath.split("/"));
-    } else {
-      return Arrays.asList(aipId, representationId, id);
-    }
+    return Arrays.asList(aipId, representationId, id);
   }
 
   public String getStoragePath() {

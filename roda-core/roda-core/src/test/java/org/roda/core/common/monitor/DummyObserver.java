@@ -44,11 +44,6 @@ public class DummyObserver implements FolderObserver {
   }
 
   @Override
-  public void transferredResourceAdded(TransferredResource resource, boolean commit) {
-    transferredResourceAdded(resource);
-  }
-
-  @Override
   public void transferredResourceAdded(TransferredResource resource) {
     LOGGER.info("CREATED: " + resource.getFullPath());
     if (resource.isFile()) {

@@ -360,6 +360,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Fixity")
   String viewRepresentationInfoHash();
+  
+  @DefaultMessage("Storage path")
+  String viewRepresentationInfoStoragePath();
 
   
   /************* Ingest process new ****************/
@@ -401,5 +404,7 @@ public interface BrowseMessages extends Messages {
   /************* Search ****************/
   @DefaultMessage("Search records...")
   String searchPlaceHolder();
+
+  
 
 }
