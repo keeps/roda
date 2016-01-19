@@ -312,7 +312,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Previous file")
   String viewRepresentationPreviousFileButton();
 
-  @DefaultMessage("Download file")
+  @DefaultMessage("Download")
   String viewRepresentationDownloadFileButton();
 
   @DefaultMessage("File info")

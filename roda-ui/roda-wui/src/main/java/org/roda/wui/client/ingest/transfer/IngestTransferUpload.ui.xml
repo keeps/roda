@@ -6,7 +6,7 @@
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -27,7 +27,7 @@
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:HTML ui:field="uploadForm" />
-				<g:HTML  ui:field="uploadList">
+				<g:HTML ui:field="uploadList">
 					<ul id="upload-list">
 						<!-- The file uploads will be shown here -->
 					</ul>

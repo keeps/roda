@@ -1652,6 +1652,10 @@
 	margin: 20px auto;
 }
 
+.dragover #drop {
+	border: 5px dashed #ddd;
+}
+
 #drop {
 	padding: 40px 50px;
 	text-align: center;
@@ -1661,6 +1665,17 @@
 	color: #7f858a;
 	border: 5px dashed #e6e7e9;
 	border-radius: 10px;
+}
+
+#drop h4 {
+	font-size: 2.4rem;
+    line-height: 1.35;
+    letter-spacing: -.08rem;
+	color: #999;
+	text-transform: none;
+	margin-top: 0px;
+	margin-bottom: 1rem;
+    font-weight: 400;
 }
 
 #drop a {
@@ -2104,6 +2119,11 @@
 .viewRepresentationErrorPreview .fa-5,
 	.viewRepresentationNotSupportedPreview .fa-5 {
 	font-size: 10em;
+}
+
+.viewRepresentationNotSupportedDownloadButton {
+	font-size: 1.2rem;
+	padding: 8px 20px;	
 }
 
 .viewRepresentationAudioFilePreviewHTML .fa-5 {

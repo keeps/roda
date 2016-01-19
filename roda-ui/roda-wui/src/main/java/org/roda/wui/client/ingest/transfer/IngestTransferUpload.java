@@ -22,6 +22,12 @@ import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.DragLeaveEvent;
+import com.google.gwt.event.dom.client.DragLeaveHandler;
+import com.google.gwt.event.dom.client.DragOverEvent;
+import com.google.gwt.event.dom.client.DragOverHandler;
+import com.google.gwt.event.dom.client.DropEvent;
+import com.google.gwt.event.dom.client.DropHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -156,7 +162,7 @@ public class IngestTransferUpload extends Composite {
             @Override
             public void onSuccess(TransferredResource r) {
               resource = r;
-              username= r.getOwner();
+              username = r.getOwner();
               callback.onSuccess(IngestTransferUpload.this);
               updateUploadForm();
             }
@@ -173,12 +179,37 @@ public class IngestTransferUpload extends Composite {
 
     if (uploadUrl != null) {
       SafeHtml html = SafeHtmlUtils.fromSafeConstant("<form id='upload' method='post' action='" + getUploadUrl()
-        + "' enctype='multipart/form-data'>" + "<div id='drop'>" + messages.ingestTransferUploadDropHere() + "<a>"
-        + messages.ingestTransferUploadBrowseFiles() + "</a>" + "<input type='file' name='upl' multiple='true' />"
-        + "</div>" + "</form>");
+        + "' enctype='multipart/form-data'>" + "<div id='drop'><h4>" + messages.ingestTransferUploadDropHere()
+        + "</h4><a>" + messages.ingestTransferUploadBrowseFiles() + "</a>"
+        + "<input type='file' name='upl' multiple='true' />" + "</div>" + "</form>");
 
       uploadForm.setHTML(html);
       uploadList.setHTML(SafeHtmlUtils.fromSafeConstant("<ul id='upload-list'></ul>"));
+
+      uploadForm.addDomHandler(new DragOverHandler() {
+
+        @Override
+        public void onDragOver(DragOverEvent event) {
+          uploadForm.addStyleName("dragover");
+        }
+      }, DragOverEvent.getType());
+
+      uploadForm.addDomHandler(new DragLeaveHandler() {
+
+        @Override
+        public void onDragLeave(DragLeaveEvent event) {
+          uploadForm.removeStyleName("dragover");
+        }
+      }, DragLeaveEvent.getType());
+
+      uploadForm.addDomHandler(new DropHandler() {
+
+        @Override
+        public void onDrop(DropEvent event) {
+          uploadForm.removeStyleName("dragover");
+        }
+      }, DropEvent.getType());
+
       JavascriptUtils.runMiniUploadForm();
     } else {
       uploadForm.setHTML(SafeHtmlUtils.EMPTY_SAFE_HTML);

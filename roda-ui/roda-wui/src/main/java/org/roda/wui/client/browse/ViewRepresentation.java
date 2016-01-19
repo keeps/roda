@@ -66,6 +66,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -491,6 +492,11 @@ public class ViewRepresentation extends Composite {
 
   @UiHandler("downloadFileButton")
   void buttonDownloadFileButtonHandler(ClickEvent e) {
+    downloadFile();
+
+  }
+
+  private void downloadFile() {
     SafeUri downloadUri = null;
     if (file != null) {
       downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId());
@@ -636,28 +642,48 @@ public class ViewRepresentation extends Composite {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-circle fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationErrorPreview()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
 
+    Button downloadButton = new Button(messages.viewRepresentationDownloadFileButton());
+    downloadButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        downloadFile();
+      }
+    });
+
     html.setHTML(b.toSafeHtml());
     filePreview.add(html);
+    filePreview.add(downloadButton);
     html.setStyleName("viewRepresentationErrorPreview");
+    downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
   }
 
   private void notSupportedPreview() {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-circle fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreview()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));
 
+    Button downloadButton = new Button(messages.viewRepresentationDownloadFileButton());
+    downloadButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        downloadFile();
+      }
+    });
+
     html.setHTML(b.toSafeHtml());
     filePreview.add(html);
+    filePreview.add(downloadButton);
     html.setStyleName("viewRepresentationNotSupportedPreview");
+    downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
   }
 
   private void imagePreview(SimpleFile file) {
