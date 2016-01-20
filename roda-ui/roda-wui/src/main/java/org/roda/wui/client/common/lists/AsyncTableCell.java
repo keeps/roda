@@ -190,7 +190,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     };
 
     autoUpdateTimerMillis = periodMillis;
-    autoUpdateTimer.scheduleRepeating(periodMillis);
+    if (this.isAttached()) {
+      autoUpdateTimer.scheduleRepeating(periodMillis);
+    }
 
   }
 
