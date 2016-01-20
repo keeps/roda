@@ -11,7 +11,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -19,7 +18,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.IndexedAIP;
-import org.roda.wui.api.controllers.Browser;
+import org.roda.core.data.v2.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.PreservationEventList;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -46,6 +45,8 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.BrowseMessages;
 
@@ -65,6 +66,9 @@ public class PreservationEvents extends Composite {
         final String aipId = historyTokens.get(0);
         PreservationEvents preservationEvents = new PreservationEvents(aipId);
         callback.onSuccess(preservationEvents);
+      } else if (historyTokens.size() > 1
+        && historyTokens.get(0).equals(ShowPreservationEvent.RESOLVER.getHistoryToken())) {
+        ShowPreservationEvent.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         Tools.newHistory(Browse.RESOLVER);
         callback.onSuccess(null);
@@ -124,15 +128,26 @@ public class PreservationEvents extends Composite {
    * @param itemBundle
    * 
    */
-  public PreservationEvents(String aipId) {
+  public PreservationEvents(final String aipId) {
     this.aipId = aipId;
 
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
     Facets facets = null;
 
-    eventList = new PreservationEventList(filter, facets, "Preservation events");
+    eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle());
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    eventList.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedPreservationEvent selected = eventList.getSelectionModel().getSelectedObject();
+        if (selected != null) {
+          Tools.newHistory(ShowPreservationEvent.RESOLVER, aipId, selected.getId());
+        }
+      }
+    });
 
     BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<BrowseItemBundle>() {
@@ -152,19 +167,9 @@ public class PreservationEvents extends Composite {
 
   public void viewAction() {
     IndexedAIP aip = itemBundle.getAip();
-    // final PreservationMetadataBundle preservationMetadata =
-    // itemBundle.getPreservationMetadata();
 
     breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
     breadcrumb.setVisible(true);
-
-    // HTMLPanel itemIconHtmlPanel =
-    // DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-    // itemIconHtmlPanel.addStyleName("browseItemIcon-other");
-    // itemIcon.setWidget(itemIconHtmlPanel);
-    // itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-    // itemTitle.removeStyleName("browseTitle-allCollections");
-    // itemDates.setText(getDatesText(aip));
   }
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
@@ -188,25 +193,6 @@ public class PreservationEvents extends Composite {
     builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
     SafeHtml breadcrumbLabel = builder.toSafeHtml();
     return breadcrumbLabel;
-  }
-
-  private String getDatesText(IndexedAIP aip) {
-    String ret;
-
-    Date dateInitial = aip.getDateInitial();
-    Date dateFinal = aip.getDateFinal();
-
-    if (dateInitial == null && dateFinal == null) {
-      ret = messages.titleDatesEmpty();
-    } else if (dateInitial != null && dateFinal == null) {
-      ret = messages.titleDatesNoFinal(dateInitial);
-    } else if (dateInitial == null && dateFinal != null) {
-      ret = messages.titleDatesNoInitial(dateFinal);
-    } else {
-      ret = messages.titleDates(dateInitial, dateFinal);
-    }
-
-    return ret;
   }
 
   @UiHandler("downloadButton")

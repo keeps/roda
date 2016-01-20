@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+
+	<ui:style>
+	
+	</ui:style>
+
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
+	<g:FlowPanel styleName="preservationEvent" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:FlowPanel styleName="browseItemPanel">
+					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
+					<g:HTML styleName="browseItemIcon-other">
+						<i class="fa fa-clock-o"></i>
+					</g:HTML>
+					<g:FlowPanel styleName="browseItemPanelText">
+						<g:Label styleName="h1" addStyleNames="browseItemText"
+							ui:field="itemTitle">
+							<ui:text from='{messages.preservationEventTitle}' />
+						</g:Label>
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventId}' />
+					</g:Label>
+					<g:Label ui:field="eventIdValue" />
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventPath}' />
+					</g:Label>
+					<g:Label ui:field="eventPathValue" />
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventDatetime}' />
+					</g:Label>
+					<g:Label ui:field="eventDatetimeLabel" />
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventType}' />
+					</g:Label>
+					<g:Label ui:field="eventTypeLabel" />
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventDetail}' />
+					</g:Label>
+					<g:Label ui:field="eventDetailLabel" />
+
+					<!-- AGENTS -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventAgentsHeader}' />
+					</g:Label>
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventAgentId}' />
+					</g:Label>
+					<g:Label ui:field="eventAgentIdLabel" />
+					
+					<g:Label ui:field="eventAgentRoleLabel" styleName="label">
+						<ui:text from='{messages.preservationEventAgentRole}' />
+					</g:Label>
+					<g:Label ui:field="eventAgentRoleValue" />
+
+					<!-- LINKING OBJECTS -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventObjectsHeader}' />
+					</g:Label>
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventObjectId}' />
+					</g:Label>
+					<g:Label ui:field="eventObjectIdValue" />
+					<g:Label ui:field="eventObjectRoleLabel" styleName="label">
+						<ui:text from='{messages.preservationEventObjectRole}' />
+					</g:Label>
+					<g:Label ui:field="eventObjectRoleValue" />
+					
+
+					<!-- OUTCOME -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventOutcomeInformationHeader}' />
+					</g:Label>
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventOutcome}' />
+					</g:Label>
+					<g:Label ui:field="eventOutcomeLabel" />
+					<g:Label ui:field="eventOutcomeDetailNoteLabel" styleName="label">
+						<ui:text from='{messages.preservationEventOutcomeDetailNote}' />
+					</g:Label>
+					<g:Label ui:field="eventOutcomeDetailNoteValue" />
+					<g:Label ui:field="eventOutcomeDetailExtensionLabel"
+						styleName="label">
+						<ui:text from='{messages.preservationEventOutcomeDetailExtension}' />
+					</g:Label>
+					<g:Label ui:field="eventOutcomeDetailExtensionValue" />
+				</g:FlowPanel>
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarActionsTitle}' />
+					</g:Label>
+					<g:Button addStyleNames="btn btn-back" ui:field="backButton">
+						<ui:text from='{messages.preservationEventsBackButton}' />
+					</g:Button>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

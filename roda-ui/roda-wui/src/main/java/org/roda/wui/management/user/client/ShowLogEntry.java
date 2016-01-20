@@ -39,7 +39,7 @@ import config.i18n.client.CommonMessages;
  * @author Luis Faria
  * 
  */
-public class LogEntryPanel extends Composite {
+public class ShowLogEntry extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -56,7 +56,7 @@ public class LogEntryPanel extends Composite {
 
           @Override
           public void onSuccess(LogEntry result) {
-            LogEntryPanel logEntryPanel = new LogEntryPanel(result);
+            ShowLogEntry logEntryPanel = new ShowLogEntry(result);
             callback.onSuccess(logEntryPanel);
           }
         });
@@ -80,7 +80,7 @@ public class LogEntryPanel extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, LogEntryPanel> {
+  interface MyUiBinder extends UiBinder<Widget, ShowLogEntry> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -124,14 +124,14 @@ public class LogEntryPanel extends Composite {
    * Create a new panel to view a log entry
    * 
    */
-  public LogEntryPanel(LogEntry logEntry) {
+  public ShowLogEntry(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));
 
     logId.setText(logEntry.getId());
     logComponent.setText(logEntry.getActionComponent());
     logMethod.setText(logEntry.getActionMethod());
     logAddress.setText(logEntry.getAddress());
-    logDatetime.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_FULL).format(logEntry.getDatetime()));
+    logDatetime.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(logEntry.getDatetime()));
     logRelatedObjectLabel.setVisible(logEntry.getRelatedObjectID() != null && !logEntry.getRelatedObjectID().isEmpty());
     logRelatedObject.setText(logEntry.getRelatedObjectID());
     logUsername.setText(logEntry.getUsername());

@@ -15,6 +15,7 @@ import java.util.List;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.user.cellview.client.Header;
 
 /**
  * @author Luis Faria
@@ -290,16 +291,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("OK")
   String dialogOk();
 
-  /*** Preservation events ***/
-
-  @DefaultMessage("Download")
-  String preservationEventsDownloadButton();
-
-  @DefaultMessage("Back")
-  String preservationEventsBackButton();
-
-  @DefaultMessage("Preservation events")
-  String preservationEventsTitle();
 
   /*** View representation ***/
 
@@ -405,5 +396,88 @@ public interface BrowseMessages extends Messages {
   /************* Search ****************/
   @DefaultMessage("Search records...")
   String searchPlaceHolder();
+
+  /************* Preservation Event List ****************/
+
+  @DefaultMessage("Date")
+  String preservationEventListHeaderDate();
+
+  @DefaultMessage("Agents")
+  String preservationEventListHeaderAgent();
+
+  @DefaultMessage("Type")
+  String preservationEventListHeaderType();
+
+  @DefaultMessage("Detail")
+  String preservationEventListHeaderDetail();
+
+  @DefaultMessage("Objects")
+  String preservationEventListHeaderObject();
+
+  @DefaultMessage("Outcome")
+  String preservationEventListHeaderOutcome();
+  
+  /*** Preservation events ***/
+
+  @DefaultMessage("Download")
+  String preservationEventsDownloadButton();
+
+  @DefaultMessage("Back")
+  String preservationEventsBackButton();
+
+  @DefaultMessage("Preservation events")
+  String preservationEventsTitle();
+  
+  /*** Preservation event ***/
+
+  @DefaultMessage("Preservation event")
+  String preservationEventTitle();
+  
+  @DefaultMessage("Identifier")
+  String preservationEventId();
+  
+  @DefaultMessage("Path")
+  String preservationEventPath();
+  
+  @DefaultMessage("Date")
+  String preservationEventDatetime();
+  
+  @DefaultMessage("Type")
+  String preservationEventType();
+  
+  @DefaultMessage("Detail")
+  String preservationEventDetail();
+  
+  @DefaultMessage("Agents")
+  String preservationEventAgentsHeader();
+  
+  @DefaultMessage("Identifier")
+  String preservationEventAgentId();
+  
+  @DefaultMessage("Role")
+  String preservationEventAgentRole();
+  
+  @DefaultMessage("Objects")
+  String preservationEventObjectsHeader();
+  
+  @DefaultMessage("Identifier")
+  String preservationEventObjectId();
+  
+  @DefaultMessage("Role")
+  String preservationEventObjectRole();
+  
+  @DefaultMessage("Outcome information")
+  String preservationEventOutcomeInformationHeader();
+  
+  @DefaultMessage("Outcome")
+  String preservationEventOutcome();
+  
+  @DefaultMessage("Outcome detail note")
+  String preservationEventOutcomeDetailNote();
+  
+  @DefaultMessage("Outcome detail extension")
+  String preservationEventOutcomeDetailExtension();
+
+  
 
 }

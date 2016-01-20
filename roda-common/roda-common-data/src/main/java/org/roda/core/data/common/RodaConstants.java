@@ -426,11 +426,11 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_TYPE = "eventType";
   public static final String PRESERVATION_EVENT_OUTCOME = "eventOutcome";
   public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION = "eventOutcomeDetailExtension";
-  public static final Object PRESERVATION_EVENT_AGENT_IDENTIFIER_TYPE = "agentIdentifierType";
-  public static final Object PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE = "agentIdentifierValue";
-  public static final Object PRESERVATION_EVENT_AGENT_ROLE = "agentRole";
-  public static final Object PRESERVATION_EVENT_OBJECT_IDENTIFIER_TYPE = "objectIdentifierType";
-  public static final Object PRESERVATION_EVENT_OBJECT_IDENTIFIER_VALUE = "objectIdentifierValue";
-  public static final Object PRESERVATION_EVENT_OBJECT_ROLE = "objectRole";
+  public static final String PRESERVATION_EVENT_AGENT_IDENTIFIER_TYPE = "agentIdentifierType";
+  public static final String PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE = "agentIdentifierValue";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE = "agentRole";
+  public static final String PRESERVATION_EVENT_OBJECT_IDENTIFIER_TYPE = "objectIdentifierType";
+  public static final String PRESERVATION_EVENT_OBJECT_IDENTIFIER_VALUE = "objectIdentifierValue";
+  public static final String PRESERVATION_EVENT_OBJECT_ROLE = "objectRole";
 
 }

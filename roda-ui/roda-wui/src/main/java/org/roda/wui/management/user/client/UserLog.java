@@ -143,7 +143,7 @@ public class UserLog extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         LogEntry selected = logList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(LogEntryPanel.RESOLVER, selected.getId());
+          Tools.newHistory(ShowLogEntry.RESOLVER, selected.getId());
         }
       }
     });
@@ -186,8 +186,8 @@ public class UserLog extends Composite {
     if (historyTokens.size() == 0) {
       logList.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.size() > 1 && LogEntryPanel.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      LogEntryPanel.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1 && ShowLogEntry.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
+      ShowLogEntry.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
