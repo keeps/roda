@@ -187,10 +187,13 @@ public class JavascriptUtils {
     $wnd.history.pushState(newUrl, "", newUrl);
   }-*/;
   
-  public static native void showRightHiddenPanel(String panel) /*-{
+  public static native void toggleRightPanel(String panel) /*-{
     $wnd.jQuery(panel).animate({width:'toggle'},100);  
   }-*/;
   
+  public static native void hideRightPanel(String panel) /*-{
+    $wnd.jQuery(panel).hide();  
+  }-*/;
   
   public static native void historyGo(int n) /*-{
     $wnd.history.go(n);
