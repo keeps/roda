@@ -13,7 +13,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.EnumSet;
@@ -50,7 +49,9 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          indexPath(dir, attrs);
+          if (!dir.equals(basePath)) {
+            indexPath(dir, attrs);
+          }
           return FileVisitResult.CONTINUE;
         }
 
@@ -73,7 +74,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       LOGGER.info("End indexing Transferred Resources");
       LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
-      RodaCoreFactory.setFolderMonitorDate(basePath, new Date());
+      RodaCoreFactory.setFolderMonitorDate(new Date());
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error reindexing Transferred Resources", e);
     }
@@ -99,41 +100,21 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   public void transferredResourceAdded(TransferredResource resource, boolean commit) {
 
     try {
-      if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
-        for (String ancestor : resource.getAncestorsPaths()) {
-          TransferredResource resourceAncestor = FolderMonitorNIO
-            .createTransferredResource(basePath.resolve(Paths.get(ancestor)), Paths.get(resource.getBasePath()));
-          if (resourceAncestor.isToIndex()) {
-            LOGGER.debug("---------------- ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
-            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
-              SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
-          } else {
-            LOGGER.debug("---------------- NOT ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
-          }
-        }
-      }
-      if (resource.isToIndex()) {
-        LOGGER.debug("---------------- ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
-        index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
-      } else {
-        LOGGER.debug("---------------- NOT ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
-      }
+      // TODO check if indexing ancestors is really needed
+      // if (resource.getAncestorsPaths() != null &&
+      // resource.getAncestorsPaths().size() > 0) {
+      // for (String ancestor : resource.getAncestorsPaths()) {
+      // TransferredResource resourceAncestor = FolderMonitorNIO
+      // .createTransferredResource(basePath.resolve(Paths.get(ancestor)),
+      // Paths.get(resource.getBasePath()));
+      // index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+      // SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+      //
+      // }
+      // }
+
+      index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
+
       if (commit) {
         index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       }

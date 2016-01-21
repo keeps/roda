@@ -52,14 +52,6 @@
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel ui:field="filtersPanel">
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							<ui:text from='{messages.ingestTransferFilterProducers}' />
-						</g:Label>
-						<g:FlowPanel ui:field="facetOwner" />
-					</g:FlowPanel>
-				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarFoldersFilesTitle}' />

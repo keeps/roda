@@ -72,7 +72,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   private TextColumn<TransferredResource> nameColumn;
   private TextColumn<TransferredResource> sizeColumn;
   private Column<TransferredResource, Date> creationDateColumn;
-  private TextColumn<TransferredResource> ownerColumn;
 
   public TransferredResourceList() {
     this(null, null, null);
@@ -123,14 +122,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       }
     };
 
-    // idColumn = new TextColumn<TransferredResource>() {
-    //
-    // @Override
-    // public String getValue(TransferredResource r) {
-    // return r != null ? r.getId() : null;
-    // }
-    // };
-
     nameColumn = new TextColumn<TransferredResource>() {
 
       @Override
@@ -155,20 +146,11 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       }
     };
 
-    ownerColumn = new TextColumn<TransferredResource>() {
-
-      @Override
-      public String getValue(TransferredResource r) {
-        return r != null ? r.getOwner() : null;
-      }
-    };
-
     isFileColumn.setSortable(true);
     // idColumn.setSortable(true);
     nameColumn.setSortable(true);
     sizeColumn.setSortable(true);
     creationDateColumn.setSortable(true);
-    ownerColumn.setSortable(true);
 
     Header<Boolean> selectHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
 
@@ -239,7 +221,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
     display.addColumn(sizeColumn, sizeHeader, sizeFooter);
     display.addColumn(creationDateColumn, "Date created");
-    display.addColumn(ownerColumn, "Producer");
 
     // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
@@ -254,7 +235,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     sizeFooter.setHeaderStyleNames("text-align-right");
     sizeColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     creationDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
-    ownerColumn.setCellStyleNames("nowrap");
   }
 
   @Override
@@ -268,7 +248,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     columnSortingKeyMap.put(nameColumn, RodaConstants.TRANSFERRED_RESOURCE_NAME);
     columnSortingKeyMap.put(sizeColumn, RodaConstants.TRANSFERRED_RESOURCE_SIZE);
     columnSortingKeyMap.put(creationDateColumn, RodaConstants.TRANSFERRED_RESOURCE_DATE);
-    columnSortingKeyMap.put(ownerColumn, RodaConstants.TRANSFERRED_RESOURCE_OWNER);
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

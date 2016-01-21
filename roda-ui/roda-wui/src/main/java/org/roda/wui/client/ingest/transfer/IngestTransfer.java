@@ -12,41 +12,34 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.RodaUser;
 import org.roda.core.data.v2.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.TransferredResourceList.CheckboxSelectionListener;
+import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.CreateJob;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
-import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -56,7 +49,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -129,7 +121,7 @@ public class IngestTransfer extends Composite {
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   private TransferredResource resource;
-  
+
   @UiField
   Label ingestTransferTitle;
 
@@ -151,13 +143,6 @@ public class IngestTransfer extends Composite {
   @UiField
   Label itemDates;
 
-  // FILTERS
-  @UiField
-  FlowPanel filtersPanel;
-
-  @UiField(provided = true)
-  FlowPanel facetOwner;
-
   // BUTTONS
   @UiField
   Button uploadFiles;
@@ -172,15 +157,10 @@ public class IngestTransfer extends Composite {
   Button startIngest;
 
   private IngestTransfer() {
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
+    Facets facets = null;
 
     // TODO externalise strings
     transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, "Transferred resources list");
-
-    facetOwner = new FlowPanel();
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.TRANSFERRED_RESOURCE_OWNER, facetOwner);
-    FacetUtils.bindFacets(transferredResourceList, facetPanels, true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -194,20 +174,10 @@ public class IngestTransfer extends Composite {
         } else if (r != null && r.isFile()) {
           // disable selection
           transferredResourceList.getSelectionModel().clear();
-          
+
           // TODO download file
-          
+
         }
-      }
-    });
-
-    transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
-        boolean visible = event.getValue().getTotalCount() > 0;
-        // transferredResourceList.setVisible(visible);
-        filtersPanel.setVisible(visible);
       }
     });
 
@@ -227,7 +197,7 @@ public class IngestTransfer extends Composite {
 
   protected void view(TransferredResource r) {
     resource = r;
-    
+
     ingestTransferTitle.setVisible(false);
     ingestTransferDescription.setVisible(false);
 
@@ -236,14 +206,12 @@ public class IngestTransfer extends Composite {
 
     itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText(r.getName());
-    itemDates.setText(
-      messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize()), r.getOwner()));
+    itemDates.setText(messages.ingestTransferItemInfo(r.getCreationDate(), Humanize.readableFileSize(r.getSize())));
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
     Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()),
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_OWNER, r.getOwner()));
+      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
     transferredResourceList.setFilter(filter);
 
     breadcrumb.updatePath(getBreadcrumbs(r));
@@ -254,7 +222,7 @@ public class IngestTransfer extends Composite {
 
   protected void view() {
     resource = null;
-    
+
     ingestTransferTitle.setVisible(true);
     ingestTransferDescription.setVisible(true);
 
@@ -297,7 +265,7 @@ public class IngestTransfer extends Composite {
     if (historyTokens.size() == 0) {
       view();
       callback.onSuccess(this);
-    } else if (historyTokens.size() > 1
+    } else if (historyTokens.size() >= 1
       && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
       IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
@@ -324,7 +292,7 @@ public class IngestTransfer extends Composite {
                   }
                 });
               } else {
-                Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                AsyncRequestUtils.defaultFailureTreatment(caught);
                 Tools.newHistory(IngestTransfer.RESOLVER);
               }
 
@@ -348,7 +316,7 @@ public class IngestTransfer extends Composite {
 
   public static String getTransferredResourceIdFromPath(List<String> historyTokens) {
     String ret;
-    if (historyTokens.size() > 1) {
+    if (historyTokens.size() > 0) {
       ret = Tools.join(historyTokens, TRANSFERRED_RESOURCE_ID_SEPARATOR);
     } else {
       ret = null;
@@ -373,19 +341,7 @@ public class IngestTransfer extends Composite {
     if (resource != null) {
       Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
     } else {
-      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
-
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError("Error", caught.getMessage());
-        }
-
-        @Override
-        public void onSuccess(RodaUser user) {
-          Tools.newHistory(IngestTransferUpload.RESOLVER, user.getName());
-        }
-      });
-
+      Tools.newHistory(IngestTransferUpload.RESOLVER);
     }
   }
 
@@ -407,7 +363,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+              AsyncRequestUtils.defaultFailureTreatment(caught);
             }
 
             @Override
@@ -434,7 +390,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              Toast.showError(caught.getMessage());
+              AsyncRequestUtils.defaultFailureTreatment(caught);
             }
 
             @Override
@@ -445,7 +401,7 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    Toast.showError("Error removing", caught.getMessage());
+                    AsyncRequestUtils.defaultFailureTreatment(caught);
                   }
 
                   @Override
@@ -476,7 +432,7 @@ public class IngestTransfer extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            Toast.showError(caught.getMessage());
+            AsyncRequestUtils.defaultFailureTreatment(caught);
           }
 
           @Override
@@ -486,7 +442,7 @@ public class IngestTransfer extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  Toast.showError("Error", caught.getMessage());
+                  AsyncRequestUtils.defaultFailureTreatment(caught);
                   transferredResourceList.refresh();
                 }
 

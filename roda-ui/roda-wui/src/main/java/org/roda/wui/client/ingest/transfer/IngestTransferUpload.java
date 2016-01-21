@@ -114,7 +114,6 @@ public class IngestTransferUpload extends Composite {
   @UiField
   HTML uploadList;
 
-  private String username;
   private TransferredResource resource;
 
   private IngestTransferUpload() {
@@ -125,8 +124,8 @@ public class IngestTransferUpload extends Composite {
     String ret;
 
     if (resource == null) {
-      // upload to user root
-      ret = RestUtils.createTransferredResourceUploadUri(username);
+      // upload to root
+      ret = RestUtils.createTransferredResourceUploadUri(null);
     } else if (resource != null && !resource.isFile()) {
       String id = resource.getId();
       ret = RestUtils.createTransferredResourceUploadUri(id);
@@ -139,12 +138,8 @@ public class IngestTransferUpload extends Composite {
 
   protected void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      Tools.newHistory(IngestTransfer.RESOLVER);
-      callback.onSuccess(null);
-    } else if (historyTokens.size() == 1) {
-      // Upload to user root
+      // Upload to root
       resource = null;
-      username = historyTokens.get(0);
       callback.onSuccess(IngestTransferUpload.this);
       updateUploadForm();
     } else {
@@ -162,7 +157,6 @@ public class IngestTransferUpload extends Composite {
             @Override
             public void onSuccess(TransferredResource r) {
               resource = r;
-              username = r.getOwner();
               callback.onSuccess(IngestTransferUpload.this);
               updateUploadForm();
             }

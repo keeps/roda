@@ -92,8 +92,6 @@
 		required="true" multiValued="false" />
 	<field name="size" type="long" indexed="true" stored="true"
 		required="true" multiValued="false" />
-	<field name="owner" type="string" indexed="true" stored="true"
-		required="true" multiValued="false" />
 
 	<!-- Dynamic field definitions allow using convention over configuration 
 		for fields via the specification of patterns to match field names. EXAMPLE: 

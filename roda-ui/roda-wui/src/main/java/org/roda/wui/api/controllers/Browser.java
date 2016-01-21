@@ -717,11 +717,6 @@ public class Browser extends RodaCoreService {
 
     UserUtility.checkTransferredResourceAccess(user, Arrays.asList(parent));
 
-    // fix parent
-    if (parent == null) {
-      parent = user.getName();
-    }
-
     // delegate
     try {
       String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName);

@@ -16,6 +16,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
@@ -71,8 +72,9 @@ public class FolderMonitorNIO {
     observers.remove(observer);
   }
 
-  public String createFolder(Path parent, String folderName) throws IOException {
-    Path createdPath = Files.createDirectories(basePath.resolve(parent).resolve(folderName));
+  public String createFolder(String parent, String folderName) throws IOException {
+    Path parentPath = parent != null ? basePath.resolve(parent) : basePath;
+    Path createdPath = Files.createDirectories(parentPath.resolve(folderName));
     TransferredResource tr = createTransferredResource(createdPath, basePath);
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(tr);
@@ -109,7 +111,7 @@ public class FolderMonitorNIO {
 
   public void createFile(String path, String fileName, InputStream inputStream)
     throws IOException, FileAlreadyExistsException {
-    Path parent = basePath.resolve(path);
+    Path parent = path != null ? basePath.resolve(path) : basePath;
     Files.createDirectories(parent);
     Path file = parent.resolve(fileName);
     Files.copy(inputStream, file);
@@ -135,7 +137,6 @@ public class FolderMonitorNIO {
   public static TransferredResource createTransferredResource(Path resourcePath, Path basePath) {
     Path relativeToBase = basePath.relativize(resourcePath);
     TransferredResource tr = new TransferredResource();
-    tr.setBasePath(basePath.toString());
     try {
       BasicFileAttributes attr = Files.readAttributes(basePath, BasicFileAttributes.class);
       Date d = new Date(attr.creationTime().toMillis());
@@ -148,31 +149,30 @@ public class FolderMonitorNIO {
     tr.setFullPath(resourcePath.toString());
     tr.setId(relativeToBase.toString());
     tr.setName(resourcePath.getFileName().toString());
-    tr.setOwner(relativeToBase.getName(0).toString());
-    if (relativeToBase.getNameCount() > 1) {
-      tr.setToIndex(true);
-      tr.setRelativePath(relativeToBase.subpath(1, relativeToBase.getNameCount()).toString());
-      if (relativeToBase.getParent() != null && relativeToBase.getParent().getNameCount() > 1) {
-        tr.setParentId(relativeToBase.subpath(1, relativeToBase.getNameCount()).getParent().toString());
-      }
-    } else {
-      tr.setToIndex(false);
+
+    tr.setRelativePath(relativeToBase.toString());
+    if (relativeToBase.getParent() != null) {
+      tr.setParentId(relativeToBase.getParent().toString());
     }
+
     try {
       tr.setSize(Files.isDirectory(resourcePath) ? 0L : Files.size(resourcePath));
     } catch (IOException e) {
       tr.setSize(0L);
     }
+
     List<String> ancestors = new ArrayList<String>();
-    String[] tokens = relativeToBase.toString().split("/");
-    String temp = "";
-    for (String s : tokens) {
-      temp += s;
-      ancestors.add(temp);
-      temp += "/";
+
+    StringBuilder temp = new StringBuilder();
+    Iterator<Path> pathIterator = relativeToBase.iterator();
+    while (pathIterator.hasNext()) {
+      temp.append(pathIterator.next().toString());
+      ancestors.add(temp.toString());
+      temp.append("/");
     }
     ancestors.remove(ancestors.size() - 1);
     tr.setAncestorsPaths(ancestors);
+
     return tr;
   }
 

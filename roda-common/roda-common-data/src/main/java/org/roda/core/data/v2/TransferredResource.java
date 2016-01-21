@@ -17,46 +17,20 @@ public class TransferredResource implements Serializable {
   private String id;
   private String fullPath;
   private String relativePath;
-  private String parentPath;
+  private String parentId;
+  private List<String> ancestorsPaths;
+
   private long size;
   private Date creationDate;
   private String name;
   private boolean file;
-  private String owner;
-  private List<String> ancestorsPaths;
-  private String basePath;
-  private boolean toIndex;
-
-  public boolean isToIndex() {
-    return toIndex;
-  }
-
-  public void setToIndex(boolean toIndex) {
-    this.toIndex = toIndex;
-  }
 
   public String getParentPath() {
-    return parentPath;
+    return parentId;
   }
 
   public void setParentPath(String parentPath) {
-    this.parentPath = parentPath;
-  }
-
-  public String getBasePath() {
-    return basePath;
-  }
-
-  public void setBasePath(String basePath) {
-    this.basePath = basePath;
-  }
-
-  public String getOwner() {
-    return owner;
-  }
-
-  public void setOwner(String owner) {
-    this.owner = owner;
+    this.parentId = parentPath;
   }
 
   public boolean isFile() {
@@ -120,11 +94,11 @@ public class TransferredResource implements Serializable {
   }
 
   public String getParentId() {
-    return parentPath;
+    return parentId;
   }
 
   public void setParentId(String parentId) {
-    this.parentPath = parentId;
+    this.parentId = parentId;
   }
 
   public List<String> getAncestorsPaths() {
@@ -137,9 +111,9 @@ public class TransferredResource implements Serializable {
 
   @Override
   public String toString() {
-    return "TransferredResource [id=" + id + ", fullPath=" + fullPath + ", relativePath=" + relativePath
-      + ", parentPath=" + parentPath + ", size=" + size + ", creationDate=" + creationDate + ", name=" + name
-      + ", file=" + file + ", owner=" + owner + "]";
+    return "TransferredResource [id=" + id + ", fullPath=" + fullPath + ", relativePath=" + relativePath + ", parentId="
+      + parentId + ", ancestorsPaths=" + ancestorsPaths + ", size=" + size + ", creationDate=" + creationDate
+      + ", name=" + name + ", file=" + file + "]";
   }
 
 }

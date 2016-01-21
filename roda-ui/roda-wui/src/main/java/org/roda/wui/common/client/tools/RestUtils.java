@@ -140,8 +140,12 @@ public class RestUtils {
     // api/v1/transferred/?parentId={parentId}
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_TRANSFERRED).append(RodaConstants.API_QUERY_START).append("parentId")
-      .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(parentId);
+    b.append(RodaConstants.API_REST_V1_TRANSFERRED);
+
+    if (parentId != null) {
+      b.append(RodaConstants.API_QUERY_START).append("parentId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(parentId);
+    }
 
     return b.toString();
   }

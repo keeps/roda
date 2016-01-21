@@ -189,8 +189,8 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Ingest transfer")
   String ingestTransferTitle();
 
-  @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}, from {2}")
-  String ingestTransferItemInfo(Date creationDate, String readableFileSize, String owner);
+  @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}")
+  String ingestTransferItemInfo(Date creationDate, String readableFileSize);
 
   @DefaultMessage("Confirm remove folder")
   String ingestTransferRemoveFolderConfirmDialogTitle();
@@ -230,9 +230,6 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Process")
   String ingestTransferButtonIngestSelectedItems();
-
-  @DefaultMessage("Producers")
-  String ingestTransferFilterProducers();
 
   @DefaultMessage("Resource not found")
   String ingestTransferNotFoundDialogTitle();

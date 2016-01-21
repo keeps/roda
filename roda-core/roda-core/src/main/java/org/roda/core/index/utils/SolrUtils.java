@@ -1336,7 +1336,6 @@ public class SolrUtils {
     boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
-    String owner = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_OWNER));
 
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
 
@@ -1348,7 +1347,6 @@ public class SolrUtils {
     tr.setSize(size);
     tr.setParentId(parentId);
     tr.setFile(isFile);
-    tr.setOwner(owner);
     tr.setAncestorsPaths(ancestorsPath);
     return tr;
   }
@@ -1368,7 +1366,6 @@ public class SolrUtils {
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, resource.isFile());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, resource.getSize());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, resource.getName());
-    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_OWNER, resource.getOwner());
     if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
       transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
     }

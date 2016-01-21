@@ -9,11 +9,9 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.TransferredResource;
@@ -37,45 +35,23 @@ public class IndexFolderObserver implements FolderObserver {
 
   public void transferredResourceAdded(TransferredResource resource) {
     try {
-      if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
-        for (String ancestor : resource.getAncestorsPaths()) {
-          TransferredResource resourceAncestor = FolderMonitorNIO
-            .createTransferredResource(basePath.resolve(Paths.get(ancestor)), Paths.get(resource.getBasePath()));
-          if (resourceAncestor.isToIndex()) {
-            LOGGER.debug("---------------- ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
-            index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
-              SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
-          } else {
-            LOGGER.debug("---------------- NOT ADDED ----------------------");
-            LOGGER.debug("FULLPATH " + resourceAncestor.getFullPath());
-            LOGGER.debug("RELATIVE " + resourceAncestor.getRelativePath());
-            LOGGER.debug("PARENT " + resourceAncestor.getParentPath());
-            LOGGER.debug("------------------------------------------------");
-          }
-        }
-      }
-      if (resource.isToIndex()) {
-        LOGGER.debug("---------------- ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
-        index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
-      } else {
-        LOGGER.debug("---------------- NOT ADDED ----------------------");
-        LOGGER.debug("FULLPATH " + resource.getFullPath());
-        LOGGER.debug("RELATIVE " + resource.getRelativePath());
-        LOGGER.debug("PARENT " + resource.getParentPath());
-        LOGGER.debug("------------------------------------------------");
-      }
+      // TODO check if indexing ancestors is really needed
+      // if (resource.getAncestorsPaths() != null &&
+      // resource.getAncestorsPaths().size() > 0) {
+      // for (String ancestor : resource.getAncestorsPaths()) {
+      // TransferredResource resourceAncestor = FolderMonitorNIO
+      // .createTransferredResource(basePath.resolve(Paths.get(ancestor)),
+      // Paths.get(resource.getBasePath()));
+      // index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+      // SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+      //
+      // }
+      // }
+
+      index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
+
     } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to SIPMonitorIndex: " + e.getMessage(), e);
-    } catch (Throwable t) {
-      LOGGER.error("ERROR: " + t.getMessage(), t);
+      LOGGER.error("Error adding path to Transferred Resources index", e);
     }
   }
 

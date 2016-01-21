@@ -817,7 +817,7 @@ public class BrowserHelper {
 
   public static String createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
     try {
-      return RodaCoreFactory.getFolderMonitor().createFolder(Paths.get(parent), folderName);
+      return RodaCoreFactory.getFolderMonitor().createFolder(parent, folderName);
     } catch (IOException e) {
       LOGGER.error("Error creating transferred resource folder", e);
       throw new GenericException("Error creating transferred resource folder: " + e.getMessage());

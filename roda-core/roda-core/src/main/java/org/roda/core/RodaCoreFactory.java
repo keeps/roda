@@ -135,6 +135,8 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 public class RodaCoreFactory {
+  private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
 
   private static boolean instantiated = false;
@@ -143,7 +145,7 @@ public class RodaCoreFactory {
   // Core related objects
   private static Path rodaHomePath;
   private static Path storagePath;
-  private static Path indexPath;
+  private static Path indexDataPath;
   private static Path dataPath;
   private static Path logPath;
   private static Path configPath;
@@ -309,7 +311,15 @@ public class RodaCoreFactory {
     if (nodeType == NodeType.MASTER) {
       Path solrHome = configPath.resolve("index");
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
-        copyIndexConfigsFromClasspathToRodaHome();
+        try {
+          Path tempConfig = Files.createTempDirectory("index");
+          copyIndexConfigsFromClasspathTo(tempConfig);
+          solrHome = tempConfig.resolve("config").resolve("index");
+          LOGGER.info("Using SOLR home: " + solrHome);
+        } catch (IOException e) {
+          LOGGER.error("Error creating temporary SOLR home", e);
+          // TODO throw exception?
+        }
       }
 
       // instantiate solr
@@ -321,8 +331,8 @@ public class RodaCoreFactory {
       try {
         URL solrConfigURL = RodaCoreFactory.class.getResource("/config/index/solr.xml");
         Path solrConfigPath = Paths.get(solrConfigURL.toURI());
-        Files.copy(solrConfigPath, indexPath.resolve("solr.xml"));
-        Path aipSchema = indexPath.resolve("aip");
+        Files.copy(solrConfigPath, indexDataPath.resolve("solr.xml"));
+        Path aipSchema = indexDataPath.resolve("aip");
         Files.createDirectories(aipSchema);
         Files.createFile(aipSchema.resolve("core.properties"));
 
@@ -339,7 +349,7 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void copyIndexConfigsFromClasspathToRodaHome() {
+  private static void copyIndexConfigsFromClasspathTo(Path dir) {
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
     // classLoadersList.add(ClasspathHelper.staticClassLoader());
@@ -352,7 +362,7 @@ public class RodaCoreFactory {
 
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
-      Path destinyPath = rodaHomePath.resolve(resource);
+      Path destinyPath = dir.resolve(resource);
       try {
         // create all parent directories
         Files.createDirectories(destinyPath.getParent());
@@ -384,17 +394,17 @@ public class RodaCoreFactory {
   }
 
   private static void setSolrSystemProperties() {
-    System.setProperty("solr.data.dir", indexPath.toString());
-    System.setProperty("solr.data.dir.aip", indexPath.resolve("aip").toString());
-    System.setProperty("solr.data.dir.sdo", indexPath.resolve("sdo").toString());
-    System.setProperty("solr.data.dir.representations", indexPath.resolve("representation").toString());
-    System.setProperty("solr.data.dir.file", indexPath.resolve("file").toString());
-    System.setProperty("solr.data.dir.preservationevent", indexPath.resolve("preservationevent").toString());
-    System.setProperty("solr.data.dir.actionlog", indexPath.resolve("actionlog").toString());
-    System.setProperty("solr.data.dir.members", indexPath.resolve("members").toString());
-    System.setProperty("solr.data.dir.transferredresource", indexPath.resolve("transferredresource").toString());
-    System.setProperty("solr.data.dir.job", indexPath.resolve("job").toString());
-    System.setProperty("solr.data.dir.jobreport", indexPath.resolve("jobreport").toString());
+    System.setProperty("solr.data.dir", indexDataPath.toString());
+    System.setProperty("solr.data.dir.aip", indexDataPath.resolve("aip").toString());
+    System.setProperty("solr.data.dir.sdo", indexDataPath.resolve("sdo").toString());
+    System.setProperty("solr.data.dir.representations", indexDataPath.resolve("representation").toString());
+    System.setProperty("solr.data.dir.file", indexDataPath.resolve("file").toString());
+    System.setProperty("solr.data.dir.preservationevent", indexDataPath.resolve("preservationevent").toString());
+    System.setProperty("solr.data.dir.actionlog", indexDataPath.resolve("actionlog").toString());
+    System.setProperty("solr.data.dir.members", indexDataPath.resolve("members").toString());
+    System.setProperty("solr.data.dir.transferredresource", indexDataPath.resolve("transferredresource").toString());
+    System.setProperty("solr.data.dir.job", indexDataPath.resolve("job").toString());
+    System.setProperty("solr.data.dir.jobreport", indexDataPath.resolve("jobreport").toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
@@ -460,7 +470,7 @@ public class RodaCoreFactory {
     dataPath = rodaHomePath.resolve("data");
     logPath = dataPath.resolve("log");
     storagePath = dataPath.resolve("storage");
-    indexPath = dataPath.resolve("index");
+    indexDataPath = dataPath.resolve("index");
 
     // configure logback
     if (nodeType != NodeType.TEST) {
@@ -514,7 +524,7 @@ public class RodaCoreFactory {
     essentialDirectories.add(dataPath.resolve("transferredResources"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
-    essentialDirectories.add(indexPath);
+    essentialDirectories.add(indexDataPath);
 
     for (Path path : essentialDirectories) {
       try {
@@ -597,7 +607,7 @@ public class RodaCoreFactory {
     Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
     String transferredResourcesFolder = rodaConfig.getString("transferredResources.folder");
     Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
-    Date date = getFolderMonitorDate(transferredResourcesFolderPath);
+    Date date = getFolderMonitorDate();
     transferredResourcesFolderObserver = new IndexFolderObserver(solr, transferredResourcesFolderPath);
     transferredResourcesFolderMonitor = new FolderMonitorNIO(transferredResourcesFolderPath, date, solr);
     transferredResourcesFolderMonitor.addFolderObserver(transferredResourcesFolderObserver);
@@ -605,10 +615,10 @@ public class RodaCoreFactory {
       .debug("Transferred resources folder monitor is fully initialized? " + getFolderMonitor().isFullyInitialized());
   }
 
-  public static Date getFolderMonitorDate(Path folderPath) {
+  public static Date getFolderMonitorDate() {
     Date folderMonitorDate = null;
     try {
-      Path dateFile = folderPath.resolve(".date");
+      Path dateFile = dataPath.resolve(TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME);
       if (Files.exists(dateFile)) {
         String dateFromFile = new String(Files.readAllBytes(dateFile));
         SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
@@ -620,9 +630,9 @@ public class RodaCoreFactory {
     return folderMonitorDate;
   }
 
-  public static void setFolderMonitorDate(Path folderPath, Date d) {
+  public static void setFolderMonitorDate(Date d) {
     try {
-      Path dateFile = folderPath.resolve(".date");
+      Path dateFile = dataPath.resolve(TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME);
       if (!Files.exists(dateFile)) {
         Files.createFile(dateFile);
       }

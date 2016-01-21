@@ -292,7 +292,10 @@ public class UserUtility {
       return;
     } else {
       for (String id : ids) {
-        if (!Paths.get(id).getName(0).toString().equalsIgnoreCase(user.getName())) {
+        if (id == null && !user.getName().equals("admin")) {
+          throw new AuthorizationDeniedException(
+            "The user '" + user.getId() + "' does not have permissions to create resource in root!");
+        } else if (!Paths.get(id).getName(0).toString().equalsIgnoreCase(user.getName())) {
           throw new AuthorizationDeniedException(
             "The user '" + user.getId() + "' does not have permissions to access to transferred resource " + id + " !");
         }
