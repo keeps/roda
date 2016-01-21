@@ -136,6 +136,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_AIP = "AIP";
   public static final String STORAGE_CONTAINER_PRESERVATION = "Preservation";
   public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
+  public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
   // FIXME not in use. are the following to remove?
   // public static final String STORAGE_CONTAINER_NOTIFICATIONS =

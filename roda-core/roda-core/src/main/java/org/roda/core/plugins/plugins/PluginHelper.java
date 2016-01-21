@@ -114,19 +114,20 @@ public final class PluginHelper {
     return index.retrieve(Job.class, getJobId(pluginParameters));
   }
 
-  public static void createJobReport(ModelService model, String jobId, String objectId) {
-    JobReport jobReport = new JobReport();
-    jobReport.setId(UUID.randomUUID().toString());
-    jobReport.setJobId(jobId);
-    jobReport.setObjectId(objectId);
-    Date currentDate = new Date();
-    jobReport.setDateCreated(currentDate);
-    jobReport.setDateUpdated(currentDate);
-    Report report = new Report();
-    jobReport.setReport(report);
-
-    model.createJobReport(jobReport);
-  }
+  // public static void createJobReport(ModelService model, String jobId, String
+  // objectId) throws GenericException {
+  // JobReport jobReport = new JobReport();
+  // jobReport.setId(UUID.randomUUID().toString());
+  // jobReport.setJobId(jobId);
+  // jobReport.setObjectId(objectId);
+  // Date currentDate = new Date();
+  // jobReport.setDateCreated(currentDate);
+  // jobReport.setDateUpdated(currentDate);
+  // Report report = new Report();
+  // jobReport.setReport(report);
+  //
+  // model.createJobReport(jobReport);
+  // }
 
   public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
     PluginState pluginState, String jobId) {
@@ -145,8 +146,11 @@ public final class PluginHelper {
     report.addItem(reportItem);
     jobReport.setReport(report);
 
-    model.createJobReport(jobReport);
-
+    try {
+      model.createJobReport(jobReport);
+    } catch (GenericException e) {
+      LOGGER.error("Error creating Job Report", e);
+    }
   }
 
   public static void updateJobReport(ModelService model, IndexService index, Plugin<?> plugin, ReportItem reportItem,
@@ -305,7 +309,7 @@ public final class PluginHelper {
 
       model.updateJob(job);
     } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Unable to get Job from index", e);
+      LOGGER.error("Unable to get or update Job from index", e);
     }
   }
 

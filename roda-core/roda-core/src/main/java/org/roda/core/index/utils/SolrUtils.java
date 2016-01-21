@@ -1404,8 +1404,6 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, ModelUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
-    doc.addField(RodaConstants.JOB_OBJECT_IDS_TO_AIP_REPORT,
-      ModelUtils.getJsonFromObject(job.getObjectIdsToAipReport()));
 
     return doc;
   }
@@ -1426,8 +1424,6 @@ public class SolrUtils {
     job.setOrchestratorMethod(
       ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
-    job.setObjectIdsToAipReport(
-      ModelUtils.getJobReportsFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECT_IDS_TO_AIP_REPORT))));
 
     return job;
   }

@@ -36,6 +36,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
 import org.roda.core.data.v2.RepresentationState;
@@ -54,6 +56,7 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -476,6 +479,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
   }
 
+  public static StoragePath getJobPath(String jobId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId);
+  }
+
+  public static StoragePath getJobReportPath(String jobReportId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT, jobReportId);
+  }
+
   // @Deprecated
   // public static StoragePath getLogPath(Date d) throws StorageServiceException
   // {
@@ -491,6 +502,45 @@ public final class ModelUtils {
       Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
       throw new GenericException("Error writing log entry to file", e);
+    }
+  }
+
+  public static void writeJobToFile(Job job, Path logFile) throws GenericException {
+    try {
+      String entryJSON = ModelUtils.getJsonFromObject(job);
+      Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.CREATE);
+    } catch (IOException e) {
+      throw new GenericException("Error writing job to file", e);
+    }
+  }
+
+  public static void writeJobReportToFile(JobReport jobReport, Path logFile) throws GenericException {
+    try {
+      String entryJSON = ModelUtils.getJsonFromObject(jobReport);
+      Files.write(logFile, entryJSON.getBytes(), StandardOpenOption.CREATE);
+    } catch (IOException e) {
+      throw new GenericException("Error writing job report to file", e);
+    }
+  }
+
+  public static void createOrUpdateJobInStorage(StorageService storage, Job job) throws GenericException {
+    try {
+      String jobAsJson = ModelUtils.getJsonFromObject(job);
+      StoragePath jobPath = ModelUtils.getJobPath(job.getId());
+      storage.updateBinaryContent(jobPath, new StringContentPayload(jobAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating job in storage", e);
+    }
+  }
+
+  public static void createOrUpdateJobReportInStorage(StorageService storage, JobReport jobReport)
+    throws GenericException {
+    try {
+      String jobReportAsJson = ModelUtils.getJsonFromObject(jobReport);
+      StoragePath jobReportPath = ModelUtils.getJobReportPath(jobReport.getId());
+      storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating job report in storage", e);
     }
   }
 

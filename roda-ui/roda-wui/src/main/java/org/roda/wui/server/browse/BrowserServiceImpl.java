@@ -653,7 +653,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public Job createJob(Job job)
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.createJob(user, job);
   }
@@ -725,10 +726,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getSupportedMetadata(user, locale);
   }
-  
+
   @Override
-  public IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.findIndexedPreservationEvents(user, filter, sorter, sublist, facets);
   }

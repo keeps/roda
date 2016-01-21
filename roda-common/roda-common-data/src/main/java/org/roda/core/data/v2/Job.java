@@ -17,8 +17,6 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.roda.core.data.Report;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -64,8 +62,6 @@ public class Job implements Serializable {
   private ORCHESTRATOR_METHOD orchestratorMethod = null;
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
-  // map between object ids and aip report
-  private Map<String, Report> objectIdsToAipReport = new HashMap<String, Report>();
 
   // report id
   private String reportId = null;
@@ -90,7 +86,6 @@ public class Job implements Serializable {
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
-    this.objectIdsToAipReport = new HashMap<>(job.getObjectIdsToAipReport());
   }
 
   public String getId() {
@@ -191,14 +186,6 @@ public class Job implements Serializable {
   public Job setObjectIds(List<String> objectIds) {
     this.objectIds = objectIds;
     return this;
-  }
-
-  public Map<String, Report> getObjectIdsToAipReport() {
-    return objectIdsToAipReport;
-  }
-
-  public void setObjectIdsToAipReport(Map<String, Report> objectIdsToAipReport) {
-    this.objectIdsToAipReport = objectIdsToAipReport;
   }
 
   public PluginType getPluginType() {

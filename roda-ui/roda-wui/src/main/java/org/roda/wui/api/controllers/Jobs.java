@@ -44,7 +44,7 @@ public class Jobs extends RodaCoreService {
    * ---------------------------------------------------------------------------
    */
   public static Job createJob(RodaUser user, Job job)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // validate input and set missing information when possible

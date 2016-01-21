@@ -124,6 +124,7 @@ public class ModelService extends ModelObservable {
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_AIP);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_PRESERVATION);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_ACTIONLOG);
+      createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB);
       createContainerIfNotExists(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error while ensuring that all containers exist", e);
@@ -1808,15 +1809,21 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public void createJob(Job job, Path jobsDirectory) {
+  public void createJob(Job job) throws GenericException {
     // create job in storage
-    // TODO
+    ModelUtils.createOrUpdateJobInStorage(storage, job);
 
     // index it
     notifyJobCreated(job);
   }
 
-  public void updateJob(Job job) {
+  public void updateJob(Job job) throws GenericException {
+    // TODO should we always write to storage or only when completion percentage
+    // is 100???
+    // update job in storage
+    ModelUtils.createOrUpdateJobInStorage(storage, job);
+
+    // index it
     notifyJobUpdated(job);
   }
 
@@ -1826,17 +1833,19 @@ public class ModelService extends ModelObservable {
     notifyFileUpdated(file);
   }
 
-  public void createJobReport(JobReport jobReport) {
+  public void createJobReport(JobReport jobReport) throws GenericException {
     // create job report in storage
-    // TODO
+    ModelUtils.createOrUpdateJobReportInStorage(storage, jobReport);
 
     // index it
     notifyJobReportCreated(jobReport);
   }
 
-  public void updateJobReport(JobReport jobReport) {
+  public void updateJobReport(JobReport jobReport) throws GenericException {
     // update job report in storage
-    // TODO
+    ModelUtils.createOrUpdateJobReportInStorage(storage, jobReport);
+
+    // index it
     notifyJobReportUpdated(jobReport);
   }
 

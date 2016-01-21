@@ -277,7 +277,7 @@ public interface BrowserService extends RemoteService {
 
   Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException;
+  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
 
   List<PluginInfo> getPluginsInfo(PluginType type);
 

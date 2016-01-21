@@ -524,6 +524,8 @@ public class RodaCoreFactory {
     essentialDirectories.add(rodaHomePath.resolve("log"));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(dataPath.resolve("transferredResources"));
+    //essentialDirectories.add(dataPath.resolve("jobs"));
+    //essentialDirectories.add(dataPath.resolve("jobreports"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
@@ -704,6 +706,10 @@ public class RodaCoreFactory {
 
   public static Path getJobsPath() {
     return dataPath.resolve("jobs");
+  }
+
+  public static Path getJobReportsPath() {
+    return dataPath.resolve("jobreports");
   }
 
   public static Path getPluginsPath() {

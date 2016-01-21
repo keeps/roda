@@ -71,11 +71,11 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(Job job) throws NotFoundException {
+  protected static Job createJob(Job job) throws NotFoundException, GenericException {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
-    RodaCoreFactory.getModelService().createJob(updatedJob, null);
+    RodaCoreFactory.getModelService().createJob(updatedJob);
 
     // FIXME should we verify if the job was created with success???
     // FIXME correctly handle future returned by Patterns.ask
