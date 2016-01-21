@@ -149,7 +149,8 @@ public class EditDescriptiveMetadata extends Composite {
           int index = 0;
           for (SupportedMetadataTypeBundle b : metadataTypes) {
             type.addItem(b.getLabel(), b.getType());
-            if (b.getType().equals(bundle.getType().toLowerCase())) {
+            String lowerCaseType = bundle.getType() != null ? bundle.getType().toLowerCase() : null;
+            if (b.getType().equals(lowerCaseType)) {
               selected = index;
             }
 
