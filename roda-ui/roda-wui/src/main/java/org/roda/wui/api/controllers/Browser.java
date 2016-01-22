@@ -30,7 +30,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.AIP;
@@ -805,7 +805,7 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.isTransferFullyInitialized();
   }
 
-  public static IndexResult<SimpleFile> getFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+  public static IndexResult<IndexedFile> getFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws GenericException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -814,7 +814,7 @@ public class Browser extends RodaCoreService {
     // UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexResult<SimpleFile> files = BrowserHelper.findFiles(filter, sorter, sublist, facets);
+    IndexResult<IndexedFile> files = BrowserHelper.findFiles(filter, sorter, sublist, facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

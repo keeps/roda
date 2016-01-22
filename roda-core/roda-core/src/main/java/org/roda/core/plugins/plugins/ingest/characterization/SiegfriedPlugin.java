@@ -27,7 +27,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AgentPreservationObject;
 import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.data.v2.ip.FileFormat;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -127,7 +127,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
           final JSONObject obj = new JSONObject(siegfriedOutput);
           JSONArray files = (JSONArray) obj.get("files");
-          List<SimpleFile> updatedFiles = new ArrayList<SimpleFile>();
+          List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (int i = 0; i < files.length(); i++) {
             JSONObject fileObject = files.getJSONObject(i);
 
@@ -158,7 +158,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   if (fileName.contains(".")) {
                     extension = fileName.substring(fileName.lastIndexOf('.'));
                   }
-                  SimpleFile f = index.retrieve(SimpleFile.class,
+                  IndexedFile f = index.retrieve(IndexedFile.class,
                     SolrUtils.getId(aip.getId(), representationID, fileName));
                   FileFormat ff = new org.roda.core.data.v2.ip.FileFormat();
                   ff.setFormatDesignationName(format);

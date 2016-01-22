@@ -11,14 +11,15 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-public class DescriptionLevelCategory implements EadCValue, Serializable {
+public class DescriptionLevelCategory implements Serializable {
 
   private static final long serialVersionUID = -3280565214967201182L;
 
   public static final DescriptionLevelCategory ORGANIZATIONAL = new DescriptionLevelCategory("organizational");
 
   public static final DescriptionLevelCategory CATEGORIZATION = new DescriptionLevelCategory("categorization");
-  public static final DescriptionLevelCategory INTELLECTUAL_ENTITY = new DescriptionLevelCategory("intellectual_entity");
+  public static final DescriptionLevelCategory INTELLECTUAL_ENTITY = new DescriptionLevelCategory(
+    "intellectual_entity");
   public static final DescriptionLevelCategory INTELLECTUAL_SUBDIVISION = new DescriptionLevelCategory(
     "intellectual_subdivision");
   public static final DescriptionLevelCategory MECHANIC_SUBDIVISION = new DescriptionLevelCategory(

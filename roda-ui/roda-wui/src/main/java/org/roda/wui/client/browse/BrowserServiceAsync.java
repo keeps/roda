@@ -19,7 +19,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -86,7 +86,7 @@ public interface BrowserServiceAsync {
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
 
   void getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
-    AsyncCallback<IndexResult<SimpleFile>> callback);
+    AsyncCallback<IndexResult<IndexedFile>> callback);
 
   void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<Job>> callback);

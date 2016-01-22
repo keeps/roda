@@ -7,11 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.deprecated.RODAObject;
 import org.roda.core.data.eadc.DescriptionLevel;
 
 /**
@@ -19,11 +19,14 @@ import org.roda.core.data.eadc.DescriptionLevel;
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class IndexedAIP extends RODAObject {
+public class IndexedAIP implements Serializable {
   private static final long serialVersionUID = 38813680938917204L;
 
   // FIXME this should be defined from DescriptionLevelManager information
   public static final Filter FONDS_FILTER = new Filter(new SimpleFilterParameter("level", "fonds"));
+
+  private String id;
+  private AIPState state;
 
   private String level = null;
   private String title = null;
@@ -41,17 +44,7 @@ public class IndexedAIP extends RODAObject {
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
   public IndexedAIP() {
-    super(null, null);
-  }
-
-  /**
-   * Constructs a new (<strong>invalid</strong>) {@link IndexedAIP} from a
-   * {@link RODAObject}.
-   * 
-   * @param rodaObject
-   */
-  public IndexedAIP(RODAObject rodaObject) {
-    super(rodaObject);
+    super();
   }
 
   /**
@@ -61,9 +54,9 @@ public class IndexedAIP extends RODAObject {
    *          the {@link IndexedAIP} to be cloned.
    */
   public IndexedAIP(IndexedAIP other) {
-    this(other.getId(), other.getLabel(), other.getLastModifiedDate(), other.getCreatedDate(), other.getState(),
-      other.getLevel(), other.getTitle(), other.getDateInitial(), other.getDateFinal(), other.getDescription(),
-      other.getParentID(), other.getSubElementsCount(), other.getPermissions());
+    this(other.getId(), other.getState(), other.getLevel(), other.getTitle(), other.getDateInitial(),
+      other.getDateFinal(), other.getDescription(), other.getParentID(), other.getSubElementsCount(),
+      other.getPermissions());
   }
 
   /**
@@ -82,18 +75,11 @@ public class IndexedAIP extends RODAObject {
    * @param parentID
    * @param subElementsCount
    */
-  public IndexedAIP(String id, String label, Date lastModifiedDate, Date createdDate, String state, String level,
-    String title, Date dateInitial, Date dateFinal, String description, String parentID, int subElementsCount,
-    RODAObjectPermissions permissions) {
+  public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
+    String description, String parentID, int subElementsCount, RODAObjectPermissions permissions) {
 
-    super(id, label, lastModifiedDate, createdDate, state);
-
-    if (id != null) {
-      setId(id);
-    } else {
-      setId(getLabel());
-    }
-
+    setId(id);
+    setState(state);
     setLevel(level);
     setTitle(title);
     setDateInitial(dateInitial);
@@ -107,29 +93,16 @@ public class IndexedAIP extends RODAObject {
     setPermissions(permissions);
   }
 
-  /**
-   * @see RODAObject#toString()
-   */
-  @Override
-  public String toString() {
-    return "SimpleDescriptionObject(" + super.toString() + ", " + "level=" + getLevel() + ", id=" + getId() + ", title="
-      + getTitle() + ", dateInitial=" + getDateInitial() + ", dateFinal=" + getDateFinal() + ", description="
-      + getDescription() + ", parentID=" + getParentID() + ", childCount=" + getSubElementsCount() + ")";
+  public AIPState getState() {
+    return state;
   }
 
-  // TODO:
-  public String getValue(String element) throws IllegalArgumentException {
-
-    return element;
+  public void setState(AIPState state) {
+    this.state = state;
   }
 
-  /**
-   * @param element
-   * @param value
-   * @throws IllegalArgumentException
-   */
-  public void setValue(String element, String value) throws IllegalArgumentException {
-    // TODO:
+  public void setId(String id) {
+    this.id = id;
   }
 
   /**
@@ -151,14 +124,8 @@ public class IndexedAIP extends RODAObject {
     this.level = level;
   }
 
-  /**
-   * Gets the unitID of this Description Object.
-   * 
-   * @return a String containing the unitID of this Descriptive Object.
-   */
-  @Override
   public String getId() {
-    return getLabel();
+    return id;
   }
 
   /**
@@ -262,6 +229,86 @@ public class IndexedAIP extends RODAObject {
 
   public void setPermissions(RODAObjectPermissions permissions) {
     this.permissions = permissions;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((dateFinal == null) ? 0 : dateFinal.hashCode());
+    result = prime * result + ((dateInitial == null) ? 0 : dateInitial.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((level == null) ? 0 : level.hashCode());
+    result = prime * result + ((parentID == null) ? 0 : parentID.hashCode());
+    result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
+    result = prime * result + ((state == null) ? 0 : state.hashCode());
+    result = prime * result + subElementsCount;
+    result = prime * result + ((title == null) ? 0 : title.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IndexedAIP other = (IndexedAIP) obj;
+    if (dateFinal == null) {
+      if (other.dateFinal != null)
+        return false;
+    } else if (!dateFinal.equals(other.dateFinal))
+      return false;
+    if (dateInitial == null) {
+      if (other.dateInitial != null)
+        return false;
+    } else if (!dateInitial.equals(other.dateInitial))
+      return false;
+    if (description == null) {
+      if (other.description != null)
+        return false;
+    } else if (!description.equals(other.description))
+      return false;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    if (level == null) {
+      if (other.level != null)
+        return false;
+    } else if (!level.equals(other.level))
+      return false;
+    if (parentID == null) {
+      if (other.parentID != null)
+        return false;
+    } else if (!parentID.equals(other.parentID))
+      return false;
+    if (permissions == null) {
+      if (other.permissions != null)
+        return false;
+    } else if (!permissions.equals(other.permissions))
+      return false;
+    if (state != other.state)
+      return false;
+    if (subElementsCount != other.subElementsCount)
+      return false;
+    if (title == null) {
+      if (other.title != null)
+        return false;
+    } else if (!title.equals(other.title))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "IndexedAIP [id=" + id + ", state=" + state + ", level=" + level + ", title=" + title + ", dateInitial="
+      + dateInitial + ", dateFinal=" + dateFinal + ", description=" + description + ", parentID=" + parentID
+      + ", subElementsCount=" + subElementsCount + ", permissions=" + permissions + "]";
   }
 
 }

@@ -9,8 +9,6 @@ package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
 
-import org.roda.core.data.deprecated.RODAObject;
-
 /**
  * @author Rui Castro
  */

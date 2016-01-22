@@ -8,7 +8,6 @@
 package org.roda.core.model;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +20,7 @@ public class AIP implements Serializable {
   private String id;
   private String parentId;
   private boolean active;
-  private Date dateCreated;
-  private Date dateModified;
+
   private List<String> descriptiveMetadataIds;
   private List<String> representationIds;
   // key representationID , value fileID
@@ -33,23 +31,21 @@ public class AIP implements Serializable {
   private Map<String, List<String>> preservationFileObjectsIds;
   // key->type, value->fileID
   private Map<String, List<String>> otherMetadataIds;
-  
+
   private RODAObjectPermissions permissions;
 
   public AIP() {
     super();
   }
 
-  public AIP(String id, String parentId, boolean active, Date dateCreated, Date dateModified,
-    RODAObjectPermissions permissions, List<String> descriptiveMetadataIds, List<String> representationIds,
+  public AIP(String id, String parentId, boolean active, RODAObjectPermissions permissions,
+    List<String> descriptiveMetadataIds, List<String> representationIds,
     Map<String, List<String>> preservationRepresentationObjectsIds, Map<String, List<String>> preservationEventsIds,
     Map<String, List<String>> preservationFileObjectsIds) {
     super();
     this.id = id;
     this.parentId = parentId;
     this.active = active;
-    this.dateCreated = dateCreated;
-    this.dateModified = dateModified;
     this.permissions = permissions;
     this.descriptiveMetadataIds = descriptiveMetadataIds;
     this.representationIds = representationIds;
@@ -82,20 +78,6 @@ public class AIP implements Serializable {
     return active;
   }
 
-  /**
-   * @return the dateCreated
-   */
-  public Date getDateCreated() {
-    return dateCreated;
-  }
-
-  /**
-   * @return the dateModified
-   */
-  public Date getDateModified() {
-    return dateModified;
-  }
-
   public static long getSerialversionuid() {
     return serialVersionUID;
   }
@@ -110,14 +92,6 @@ public class AIP implements Serializable {
 
   public void setActive(boolean active) {
     this.active = active;
-  }
-
-  public void setDateCreated(Date dateCreated) {
-    this.dateCreated = dateCreated;
-  }
-
-  public void setDateModified(Date dateModified) {
-    this.dateModified = dateModified;
   }
 
   public RODAObjectPermissions getPermissions() {
@@ -170,7 +144,7 @@ public class AIP implements Serializable {
   public Map<String, List<String>> getPreservationsEventsIds() {
     return preservationEventsIds;
   }
-  
+
   /**
    * @return the otherMetadataIds
    */
@@ -180,11 +154,11 @@ public class AIP implements Serializable {
 
   @Override
   public String toString() {
-    return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", dateCreated=" + dateCreated
-      + ", dateModified=" + dateModified + ", descriptiveMetadataIds=" + descriptiveMetadataIds + ", representationIds="
-      + representationIds + ", preservationRepresentationObjectsIds=" + preservationRepresentationObjectsIds
-      + ", preservationEventsIds=" + preservationEventsIds + ", preservationFileObjectsIds="
-      + preservationFileObjectsIds + ", permissions=" + permissions + "]";
+    return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", descriptiveMetadataIds="
+      + descriptiveMetadataIds + ", representationIds=" + representationIds + ", preservationRepresentationObjectsIds="
+      + preservationRepresentationObjectsIds + ", preservationEventsIds=" + preservationEventsIds
+      + ", preservationFileObjectsIds=" + preservationFileObjectsIds + ", otherMetadataIds=" + otherMetadataIds
+      + ", permissions=" + permissions + "]";
   }
 
   @Override
@@ -192,10 +166,9 @@ public class AIP implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + (active ? 1231 : 1237);
-    result = prime * result + ((dateCreated == null) ? 0 : dateCreated.hashCode());
-    result = prime * result + ((dateModified == null) ? 0 : dateModified.hashCode());
     result = prime * result + ((descriptiveMetadataIds == null) ? 0 : descriptiveMetadataIds.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((otherMetadataIds == null) ? 0 : otherMetadataIds.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((preservationEventsIds == null) ? 0 : preservationEventsIds.hashCode());
@@ -208,95 +181,60 @@ public class AIP implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (!(obj instanceof AIP)) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     AIP other = (AIP) obj;
-    if (active != other.active) {
+    if (active != other.active)
       return false;
-    }
-    if (dateCreated == null) {
-      if (other.dateCreated != null) {
-        return false;
-      }
-    } else if (!dateCreated.equals(other.dateCreated)) {
-      return false;
-    }
-    if (dateModified == null) {
-      if (other.dateModified != null) {
-        return false;
-      }
-    } else if (!dateModified.equals(other.dateModified)) {
-      return false;
-    }
     if (descriptiveMetadataIds == null) {
-      if (other.descriptiveMetadataIds != null) {
+      if (other.descriptiveMetadataIds != null)
         return false;
-      }
-    } else if (!descriptiveMetadataIds.equals(other.descriptiveMetadataIds)) {
+    } else if (!descriptiveMetadataIds.equals(other.descriptiveMetadataIds))
       return false;
-    }
     if (id == null) {
-      if (other.id != null) {
+      if (other.id != null)
         return false;
-      }
-    } else if (!id.equals(other.id)) {
+    } else if (!id.equals(other.id))
       return false;
-    }
+    if (otherMetadataIds == null) {
+      if (other.otherMetadataIds != null)
+        return false;
+    } else if (!otherMetadataIds.equals(other.otherMetadataIds))
+      return false;
     if (parentId == null) {
-      if (other.parentId != null) {
+      if (other.parentId != null)
         return false;
-      }
-    } else if (!parentId.equals(other.parentId)) {
+    } else if (!parentId.equals(other.parentId))
       return false;
-    }
     if (permissions == null) {
-      if (other.permissions != null) {
+      if (other.permissions != null)
         return false;
-      }
-    } else if (!permissions.equals(other.permissions)) {
+    } else if (!permissions.equals(other.permissions))
       return false;
-    }
-    // FIXME this makes partial objects not comparable
-    // if (preservationEventsIds == null) {
-    // if (other.preservationEventsIds != null) {
-    // return false;
-    // }
-    // } else if
-    // (!preservationEventsIds.equals(other.preservationEventsIds)) {
-    // return false;
-    // }
-    // if (preservationFileObjectsIds == null) {
-    // if (other.preservationFileObjectsIds != null) {
-    // return false;
-    // }
-    // } else if
-    // (!preservationFileObjectsIds.equals(other.preservationFileObjectsIds))
-    // {
-    // return false;
-    // }
-    // if (preservationRepresentationObjectsIds == null) {
-    // if (other.preservationRepresentationObjectsIds != null) {
-    // return false;
-    // }
-    // } else if
-    // (!preservationRepresentationObjectsIds.equals(other.preservationRepresentationObjectsIds))
-    // {
-    // return false;
-    // }
+    if (preservationEventsIds == null) {
+      if (other.preservationEventsIds != null)
+        return false;
+    } else if (!preservationEventsIds.equals(other.preservationEventsIds))
+      return false;
+    if (preservationFileObjectsIds == null) {
+      if (other.preservationFileObjectsIds != null)
+        return false;
+    } else if (!preservationFileObjectsIds.equals(other.preservationFileObjectsIds))
+      return false;
+    if (preservationRepresentationObjectsIds == null) {
+      if (other.preservationRepresentationObjectsIds != null)
+        return false;
+    } else if (!preservationRepresentationObjectsIds.equals(other.preservationRepresentationObjectsIds))
+      return false;
     if (representationIds == null) {
-      if (other.representationIds != null) {
+      if (other.representationIds != null)
         return false;
-      }
-    } else if (!representationIds.equals(other.representationIds)) {
+    } else if (!representationIds.equals(other.representationIds))
       return false;
-    }
     return true;
   }
 

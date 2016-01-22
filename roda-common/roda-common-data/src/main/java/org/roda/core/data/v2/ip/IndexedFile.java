@@ -7,13 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.deprecated.RODAObject;
-
-// FIXME rename this to IndexedFile
-public class SimpleFile extends RODAObject {
+public class IndexedFile implements Serializable {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
@@ -33,11 +31,11 @@ public class SimpleFile extends RODAObject {
   private String fulltext;
   private String storagePath;
 
-  public SimpleFile() {
-    super(null, null);
+  public IndexedFile() {
+    super();
   }
 
-  public SimpleFile(String id, String aipId, String representationId, String storagePath, boolean entryPoint,
+  public IndexedFile(String id, String aipId, String representationId, String storagePath, boolean entryPoint,
     FileFormat fileFormat, String originalName, long size, boolean isFile, String creatingApplicationName,
     String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext) {
     super();
@@ -189,7 +187,7 @@ public class SimpleFile extends RODAObject {
     if (getClass() != obj.getClass()) {
       return false;
     }
-    SimpleFile other = (SimpleFile) obj;
+    IndexedFile other = (IndexedFile) obj;
     if (aipId == null) {
       if (other.aipId != null) {
         return false;

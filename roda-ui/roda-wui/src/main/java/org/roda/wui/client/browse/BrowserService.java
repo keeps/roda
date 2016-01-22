@@ -22,7 +22,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.RepresentationPreservationObject;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -148,7 +148,7 @@ public interface BrowserService extends RemoteService {
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  IndexResult<SimpleFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+  IndexResult<IndexedFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)

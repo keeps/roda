@@ -86,7 +86,7 @@ import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -1180,9 +1180,9 @@ public class RodaCoreFactory {
   private static void printFiles(Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
-    IndexResult<SimpleFile> res = index.find(SimpleFile.class, filter, sorter, sublist);
+    IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist);
 
-    for (SimpleFile sf : res.getResults()) {
+    for (IndexedFile sf : res.getResults()) {
       System.out.println(sf.toString());
     }
   }

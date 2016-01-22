@@ -21,7 +21,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AgentPreservationObject;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -117,7 +117,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         for (String representationID : aip.getRepresentationIds()) {
           LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          List<SimpleFile> updatedFiles = new ArrayList<SimpleFile>();
+          List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (String fileID : representation.getFileIds()) {
             LOGGER.debug(
               "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
@@ -131,7 +131,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + OUTPUT_EXT,
               APP_NAME, resource);
             try {
-              SimpleFile f = index.retrieve(SimpleFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
+              IndexedFile f = index.retrieve(IndexedFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
 
               Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
               if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {

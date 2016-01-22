@@ -202,8 +202,6 @@ public final class RodaConstants {
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ACTIVE = "active";
 
-  public static final String AIP_DATE_CREATED = "dateCreated";
-  public static final String AIP_DATE_MODIFIED = "dateModified";
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";

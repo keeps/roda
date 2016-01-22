@@ -43,7 +43,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.RepresentationPreservationObject;
 import org.roda.core.data.v2.ip.RepresentationState;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -959,9 +959,8 @@ public class ModelService extends ModelObservable {
       retrieveAIPPreservationInformation(storagePath, representationIds, preservationRepresentationObjects,
         preservationFileObjects, preservationEvents);
 
-      aip = new AIP(storagePath.getName(), parentId, active, dateCreated, dateModified, permissions,
-        descriptiveMetadataBinaryIds, representationIds, preservationRepresentationObjects, preservationEvents,
-        preservationFileObjects);
+      aip = new AIP(storagePath.getName(), parentId, active, permissions, descriptiveMetadataBinaryIds,
+        representationIds, preservationRepresentationObjects, preservationEvents, preservationFileObjects);
 
     } else {
       throw new GenericException(
@@ -1173,7 +1172,7 @@ public class ModelService extends ModelObservable {
 
     return representationPreservationObject;
   }
-  
+
   // FIXME verify/refactor this method
   private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(String aipId,
     String representationId, String fileId, Binary resource) throws GenericException {
@@ -1847,8 +1846,8 @@ public class ModelService extends ModelObservable {
     notifyJobReportUpdated(jobReport);
   }
 
-  public void updateFileFormats(List<SimpleFile> updatedFiles) throws ModelServiceException {
-    for (SimpleFile file : updatedFiles) {
+  public void updateFileFormats(List<IndexedFile> updatedFiles) throws ModelServiceException {
+    for (IndexedFile file : updatedFiles) {
       // update PREMIS
       try {
         RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),

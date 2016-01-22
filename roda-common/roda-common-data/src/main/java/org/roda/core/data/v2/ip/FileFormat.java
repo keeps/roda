@@ -7,11 +7,11 @@
  */
 package org.roda.core.data.v2.ip;
 
+import java.io.Serializable;
 import java.util.Map;
 
-import org.roda.core.data.deprecated.RODAObject;
-
-public class FileFormat extends RODAObject {
+public class FileFormat implements Serializable {
+  
   private static final long serialVersionUID = -6855712550409310949L;
 
   private String formatDesignationName;
@@ -23,7 +23,7 @@ public class FileFormat extends RODAObject {
   private Map<String, String> formatRegistries;
   
   public FileFormat() {
-    super(null, null);
+    super();
   }
 
   public FileFormat(String formatDesignationName, String formatDesignationVersion, String mimeType, String pronom,

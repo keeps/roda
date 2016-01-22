@@ -12,13 +12,13 @@ import java.io.Serializable;
 import org.roda.core.data.common.InvalidDescriptionLevel;
 
 /**
- * This is the description level of a {@link SimpleDescriptionObject}.
+ * 
  * 
  * @author Rui Castro
  * @author Hélder Silva
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class DescriptionLevel implements EadCValue, Comparable<DescriptionLevel>, Serializable {
+public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializable {
   private static final long serialVersionUID = 9038357012292858570L;
 
   // description level

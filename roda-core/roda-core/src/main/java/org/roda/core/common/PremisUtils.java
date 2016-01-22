@@ -38,7 +38,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.Fixity;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.File;
@@ -214,7 +214,7 @@ public class PremisUtils {
   }
 
   public static RepresentationFilePreservationObject updateFile(RepresentationFilePreservationObject rfpo,
-    SimpleFile file) {
+    IndexedFile file) {
 
     // file format
     FileFormat fileFormat = file.getFileFormat();

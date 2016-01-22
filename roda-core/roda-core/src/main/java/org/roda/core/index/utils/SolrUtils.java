@@ -77,29 +77,29 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.DateGranularity;
-import org.roda.core.data.deprecated.RODAObject;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.Fixity;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.RepresentationState;
-import org.roda.core.data.v2.ip.SimpleFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -719,7 +719,7 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_TRANSFERRED_RESOURCE;
     } else if (resultClass.equals(Job.class)) {
       indexName = RodaConstants.INDEX_JOB;
-    } else if (resultClass.equals(SimpleFile.class)) {
+    } else if (resultClass.equals(IndexedFile.class)) {
       indexName = RodaConstants.INDEX_FILE;
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
@@ -746,7 +746,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
-    } else if (resultClass.equals(SimpleFile.class)) {
+    } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToSimpleFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc));
@@ -810,8 +810,6 @@ public class SolrUtils {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
     final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
-    final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
     final List<String> descriptiveMetadataFileIds = objectToListString(
       doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
@@ -824,8 +822,8 @@ public class SolrUtils {
     final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
     final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
 
-    return new AIP(id, parentId, active, dateCreated, dateModified, permissions, descriptiveMetadataFileIds,
-      representationIds, preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
+    return new AIP(id, parentId, active, permissions, descriptiveMetadataFileIds, representationIds,
+      preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
   }
 
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
@@ -835,12 +833,9 @@ public class SolrUtils {
   // the indexedaip
   public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final String label = id;
     final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
-    final String state = active ? RODAObject.STATE_ACTIVE : RODAObject.STATE_INACTIVE;
+    final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.AIP_DATE_CREATED));
-    final Date dateModified = objectToDate(doc.get(RodaConstants.AIP_DATE_MODIFIED));
     final List<String> descriptiveMetadataFileIds = objectToListString(
       doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
@@ -864,8 +859,8 @@ public class SolrUtils {
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
     final int childrenCount = 0;
 
-    return new IndexedAIP(id, label, dateModified, dateCreated, state, level, title, dateInitial, dateFinal,
-      description, parentId, childrenCount, permissions);
+    return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, childrenCount,
+      permissions);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
@@ -876,8 +871,6 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
-    ret.addField(RodaConstants.AIP_DATE_CREATED, aip.getDateCreated());
-    ret.addField(RodaConstants.AIP_DATE_MODIFIED, aip.getDateModified());
     ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
     ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
@@ -1508,8 +1501,8 @@ public class SolrUtils {
     return doc;
   }
 
-  public static SimpleFile solrDocumentToSimpleFile(SolrDocument doc) {
-    SimpleFile file = null;
+  public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
+    IndexedFile file = null;
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
@@ -1538,7 +1531,7 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
-    file = new SimpleFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size, isFile,
+    file = new IndexedFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size, isFile,
       creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }

@@ -62,7 +62,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
@@ -893,9 +893,9 @@ public class BrowserHelper {
     return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
   }
 
-  public static IndexResult<SimpleFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public static IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(SimpleFile.class, filter, sorter, sublist, facets);
+    return RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, sorter, sublist, facets);
   }
 
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(Locale locale) throws GenericException {

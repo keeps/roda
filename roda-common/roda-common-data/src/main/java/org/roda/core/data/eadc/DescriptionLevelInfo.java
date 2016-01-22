@@ -14,12 +14,11 @@ import java.util.Map;
 import org.roda.core.data.common.InvalidDescriptionLevel;
 
 /**
- * This is information about the description level of a
- * {@link SimpleDescriptionObject}.
+ * 
  * 
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class DescriptionLevelInfo implements EadCValue, Serializable {
+public class DescriptionLevelInfo implements Serializable {
 
   private static final long serialVersionUID = -5841187419574977416L;
 

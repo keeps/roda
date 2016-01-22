@@ -29,7 +29,7 @@ import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.FileList;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -145,12 +145,12 @@ public class ViewRepresentation extends Composite {
                 filter.add(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
 
                 BrowserService.Util.getInstance().getRepresentationFiles(filter, new Sorter(), new Sublist(), null,
-                  LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<IndexResult<SimpleFile>>() {
+                  LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<IndexResult<IndexedFile>>() {
 
                   @Override
-                  public void onSuccess(IndexResult<SimpleFile> result) {
+                  public void onSuccess(IndexResult<IndexedFile> result) {
                     if (result.getResults().size() == 1) {
-                      SimpleFile simpleFile = result.getResults().get(0);
+                      IndexedFile simpleFile = result.getResults().get(0);
                       ViewRepresentation view;
                       if (simpleFile.isFile()) {
                         view = new ViewRepresentation(viewers, aipId, itemBundle, representationId, fileId, simpleFile);
@@ -215,7 +215,7 @@ public class ViewRepresentation extends Composite {
   private String representationId;
   @SuppressWarnings("unused")
   private String fileId;
-  private SimpleFile file;
+  private IndexedFile file;
   private Filter defaultFilter;
 
   private boolean singleFileMode = false;
@@ -298,7 +298,7 @@ public class ViewRepresentation extends Composite {
    * 
    */
   public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
-    String fileId, SimpleFile file) {
+    String fileId, IndexedFile file) {
     this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
@@ -336,10 +336,10 @@ public class ViewRepresentation extends Composite {
       }
     });
 
-    filesList.addValueChangeHandler(new ValueChangeHandler<IndexResult<SimpleFile>>() {
+    filesList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedFile>>() {
 
       @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<SimpleFile>> event) {
+      public void onValueChange(ValueChangeEvent<IndexResult<IndexedFile>> event) {
         if (showNextFile) {
           filesList.nextItemSelection();
           showNextFile = false;
@@ -347,7 +347,7 @@ public class ViewRepresentation extends Composite {
           filesList.previousItemSelection();
           showPreviousFile = false;
         } else if (firstLoad) {
-          List<SimpleFile> results = event.getValue().getResults();
+          List<IndexedFile> results = event.getValue().getResults();
 
           if (results.size() == 1 && results.get(0).isFile()
             && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
@@ -419,7 +419,7 @@ public class ViewRepresentation extends Composite {
     JavascriptUtils.updateURLWithoutReloading(url);
   }
 
-  private List<BreadcrumbItem> getBreadcrumbs(final BrowseItemBundle itemBundle, SimpleFile simpleFile) {
+  private List<BreadcrumbItem> getBreadcrumbs(final BrowseItemBundle itemBundle, IndexedFile simpleFile) {
     List<BreadcrumbItem> ret = new ArrayList<>();
     IndexedAIP aip = itemBundle.getAip();
     List<Representation> representations = itemBundle.getRepresentations();
@@ -633,7 +633,7 @@ public class ViewRepresentation extends Composite {
     } 
   }
 
-  private String viewerType(SimpleFile file) {
+  private String viewerType(IndexedFile file) {
     String type = null;
     if (file.getFileFormat() != null) {
       if (file.getFileFormat().getPronom() != null) {
@@ -718,13 +718,13 @@ public class ViewRepresentation extends Composite {
     downloadButton.setStyleName("btn btn-donwload viewRepresentationNotSupportedDownloadButton");
   }
 
-  private void imagePreview(SimpleFile file) {
+  private void imagePreview(IndexedFile file) {
     Image image = new Image(RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()));
     filePreview.add(image);
     image.setStyleName("viewRepresentationImageFilePreview");
   }
 
-  private void pdfPreview(SimpleFile file) {
+  private void pdfPreview(IndexedFile file) {
     String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file=" + encode(GWT.getHostPageBaseURL()
       + RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString());
 
@@ -733,7 +733,7 @@ public class ViewRepresentation extends Composite {
     frame.setStyleName("viewRepresentationPDFFilePreview");
   }
 
-  private void textPreview(SimpleFile file) {
+  private void textPreview(IndexedFile file) {
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
       RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString());
     try {
@@ -766,7 +766,7 @@ public class ViewRepresentation extends Composite {
     }
   }
 
-  private void audioPreview(SimpleFile file) {
+  private void audioPreview(IndexedFile file) {
     Audio audioPlayer = Audio.createIfSupported();
     if (audioPlayer != null) {
       HTML html = new HTML();
@@ -786,7 +786,7 @@ public class ViewRepresentation extends Composite {
     }
   }
 
-  private void videoPreview(SimpleFile file) {
+  private void videoPreview(IndexedFile file) {
     Video videoPlayer = Video.createIfSupported();
     if (videoPlayer != null) {
       videoPlayer.addSource(
@@ -843,9 +843,6 @@ public class ViewRepresentation extends Composite {
           values.put(messages.viewRepresentationInfoPronom(), fileFormat.getPronom());
         }
 
-        if (fileFormat.getCreatedDate() != null) {
-          values.put(messages.viewRepresentationInfoCreatedDate(), fileFormat.getCreatedDate().toString());
-        }
       }
 
       if (file.getCreatingApplicationName() != null) {

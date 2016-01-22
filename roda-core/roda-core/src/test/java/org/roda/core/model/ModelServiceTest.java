@@ -123,9 +123,6 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertTrue(aip.isActive());
 
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_CREATED), aip.getDateCreated());
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_MODIFIED), aip.getDateModified());
-
     assertThat(aip.getDescriptiveMetadataIds(), containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
     assertThat(aip.getRepresentationIds(),
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_2_ID));
@@ -173,7 +170,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
     assertTrue(file_1_1.isEntryPoint());
-    
+
     // TODO test format registries
 
     final Binary binary_1_1 = storage.getBinary(file_1_1.getStoragePath());

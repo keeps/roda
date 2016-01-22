@@ -9,8 +9,6 @@ package org.roda.core.data.v2.ip;
 
 import java.util.Date;
 
-import org.roda.core.data.deprecated.RODAObject;
-
 /**
  * This is an abstract preservation object. Each specific type of preservation
  * object has to extend this class.

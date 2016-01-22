@@ -37,7 +37,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.deprecated.RODAObject;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -45,6 +44,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.log.LogEntry;
@@ -113,10 +113,8 @@ public class IndexServiceTest {
     // index)
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId);
     assertEquals(aip.getId(), indexedAip.getId());
-    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(indexedAip.getState()));
+    assertEquals(aip.isActive(), AIPState.ACTIVE.equals(indexedAip.getState()));
     assertEquals(aip.getParentId(), indexedAip.getParentID());
-    assertEquals(aip.getDateCreated(), indexedAip.getCreatedDate());
-    assertEquals(aip.getDateModified(), indexedAip.getLastModifiedDate());
 
     final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null);
     assertEquals(1, indexAips.getTotalCount());
@@ -126,10 +124,8 @@ public class IndexServiceTest {
 
     final IndexedAIP aipFromList = indexAips.getResults().get(0);
     assertEquals(aip.getId(), aipFromList.getId());
-    assertEquals(aip.isActive(), RODAObject.STATE_ACTIVE.equals(aipFromList.getState()));
+    assertEquals(aip.isActive(), AIPState.ACTIVE.equals(aipFromList.getState()));
     assertEquals(aip.getParentId(), aipFromList.getParentID());
-    assertEquals(aip.getDateCreated(), aipFromList.getCreatedDate());
-    assertEquals(aip.getDateModified(), aipFromList.getLastModifiedDate());
 
     assertEquals(indexedAip, aipFromList);
     assertEquals("fonds", indexedAip.getLevel());
@@ -225,7 +221,7 @@ public class IndexServiceTest {
 
     final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId);
     // FIXME how to compare AIP (from model) and IndexAIP (from index)
-    //assertEquals(updatedAIP, indexedAIP);
+    // assertEquals(updatedAIP, indexedAIP);
 
     model.deleteAIP(aipId);
   }

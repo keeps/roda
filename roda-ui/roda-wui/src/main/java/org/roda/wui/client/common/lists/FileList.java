@@ -16,7 +16,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
@@ -35,16 +35,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class FileList extends AsyncTableCell<SimpleFile> {
+public class FileList extends AsyncTableCell<IndexedFile> {
 
   private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private Column<SimpleFile, SafeHtml> iconColumn;
-  private TextColumn<SimpleFile> filenameColumn;
-  private TextColumn<SimpleFile> mimetypeColumn;
-  private TextColumn<SimpleFile> lengthColumn;
+  private Column<IndexedFile, SafeHtml> iconColumn;
+  private TextColumn<IndexedFile> filenameColumn;
+  private TextColumn<IndexedFile> mimetypeColumn;
+  private TextColumn<IndexedFile> lengthColumn;
 
   public FileList() {
     this(null, null, null);
@@ -55,11 +55,11 @@ public class FileList extends AsyncTableCell<SimpleFile> {
   }
 
   @Override
-  protected void configureDisplay(CellTable<SimpleFile> display) {
-    iconColumn = new Column<SimpleFile, SafeHtml>(new SafeHtmlCell()) {
+  protected void configureDisplay(CellTable<IndexedFile> display) {
+    iconColumn = new Column<IndexedFile, SafeHtml>(new SafeHtmlCell()) {
 
       @Override
-      public SafeHtml getValue(SimpleFile file) {
+      public SafeHtml getValue(IndexedFile file) {
         if (file != null) {
           if (file.isFile()) {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
@@ -73,27 +73,27 @@ public class FileList extends AsyncTableCell<SimpleFile> {
       }
     };
 
-    filenameColumn = new TextColumn<SimpleFile>() {
+    filenameColumn = new TextColumn<IndexedFile>() {
 
       @Override
-      public String getValue(SimpleFile file) {
+      public String getValue(IndexedFile file) {
         return (file != null) ? file.getOriginalName() : null;
       }
     };
 
-    mimetypeColumn = new TextColumn<SimpleFile>() {
+    mimetypeColumn = new TextColumn<IndexedFile>() {
 
       @Override
-      public String getValue(SimpleFile file) {
+      public String getValue(IndexedFile file) {
         return (file != null && file.getFileFormat() != null && file.getFileFormat().getMimeType() != null
           && !file.getFileFormat().getMimeType().isEmpty()) ? file.getFileFormat().getMimeType() : "";
       }
     };
 
-    lengthColumn = new TextColumn<SimpleFile>() {
+    lengthColumn = new TextColumn<IndexedFile>() {
 
       @Override
-      public String getValue(SimpleFile file) {
+      public String getValue(IndexedFile file) {
         return (file != null) ? Humanize.readableFileSize(file.getSize()) : null;
       }
     };
@@ -122,14 +122,14 @@ public class FileList extends AsyncTableCell<SimpleFile> {
 
   @Override
   protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<SimpleFile>> callback) {
+    AsyncCallback<IndexResult<IndexedFile>> callback) {
     Filter filter = getFilter();
     if (filter == null) {
       // search not yet ready, deliver empty result
       callback.onSuccess(null);
     } else {
 
-      Map<Column<SimpleFile, ?>, String> columnSortingKeyMap = new HashMap<Column<SimpleFile, ?>, String>();
+      Map<Column<IndexedFile, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, String>();
       columnSortingKeyMap.put(filenameColumn, RodaConstants.FILE_ORIGINALNAME);
       columnSortingKeyMap.put(lengthColumn, RodaConstants.FILE_SIZE);
       columnSortingKeyMap.put(mimetypeColumn, RodaConstants.FILE_FORMAT_MIMETYPE);
@@ -142,11 +142,11 @@ public class FileList extends AsyncTableCell<SimpleFile> {
   }
 
   @Override
-  protected ProvidesKey<SimpleFile> getKeyProvider() {
-    return new ProvidesKey<SimpleFile>() {
+  protected ProvidesKey<IndexedFile> getKeyProvider() {
+    return new ProvidesKey<IndexedFile>() {
 
       @Override
-      public Object getKey(SimpleFile item) {
+      public Object getKey(IndexedFile item) {
         return item.getId();
       }
     };
