@@ -14,7 +14,7 @@ import java.util.Map;
 
 import org.roda.core.data.common.AuthenticationDeniedException;
 import org.roda.core.data.common.RODAException;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.client.GenericException;
 
 import com.google.gwt.core.client.GWT;

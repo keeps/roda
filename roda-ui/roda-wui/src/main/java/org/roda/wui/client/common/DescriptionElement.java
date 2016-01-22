@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Vector;
 
-import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.eadc.Acqinfos;
 import org.roda.core.data.eadc.ArrangementTable;
 import org.roda.core.data.eadc.BioghistChronitem;
@@ -74,6 +73,7 @@ import config.i18n.client.DisseminationConstants;
  * @author Luis Faria
  * 
  */
+@Deprecated
 public class DescriptionElement implements SourcesChangeEvents {
 
   public static enum EditMode {
@@ -88,7 +88,7 @@ public class DescriptionElement implements SourcesChangeEvents {
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final DescriptionObject object;
+  // private final DescriptionObject object;
 
   private final String element;
 
@@ -114,15 +114,15 @@ public class DescriptionElement implements SourcesChangeEvents {
 
   private List<MetadataElementEditor> editors;
 
-  public DescriptionElement(DescriptionObject object, String element, String description, boolean required,
+  public DescriptionElement(/* DescriptionObject object, */ String element, String description, boolean required,
     boolean valueAsHTML) {
-    this(object, element, description, new EditMode[] {}, required, valueAsHTML);
+    this(/* object, */ element, description, new EditMode[] {}, required, valueAsHTML);
   }
 
-  public DescriptionElement(DescriptionObject object, String element, String description, EditMode[] editModes,
+  public DescriptionElement(/* DescriptionObject object, */ String element, String description, EditMode[] editModes,
     boolean required, boolean valueAsHTML) {
     readonly = true;
-    this.object = object;
+    // this.object = object;
     this.element = element;
     this.description = description;
     this.editModes = editModes;
@@ -161,7 +161,7 @@ public class DescriptionElement implements SourcesChangeEvents {
   }
 
   private void setValue(EadCValue value) {
-    object.setValue(element, value);
+    // object.setValue(element, value);
   }
 
   public void save() {
@@ -231,11 +231,11 @@ public class DescriptionElement implements SourcesChangeEvents {
     } else if (mode.equals(EditMode.COUNTRYCODE)) {
       ret = new CountryEditor();
     } else if (mode.equals(EditMode.PHYSDESC_DIMENSIONS)) {
-      ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_DIMENSIONS);
+      // ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_DIMENSIONS);
     } else if (mode.equals(EditMode.PHYSDESC_PHYSFACET)) {
-      ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_PHYSFACET);
+      // ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_PHYSFACET);
     } else if (mode.equals(EditMode.PHYSDESC_EXTENT)) {
-      ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_EXTENT);
+      // ret = new PhysDescElementEditor(DescriptionObject.PHYSDESC_EXTENT);
     } else if (mode.equals(EditMode.LANGUAGES_LIST)) {
       ret = new LanguageEditor();
     } else if (mode.equals(EditMode.CHRON_LIST)) {

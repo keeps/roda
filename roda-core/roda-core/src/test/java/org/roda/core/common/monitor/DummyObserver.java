@@ -12,7 +12,7 @@ import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -22,7 +22,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.EnumSet;
 import java.util.List;
 
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

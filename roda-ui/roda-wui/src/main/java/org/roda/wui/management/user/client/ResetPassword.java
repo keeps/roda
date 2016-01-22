@@ -15,7 +15,7 @@ import java.util.List;
 
 import org.roda.core.data.common.InvalidTokenException;
 import org.roda.core.data.common.NoSuchUserException;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;

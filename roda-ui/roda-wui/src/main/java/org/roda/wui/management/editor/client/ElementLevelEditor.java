@@ -47,17 +47,18 @@ public class ElementLevelEditor implements MetadataElementEditor {
       init(DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS
         .toArray(new DescriptionLevel[DescriptionLevelUtils.REPRESENTATION_DESCRIPTION_LEVELS.size()]));
     } else {
-      EditorService.Util.getInstance().getPossibleLevels(pid, new AsyncCallback<DescriptionLevel[]>() {
-
-        public void onFailure(Throwable caught) {
-          logger.error("Error getting possible levels for " + pid, caught);
-        }
-
-        public void onSuccess(DescriptionLevel[] possibleLevels) {
-          init(possibleLevels);
-        }
-
-      });
+      // EditorService.Util.getInstance().getPossibleLevels(pid, new
+      // AsyncCallback<DescriptionLevel[]>() {
+      //
+      // public void onFailure(Throwable caught) {
+      // logger.error("Error getting possible levels for " + pid, caught);
+      // }
+      //
+      // public void onSuccess(DescriptionLevel[] possibleLevels) {
+      // init(possibleLevels);
+      // }
+      //
+      // });
     }
 
     layout.addStyleName("wui-editor-level");

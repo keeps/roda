@@ -25,7 +25,7 @@ import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;

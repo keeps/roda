@@ -10,7 +10,7 @@ package org.roda.wui.client.common.lists;
 import java.io.Serializable;
 
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.user.cellview.client.CellTable;

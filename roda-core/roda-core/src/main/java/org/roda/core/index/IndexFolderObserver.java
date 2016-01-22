@@ -14,7 +14,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

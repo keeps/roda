@@ -13,9 +13,9 @@ package org.roda.wui.management.event.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.PluginInfo;
-import org.roda.core.data.PluginParameter;
-import org.roda.core.data.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 

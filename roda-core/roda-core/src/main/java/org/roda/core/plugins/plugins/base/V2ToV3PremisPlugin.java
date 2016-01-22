@@ -21,13 +21,13 @@ import javax.xml.transform.TransformerException;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
-import org.roda.core.data.PluginParameter;
-import org.roda.core.data.Report;
 import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.PluginType;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.ModelService;

@@ -31,13 +31,13 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.RodaGroup;
-import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.LogUtility;
@@ -284,7 +284,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     return successful;
   }
 
-  private boolean sendEmailVerification(org.roda.core.data.v2.User user) throws RODAException {
+  private boolean sendEmailVerification(org.roda.core.data.v2.user.User user) throws RODAException {
     boolean success = false;
 
     // FIXME

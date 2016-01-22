@@ -10,8 +10,8 @@ package org.roda.wui.client.browse;
 import java.io.Serializable;
 import java.util.List;
 
-import org.roda.core.data.v2.IndexedAIP;
-import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Representation;
 
 public class BrowseItemBundle implements Serializable {
 

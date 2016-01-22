@@ -13,7 +13,7 @@ package org.roda.wui.client.common;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.DescriptionObject;
+//import org.roda.core.data.DescriptionObject;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.ChangeListener;
@@ -29,13 +29,14 @@ import config.i18n.client.DisseminationMessages;
  * @author Luis Faria
  * 
  */
+@Deprecated
 public class DescriptionGroupPanel extends FlowPanel implements SourcesChangeEvents {
 
   private static DisseminationMessages messages = (DisseminationMessages) GWT.create(DisseminationMessages.class);
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final DescriptionObject object;
+//  private final DescriptionObject object;
 
   private final String name;
 
@@ -53,13 +54,13 @@ public class DescriptionGroupPanel extends FlowPanel implements SourcesChangeEve
 
   private List<ChangeListener> listeners;
 
-  public DescriptionGroupPanel(String name, DescriptionObject object) {
-    this(name, object, true);
+  public DescriptionGroupPanel(String name/*, DescriptionObject object*/) {
+    this(name, /*object, */true);
   }
 
-  public DescriptionGroupPanel(String name, DescriptionObject object, boolean optionalVisible) {
+  public DescriptionGroupPanel(String name,/* DescriptionObject object,*/ boolean optionalVisible) {
     this.name = name;
-    this.object = object;
+//    this.object = object;
     readonly = true;
     this.optionalVisible = optionalVisible;
     listeners = new Vector<ChangeListener>();

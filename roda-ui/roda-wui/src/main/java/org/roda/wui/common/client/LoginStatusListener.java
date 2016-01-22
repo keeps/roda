@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 
 /**
  * @author Luis Faria

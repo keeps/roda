@@ -9,28 +9,25 @@ package org.roda.wui.client.browse;
 
 import java.util.List;
 
-import org.roda.core.data.DescriptionObject;
-import org.roda.core.data.PluginInfo;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.RODAException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.IndexedAIP;
-import org.roda.core.data.v2.IndexedPreservationEvent;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.JobReport;
-import org.roda.core.data.v2.PluginType;
-import org.roda.core.data.v2.RepresentationPreservationObject;
-import org.roda.core.data.v2.SimpleDescriptionObject;
-import org.roda.core.data.v2.SimpleFile;
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.RepresentationPreservationObject;
+import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -40,8 +37,7 @@ import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 /**
- * @author Luis Faria
- * @author Vladislav Korecký <vladislav_korecky@gordic.cz>
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public interface BrowserService extends RemoteService {
 
@@ -113,127 +109,10 @@ public interface BrowserService extends RemoteService {
    */
   IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  /**
-   * Get description object
-   *
-   * @param pid
-   *          the object id
-   * @return {@link DescriptionObject}
-   * @throws RODAException
-   */
-  DescriptionObject getDescriptionObject(String pid) throws RODAException;
-
-  /**
-   * Get the pid of all ancestors of the node.
-   *
-   * @param pid
-   *          the pid of the node
-   * @return A array that starts in the fonds of witch this node belongs to, and
-   *         ends in the node itself
-   * @throws NotFoundException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  List<IndexedAIP> getAncestors(IndexedAIP aip)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
-  public Long countDescriptiveMetadataBinaries(String aipId)
+  Long countDescriptiveMetadataBinaries(String aipId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
-
-  /**
-   * Get the index of a collection
-   *
-   * @param collectionPID
-   *          the collection id
-   * @param filter
-   * @param sorter
-   * @return the index of the collection
-   * @throws RODAException
-   */
-  // Integer getCollectionIndex(String collectionPID, Filter filter,
-  // Sorter sorter) throws RODAException;
-
-  /**
-   * Get an item index
-   *
-   * @param parentPID
-   *          the parent pid
-   * @param childPID
-   *          the item pid
-   * @param filter
-   * @param sorter
-   * @return the item index
-   * @throws RODAException
-   */
-  // Integer getItemIndex(String parentPID, String childPID, Filter
-  // filter, Sorter sorter) throws RODAException;
-
-  /**
-   * get sub elements
-   *
-   * @param pid
-   *          the parent id
-   * @param focusOnChild
-   *          the pid of the first item to fetch
-   * @param count
-   *          the maximum number of items to fetch
-   * @param filter
-   * @param sorter
-   * @return the sub elements list
-   * @throws RODAException
-   */
-  // SimpleDescriptionObject[] getSubElements(String pid, String
-  // focusOnChild, int count, Filter filter,
-  // Sorter sorter) throws RODAException;
-
-  /**
-   * Get representations information
-   *
-   * @param pid
-   *          the id of the associated description object
-   * @return the list of representation informations
-   * @throws RODAException
-   */
-  List<RepresentationInfo> getRepresentationsInfo(String doPID) throws RODAException;
-
-  /**
-   * Get the Representation Preservation Objects associated with a Descriptive
-   * Object
-   *
-   * @param doPID
-   *          the Description Object PID
-   * @return The list of associated Representation Preservation Objects
-   * @throws RODAException
-   */
-  List<RepresentationPreservationObject> getDOPreservationObjects(String doPID) throws RODAException;
-
-  /**
-   * Get the preservation information
-   *
-   * @param doPID
-   *          the PID of the associated description object
-   * @return A list of preservations information
-   * @throws RODAException
-   */
-  List<PreservationInfo> getPreservationsInfo(String doPID) throws RODAException;
-
-  /**
-   * Get preservation timeline info
-   *
-   * @param repPIDs
-   *          the PIDs of the representations to show
-   * @param icons
-   *          the icons to use in each representation, by order
-   * @param colors
-   *          the colors to use in each representation, by order
-   * @param locale
-   * @return {@link TimelineInfo}
-   * @throws RODAException
-   */
-  TimelineInfo getPreservationTimeline(List<String> repPIDs, List<String> icons, List<String> colors, String locale)
-    throws RODAException;
 
   IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
@@ -245,7 +124,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
-    throws RODAException, AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
@@ -277,7 +156,8 @@ public interface BrowserService extends RemoteService {
 
   Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
+  Job createJob(Job job)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
 
   List<PluginInfo> getPluginsInfo(PluginType type);
 

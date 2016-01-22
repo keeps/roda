@@ -7,8 +7,8 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.Report;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.v2.jobs.Report;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;

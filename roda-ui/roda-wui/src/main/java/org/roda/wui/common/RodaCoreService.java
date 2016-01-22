@@ -16,7 +16,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

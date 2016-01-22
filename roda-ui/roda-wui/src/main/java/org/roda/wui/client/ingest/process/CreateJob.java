@@ -15,11 +15,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.PluginInfo;
-import org.roda.core.data.PluginParameter;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;

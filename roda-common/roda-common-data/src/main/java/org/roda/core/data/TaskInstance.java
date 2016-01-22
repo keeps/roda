@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.roda.core.data.common.InvalidTaskStateException;
+import org.roda.core.data.v2.jobs.PluginInfo;
 
 /**
  * This is an instance of a {@link Task}.

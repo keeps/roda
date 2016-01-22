@@ -14,10 +14,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.IndexedAIP;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
@@ -258,57 +258,59 @@ public class EditProducersPanel extends Composite {
 
   private void initializeProducerList() {
     loading.show();
-    EditorService.Util.getInstance().getProducers(fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
-
-      public void onFailure(Throwable caught) {
-        loading.hide();
-        logger.error("Error initialing producer list", caught);
-      }
-
-      public void onSuccess(List<RODAMember> producers) {
-        EditProducersPanel.this.producers = producers;
-        updateMemberList();
-        loading.hide();
-      }
-
-    });
+//    EditorService.Util.getInstance().getProducers(fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
+//
+//      public void onFailure(Throwable caught) {
+//        loading.hide();
+//        logger.error("Error initialing producer list", caught);
+//      }
+//
+//      public void onSuccess(List<RODAMember> producers) {
+//        EditProducersPanel.this.producers = producers;
+//        updateMemberList();
+//        loading.hide();
+//      }
+//
+//    });
   }
 
   private void addProducer(RODAMember producer) {
     loading.show();
-    EditorService.Util.getInstance().addProducer(producer, fondsAip.getId(), new AsyncCallback<List<RODAMember>>() {
-
-      public void onFailure(Throwable caught) {
-        loading.hide();
-        logger.error("Error adding producer", caught);
-      }
-
-      public void onSuccess(List<RODAMember> producers) {
-        EditProducersPanel.this.producers = producers;
-        updateMemberList();
-        loading.hide();
-      }
-
-    });
+    // EditorService.Util.getInstance().addProducer(producer, fondsAip.getId(),
+    // new AsyncCallback<List<RODAMember>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error adding producer", caught);
+    // }
+    //
+    // public void onSuccess(List<RODAMember> producers) {
+    // EditProducersPanel.this.producers = producers;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   private void removeProducers(List<RODAMember> producers) {
     loading.show();
-    EditorService.Util.getInstance().removeProducers(producers, fondsAip.getId(),
-      new AsyncCallback<List<RODAMember>>() {
-
-        public void onFailure(Throwable caught) {
-          loading.hide();
-          logger.error("Error adding producer", caught);
-        }
-
-        public void onSuccess(List<RODAMember> producers) {
-          EditProducersPanel.this.producers = producers;
-          updateMemberList();
-          loading.hide();
-        }
-
-      });
+    // EditorService.Util.getInstance().removeProducers(producers,
+    // fondsAip.getId(),
+    // new AsyncCallback<List<RODAMember>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error adding producer", caught);
+    // }
+    //
+    // public void onSuccess(List<RODAMember> producers) {
+    // EditProducersPanel.this.producers = producers;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   private boolean isSelected(Object miniPanel) {

@@ -13,7 +13,7 @@ package org.roda.wui.management.user.client;
 import java.util.Set;
 
 import org.roda.core.data.common.GroupAlreadyExistsException;
-import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.user.Group;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;
 

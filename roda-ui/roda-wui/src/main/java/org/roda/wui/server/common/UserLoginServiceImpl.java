@@ -17,7 +17,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.AuthenticationDeniedException;
 import org.roda.core.data.common.RODAException;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.UserLoginService;
 import org.roda.wui.common.client.GenericException;

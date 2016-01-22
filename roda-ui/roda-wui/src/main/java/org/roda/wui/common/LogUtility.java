@@ -16,8 +16,8 @@ import org.roda.core.data.common.LoggerException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.LogEntryParameter;
-import org.roda.core.data.v2.RodaSimpleUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelServiceException;
 
 // FIXME remove this RodaCoreService from roda-wui already provides these functionalities 

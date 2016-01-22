@@ -13,9 +13,9 @@ import java.util.Map;
 
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.v2.FacetFieldResult;
-import org.roda.core.data.v2.FacetValue;
-import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.client.common.lists.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 

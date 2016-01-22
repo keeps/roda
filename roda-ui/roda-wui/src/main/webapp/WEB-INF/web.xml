@@ -132,10 +132,6 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>FileDownload</servlet-name>
-		<servlet-class>org.roda.wui.common.server.FileDownload</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>GAnalyticsService</servlet-name>
 		<servlet-class>
 			org.roda.wui.server.main.GAnalyticsServiceImpl</servlet-class>
@@ -159,16 +155,6 @@
 		<servlet-name>BrowserService</servlet-name>
 		<servlet-class>
 			org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>EditorService</servlet-name>
-		<servlet-class>
-			org.roda.wui.management.editor.server.EditorServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<servlet-name>FileUpload</servlet-name>
-		<servlet-class>
-			org.roda.wui.common.fileupload.server.FileUpload</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>EventManagementService</servlet-name>
@@ -224,10 +210,6 @@
 		<url-pattern>/org.roda.wui.RodaWUI/descriptionlevel</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>FileDownload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/wuidownload</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>UserManagementService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/UserManagementService</url-pattern>
 	</servlet-mapping>
@@ -238,14 +220,6 @@
 	<servlet-mapping>
 		<servlet-name>BrowserService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>EditorService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/editorservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>FileUpload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/fileUpload</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>EventManagementService</servlet-name>
@@ -281,104 +255,18 @@
 
 	<!-- RODA Default Disseminators -->
 	<servlet>
-		<description>Download the AIP</description>
-		<display-name>RepresentationDownload</display-name>
-		<servlet-name>RepresentationDownload</servlet-name>
-		<servlet-class>
-			org.roda.disseminators.RepresentationDownload.RepresentationDownload</servlet-class>
-
-	</servlet>
-	<servlet>
-		<description>
-		SimpleViewer disseminator</description>
-		<display-name>SimpleViewer</display-name>
-		<servlet-name>SimpleViewer</servlet-name>
-		<servlet-class>
-			org.roda.disseminators.simpleviewer.SimpleViewer</servlet-class>
-	</servlet>
-	<servlet>
 		<description>
 		cached disseminator resources</description>
 		<display-name>Cache</display-name>
 		<servlet-name>Cache</servlet-name>
 		<servlet-class>org.roda.disseminators.common.cache.Cache</servlet-class>
 	</servlet>
-	<!-- <servlet> -->
-	<!-- <description> -->
-	<!-- </description> -->
-	<!-- <display-name>PhpMyAdmin</display-name> -->
-	<!-- <servlet-name>PhpMyAdmin</servlet-name> -->
-	<!-- <servlet-class>org.roda.disseminators.PhpMyAdmin.PhpMyAdmin</servlet-class> -->
-	<!-- </servlet> -->
-	<servlet>
-		<description>
-		</description>
-		<display-name>FlashPageFlipFree</display-name>
-		<servlet-name>FlashPageFlipFree</servlet-name>
-		<servlet-class>
-			org.roda.disseminators.flashpageflipFree.FlashPageFlipFree</servlet-class>
-	</servlet>
-	<servlet>
-		<description>
-		JW FLV Media Player</description>
-		<display-name>MediaPlayer</display-name>
-		<servlet-name>MediaPlayer</servlet-name>
-		<servlet-class>
-			org.roda.disseminators.mediaplayer.MediaPlayer</servlet-class>
-	</servlet>
-	<servlet>
-		<description>
-		Download digital signature</description>
-		<display-name>Signature</display-name>
-		<servlet-name>Signature</servlet-name>
-		<servlet-class>org.roda.disseminators.signature.Signature</servlet-class>
-	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>RepresentationDownload</servlet-name>
-		<url-pattern>/RepresentationDownload/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>SimpleViewer</servlet-name>
-		<url-pattern>/SimpleViewer/*</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Cache</servlet-name>
 		<url-pattern>/Cache/*</url-pattern>
 	</servlet-mapping>
-	<!-- <servlet-mapping> -->
-	<!-- <servlet-name>PhpMyAdmin</servlet-name> -->
-	<!-- <url-pattern>/PhpMyAdmin/*</url-pattern> -->
-	<!-- </servlet-mapping> -->
-	<servlet-mapping>
-		<servlet-name>FlashPageFlipFree</servlet-name>
-		<url-pattern>/FlashPageFlipFree/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>MediaPlayer</servlet-name>
-		<url-pattern>/MediaPlayer/*</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>Signature</servlet-name>
-		<url-pattern>/Signature/*</url-pattern>
-	</servlet-mapping>
-
-	<!-- <servlet> <servlet-name>phpMyAdminHandler</servlet-name> <servlet-class> 
-		org.roda.disseminators.PhpMyAdmin.PhpMyAdminHandler</servlet-class> 
-		<init-param> <param-name>debug</param-name> <param-value>1</param-value> 
-		</init-param> <load-on-startup>6</load-on-startup> </servlet> <servlet-mapping> 
-		<servlet-name>phpMyAdminHandler</servlet-name> <url-pattern>*.php</url-pattern> 
-		</servlet-mapping> -->
-
-	<!-- RODA Non Free Disseminators -->
-	<servlet>
-		<description>
-		FlashPageFlip Basic-XML</description>
-		<display-name>FlashPageFlipPaid</display-name>
-		<servlet-name>FlashPageFlipPaid</servlet-name>
-		<servlet-class>
-			org.roda.disseminators.flashpageflipPaid.FlashPageFlipPaid</servlet-class>
-	</servlet>
+	
 	<servlet>
 		<description>
 		</description>
@@ -394,16 +282,7 @@
 		<servlet-name>GwtCacheServer</servlet-name>
 		<servlet-class>org.roda.wui.common.server.GwtCacheServer</servlet-class>
 	</servlet>
-	<servlet>
-		<servlet-name>FileUploadProgress</servlet-name>
-		<servlet-class>
-			org.roda.wui.common.fileupload.server.FileUploadProgressImpl</servlet-class>
-	</servlet>
 
-	<servlet-mapping>
-		<servlet-name>FlashPageFlipPaid</servlet-name>
-		<url-pattern>/FlashPageFlipPaid/*</url-pattern>
-	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>Munin</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/Munin/*</url-pattern>
@@ -419,10 +298,6 @@
 	<servlet-mapping>
 		<servlet-name>GwtCacheServer</servlet-name>
 		<url-pattern>/clear.cache.gif</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>FileUploadProgress</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/fileuploadprogress</url-pattern>
 	</servlet-mapping>
 
 	<!-- Welcome file -->

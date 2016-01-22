@@ -9,8 +9,8 @@ package org.roda.wui.common.server;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.roda.core.data.Report;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.common.client.ReportService;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;

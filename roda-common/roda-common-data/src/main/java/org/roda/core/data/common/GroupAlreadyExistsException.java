@@ -7,7 +7,7 @@
  */
 package org.roda.core.data.common;
 
-import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.user.Group;
 
 /**
  * Thrown to indicate that a {@link Group} with the same name already exists

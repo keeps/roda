@@ -15,7 +15,7 @@ import java.util.Vector;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

@@ -19,13 +19,13 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.IndexResult;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.RodaGroup;
-import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.RodaCoreService;
 
 public class UserManagement extends RodaCoreService {

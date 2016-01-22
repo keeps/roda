@@ -12,9 +12,9 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
-import org.roda.core.data.Attribute;
-import org.roda.core.data.ReportItem;
-import org.roda.core.data.v2.JobReport;
+import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;

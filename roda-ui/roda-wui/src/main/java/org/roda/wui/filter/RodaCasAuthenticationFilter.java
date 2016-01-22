@@ -25,10 +25,10 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.RodaSimpleUser;
-import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaSimpleUser;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

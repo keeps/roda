@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * This is the list of users and groups that can be producers of a specific
- * {@link DescriptionObject} (fonds).
+ * item.
  * 
  * @author Rui Castro
  */

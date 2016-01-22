@@ -23,7 +23,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.Representation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.model.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.PreservationMetadata;

@@ -20,11 +20,11 @@ import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.JobReport;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,8 +93,8 @@ public class JobsHelper {
     return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist, facets);
   }
 
-  public static org.roda.core.data.v2.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
-    org.roda.core.data.v2.Jobs jobs = new org.roda.core.data.v2.Jobs();
+  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
+    org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
     for (Job job : jobsFromIndexResult.getResults()) {
       jobs.addJob(job);

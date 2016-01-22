@@ -29,8 +29,8 @@ import java.util.jar.Manifest;
 
 import org.reflections.Reflections;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.PluginInfo;
-import org.roda.core.data.v2.PluginType;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.util.ClassLoaderUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

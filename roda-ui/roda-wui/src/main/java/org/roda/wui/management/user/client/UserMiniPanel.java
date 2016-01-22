@@ -10,7 +10,7 @@ package org.roda.wui.management.user.client;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.management.user.client.images.UserManagementImageBundle;
 

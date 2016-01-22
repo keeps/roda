@@ -19,7 +19,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlObject;
-import org.roda.core.data.v2.EventPreservationObject;
+import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.util.XmlEncodeUtility;
 import org.slf4j.Logger;

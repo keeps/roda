@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.roda.core.data.v2.RepresentationState;
+import org.roda.core.data.v2.ip.RepresentationState;
 
 /**
  * 

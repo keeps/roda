@@ -15,7 +15,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

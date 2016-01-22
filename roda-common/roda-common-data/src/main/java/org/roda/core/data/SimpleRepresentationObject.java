@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.v2.RODAObject;
+import org.roda.core.data.deprecated.RODAObject;
 
 /**
  * This is a {@link SimpleRepresentationObject}. It contains basic information

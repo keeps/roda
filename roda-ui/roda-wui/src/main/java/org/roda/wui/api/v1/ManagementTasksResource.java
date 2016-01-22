@@ -27,7 +27,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.orchestrate.akka.Master.Work;
 import org.roda.wui.api.v1.entities.TaskList;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;

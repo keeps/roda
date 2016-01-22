@@ -16,9 +16,9 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.Job.JOB_STATE;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;

@@ -18,10 +18,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Vector;
 
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.IndexedAIP;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 import org.roda.wui.common.client.widgets.WUIButton;
@@ -230,21 +230,21 @@ public class EditObjectPermissionsPanel extends Composite {
 
   private void initializePermissionsList() {
     loading.show();
-    EditorService.Util.getInstance().getObjectPermissions(aip.getId(),
-      new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
-
-        public void onFailure(Throwable caught) {
-          loading.hide();
-          logger.error("Error initializing permissions list", caught);
-        }
-
-        public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
-          EditObjectPermissionsPanel.this.permissions = permissions;
-          updateMemberList();
-          loading.hide();
-        }
-
-      });
+    // EditorService.Util.getInstance().getObjectPermissions(aip.getId(),
+    // new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error initializing permissions list", caught);
+    // }
+    //
+    // public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
+    // EditObjectPermissionsPanel.this.permissions = permissions;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   /**
@@ -255,22 +255,23 @@ public class EditObjectPermissionsPanel extends Composite {
    */
   private void setMemberPermissions(RODAMember member, ObjectPermissions permission) {
     loading.show();
-    EditorService.Util.getInstance().setPermission(aip.getId(), member, permission,
-      new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
-
-        public void onFailure(Throwable caught) {
-          loading.hide();
-          logger.error("Error setting member permissions", caught);
-
-        }
-
-        public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
-          EditObjectPermissionsPanel.this.permissions = permissions;
-          updateMemberList();
-          loading.hide();
-        }
-
-      });
+    // EditorService.Util.getInstance().setPermission(aip.getId(), member,
+    // permission,
+    // new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error setting member permissions", caught);
+    //
+    // }
+    //
+    // public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
+    // EditObjectPermissionsPanel.this.permissions = permissions;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
   }
 
   protected void apply() {
@@ -284,22 +285,23 @@ public class EditObjectPermissionsPanel extends Composite {
     for (GroupMiniPermissionPanel groupMiniPanel : groupMiniPermissionPanels) {
       permissions.put(groupMiniPanel.getGroup(), groupMiniPanel.getPermissions());
     }
-    EditorService.Util.getInstance().setObjectPermissions(aip.getId(), permissions, recursivelly,
-      new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
-
-        public void onFailure(Throwable caught) {
-          loading.hide();
-          logger.error("Error adding applying permissions", caught);
-
-        }
-
-        public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
-          EditObjectPermissionsPanel.this.permissions = permissions;
-          updateMemberList();
-          loading.hide();
-        }
-
-      });
+    // EditorService.Util.getInstance().setObjectPermissions(aip.getId(),
+    // permissions, recursivelly,
+    // new AsyncCallback<Map<RODAMember, ObjectPermissions>>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // loading.hide();
+    // logger.error("Error adding applying permissions", caught);
+    //
+    // }
+    //
+    // public void onSuccess(Map<RODAMember, ObjectPermissions> permissions) {
+    // EditObjectPermissionsPanel.this.permissions = permissions;
+    // updateMemberList();
+    // loading.hide();
+    // }
+    //
+    // });
 
   }
 

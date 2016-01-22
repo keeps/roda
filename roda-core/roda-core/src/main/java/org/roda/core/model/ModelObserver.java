@@ -7,12 +7,12 @@
  */
 package org.roda.core.model;
 
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 
 public interface ModelObserver {
 

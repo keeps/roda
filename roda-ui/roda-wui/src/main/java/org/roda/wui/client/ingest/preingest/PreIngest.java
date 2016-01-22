@@ -13,14 +13,12 @@ package org.roda.wui.client.ingest.preingest;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.ProducerFilterParameter;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -77,7 +75,8 @@ public class PreIngest {
     html = new HTMLWidgetWrapper("PreIngest.html");
 
     Filter classPlanFilter = new Filter();
-    classPlanFilter.add(new ProducerFilterParameter());
+    // TODO add producer filter parameter
+    // classPlanFilter.add(new ProducerFilterParameter());
 
     layout.add(html);
 

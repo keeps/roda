@@ -19,10 +19,10 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.JobReport;
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 
 /**

@@ -9,7 +9,7 @@ package org.roda.core.common.monitor;
 
 import java.nio.file.Path;
 
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.TransferredResource;
 
 public interface FolderObserver {
 

@@ -10,8 +10,8 @@ package org.roda.wui.client.ingest.process;
 import java.io.Serializable;
 import java.util.List;
 
-import org.roda.core.data.PluginInfo;
-import org.roda.core.data.v2.Job;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginInfo;
 
 public class JobBundle implements Serializable {
 

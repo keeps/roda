@@ -16,8 +16,8 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.IndexedPreservationEvent;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;

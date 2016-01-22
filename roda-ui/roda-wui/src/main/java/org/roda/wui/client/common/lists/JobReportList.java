@@ -12,14 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.poi.ss.formula.functions.T;
-import org.roda.core.data.PluginInfo;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IndexResult;
-import org.roda.core.data.v2.JobReport;
+import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.tools.Tools;

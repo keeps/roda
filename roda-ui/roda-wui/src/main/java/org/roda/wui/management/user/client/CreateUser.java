@@ -14,7 +14,7 @@ import java.util.Set;
 
 import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.UserAlreadyExistsException;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;
 

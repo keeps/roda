@@ -9,6 +9,8 @@ package org.roda.core.data.v2;
 
 import java.util.Map;
 
+import org.roda.core.data.deprecated.RODAObject;
+
 public class FileFormat extends RODAObject {
   private static final long serialVersionUID = -6855712550409310949L;
 

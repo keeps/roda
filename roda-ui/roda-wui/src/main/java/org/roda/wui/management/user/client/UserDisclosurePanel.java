@@ -15,10 +15,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.RodaGroup;
-import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.widgets.AlphabetListItem;

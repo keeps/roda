@@ -9,9 +9,9 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
-import org.roda.core.data.PluginInfo;
-import org.roda.core.data.PluginParameter;
-import org.roda.core.data.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.common.client.ClientLogger;
 

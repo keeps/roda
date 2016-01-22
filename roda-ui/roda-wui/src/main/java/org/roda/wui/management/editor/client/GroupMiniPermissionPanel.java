@@ -10,7 +10,7 @@
  */
 package org.roda.wui.management.editor.client;
 
-import org.roda.core.data.v2.Group;
+import org.roda.core.data.v2.user.Group;
 import org.roda.wui.management.user.client.GroupMiniPanel;
 
 import com.google.gwt.user.client.ui.ChangeListener;

@@ -36,7 +36,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.LikeFilterParameter;
 import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.filter.ProducerFilterParameter;
 import org.roda.core.data.adapter.filter.RegexFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -160,16 +159,6 @@ public class SolrUtilsTest {
     try {
       filter = new Filter();
       filter.add(new LikeFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
-      fail("An exception should have been thrown but it wasn't!");
-    } catch (RequestNotValidException e) {
-      // do nothing as it was expected
-    }
-
-    // 8) filter with one ProducerFilterParameter
-    try {
-      filter = new Filter();
-      filter.add(new ProducerFilterParameter());
       stringFilter = SolrUtils.parseFilter(filter);
       fail("An exception should have been thrown but it wasn't!");
     } catch (RequestNotValidException e) {

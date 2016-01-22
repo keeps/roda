@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.User;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;

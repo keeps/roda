@@ -10,6 +10,8 @@ package org.roda.core.data;
 import java.io.Serializable;
 import java.util.Date;
 
+import org.roda.core.data.v2.jobs.PluginInfo;
+
 /**
  * @author Rui Castro
  */

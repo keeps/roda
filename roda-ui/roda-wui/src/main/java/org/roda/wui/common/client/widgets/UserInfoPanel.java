@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.core.data.v2.RodaUser;
+import org.roda.core.data.v2.user.RodaUser;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.DisclosurePanel;

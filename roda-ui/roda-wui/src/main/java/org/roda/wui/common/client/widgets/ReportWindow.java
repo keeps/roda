@@ -10,7 +10,7 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.core.data.Report;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.ReportService;
 

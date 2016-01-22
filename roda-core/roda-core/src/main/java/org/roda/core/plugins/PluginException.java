@@ -7,9 +7,9 @@
  */
 package org.roda.core.plugins;
 
-import org.roda.core.data.Report;
-import org.roda.core.data.ReportItem;
 import org.roda.core.data.common.RODAException;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.ReportItem;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link Plugin}.

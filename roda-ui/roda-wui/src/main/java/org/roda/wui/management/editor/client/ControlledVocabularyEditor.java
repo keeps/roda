@@ -38,18 +38,19 @@ public class ControlledVocabularyEditor implements SourcesChangeEvents {
     if (controlledVocabularyCache.containsKey(field)) {
       callback.onSuccess(controlledVocabularyCache.get(field));
     } else {
-      EditorService.Util.getInstance().getControlledVocabulary(field, new AsyncCallback<String[]>() {
-
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        public void onSuccess(String[] values) {
-          controlledVocabularyCache.put(field, values);
-          callback.onSuccess(values);
-        }
-
-      });
+      // EditorService.Util.getInstance().getControlledVocabulary(field, new
+      // AsyncCallback<String[]>() {
+      //
+      // public void onFailure(Throwable caught) {
+      // callback.onFailure(caught);
+      // }
+      //
+      // public void onSuccess(String[] values) {
+      // controlledVocabularyCache.put(field, values);
+      // callback.onSuccess(values);
+      // }
+      //
+      // });
     }
   }
 
@@ -57,18 +58,19 @@ public class ControlledVocabularyEditor implements SourcesChangeEvents {
     if (defaultValueCache.containsKey(field)) {
       callback.onSuccess(defaultValueCache.get(field));
     } else {
-      EditorService.Util.getInstance().getDefaultValue(field, new AsyncCallback<String>() {
-
-        public void onFailure(Throwable caught) {
-          callback.onFailure(caught);
-        }
-
-        public void onSuccess(String value) {
-          defaultValueCache.put(field, value);
-          callback.onSuccess(value);
-        }
-
-      });
+      // EditorService.Util.getInstance().getDefaultValue(field, new
+      // AsyncCallback<String>() {
+      //
+      // public void onFailure(Throwable caught) {
+      // callback.onFailure(caught);
+      // }
+      //
+      // public void onSuccess(String value) {
+      // defaultValueCache.put(field, value);
+      // callback.onSuccess(value);
+      // }
+      //
+      // });
     }
   }
 

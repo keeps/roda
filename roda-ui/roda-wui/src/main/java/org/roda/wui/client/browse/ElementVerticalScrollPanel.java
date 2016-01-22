@@ -13,7 +13,7 @@ package org.roda.wui.client.browse;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LazyScroll;
 import org.roda.wui.common.client.widgets.LazyScroll.Loader;

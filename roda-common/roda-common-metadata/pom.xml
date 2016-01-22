@@ -66,70 +66,11 @@
 				</plugins>
 			</build>
 		</profile>
-		<profile>
-			<id>create-ead-c-2008-jar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>xmlbeans-maven-plugin</artifactId>
-						<configuration>
-							<outputJar>${project.build.directory}/ead-c-2008.jar</outputJar>
-							<sourceSchemas>
-								<sourceSchema>ead-c.2008.xsd</sourceSchema>
-							</sourceSchemas>
-							<javaSource>1.5</javaSource>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>xmlbeans</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		<profile>
-			<id>create-ead-c-2014-jar</id>
-			<build>
-				<plugins>
-					<plugin>
-						<!-- http://wiki.apache.org/xmlbeans/XmlBeansFaq#configPackageName -->
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>xmlbeans-maven-plugin</artifactId>
-						<configuration>
-							<outputJar>${project.build.directory}/ead-c-2014.jar</outputJar>
-							<sourceSchemas>
-								<sourceSchema>ead-c.2014.xsd</sourceSchema>
-							</sourceSchemas>
-							<javaSource>1.5</javaSource>
-						</configuration>
-						<executions>
-							<execution>
-								<phase>generate-sources</phase>
-								<goals>
-									<goal>xmlbeans</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
 	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-data</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>pt.gov.dgarq.roda</groupId>
-			<artifactId>ead-c.2014</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>pt.gov.dgarq.roda</groupId>

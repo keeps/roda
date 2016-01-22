@@ -13,7 +13,7 @@ package org.roda.wui.management.editor.client;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;

@@ -10,9 +10,9 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.core.data.Attribute;
-import org.roda.core.data.Report;
-import org.roda.core.data.ReportItem;
+import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.ReportItem;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;

@@ -16,7 +16,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;

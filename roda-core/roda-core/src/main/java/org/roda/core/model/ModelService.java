@@ -38,19 +38,19 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.AgentPreservationObject;
-import org.roda.core.data.v2.EventPreservationObject;
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.Job;
-import org.roda.core.data.v2.JobReport;
 import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.RODAObjectPermissions;
-import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.RepresentationPreservationObject;
-import org.roda.core.data.v2.RepresentationState;
-import org.roda.core.data.v2.SimpleFile;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.ip.AgentPreservationObject;
+import org.roda.core.data.v2.ip.EventPreservationObject;
+import org.roda.core.data.v2.ip.RODAObjectPermissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.ip.RepresentationPreservationObject;
+import org.roda.core.data.v2.ip.RepresentationState;
+import org.roda.core.data.v2.ip.SimpleFile;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -1175,7 +1175,7 @@ public class ModelService extends ModelObservable {
 
     return representationPreservationObject;
   }
-
+  
   // FIXME verify/refactor this method
   private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(String aipId,
     String representationId, String fileId, Binary resource) throws GenericException {

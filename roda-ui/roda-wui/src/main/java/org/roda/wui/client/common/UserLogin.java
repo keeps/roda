@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
-import org.roda.core.data.v2.Group;
-import org.roda.core.data.v2.RODAMember;
-import org.roda.core.data.v2.RodaUser;
-import org.roda.core.data.v2.User;
+import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RODAMember;
+import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.LoginStatusListener;

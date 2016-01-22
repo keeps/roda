@@ -18,7 +18,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.v2.AgentPreservationObject;
+import org.roda.core.data.v2.ip.AgentPreservationObject;
 import org.roda.core.metadata.MetadataException;
 
 import lc.xmlns.premisV2.AgentComplexType;

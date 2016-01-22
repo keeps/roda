@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.v2.Representation;
-import org.roda.core.data.v2.TransferredResource;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;

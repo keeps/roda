@@ -11,7 +11,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.roda.core.data.PluginInfo;
+import org.roda.core.data.v2.jobs.PluginInfo;
 
 public class PluginUtils {
 

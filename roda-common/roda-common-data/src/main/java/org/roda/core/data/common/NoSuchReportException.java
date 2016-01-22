@@ -7,7 +7,7 @@
  */
 package org.roda.core.data.common;
 
-import org.roda.core.data.Report;
+import org.roda.core.data.v2.jobs.Report;
 
 /**
  * Thrown to indicate that some specified {@link Report} doesn't exist.

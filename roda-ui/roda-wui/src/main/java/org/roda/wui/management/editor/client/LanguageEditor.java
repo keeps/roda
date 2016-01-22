@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Vector;
 
-import org.roda.core.data.DescriptionObject;
+//import org.roda.core.data.DescriptionObject;
 import org.roda.core.data.eadc.EadCValue;
 import org.roda.core.data.eadc.LangmaterialLanguages;
 import org.roda.wui.common.client.ClientLogger;
@@ -134,33 +134,34 @@ public class LanguageEditor implements MetadataElementEditor {
     listeners = new Vector<ChangeListener>();
     initialized = false;
     initListeners = new Vector<Command>();
-
-    ControlledVocabularyEditor.getControlledVocabulary(DescriptionObject.LANGMATERIAL_LANGUAGES,
-      new AsyncCallback<String[]>() {
-
-        public void onFailure(Throwable caught) {
-          logger.error("Error getting languages controlled" + " vocabullary", caught);
-
-        }
-
-        public void onSuccess(String[] langcodes) {
-          for (int i = 0; i < langcodes.length; i++) {
-            String description;
-            try {
-              description = constants.getString("lang_" + langcodes[i]);
-            } catch (MissingResourceException e) {
-              description = langcodes[i];
-            }
-
-            createLanguage(langcodes[i], description);
-            updateLayout();
-            initialized = true;
-            onLoad();
-          }
-
-        }
-
-      });
+    //
+    // ControlledVocabularyEditor.getControlledVocabulary(DescriptionObject.LANGMATERIAL_LANGUAGES,
+    // new AsyncCallback<String[]>() {
+    //
+    // public void onFailure(Throwable caught) {
+    // logger.error("Error getting languages controlled" + " vocabullary",
+    // caught);
+    //
+    // }
+    //
+    // public void onSuccess(String[] langcodes) {
+    // for (int i = 0; i < langcodes.length; i++) {
+    // String description;
+    // try {
+    // description = constants.getString("lang_" + langcodes[i]);
+    // } catch (MissingResourceException e) {
+    // description = langcodes[i];
+    // }
+    //
+    // createLanguage(langcodes[i], description);
+    // updateLayout();
+    // initialized = true;
+    // onLoad();
+    // }
+    //
+    // }
+    //
+    // });
 
     layout.addStyleName("wui-editor-languages");
   }

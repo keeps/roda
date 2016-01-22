@@ -7,7 +7,7 @@
  */
 package org.roda.core.data.common;
 
-import org.roda.core.data.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter;
 
 /**
  * Thrown to indicate that a {@link PluginParameter} is wrong.

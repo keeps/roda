@@ -7,7 +7,6 @@
  */
 package org.roda.disseminators.common.cache;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,13 +16,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.roda.core.data.RepresentationObject;
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
 import org.roda.core.data.common.NoSuchRODAObjectException;
 import org.roda.core.data.common.RODAClientException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Cache controlling common code
@@ -65,8 +63,8 @@ public abstract class CacheController {
    * @param cacheFile
    *          the cache directory, where resources must be created
    */
-  protected abstract void createResources(HttpServletRequest request, RepresentationObject rep, String cacheURL,
-    File cacheFile) throws Exception;
+//  protected abstract void createResources(HttpServletRequest request, RepresentationObject rep, String cacheURL,
+//    File cacheFile) throws Exception;
 
   /**
    * After creating resources, if needed send a response to user
@@ -77,8 +75,9 @@ public abstract class CacheController {
    *          the cache URL, to use to externally access files in cache
    * @param response
    */
-  protected abstract void sendResponse(HttpServletRequest request, RepresentationObject rep, String cacheURL,
-    HttpServletResponse response) throws Exception;
+  // protected abstract void sendResponse(HttpServletRequest request,
+  // RepresentationObject rep, String cacheURL,
+  // HttpServletResponse response) throws Exception;
 
   /**
    * Get a dissemination of a representation

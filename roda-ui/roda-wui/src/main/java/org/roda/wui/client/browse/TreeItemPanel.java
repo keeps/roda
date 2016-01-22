@@ -13,7 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.v2.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.StringUtility;

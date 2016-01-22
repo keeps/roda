@@ -13,9 +13,9 @@ import java.util.MissingResourceException;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.FacetFieldResult;
-import org.roda.core.data.v2.FacetValue;
-import org.roda.core.data.v2.IndexResult;
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
