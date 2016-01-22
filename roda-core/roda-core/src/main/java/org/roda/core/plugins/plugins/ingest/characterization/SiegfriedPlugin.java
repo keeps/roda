@@ -29,11 +29,11 @@ import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.AIP;
@@ -160,7 +160,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   }
                   IndexedFile f = index.retrieve(IndexedFile.class,
                     SolrUtils.getId(aip.getId(), representationID, fileName));
-                  FileFormat ff = new org.roda.core.data.v2.ip.FileFormat();
+                  FileFormat ff = new FileFormat();
                   ff.setFormatDesignationName(format);
                   ff.setFormatDesignationVersion(version);
                   ff.setPronom(pronom);

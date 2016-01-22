@@ -84,9 +84,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -137,7 +137,6 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
 public class RodaCoreFactory {
-  private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
 
@@ -158,6 +157,9 @@ public class RodaCoreFactory {
   private static boolean FEATURE_OVERRIDE_INDEX_CONFIGS = true;
   private static boolean TEST_DONT_DEPLOY_SOLR = false;
   private static boolean TEST_DONT_DEPLOY_LDAP = false;
+
+  // Core related constants
+  private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -184,12 +186,17 @@ public class RodaCoreFactory {
   private static DescriptionLevelManager descriptionLevelManager = null;
 
   public static void instantiate() {
-    if ("master".equalsIgnoreCase(getSystemProperty(RodaConstants.CORE_NODE_TYPE, "master"))) {
+    NodeType nodeType = NodeType
+      .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
+
+    if (nodeType == RodaConstants.NodeType.MASTER) {
       instantiateMaster();
-    } else if ("test".equalsIgnoreCase(getSystemProperty(RodaConstants.CORE_NODE_TYPE, "test"))) {
+    } else if (nodeType == RodaConstants.NodeType.TEST) {
       instantiateTest();
-    } else {
+    } else if (nodeType == RodaConstants.NodeType.WORKER) {
       instantiateWorker();
+    } else {
+      LOGGER.error("Unknown node type '{}'", nodeType);
     }
   }
 
@@ -268,8 +275,7 @@ public class RodaCoreFactory {
   private static void loadDescriptionLevelInformation() {
     Properties descriptionLevelConfiguration = new Properties();
     try {
-      descriptionLevelConfiguration
-        .load(getConfigurationFile("roda-description-levels-hierarchy.properties").openStream());
+      descriptionLevelConfiguration.load(getConfigurationFile(RodaConstants.CORE_DESCRIPTION_LEVELS_FILE).openStream());
     } catch (IOException e) {
       // do nothing and instantiate description level manager from empty
       // properties object
@@ -289,34 +295,36 @@ public class RodaCoreFactory {
   }
 
   private static StorageService instantiateStorage() throws GenericException {
-    StorageType storageType = StorageType
-      .valueOf(getRodaConfiguration().getString("core.storage.type", RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
+    StorageType storageType = StorageType.valueOf(
+      getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
 
     if (storageType == RodaConstants.StorageType.FEDORA4) {
-      String url = getRodaConfiguration().getString("core.storage.fedora4.url", "http://localhost:8983/solr/");
-      String username = getRodaConfiguration().getString("core.storage.fedora4.username", "");
-      String password = getRodaConfiguration().getString("core.storage.fedora4.password", "");
+      String url = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_URL,
+        "http://localhost:8983/solr/");
+      String username = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_USERNAME, "");
+      String password = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_PASSWORD, "");
 
       if (StringUtils.isNotBlank(username) && StringUtils.isNotBlank(password)) {
         return new FedoraStorageService(url, username, password);
       } else {
         return new FedoraStorageService(url);
       }
-
-    } else {
-      // default to Filesystem
+    } else if (storageType == RodaConstants.StorageType.FILESYSTEM) {
       return new FileStorageService(storagePath);
+    } else {
+      LOGGER.error("Unknown storage service '{}'", storageType.name());
+      throw new GenericException();
     }
   }
 
   private static void instantiateSolrAndIndexService() throws URISyntaxException {
     if (nodeType == NodeType.MASTER) {
-      Path solrHome = configPath.resolve("index");
+      Path solrHome = configPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
-          Path tempConfig = Files.createTempDirectory("index");
+          Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
           copyIndexConfigsFromClasspathTo(tempConfig);
-          solrHome = tempConfig.resolve("config").resolve("index");
+          solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
           LOGGER.info("Using SOLR home: " + solrHome);
         } catch (IOException e) {
           LOGGER.error("Error creating temporary SOLR home", e);
@@ -331,14 +339,16 @@ public class RodaCoreFactory {
       index = new IndexService(solr, model);
     } else if (nodeType == NodeType.TEST && !TEST_DONT_DEPLOY_SOLR) {
       try {
-        URL solrConfigURL = RodaCoreFactory.class.getResource("/config/index/solr.xml");
+        URL solrConfigURL = RodaCoreFactory.class
+          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/solr.xml");
         Path solrConfigPath = Paths.get(solrConfigURL.toURI());
         Files.copy(solrConfigPath, indexDataPath.resolve("solr.xml"));
-        Path aipSchema = indexDataPath.resolve("aip");
+        Path aipSchema = indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER);
         Files.createDirectories(aipSchema);
         Files.createFile(aipSchema.resolve("core.properties"));
 
-        Path solrHome = Paths.get(RodaCoreFactory.class.getResource("/config/index/").toURI());
+        Path solrHome = Paths.get(RodaCoreFactory.class
+          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/").toURI());
 
         // instantiate solr
         solr = instantiateSolr(solrHome);
@@ -356,11 +366,12 @@ public class RodaCoreFactory {
     classLoadersList.add(ClasspathHelper.contextClassLoader());
     // classLoadersList.add(ClasspathHelper.staticClassLoader());
 
-    Set<String> resources = new Reflections(
-      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("config/index/")))
-        .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
-          .getResources(Pattern.compile(".*"));
+    Set<String> resources = new Reflections(new ConfigurationBuilder()
+      .filterInputsBy(new FilterBuilder()
+        .include(FilterBuilder.prefix(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/")))
+      .setScanners(new ResourcesScanner())
+      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
+        .getResources(Pattern.compile(".*"));
 
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
@@ -378,14 +389,15 @@ public class RodaCoreFactory {
   }
 
   private static SolrClient instantiateSolr(Path solrHome) {
-    SolrType solrType = SolrType
-      .valueOf(getRodaConfiguration().getString("core.solr.type", RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+    SolrType solrType = SolrType.valueOf(
+      getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
     if (solrType == RodaConstants.SolrType.HTTP) {
-      String solrBaseUrl = getRodaConfiguration().getString("core.solr.http.url", "http://localhost:8983/solr/");
+      String solrBaseUrl = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_URL,
+        "http://localhost:8983/solr/");
       return new HttpSolrClient(solrBaseUrl);
     } else if (solrType == RodaConstants.SolrType.HTTP_CLOUD) {
-      String solrCloudZooKeeperUrls = getRodaConfiguration().getString("core.solr.http_cloud.urls",
+      String solrCloudZooKeeperUrls = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_CLOUD_URLS,
         "zkServerA:2181,zkServerB:2181,zkServerC:2181/solr");
       return new CloudSolrClient(solrCloudZooKeeperUrls);
     } else {
@@ -397,16 +409,20 @@ public class RodaCoreFactory {
 
   private static void setSolrSystemProperties() {
     System.setProperty("solr.data.dir", indexDataPath.toString());
-    System.setProperty("solr.data.dir.aip", indexDataPath.resolve("aip").toString());
-    System.setProperty("solr.data.dir.sdo", indexDataPath.resolve("sdo").toString());
-    System.setProperty("solr.data.dir.representations", indexDataPath.resolve("representation").toString());
-    System.setProperty("solr.data.dir.file", indexDataPath.resolve("file").toString());
-    System.setProperty("solr.data.dir.preservationevent", indexDataPath.resolve("preservationevent").toString());
-    System.setProperty("solr.data.dir.actionlog", indexDataPath.resolve("actionlog").toString());
-    System.setProperty("solr.data.dir.members", indexDataPath.resolve("members").toString());
-    System.setProperty("solr.data.dir.transferredresource", indexDataPath.resolve("transferredresource").toString());
-    System.setProperty("solr.data.dir.job", indexDataPath.resolve("job").toString());
-    System.setProperty("solr.data.dir.jobreport", indexDataPath.resolve("jobreport").toString());
+    System.setProperty("solr.data.dir.aip", indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER).toString());
+    System.setProperty("solr.data.dir.representations",
+      indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_FOLDER).toString());
+    System.setProperty("solr.data.dir.file", indexDataPath.resolve(RodaConstants.CORE_FILE_FOLDER).toString());
+    System.setProperty("solr.data.dir.preservationevent",
+      indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONEVENT_FOLDER).toString());
+    System.setProperty("solr.data.dir.actionlog",
+      indexDataPath.resolve(RodaConstants.CORE_ACTIONLOG_FOLDER).toString());
+    System.setProperty("solr.data.dir.members", indexDataPath.resolve(RodaConstants.CORE_MEMBERS_FOLDER).toString());
+    System.setProperty("solr.data.dir.transferredresource",
+      indexDataPath.resolve(RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER).toString());
+    System.setProperty("solr.data.dir.job", indexDataPath.resolve(RodaConstants.CORE_JOB_FOLDER).toString());
+    System.setProperty("solr.data.dir.jobreport",
+      indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
@@ -414,8 +430,8 @@ public class RodaCoreFactory {
       if (FEATURE_DISTRIBUTED_AKKA) {
 
         akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
-          getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, "localhost"),
-          getSystemProperty(RodaConstants.CORE_NODE_PORT, "2551"));
+          getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
+          getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
       } else {
         // pluginOrchestrator = new EmbeddedActionOrchestrator();
         pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
@@ -431,9 +447,9 @@ public class RodaCoreFactory {
 
     } else if (nodeType == NodeType.WORKER) {
       akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(
-        getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, "localhost"),
-        getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, "2551"),
-        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, "localhost"),
+        getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
+        getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT),
+        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
         getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
     } else if (nodeType == NodeType.TEST) {
       if (!TEST_DONT_DEPLOY_LDAP) {
@@ -446,10 +462,10 @@ public class RodaCoreFactory {
 
   private static Path determineRodaHomePath() {
     Path rodaHomePath;
-    if (System.getProperty("roda.home") != null) {
-      rodaHomePath = Paths.get(System.getProperty("roda.home"));
-    } else if (System.getenv("RODA_HOME") != null) {
-      rodaHomePath = Paths.get(System.getenv("RODA_HOME"));
+    if (System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY) != null) {
+      rodaHomePath = Paths.get(System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY));
+    } else if (System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE) != null) {
+      rodaHomePath = Paths.get(System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE));
     } else {
       // last attempt (using user home and hidden directory called .roda)
       String userHome = System.getProperty("user.home");
@@ -464,15 +480,15 @@ public class RodaCoreFactory {
 
       // set roda.home in order to correctly configure logging even if no
       // property has been defined
-      System.setProperty("roda.home", rodaHomePath.toString());
+      System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
     }
 
     // instantiate essential directories
-    configPath = rodaHomePath.resolve("config");
-    dataPath = rodaHomePath.resolve("data");
-    logPath = dataPath.resolve("log");
-    storagePath = dataPath.resolve("storage");
-    indexDataPath = dataPath.resolve("index");
+    configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
+    dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
+    logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
+    storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
+    indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
 
     // configure logback
     if (nodeType != NodeType.TEST) {
@@ -513,19 +529,18 @@ public class RodaCoreFactory {
   public static void ensureAllEssentialDirectoriesExist() {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
-    essentialDirectories.add(configPath.resolve("crosswalks"));
-    essentialDirectories.add(configPath.resolve("crosswalks").resolve("ingest"));
-    essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination"));
-    essentialDirectories.add(configPath.resolve("crosswalks").resolve("dissemination").resolve("html"));
-    essentialDirectories.add(configPath.resolve("i18n"));
-    essentialDirectories.add(configPath.resolve("ldap"));
-    essentialDirectories.add(configPath.resolve("plugins"));
-    essentialDirectories.add(configPath.resolve("schemas"));
-    essentialDirectories.add(rodaHomePath.resolve("log"));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
+    essentialDirectories
+      .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
+      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve("html"));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
+    essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(dataPath.resolve("transferredResources"));
-    //essentialDirectories.add(dataPath.resolve("jobs"));
-    //essentialDirectories.add(dataPath.resolve("jobreports"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
@@ -563,8 +578,8 @@ public class RodaCoreFactory {
 
   public static void startApacheDS() {
     ldap = new ApacheDS();
-    rodaApacheDsConfigDirectory = RodaCoreFactory.getConfigPath().resolve("ldap");
-    rodaApacheDsDataDirectory = RodaCoreFactory.getDataPath().resolve("ldap");
+    rodaApacheDsConfigDirectory = RodaCoreFactory.getConfigPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
+    rodaApacheDsDataDirectory = RodaCoreFactory.getDataPath().resolve(RodaConstants.CORE_LDAP_FOLDER);
 
     try {
       Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
@@ -704,16 +719,8 @@ public class RodaCoreFactory {
     return logPath;
   }
 
-  public static Path getJobsPath() {
-    return dataPath.resolve("jobs");
-  }
-
-  public static Path getJobReportsPath() {
-    return dataPath.resolve("jobreports");
-  }
-
   public static Path getPluginsPath() {
-    return configPath.resolve("plugins");
+    return configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER);
   }
 
   public static void closeSolrServer() {
@@ -746,7 +753,8 @@ public class RodaCoreFactory {
       rodaPropertiesReloadStrategy.setRefreshDelay(5000);
       propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
     } else {
-      InputStream inputStream = RodaCoreFactory.class.getResourceAsStream("/config/" + configurationFile);
+      InputStream inputStream = RodaCoreFactory.class
+        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
       if (inputStream != null) {
         LOGGER.trace("Loading configuration from classpath " + configurationFile);
         propertiesConfiguration.load(inputStream);
@@ -769,7 +777,8 @@ public class RodaCoreFactory {
         configUri = null;
       }
     } else {
-      URL resource = RodaCoreFactory.class.getResource("/config/" + configurationFile);
+      URL resource = RodaCoreFactory.class
+        .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
       if (resource != null) {
         configUri = resource;
       } else {
@@ -793,7 +802,8 @@ public class RodaCoreFactory {
       // do nothing
     }
     if (inputStream == null) {
-      inputStream = RodaUtils.class.getResourceAsStream("/config/" + configurationFile);
+      inputStream = RodaUtils.class
+        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
       LOGGER.trace("Loading configuration from classpath " + configurationFile);
     }
     return inputStream;
@@ -841,11 +851,12 @@ public class RodaCoreFactory {
     // get from internal config
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
-    Set<String> internalFilesPath = new Reflections(
-      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix("config/" + folder)))
-        .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
-          .getResources(Pattern.compile(".*"));
+    Set<String> internalFilesPath = new Reflections(new ConfigurationBuilder()
+      .filterInputsBy(
+        new FilterBuilder().include(FilterBuilder.prefix("" + RodaConstants.CORE_CONFIG_FOLDER + "/" + folder)))
+      .setScanners(new ResourcesScanner())
+      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
+        .getResources(Pattern.compile(".*"));
 
     for (String internalFilePath : internalFilesPath) {
       fileNames.add(Paths.get(internalFilePath).getFileName().toString());
@@ -885,7 +896,7 @@ public class RodaCoreFactory {
     checkForChangesInI18N();
     Messages messages = i18nMessages.get(locale);
     if (messages == null) {
-      messages = new Messages(locale, getConfigPath().resolve("i18n"));
+      messages = new Messages(locale, getConfigPath().resolve(RodaConstants.CORE_I18N_FOLDER));
       i18nMessages.put(locale, messages);
     }
     return messages;
@@ -957,8 +968,8 @@ public class RodaCoreFactory {
       params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       veraPDFPlugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAllAIPs(veraPDFPlugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
+    } catch (InvalidParameterException e) {
+      LOGGER.error("Error while running PDF validation plugin", e);
     }
   }
 
@@ -970,8 +981,8 @@ public class RodaCoreFactory {
       params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAllAIPs(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
+    } catch (InvalidParameterException e) {
+      LOGGER.error("Error while running PDF to PDFA plugin", e);
     }
   }
 
@@ -1022,7 +1033,7 @@ public class RodaCoreFactory {
       validationPlugin.setParameterValues(parameters);
       getPluginOrchestrator().runPluginOnAllAIPs(validationPlugin);
     } catch (Exception e) {
-      e.printStackTrace();
+      LOGGER.error("Error while running validation plugin", e);
     }
   }
 
@@ -1087,8 +1098,8 @@ public class RodaCoreFactory {
         }
       });
       getPluginOrchestrator().runPluginOnTransferredResources(eark, transferredResourceList);
-    } catch (InvalidParameterException | IOException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
+    } catch (InvalidParameterException | IOException e) {
+      LOGGER.error(e.getMessage(), e);
     }
   }
 
@@ -1102,8 +1113,8 @@ public class RodaCoreFactory {
       // tr.setName("Fonts");
       // transferredResourceList.add(tr);
       getPluginOrchestrator().runPluginOnTransferredResources(converter, transferredResourceList);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
+    } catch (InvalidParameterException e) {
+      LOGGER.error("Error while running Transferred resources to AIP plugin", e);
     }
   }
 

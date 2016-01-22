@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
+
 /**
  * This is an item inside a {@link Report}.
  * 
@@ -24,6 +26,8 @@ public class ReportItem implements Serializable {
   // FIXME see if this is really necessary
   private String otherId = null;
   private String itemId = null;
+  // TODO
+  private PluginState itemState = PluginState.SUCCESS;
   private List<Attribute> attributes = new ArrayList<Attribute>();
 
   /**

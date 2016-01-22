@@ -17,10 +17,23 @@ public final class RodaConstants {
   public static final String CORE_CLUSTER_PORT = "roda.cluster.port";
   public static final String CORE_NODE_HOSTNAME = "roda.node.hostname";
   public static final String CORE_NODE_PORT = "roda.node.port";
+  public static final String INSTALL_FOLDER_SYSTEM_PROPERTY = "roda.home";
+
+  /*
+   * RODA Core properties (provided via configuration file)
+   */
+  public static final String CORE_STORAGE_TYPE = "core.storage.type";
+  public static final String CORE_STORAGE_FEDORA4_URL = "core.storage.fedora4.url";
+  public static final String CORE_STORAGE_FEDORA4_USERNAME = "core.storage.fedora4.username";
+  public static final String CORE_STORAGE_FEDORA4_PASSWORD = "core.storage.fedora4.password";
+  public static final String CORE_SOLR_TYPE = "core.solr.type";
+  public static final String CORE_SOLR_HTTP_URL = "core.solr.http.url";
+  public static final String CORE_SOLR_HTTP_CLOUD_URLS = "core.solr.http_cloud.urls";
 
   /*
    * Misc
    */
+  public static final String INSTALL_FOLDER_ENVIRONEMNT_VARIABLE = "RODA_HOME";
   public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
   public static final String SHA1 = "SHA-1";
@@ -35,6 +48,35 @@ public final class RodaConstants {
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
+
+  /*
+   * Installation (and most probably classpath as well) related variables
+   */
+  public static final String CORE_DESCRIPTION_LEVELS_FILE = "roda-description-levels-hierarchy.properties";
+  public static final String CORE_CONFIG_FOLDER = "config";
+  public static final String CORE_I18N_FOLDER = "i18n";
+  public static final String CORE_DATA_FOLDER = "data";
+  public static final String CORE_STORAGE_FOLDER = "storage";
+  public static final String CORE_INDEX_FOLDER = "index";
+  public static final String CORE_CROSSWALKS_FOLDER = "crosswalks";
+  public static final String CORE_JOBREPORT_FOLDER = "jobreport";
+  public static final String CORE_JOB_FOLDER = "job";
+  public static final String CORE_TRANSFERREDRESOURCE_FOLDER = "transferredresource";
+  public static final String CORE_MEMBERS_FOLDER = "members";
+  public static final String CORE_ACTIONLOG_FOLDER = "actionlog";
+  public static final String CORE_PRESERVATIONEVENT_FOLDER = "preservationevent";
+  public static final String CORE_FILE_FOLDER = "file";
+  public static final String CORE_REPRESENTATION_FOLDER = "representation";
+  public static final String CORE_AIP_FOLDER = "aip";
+  public static final String CORE_PLUGINS_FOLDER = "plugins";
+  public static final String CORE_DISSEMINATION_FOLDER = "dissemination";
+  public static final String CORE_INGEST_FOLDER = "ingest";
+  public static final String CORE_LOG_FOLDER = "log";
+  public static final String CORE_SCHEMAS_FOLDER = "schemas";
+  public static final String CORE_LDAP_FOLDER = "ldap";
+
+  public static final String DEFAULT_NODE_HOSTNAME = "localhost";
+  public static final String DEFAULT_NODE_PORT = "2551";
 
   /*
    * API related
