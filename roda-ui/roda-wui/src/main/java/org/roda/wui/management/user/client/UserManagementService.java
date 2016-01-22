@@ -20,16 +20,14 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.GroupAlreadyExistsException;
 import org.roda.core.data.common.IllegalOperationException;
-import org.roda.core.data.common.NoSuchGroupException;
-import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaGroup;
@@ -113,7 +111,7 @@ public interface UserManagementService extends RemoteService {
    * @throws IllegalOperationException
    */
   public void createUser(User user, String password) throws RODAException, UserAlreadyExistsException,
-    EmailAlreadyExistsException, IllegalOperationException, NoSuchUserException;
+    EmailAlreadyExistsException, IllegalOperationException, NotFoundException;
 
   /**
    * Modify a user
@@ -140,7 +138,7 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    */
   public void editMyUser(User user, String password)
-    throws RODAException, EmailAlreadyExistsException, NoSuchUserException, IllegalOperationException;
+    throws RODAException, EmailAlreadyExistsException, NotFoundException, IllegalOperationException;
 
   /**
    * Create a group
@@ -161,7 +159,7 @@ public interface UserManagementService extends RemoteService {
    * @throws IllegalOperationException
    * @throws NoSuchGroupException
    */
-  public void editGroup(Group group) throws RODAException, NoSuchGroupException, IllegalOperationException;
+  public void editGroup(Group group) throws RODAException, NotFoundException, IllegalOperationException;
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
@@ -173,7 +171,7 @@ public interface UserManagementService extends RemoteService {
    * @throws IllegalOperationException
    * @throws NoSuchUserException
    */
-  public boolean removeUser(String username) throws RODAException, NoSuchUserException, IllegalOperationException;
+  public boolean removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException;
 
   /**
    * Remove a group

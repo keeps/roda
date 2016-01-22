@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2;
+package org.roda.core.data.v2.ip;
 
 import java.util.Map;
 

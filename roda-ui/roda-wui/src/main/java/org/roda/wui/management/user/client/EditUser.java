@@ -13,12 +13,11 @@ package org.roda.wui.management.user.client;
 import java.util.List;
 
 import org.roda.core.data.common.EmailAlreadyExistsException;
-import org.roda.core.data.common.NoSuchUserException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -168,7 +167,7 @@ public class EditUser extends Composite {
     UserManagementService.Util.getInstance().editUser(user, password, new AsyncCallback<Void>() {
 
       public void onFailure(Throwable caught) {
-        if (caught instanceof NoSuchUserException) {
+        if (caught instanceof NotFoundException) {
           Window.alert(messages.editUserNotFound(user.getName()));
           cancel();
         } else if (caught instanceof EmailAlreadyExistsException) {

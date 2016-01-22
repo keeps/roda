@@ -14,8 +14,8 @@ import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.RodaUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

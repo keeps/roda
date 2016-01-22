@@ -29,8 +29,6 @@ import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.GroupAlreadyExistsException;
 import org.roda.core.data.common.IllegalOperationException;
-import org.roda.core.data.common.NoSuchGroupException;
-import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -38,7 +36,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.ip.AgentPreservationObject;
 import org.roda.core.data.v2.ip.EventPreservationObject;
 import org.roda.core.data.v2.ip.RODAObjectPermissions;
@@ -49,6 +46,7 @@ import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.SimpleFile;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
@@ -1660,7 +1658,7 @@ public class ModelService extends ModelObservable {
     } catch (EmailAlreadyExistsException e) {
       success = false;
       throw new AlreadyExistsException("User already exists", e);
-    } catch (NoSuchUserException e) {
+    } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);
     } catch (IllegalOperationException e) {
@@ -1719,7 +1717,7 @@ public class ModelService extends ModelObservable {
     } catch (LdapUtilityException e) {
       success = false;
       throw new GenericException("Error updating group to LDAP", e);
-    } catch (NoSuchGroupException e) {
+    } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("Group doesn't exist", e);
     } catch (IllegalOperationException e) {

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2;
+package org.roda.core.data.v2.log;
 
 import java.io.Serializable;
 import java.util.Date;

@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.deprecated.RODAObject;
-import org.roda.core.data.v2.FileFormat;
 
 // FIXME rename this to IndexedFile
 public class SimpleFile extends RODAObject {

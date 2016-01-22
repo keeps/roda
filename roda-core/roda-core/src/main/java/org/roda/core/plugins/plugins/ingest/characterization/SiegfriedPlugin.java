@@ -24,9 +24,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.FileFormat;
 import org.roda.core.data.v2.ip.AgentPreservationObject;
 import org.roda.core.data.v2.ip.EventPreservationObject;
+import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.SimpleFile;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -160,7 +160,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                   }
                   SimpleFile f = index.retrieve(SimpleFile.class,
                     SolrUtils.getId(aip.getId(), representationID, fileName));
-                  FileFormat ff = new org.roda.core.data.v2.FileFormat();
+                  FileFormat ff = new org.roda.core.data.v2.ip.FileFormat();
                   ff.setFormatDesignationName(format);
                   ff.setFormatDesignationVersion(version);
                   ff.setPronom(pronom);

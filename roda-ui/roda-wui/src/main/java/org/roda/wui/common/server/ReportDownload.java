@@ -38,14 +38,14 @@ import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.apache.fop.servlet.ServletContextURIResolver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.common.LoginException;
-import org.roda.core.data.common.NoSuchReportException;
 import org.roda.core.data.common.RODAClientException;
 import org.roda.core.data.common.ReportException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.wui.common.client.PrintReportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Servlet implementation class for Servlet: ReportDownload
@@ -340,7 +340,7 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements ja
           "Error getting report. See server log for more info");
       } catch (LoginException e) {
         response.sendError(HttpServletResponse.SC_UNAUTHORIZED, e.getMessage());
-      } catch (NoSuchReportException e) {
+      } catch (NotFoundException e) {
         response.sendError(HttpServletResponse.SC_NOT_FOUND, e.getMessage());
       } catch (RODAClientException e) {
         logger.error("Error getting report CSV", e);
@@ -563,8 +563,8 @@ public class ReportDownload extends javax.servlet.http.HttpServlet implements ja
     return sBuffer.toString();
   }
 
-  private String getReportCSV(HttpServletRequest request, Locale locale) throws ReportException, LoginException,
-    RemoteException, NoSuchReportException, RODAClientException {
+  private String getReportCSV(HttpServletRequest request, Locale locale)
+    throws ReportException, LoginException, RemoteException, NotFoundException, RODAClientException {
     StringBuffer sBuffer = new StringBuffer();
     String reportId = request.getParameter("id");
     // Report report = RodaClientFactory.getRodaClient(request.getSession())

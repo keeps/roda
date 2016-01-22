@@ -38,8 +38,6 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -48,13 +46,14 @@ import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.GroupAlreadyExistsException;
 import org.roda.core.data.common.IllegalOperationException;
 import org.roda.core.data.common.InvalidTokenException;
-import org.roda.core.data.common.NoSuchGroupException;
-import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.common.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.util.PasswordHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
@@ -455,7 +454,7 @@ public class LdapUtility {
       if (!user.isActive()) {
         try {
           setUserPasswordUnchecked(user.getName(), PasswordHandler.generateRandomPassword(12));
-        } catch (NoSuchUserException e) {
+        } catch (NotFoundException e) {
           LOGGER.error("Created user doesn't exist! Notify developers!!!", e);
         }
       }
@@ -497,7 +496,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   public User modifyUser(User modifiedUser)
-    throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
     LOGGER.trace("modifyUser() - " + modifiedUser.getName());
 
@@ -540,7 +539,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   public void setUserPassword(String username, String password)
-    throws IllegalOperationException, NoSuchUserException, LdapUtilityException {
+    throws IllegalOperationException, NotFoundException, LdapUtilityException {
 
     if (this.ldapProtectedUsers.contains(username)) {
       throw new IllegalOperationException("User (" + username + ") is protected and cannot be modified.");
@@ -572,7 +571,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   public User modifySelfUser(User modifiedUser, String currentPassword, String newPassword)
-    throws NoSuchUserException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, EmailAlreadyExistsException, IllegalOperationException, LdapUtilityException {
 
     LOGGER.trace("modifySelfUser() - " + modifiedUser.getName());
 
@@ -645,7 +644,7 @@ public class LdapUtility {
    * 
    */
   public void deactivateUser(String username)
-    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, LdapUtilityException {
 
     User user = getUser(username);
 
@@ -660,7 +659,7 @@ public class LdapUtility {
       }
 
     } else {
-      throw new NoSuchUserException(userMessage(username, " doesn't exist."));
+      throw new NotFoundException(userMessage(username, " doesn't exist."));
 
     }
 
@@ -875,7 +874,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   public Group modifyGroup(Group modifiedGroup)
-    throws NoSuchGroupException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, LdapUtilityException {
 
     LOGGER.trace("modifyGroup() - " + modifiedGroup.getName());
 
@@ -921,7 +920,7 @@ public class LdapUtility {
 
     } catch (NameNotFoundException e) {
       LOGGER.debug("Group " + modifiedGroup.getName() + " doesn't exist.", e);
-      throw new NoSuchGroupException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
+      throw new NotFoundException("Group " + modifiedGroup.getName() + " doesn't exist.", e);
     } catch (NamingException e) {
       LOGGER.debug("Error modifying group " + modifiedGroup.getName(), e);
       throw new LdapUtilityException("Error modifying group " + modifiedGroup.getName(), e);
@@ -1160,7 +1159,7 @@ public class LdapUtility {
 
     } catch (IllegalOperationException e) {
       throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
-    } catch (NoSuchUserException e) {
+    } catch (NotFoundException e) {
       throw new LdapUtilityException("Error setting user password - " + e.getMessage(), e);
     }
 
@@ -1194,7 +1193,7 @@ public class LdapUtility {
    *           if something goes wrong with the operation.
    */
   public User confirmUserEmail(String username, String email, String emailConfirmationToken)
-    throws NoSuchUserException, IllegalArgumentException, InvalidTokenException, LdapUtilityException {
+    throws NotFoundException, IllegalArgumentException, InvalidTokenException, LdapUtilityException {
 
     User user = null;
     if (username != null) {
@@ -1214,7 +1213,7 @@ public class LdapUtility {
         message = "Email " + email + " is not registered by any user";
       }
 
-      throw new NoSuchUserException(message);
+      throw new NotFoundException(message);
 
     } else {
 
@@ -1289,7 +1288,7 @@ public class LdapUtility {
    *           if something goes wrong with the operation.
    */
   public User requestPasswordReset(String username, String email)
-    throws NoSuchUserException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, LdapUtilityException {
 
     User user = null;
     if (username != null) {
@@ -1309,7 +1308,7 @@ public class LdapUtility {
         message = "Email " + email + " is not registered by any user";
       }
 
-      throw new NoSuchUserException(message);
+      throw new NotFoundException(message);
 
     } else {
 
@@ -1355,13 +1354,13 @@ public class LdapUtility {
    *           if something goes wrong with the operation.
    */
   public User resetUserPassword(String username, String password, String resetPasswordToken)
-    throws NoSuchUserException, InvalidTokenException, IllegalOperationException, LdapUtilityException {
+    throws NotFoundException, InvalidTokenException, IllegalOperationException, LdapUtilityException {
 
     User user = getUser(username);
 
     if (user == null) {
 
-      throw new NoSuchUserException(userMessage(username, " doesn't exist"));
+      throw new NotFoundException(userMessage(username, " doesn't exist"));
 
     } else {
 
@@ -1516,7 +1515,7 @@ public class LdapUtility {
    *           if the specified Group doesn't exist.
    * @throws LdapUtilityException
    */
-  public void setSuperGroups(String groupName, Set<String> groups) throws LdapUtilityException, NoSuchGroupException {
+  public void setSuperGroups(String groupName, Set<String> groups) throws LdapUtilityException, NotFoundException {
     try {
 
       DirContext ctxRoot = getLDAPAdminDirContext(ldapRootDN);
@@ -1525,7 +1524,7 @@ public class LdapUtility {
 
     } catch (NameNotFoundException e) {
       LOGGER.debug("Group " + groupName + " doesn't exist.", e);
-      throw new NoSuchGroupException("Group " + groupName + " doesn't exist.", e);
+      throw new NotFoundException("Group " + groupName + " doesn't exist.", e);
     } catch (NamingException e) {
       LOGGER.debug("Error setting user groups", e);
       throw new LdapUtilityException("Error setting user groups", e);
@@ -2058,7 +2057,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   private void modifyUser(DirContext ctxRoot, User modifiedUser, String newPassword, boolean modifyRolesAndGroups)
-    throws NoSuchUserException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
+    throws NotFoundException, IllegalOperationException, EmailAlreadyExistsException, LdapUtilityException {
 
     LOGGER.trace("modifyUser() - " + modifiedUser.getName());
 
@@ -2093,7 +2092,7 @@ public class LdapUtility {
     } catch (NameNotFoundException e) {
 
       LOGGER.debug(userMessage(modifiedUser.getName(), " doesn't exist."), e);
-      throw new NoSuchUserException(userMessage(modifiedUser.getName(), " doesn't exist."), e);
+      throw new NotFoundException(userMessage(modifiedUser.getName(), " doesn't exist."), e);
 
     } catch (NamingException e) {
 
@@ -2558,7 +2557,7 @@ public class LdapUtility {
    * @throws LdapUtilityException
    */
   private void setUserPasswordUnchecked(String username, String password)
-    throws NoSuchUserException, LdapUtilityException {
+    throws NotFoundException, LdapUtilityException {
 
     try {
 
@@ -2571,7 +2570,7 @@ public class LdapUtility {
 
     } catch (NameNotFoundException e) {
       LOGGER.debug(userMessage(username, " doesn't exist."), e);
-      throw new NoSuchUserException(userMessage(username, " doesn't exist."), e);
+      throw new NotFoundException(userMessage(username, " doesn't exist."), e);
     } catch (NamingException e) {
       LOGGER.debug("Error setting password for user " + username, e);
       throw new LdapUtilityException("Error setting password for user " + username, e);
@@ -2584,8 +2583,7 @@ public class LdapUtility {
 
   /**
    * Returns a user UID (Unique ID) from it's DN (Distinguished Name). Ex: for
-   * <i>DN=uid=xpto,ou=people,dc=roda,dc=org</i> returns
-   * <i>rcastro</i>.
+   * <i>DN=uid=xpto,ou=people,dc=roda,dc=org</i> returns <i>rcastro</i>.
    * 
    * @param roleDN
    * @return a {@link java.lang.String} with the UID.

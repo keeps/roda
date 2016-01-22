@@ -14,8 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.EmailAlreadyExistsException;
-import org.roda.core.data.common.NoSuchRODAObjectException;
-import org.roda.core.data.common.NoSuchUserException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -110,7 +109,7 @@ public class VerifyEmail implements HistoryResolver {
             new AsyncCallback<Boolean>() {
 
             public void onFailure(Throwable caught) {
-              if (caught instanceof NoSuchRODAObjectException) {
+              if (caught instanceof NotFoundException) {
                 Window.alert(constants.verifyEmailNoSuchUser());
                 userInputBox.setFocus(true);
               } else {
@@ -172,7 +171,7 @@ public class VerifyEmail implements HistoryResolver {
               new AsyncCallback<Boolean>() {
 
               public void onFailure(Throwable caught) {
-                if (caught instanceof NoSuchUserException) {
+                if (caught instanceof NotFoundException) {
                   Window.alert(constants.verifyEmailNoSuchUser());
                 } else if (caught instanceof EmailAlreadyExistsException) {
                   Window.alert(constants.verifyEmailAlreadyExists());
@@ -250,8 +249,7 @@ public class VerifyEmail implements HistoryResolver {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryPath()
+   * @see org.roda.office.common.client.HistoryResolver#getHistoryPath()
    */
   public List<String> getHistoryPath() {
     return Arrays.asList(getHistoryToken());
@@ -260,8 +258,7 @@ public class VerifyEmail implements HistoryResolver {
   /*
    * (non-Javadoc)
    * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryToken()
+   * @see org.roda.office.common.client.HistoryResolver#getHistoryToken()
    */
   public String getHistoryToken() {
     return "verifyemail";

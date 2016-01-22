@@ -23,16 +23,14 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.EmailAlreadyExistsException;
 import org.roda.core.data.common.GroupAlreadyExistsException;
 import org.roda.core.data.common.IllegalOperationException;
-import org.roda.core.data.common.NoSuchGroupException;
-import org.roda.core.data.common.NoSuchUserException;
 import org.roda.core.data.common.UserAlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.LogEntry;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaGroup;
@@ -108,7 +106,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void createUser(User user, String password) throws GenericException, UserAlreadyExistsException,
-    EmailAlreadyExistsException, IllegalOperationException, NoSuchUserException {
+    EmailAlreadyExistsException, IllegalOperationException, NotFoundException {
     try {
       logger.debug("Creating user " + user.getName());
       Date start = new Date();
@@ -124,7 +122,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void editMyUser(User modifiedUser, String password)
-    throws EmailAlreadyExistsException, NoSuchUserException, IllegalOperationException, GenericException {
+    throws EmailAlreadyExistsException, NotFoundException, IllegalOperationException, GenericException {
     try {
       Date start = new Date();
       if (modifiedUser.getName().equals(UserUtility.getClientUser(getThreadLocalRequest().getSession()))) {
@@ -183,7 +181,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void editGroup(Group group) throws GenericException, NoSuchGroupException, IllegalOperationException {
+  public void editGroup(Group group) throws GenericException, NotFoundException, IllegalOperationException {
     try {
       logger.debug("Editing group " + group.getName());
       Date start = new Date();
@@ -198,7 +196,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public boolean removeUser(String username) throws RODAException, NoSuchUserException, IllegalOperationException {
+  public boolean removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException {
     boolean result = false;
     try {
       logger.debug("Removing user " + username);

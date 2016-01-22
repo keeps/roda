@@ -19,12 +19,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
-import org.roda.core.data.common.NoSuchRODAObjectException;
 import org.roda.core.data.common.RODAClientException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Cache implementation
@@ -127,7 +127,7 @@ public class Cache extends HttpServlet implements Servlet {
    * @throws RODAClientException
    */
   public boolean isCached(HttpServletRequest request, String pid, String disseminatorName) throws BrowserException,
-    LoginException, NoSuchRODAObjectException, RemoteException, RODAClientException {
+    LoginException, NotFoundException, RemoteException, RODAClientException {
     return isCached(pid, disseminatorName);
   }
 
@@ -162,7 +162,7 @@ public class Cache extends HttpServlet implements Servlet {
    * @throws GWTServiceException
    */
   public static File getCacheFile(HttpServletRequest request, final String pid, final String disseminatorName)
-    throws BrowserException, LoginException, RemoteException, NoSuchRODAObjectException, RODAClientException {
+    throws BrowserException, LoginException, RemoteException, NotFoundException, RODAClientException {
     return getCacheFile(pid, disseminatorName);
   }
 
@@ -183,7 +183,7 @@ public class Cache extends HttpServlet implements Servlet {
    * @throws BrowserException
    */
   public static File getCacheResource(HttpServletRequest request, final String pid, final String disseminatorName,
-    String path) throws BrowserException, LoginException, RemoteException, NoSuchRODAObjectException,
+    String path) throws BrowserException, LoginException, RemoteException, NotFoundException,
     RODAClientException {
     return new File(getCacheFile(request, pid, disseminatorName).getAbsolutePath() + path);
 

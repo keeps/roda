@@ -14,7 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.InvalidTokenException;
-import org.roda.core.data.common.NoSuchUserException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.welcome.Welcome;
@@ -25,7 +25,6 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -117,7 +116,7 @@ public class ResetPassword implements HistoryResolver {
             public void onFailure(Throwable caught) {
               if (caught instanceof InvalidTokenException) {
                 Window.alert(constants.resetPasswordInvalidToken());
-              } else if (caught instanceof NoSuchUserException) {
+              } else if (caught instanceof NotFoundException) {
                 Window.alert(constants.resetPasswordNoSuchUser());
               } else {
                 logger.error("Error reseting password", caught);

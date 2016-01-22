@@ -157,11 +157,6 @@
 			org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>EventManagementService</servlet-name>
-		<servlet-class>
-			org.roda.wui.management.event.server.EventManagementServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>ReportService</servlet-name>
 		<servlet-class>org.roda.wui.common.server.ReportServiceImpl</servlet-class>
 	</servlet>
@@ -220,10 +215,6 @@
 	<servlet-mapping>
 		<servlet-name>BrowserService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>EventManagementService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/eventmanagementservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>ReportService</servlet-name>

@@ -12,8 +12,8 @@ package org.roda.wui.management.user.client;
 
 import java.util.List;
 
-import org.roda.core.data.v2.LogEntry;
-import org.roda.core.data.v2.LogEntryParameter;
+import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;

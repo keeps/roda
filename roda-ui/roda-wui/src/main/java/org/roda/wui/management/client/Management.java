@@ -19,7 +19,6 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.management.editor.client.MetadataEditor;
-import org.roda.wui.management.event.client.EventManagement;
 import org.roda.wui.management.statistics.client.Statistics;
 import org.roda.wui.management.user.client.MemberManagement;
 import org.roda.wui.management.user.client.UserLog;
@@ -42,8 +41,8 @@ public class Management {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER,
-        EventManagement.getInstance(), Statistics.getInstance(), UserLog.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(
+        new HistoryResolver[] {MemberManagement.RESOLVER, Statistics.getInstance(), UserLog.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -100,8 +99,6 @@ public class Management {
     } else {
       if (historyTokens.get(0).equals(MemberManagement.RESOLVER.getHistoryToken())) {
         MemberManagement.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-      } else if (historyTokens.get(0).equals(EventManagement.getInstance().getHistoryToken())) {
-        EventManagement.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(MetadataEditor.getInstance().getHistoryToken())) {
         MetadataEditor.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(Statistics.getInstance().getHistoryToken())) {

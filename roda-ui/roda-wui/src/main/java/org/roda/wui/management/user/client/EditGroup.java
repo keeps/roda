@@ -12,7 +12,7 @@ package org.roda.wui.management.user.client;
 
 import java.util.Set;
 
-import org.roda.core.data.common.NoSuchGroupException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.WUIButton;
@@ -91,7 +91,7 @@ public class EditGroup extends WUIWindow {
         UserManagementService.Util.getInstance().editGroup(EditGroup.this.group, new AsyncCallback<Void>() {
 
           public void onFailure(Throwable caught) {
-            if (caught instanceof NoSuchGroupException) {
+            if (caught instanceof NotFoundException) {
               Window.alert(messages.editGroupNotFound(name));
               EditGroup.this.cancel();
             } else {

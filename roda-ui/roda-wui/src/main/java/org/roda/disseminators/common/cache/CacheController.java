@@ -18,8 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
-import org.roda.core.data.common.NoSuchRODAObjectException;
 import org.roda.core.data.common.RODAClientException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,7 +95,7 @@ public abstract class CacheController {
    * @throws BrowserException
    */
   public void get(String pid, final HttpServletRequest request, HttpServletResponse response) throws IOException,
-    BrowserException, LoginException, NoSuchRODAObjectException, RODAClientException {
+    BrowserException, LoginException, NotFoundException, RODAClientException {
     // String servletUrl = RodaClientFactory.getServletUrl(request);
     // final String cacheURL = Cache.getCacheUrl(request);
     // if (waitingForResources.contains(pid)) {

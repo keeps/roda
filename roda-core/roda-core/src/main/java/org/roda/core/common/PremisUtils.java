@@ -35,7 +35,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.FileFormat;
+import org.roda.core.data.v2.ip.FileFormat;
 import org.roda.core.data.v2.ip.Fixity;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.SimpleFile;
