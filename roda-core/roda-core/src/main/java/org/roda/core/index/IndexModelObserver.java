@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -43,7 +44,6 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.Binary;
@@ -81,28 +81,27 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexPreservationsEvents(final AIP aip) {
-    final Map<String, List<String>> preservationEventsIds = aip.getPreservationsEventsIds();
-    for (Map.Entry<String, List<String>> eventEntry : preservationEventsIds.entrySet()) {
-      try {
-        for (String fileId : eventEntry.getValue()) {
-          
-          StoragePath filePath = ModelUtils.buildPreservationPath(PREMIS_TYPE.EVENT, aip.getId(), eventEntry.getKey(), null, fileId);
-          LOGGER.debug("FILEPATH: "+filePath);
+    for (PreservationMetadata pm : aip.getMetadata().getPreservationMetadata()) {
+      if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+        try {
+
+          StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
           Binary binary = model.getStorage().getBinary(filePath);
 
-          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), eventEntry.getKey(), fileId,
-            binary);
+          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationID(),
+            pm.getId(), binary);
           LOGGER.debug(premisEventDocument.toString());
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+
+        } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+          | AuthorizationDeniedException e) {
+          LOGGER.error("Could not index premis event", e);
         }
-      } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-        | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index premis event", e);
-      }
-      try {
-        index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
-      } catch (SolrServerException | IOException e) {
-        LOGGER.error("Could not commit indexed representations", e);
+        try {
+          index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
+        } catch (SolrServerException | IOException e) {
+          LOGGER.error("Could not commit indexed representations", e);
+        }
       }
     }
   }
@@ -148,8 +147,8 @@ public class IndexModelObserver implements ModelObserver {
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
-        if (representation.getFileIds() != null && !representation.getFileIds().isEmpty()) {
-          for (String fileId : representation.getFileIds()) {
+        if (representation.getFilesDirectlyUnder() != null && !representation.getFilesDirectlyUnder().isEmpty()) {
+          for (String fileId : representation.getFilesDirectlyUnder()) {
             File file = model.retrieveFile(aip.getId(), representationId, fileId);
             indexFile(file, false);
           }
@@ -202,11 +201,29 @@ public class IndexModelObserver implements ModelObserver {
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile, fulltext);
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
-      if (commit) {
-        index.commit(RodaConstants.INDEX_FILE);
-      }
+
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Could not index file: " + file, e);
+    }
+
+    if (file.getFilesDirectlyUnder() != null && !file.getFilesDirectlyUnder().isEmpty()) {
+      for (String fileUnderId : file.getFilesDirectlyUnder()) {
+        File fileUnder;
+        try {
+          fileUnder = model.retrieveFile(file.getAipId(), file.getId(), fileUnderId);
+          indexFile(fileUnder, false);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Could not index files under: " + file, e);
+        }
+      }
+    }
+
+    if (commit) {
+      try {
+        index.commit(RodaConstants.INDEX_FILE);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Could not index file: " + file, e);
+      }
     }
   }
 
@@ -358,22 +375,25 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
-      if(preservationMetadata.getAipID()!=null){
-        AIP aip = model.retrieveAIP(preservationMetadata.getAipID());
+      if (preservationMetadata.getAipId() != null) {
+        AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
         indexAIP(aip);
       }
 
-      Binary binary = model.getStorage().getBinary(preservationMetadata.getStoragePath());
-      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipID(),
+      StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationMetadata);
+      Binary binary = model.getStorage().getBinary(storagePath);
+      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
         preservationMetadata.getRepresentationID(), preservationMetadata.getId(), binary);
 
-      String type = preservationMetadata.getType();
-      if (type.equalsIgnoreCase("event")) {
+      PreservationMetadataType type = preservationMetadata.getType();
+      if (type.equals(PreservationMetadataType.EVENT)) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
-        
-        List<PreservationLinkingAgent> linkingAgents = ModelUtils.extractAgentsFromPreservationBinary(binary,EventComplexType.class);
-        List<PreservationLinkingObject> linkingObjects = ModelUtils.extractLinkingObjectsFromPreservationBinary(binary,EventComplexType.class);
-        
+        List<PreservationLinkingAgent> linkingAgents = ModelUtils.extractAgentsFromPreservationBinary(binary,
+          EventComplexType.class);
+        List<PreservationLinkingObject> linkingObjects = ModelUtils.extractLinkingObjectsFromPreservationBinary(binary,
+          EventComplexType.class);
+      } else if (type.equals(PreservationMetadataType.AGENT)) {
+        index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
       }
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
@@ -387,14 +407,14 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadata) {
     try {
-      aipUpdated(model.retrieveAIP(preservationMetadata.getAipID()));
+      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata updated on retrieving the full AIP", e);
     }
   }
 
   @Override
-  public void preservationMetadataDeleted(String aipId, String representationId, String fileID, String preservationMetadataBinaryId) {
+  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId) {
     try {
       aipUpdated(model.retrieveAIP(aipId));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {

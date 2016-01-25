@@ -63,7 +63,7 @@ public interface ModelObserver {
 
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
 
-  public void preservationMetadataDeleted(String aipId, String representationId, String fileId, String preservationMetadataBinaryId);
+  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId);
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
 

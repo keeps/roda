@@ -29,6 +29,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ValidationException;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.slf4j.Logger;
@@ -55,9 +56,10 @@ public class ValidationUtils {
     try {
       descriptiveMetadataBinaries = model.listDescriptiveMetadataBinaries(aipID);
       for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataBinaries) {
-        StoragePath storagePath = descriptiveMetadata.getStoragePath();
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(descriptiveMetadata.getAipId(),
+          descriptiveMetadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
-        if (force) { // FORCE
+        if (force) {
           LOGGER.debug("FORCE");
           try {
             if (!forceOnly) {
@@ -202,7 +204,7 @@ public class ValidationUtils {
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean ret;
     try {
-      StoragePath storagePath = metadata.getStoragePath();
+      StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
       Binary binary = model.getStorage().getBinary(storagePath);
       validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
       ret = true;
@@ -229,7 +231,7 @@ public class ValidationUtils {
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean ret;
     try {
-      StoragePath storagePath = metadata.getStoragePath();
+      StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
       Binary binary = model.getStorage().getBinary(storagePath);
       validatePreservationBinary(binary);
       ret = true;

@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
@@ -35,12 +34,12 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Report;
@@ -91,42 +90,6 @@ public final class ModelUtils {
    */
   private ModelUtils() {
 
-  }
-
-  /**
-   * Builds, from metadata, a {@code FileFormat} object
-   * 
-   * @param metadata
-   *          metadata
-   * @throws GenericException
-   */
-  public static FileFormat getFileFormat(Map<String, Set<String>> metadata) throws GenericException {
-    String mimetype = getString(metadata, RodaConstants.STORAGE_META_FORMAT_MIME);
-    String version = getString(metadata, RodaConstants.STORAGE_META_FORMAT_VERSION);
-    // FIXME how to load format registries if any
-    // Map<String, String> formatRegistries = new HashMap<String, String>();
-
-    FileFormat format = new FileFormat();
-    format.setMimeType(mimetype);
-    format.setMimeType(version);
-
-    // TODO check if this is needed or add all other metadata
-    return format;
-  }
-
-  /**
-   * Builds, from metadata, a {@code Set<RepresentationState>} object
-   * 
-   * @param metadata
-   *          metadata
-   */
-  public static Set<RepresentationState> getStatuses(Map<String, Set<String>> metadata) {
-    Set<RepresentationState> statuses = new TreeSet<RepresentationState>();
-    Set<String> statusesInString = metadata.get(RodaConstants.STORAGE_META_REPRESENTATION_STATUSES);
-    for (String statusString : statusesInString) {
-      statuses.add(RepresentationState.valueOf(statusString.toUpperCase()));
-    }
-    return statuses;
   }
 
   public static <T> T getAs(Map<String, Set<String>> metadata, String key, Class<T> type) throws GenericException {
@@ -348,10 +311,18 @@ public final class ModelUtils {
       representationId);
   }
 
-  public static StoragePath getRepresentationFilePath(String aipId, String representationId, String fileId)
+  public static StoragePath getRepresentationFilePath(String aipId, String representationId, String... fileId)
     throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId, RodaConstants.STORAGE_DIRECTORY_DATA,
-      representationId, fileId);
+    List<String> path = new ArrayList<>();
+    path.add(RodaConstants.STORAGE_CONTAINER_AIP);
+    path.add(aipId);
+    path.add(RodaConstants.STORAGE_DIRECTORY_DATA);
+    path.add(representationId);
+    for (String fileIdPartial : fileId) {
+      path.add(fileIdPartial);
+    }
+
+    return DefaultStoragePath.parse(path);
   }
 
   public static String getAIPidFromStoragePath(StoragePath path) {
@@ -365,6 +336,42 @@ public final class ModelUtils {
       throw new GenericException(
         "Error while trying to obtain representation id from storage path (length is not 3 or above)");
     }
+  }
+
+  public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
+    throws RequestNotValidException {
+    // TODO review this method
+    return getPreservationFilePath(pm.getAipId(), pm.getRepresentationID(), pm.getId());
+  }
+
+  /**
+   * @deprecated
+   * @see #getAIPRepresentationPreservationPath(String, String)
+   */
+  @Deprecated
+  public static StoragePath getPreservationPath(String aipId, String representationID) throws RequestNotValidException {
+    // TODO check if this method should be removed
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID);
+
+  }
+
+  public static StoragePath getPreservationPath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+
+  }
+
+  public static StoragePath getPreservationFilePath(String aipId, String representationId, String fileId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId),
+      fileId + ".file.premis.xml");
+  }
+
+  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
+
   }
 
   public static Representation getPreservationRepresentationObject(Binary preservationBinary) {
@@ -652,7 +659,7 @@ public final class ModelUtils {
       if (identifiers != null) {
         for (LinkingObjectIdentifierComplexType loict : identifiers) {
           PreservationLinkingObject object = new PreservationLinkingObject();
-          
+
           object.setTitle(loict.getTitle());
           object.setIdentifierType(loict.getLinkingObjectIdentifierType());
           object.setIdentifierValue(loict.getLinkingObjectIdentifierValue());
@@ -670,26 +677,28 @@ public final class ModelUtils {
     }
     return objects;
   }
-  
-  public static String getPreservationType(Binary binary) {
-    String type = "";
+
+  public static PreservationMetadataType getPreservationType(Binary binary) {
+    PreservationMetadataType type;
     EventComplexType event = ModelUtils.getPreservationEvent(binary);
     if (event != null) {
-      type = "event";
+      type = PreservationMetadataType.EVENT;
     } else {
       lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(binary);
       if (file != null) {
-        type = "file";
+        type = PreservationMetadataType.OBJECT_FILE;
       } else {
         AgentComplexType agent = ModelUtils.getPreservationAgentObject(binary);
         if (agent != null) {
-          type = "agent";
+          type = PreservationMetadataType.AGENT;
         } else {
           Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
           if (representation != null) {
-            type = "representation";
+            type = PreservationMetadataType.OBJECT_REPRESENTATION;
           } else {
-            type = "unknown";
+            // TODO send log
+            // TODO support remaining types
+            type = null;
           }
         }
       }
@@ -744,11 +753,10 @@ public final class ModelUtils {
 
     AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
     if (modelAIP != null) {
-      List<String> descriptiveMetadaIds = modelAIP.getDescriptiveMetadataIds();
-      if (descriptiveMetadaIds != null && descriptiveMetadaIds.size() > 0) {
+      List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getMetadata().getDescriptiveMetadata();
+      if (descriptiveMetadata != null && descriptiveMetadata.size() > 0) {
         ArrayNode metadata = mapper.createArrayNode();
-        for (String descriptiveMetadataID : descriptiveMetadaIds) {
-          DescriptiveMetadata dm = model.retrieveDescriptiveMetadata(modelAIP.getId(), descriptiveMetadataID);
+        for (DescriptiveMetadata dm : descriptiveMetadata) {
           ObjectNode dmNode = mapper.createObjectNode();
           if (dm.getId() != null) {
             dmNode = dmNode.put("id", dm.getId());
@@ -768,56 +776,68 @@ public final class ModelUtils {
     return node;
   }
 
-  //agent path -> /Preservation/Agents/[agentID].agent.premis.xml
+  // agent path -> /Preservation/Agents/[agentID].agent.premis.xml
   public static StoragePath getPreservationAgentPath(String agentID) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,agentID+".agent.premis.xml");
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID + ".agent.premis.xml");
   }
 
-  //aip metadata path -> /AIP/[aipId]/Metadata/Preservation
+  // aip metadata path -> /AIP/[aipId]/Metadata/Preservation
   public static StoragePath getAIPPreservationMetadataPath(String aipId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
   }
 
-  //representation metadata path -> /AIP/[aipId]/Metadata/Preservation/[representationId]
-  public static StoragePath getAIPRepresentationPreservationPath(String aipId, String representationID) throws RequestNotValidException {
+  // representation metadata path ->
+  // /AIP/[aipId]/Metadata/Preservation/[representationId]
+  public static StoragePath getAIPRepresentationPreservationPath(String aipId, String representationID)
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,representationID);
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID);
   }
 
-  public static StoragePath getPreservationRepresentationPath(String aipID, String representationID) throws RequestNotValidException {
+  public static StoragePath getPreservationRepresentationPath(String aipID, String representationID)
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,representationID,representationID+".representation.premis.xml");
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,
+      representationID + ".representation.premis.xml");
   }
 
   public static StoragePath getPath(StoragePath parent, String children) throws RequestNotValidException {
     return DefaultStoragePath.parse(parent, children);
   }
 
-  // TODO right now, all premis for files are saved under the representation folder... if need, add parameter "fileID"...
-  public static StoragePath getPreservationFilePathRaw(String aipId, String representationId, String preservationID) throws RequestNotValidException {
-     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
+  // TODO right now, all premis for files are saved under the representation
+  // folder... if need, add parameter "fileID"...
+  public static StoragePath getPreservationFilePathRaw(String aipId, String representationId, String preservationID)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
   }
 
-  public static StoragePath getPreservationFilePath(String aipId, String representationId, String fileId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), fileId+".file.premis.xml");
-  }
-
+  /**
+   * @deprecated
+   * @see #getPreservationMetadataStoragePath(PreservationMetadata)
+   */
+  @Deprecated
   public static StoragePath buildPreservationPath(PREMIS_TYPE type, String aipId, String representationId,
     String fileId, String preservationId) throws RequestNotValidException {
     StoragePath path = null;
-    if(type.toString().equalsIgnoreCase(PREMIS_TYPE.AGENT.toString())){
-      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,preservationId+".agent.premis.xml");
-    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.REPRESENTATION.toString())){
+    if (type.toString().equalsIgnoreCase(PREMIS_TYPE.AGENT.toString())) {
+      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+        RodaConstants.STORAGE_DIRECTORY_AGENTS, preservationId + ".agent.premis.xml");
+    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.REPRESENTATION.toString())) {
       path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,representationId+".representation.premis.xml");
-    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.EVENT.toString())){
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+        representationId + ".representation.premis.xml");
+    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.EVENT.toString())) {
       // TODO HANDLE AIP and REPRESENTATION EVENTS
       path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,preservationId+".event.premis.xml");
-    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.FILE.toString())){
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+        preservationId + ".event.premis.xml");
+    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.FILE.toString())) {
       path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,fileId+".file.premis.xml");
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+        fileId + ".file.premis.xml");
     }
     return path;
   }

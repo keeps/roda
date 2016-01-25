@@ -58,12 +58,12 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -123,15 +123,14 @@ public class BrowserHelper {
 
     // set representations
     // getting the last 2 representations
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_DATE_CREATION, true));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_ORIGINAL, true));
     IndexResult<Representation> findRepresentations = findRepresentations(aipId, sorter,
       new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
     List<Representation> representations = findRepresentations.getResults();
 
     // if there are more representations ensure one original is there
     if (findRepresentations.getTotalCount() > findRepresentations.getLimit()) {
-      boolean hasOriginals = findRepresentations.getResults().stream()
-        .anyMatch(x -> x.getStatuses().contains(RepresentationState.ORIGINAL));
+      boolean hasOriginals = findRepresentations.getResults().stream().anyMatch(x -> x.isOriginal());
       if (!hasOriginals) {
         boolean onlyOriginals = true;
         IndexResult<Representation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals, sorter,
@@ -241,7 +240,7 @@ public class BrowserHelper {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
     if (onlyOriginals) {
-      filter.add(new SimpleFilterParameter(RodaConstants.SRO_STATUS, RepresentationState.ORIGINAL.toString()));
+      filter.add(new SimpleFilterParameter(RodaConstants.SRO_ORIGINAL, Boolean.TRUE.toString()));
     }
     Facets facets = null;
 
@@ -275,22 +274,36 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
       ModelService model = RodaCoreFactory.getModelService();
-      StorageService storage = RodaCoreFactory.getStorageService();
       Representation representation = model.retrieveRepresentation(aipId, representationId);
 
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      List<String> fileIds = representation.getFileIds();
+      List<String> fileIds = representation.getFilesDirectlyUnder();
       for (String fileId : fileIds) {
-        StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
-        Binary binary = storage.getBinary(filePath);
-        ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
-        zipEntries.add(info);
+        addToZip(zipEntries, aipId, representationId, fileId);
       }
 
       return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
     } catch (IOException e) {
       throw new GenericException("Error getting AIP representation", e);
+    }
+
+  }
+
+  private static void addToZip(List<ZipEntryInfo> zipEntries, String aipId, String representationId, String... fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    StorageService storage = RodaCoreFactory.getStorageService();
+
+    ModelService model = RodaCoreFactory.getModelService();
+    org.roda.core.data.v2.ip.File file = model.retrieveFile(aipId, representationId, fileId);
+
+    if (file.isFile()) {
+      StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+      Binary binary = storage.getBinary(filePath);
+      ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
+      zipEntries.add(info);
+    } else {
+
     }
 
   }
@@ -316,8 +329,9 @@ public class BrowserHelper {
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
       for (DescriptiveMetadata dm : metadata) {
         if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-          Binary binary = storage.getBinary(dm.getStoragePath());
-          ZipEntryInfo info = new ZipEntryInfo(dm.getStoragePath().getName(), binary.getContent().createInputStream());
+          StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, dm.getId());
+          Binary binary = storage.getBinary(storagePath);
+          ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent().createInputStream());
           zipEntries.add(info);
         } else {
           break;
@@ -425,9 +439,9 @@ public class BrowserHelper {
         preservationFiles = model.listPreservationMetadataBinaries(aipId, r.getId());
         for (PreservationMetadata preservationFile : preservationFiles) {
           if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-            Binary binary = storage.getBinary(preservationFile.getStoragePath());
-            ZipEntryInfo info = new ZipEntryInfo(
-              r.getId() + File.separator + preservationFile.getStoragePath().getName(),
+            StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
+            Binary binary = storage.getBinary(storagePath);
+            ZipEntryInfo info = new ZipEntryInfo(r.getId() + File.separator + storagePath.getName(),
               binary.getContent().createInputStream());
             zipEntries.add(info);
           } else {
@@ -505,19 +519,19 @@ public class BrowserHelper {
         for (PreservationMetadata preservationFile : preservationFiles) {
           boolean add = false;
 
-          if (preservationFile.getType().equalsIgnoreCase("agent")) {
+          if (preservationFile.getType().equals(PreservationMetadataType.AGENT)) {
             if (counterAgent >= pagingParamsAgent.getFirst()
               && (counterAgent <= pagingParamsAgent.getSecond() || pagingParamsAgent.getSecond() == -1)) {
               add = true;
             }
             counterAgent++;
-          } else if (preservationFile.getType().equalsIgnoreCase("event")) {
+          } else if (preservationFile.getType().equals(PreservationMetadataType.EVENT)) {
             if (counterEvent >= pagingParamsEvent.getFirst()
               && (counterEvent <= pagingParamsEvent.getSecond() || pagingParamsEvent.getSecond() == -1)) {
               add = true;
             }
             counterEvent++;
-          } else if (preservationFile.getType().equalsIgnoreCase("file")) {
+          } else if (preservationFile.getType().equals(PreservationMetadataType.OBJECT_FILE)) {
             if (counterFile >= pagingParamsFile.getFirst()
               && (counterFile <= pagingParamsFile.getSecond() || pagingParamsFile.getSecond() == -1)) {
               add = true;
@@ -526,9 +540,9 @@ public class BrowserHelper {
           }
 
           if (add) {
-            Binary binary = storage.getBinary(preservationFile.getStoragePath());
-            ZipEntryInfo info = new ZipEntryInfo(preservationFile.getStoragePath().getName(),
-              binary.getContent().createInputStream());
+            StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
+            Binary binary = storage.getBinary(storagePath);
+            ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent().createInputStream());
             zipEntries.add(info);
           }
         }

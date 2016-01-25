@@ -8,9 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 public class Representation implements Serializable {
 
@@ -18,223 +16,99 @@ public class Representation implements Serializable {
 
   private String id;
   private String aipId;
-  private boolean active;
-  private Date dateCreated;
-  private Date dateModified;
-  private Set<RepresentationState> statuses;
-  private String type;
-  private List<String> fileIds;
-  private long sizeInBytes;
+
+  private boolean original;
+
+  private List<String> filesDirectlyUnder;
+
+  public Representation() {
+    super();
+  }
+
+  public Representation(String id, String aipId, boolean original, List<String> filesDirectlyUnder) {
+    super();
+    this.id = id;
+    this.aipId = aipId;
+    this.original = original;
+    this.filesDirectlyUnder = filesDirectlyUnder;
+  }
+
+  public String getId() {
+    return id;
+  }
 
   public void setId(String id) {
     this.id = id;
+  }
+
+  public String getAipId() {
+    return aipId;
   }
 
   public void setAipId(String aipId) {
     this.aipId = aipId;
   }
 
-  public void setActive(boolean active) {
-    this.active = active;
+  public boolean isOriginal() {
+    return original;
   }
 
-  public void setDateCreated(Date dateCreated) {
-    this.dateCreated = dateCreated;
+  public void setOriginal(boolean original) {
+    this.original = original;
   }
 
-  public void setDateModified(Date dateModified) {
-    this.dateModified = dateModified;
+  public List<String> getFilesDirectlyUnder() {
+    return filesDirectlyUnder;
   }
 
-  public void setStatuses(Set<RepresentationState> statuses) {
-    this.statuses = statuses;
-  }
-
-  public void setType(String type) {
-    this.type = type;
-  }
-
-  public void setFileIds(List<String> fileIds) {
-    this.fileIds = fileIds;
-  }
-
-  public Representation() {
-    super();
-  }
-
-  public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,
-    Set<RepresentationState> statuses, String type, long sizeInBytes, List<String> fileIds) {
-    super();
-    this.id = id;
-    this.aipId = aipId;
-    this.active = active;
-    this.dateCreated = dateCreated;
-    this.dateModified = dateModified;
-    this.statuses = statuses;
-    this.type = type;
-    this.sizeInBytes = sizeInBytes;
-    this.fileIds = fileIds;
-  }
-
-  public Representation(String id, String aipId, boolean active, Date dateCreated, Date dateModified,
-    Set<RepresentationState> statuses, String type, List<String> fileIds) {
-    this(id, aipId, active, dateCreated, dateModified, statuses, type, 0, fileIds);
-  }
-
-  /**
-   * @return the id
-   */
-  public String getId() {
-    return id;
-  }
-
-  /**
-   * @return the aipId
-   */
-  public String getAipId() {
-    return aipId;
-  }
-
-  /**
-   * @return the active
-   */
-  public boolean isActive() {
-    return active;
-  }
-
-  /**
-   * @return the dateCreated
-   */
-  public Date getDateCreated() {
-    return dateCreated;
-  }
-
-  /**
-   * @return the dateModified
-   */
-  public Date getDateModified() {
-    return dateModified;
-  }
-
-  /**
-   * @return the statuses
-   */
-  public Set<RepresentationState> getStatuses() {
-    return statuses;
-  }
-
-  /**
-   * @return the type
-   */
-  public String getType() {
-    return type;
-  }
-
-  /**
-   * @return the fileIds
-   */
-  public List<String> getFileIds() {
-    return fileIds;
-  }
-
-  public long getSizeInBytes() {
-    return sizeInBytes;
-  }
-
-  public void setSizeInBytes(long sizeInBytes) {
-    this.sizeInBytes = sizeInBytes;
-  }
-
-  @Override
-  public String toString() {
-    return "Representation [id=" + id + ", aipId=" + aipId + ", active=" + active + ", dateCreated=" + dateCreated
-      + ", dateModified=" + dateModified + ", statuses=" + statuses + ", type=" + type + ", sizeInBytes=" + sizeInBytes
-      + ", fileIds=" + fileIds + "]";
+  public void setFilesDirectlyUnder(List<String> filesDirectlyUnder) {
+    this.filesDirectlyUnder = filesDirectlyUnder;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (active ? 1231 : 1237);
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-    result = prime * result + ((dateCreated == null) ? 0 : dateCreated.hashCode());
-    result = prime * result + ((dateModified == null) ? 0 : dateModified.hashCode());
-    result = prime * result + ((fileIds == null) ? 0 : fileIds.hashCode());
+    result = prime * result + ((filesDirectlyUnder == null) ? 0 : filesDirectlyUnder.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((statuses == null) ? 0 : statuses.hashCode());
-    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + (original ? 1231 : 1237);
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     Representation other = (Representation) obj;
-    if (active != other.active) {
-      return false;
-    }
-    if (sizeInBytes != other.sizeInBytes) {
-      return false;
-    }
     if (aipId == null) {
-      if (other.aipId != null) {
+      if (other.aipId != null)
         return false;
-      }
-    } else if (!aipId.equals(other.aipId)) {
+    } else if (!aipId.equals(other.aipId))
       return false;
-    }
-    if (dateCreated == null) {
-      if (other.dateCreated != null) {
+    if (filesDirectlyUnder == null) {
+      if (other.filesDirectlyUnder != null)
         return false;
-      }
-    } else if (!dateCreated.equals(other.dateCreated)) {
+    } else if (!filesDirectlyUnder.equals(other.filesDirectlyUnder))
       return false;
-    }
-    if (dateModified == null) {
-      if (other.dateModified != null) {
-        return false;
-      }
-    } else if (!dateModified.equals(other.dateModified)) {
-      return false;
-    }
-    if (fileIds == null) {
-      if (other.fileIds != null) {
-        return false;
-      }
-    } else if (!fileIds.equals(other.fileIds)) {
-      return false;
-    }
     if (id == null) {
-      if (other.id != null) {
+      if (other.id != null)
         return false;
-      }
-    } else if (!id.equals(other.id)) {
+    } else if (!id.equals(other.id))
       return false;
-    }
-    if (statuses == null) {
-      if (other.statuses != null) {
-        return false;
-      }
-    } else if (!statuses.equals(other.statuses)) {
+    if (original != other.original)
       return false;
-    }
-    if (type == null) {
-      if (other.type != null) {
-        return false;
-      }
-    } else if (!type.equals(other.type)) {
-      return false;
-    }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "Representation [id=" + id + ", aipId=" + aipId + ", original=" + original + ", filesDirectlyUnder="
+      + filesDirectlyUnder + "]";
   }
 
 }

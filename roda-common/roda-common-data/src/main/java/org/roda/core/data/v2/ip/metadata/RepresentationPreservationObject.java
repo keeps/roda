@@ -8,7 +8,6 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.util.Arrays;
-import java.util.Date;
 
 /**
  * This is a representation preservation object. It contains preservation
@@ -16,7 +15,10 @@ import java.util.Date;
  * 
  * @author Rui Castro
  */
-public class RepresentationPreservationObject extends PreservationObject {
+public class RepresentationPreservationObject extends PreservationMetadata {
+
+  private static final long serialVersionUID = -1658449853029007714L;
+
   public static final String PRESERVATION_LEVEL_FULL = "full";
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
 
@@ -59,25 +61,21 @@ public class RepresentationPreservationObject extends PreservationObject {
    */
   public RepresentationPreservationObject() {
     super();
+    setType(PreservationMetadataType.OBJECT_REPRESENTATION);
   }
 
-  /**
-   * @param id
-   * @param label
-   * @param model
-   * @param lastModifiedDate
-   * @param createdDate
-   * @param state
-   * @param ID
-   */
-  public RepresentationPreservationObject(String id, String label, String model, Date lastModifiedDate,
-    Date createdDate, String state, String ID) {
+  public RepresentationPreservationObject(String id, String aipId, String representationId, String preservationLevel,
+    String representationObjectID, RepresentationFilePreservationObject rootFile,
+    RepresentationFilePreservationObject[] partFiles, String derivedFromRepresentationObjectID,
+    String derivationEventID, String[] preservationEventIDs) {
     super();
-    setId(id);
-    setLabel(label);
-    setLastModifiedDate(lastModifiedDate);
-    setCreatedDate(createdDate);
-    setState(state);
+    this.preservationLevel = preservationLevel;
+    this.representationObjectID = representationObjectID;
+    this.rootFile = rootFile;
+    this.partFiles = partFiles;
+    this.derivedFromRepresentationObjectID = derivedFromRepresentationObjectID;
+    this.derivationEventID = derivationEventID;
+    this.preservationEventIDs = preservationEventIDs;
   }
 
   /**

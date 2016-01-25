@@ -7,23 +7,29 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import org.roda.core.data.v2.ip.StoragePath;
+import java.io.Serializable;
 
-public class PreservationMetadata {
-  private final String id;
-  private final String aipID;
-  private final String representationID;
-  private final String fileID;
-  private final StoragePath storagePath;
-  private final String type;
+public class PreservationMetadata implements Serializable {
+  private static final long serialVersionUID = -4312941542769679721L;
 
-  public PreservationMetadata(String id, String aipID, String representationId, String fileID, StoragePath storagePath, String type) {
+  public static enum PreservationMetadataType {
+    OBJECT_REPRESENTATION, OBJECT_FILE, OBJECT_INTELLECTUAL_ENTITY, AGENT, EVENT, RIGHTS_STATEMENT, ENVIRONMENT;
+  }
+
+  private String id;
+  private String aipId;
+  private String representationID;
+  private PreservationMetadataType type;
+
+  public PreservationMetadata() {
+    super();
+  }
+
+  public PreservationMetadata(String id, String aipId, String representationId, PreservationMetadataType type) {
     super();
     this.id = id;
-    this.aipID = aipID;
+    this.aipId = aipId;
     this.representationID = representationId;
-    this.fileID = fileID;
-    this.storagePath = storagePath;
     this.type = type;
   }
 
@@ -37,87 +43,79 @@ public class PreservationMetadata {
   /**
    * @return the aipId
    */
-  public String getAipID() {
-    return aipID;
+  public String getAipId() {
+    return aipId;
+  }
+  
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
   }
 
   public String getRepresentationID() {
     return representationID;
   }
-
-  /**
-   * @return the storagePath
-   */
-  public StoragePath getStoragePath() {
-    return storagePath;
+  
+  public void setRepresentationID(String representationID) {
+    this.representationID = representationID;
   }
 
-  public String getType() {
+  public PreservationMetadataType getType() {
     return type;
   }
 
-  @Override
-  public String toString() {
-    return "PreservationMetadata [id=" + id + ", aipId=" + aipID + ", representationID=" + representationID
-      + ", storagePath=" + storagePath + ", type=" + type + "]";
+  public void setId(String id) {
+    this.id = id;
+  }
+
+
+  public void setType(PreservationMetadataType type) {
+    this.type = type;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((aipID == null) ? 0 : aipID.hashCode());
-    result = prime * result + ((getRepresentationID() == null) ? 0 : getRepresentationID().hashCode());
+    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
+    result = prime * result + ((representationID == null) ? 0 : representationID.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj) {
+    if (this == obj)
       return true;
-    }
-    if (obj == null) {
+    if (obj == null)
       return false;
-    }
-    if (getClass() != obj.getClass()) {
+    if (getClass() != obj.getClass())
       return false;
-    }
     PreservationMetadata other = (PreservationMetadata) obj;
-    if (aipID == null) {
-      if (other.aipID != null) {
+    if (aipId == null) {
+      if (other.aipId != null)
         return false;
-      }
-    } else if (!aipID.equals(other.aipID)) {
+    } else if (!aipId.equals(other.aipId))
       return false;
-    }
-    if (getRepresentationID() == null) {
-      if (other.getRepresentationID() != null) {
-        return false;
-      }
-    } else if (!getRepresentationID().equals(other.getRepresentationID())) {
-      return false;
-    }
     if (id == null) {
-      if (other.id != null) {
+      if (other.id != null)
         return false;
-      }
-    } else if (!id.equals(other.id)) {
+    } else if (!id.equals(other.id))
       return false;
-    }
-    if (storagePath == null) {
-      if (other.storagePath != null) {
+    if (representationID == null) {
+      if (other.representationID != null)
         return false;
-      }
-    } else if (!storagePath.equals(other.storagePath)) {
+    } else if (!representationID.equals(other.representationID))
       return false;
-    }
+    if (type != other.type)
+      return false;
     return true;
   }
 
-  public String getFileID() {
-    return fileID;
+  @Override
+  public String toString() {
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationID + ", type="
+      + type + "]";
   }
 
 }

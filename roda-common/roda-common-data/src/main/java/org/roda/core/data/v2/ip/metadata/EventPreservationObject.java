@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -15,18 +14,11 @@ import java.util.List;
  * This is an event preservation object
  * 
  * @author Rui Castro
+ * @author Luis Faria
  * 
  */
-public class EventPreservationObject extends PreservationObject implements Serializable {
-  private Date date;
-  private String name;
-  private String description;
-  private String outcomeResult;
-  private String outcomeDetails;
-  private String targetID;
+public class EventPreservationObject extends PreservationMetadata {
   private static final long serialVersionUID = 1555211337883930542L;
-  private List<PreservationLinkingObject> linkingObjects = null;
-  private List<PreservationLinkingAgent> linkingAgent = null;
 
   /*
    * accession adding emulation information appraisal capture compression
@@ -69,6 +61,16 @@ public class EventPreservationObject extends PreservationObject implements Seria
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
 
+  private Date date;
+  private String name;
+  private String description;
+  private String outcomeResult;
+  private String outcomeDetails;
+  private String targetID;
+
+  private List<PreservationLinkingObject> linkingObjects = null;
+  private List<PreservationLinkingAgent> linkingAgent = null;
+
   // ID is already set in PreservationObject
   // getType() is already set in PreservationObject
 
@@ -80,6 +82,7 @@ public class EventPreservationObject extends PreservationObject implements Seria
   private String outcomeDetailNote = null;
   private String outcomeDetailExtension = null;
 
+  // TODO agents show be a list
   private String agentID = null;
   private String agentRole = null;
 
@@ -92,19 +95,25 @@ public class EventPreservationObject extends PreservationObject implements Seria
     super();
   }
 
-  /**
-   * @see PreservationObject#toString()
-   */
-  @Override
-  public String toString() {
-
-    int objectCount = (getObjectIDs() != null) ? getObjectIDs().length : 0;
-
-    return "EventPreservationObject(" + super.toString() + ", datetime=" //$NON-NLS-1$ //$NON-NLS-2$
-      + getDatetime() + ", eventType=" + getEventType() //$NON-NLS-1$
-      + ", eventDetail=" + getEventDetail() + ", outcome=" //$NON-NLS-1$ //$NON-NLS-2$
-      + getOutcome() + ", agentID=" + getAgentID() + ", agentRole=" //$NON-NLS-1$ //$NON-NLS-2$
-      + getAgentRole() + ", objectIDs=" + objectCount + ")"; //$NON-NLS-1$ //$NON-NLS-2$
+  public EventPreservationObject(Date date, String name, String description, String outcomeResult,
+    String outcomeDetails, String targetID, Date datetime, String eventType, String eventDetail, String outcome,
+    String outcomeDetailNote, String outcomeDetailExtension, String agentID, String agentRole, String[] objectIDs) {
+    super();
+    this.date = date;
+    this.name = name;
+    this.description = description;
+    this.outcomeResult = outcomeResult;
+    this.outcomeDetails = outcomeDetails;
+    this.targetID = targetID;
+    this.datetime = datetime;
+    this.eventType = eventType;
+    this.eventDetail = eventDetail;
+    this.outcome = outcome;
+    this.outcomeDetailNote = outcomeDetailNote;
+    this.outcomeDetailExtension = outcomeDetailExtension;
+    this.agentID = agentID;
+    this.agentRole = agentRole;
+    this.objectIDs = objectIDs;
   }
 
   /**
@@ -135,7 +144,6 @@ public class EventPreservationObject extends PreservationObject implements Seria
    */
   public void setEventType(String eventType) {
     this.eventType = eventType;
-    setLabel(eventType);
   }
 
   /**
@@ -306,7 +314,5 @@ public class EventPreservationObject extends PreservationObject implements Seria
   public void setLinkingAgent(List<PreservationLinkingAgent> linkingAgent) {
     this.linkingAgent = linkingAgent;
   }
-
-  
 
 }

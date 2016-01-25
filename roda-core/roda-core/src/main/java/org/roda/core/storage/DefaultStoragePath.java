@@ -40,6 +40,21 @@ public class DefaultStoragePath implements StoragePath {
     }
     return parse(builder.toString());
   }
+  
+  public static DefaultStoragePath parse(Iterable<String> pathPartials) throws RequestNotValidException {
+    StringBuilder builder = new StringBuilder();
+    boolean empty = true;
+    for (String pathPartial : pathPartials) {
+      if (!empty) {
+        builder.append(SEPARATOR);
+      } else {
+        empty = false;
+      }
+      builder.append(pathPartial);
+
+    }
+    return parse(builder.toString());
+  }
 
   public static DefaultStoragePath parse(StoragePath base, String resourceName) throws RequestNotValidException {
     if (resourceName.contains(SEPARATOR_REGEX)) {

@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -41,13 +40,14 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
+import org.roda.core.data.v2.ip.metadata.Metadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Job;
@@ -283,9 +283,8 @@ public class ModelService extends ModelObservable {
     AuthorizationDeniedException {
 
     // set basic AIP information
-    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, active);
-    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_CREATED, new Date());
-    ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED, new Date());
+    // TODO set AIP as active
+    // ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, active);
 
     // set default permissions
     // TODO setPermissions(metadata, defaultPermissions);
@@ -458,8 +457,7 @@ public class ModelService extends ModelObservable {
     binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
 
     storage.createBinary(binaryPath, binaryMetadata, binary.getContent(), asReference);
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
-      binaryPath);
+    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
     notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
 
     return descriptiveMetadataBinary;
@@ -482,8 +480,7 @@ public class ModelService extends ModelObservable {
     binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
     storage.updateMetadata(binaryPath, binaryMetadata, true);
 
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
-      binaryPath);
+    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
     notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
 
     return descriptiveMetadataBinary;
@@ -592,25 +589,12 @@ public class ModelService extends ModelObservable {
     // delete files that were removed on representation update
     deleteUnneededFilesFromRepresentation(aipId, representationId, fileIDsToUpdate);
 
-    // get representation metadata (from source representation)
-    Map<String, Set<String>> representationMetadata = sourceDirectory.getMetadata();
-
-    // obtain information (from metadata) to build representation object
-    boolean active = ModelUtils.getBoolean(representationMetadata, RodaConstants.STORAGE_META_ACTIVE);
-    Date dateCreated = ModelUtils.getDate(representationMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-    Date dateModified = new Date();
-    Long sizeInBytes = ModelUtils.getLong(representationMetadata, RodaConstants.STORAGE_META_SIZE_IN_BYTES);
-    representationMetadata.put(RodaConstants.STORAGE_META_DATE_MODIFIED,
-      Sets.newHashSet(RodaUtils.dateToString(dateModified)));
-    String type = ModelUtils.getString(representationMetadata, RodaConstants.STORAGE_META_TYPE);
-    Set<RepresentationState> statuses = ModelUtils.getStatuses(representationMetadata);
-
-    // update representation metadata (essentially date.modified)
-    updateRepresentationMetadata(aipId, representationId, representationMetadata);
+    // TODO how to known if representation is original?
+    boolean original = true;
 
     // build return object
-    Representation representation = new Representation(representationId, aipId, active, dateCreated, dateModified,
-      statuses, type, sizeInBytes, fileIDsToUpdate);
+    Representation representation = new Representation(representationId, aipId, original, fileIDsToUpdate);
+
     notifyRepresentationUpdated(representation);
     return representation;
   }
@@ -625,13 +609,6 @@ public class ModelService extends ModelObservable {
     }
 
     return sourceDirectory;
-  }
-
-  private void updateRepresentationMetadata(String aipId, String representationId,
-    Map<String, Set<String>> representationMetadata)
-      throws RequestNotValidException, GenericException, AuthorizationDeniedException, NotFoundException {
-    storage.updateMetadata(ModelUtils.getRepresentationPath(aipId, representationId), representationMetadata, true);
-
   }
 
   private void deleteUnneededFilesFromRepresentation(String aipId, String representationId,
@@ -673,7 +650,7 @@ public class ModelService extends ModelObservable {
           File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
             createIfNotExists, notify);
           notifyFileUpdated(fileUpdated);
-          fileIDsToUpdate.add(fileUpdated.getStoragePath().getName());
+          fileIDsToUpdate.add(fileUpdated.getId());
         } else {
           // FIXME log error and continue???
         }
@@ -726,7 +703,8 @@ public class ModelService extends ModelObservable {
           public File next() {
             try {
               return convertResourceToRepresentationFile(iterator.next());
-            } catch (GenericException | NoSuchElementException e) {
+            } catch (GenericException | NoSuchElementException | NotFoundException | AuthorizationDeniedException
+              | RequestNotValidException e) {
               LOGGER.error("Error while listing representation files", e);
               return null;
             }
@@ -745,7 +723,7 @@ public class ModelService extends ModelObservable {
 
   // FIXME under a certain representation may exist files but also folders.
   // how to handle that in this method?
-  public File retrieveFile(String aipId, String representationId, String fileId)
+  public File retrieveFile(String aipId, String representationId, String... fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file;
     StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
@@ -816,9 +794,8 @@ public class ModelService extends ModelObservable {
       .listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
     while (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next();
-      Iterator<Resource> preservationIterator = storage
-        .listResourcesUnderDirectory(ModelUtils.getPreservationRepresentationPath(aipId, resource.getStoragePath().getName()))
-        .iterator();
+      Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(
+        ModelUtils.getPreservationRepresentationPath(aipId, resource.getStoragePath().getName())).iterator();
       while (preservationIterator.hasNext()) {
         Resource preservationObject = preservationIterator.next();
         Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
@@ -840,7 +817,8 @@ public class ModelService extends ModelObservable {
     return it;
   }
 
-  public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     RepresentationPreservationObject obj = null;
 
     StoragePath sp = ModelUtils.getPreservationRepresentationPath(aipId, representationId);
@@ -877,29 +855,15 @@ public class ModelService extends ModelObservable {
     throws GenericException {
     if (resource instanceof DefaultBinary) {
       try {
-        Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-
-        // retrieve needed information to instantiate Representation
-        Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-        // Date dateCreated = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_CREATED);
-        // Date dateModified = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_MODIFIED);
-
-        if (active == null) {
-          // when not stated, considering active=false
-          active = false;
-        }
         PremisAgentHelper pah = PremisAgentHelper.newInstance(resource.getContent().createInputStream());
         AgentPreservationObject apo = new AgentPreservationObject();
         apo.setAgentName((pah.getAgent().getAgentNameList() != null && pah.getAgent().getAgentNameList().size() > 0)
           ? pah.getAgent().getAgentNameList().get(0) : "");
         apo.setAgentType(pah.getAgent().getAgentType());
-        apo.setFileID(agentID);
         apo
           .setId((pah.getAgent().getAgentIdentifierList() != null && pah.getAgent().getAgentIdentifierList().size() > 0)
             ? pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue() : "");
-        apo.setType(""); // TODO: ??????????
+        apo.setType(PreservationMetadataType.AGENT);
         return apo;
       } catch (PremisMetadataException | IOException e) {
         throw new GenericException("Error while trying to convert a binary into a representation preservation object",
@@ -933,39 +897,38 @@ public class ModelService extends ModelObservable {
     AIP aip;
     if (resource instanceof DefaultDirectory) {
       StoragePath storagePath = resource.getStoragePath();
-      Map<String, Set<String>> metadata = resource.getMetadata();
+
+      String aipId = storagePath.getName();
+
+      Map<String, Set<String>> resourceMetadata = resource.getMetadata();
 
       // obtain basic AIP information
-      String parentId = ModelUtils.getString(metadata, RodaConstants.STORAGE_META_PARENT_ID);
-      Boolean active = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ACTIVE);
-      Date dateCreated = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_CREATED);
-      Date dateModified = ModelUtils.getDate(metadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
-
-      // obtain permissions
-      RODAObjectPermissions permissions = getPermissions(metadata);
-
-      if (active == null) {
-        // when not stated, consider active=false
-        active = false;
-      }
+      // TODO get basic AIP info from aip.json or METS.xml
+      String parentId = ModelUtils.getString(resourceMetadata, RodaConstants.STORAGE_META_PARENT_ID);
+      boolean active = true;
+      RODAObjectPermissions permissions = null;
 
       // obtain descriptive metadata information
       List<String> descriptiveMetadataBinaryIds = ModelUtils.getChildIds(storage,
-        ModelUtils.getDescriptiveMetadataPath(storagePath.getName()), false);
+        ModelUtils.getDescriptiveMetadataPath(aipId), false);
+      List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
+      for (String descriptiveMetadataBinaryId : descriptiveMetadataBinaryIds) {
+        // TODO set type
+        String type = null;
+        descriptiveMetadata.add(new DescriptiveMetadata(descriptiveMetadataBinaryId, aipId, type));
+      }
 
       // obtain representations information
-      List<String> representationIds = ModelUtils.getChildIds(storage,
-        ModelUtils.getRepresentationsPath(storagePath.getName()), false);
+      List<String> representationIds = ModelUtils.getChildIds(storage, ModelUtils.getRepresentationsPath(aipId), false);
 
       // obtain preservation information
-      final Map<String, List<String>> preservationRepresentationObjects = new HashMap<String, List<String>>();
-      final Map<String, List<String>> preservationFileObjects = new HashMap<String, List<String>>();
-      final Map<String, List<String>> preservationEvents = new HashMap<String, List<String>>();
-      retrieveAIPPreservationInformation(storagePath, representationIds, preservationRepresentationObjects,
-        preservationFileObjects, preservationEvents);
+      List<PreservationMetadata> preservationMetadata = retrieveAIPPreservationInformation(aipId, representationIds);
 
-      aip = new AIP(storagePath.getName(), parentId, active, permissions, descriptiveMetadataBinaryIds,
-        representationIds, preservationRepresentationObjects, preservationEvents, preservationFileObjects);
+      // TODO fetch other metadata
+      List<OtherMetadata> otherMetadata = null;
+
+      Metadata metadata = new Metadata(descriptiveMetadata, preservationMetadata, otherMetadata);
+      aip = new AIP(aipId, parentId, active, permissions, metadata, representationIds);
 
     } else {
       throw new GenericException(
@@ -989,73 +952,39 @@ public class ModelService extends ModelObservable {
     return hasAgent;
   }
 
-  private RODAObjectPermissions getPermissions(Map<String, Set<String>> metadata) {
-    RODAObjectPermissions permissions = new RODAObjectPermissions();
+  private List<PreservationMetadata> retrieveAIPPreservationInformation(String aipId, List<String> representationIds)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
-    // grant permissions
-    Set<String> set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_GRANT_USERS);
-    permissions.setGrantUsers(set);
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_GRANT_GROUPS);
-    permissions.setGrantGroups(set);
+    List<PreservationMetadata> ret = new ArrayList<>();
 
-    // read permissions
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_READ_USERS);
-    permissions.setReadUsers(set);
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_READ_GROUPS);
-    permissions.setReadGroups(set);
-
-    // insert permissions
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_INSERT_USERS);
-    permissions.setInsertUsers(set);
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_INSERT_GROUPS);
-    permissions.setInsertGroups(set);
-
-    // modify permissions
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_MODIFY_USERS);
-    permissions.setModifyUsers(set);
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_MODIFY_GROUPS);
-    permissions.setModifyGroups(set);
-
-    // remove permissions
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_REMOVE_USERS);
-    permissions.setRemoveUsers(set);
-    set = metadata.get(RodaConstants.STORAGE_META_PERMISSION_REMOVE_GROUPS);
-    permissions.setRemoveGroups(set);
-
-    return permissions;
-  }
-
-  private void retrieveAIPPreservationInformation(StoragePath storagePath, List<String> representationIds,
-    final Map<String, List<String>> preservationRepresentationObjects,
-    final Map<String, List<String>> preservationFileObjects, final Map<String, List<String>> preservationEvents)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     for (String representationID : representationIds) {
-      StoragePath representationPreservationPath = ModelUtils.getAIPRepresentationPreservationPath(storagePath.getName(),
+      StoragePath representationPreservationPath = ModelUtils.getAIPRepresentationPreservationPath(aipId,
         representationID);
 
       // obtain list of preservation related files
       List<String> preservationFileIds = ModelUtils.getChildIds(storage, representationPreservationPath, false);
 
-      final List<String> preservationRepresentationObjectFileIds = new ArrayList<String>();
-      final List<String> preservationFileObjectFileIds = new ArrayList<String>();
-      final List<String> preservationEventFileIds = new ArrayList<String>();
-
       for (String preservationFileId : preservationFileIds) {
+        // TODO review due to directories in representations
         StoragePath binaryPath = ModelUtils.getPath(representationPreservationPath, preservationFileId);
         Binary preservationBinary = storage.getBinary(binaryPath);
 
         lc.xmlns.premisV2.Representation representation = ModelUtils
           .getPreservationRepresentationObject(preservationBinary);
         if (representation != null) {
-          preservationRepresentationObjectFileIds.add(preservationFileId);
+          ret.add(new PreservationMetadata(preservationFileId, aipId, representationID,
+            PreservationMetadataType.OBJECT_REPRESENTATION));
         } else {
           EventComplexType event = ModelUtils.getPreservationEvent(preservationBinary);
           if (event != null) {
-            preservationEventFileIds.add(preservationFileId);
+            ret.add(
+              new PreservationMetadata(preservationFileId, aipId, representationID, PreservationMetadataType.EVENT));
           } else {
             lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(preservationBinary);
             if (file != null) {
-              preservationFileObjectFileIds.add(preservationFileId);
+              ret.add(new PreservationMetadata(preservationFileId, aipId, representationID,
+                PreservationMetadataType.OBJECT_FILE));
+
             } else {
               LOGGER.warn(
                 "The binary {} is neither a PreservationRepresentationObject or PreservationEvent or PreservationFileObject...Moving on...",
@@ -1064,20 +993,20 @@ public class ModelService extends ModelObservable {
           }
         }
       }
-      preservationRepresentationObjects.put(representationID, preservationRepresentationObjectFileIds);
-      preservationFileObjects.put(representationID, preservationFileObjectFileIds);
-      preservationEvents.put(representationID, preservationEventFileIds);
-
     }
+
+    return ret;
   }
 
   private DescriptiveMetadata convertResourceToDescriptiveMetadata(Resource resource) throws GenericException {
     if (resource instanceof DefaultBinary) {
-      // retrieve needed information to instantiate DescriptiveMetadata
+
+      String id = resource.getStoragePath().getName();
+      String aipId = ModelUtils.getAIPidFromStoragePath(resource.getStoragePath());
+      // TODO find another way to retrieve descriptive metadata type
       String type = ModelUtils.getString(resource.getMetadata(), RodaConstants.STORAGE_META_TYPE);
 
-      return new DescriptiveMetadata(resource.getStoragePath().getName(),
-        ModelUtils.getAIPidFromStoragePath(resource.getStoragePath()), type, resource.getStoragePath());
+      return new DescriptiveMetadata(id, aipId, type);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a descriptive metadata binary");
@@ -1086,10 +1015,12 @@ public class ModelService extends ModelObservable {
 
   private PreservationMetadata convertResourceToPreservationMetadata(Resource resource) throws GenericException {
     if (resource instanceof DefaultBinary) {
-      String type = ModelUtils.getPreservationType((DefaultBinary) resource);
-      return new PreservationMetadata(resource.getStoragePath().getName(),
-        ModelUtils.getAIPidFromStoragePath(resource.getStoragePath()),
-        ModelUtils.getRepresentationIdFromStoragePath(resource.getStoragePath()),ModelUtils.getRepresentationIdFromStoragePath(resource.getStoragePath()), resource.getStoragePath(), type);
+      String id = resource.getStoragePath().getName();
+      String aipId = ModelUtils.getAIPidFromStoragePath(resource.getStoragePath());
+      String representationId = ModelUtils.getRepresentationIdFromStoragePath(resource.getStoragePath());
+      PreservationMetadataType type = ModelUtils.getPreservationType((DefaultBinary) resource);
+
+      return new PreservationMetadata(id, aipId, representationId, type);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a preservation metadata binary");
@@ -1100,28 +1031,15 @@ public class ModelService extends ModelObservable {
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     if (resource instanceof DefaultDirectory) {
       StoragePath directoryPath = resource.getStoragePath();
-      Map<String, Set<String>> directoryMetadata = resource.getMetadata();
 
-      // retrieve needed information to instantiate Representation
-      Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-      Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-      Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
-      Set<RepresentationState> statuses = ModelUtils.getStatuses(directoryMetadata);
-      String type = ModelUtils.getString(directoryMetadata, RodaConstants.STORAGE_META_TYPE);
       List<String> fileIds = ModelUtils.getChildIds(storage, resource.getStoragePath(), true);
-      Long sizeInBytes = ModelUtils.getLong(directoryMetadata, RodaConstants.STORAGE_META_SIZE_IN_BYTES);
 
-      if (sizeInBytes == null) {
-        sizeInBytes = 0L;
-      }
+      String id = directoryPath.getName();
+      String aipId = ModelUtils.getAIPidFromStoragePath(directoryPath);
+      // TODO infer original
+      boolean original = true;
 
-      if (active == null) {
-        // when not stated, considering active=false
-        active = false;
-      }
-
-      return new Representation(directoryPath.getName(), ModelUtils.getAIPidFromStoragePath(directoryPath), active,
-        dateCreated, dateModified, statuses, type, sizeInBytes, fileIds);
+      return new Representation(id, aipId, original, fileIds);
 
     } else {
       throw new GenericException(
@@ -1129,25 +1047,42 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private File convertResourceToRepresentationFile(Resource resource) throws GenericException {
+  private File convertResourceToRepresentationFile(Resource resource)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    File ret;
+
+    StoragePath resourcePath = resource.getStoragePath();
+
+    String id = resourcePath.getName();
+    String aipId = ModelUtils.getAIPidFromStoragePath(resourcePath);
+    String representationId = ModelUtils.getRepresentationIdFromStoragePath(resourcePath);
+
     if (resource instanceof DefaultBinary) {
-      StoragePath binaryPath = resource.getStoragePath();
-      Map<String, Set<String>> metadata = resource.getMetadata();
+      boolean isFile = true;
+      List<String> filesDirectlyUnder = null;
 
-      // retrieve needed information to instantiate File
-      Boolean entryPoint = ModelUtils.getBoolean(metadata, RodaConstants.STORAGE_META_ENTRYPOINT);
+      ret = new File(id, aipId, representationId, isFile, filesDirectlyUnder);
+    } else if (resource instanceof DefaultDirectory) {
+      boolean isFile = false;
+      List<String> filesDirectlyUnder = new ArrayList<>();
 
-      if (entryPoint == null) {
-        entryPoint = false;
+      ClosableIterable<Resource> iterable = storage.listResourcesUnderDirectory(resourcePath);
+
+      for (Resource fileUnder : iterable) {
+        filesDirectlyUnder.add(fileUnder.getStoragePath().getName());
+      }
+      try {
+        iterable.close();
+      } catch (IOException e) {
+        LOGGER.warn("Error closing iterable, possible file leak", e);
       }
 
-      return new File(binaryPath.getName(), ModelUtils.getAIPidFromStoragePath(binaryPath),
-        ModelUtils.getRepresentationIdFromStoragePath(binaryPath), entryPoint, binaryPath, binaryPath.getName(),
-        ((DefaultBinary) resource).getSizeInBytes(), true);
+      ret = new File(resourcePath.getName(), aipId, representationId, isFile, filesDirectlyUnder);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
     }
+    return ret;
   }
 
   public RepresentationPreservationObject retrieveRepresentationPreservationObject(String aipId,
@@ -1182,31 +1117,18 @@ public class ModelService extends ModelObservable {
     String representationId, String fileId, Binary resource) throws GenericException {
     if (resource instanceof DefaultBinary) {
       try {
-        Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-
         // retrieve needed information to instantiate Representation
-        Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-        // Date dateCreated = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_CREATED);
-        // Date dateModified = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_MODIFIED);
-
-        if (active == null) {
-          // when not stated, considering active=false
-          active = false;
-        }
-
         // FIXME check if inputstream gets closed
         PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
 
         RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
-        rfpo.setAipID(aipId);
+        rfpo.setAipId(aipId);
         rfpo.setRepresentationID(representationId);
-        rfpo.setFileID(fileId);
+        rfpo.setFileId(fileId);
+        rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
         rfpo.setCompositionLevel(pfoh.getRepresentationFilePreservationObject().getCompositionLevel());
         rfpo.setContentLocationType(pfoh.getRepresentationFilePreservationObject().getContentLocationType());
         rfpo.setContentLocationValue(pfoh.getRepresentationFilePreservationObject().getContentLocationValue());
-        rfpo.setCreatedDate(pfoh.getRepresentationFilePreservationObject().getCreatedDate());
         rfpo.setCreatingApplicationName(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationName());
         rfpo.setCreatingApplicationVersion(
           pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
@@ -1218,11 +1140,7 @@ public class ModelService extends ModelObservable {
         rfpo.setFormatRegistryName(pfoh.getRepresentationFilePreservationObject().getFormatRegistryName());
         rfpo.setFormatRegistryRole(pfoh.getRepresentationFilePreservationObject().getFormatRegistryRole());
         rfpo.setHash(pfoh.getRepresentationFilePreservationObject().getHash());
-        rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
-        rfpo.setLabel(pfoh.getRepresentationFilePreservationObject().getLabel());
-        rfpo.setLastModifiedDate(pfoh.getRepresentationFilePreservationObject().getLastModifiedDate());
         rfpo.setMimetype(pfoh.getRepresentationFilePreservationObject().getMimetype());
-        rfpo.setModel(pfoh.getRepresentationFilePreservationObject().getModel());
         rfpo.setObjectCharacteristicsExtension(
           pfoh.getRepresentationFilePreservationObject().getObjectCharacteristicsExtension());
         rfpo.setOriginalName(pfoh.getRepresentationFilePreservationObject().getOriginalName());
@@ -1230,7 +1148,6 @@ public class ModelService extends ModelObservable {
         rfpo.setPronomId(pfoh.getRepresentationFilePreservationObject().getPronomId());
         rfpo.setRepresentationObjectId(pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
         rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
-        rfpo.setState(pfoh.getRepresentationFilePreservationObject().getState());
         rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
         rfpo.setRepresentationID(representationId);
         return rfpo;
@@ -1252,42 +1169,26 @@ public class ModelService extends ModelObservable {
     String representationId, String fileId, Binary resource) throws GenericException {
     if (resource instanceof DefaultBinary) {
       try {
-        Map<String, Set<String>> directoryMetadata = resource.getMetadata();
-
-        // retrieve needed information to instantiate Representation
-        Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-        // Date dateCreated = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_CREATED);
-        // Date dateModified = ModelUtils.getDate(directoryMetadata,
-        // RodaConstants.STORAGE_META_DATE_MODIFIED);
-
-        if (active == null) {
-          // when not stated, considering active=false
-          active = false;
-        }
 
         // FIXME check if inputstream gets closed
         PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper
           .newInstance(resource.getContent().createInputStream());
         RepresentationPreservationObject rpo = new RepresentationPreservationObject();
-        rpo.setAipID(aipId);
+        rpo.setAipId(aipId);
         rpo.setRepresentationID(representationId);
-        rpo.setFileID(fileId);
-        rpo.setCreatedDate(proh.getRepresentationPreservationObject().getCreatedDate());
+        rpo.setId(proh.getRepresentationPreservationObject().getId());
+
         rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
         rpo.setDerivedFromRepresentationObjectID(
           proh.getRepresentationPreservationObject().getDerivedFromRepresentationObjectID());
-        rpo.setId(proh.getRepresentationPreservationObject().getId());
-        rpo.setLabel(proh.getRepresentationPreservationObject().getLabel());
-        rpo.setLastModifiedDate(proh.getRepresentationPreservationObject().getLastModifiedDate());
-        rpo.setModel(proh.getRepresentationPreservationObject().getModel());
+
         rpo.setPartFiles(proh.getRepresentationPreservationObject().getPartFiles());
         rpo.setPreservationEventIDs(proh.getRepresentationPreservationObject().getPreservationEventIDs());
         rpo.setPreservationLevel(proh.getRepresentationPreservationObject().getPreservationLevel());
         rpo.setRepresentationObjectID(proh.getRepresentationPreservationObject().getRepresentationObjectID());
         rpo.setRootFile(proh.getRepresentationPreservationObject().getRootFile());
-        rpo.setState(proh.getRepresentationPreservationObject().getState());
         rpo.setType(proh.getRepresentationPreservationObject().getType());
+
         return rpo;
       } catch (PremisMetadataException e) {
         throw new GenericException("Error while trying to convert a binary into a representation preservation object");
@@ -1299,8 +1200,9 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public EventPreservationObject retrieveEventPreservationObject(String aipId, String representationId, String fileId, String preservationID)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public EventPreservationObject retrieveEventPreservationObject(String aipId, String representationId, String fileId,
+    String preservationID)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     EventPreservationObject eventPreservationObject = null;
 
     StoragePath filePath = ModelUtils.getPreservationFilePathRaw(aipId, representationId, preservationID);
@@ -1318,23 +1220,14 @@ public class ModelService extends ModelObservable {
       try {
         Map<String, Set<String>> directoryMetadata = resource.getMetadata();
         // retrieve needed information to instantiate Representation
-        Boolean active = ModelUtils.getBoolean(directoryMetadata, RodaConstants.STORAGE_META_ACTIVE);
-        Date dateCreated = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_CREATED);
-        Date dateModified = ModelUtils.getDate(directoryMetadata, RodaConstants.STORAGE_META_DATE_MODIFIED);
-
-        if (active == null) {
-          active = false;
-        }
 
         PremisEventHelper peh = PremisEventHelper.newInstance(resource.getContent().createInputStream());
 
         // TODO premisevent to EventPreservationObject
         EventPreservationObject epo = new EventPreservationObject();
-        epo.setAipID(aipId);
+        epo.setId(fileId);
+        epo.setAipId(aipId);
         epo.setRepresentationID(representationId);
-        epo.setFileID(fileId);
-        epo.setLastModifiedDate(dateModified);
-        epo.setCreatedDate(dateCreated);
         epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList() != null
           && peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
             ? peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue() : null);
@@ -1350,9 +1243,6 @@ public class ModelService extends ModelObservable {
         epo.setDescription(""); // TODO: ????
         epo.setEventDetail(peh.getEvent().getEventDetail());
         epo.setEventType(peh.getEvent().getEventType());
-        epo.setId(fileId);
-        epo.setLabel(""); // TODO: ???
-        epo.setModel(""); // TODO: ???
         epo.setName(""); // TODO: ???
         List<LinkingObjectIdentifierComplexType> linkingObjects = peh.getEvent().getLinkingObjectIdentifierList();
         if (linkingObjects != null && linkingObjects.size() > 0) {
@@ -1393,9 +1283,8 @@ public class ModelService extends ModelObservable {
         }
         epo.setOutcomeDetails(""); // TODO: ???
         epo.setOutcomeResult(""); // TODO: ???
-        epo.setState(""); // TODO: ???
         epo.setTargetID(""); // TODO: ???
-        epo.setType(peh.getEvent().getEventType());
+        epo.setEventType(peh.getEvent().getEventType());
         return epo;
       } catch (PremisMetadataException e) {
         throw new GenericException("Error while trying to convert a binary into a event preservation object");
@@ -1433,7 +1322,118 @@ public class ModelService extends ModelObservable {
       notifyLogEntryCreated(logEntry);
     }
   }
-  
+
+  // TODO verify
+  public ClosableIterable<PreservationMetadata> listPreservationMetadataBinaries(String aipId, String representationID)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    ClosableIterable<PreservationMetadata> aipsIterable;
+
+    final ClosableIterable<Resource> resourcesIterable = storage
+      .listResourcesUnderContainer(ModelUtils.getAIPRepresentationPreservationPath(aipId, representationID));
+    Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
+
+    aipsIterable = new ClosableIterable<PreservationMetadata>() {
+
+      @Override
+      public Iterator<PreservationMetadata> iterator() {
+        return new Iterator<PreservationMetadata>() {
+
+          @Override
+          public boolean hasNext() {
+            if (resourcesIterator == null) {
+              return false;
+            }
+            return resourcesIterator.hasNext();
+          }
+
+          @Override
+          public PreservationMetadata next() {
+            try {
+              Resource next = resourcesIterator.next();
+              return convertResourceToPreservationMetadata(next);
+            } catch (NoSuchElementException | GenericException e) {
+              LOGGER.error("Error while listing preservation metadata binaries", e);
+              return null;
+            }
+          }
+
+          @Override
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+
+      @Override
+      public void close() throws IOException {
+        resourcesIterable.close();
+      }
+    };
+
+    return aipsIterable;
+  }
+
+  // TODO verify
+  public PreservationMetadata createPreservationMetadata(String aipId, String representationID,
+    String preservationMetadataId, Binary binary)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    PreservationMetadata preservationMetadataBinary;
+
+    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationID, preservationMetadataId);
+    boolean asReference = false;
+    Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
+    preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationID,
+      ModelUtils.getPreservationType(updatedBinary));
+    notifyPreservationMetadataCreated(preservationMetadataBinary);
+
+    return preservationMetadataBinary;
+  }
+
+  // TODO verify
+  public PreservationMetadata createPreservationMetadata(String aipId, String preservationMetadataId, Binary binary)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    PreservationMetadata preservationMetadataBinary;
+    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, preservationMetadataId);
+    boolean asReference = false;
+    Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
+    preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, null,
+      ModelUtils.getPreservationType(updatedBinary));
+    notifyPreservationMetadataCreated(preservationMetadataBinary);
+    return preservationMetadataBinary;
+  }
+
+  // TODO verify
+  public PreservationMetadata updatePreservationMetadata(String aipId, String representationId,
+    String preservationMetadataId, Binary binary, boolean payloadOnly)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    PreservationMetadata preservationMetadataBinary;
+    PreservationMetadataType type = ModelUtils.getPreservationType(binary);
+    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
+    if (payloadOnly) {
+      storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
+      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, type);
+    } else {
+
+      boolean asReference = false;
+      boolean createIfNotExists = false;
+      storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
+      storage.updateMetadata(binaryPath, binaryMetadata, true);
+      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, type);
+    }
+    notifyPreservationMetadataUpdated(preservationMetadataBinary);
+
+    return preservationMetadataBinary;
+  }
+
+  // TODO verify
+  public void deletePreservationMetadata(String aipId, String representationId, String preservationMetadataId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
+    storage.deleteResource(binaryPath);
+    notifyPreservationMetadataDeleted(aipId, representationId, preservationMetadataId);
+  }
+
   public void addLogEntry(LogEntry logEntry, Path logDirectory)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     addLogEntry(logEntry, logDirectory, true);
@@ -1699,8 +1699,8 @@ public class ModelService extends ModelObservable {
         Binary b = (Binary) FSUtils.convertPathToResource(premisFile.getParent(), premisFile);
 
         storage.updateBinaryContent(
-          ModelUtils.getPreservationFilePath(file.getAipId(), file.getRepresentationId(), file.getId()),
-          b.getContent(), false, true);
+          ModelUtils.getPreservationFilePath(file.getAipId(), file.getRepresentationId(), file.getId()), b.getContent(),
+          false, true);
       } catch (IOException | PremisMetadataException | GenericException | RequestNotValidException | NotFoundException
         | AuthorizationDeniedException e) {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
@@ -1710,74 +1710,35 @@ public class ModelService extends ModelObservable {
     // TODO is any notify needed?
   }
 
-  public ClosableIterable<PreservationMetadata> listPreservationMetadataBinaries(String aipId, String representationID) throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    ClosableIterable<PreservationMetadata> aipsIterable;
-
-    final ClosableIterable<Resource> resourcesIterable = storage
-      .listResourcesUnderContainer(ModelUtils.getAIPRepresentationPreservationPath(aipId, representationID));
-    Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
-
-    aipsIterable = new ClosableIterable<PreservationMetadata>() {
-
-      @Override
-      public Iterator<PreservationMetadata> iterator() {
-        return new Iterator<PreservationMetadata>() {
-
-          @Override
-          public boolean hasNext() {
-            if (resourcesIterator == null) {
-              return false;
-            }
-            return resourcesIterator.hasNext();
-          }
-
-          @Override
-          public PreservationMetadata next() {
-            try {
-              Resource next = resourcesIterator.next();
-              return convertResourceToPreservationMetadata(next);
-            } catch (NoSuchElementException | GenericException e) {
-              LOGGER.error("Error while listing AIPs", e);
-              return null;
-            }
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-
-      @Override
-      public void close() throws IOException {
-        resourcesIterable.close();
-      }
-    };
-
-    return aipsIterable;
-  }
-
+  // TODO remove PREMIS type and file Id
   public void createPreservationMetadata(String aipId, String representationId, String fileId, String fileName,
-    Binary binary, PREMIS_TYPE type) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    Binary binary, PREMIS_TYPE type)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, fileName);
-    LOGGER.debug("createPreservationMetadata "+binaryPath.asString());
-      storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId, fileId, binaryPath, ModelUtils.getPreservationType(binary));
+    LOGGER.debug("createPreservationMetadata " + binaryPath.asString());
+    storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
+    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId,
+      ModelUtils.getPreservationType(binary));
     notifyPreservationMetadataCreated(pm);
   }
 
+  // TODO remove PREMIS type and file Id
   public void updatePreservationMetadata(String aipId, String representationId, String fileId, String fileName,
-    Binary binary,PREMIS_TYPE type) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    Binary binary, PREMIS_TYPE type)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, fileName);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId, fileId, binaryPath, ModelUtils.getPreservationType(binary));
+    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId,
+      ModelUtils.getPreservationType(binary));
     notifyPreservationMetadataUpdated(pm);
   }
 
-  public void deletePreservationMetadata(String aipId, String representationId, String fileId, String preservationId, PREMIS_TYPE type) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+  // TODO remove PREMIS type and file Id
+  public void deletePreservationMetadata(String aipId, String representationId, String fileId, String preservationId,
+    PREMIS_TYPE type)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, preservationId);
     storage.deleteResource(binaryPath);
-    notifyPreservationMetadataDeleted(aipId, representationId, fileId, preservationId);
+    notifyPreservationMetadataDeleted(aipId, representationId, preservationId);
   }
 }

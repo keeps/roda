@@ -204,21 +204,27 @@ public final class RodaConstants {
    */
   public static final String STORAGE_META_PARENT_ID = "parentId";
   public static final String STORAGE_META_TYPE = "type";
-  public static final String STORAGE_META_ACTIVE = "active";
-  public static final String STORAGE_META_SIZE_IN_BYTES = "sizeInBytes";
-  public static final String STORAGE_META_ENTRYPOINT = "entryPoint";
-  public static final String STORAGE_META_FORMAT_MIME = "format.mimetype";
-  public static final String STORAGE_META_FORMAT_VERSION = "format.version";
-  public static final String STORAGE_META_DATE_CREATED = "date.created";
-  public static final String STORAGE_META_DATE_MODIFIED = "date.modified";
-  public static final String STORAGE_META_AIP_ID = "aip.id";
-  public static final String STORAGE_META_REPRESENTATION_ID = "representation.id";
-  public static final String STORAGE_META_REPRESENTATION_STATUSES = "representation.statuses";
-  public static final String STORAGE_META_DIGEST_SHA1 = "digest.sha1";
-  public static final String STORAGE_META_PERMISSION_GRANT_USERS = "permission.grant.users";
-  public static final String STORAGE_META_PERMISSION_GRANT_GROUPS = "permission.grant.groups";
-  public static final String STORAGE_META_PERMISSION_READ_USERS = "permission.read.users";
-  public static final String STORAGE_META_PERMISSION_READ_GROUPS = "permission.read.groups";
+  // public static final String STORAGE_META_ACTIVE = "active";
+  // public static final String STORAGE_META_SIZE_IN_BYTES = "sizeInBytes";
+  // public static final String STORAGE_META_ENTRYPOINT = "entryPoint";
+  // public static final String STORAGE_META_FORMAT_MIME = "format.mimetype";
+  // public static final String STORAGE_META_FORMAT_VERSION = "format.version";
+  // public static final String STORAGE_META_DATE_CREATED = "date.created";
+  // public static final String STORAGE_META_DATE_MODIFIED = "date.modified";
+  // public static final String STORAGE_META_AIP_ID = "aip.id";
+  // public static final String STORAGE_META_REPRESENTATION_ID =
+  // "representation.id";
+  // public static final String STORAGE_META_REPRESENTATION_STATUSES =
+  // "representation.statuses";
+  // public static final String STORAGE_META_DIGEST_SHA1 = "digest.sha1";
+  // public static final String STORAGE_META_PERMISSION_GRANT_USERS =
+  // "permission.grant.users";
+  // public static final String STORAGE_META_PERMISSION_GRANT_GROUPS =
+  // "permission.grant.groups";
+  // public static final String STORAGE_META_PERMISSION_READ_USERS =
+  // "permission.read.users";
+  // public static final String STORAGE_META_PERMISSION_READ_GROUPS =
+  // "permission.read.groups";
   // XXX the following two constants formerly were known as producers
   // permissions
   public static final String STORAGE_META_PERMISSION_INSERT_USERS = "permission.insert.users";
@@ -251,18 +257,28 @@ public final class RodaConstants {
   public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
   public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
 
-  public static final String AIP_PERMISSION_GRANT_USERS = STORAGE_META_PERMISSION_GRANT_USERS;
-  public static final String AIP_PERMISSION_GRANT_GROUPS = STORAGE_META_PERMISSION_GRANT_GROUPS;
-  public static final String AIP_PERMISSION_READ_USERS = STORAGE_META_PERMISSION_READ_USERS;
-  public static final String AIP_PERMISSION_READ_GROUPS = STORAGE_META_PERMISSION_READ_GROUPS;
+  // TODO remove
+  // public static final String AIP_PERMISSION_GRANT_USERS =
+  // STORAGE_META_PERMISSION_GRANT_USERS;
+  // public static final String AIP_PERMISSION_GRANT_GROUPS =
+  // STORAGE_META_PERMISSION_GRANT_GROUPS;
+  // public static final String AIP_PERMISSION_READ_USERS =
+  // STORAGE_META_PERMISSION_READ_USERS;
+  // public static final String AIP_PERMISSION_READ_GROUPS =
+  // STORAGE_META_PERMISSION_READ_GROUPS;
   // XXX the following two constants formerly were known as producers
   // permissions
-  public static final String AIP_PERMISSION_INSERT_USERS = STORAGE_META_PERMISSION_INSERT_USERS;
-  public static final String AIP_PERMISSION_INSERT_GROUPS = STORAGE_META_PERMISSION_INSERT_GROUPS;
-  public static final String AIP_PERMISSION_MODIFY_USERS = STORAGE_META_PERMISSION_MODIFY_USERS;
-  public static final String AIP_PERMISSION_MODIFY_GROUPS = STORAGE_META_PERMISSION_MODIFY_GROUPS;
-  public static final String AIP_PERMISSION_REMOVE_USERS = STORAGE_META_PERMISSION_REMOVE_USERS;
-  public static final String AIP_PERMISSION_REMOVE_GROUPS = STORAGE_META_PERMISSION_REMOVE_GROUPS;
+//  public static final String AIP_PERMISSION_INSERT_USERS = STORAGE_META_PERMISSION_INSERT_USERS;
+  // public static final String AIP_PERMISSION_INSERT_GROUPS =
+  // STORAGE_META_PERMISSION_INSERT_GROUPS;
+  // public static final String AIP_PERMISSION_MODIFY_USERS =
+  // STORAGE_META_PERMISSION_MODIFY_USERS;
+  // public static final String AIP_PERMISSION_MODIFY_GROUPS =
+  // STORAGE_META_PERMISSION_MODIFY_GROUPS;
+  // public static final String AIP_PERMISSION_REMOVE_USERS =
+  // STORAGE_META_PERMISSION_REMOVE_USERS;
+  // public static final String AIP_PERMISSION_REMOVE_GROUPS =
+  // STORAGE_META_PERMISSION_REMOVE_GROUPS;
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
   public static final String AIP_TITLE_SORT = "title_sort";
@@ -285,13 +301,7 @@ public final class RodaConstants {
   public static final String SRO_UUID = "uuid";
   public static final String SRO_ID = "id";
   public static final String SRO_AIP_ID = "aipId";
-  public static final String SRO_ACTIVE = "active";
-  public static final String SRO_LABEL = "label";
-  public static final String SRO_TYPE = "type";
-  public static final String SRO_SUBTYPE = "subtype";
-  public static final String SRO_DATE_MODIFICATION = "dateModified";
-  public static final String SRO_DATE_CREATION = "dateCreated";
-  public static final String SRO_STATUS = "status";
+  public static final String SRO_ORIGINAL = "original";
   public static final String SRO_FILE_IDS = "fileId";
   public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
   public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";

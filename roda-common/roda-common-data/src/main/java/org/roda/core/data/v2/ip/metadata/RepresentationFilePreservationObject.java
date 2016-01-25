@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.Arrays;
 
 /**
@@ -15,7 +14,7 @@ import java.util.Arrays;
  * 
  * @author Rui Castro
  */
-public class RepresentationFilePreservationObject extends PreservationObject implements Serializable {
+public class RepresentationFilePreservationObject extends PreservationMetadata {
   private static final long serialVersionUID = 3984141759920127217L;
   /**
    * Full preservation level, from file integrity, file format management, to
@@ -27,6 +26,8 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
    * Only file integrity is preserved
    */
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
+
+  private String fileId;
 
   private String preservationLevel = null;
 
@@ -70,38 +71,12 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
     this.compositionLevel = -1;
   }
 
-  /**
-   * @param obj
-   * 
-   * @return <code>true</code> if the objects are equal and <code>false</code>
-   *         otherwise.
-   */
-  @Override
-  public boolean equals(Object obj) {
-    if (obj != null && obj instanceof RepresentationFilePreservationObject) {
-      RepresentationFilePreservationObject other = (RepresentationFilePreservationObject) obj;
-
-      return getId() == other.getId() || getId().equals(other.getId());
-
-    } else {
-      return false;
-    }
+  public String getFileId() {
+    return fileId;
   }
 
- 
-
-  @Override
-  public String toString() {
-    return "RepresentationFilePreservationObject [preservationLevel=" + preservationLevel + ", compositionLevel="
-      + compositionLevel + ", fixities=" + Arrays.toString(fixities) + ", formatDesignationName="
-      + formatDesignationName + ", formatDesignationVersion=" + formatDesignationVersion + ", formatRegistryName="
-      + formatRegistryName + ", formatRegistryKey=" + formatRegistryKey + ", formatRegistryRole=" + formatRegistryRole
-      + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
-      + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", originalName="
-      + originalName + ", objectCharacteristicsExtension=" + objectCharacteristicsExtension + ", contentLocationType="
-      + contentLocationType + ", contentLocationValue=" + contentLocationValue + ", pronomId=" + pronomId
-      + ", mimetype=" + mimetype + ", size=" + size + ", hash=" + hash + ", representationObjectId="
-      + representationObjectId + "]";
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
   }
 
   /**
@@ -367,6 +342,38 @@ public class RepresentationFilePreservationObject extends PreservationObject imp
 
   public void setRepresentationObjectId(String representationObjectId) {
     this.representationObjectId = representationObjectId;
+  }
+
+  /**
+   * @param obj
+   * 
+   * @return <code>true</code> if the objects are equal and <code>false</code>
+   *         otherwise.
+   */
+  @Override
+  public boolean equals(Object obj) {
+    if (obj != null && obj instanceof RepresentationFilePreservationObject) {
+      RepresentationFilePreservationObject other = (RepresentationFilePreservationObject) obj;
+
+      return getId() == other.getId() || getId().equals(other.getId());
+
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public String toString() {
+    return "RepresentationFilePreservationObject [fileId=" + fileId + ", preservationLevel=" + preservationLevel
+      + ", compositionLevel=" + compositionLevel + ", fixities=" + Arrays.toString(fixities)
+      + ", formatDesignationName=" + formatDesignationName + ", formatDesignationVersion=" + formatDesignationVersion
+      + ", formatRegistryName=" + formatRegistryName + ", formatRegistryKey=" + formatRegistryKey
+      + ", formatRegistryRole=" + formatRegistryRole + ", creatingApplicationName=" + creatingApplicationName
+      + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
+      + dateCreatedByApplication + ", originalName=" + originalName + ", objectCharacteristicsExtension="
+      + objectCharacteristicsExtension + ", contentLocationType=" + contentLocationType + ", contentLocationValue="
+      + contentLocationValue + ", pronomId=" + pronomId + ", mimetype=" + mimetype + ", size=" + size + ", hash=" + hash
+      + ", representationObjectId=" + representationObjectId + ", super.toString()=" + super.toString() + "]";
   }
 
 }

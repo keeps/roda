@@ -23,7 +23,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,6 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -88,9 +88,9 @@ import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -729,9 +729,7 @@ public class SolrUtils {
 
   private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
-    if (resultClass.equals(AIP.class)) {
-      ret = resultClass.cast(solrDocumentToAIP(doc));
-    } else if (resultClass.equals(IndexedAIP.class)) {
+    if (resultClass.equals(IndexedAIP.class)) {
       ret = resultClass.cast(solrDocumentToIndexAIP(doc));
     } else if (resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
@@ -806,26 +804,6 @@ public class SolrUtils {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
 
-  public static AIP solrDocumentToAIP(SolrDocument doc) {
-    final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
-    final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
-    final List<String> descriptiveMetadataFileIds = objectToListString(
-      doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
-    final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
-
-    RODAObjectPermissions permissions = getPermissions(doc);
-
-    // FIXME this information is not being recorded. passing by empty
-    // collections for easier processing
-    final Map<String, List<String>> preservationRepresentationObjectsIds = new HashMap<String, List<String>>();
-    final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
-    final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
-
-    return new AIP(id, parentId, active, permissions, descriptiveMetadataFileIds, representationIds,
-      preservationRepresentationObjectsIds, preservationEventsIds, preservationFileObjectsIds);
-  }
-
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
     Arrays.asList("title", "level", "dateInitial", "dateFinal"));
 
@@ -866,12 +844,15 @@ public class SolrUtils {
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     SolrInputDocument ret = new SolrInputDocument();
-    final String aipId = aip.getId();
 
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
-    ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, aip.getDescriptiveMetadataIds());
+
+    List<String> descriptiveMetadataIds = aip.getMetadata().getDescriptiveMetadata().stream().map(dm -> dm.getId())
+      .collect(Collectors.toList());
+
+    ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
     ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
 
@@ -881,9 +862,8 @@ public class SolrUtils {
       // guarding against repeated fields
       Set<String> usedNonRepeatableFields = new HashSet<>();
 
-      for (String descId : aip.getDescriptiveMetadataIds()) {
-        DescriptiveMetadata metadata = model.retrieveDescriptiveMetadata(aipId, descId);
-        StoragePath storagePath = metadata.getStoragePath();
+      for (DescriptiveMetadata metadata : aip.getMetadata().getDescriptiveMetadata()) {
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
           SolrInputDocument fields = getDescriptiveMetataFields(binary);
@@ -899,9 +879,9 @@ public class SolrUtils {
           }
         } catch (GenericException ise) {
           // TODO index the index errors for later processing
-          LOGGER.warn("Error processing descriptive metadata " + descId + " from AIP " + aipId);
+          LOGGER.warn("Error processing descriptive metadata: " + metadata);
         } catch (Throwable e) {
-          LOGGER.error("Error processing descriptive metadata " + descId + " from AIP " + aipId, e);
+          LOGGER.error("Error processing descriptive metadata: " + metadata, e);
         }
       }
     }
@@ -911,67 +891,76 @@ public class SolrUtils {
 
   private static RODAObjectPermissions getPermissions(SolrDocument doc) {
     RODAObjectPermissions permissions = new RODAObjectPermissions();
+    // TODO get information from aip.json or METS.xml
 
-    List<String> list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_USERS));
-    permissions.setGrantUsers(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_GROUPS));
-    permissions.setGrantGroups(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_USERS));
-    permissions.setReadUsers(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_GROUPS));
-    permissions.setReadGroups(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_USERS));
-    permissions.setInsertUsers(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_GROUPS));
-    permissions.setInsertGroups(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_USERS));
-    permissions.setModifyUsers(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS));
-    permissions.setModifyGroups(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_USERS));
-    permissions.setRemoveUsers(list);
-    list = objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS));
-    permissions.setRemoveGroups(list);
+    // List<String> list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_USERS));
+    // permissions.setGrantUsers(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_GROUPS));
+    // permissions.setGrantGroups(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_USERS));
+    // permissions.setReadUsers(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_GROUPS));
+    // permissions.setReadGroups(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_USERS));
+    // permissions.setInsertUsers(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_GROUPS));
+    // permissions.setInsertGroups(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_USERS));
+    // permissions.setModifyUsers(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS));
+    // permissions.setModifyGroups(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_USERS));
+    // permissions.setRemoveUsers(list);
+    // list =
+    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS));
+    // permissions.setRemoveGroups(list);
 
     return permissions;
   }
 
   private static void setPermissions(AIP aip, final SolrInputDocument ret) {
     RODAObjectPermissions permissions = aip.getPermissions();
-    ret.addField(RodaConstants.AIP_PERMISSION_GRANT_USERS, permissions.getGrantUsers());
-    ret.addField(RodaConstants.AIP_PERMISSION_GRANT_GROUPS, permissions.getGrantGroups());
-    ret.addField(RodaConstants.AIP_PERMISSION_READ_USERS, permissions.getReadUsers());
-    ret.addField(RodaConstants.AIP_PERMISSION_READ_GROUPS, permissions.getReadGroups());
-    ret.addField(RodaConstants.AIP_PERMISSION_INSERT_USERS, permissions.getInsertUsers());
-    ret.addField(RodaConstants.AIP_PERMISSION_INSERT_GROUPS, permissions.getInsertGroups());
-    ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_USERS, permissions.getModifyUsers());
-    ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS, permissions.getModifyGroups());
-    ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_USERS, permissions.getRemoveUsers());
-    ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS, permissions.getRemoveGroups());
+    // TODO set this information into aip.json or METS.xml
+    // ret.addField(RodaConstants.AIP_PERMISSION_GRANT_USERS,
+    // permissions.getGrantUsers());
+    // ret.addField(RodaConstants.AIP_PERMISSION_GRANT_GROUPS,
+    // permissions.getGrantGroups());
+    // ret.addField(RodaConstants.AIP_PERMISSION_READ_USERS,
+    // permissions.getReadUsers());
+    // ret.addField(RodaConstants.AIP_PERMISSION_READ_GROUPS,
+    // permissions.getReadGroups());
+    // ret.addField(RodaConstants.AIP_PERMISSION_INSERT_USERS,
+    // permissions.getInsertUsers());
+    // ret.addField(RodaConstants.AIP_PERMISSION_INSERT_GROUPS,
+    // permissions.getInsertGroups());
+    // ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_USERS,
+    // permissions.getModifyUsers());
+    // ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS,
+    // permissions.getModifyGroups());
+    // ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_USERS,
+    // permissions.getRemoveUsers());
+    // ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS,
+    // permissions.getRemoveGroups());
   }
 
-  public static Representation solrDocumentToRepresentation(SolrDocument doc) {
+  public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.SRO_ACTIVE));
-    final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
-    final Date dateCreated = objectToDate(doc.get(RodaConstants.SRO_DATE_CREATION));
-    final Date dateModified = objectToDate(doc.get(RodaConstants.SRO_DATE_MODIFICATION));
-    final Set<RepresentationState> statuses = new HashSet<RepresentationState>();
-    Collection<Object> fieldValues = doc.getFieldValues(RodaConstants.SRO_STATUS);
-    for (Object statusField : fieldValues) {
-      String statusAsString = objectToString(statusField);
-      if (statusAsString != null) {
-        RepresentationState state = RepresentationState.valueOf(statusAsString);
-        statuses.add(state);
-      } else {
-        LOGGER.error("Error parsing representation status, found a NULL");
-      }
-    }
+    final Boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL));
     final List<String> fileIds = objectToListString(doc.get(RodaConstants.SRO_FILE_IDS));
 
-    final String type = objectToString(doc.get(RodaConstants.SRO_TYPE));
-    return new Representation(id, aipId, active, dateCreated, dateModified, statuses, type, sizeInBytes, fileIds);
+    final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
+
+    return new IndexedRepresentation(id, aipId, original, fileIds, sizeInBytes);
   }
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
@@ -979,17 +968,14 @@ public class SolrUtils {
     doc.addField(RodaConstants.SRO_UUID, getId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.SRO_ID, rep.getId());
     doc.addField(RodaConstants.SRO_AIP_ID, rep.getAipId());
-    doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, rep.getSizeInBytes());
-    doc.addField(RodaConstants.SRO_DATE_CREATION, rep.getDateCreated());
-    doc.addField(RodaConstants.SRO_DATE_MODIFICATION, rep.getDateModified());
-    if (rep.getStatuses() != null && !rep.getStatuses().isEmpty()) {
-      for (RepresentationState rs : rep.getStatuses()) {
-        doc.addField(RodaConstants.SRO_STATUS, rs.toString());
-      }
-    }
-    doc.addField(RodaConstants.SRO_TYPE, rep.getType());
 
-    doc.addField(RodaConstants.SRO_FILE_IDS, rep.getFileIds());
+    // TODO calculate all files or make it obvious it is only direct files
+    doc.addField(RodaConstants.SRO_FILE_IDS, rep.getFilesDirectlyUnder());
+
+    // TODO calculate representation storage size or get this information from
+    // somewhere
+    doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, 0L);
+
     return doc;
   }
 
@@ -1334,20 +1320,30 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
-    doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-    if (file.getOriginalName() != null) {
-      doc.addField(RodaConstants.FILE_ORIGINALNAME, file.getOriginalName());
-    }
-    if (file.getSize() != 0) {
-      doc.addField(RodaConstants.FILE_SIZE, file.getSize());
-    }
     doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
-    if (file.getStoragePath() != null) {
-      doc.addField(RodaConstants.FILE_STORAGEPATH, file.getStoragePath().asString());
+
+    // extra-fields
+    try {
+      StoragePath filePath = ModelUtils.getRepresentationFilePath(file.getAipId(), file.getRepresentationId(),
+        file.getId());
+      doc.addField(RodaConstants.FILE_STORAGEPATH, filePath.asString());
+    } catch (RequestNotValidException e) {
+      LOGGER.warn("Could not index file storage path", e);
     }
 
+    // Add information from PREMIS
     if (premisFile != null) {
-      // Add information from PREMIS
+      // TODO get entry point from PREMIS or remove it
+      // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+
+      if (premisFile.getOriginalName() != null) {
+        doc.addField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName());
+      }
+
+      if (premisFile.getSize() != 0) {
+        doc.addField(RodaConstants.FILE_SIZE, premisFile.getSize());
+      }
+
       if (premisFile.getFixities() != null && premisFile.getFixities().length > 0) {
         List<String> hashes = new ArrayList<>();
         for (Fixity fixity : premisFile.getFixities()) {

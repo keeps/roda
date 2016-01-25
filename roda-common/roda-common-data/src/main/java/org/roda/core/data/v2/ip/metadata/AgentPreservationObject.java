@@ -7,14 +7,15 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.util.Date;
-
 /**
  * This is a agent preservation object.
  * 
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
-public class AgentPreservationObject extends PreservationObject {
+public class AgentPreservationObject extends PreservationMetadata {
+
+  private static final long serialVersionUID = -2413075074669272807L;
 
   public static final String PRESERVATION_AGENT_TYPE_INGEST_TASK = "software:ingest_task";
   public static final String PRESERVATION_AGENT_TYPE_MIGRATOR = "software:migrator";
@@ -31,28 +32,31 @@ public class AgentPreservationObject extends PreservationObject {
     PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN, PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN,
     PRESERVATION_AGENT_TYPE_PDFTOPDFA_CONVERSION_PLUGIN, PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN};
 
-  /**
-   * Preservation Object type - Agent
-   */
-  public static final String TYPE = "agent";
-
+  private String agentName = null;
   private String agentType = null;
+
+  // TODO add agentVersion
+  // TODO add agentNote
+  // TODO add agentExtension
+
+  // TODO add linking events
+  // TODO add linking rights
+  // TODO add linking environments
 
   /**
    * Constructs an empty {@link AgentPreservationObject}.
    */
   public AgentPreservationObject() {
-    setType(TYPE);
+    setType(PreservationMetadataType.AGENT);
   }
 
   /**
    * @param agent
    */
   public AgentPreservationObject(AgentPreservationObject agent) {
-    this(agent.getId(), agent.getLabel(), agent.getLastModifiedDate(), agent.getCreatedDate(), agent.getState());
+    this(agent.getId(), agent.getAipId(), agent.getRepresentationID());
 
-    setType(agent.getType());
-    setId(agent.getId());
+    setAgentName(agent.getAgentName());
     setAgentType(agent.getAgentType());
   }
 
@@ -64,47 +68,61 @@ public class AgentPreservationObject extends PreservationObject {
    * @param createdDate
    * @param state
    */
-  public AgentPreservationObject(String id, String label, Date lastModifiedDate, Date createdDate, String state) {
-    super(id, label, lastModifiedDate, createdDate, state);
+  public AgentPreservationObject(String id, String aipId, String representationId) {
+    super(id, aipId, representationId, PreservationMetadataType.AGENT);
   }
 
-  /**
-   * @see PreservationObject#toString()
-   */
-  @Override
-  public String toString() {
-    return "AgentPreservationObject(" + super.toString() + ", agentType=" //$NON-NLS-1$ //$NON-NLS-2$
-      + getAgentType() + ", agentName=" + getAgentName() + ")"; //$NON-NLS-1$ //$NON-NLS-2$
-  }
-
-  /**
-   * @return the agentName
-   */
   public String getAgentName() {
-    return getLabel();
+    return agentName;
   }
 
-  /**
-   * @param agentName
-   *          the agentName to set
-   */
   public void setAgentName(String agentName) {
-    setLabel(agentName);
+    this.agentName = agentName;
   }
 
-  /**
-   * @return the agentType
-   */
   public String getAgentType() {
     return agentType;
   }
 
-  /**
-   * @param agentType
-   *          the agentType to set
-   */
   public void setAgentType(String agentType) {
     this.agentType = agentType;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((agentName == null) ? 0 : agentName.hashCode());
+    result = prime * result + ((agentType == null) ? 0 : agentType.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AgentPreservationObject other = (AgentPreservationObject) obj;
+    if (agentName == null) {
+      if (other.agentName != null)
+        return false;
+    } else if (!agentName.equals(other.agentName))
+      return false;
+    if (agentType == null) {
+      if (other.agentType != null)
+        return false;
+    } else if (!agentType.equals(other.agentType))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "AgentPreservationObject [agentName=" + agentName + ", agentType=" + agentType + ", super.toString()="
+      + super.toString() + "]";
   }
 
 }
