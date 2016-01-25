@@ -16,7 +16,6 @@ import java.io.StringWriter;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,14 +26,13 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrException;
@@ -60,10 +58,10 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -244,7 +242,6 @@ public class BrowserHelper {
 
   private static IndexResult<Representation> findRepresentations(String aipId, boolean onlyOriginals, Sorter sorter,
     Sublist sublist) throws GenericException, RequestNotValidException {
-    IndexResult<Representation> reps;
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
     if (onlyOriginals) {
@@ -843,7 +840,6 @@ public class BrowserHelper {
   }
 
   // TODO Limit access to SDO accessible by user
-  // TODO improve descriptionlevelmanager initialization
   public static StreamResponse getClassificationPlan(String type, RodaUser user)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
@@ -854,12 +850,7 @@ public class BrowserHelper {
       ArrayNode array = mapper.createArrayNode();
       List<DescriptionLevel> descriptionLevels = RodaCoreFactory.getDescriptionLevelManager()
         .getAllButRepresentationsDescriptionLevels();
-      List<String> descriptionsLevels = (List<String>) CollectionUtils.collect(descriptionLevels, new Transformer() {
-        @Override
-        public Object transform(Object dl) {
-          return ((DescriptionLevel) dl).getLevel();
-        }
-      });
+      List<String> descriptionsLevels = descriptionLevels.stream().map(d -> d.getLevel()).collect(Collectors.toList());
 
       Filter allButRepresentationsFilter = new Filter(
         new OneOfManyFilterParameter(RodaConstants.AIP_LEVEL, descriptionsLevels));

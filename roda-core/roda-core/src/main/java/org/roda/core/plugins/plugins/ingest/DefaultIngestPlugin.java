@@ -26,10 +26,10 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -52,15 +52,22 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
     "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Known format of SIP to be ingest into the repository.");
+  public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter("parameter.parent_id",
+    "Parent Description Object ID", PluginParameterType.STRING, "", false, false,
+    "Use the provided parent Description Object ID.");
+  public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter("parameter.force_parent_id",
+    "Force parent Description Object ID", PluginParameterType.BOOLEAN, "false", false, false,
+    "Use the provided parent Description Object ID even if the SIPs provide one.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
+
   public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
     "parameter.do_pdftopdfa_conversion", "Convert PDF to valid PDF/A", PluginParameterType.BOOLEAN, "false", true,
     false, "Converts PDF files into veraPDF valid PDF/A files.");
-
   public static final PluginParameter PARAMETER_DO_VERAPDF_CHECK = new PluginParameter("parameter.do_verapdf_check",
     "VeraPDF check", PluginParameterType.BOOLEAN, "false", true, false,
     "Verifies if PDF files sent are veraPDF valid PDF/A files.");
+
   public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
     "parameter.create.premis.skeleton", "Create basic PREMIS information", PluginParameterType.BOOLEAN, "true", true,
     true, "Create basic PREMIS information (e.g. PREMIS object for each representation file, etc.).");
@@ -115,6 +122,8 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
     pluginParameters.add(PARAMETER_SIP_TO_AIP_CLASS);
+    pluginParameters.add(PARAMETER_PARENT_ID);
+    pluginParameters.add(PARAMETER_FORCE_PARENT_ID);
     pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
     pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
     pluginParameters.add(PARAMETER_DO_SIP_SYNTAX_CHECK);

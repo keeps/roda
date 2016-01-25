@@ -107,9 +107,19 @@ public interface Plugin<T extends Serializable> {
 
   // public Report getCurrentReport();
 
+  /**
+   * Method to return Plugin type (so it can be grouped for different purposes)
+   */
   public PluginType getType();
 
+  /**
+   * Method used by PluginManager to obtain a new instance of a plugin, from the
+   * current loaded Plugin, to provide to PluginOrchestrator
+   */
   public Plugin<T> cloneMe();
 
+  /**
+   * Method that validates the parameters provided to the Plugin
+   */
   public boolean areParameterValuesValid();
 }

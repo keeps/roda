@@ -59,8 +59,8 @@ public class BagitToAIPPluginUtils {
       try {
         model.retrieveAIP(parentFromBagit);
         metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentFromBagit)));
-      } catch (RODAException mse) {
-        LOGGER.error("Error retrieving AIP", mse);
+      } catch (RODAException e) {
+        LOGGER.error("Error retrieving AIP", e);
       }
     }
 
