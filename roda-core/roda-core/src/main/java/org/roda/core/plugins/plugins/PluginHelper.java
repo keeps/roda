@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -39,12 +40,12 @@ import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
@@ -109,25 +110,43 @@ public final class PluginHelper {
     return pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
+  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters,
+    PluginParameter pluginParameter) {
+    return verifyIfStepShouldBePerformed(pluginParameters, pluginParameter);
+  }
+
+  public static String getStringFromParameters(Map<String, String> pluginParameters, PluginParameter pluginParameter) {
+    return pluginParameters.getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
+  }
+
+  public static String getParentIdFromParameters(Map<String, String> pluginParameters) {
+    return pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PARENT_ID);
+  }
+
+  public static boolean getForceParentIdFromParameters(Map<String, String> pluginParameters) {
+    return new Boolean(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
+  }
+
+  public static boolean verifyIfStepShouldBePerformed(Map<String, String> pluginParameters,
+    PluginParameter pluginParameter) {
+    String paramValue = getStringFromParameters(pluginParameters, pluginParameter);
+    return Boolean.parseBoolean(paramValue);
+  }
+
+  public static String getParentId(String sipParentId, String jobDefinedParentId, boolean jobDefinedForceParentId) {
+    String ret = sipParentId;
+
+    if ((StringUtils.isBlank(sipParentId) && StringUtils.isNotBlank(jobDefinedParentId)) || jobDefinedForceParentId) {
+      ret = jobDefinedParentId;
+    }
+
+    return ret;
+  }
+
   public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters)
     throws NotFoundException, GenericException {
     return index.retrieve(Job.class, getJobId(pluginParameters));
   }
-
-  // public static void createJobReport(ModelService model, String jobId, String
-  // objectId) throws GenericException {
-  // JobReport jobReport = new JobReport();
-  // jobReport.setId(UUID.randomUUID().toString());
-  // jobReport.setJobId(jobId);
-  // jobReport.setObjectId(objectId);
-  // Date currentDate = new Date();
-  // jobReport.setDateCreated(currentDate);
-  // jobReport.setDateUpdated(currentDate);
-  // Report report = new Report();
-  // jobReport.setReport(report);
-  //
-  // model.createJobReport(jobReport);
-  // }
 
   public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
     PluginState pluginState, String jobId) {
@@ -277,12 +296,6 @@ public final class PluginHelper {
     data.put("representation.type", Sets.newHashSet(""));
     data.put("representation.statuses", Sets.newHashSet("original"));
     return data;
-  }
-
-  public static boolean verifyIfStepShouldBePerformed(Map<String, String> pluginParameters,
-    PluginParameter pluginParameter) {
-    String paramValue = pluginParameters.getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
-    return Boolean.parseBoolean(paramValue);
   }
 
   public static int updateJobStatus(IndexService index, ModelService model, int currentCompletionPercentage,

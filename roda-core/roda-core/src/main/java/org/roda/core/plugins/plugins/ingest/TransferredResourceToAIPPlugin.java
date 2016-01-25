@@ -17,8 +17,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -30,11 +32,11 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -96,12 +98,15 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(parameters);
+
     for (TransferredResource transferredResource : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(transferredResource, this);
 
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
-        AIP aip = model.createAIP(new HashMap<String, Set<String>>(), false, true);
+        HashMap<String, Set<String>> metadata = setAIPMetadata(model, jobDefinedParentId);
+        AIP aip = model.createAIP(metadata, false, true);
         final String aipID = aip.getId();
         String representationID = "representation";
         PluginHelper.createDirectories(model, aip.getId(), representationID);
@@ -131,7 +136,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
                   + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
                 Binary fileBinary = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
                 model.createFile(aipID, representationID, relativePath.toString().replace('/', '_'), fileBinary);
-              } catch (RODAException sse) {
+              } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }
               return FileVisitResult.CONTINUE;
@@ -151,7 +156,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         sw.append("</metadata>");
         Files.write(metadataFile, sw.toString().getBytes("UTF-8"));
         Binary metadataBinary = (Binary) FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "metadata");
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "key-value");
 
         aip = model.retrieveAIP(aip.getId());
 
@@ -172,6 +177,20 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
     }
     return report;
+  }
+
+  private HashMap<String, Set<String>> setAIPMetadata(ModelService model, String parentId) {
+    HashMap<String, Set<String>> metadata = new HashMap<String, Set<String>>();
+    if (parentId != null) {
+      try {
+        // FIXME shouldn't this be changed by an index search instead?
+        model.retrieveAIP(parentId);
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
+      } catch (RODAException e) {
+        LOGGER.warn("Couldn't find parent AIP '{}'", parentId);
+      }
+    }
+    return metadata;
   }
 
   @Override

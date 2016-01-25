@@ -43,7 +43,7 @@ import gov.loc.repository.bagit.BagInfoTxt;
 public class BagitToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
-  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename)
+  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String parentId)
     throws BagitNotValidException, IOException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
     AIP aip = null;
@@ -54,13 +54,13 @@ public class BagitToAIPPluginUtils {
     Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
 
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    String parentFromBagit = bagInfoTxt.get("parent");
-    if (parentFromBagit != null) {
+    if (parentId != null) {
       try {
-        model.retrieveAIP(parentFromBagit);
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentFromBagit)));
+        // FIXME shouldn't this be changed by an index search instead?
+        model.retrieveAIP(parentId);
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
       } catch (RODAException e) {
-        LOGGER.error("Error retrieving AIP", e);
+        LOGGER.warn("Couldn't find parent AIP '{}'", parentId);
       }
     }
 

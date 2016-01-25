@@ -407,6 +407,8 @@ public final class RodaConstants {
   public static final String JOB_OBJECT_IDS_TO_AIP_REPORT = "objectIdsToAipReport";
 
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
+  public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
+  public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";

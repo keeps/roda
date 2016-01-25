@@ -18,11 +18,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -86,6 +86,9 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(parameters);
+    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(parameters);
+
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
 
@@ -99,17 +102,19 @@ public class BagitToAIPPlugin implements Plugin<TransferredResource> {
         if (!result.isSuccess()) {
           throw new BagitNotValidException(result.getMessages() + "");
         }
-        String parentFromBagit = bag.getBagInfoTxt().get("parent");
 
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml");
+        String parentId = PluginHelper.getParentId(bag.getBagInfoTxt().get("parent"), jobDefinedParentId,
+          jobDefinedForceParentId);
+
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml", parentId);
 
         state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aipCreated.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-        if (parentFromBagit != null && aipCreated.getParentId() == null) {
-          reportItem = reportItem.addAttribute(
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found: " + parentFromBagit));
+        if (aipCreated.getParentId() == null) {
+          reportItem = reportItem
+            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found: " + parentId));
         }
 
         LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());

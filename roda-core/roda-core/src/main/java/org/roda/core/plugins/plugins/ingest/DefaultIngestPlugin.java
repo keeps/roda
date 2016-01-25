@@ -52,12 +52,12 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
     "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Known format of SIP to be ingest into the repository.");
-  public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter("parameter.parent_id",
+  public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
     "Parent Description Object ID", PluginParameterType.STRING, "", false, false,
-    "Use the provided parent Description Object ID.");
-  public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter("parameter.force_parent_id",
-    "Force parent Description Object ID", PluginParameterType.BOOLEAN, "false", false, false,
-    "Use the provided parent Description Object ID even if the SIPs provide one.");
+    "Use the provided parent Description Object ID if the SIPs does not provide one.");
+  public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter(
+    RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent Description Object ID", PluginParameterType.BOOLEAN,
+    "false", false, false, "Use the provided parent Description Object ID even if the SIPs provide one.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
 
@@ -156,6 +156,13 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     aipIdToObjectId = new HashMap<>();
 
     PluginHelper.updateJobStatus(index, model, 0, parameters);
+
+    // 0) process "parent id" and "force parent id" info. (because we might need
+    // to fallback to default values)
+    String parentId = PluginHelper.getStringFromParameters(parameters, PARAMETER_PARENT_ID);
+    boolean forceParentId = PluginHelper.getBooleanFromParameters(parameters, PARAMETER_FORCE_PARENT_ID);
+    parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
+    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
 
     // 1) transform TransferredResource into an AIP
     // 1.1) obtain list of AIPs that were successfully transformed from

@@ -18,11 +18,11 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -84,6 +84,9 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(parameters);
+    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(parameters);
+
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
 
@@ -94,7 +97,9 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
         EARKParser migrator = new EARKParser();
         SIP sip = migrator.parse(earkSIPPath);
 
-        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAip(sip, earkSIPPath, model, storage);
+        String parentId = PluginHelper.getParentId(sip.getParentID(), jobDefinedParentId, jobDefinedForceParentId);
+
+        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
 
         state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aipCreated.getId(),

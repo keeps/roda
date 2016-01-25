@@ -38,17 +38,18 @@ import org.slf4j.LoggerFactory;
 public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
-  public static AIP earkSIPToAip(SIP sip, Path sipPath, ModelService model, StorageService storage)
+  public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String parentId)
     throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
 
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    if (sip.getParentID() != null) {
+    if (parentId != null) {
       try {
-        model.retrieveAIP(sip.getParentID());
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(sip.getParentID())));
-      } catch (RODAException mse) {
-        LOGGER.warn("Could not retrieve parent AIP");
+        // FIXME shouldn't this be changed by an index search instead?
+        model.retrieveAIP(parentId);
+        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
+      } catch (RODAException e) {
+        LOGGER.warn("Couldn't find parent AIP '{}'", parentId);
       }
     }
     AIP aip = model.createAIP(metadata, false, true);
