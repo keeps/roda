@@ -359,6 +359,34 @@ public final class PluginHelper {
     }
   }
 
+  public static void createPremisEventIfInexistent(ModelService model, EventPreservationObject event,
+    String representationID) {
+    try {
+      model.getEventPreservationObject(event.getAipId(), representationID, null, event.getId());
+    } catch (NotFoundException e) {
+      try {
+        byte[] serializedPremisEvent = new PremisEventHelper(event).saveToByteArray();
+        Path eventFile = Files.createTempFile("event_preservation", ".xml");
+        Files.copy(new ByteArrayInputStream(serializedPremisEvent), eventFile, StandardCopyOption.REPLACE_EXISTING);
+        Binary eventResource = (Binary) FSUtils.convertPathToResource(eventFile.getParent(), eventFile);
+
+        if (representationID == null) { // "AIP Event"
+          model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), null, event.getId(),
+            eventResource);
+        } else { // "Representation Event"
+          model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), representationID,
+            event.getId(), eventResource);
+        }
+
+      } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
+        | AuthorizationDeniedException ee) {
+        LOGGER.error("Error creating PREMIS event", e);
+      }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting PREMIS event", e);
+    }
+  }
+
   // FIXME refactor this method (using others, from this class, that have this
   // logic)
   public static void createPluginEventAndAgent(String aipID, String representationID, ModelService model, String type,
@@ -366,12 +394,15 @@ public final class PluginHelper {
     String detailExtension, String agentName, String agentType)
       throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
       AlreadyExistsException, AuthorizationDeniedException {
+
+    String name = UUID.randomUUID().toString();
+
     EventPreservationObject epo = new EventPreservationObject();
     epo.setDatetime(new Date());
+    epo.setAipId(aipID);
     epo.setEventType(type);
     epo.setEventDetail(details);
     epo.setAgentRole(agentRole);
-    String name = UUID.randomUUID().toString();
     epo.setId(name);
     epo.setAgentID(agentID);
     epo.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
@@ -379,23 +410,13 @@ public final class PluginHelper {
     epo.setOutcomeDetailNote(detailNote);
     epo.setOutcomeDetailExtension(detailExtension);
 
-    if (!model.hasAgentPreservationObject(agentID)) {
-      AgentPreservationObject apo = new AgentPreservationObject();
-      apo.setAgentName(agentName);
-      apo.setAgentType(agentType);
-      apo.setId(agentID);
+    AgentPreservationObject apo = new AgentPreservationObject();
+    apo.setAgentName(agentName);
+    apo.setAgentType(agentType);
+    apo.setId(agentID);
 
-      byte[] serializedPremisAgent = new PremisAgentHelper(apo).saveToByteArray();
-      Path agentFile = Files.createTempFile("agent_preservation", ".xml");
-      Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
-      Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-      model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agentID, agentResource);
-    }
+    createPremisAgentIfInexistent(model, apo);
+    createPremisEventIfInexistent(model, epo, representationID);
 
-    byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
-    Path eventFile = Files.createTempFile("event_preservation", ".xml");
-    Files.copy(new ByteArrayInputStream(serializedPremisEvent), eventFile, StandardCopyOption.REPLACE_EXISTING);
-    Binary eventResource = (Binary) FSUtils.convertPathToResource(eventFile.getParent(), eventFile);
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, name, eventResource);
   }
 }

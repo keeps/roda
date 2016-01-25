@@ -517,6 +517,11 @@
 			<groupId>org.ghost4j</groupId>
 			<artifactId>ghost4j</artifactId>
 		</dependency>
+		<!-- JODCONVERTER -->
+		<dependency>
+			<groupId>com.artofsolving</groupId>
+			<artifactId>jodconverter</artifactId>
+		</dependency>
 		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>org.reflections</groupId>

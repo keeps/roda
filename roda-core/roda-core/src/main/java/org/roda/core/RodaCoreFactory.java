@@ -123,7 +123,11 @@ import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.FFMPEGVideoConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.JODConverterPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PDFtoPDFAPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.SoxSoundConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
@@ -308,7 +312,6 @@ public class RodaCoreFactory {
   private static StorageService instantiateStorage() throws GenericException {
     StorageType storageType = StorageType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
-
     if (storageType == RodaConstants.StorageType.FEDORA4) {
       String url = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_URL,
         "http://localhost:8983/solr/");
@@ -441,7 +444,6 @@ public class RodaCoreFactory {
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (nodeType == NodeType.MASTER) {
       if (FEATURE_DISTRIBUTED_AKKA) {
-
         akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
           getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
           getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
@@ -880,7 +882,6 @@ public class RodaCoreFactory {
       .setScanners(new ResourcesScanner())
       .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
         .getResources(Pattern.compile(".*"));
-
     for (String internalFilePath : internalFilesPath) {
       fileNames.add(Paths.get(internalFilePath).getFileName().toString());
     }
@@ -1002,10 +1003,76 @@ public class RodaCoreFactory {
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      params.put("inputFormat", "pdf");
+      params.put("outputFormat", "pdf");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllAIPs(plugin);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error while running PDF to PDFA plugin", e);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runImageMagickConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome,
+    String inputFormat, String outputFormat) {
+    try {
+      Plugin<AIP> plugin = new ImageMagickConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runSoxSoundConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome, String inputFormat,
+    String outputFormat) {
+    try {
+      Plugin<AIP> plugin = new SoxSoundConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runFFMPEGVideoConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome,
+    String inputFormat, String outputFormat) {
+    try {
+      Plugin<AIP> plugin = new FFMPEGVideoConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runJODConverterPlugin(String maxKbytes, String hasPartialSuccessOnOutcome, String inputFormat,
+    String outputFormat) {
+    try {
+      Plugin<AIP> plugin = new JODConverterPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
     }
   }
 
@@ -1170,6 +1237,10 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar siegfried");
     System.err.println("java -jar x.jar verapdf");
     System.err.println("java -jar x.jar pdftopdfa");
+    System.err.println("java -jar x.jar imagemagickconvert");
+    System.err.println("java -jar x.jar soxsoundconvert");
+    System.err.println("java -jar x.jar ffmpegvideoconvert");
+    System.err.println("java -jar x.jar jodconverter");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1276,6 +1347,14 @@ public class RodaCoreFactory {
       runVeraPDFPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("pdftopdfa".equals(args.get(0))) {
       runPDFtoPDFAPlugin(args.get(1), args.get(2));
+    } else if ("imagemagickconvert".equals(args.get(0))) {
+      runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+    } else if ("soxsoundconvert".equals(args.get(0))) {
+      runSoxSoundConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+    } else if ("ffmpegvideoconvert".equals(args.get(0))) {
+      runFFMPEGVideoConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+    } else if ("jodconverter".equals(args.get(0))) {
+      runJODConverterPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("jhove".equals(args.get(0))) {
       runJhovePlugin();
     } else if ("fits".equals(args.get(0))) {
