@@ -38,7 +38,6 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
     pack.setDescriptionLevelsInfo(descriptionLevelManager.getDescriptionLevelsInfo());
     pack.setDescriptionLevels(descriptionLevelManager.getDescriptionLevels());
     pack.setRootDescriptionLevels(descriptionLevelManager.getRootDescriptionLevels());
-    pack.setLeafDescriptionLevels(descriptionLevelManager.getLeafDescriptionLevels());
     pack.setRepresentationDescriptionLevels(descriptionLevelManager.getRepresentationsDescriptionLevels());
     pack.setAllButRepresentationDescriptionLevels(descriptionLevelManager.getAllButRepresentationsDescriptionLevels());
 

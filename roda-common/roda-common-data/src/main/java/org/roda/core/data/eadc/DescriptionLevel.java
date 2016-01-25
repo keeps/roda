@@ -9,7 +9,7 @@ package org.roda.core.data.eadc;
 
 import java.io.Serializable;
 
-import org.roda.core.data.common.InvalidDescriptionLevel;
+import org.roda.core.data.exceptions.RequestNotValidException;
 
 /**
  * 
@@ -18,18 +18,11 @@ import org.roda.core.data.common.InvalidDescriptionLevel;
  * @author Hélder Silva
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializable {
+public class DescriptionLevel implements Serializable {
   private static final long serialVersionUID = 9038357012292858570L;
 
   // description level
   private String level = null;
-
-  /**
-   * Description Object Level Fonds (fonds)
-   */
-  // FIXME this should be removed in order to have a fully programmable
-  // description levels system
-  public static final DescriptionLevel FONDS = new DescriptionLevel("fonds");
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link DescriptionLevel}.
@@ -51,7 +44,7 @@ public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializa
    * @throws InvalidDescriptionLevel
    *           if the specified level is not one of the allowed levels.
    */
-  public DescriptionLevel(DescriptionLevel dLevel) throws InvalidDescriptionLevel {
+  public DescriptionLevel(DescriptionLevel dLevel) throws RequestNotValidException {
     this(dLevel.getLevel());
   }
 
@@ -64,7 +57,7 @@ public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializa
    * @throws InvalidDescriptionLevel
    *           if the specified level is not one of the allowed levels.
    */
-  public DescriptionLevel(String level) throws InvalidDescriptionLevel {
+  public DescriptionLevel(String level) throws RequestNotValidException {
     setLevel(level);
   }
 
@@ -85,25 +78,6 @@ public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializa
   }
 
   /**
-   * Compare to other description level
-   * 
-   * @param other
-   * @return (&lt;0), 0 or (&gt;0) if other description level is a descendant of
-   *         this object, equal to this object or a ascendant level of this
-   *         object.
-   */
-  @Deprecated
-  public int compareTo(DescriptionLevel other) {
-
-    // DescriptionLevel otherDescriptionLevel = (DescriptionLevel) other;
-    //
-    // List<DescriptionLevel> levels = DESCRIPTION_LEVELS;
-    //
-    // return levels.indexOf(this) - levels.indexOf(otherDescriptionLevel);
-    return 0;
-  }
-
-  /**
    * @see Object#toString()
    */
   public String toString() {
@@ -118,19 +92,6 @@ public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializa
   }
 
   /**
-   * If the level {@link String} for some reason a special word in some context
-   * (e.g. the word "class" it's exclusive for the Java language and therefore
-   * one can't use it as an assessor keyword)
-   */
-  public String getLevelSanitized() {
-    if (level.equals("class")) {
-      return "class_";
-    } else {
-      return level;
-    }
-  }
-
-  /**
    * Sets the level (it gets trimmed in the process)
    * 
    * @param level
@@ -138,11 +99,11 @@ public class DescriptionLevel implements Comparable<DescriptionLevel>, Serializa
    * @throws InvalidDescriptionLevel
    *           if the specified level is null or empty {@link String}.
    */
-  public void setLevel(String level) throws InvalidDescriptionLevel {
+  public void setLevel(String level) throws RequestNotValidException {
     if (level != null && !"".equals(level.trim().toLowerCase())) {
       this.level = level.trim().toLowerCase();
     } else {
-      throw new InvalidDescriptionLevel("Invalid level: " + level);
+      throw new RequestNotValidException("Invalid level: '" + level + "'");
     }
   }
 }

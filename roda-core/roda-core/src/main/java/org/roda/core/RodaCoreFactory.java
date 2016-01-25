@@ -281,7 +281,11 @@ public class RodaCoreFactory {
       // properties object
     }
     LOGGER.trace("Description level configurations being loaded: {}", descriptionLevelConfiguration);
-    descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
+    try {
+      descriptionLevelManager = new DescriptionLevelManager(descriptionLevelConfiguration);
+    } catch (RequestNotValidException e) {
+      LOGGER.error("Error loading description levels", e);
+    }
   }
 
   private static void instantiateEssentialDirectories() {

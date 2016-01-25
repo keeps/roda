@@ -10,11 +10,11 @@ package org.roda.core.data.eadc;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
+
+import org.roda.core.data.exceptions.RequestNotValidException;
 
 /**
  * Utility for loading description levels.
@@ -33,9 +33,6 @@ public class DescriptionLevelManager implements Serializable {
   private static List<DescriptionLevelInfo> DESCRIPTION_LEVELS_INFO = new ArrayList<DescriptionLevelInfo>();
   // root description levels
   private static List<DescriptionLevel> ROOT_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
-  // leaf description level
-  @Deprecated
-  private static List<DescriptionLevel> LEAF_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
   // description levels which can have representations on it
   private static List<DescriptionLevel> REPRESENTATION_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
   // all description levels without the representation description levels
@@ -52,8 +49,9 @@ public class DescriptionLevelManager implements Serializable {
    * 
    * @param descriptionLevels
    *          map read from the properties files
+   * @throws RequestNotValidException
    */
-  public DescriptionLevelManager(Map<Object, Object> descriptionLevels) {
+  public DescriptionLevelManager(Map<Object, Object> descriptionLevels) throws RequestNotValidException {
     loadDescriptionLevelHierarchy(descriptionLevels);
   }
 
@@ -140,24 +138,6 @@ public class DescriptionLevelManager implements Serializable {
   }
 
   /**
-   * Non-cloned version of the list containing leaf description levels
-   */
-  @Deprecated
-  public List<DescriptionLevel> getLeafDescriptionLevels() {
-    return LEAF_DESCRIPTION_LEVELS;
-  }
-
-  @Deprecated
-  public String getFirstLeafLevel() {
-    return LEAF_DESCRIPTION_LEVELS.get(0).getLevel();
-  }
-
-  @Deprecated
-  public DescriptionLevel getFirstLeafDescriptionLevel() {
-    return LEAF_DESCRIPTION_LEVELS.get(0);
-  }
-
-  /**
    * Non-cloned version of the list containing all but representations
    * description levels
    */
@@ -165,30 +145,8 @@ public class DescriptionLevelManager implements Serializable {
     return ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
   }
 
-  private Set<String> getAllDescendants(String level) {
-    Set<String> descendants = new HashSet<String>();
-    Set<String> visitedLevels = new HashSet<String>();
-    for (DescriptionLevel descendant : PARENT_TO_CHILDREN_MAPPING.get(level)) {
-      descendants.add(descendant.getLevel());
-      descendants.addAll(getAllDescendants(descendant.getLevel(), visitedLevels));
 
-    }
-    return descendants;
-  }
-
-  private Set<String> getAllDescendants(String level, Set<String> visitedLevels) {
-    Set<String> descendants = new HashSet<String>();
-    if (!visitedLevels.contains(level)) {
-      visitedLevels.add(level);
-      descendants.add(level);
-      for (DescriptionLevel descendant : PARENT_TO_CHILDREN_MAPPING.get(level)) {
-        descendants.addAll(getAllDescendants(descendant.getLevel(), visitedLevels));
-      }
-    }
-    return descendants;
-  }
-
-  private void loadDescriptionLevelHierarchy(Map<Object, Object> descriptionLevels) {
+  private void loadDescriptionLevelHierarchy(Map<Object, Object> descriptionLevels) throws RequestNotValidException {
 
     // instantiate objects to contain the description levels (both String
     // and
@@ -197,7 +155,6 @@ public class DescriptionLevelManager implements Serializable {
     DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
     DESCRIPTION_LEVELS_INFO = new ArrayList<DescriptionLevelInfo>();
     ROOT_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
-    LEAF_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
     REPRESENTATION_DESCRIPTION_LEVELS = new ArrayList<DescriptionLevel>();
     PARENT_TO_CHILDREN_MAPPING = new HashMap<String, List<DescriptionLevel>>();
     CHILDREN_TO_PARENT_MAPPING = new HashMap<String, List<DescriptionLevel>>();
@@ -229,10 +186,6 @@ public class DescriptionLevelManager implements Serializable {
         // process information about child levels
         childLevels = splitChildLevelsAsObjects(value);
         PARENT_TO_CHILDREN_MAPPING.put(level, childLevels);
-
-        if (childLevels.size() == 0) {
-          LEAF_DESCRIPTION_LEVELS.add(new DescriptionLevel(level));
-        }
 
         for (DescriptionLevel childrenLevel : childLevels) {
           tempList = CHILDREN_TO_PARENT_MAPPING.get(childrenLevel.getLevel());
@@ -266,7 +219,7 @@ public class DescriptionLevelManager implements Serializable {
     ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS.removeAll(DescriptionLevelManager.REPRESENTATION_DESCRIPTION_LEVELS);
   }
 
-  private List<DescriptionLevel> splitChildLevelsAsObjects(String childLevels) {
+  private List<DescriptionLevel> splitChildLevelsAsObjects(String childLevels) throws RequestNotValidException {
     List<DescriptionLevel> res = new ArrayList<DescriptionLevel>();
     for (String level : splitList(childLevels)) {
       res.add(new DescriptionLevel(level));

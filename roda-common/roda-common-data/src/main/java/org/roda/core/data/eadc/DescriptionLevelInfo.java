@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.roda.core.data.common.InvalidDescriptionLevel;
+import org.roda.core.data.exceptions.RequestNotValidException;
 
 /**
  * 
@@ -54,35 +54,22 @@ public class DescriptionLevelInfo implements Serializable {
   }
 
   /**
-   * If the level {@link String} for some reason a special word in some context
-   * (e.g. the word "class" it's exclusive for the Java language and therefore
-   * one can't use it as an assessor keyword)
-   */
-  public String getLevelSanitized() {
-    if (level.equals("class")) {
-      return "class_";
-    } else {
-      return level;
-    }
-  }
-
-  /**
    * Sets the level (it gets trimmed in the process)
    * 
    * @param level
    *          the level to set.
-   * @throws InvalidDescriptionLevel
+   * @throws RequestNotValidException
    *           if the specified level is null or empty {@link String}.
    */
-  public void setLevel(String level) throws InvalidDescriptionLevel {
+  public void setLevel(String level) throws RequestNotValidException {
     if (level != null && !"".equals(level.trim().toLowerCase())) {
       this.level = level.trim().toLowerCase();
     } else {
-      throw new InvalidDescriptionLevel("Invalid level: " + level);
+      throw new RequestNotValidException("Invalid level: '" + level + "'");
     }
   }
 
-  public DescriptionLevel getDescriptionLevel() {
+  public DescriptionLevel getDescriptionLevel() throws RequestNotValidException {
     return new DescriptionLevel(getLevel());
   }
 

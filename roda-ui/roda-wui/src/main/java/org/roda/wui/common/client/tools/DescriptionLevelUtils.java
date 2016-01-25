@@ -15,20 +15,14 @@ import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
-
-import config.i18n.client.CommonConstants;
-import config.i18n.client.DisseminationConstants;
 
 public class DescriptionLevelUtils {
 
   private static ClientLogger logger = new ClientLogger(DescriptionLevelUtils.class.getName());
-  private static CommonConstants constants = (CommonConstants) GWT.create(CommonConstants.class);
 
   private DescriptionLevelUtils() {
     super();
@@ -37,7 +31,6 @@ public class DescriptionLevelUtils {
   public static List<DescriptionLevelInfo> DESCRIPTION_LEVELS_INFO;
   public static List<DescriptionLevel> DESCRIPTION_LEVELS;
   public static List<DescriptionLevel> ROOT_DESCRIPTION_LEVELS;
-  public static List<DescriptionLevel> LEAF_DESCRIPTION_LEVELS;
   public static List<DescriptionLevel> REPRESENTATION_DESCRIPTION_LEVELS;
   public static List<DescriptionLevel> ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
 
@@ -55,7 +48,6 @@ public class DescriptionLevelUtils {
         DESCRIPTION_LEVELS_INFO = result.getDescriptionLevelsInfo();
         DESCRIPTION_LEVELS = result.getDescriptionLevels();
         ROOT_DESCRIPTION_LEVELS = result.getRootDescriptionLevels();
-        LEAF_DESCRIPTION_LEVELS = result.getLeafDescriptionLevels();
         REPRESENTATION_DESCRIPTION_LEVELS = result.getRepresentationDescriptionLevels();
         ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS = result.getAllButRepresentationDescriptionLevels();
         callback.onSuccess(null);
@@ -80,49 +72,6 @@ public class DescriptionLevelUtils {
   }
 
   /**
-   * @deprecated use
-   *             {@link DescriptionLevelUtils#getElementLevelIconSafeHtml(String)}
-   *             instead
-   * @param level
-   * @return
-   */
-  public static String getElementLevelIconPath(String level) {
-    String ret;
-    final DescriptionLevelInfo levelInfo = getDescriptionLevel(level);
-    if (levelInfo != null) {
-      ret = GWT.getModuleBaseURL() + "description_levels/" + levelInfo.getCategory().getCategory() + ".png";
-
-    } else {
-      ret = GWT.getModuleBaseURL() + "description_levels/default.png";
-    }
-    return ret;
-  }
-
-  /**
-   * Get description level icon
-   * 
-   * @param level
-   * @return the icon message
-   * 
-   * @deprecated use
-   *             {@link DescriptionLevelUtils#getElementLevelIconHTMLPanel(String)}
-   *             instead
-   */
-  public static Image getElementLevelIconImage(String level) {
-    Image ret;
-    final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
-    if (levelInfo != null) {
-      ret = new Image(GWT.getModuleBaseURL() + "description_levels/" + levelInfo.getCategory().getCategory() + ".png");
-      ret.setAltText(levelInfo.getLabel(constants.locale()));
-    } else {
-      ret = new Image(GWT.getModuleBaseURL() + "description_levels/default.png");
-      ret.setAltText("default");
-    }
-
-    return ret;
-  }
-
-  /**
    * Get description level icon
    * 
    * @param level
@@ -143,25 +92,6 @@ public class DescriptionLevelUtils {
       ret = "description-level description-level-" + levelInfo.getCategory().getCategory();
     } else {
       ret = "description-level";
-    }
-    return ret;
-  }
-  
-  // TODO merge constants
-  private static DisseminationConstants disseminationConstants = (DisseminationConstants) GWT.create(DisseminationConstants.class);
-  
-  /**
-   * Get translation of each descriptive level
-   * 
-   * @param level
-   * @return the translation string
-   */
-  public static String getElementLevelTranslation(DescriptionLevel level) {
-    String ret;
-    if (DescriptionLevelUtils.DESCRIPTION_LEVELS.contains(level)) {
-      ret = disseminationConstants.getString(level.getLevelSanitized());
-    } else {
-      ret = null;
     }
     return ret;
   }

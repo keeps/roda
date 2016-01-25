@@ -20,7 +20,6 @@ public class DescriptionLevelInfoPack implements Serializable {
   public List<DescriptionLevelInfo> descriptionLevelsInfo;
   public List<DescriptionLevel> descriptionLevels;
   public List<DescriptionLevel> rootDescriptionLevels;
-  public List<DescriptionLevel> leafDescriptionLevels;
   public List<DescriptionLevel> representationDescriptionLevels;
   public List<DescriptionLevel> allButRepresentationDescriptionLevels;
 
@@ -49,14 +48,6 @@ public class DescriptionLevelInfoPack implements Serializable {
 
   public void setRootDescriptionLevels(List<DescriptionLevel> rootDescriptionLevels) {
     this.rootDescriptionLevels = rootDescriptionLevels;
-  }
-
-  public List<DescriptionLevel> getLeafDescriptionLevels() {
-    return leafDescriptionLevels;
-  }
-
-  public void setLeafDescriptionLevels(List<DescriptionLevel> leafDescriptionLevels) {
-    this.leafDescriptionLevels = leafDescriptionLevels;
   }
 
   public List<DescriptionLevel> getRepresentationDescriptionLevels() {
