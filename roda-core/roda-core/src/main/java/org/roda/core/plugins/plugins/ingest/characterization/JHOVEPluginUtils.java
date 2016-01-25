@@ -72,7 +72,7 @@ public class JHOVEPluginUtils {
 
   }
 
-  public static Path runJhove(org.roda.core.model.File file, Binary binary, Map<String, String> parameterValues)
+  public static Path runJhove(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
     throws Exception {
     // FIXME temp file that doesn't get deleted afterwards
     java.io.File f = File.createTempFile("temp", ".temp");

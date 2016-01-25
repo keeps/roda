@@ -5,13 +5,11 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.model;
+package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
-import org.roda.core.data.v2.ip.RODAObjectPermissions;
 
 public class AIP implements Serializable {
 

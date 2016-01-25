@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.roda.core.storage.StoragePath;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.fedora.FedoraStorageService;
 
 /**

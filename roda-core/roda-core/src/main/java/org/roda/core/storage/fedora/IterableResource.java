@@ -21,9 +21,9 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Resource;
-import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
 

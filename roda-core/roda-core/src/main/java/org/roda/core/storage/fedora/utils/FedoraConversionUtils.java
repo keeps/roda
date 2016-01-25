@@ -21,6 +21,7 @@ import org.fcrepo.client.FedoraException;
 import org.fcrepo.client.FedoraObject;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
@@ -29,7 +30,6 @@ import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.StoragePath;
 import org.roda.core.storage.fedora.FedoraContentPayload;
 import org.roda.core.storage.fedora.FedoraStorageService;
 

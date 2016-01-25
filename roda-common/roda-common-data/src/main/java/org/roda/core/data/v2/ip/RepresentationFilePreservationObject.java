@@ -10,6 +10,9 @@ package org.roda.core.data.v2.ip;
 import java.io.Serializable;
 import java.util.Arrays;
 
+import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.PreservationObject;
+
 /**
  * This is a Preservation Object for a {@link RepresentationFile}.
  * 

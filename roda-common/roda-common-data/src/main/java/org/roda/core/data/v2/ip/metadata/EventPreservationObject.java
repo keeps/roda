@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2.ip;
+package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
 import java.util.Date;

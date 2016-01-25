@@ -72,7 +72,7 @@ public class FITSPluginUtils {
     return command;
   }
 
-  public static Path runFits(org.roda.core.model.File file, Binary binary, Map<String, String> parameterValues)
+  public static Path runFits(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
     throws IOException, FitsException {
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);

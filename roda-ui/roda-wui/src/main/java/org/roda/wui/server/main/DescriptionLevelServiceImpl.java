@@ -10,7 +10,7 @@ package org.roda.wui.server.main;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.eadc.DescriptionLevelManager;
+import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelService;
 import org.slf4j.Logger;

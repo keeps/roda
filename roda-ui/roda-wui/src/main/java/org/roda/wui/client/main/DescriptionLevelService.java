@@ -9,7 +9,7 @@ package org.roda.wui.client.main;
 
 import java.util.List;
 
-import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.descriptionLevels.DescriptionLevel;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;

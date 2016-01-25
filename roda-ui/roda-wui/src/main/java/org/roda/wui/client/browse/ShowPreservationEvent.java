@@ -13,7 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.ip.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.common.utils.StringUtils;

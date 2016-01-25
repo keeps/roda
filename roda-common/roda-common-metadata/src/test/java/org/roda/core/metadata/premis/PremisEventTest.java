@@ -9,7 +9,7 @@ package org.roda.core.metadata.premis;
 
 import java.util.Date;
 
-import org.roda.core.data.v2.ip.EventPreservationObject;
+import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 

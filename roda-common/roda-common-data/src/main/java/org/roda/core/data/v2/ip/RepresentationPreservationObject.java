@@ -10,6 +10,8 @@ package org.roda.core.data.v2.ip;
 import java.util.Arrays;
 import java.util.Date;
 
+import org.roda.core.data.v2.ip.metadata.PreservationObject;
+
 /**
  * This is a representation preservation object. It contains preservation
  * metadata about a representation.

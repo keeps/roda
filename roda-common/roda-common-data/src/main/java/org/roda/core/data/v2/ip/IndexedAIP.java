@@ -12,7 +12,7 @@ import java.util.Date;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.eadc.DescriptionLevel;
+import org.roda.core.data.descriptionLevels.DescriptionLevel;
 
 /**
  * This class contains the indexed information about an AIP.

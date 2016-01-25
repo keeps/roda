@@ -5,11 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.model;
+package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
-
-import org.roda.core.storage.StoragePath;
 
 public class File implements Serializable {
 

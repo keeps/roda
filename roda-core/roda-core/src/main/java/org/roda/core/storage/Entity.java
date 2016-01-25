@@ -10,6 +10,8 @@ package org.roda.core.storage;
 import java.util.Map;
 import java.util.Set;
 
+import org.roda.core.data.v2.ip.StoragePath;
+
 /**
  * Interface with the minimal/common set of methods that should be implemented
  * by all roda storage model "entities"

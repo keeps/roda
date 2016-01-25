@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.eadc;
+package org.roda.core.data.descriptionLevels;
 
 import java.io.Serializable;
 

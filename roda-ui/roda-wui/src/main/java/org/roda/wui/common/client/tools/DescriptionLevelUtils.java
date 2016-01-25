@@ -9,8 +9,8 @@ package org.roda.wui.common.client.tools;
 
 import java.util.List;
 
-import org.roda.core.data.eadc.DescriptionLevel;
-import org.roda.core.data.eadc.DescriptionLevelInfo;
+import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.descriptionLevels.DescriptionLevelInfo;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;

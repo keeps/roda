@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.StoragePath;
 
 public class DefaultStoragePath implements StoragePath {
 

@@ -10,8 +10,8 @@ package org.roda.wui.client.main;
 import java.io.Serializable;
 import java.util.List;
 
-import org.roda.core.data.eadc.DescriptionLevel;
-import org.roda.core.data.eadc.DescriptionLevelInfo;
+import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.descriptionLevels.DescriptionLevelInfo;
 
 public class DescriptionLevelInfoPack implements Serializable {
 

@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
-import org.roda.core.model.AIP;
-import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
