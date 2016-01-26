@@ -11,6 +11,7 @@ import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
 
 public class RodaPropertiesReloadStrategy extends FileChangedReloadingStrategy {
 
+  @Override
   public void reloadingPerformed() {
     RodaCoreFactory.reloadRodaConfigurationsAfterFileChange();
     super.updateLastModified();

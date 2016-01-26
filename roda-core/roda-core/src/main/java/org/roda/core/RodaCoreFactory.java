@@ -136,6 +136,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 
+/**
+ * @author Hélder Silva <hsilva@keep.pt>
+ */
 public class RodaCoreFactory {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RodaCoreFactory.class);
@@ -184,6 +187,11 @@ public class RodaCoreFactory {
   private static Map<String, Map<String, String>> propertiesCache = null;
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
   private static DescriptionLevelManager descriptionLevelManager = null;
+
+  /** Private empty constructor */
+  private RodaCoreFactory() {
+
+  }
 
   public static void instantiate() {
     NodeType nodeType = NodeType
@@ -544,7 +552,6 @@ public class RodaCoreFactory {
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
-    essentialDirectories.add(dataPath.resolve("transferredResources"));
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
@@ -627,8 +634,8 @@ public class RodaCoreFactory {
 
   public static void startTransferredResourcesFolderMonitor() throws Exception {
 
-    Configuration rodaConfig = RodaCoreFactory.getRodaConfiguration();
-    String transferredResourcesFolder = rodaConfig.getString("transferredResources.folder");
+    String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path transferredResourcesFolderPath = dataPath.resolve(transferredResourcesFolder);
     Date date = getFolderMonitorDate();
     transferredResourcesFolderObserver = new IndexFolderObserver(solr, transferredResourcesFolderPath);
