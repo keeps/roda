@@ -15,22 +15,25 @@ public class File implements Serializable {
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String id;
+  private List<String> path;
+
   private String aipId;
   private String representationId;
 
-  private boolean isFile;
+  private boolean isDirectory;
   private List<String> filesDirectlyUnder;
 
   public File() {
     super();
   }
 
-  public File(String id, String aipId, String representationId, boolean isFile, List<String> filesDirectlyUnder) {
+  public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory,
+    List<String> filesDirectlyUnder) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
-    this.isFile = isFile;
+    this.isDirectory = isDirectory;
     this.filesDirectlyUnder = filesDirectlyUnder;
   }
 
@@ -58,12 +61,20 @@ public class File implements Serializable {
     this.representationId = representationId;
   }
 
-  public boolean isFile() {
-    return isFile;
+  public List<String> getPath() {
+    return path;
   }
 
-  public void setFile(boolean isFile) {
-    this.isFile = isFile;
+  public void setPath(List<String> path) {
+    this.path = path;
+  }
+
+  public boolean isDirectory() {
+    return isDirectory;
+  }
+
+  public void setDirectory(boolean isDirectory) {
+    this.isDirectory = isDirectory;
   }
 
   public List<String> getFilesDirectlyUnder() {
@@ -81,7 +92,8 @@ public class File implements Serializable {
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((filesDirectlyUnder == null) ? 0 : filesDirectlyUnder.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + (isFile ? 1231 : 1237);
+    result = prime * result + (isDirectory ? 1231 : 1237);
+    result = prime * result + ((path == null) ? 0 : path.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     return result;
   }
@@ -110,7 +122,12 @@ public class File implements Serializable {
         return false;
     } else if (!id.equals(other.id))
       return false;
-    if (isFile != other.isFile)
+    if (isDirectory != other.isDirectory)
+      return false;
+    if (path == null) {
+      if (other.path != null)
+        return false;
+    } else if (!path.equals(other.path))
       return false;
     if (representationId == null) {
       if (other.representationId != null)
@@ -122,8 +139,8 @@ public class File implements Serializable {
 
   @Override
   public String toString() {
-    return "File [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", isFile=" + isFile
-      + ", filesDirectlyUnder=" + filesDirectlyUnder + "]";
+    return "File [id=" + id + ", path=" + path + ", aipId=" + aipId + ", representationId=" + representationId
+      + ", isDirectory=" + isDirectory + ", filesDirectlyUnder=" + filesDirectlyUnder + "]";
   }
 
 }

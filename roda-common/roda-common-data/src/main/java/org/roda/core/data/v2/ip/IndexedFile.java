@@ -25,7 +25,7 @@ public class IndexedFile implements Serializable {
   private FileFormat fileFormat = null;
   private String originalName = null;
   private long size = 0;
-  private boolean isFile = false;
+  private boolean isDirectory = false;
   private String creatingApplicationName;
   private String creatingApplicationVersion;
   private String dateCreatedByApplication;
@@ -38,7 +38,7 @@ public class IndexedFile implements Serializable {
   }
 
   public IndexedFile(String id, String aipId, String representationId, String storagePath, boolean entryPoint,
-    FileFormat fileFormat, String originalName, long size, boolean isFile, String creatingApplicationName,
+    FileFormat fileFormat, String originalName, long size, boolean isDirectory, String creatingApplicationName,
     String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext) {
     super();
     this.id = id;
@@ -48,7 +48,7 @@ public class IndexedFile implements Serializable {
     this.fileFormat = fileFormat;
     this.size = size;
     this.originalName = originalName;
-    this.isFile = isFile;
+    this.isDirectory = isDirectory;
     this.creatingApplicationName = creatingApplicationName;
     this.creatingApplicationVersion = creatingApplicationVersion;
     this.dateCreatedByApplication = dateCreatedByApplication;
@@ -97,12 +97,12 @@ public class IndexedFile implements Serializable {
     this.hash = hash;
   }
 
-  public boolean isFile() {
-    return isFile;
+  public boolean isDirectory() {
+    return isDirectory;
   }
 
-  public void setFile(boolean isFile) {
-    this.isFile = isFile;
+  public void setDirectory(boolean isDirectory) {
+    this.isDirectory = isDirectory;
   }
 
   public String getOriginalName() {
@@ -156,74 +156,6 @@ public class IndexedFile implements Serializable {
     return fileFormat;
   }
 
-  @Override
-  public String toString() {
-    return "File[\n" + "id:" + id + "\n" + "aipId:" + aipId + "\n" + "representationId:" + representationId + "\n"
-      + "entryPoint:" + entryPoint + "\n" + "fileFormat:" + fileFormat + "\n" + "size:" + size + "\n" + "entryPoint:"
-      + entryPoint + "\n" + "originalName:" + originalName + "\n" + "isFile:" + isFile + "\n"
-      + "creatingApplicationName:" + creatingApplicationName + "\n" + "creatingApplicationVersion:"
-      + creatingApplicationVersion + "\n" + "dateCreatedByApplication:" + dateCreatedByApplication + "\n" + "fulltext:"
-      + fulltext + "\n" + "StoragePath:" + storagePath + "\n]";
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-    result = prime * result + (entryPoint ? 1231 : 1237);
-    result = prime * result + ((fileFormat == null) ? 0 : fileFormat.hashCode());
-    result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
-      return true;
-    }
-    if (obj == null) {
-      return false;
-    }
-    if (getClass() != obj.getClass()) {
-      return false;
-    }
-    IndexedFile other = (IndexedFile) obj;
-    if (aipId == null) {
-      if (other.aipId != null) {
-        return false;
-      }
-    } else if (!aipId.equals(other.aipId)) {
-      return false;
-    }
-    if (entryPoint != other.entryPoint) {
-      return false;
-    }
-    if (fileFormat == null) {
-      if (other.fileFormat != null) {
-        return false;
-      }
-    } else if (!fileFormat.equals(other.fileFormat)) {
-      return false;
-    }
-    if (id == null) {
-      if (other.id != null) {
-        return false;
-      }
-    } else if (!id.equals(other.id)) {
-      return false;
-    }
-    if (representationId == null) {
-      if (other.representationId != null) {
-        return false;
-      }
-    } else if (!representationId.equals(other.representationId)) {
-      return false;
-    }
-    return true;
-  }
-
   public void setId(String id) {
     this.id = id;
   }
@@ -255,6 +187,109 @@ public class IndexedFile implements Serializable {
 
   public void setStoragePath(String storagePath) {
     this.storagePath = storagePath;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((creatingApplicationName == null) ? 0 : creatingApplicationName.hashCode());
+    result = prime * result + ((creatingApplicationVersion == null) ? 0 : creatingApplicationVersion.hashCode());
+    result = prime * result + ((dateCreatedByApplication == null) ? 0 : dateCreatedByApplication.hashCode());
+    result = prime * result + (entryPoint ? 1231 : 1237);
+    result = prime * result + ((fileFormat == null) ? 0 : fileFormat.hashCode());
+    result = prime * result + ((fulltext == null) ? 0 : fulltext.hashCode());
+    result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + (isDirectory ? 1231 : 1237);
+    result = prime * result + ((originalName == null) ? 0 : originalName.hashCode());
+    result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
+    result = prime * result + (int) (size ^ (size >>> 32));
+    result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    IndexedFile other = (IndexedFile) obj;
+    if (aipId == null) {
+      if (other.aipId != null)
+        return false;
+    } else if (!aipId.equals(other.aipId))
+      return false;
+    if (creatingApplicationName == null) {
+      if (other.creatingApplicationName != null)
+        return false;
+    } else if (!creatingApplicationName.equals(other.creatingApplicationName))
+      return false;
+    if (creatingApplicationVersion == null) {
+      if (other.creatingApplicationVersion != null)
+        return false;
+    } else if (!creatingApplicationVersion.equals(other.creatingApplicationVersion))
+      return false;
+    if (dateCreatedByApplication == null) {
+      if (other.dateCreatedByApplication != null)
+        return false;
+    } else if (!dateCreatedByApplication.equals(other.dateCreatedByApplication))
+      return false;
+    if (entryPoint != other.entryPoint)
+      return false;
+    if (fileFormat == null) {
+      if (other.fileFormat != null)
+        return false;
+    } else if (!fileFormat.equals(other.fileFormat))
+      return false;
+    if (fulltext == null) {
+      if (other.fulltext != null)
+        return false;
+    } else if (!fulltext.equals(other.fulltext))
+      return false;
+    if (hash == null) {
+      if (other.hash != null)
+        return false;
+    } else if (!hash.equals(other.hash))
+      return false;
+    if (id == null) {
+      if (other.id != null)
+        return false;
+    } else if (!id.equals(other.id))
+      return false;
+    if (isDirectory != other.isDirectory)
+      return false;
+    if (originalName == null) {
+      if (other.originalName != null)
+        return false;
+    } else if (!originalName.equals(other.originalName))
+      return false;
+    if (representationId == null) {
+      if (other.representationId != null)
+        return false;
+    } else if (!representationId.equals(other.representationId))
+      return false;
+    if (size != other.size)
+      return false;
+    if (storagePath == null) {
+      if (other.storagePath != null)
+        return false;
+    } else if (!storagePath.equals(other.storagePath))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "IndexedFile [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", entryPoint="
+      + entryPoint + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
+      + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
+      + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
+      + dateCreatedByApplication + ", hash=" + hash + ", fulltext=" + fulltext + ", storagePath=" + storagePath + "]";
   }
 
 }

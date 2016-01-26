@@ -9,7 +9,6 @@ package org.roda.core.model;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -28,6 +27,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
@@ -39,7 +39,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.RodaUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -126,7 +125,9 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertTrue(aip.isActive());
 
-    assertThat(aip.getDescriptiveMetadataIds(), containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
+    List<String> descriptiveMetadataIds = aip.getMetadata().getDescriptiveMetadata().stream().map(dm -> dm.getId())
+      .collect(Collectors.toList());
+    assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
     assertThat(aip.getRepresentationIds(),
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_2_ID));
 
@@ -138,7 +139,9 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_ID, descMetadata.getId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE, descMetadata.getType());
 
-    final Binary descMetadataBinary = storage.getBinary(descMetadata.getStoragePath());
+    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
+      descMetadata.getId());
+    final Binary descMetadataBinary = storage.getBinary(descriptiveMetadataPath);
     assertTrue(descMetadataBinary.getSizeInBytes() > 0);
     assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
       IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
@@ -147,23 +150,15 @@ public class ModelServiceTest {
     final Representation representation1 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(aipId, representation1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, representation1.getId());
-    assertTrue(representation1.isActive());
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_CREATED), representation1.getDateCreated());
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_MODIFIED), representation1.getDateModified());
-    assertEquals(CorporaConstants.REPRESENTATION_1_TYPE, representation1.getType());
-    assertEquals(CorporaConstants.REPRESENTATION_1_STATUSES, representation1.getStatuses());
-    assertThat(representation1.getFileIds(),
+    assertEquals(CorporaConstants.REPRESENTATION_1_ORIGINAL, representation1.isOriginal());
+    assertThat(representation1.getFilesDirectlyUnder(),
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_FILE_1_ID, CorporaConstants.REPRESENTATION_1_FILE_2_ID));
 
     final Representation representation2 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_2_ID);
     assertEquals(aipId, representation2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, representation2.getId());
-    assertTrue(representation2.isActive());
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_CREATED), representation2.getDateCreated());
-    assertEquals(RodaUtils.parseDate(CorporaConstants.DATE_MODIFIED), representation2.getDateModified());
-    assertEquals(CorporaConstants.REPRESENTATION_2_TYPE, representation2.getType());
-    assertEquals(CorporaConstants.REPRESENTATION_2_STATUSES, representation2.getStatuses());
-    assertThat(representation2.getFileIds(),
+    assertEquals(CorporaConstants.REPRESENTATION_2_ORIGINAL, representation2.isOriginal());
+    assertThat(representation2.getFilesDirectlyUnder(),
       containsInAnyOrder(CorporaConstants.REPRESENTATION_2_FILE_1_ID, CorporaConstants.REPRESENTATION_2_FILE_2_ID));
 
     // testing files
@@ -172,11 +167,10 @@ public class ModelServiceTest {
     assertEquals(aipId, file_1_1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
-    assertTrue(file_1_1.isEntryPoint());
 
-    // TODO test format registries
+    // TODO test directories
 
-    final Binary binary_1_1 = storage.getBinary(file_1_1.getStoragePath());
+    final Binary binary_1_1 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_1_1));
     assertTrue(binary_1_1.getSizeInBytes() > 0);
     assertEquals(binary_1_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_1.getContent().createInputStream()).length);
@@ -186,10 +180,8 @@ public class ModelServiceTest {
     assertEquals(aipId, file_1_2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_ID, file_1_2.getId());
-    assertFalse(file_1_2.isEntryPoint());
-    // TODO test format registries
 
-    final Binary binary_1_2 = storage.getBinary(file_1_2.getStoragePath());
+    final Binary binary_1_2 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_1_2));
     assertTrue(binary_1_2.getSizeInBytes() > 0);
     assertEquals(binary_1_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_2.getContent().createInputStream()).length);
@@ -199,10 +191,8 @@ public class ModelServiceTest {
     assertEquals(aipId, file_2_1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_ID, file_2_1.getId());
-    assertFalse(file_2_1.isEntryPoint());
-    // TODO test format registries
 
-    final Binary binary_2_1 = storage.getBinary(file_2_1.getStoragePath());
+    final Binary binary_2_1 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_2_1));
     assertTrue(binary_2_1.getSizeInBytes() > 0);
     assertEquals(binary_2_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_1.getContent().createInputStream()).length);
@@ -212,10 +202,8 @@ public class ModelServiceTest {
     assertEquals(aipId, file_2_2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_ID, file_2_2.getId());
-    assertTrue(file_2_2.isEntryPoint());
-    // TODO test format registries
 
-    final Binary binary_2_2 = storage.getBinary(file_2_2.getStoragePath());
+    final Binary binary_2_2 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_2_2));
     assertTrue(binary_2_2.getSizeInBytes() > 0);
     assertEquals(binary_2_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_2.getContent().createInputStream()).length);
@@ -337,8 +325,7 @@ public class ModelServiceTest {
     assertEquals(updatedAIP, retrievedAIP);
 
     // check content is correct
-    StorageTestUtils.testEntityEqualRecursively(corporaService, otherAipPath, storage, ModelUtils.getAIPpath(aipId),
-      true);
+    StorageTestUtils.testEntityEqualRecursively(corporaService, otherAipPath, storage, ModelUtils.getAIPpath(aipId));
   }
 
   @Test
@@ -375,7 +362,8 @@ public class ModelServiceTest {
     assertEquals(newDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary newDescriptiveMetadataBinary = storage.getBinary(newDescriptiveMetadata.getStoragePath());
+    Binary newDescriptiveMetadataBinary = storage
+      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       newDescriptiveMetadataBinary.getContent().createInputStream()));
 
@@ -400,7 +388,8 @@ public class ModelServiceTest {
     assertEquals(updatedDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary updatedDescriptiveMetadataBinary = storage.getBinary(updatedDescriptiveMetadata.getStoragePath());
+    Binary updatedDescriptiveMetadataBinary = storage
+      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       updatedDescriptiveMetadataBinary.getContent().createInputStream()));
 
@@ -478,7 +467,7 @@ public class ModelServiceTest {
 
     // check content
     StorageTestUtils.testEntityEqualRecursively(corporaService, corporaRepresentationPath, storage,
-      ModelUtils.getRepresentationPath(aipId, CorporaConstants.REPRESENTATION_1_ID), true);
+      ModelUtils.getRepresentationPath(aipId, CorporaConstants.REPRESENTATION_1_ID));
   }
 
   @Test
@@ -525,7 +514,7 @@ public class ModelServiceTest {
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(createdFile.getStoragePath());
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFilePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -551,7 +540,7 @@ public class ModelServiceTest {
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(createdFile.getStoragePath());
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFilePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -583,8 +572,8 @@ public class ModelServiceTest {
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,null,
       CorporaConstants.EVENT_RODA_398_PREMIS_XML);
-    assertEquals(epo.getAgentID(), CorporaConstants.AGENT_RODA_8);
-    assertEquals(epo.getType(), CorporaConstants.INGESTION);
+    assertEquals(CorporaConstants.AGENT_RODA_8, epo.getAgentID());
+    assertEquals(CorporaConstants.INGESTION, epo.getType());
   }
 
   @Test
@@ -622,7 +611,7 @@ public class ModelServiceTest {
     Iterator<RepresentationPreservationObject> it = representationPreservationObject.iterator();
     while (it.hasNext()) {
       RepresentationPreservationObject rpo = it.next();
-      fileIDs.add(rpo.getFileID());
+      fileIDs.add(rpo.getId());
     }
     assertThat(fileIDs,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_PREMIS_XML, CorporaConstants.REPRESENTATION_PREMIS_XML));

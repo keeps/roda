@@ -18,7 +18,7 @@ import java.util.Map;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -109,13 +109,14 @@ public class FITSPlugin implements Plugin<AIP> {
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
           tempStorage.copy(storage, representationPath, representationPath);
           FITSPluginUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          for (String fileID : representation.getFileIds()) {
-            Path p = output.resolve(fileID + ".fits.xml");
+
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          for (File file : allFiles) {
+            Path p = output.resolve(file.getId() + ".fits.xml");
             Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
-              + ", FILE: " + fileID + ")");
-            model.createOtherMetadata(aip.getId(), representationID, fileID + ".xml", "FITS", resource);
+              + ", FILE: " + file.getId() + ")");
+            model.createOtherMetadata(aip.getId(), representationID, file.getId() + ".xml", "FITS", resource);
           }
           FSUtils.deletePath(data);
           FSUtils.deletePath(output);

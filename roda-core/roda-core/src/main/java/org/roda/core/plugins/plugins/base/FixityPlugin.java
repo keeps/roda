@@ -8,8 +8,6 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +20,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -32,6 +31,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -99,41 +99,39 @@ public class FixityPlugin implements Plugin<AIP> {
           LOGGER.debug("Checking fixity for files in representation " + representationID + " of AIP " + aip.getId());
           try {
             Representation r = model.retrieveRepresentation(aip.getId(), representationID);
-            List<String> fileIDs = r.getFileIds();
+            Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+
             List<String> okFileIDS = new ArrayList<String>();
             List<String> koFileIDS = new ArrayList<String>();
-            if (fileIDs != null && fileIDs.size() > 0) {
-              for (String fileID : fileIDs) {
-                LOGGER.debug("Checking fixity for " + fileID);
-                File currentFile = model.retrieveFile(aip.getId(), representationID, fileID);
-                Binary currentFileBinary = storage.getBinary(currentFile.getStoragePath());
-                Path currentPath = Files.createTempFile("temp", "");
-                currentFileBinary.getContent().writeToPath(currentPath);
-                RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(),
-                  representationID, fileID);
-                if (rfpo.getFixities() != null) {
-                  boolean fixityOK = true;
-                  for (Fixity f : rfpo.getFixities()) {
-                    try {
-                      Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary,
-                        f.getMessageDigestAlgorithm(), "FixityCheck action");
-                      if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
-                        fixityOK = false;
-                        break;
-                      }
-                    } catch (NoSuchAlgorithmException nsae) {
+            for (File currentFile : allFiles) {
+              StoragePath storagePath = ModelUtils.getRepresentationFilePath(currentFile);
+              Binary currentFileBinary = storage.getBinary(storagePath);
+              RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(),
+                representationID, currentFile.getId());
+              if (rfpo.getFixities() != null) {
+                boolean fixityOK = true;
+                for (Fixity f : rfpo.getFixities()) {
+                  try {
+                    Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
+                      "FixityCheck action");
+                    if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
                       fixityOK = false;
                       break;
                     }
-                  }
-                  if (fixityOK) {
-                    okFileIDS.add(fileID);
-                  } else {
-                    koFileIDS.add(fileID);
+                  } catch (NoSuchAlgorithmException nsae) {
+                    fixityOK = false;
+                    break;
                   }
                 }
+                if (fixityOK) {
+                  // TODO support file path
+                  okFileIDS.add(currentFile.getId());
+                } else {
+                  koFileIDS.add(currentFile.getId());
+                }
               }
-              if (okFileIDS.size() < fileIDs.size()) {
+
+              if (koFileIDS.size() > 0) {
                 LOGGER.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());
                 StringBuilder sb = new StringBuilder();
                 sb.append("<p>The following file have bad checksums:</p>");
@@ -154,8 +152,8 @@ public class FixityPlugin implements Plugin<AIP> {
                   EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                   "Checksums recorded in PREMIS were compared with the files in the repository",
                   EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                  Arrays.asList(representationID), PluginState.SUCCESS, fileIDs.size() + " files checked successfully",
-                  fileIDs.toString());
+                  Arrays.asList(representationID), PluginState.SUCCESS,
+                  okFileIDS.size() + " files checked successfully", okFileIDS.toString());
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
             }

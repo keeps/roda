@@ -25,7 +25,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
@@ -115,20 +114,24 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
         try {
           logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
 
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          for (File file : allFiles) {
+            logger.debug("Processing file: " + file);
 
-          for (String fileID : representation.getFileIds()) {
-            logger.debug(
-              "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
+            if (!file.isDirectory()) {
+              /*
+               * && file.getOriginalName().endsWith(".pdf") && (file.getSize()
+               * <= maxKbytes * 1024)
+               */
+              // TODO filter by file type and size
 
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            if (file.getOriginalName().endsWith(".pdf") && (file.getSize() <= maxKbytes * 1024)) {
-              Binary binary = storage.getBinary(file.getStoragePath());
+              StoragePath fileStoragePath = ModelUtils.getRepresentationFilePath(file);
+              Binary binary = storage.getBinary(fileStoragePath);
 
               // FIXME file that doesn't get deleted afterwards
-              logger.debug("Running PDFtoPDFAPlugin on " + fileID);
+              logger.debug("Running PDFtoPDFAPlugin on " + file.getId());
               Path pluginResult = PDFtoPDFAPluginUtils.runPDFtoPDFA(binary.getContent().createInputStream(),
-                file.getStoragePath().getName());
+                file.getId());
 
               if (pluginResult != null) {
                 Binary resource = (Binary) FSUtils.convertPathToResource(pluginResult.getParent(), pluginResult);
@@ -144,13 +147,12 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
                 }
 
                 // update file on new representation
-                model.updateFile(aip.getId(), newRepresentationID, fileID, resource, true, true);
-                alteredFiles.add(fileID);
+                model.updateFile(aip.getId(), newRepresentationID, file.getId(), resource, true, true);
+                alteredFiles.add(file.getId());
                 newRepresentations.add(newRepresentationID);
 
               } else {
-                logger.debug("PDFA conversion failed on file " + fileID + " of representation " + representationID
-                  + " from AIP " + aip.getId());
+                logger.debug("PDFA conversion failed on file: " + file);
                 state = 2;
               }
             }

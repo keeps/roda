@@ -39,6 +39,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -151,12 +152,12 @@ public final class HTMLUtils {
     Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
     while (iterator.hasNext()) {
       PreservationMetadata pm = iterator.next();
-      String type = pm.getType();
-      if (type.equalsIgnoreCase("event")) {
+      PreservationMetadataType type = pm.getType();
+      if (type.equals(PreservationMetadataType.EVENT)) {
         eventIds.add(pm.getId());
-      } else if (type.equalsIgnoreCase("agent")) {
+      } else if (type.equals(PreservationMetadataType.AGENT)) {
         agentIds.add(pm.getId());
-      } else if (type.equalsIgnoreCase("file")) {
+      } else if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
         fileIds.add(pm.getId());
       }
     }

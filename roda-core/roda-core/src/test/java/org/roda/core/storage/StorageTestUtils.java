@@ -21,9 +21,8 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -86,12 +85,6 @@ public class StorageTestUtils {
 
   public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
     StorageService targetStorage, StoragePath targetEntityStoragePath)
-      throws IOException, NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    testEntityEqualRecursively(sourceStorage, sourceEntityStoragePath, targetStorage, targetEntityStoragePath, false);
-  }
-
-  public static void testEntityEqualRecursively(StorageService sourceStorage, StoragePath sourceEntityStoragePath,
-    StorageService targetStorage, StoragePath targetEntityStoragePath, boolean ignoreDateModified)
       throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException, IOException {
 
     assertEquals(sourceEntityStoragePath.isFromAContainer(), targetEntityStoragePath.isFromAContainer());
@@ -106,10 +99,7 @@ public class StorageTestUtils {
 
       Map<String, Set<String>> sourceMetadata = sourceContainer.getMetadata();
       Map<String, Set<String>> targetMetadata = targetContainer.getMetadata();
-      if (ignoreDateModified) {
-        sourceMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-        targetMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-      }
+
       assertEquals(sourceMetadata, targetMetadata);
 
       sourceResourceList = sourceStorage.listResourcesUnderContainer(sourceEntityStoragePath);
@@ -121,10 +111,6 @@ public class StorageTestUtils {
 
       Map<String, Set<String>> sourceMetadata = sourceDirectory.getMetadata();
       Map<String, Set<String>> targetMetadata = sourceDirectory.getMetadata();
-      if (ignoreDateModified) {
-        sourceMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-        targetMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-      }
       assertEquals(sourceMetadata, targetMetadata);
 
       assertEquals(sourceDirectory.isDirectory(), targetDirectory.isDirectory());
@@ -138,10 +124,7 @@ public class StorageTestUtils {
 
       Map<String, Set<String>> sourceMetadata = sourceBinary.getMetadata();
       Map<String, Set<String>> targetMetadata = targetBinary.getMetadata();
-      if (ignoreDateModified) {
-        sourceMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-        targetMetadata.remove(RodaConstants.STORAGE_META_DATE_MODIFIED);
-      }
+
       assertEquals(sourceMetadata, targetMetadata);
 
       assertEquals(sourceBinary.isDirectory(), targetBinary.isDirectory());
@@ -160,8 +143,7 @@ public class StorageTestUtils {
       for (Resource r : sourceResourceList) {
         StoragePath targetResourceStoragePath = DefaultStoragePath.parse(targetEntityStoragePath,
           r.getStoragePath().getName());
-        testEntityEqualRecursively(sourceStorage, r.getStoragePath(), targetStorage, targetResourceStoragePath,
-          ignoreDateModified);
+        testEntityEqualRecursively(sourceStorage, r.getStoragePath(), targetStorage, targetResourceStoragePath);
       }
     }
 

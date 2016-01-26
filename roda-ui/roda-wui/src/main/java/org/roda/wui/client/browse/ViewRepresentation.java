@@ -11,10 +11,8 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
@@ -26,10 +24,9 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationState;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.FileList;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -152,7 +149,7 @@ public class ViewRepresentation extends Composite {
                     if (result.getResults().size() == 1) {
                       IndexedFile simpleFile = result.getResults().get(0);
                       ViewRepresentation view;
-                      if (simpleFile.isFile()) {
+                      if (!simpleFile.isDirectory()) {
                         view = new ViewRepresentation(viewers, aipId, itemBundle, representationId, fileId, simpleFile);
                       } else {
                         view = new ViewRepresentation(viewers, aipId, itemBundle, representationId, fileId);
@@ -349,11 +346,11 @@ public class ViewRepresentation extends Composite {
         } else if (firstLoad) {
           List<IndexedFile> results = event.getValue().getResults();
 
-          if (results.size() == 1 && results.get(0).isFile()
+          if (results.size() == 1 && !results.get(0).isDirectory()
             && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
             singleFileMode = true;
             filesList.nextItemSelection();
-          } else if (results.size() > 1 && results.get(0).isFile() && ViewRepresentation.this.file == null
+          } else if (results.size() > 1 && !results.get(0).isDirectory() && ViewRepresentation.this.file == null
             && Window.getClientWidth() > WINDOW_WIDTH) {
             filesList.nextItemSelection();
           }
@@ -458,8 +455,9 @@ public class ViewRepresentation extends Composite {
       }
 
       ret.add(new BreadcrumbItem(
-        simpleFile.isFile() ? getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FILE)
-          : getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FOLDER),
+        simpleFile.isDirectory()
+          ? getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FOLDER)
+          : getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FILE),
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, simpleFile.getId())));
     }
 
@@ -478,13 +476,8 @@ public class ViewRepresentation extends Composite {
 
   private String representationType(Representation rep) {
     SafeHtml labelText;
-    Set<RepresentationState> statuses = rep.getStatuses();
-    if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
-      labelText = messages.downloadTitleOriginalAndNormalized();
-    } else if (statuses.contains(RepresentationState.ORIGINAL)) {
+    if (rep.isOriginal()) {
       labelText = messages.downloadTitleOriginal();
-    } else if (statuses.contains(RepresentationState.NORMALIZED)) {
-      labelText = messages.downloadTitleNormalized();
     } else {
       labelText = messages.downloadTitleDefault();
     }
@@ -535,7 +528,7 @@ public class ViewRepresentation extends Composite {
   void buttonInfoFileButtonHandler(ClickEvent e) {
     toggleRightPanel();
   }
-  
+
   private void toggleRightPanel() {
     infoFileButton.setStyleName(infoFileButton.getStyleName().contains(" active")
       ? infoFileButton.getStyleName().replace(" active", "") : infoFileButton.getStyleName().concat(" active"));
@@ -543,7 +536,7 @@ public class ViewRepresentation extends Composite {
     changeInfoFile();
     JavascriptUtils.toggleRightPanel(".infoFilePanel");
   }
-  
+
   private void hideRightPanel() {
     infoFileButton.removeStyleName("active");
     JavascriptUtils.hideRightPanel(".infoFilePanel");
@@ -630,7 +623,7 @@ public class ViewRepresentation extends Composite {
       }
     } else {
       emptyPreview();
-    } 
+    }
   }
 
   private String viewerType(IndexedFile file) {
@@ -665,7 +658,7 @@ public class ViewRepresentation extends Composite {
     html.setHTML(b.toSafeHtml());
     filePreview.add(html);
     html.setStyleName("viewRepresentationEmptyPreview");
-    
+
     downloadFileButton.setVisible(false);
     infoFileButton.setVisible(false);
   }

@@ -665,9 +665,13 @@ public class SolrUtils {
   }
 
   private static Boolean objectToBoolean(Object object) {
+    return objectToBoolean(object, null);
+  }
+
+  private static Boolean objectToBoolean(Object object, Boolean defaultValue) {
     Boolean ret;
     if (object == null) {
-      ret = null;
+      ret = defaultValue;
     } else if (object instanceof Boolean) {
       ret = (Boolean) object;
     } else if (object instanceof String) {
@@ -955,12 +959,13 @@ public class SolrUtils {
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
-    final Boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL));
+    final boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
     final List<String> fileIds = objectToListString(doc.get(RodaConstants.SRO_FILE_IDS));
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
+    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
 
-    return new IndexedRepresentation(id, aipId, original, fileIds, sizeInBytes);
+    return new IndexedRepresentation(id, aipId, original, fileIds, sizeInBytes, totalNumberOfFiles);
   }
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
@@ -1320,7 +1325,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
-    doc.addField(RodaConstants.FILE_ISFILE, file.isFile());
+    doc.addField(RodaConstants.FILE_ISDIRECTORY, file.isDirectory());
 
     // extra-fields
     try {
@@ -1412,7 +1417,7 @@ public class SolrUtils {
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
     long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
-    boolean isFile = objectToBoolean(doc.get(RodaConstants.FILE_ISFILE));
+    boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
     String path = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
     // format
@@ -1432,8 +1437,8 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
-    file = new IndexedFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size, isFile,
-      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
+    file = new IndexedFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size,
+      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }
 

@@ -120,7 +120,7 @@
    <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="isFile" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="isDirectory" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="extension" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fulltext" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="creatingApplicationName" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 

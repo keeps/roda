@@ -62,7 +62,7 @@ public class JpylyzerPluginUtils {
     return command;
   }
 
-  public static Path runFFProbe(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
+  public static Path runJpylyzer(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
     throws IOException, PluginException {
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);

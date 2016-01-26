@@ -288,7 +288,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     Directory directory = getStorage().getDirectory(directoryStoragePath);
     assertNotNull(directory);
     assertEquals(directoryStoragePath, directory.getStoragePath());
-    directory.getMetadata().remove(RodaConstants.STORAGE_META_SIZE_IN_BYTES);
     assertEquals(directoryMetadata, directory.getMetadata());
     assertTrue(directory.isDirectory());
 
@@ -442,7 +441,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     assertEquals(Long.valueOf(Files.size(tempFile)), binary.getSizeInBytes());
 
     // TODO test content digest properly
-    assertFalse(binary.getContentDigest().isEmpty());
+    assertTrue(binary.getContentDigest() == null);
 
     // delete temp file
     Files.delete(tempFile);

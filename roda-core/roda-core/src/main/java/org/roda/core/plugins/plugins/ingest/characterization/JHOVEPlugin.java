@@ -13,15 +13,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -80,21 +85,24 @@ public class JHOVEPlugin implements Plugin<AIP> {
       try {
         for (String representationID : aip.getRepresentationIds()) {
           LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          for (String fileID : representation.getFileIds()) {
-            LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            Binary binary = storage.getBinary(file.getStoragePath());
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          for (File file : allFiles) {
+            if (!file.isDirectory()) {
+              LOGGER.debug("Processing file: " + file);
+              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              Binary binary = storage.getBinary(storagePath);
 
-            Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
-            Binary resource = (Binary) FSUtils.convertPathToResource(jhoveResults.getParent(), jhoveResults);
-            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml", "JHOVE",
-              resource);
-            jhoveResults.toFile().delete();
+              Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
+              Binary resource = (Binary) FSUtils.convertPathToResource(jhoveResults.getParent(), jhoveResults);
+              model.createOtherMetadata(aip.getId(), representationID, file.getId() + ".xml", "JHOVE", resource);
+              jhoveResults.toFile().delete();
+            }
           }
         }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Error processing AIP: " + aip.getId(), e);
       } catch (Exception e) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+        LOGGER.error("Error processing AIP: " + aip.getId(), e);
       }
     }
     return null;

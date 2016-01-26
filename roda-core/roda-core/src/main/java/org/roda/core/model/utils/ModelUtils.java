@@ -33,7 +33,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
@@ -68,10 +70,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
-import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
-import lc.xmlns.premisV2.Representation;
 
 /**
  * Model related utility class
@@ -81,6 +81,11 @@ import lc.xmlns.premisV2.Representation;
 public final class ModelUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
+  /**
+   * @deprecated
+   * @see PreservationMetadataType
+   */
+  @Deprecated
   public enum PREMIS_TYPE {
     REPRESENTATION, FILE, EVENT, AGENT, UNKNOWN
   }
@@ -295,6 +300,11 @@ public final class ModelUtils {
       descriptiveMetadataBinaryId);
   }
 
+  public static StoragePath getDescriptiveMetadataStoragePath(DescriptiveMetadata descriptiveMetadata)
+    throws RequestNotValidException {
+    return getDescriptiveMetadataPath(descriptiveMetadata.getAipId(), descriptiveMetadata.getId());
+  }
+
   public static StoragePath getOtherMetadataPath(String aipId, String otherMetadataBinaryId)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
@@ -325,6 +335,17 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  public static StoragePath getRepresentationFilePath(File f) throws RequestNotValidException {
+    // TODO make a better method for getting file path
+    List<String> fileId = new ArrayList<>();
+    if (f.getPath() != null) {
+      fileId.addAll(f.getPath());
+    }
+    fileId.add(f.getId());
+    return getRepresentationFilePath(f.getAipId(), f.getRepresentationId(), fileId.toArray(new String[] {}));
+
+  }
+
   public static String getAIPidFromStoragePath(StoragePath path) {
     return path.getDirectoryPath().get(0);
   }
@@ -332,6 +353,16 @@ public final class ModelUtils {
   public static String getRepresentationIdFromStoragePath(StoragePath path) throws GenericException {
     if (path.getDirectoryPath().size() >= 3) {
       return path.getDirectoryPath().get(2);
+    } else {
+      throw new GenericException(
+        "Error while trying to obtain representation id from storage path (length is not 3 or above)");
+    }
+  }
+
+  public static List<String> getFilePathFromStoragePath(StoragePath path) throws GenericException {
+    List<String> directoryPath = path.getDirectoryPath();
+    if (directoryPath.size() >= 3) {
+      return directoryPath.subList(3, directoryPath.size());
     } else {
       throw new GenericException(
         "Error while trying to obtain representation id from storage path (length is not 3 or above)");
@@ -374,8 +405,8 @@ public final class ModelUtils {
 
   }
 
-  public static Representation getPreservationRepresentationObject(Binary preservationBinary) {
-    Representation representation = null;
+  public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(Binary preservationBinary) {
+    lc.xmlns.premisV2.Representation representation = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
@@ -414,8 +445,8 @@ public final class ModelUtils {
     return event;
   }
 
-  public static File getPreservationFileObject(Binary preservationBinary) {
-    File file = null;
+  public static lc.xmlns.premisV2.File getPreservationFileObject(Binary preservationBinary) {
+    lc.xmlns.premisV2.File file = null;
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = preservationBinary.getContent().createInputStream();
@@ -623,7 +654,8 @@ public final class ModelUtils {
 
   public static <T> List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b, Class<T> c) {
     List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
-    if (c.equals(File.class)) {
+    if (c.equals(lc.xmlns.premisV2.File.class)) {
+      // TODO check if files has agents
       LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
       EventComplexType event = getPreservationEvent(b);
@@ -639,7 +671,7 @@ public final class ModelUtils {
           agents.add(agent);
         }
       }
-    } else if (c.equals(Representation.class)) {
+    } else if (c.equals(lc.xmlns.premisV2.Representation.class)) {
       // TODO
       LOGGER.error("Not implemented!");
     } else {
@@ -692,7 +724,7 @@ public final class ModelUtils {
         if (agent != null) {
           type = PreservationMetadataType.AGENT;
         } else {
-          Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
+          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
           if (representation != null) {
             type = PreservationMetadataType.OBJECT_REPRESENTATION;
           } else {

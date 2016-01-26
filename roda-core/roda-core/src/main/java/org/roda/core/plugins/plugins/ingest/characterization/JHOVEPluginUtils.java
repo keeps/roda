@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Map;
@@ -23,6 +24,7 @@ import org.roda.core.util.FileUtility;
 
 import edu.harvard.hul.ois.jhove.App;
 import edu.harvard.hul.ois.jhove.JhoveBase;
+import edu.harvard.hul.ois.jhove.JhoveException;
 import edu.harvard.hul.ois.jhove.Module;
 import edu.harvard.hul.ois.jhove.OutputHandler;
 

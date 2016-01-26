@@ -297,13 +297,13 @@ public class BrowserHelper {
     ModelService model = RodaCoreFactory.getModelService();
     org.roda.core.data.v2.ip.File file = model.retrieveFile(aipId, representationId, fileId);
 
-    if (file.isFile()) {
+    if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
       Binary binary = storage.getBinary(filePath);
       ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
       zipEntries.add(info);
     } else {
-
+      // TODO add directory zip entry
     }
 
   }

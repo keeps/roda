@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.Stack;
 
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
@@ -78,7 +79,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
-import jersey.repackaged.com.google.common.collect.Sets;
+import com.google.common.collect.Sets;
+
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
@@ -678,7 +680,7 @@ public class ModelService extends ModelObservable {
 
   // FIXME under a certain representation may exist files but also folders.
   // how to handle that in this method?
-  public Iterable<File> listFiles(String aipId, String representationId)
+  public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Iterable<File> it = null;
 
@@ -721,8 +723,172 @@ public class ModelService extends ModelObservable {
     return it;
   }
 
-  // FIXME under a certain representation may exist files but also folders.
-  // how to handle that in this method?
+  public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId, String... fileId)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Iterable<File> it = null;
+
+    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+
+    final Iterator<Resource> iterator = storage.listResourcesUnderDirectory(filePath).iterator();
+
+    it = new Iterable<File>() {
+
+      @Override
+      public Iterator<File> iterator() {
+        return new Iterator<File>() {
+
+          @Override
+          public boolean hasNext() {
+            if (iterator == null) {
+              return true;
+            }
+            return iterator.hasNext();
+          }
+
+          @Override
+          public File next() {
+            try {
+              return convertResourceToRepresentationFile(iterator.next());
+            } catch (GenericException | NoSuchElementException | NotFoundException | AuthorizationDeniedException
+              | RequestNotValidException e) {
+              LOGGER.error("Error while listing representation files", e);
+              return null;
+            }
+          }
+
+          @Override
+          public void remove() {
+            throw new UnsupportedOperationException();
+          }
+        };
+      }
+    };
+
+    return it;
+  }
+
+  public Iterable<File> listAllFiles(final String aipId, final String representationId, final List<String> basePath,
+    final List<String> fileIds)
+      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    final Iterator<String> fileIdIterator = fileIds.iterator();
+
+    Iterable<File> ret = new Iterable<File>() {
+
+      @Override
+      public Iterator<File> iterator() {
+        return new Iterator<File>() {
+
+          Stack<Iterable<File>> itStack = new Stack<Iterable<File>>();
+
+          @Override
+          public boolean hasNext() {
+            boolean hasNext;
+
+            if (itStack.isEmpty()) {
+              hasNext = fileIdIterator.hasNext();
+            } else {
+              hasNext = false;
+              // find a non-empty iterator or empty stack
+              do {
+                if (!itStack.peek().iterator().hasNext()) {
+                  itStack.pop();
+                } else {
+                  hasNext = true;
+                }
+              } while (!hasNext && !itStack.isEmpty());
+
+            }
+            return hasNext;
+          }
+
+          @Override
+          public File next() {
+            File file = null;
+            if (itStack.isEmpty()) {
+              String nextFileId = fileIdIterator.next();
+              List<String> fileIdPath = new ArrayList<>(basePath);
+              fileIdPath.add(nextFileId);
+              try {
+                file = retrieveFile(aipId, representationId, fileIdPath.toArray(new String[] {}));
+              } catch (RequestNotValidException | GenericException | NotFoundException
+                | AuthorizationDeniedException e) {
+                LOGGER.error("Error listing files", e);
+              }
+            } else {
+              file = itStack.peek().iterator().next();
+            }
+
+            try {
+              if (file != null && file.isDirectory()) {
+                List<String> filesDirectlyUnder = file.getFilesDirectlyUnder();
+                if (!filesDirectlyUnder.isEmpty()) {
+                  List<String> fileIdPath = new ArrayList<>(file.getPath());
+                  fileIdPath.add(file.getId());
+                  Iterable<File> subIterable = listAllFiles(aipId, representationId, fileIdPath, filesDirectlyUnder);
+                  itStack.push(subIterable);
+                }
+              }
+            } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+              LOGGER.warn("Error while listing all files", e);
+            }
+
+            return file;
+          }
+        };
+      }
+    };
+
+    return ret;
+
+  }
+
+  public Iterable<File> listAllFiles(String aipId, String representationId)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    final Iterator<File> filesDirectlyUnder = listFilesDirectlyUnder(aipId, representationId).iterator();
+
+    Iterable<File> it = new Iterable<File>() {
+
+      @Override
+      public Iterator<File> iterator() {
+        return new Iterator<File>() {
+
+          Iterator<File> it = null;
+
+          @Override
+          public boolean hasNext() {
+            return it != null ? it.hasNext() : filesDirectlyUnder.hasNext();
+          }
+
+          @Override
+          public File next() {
+            File nextFile;
+            if (it == null) {
+              nextFile = filesDirectlyUnder.next();
+            } else {
+              nextFile = it.next();
+            }
+
+            if (nextFile.isDirectory()) {
+              try {
+                it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder())
+                  .iterator();
+
+              } catch (NotFoundException | GenericException | RequestNotValidException
+                | AuthorizationDeniedException e) {
+                LOGGER.error("Error listing files", e);
+              }
+            }
+            return nextFile;
+          }
+        };
+      }
+    };
+
+    return it;
+  }
+
   public File retrieveFile(String aipId, String representationId, String... fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file;
@@ -1056,12 +1222,13 @@ public class ModelService extends ModelObservable {
     String id = resourcePath.getName();
     String aipId = ModelUtils.getAIPidFromStoragePath(resourcePath);
     String representationId = ModelUtils.getRepresentationIdFromStoragePath(resourcePath);
+    List<String> filePath = ModelUtils.getFilePathFromStoragePath(resourcePath);
 
     if (resource instanceof DefaultBinary) {
       boolean isFile = true;
       List<String> filesDirectlyUnder = null;
 
-      ret = new File(id, aipId, representationId, isFile, filesDirectlyUnder);
+      ret = new File(id, aipId, representationId, filePath, isFile, filesDirectlyUnder);
     } else if (resource instanceof DefaultDirectory) {
       boolean isFile = false;
       List<String> filesDirectlyUnder = new ArrayList<>();
@@ -1077,7 +1244,7 @@ public class ModelService extends ModelObservable {
         LOGGER.warn("Error closing iterable, possible file leak", e);
       }
 
-      ret = new File(resourcePath.getName(), aipId, representationId, isFile, filesDirectlyUnder);
+      ret = new File(resourcePath.getName(), aipId, representationId, filePath, isFile, filesDirectlyUnder);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
@@ -1099,6 +1266,7 @@ public class ModelService extends ModelObservable {
     return representationPreservationObject;
   }
 
+  // FIXME support file path
   public RepresentationFilePreservationObject retrieveRepresentationFileObject(String aipId, String representationId,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     RepresentationFilePreservationObject representationPreservationObject = null;

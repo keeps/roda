@@ -10,8 +10,6 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +25,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -40,6 +39,7 @@ import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -146,9 +146,10 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
     List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
     Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-    for (String fileID : representation.getFileIds()) {
+    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+    for (File file : allFiles) {
       pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationID, pObject,
-        pObjectPartFiles, fileID);
+        pObjectPartFiles, file);
     }
 
     createPremisObjectForRepresentation(model, aip, representationID, pObject, pObjectPartFiles);
@@ -163,30 +164,28 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
     helper.saveToFile(premisRepresentation.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID,null, null,
-      (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation), PREMIS_TYPE.REPRESENTATION);
+    model.createPreservationMetadata(aip.getId(), representationID, null, null,
+      (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation),
+      PREMIS_TYPE.REPRESENTATION);
 
     FSUtils.deletePath(premisRepresentation);
   }
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
     StorageService storage, Path temp, AIP aip, String representationID, RepresentationPreservationObject pObject,
-    List<RepresentationFilePreservationObject> pObjectPartFiles, String fileID)
-      throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException {
-    LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
+    List<RepresentationFilePreservationObject> pObjectPartFiles, File file) throws IOException, PremisMetadataException,
+      RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    LOGGER.debug("Processing file: " + file);
 
-    File file = model.retrieveFile(aip.getId(), representationID, fileID);
-    Binary binary = storage.getBinary(file.getStoragePath());
-    Path pathFile = Paths.get(temp.toString(), file.getStoragePath().getName());
-    Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
+    StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+    Binary binary = storage.getBinary(storagePath);
 
     RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,
       "PremisSkeletonAction");
     Path premis = Files.createTempFile(file.getId(), ".premis.xml");
     PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
     helper.saveToFile(premis.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID,file.getId(),null,
+    model.createPreservationMetadata(aip.getId(), representationID, file.getId(), null,
       (Binary) FSUtils.convertPathToResource(premis.getParent(), premis), PREMIS_TYPE.FILE);
     if (pObject.getRootFile() == null) {
       pObject.setRootFile(premisObject);

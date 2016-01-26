@@ -15,7 +15,6 @@ import java.util.List;
 
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.user.cellview.client.Header;
 
 /**
  * @author Luis Faria
@@ -158,18 +157,12 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0,number} files, {1}")
   @AlternateMessage({"one", "One file, {1}"})
-  String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
-
-  @DefaultMessage("Original")
-  SafeHtml downloadTitleOriginalAndNormalized();
+  String downloadRepresentationInfo(@PluralCount long numberOfFiles, String readableFileSize);
 
   @DefaultMessage("Original")
   SafeHtml downloadTitleOriginal();
 
-  @DefaultMessage("Normalized")
-  SafeHtml downloadTitleNormalized();
-
-  @DefaultMessage("Document")
+  @DefaultMessage("Alternative")
   SafeHtml downloadTitleDefault();
 
   @DefaultMessage("")
@@ -287,7 +280,6 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("OK")
   String dialogOk();
-
 
   /*** View representation ***/
 
@@ -413,7 +405,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Outcome")
   String preservationEventListHeaderOutcome();
-  
+
   /*** Preservation events ***/
 
   @DefaultMessage("Download")
@@ -424,57 +416,55 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Preservation events")
   String preservationEventsTitle();
-  
+
   /*** Preservation event ***/
 
   @DefaultMessage("Preservation event")
   String preservationEventTitle();
-  
+
   @DefaultMessage("Identifier")
   String preservationEventId();
-  
+
   @DefaultMessage("Path")
   String preservationEventPath();
-  
+
   @DefaultMessage("Date")
   String preservationEventDatetime();
-  
+
   @DefaultMessage("Type")
   String preservationEventType();
-  
+
   @DefaultMessage("Detail")
   String preservationEventDetail();
-  
+
   @DefaultMessage("Agents")
   String preservationEventAgentsHeader();
-  
+
   @DefaultMessage("Identifier")
   String preservationEventAgentId();
-  
+
   @DefaultMessage("Role")
   String preservationEventAgentRole();
-  
+
   @DefaultMessage("Objects")
   String preservationEventObjectsHeader();
-  
+
   @DefaultMessage("Identifier")
   String preservationEventObjectId();
-  
+
   @DefaultMessage("Role")
   String preservationEventObjectRole();
-  
+
   @DefaultMessage("Outcome information")
   String preservationEventOutcomeInformationHeader();
-  
+
   @DefaultMessage("Outcome")
   String preservationEventOutcome();
-  
+
   @DefaultMessage("Outcome detail note")
   String preservationEventOutcomeDetailNote();
-  
+
   @DefaultMessage("Outcome detail extension")
   String preservationEventOutcomeDetailExtension();
-
-  
 
 }

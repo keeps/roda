@@ -7,12 +7,6 @@
  */
 package org.roda.core;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
-import org.roda.core.data.v2.ip.RepresentationState;
-
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -35,8 +29,7 @@ public class CorporaConstants {
 
   public static final String REPRESENTATION_1_ID = "representation_1";
   public static final String REPRESENTATION_1_TYPE = "digitalized_work";
-  public static final Set<RepresentationState> REPRESENTATION_1_STATUSES = new HashSet<RepresentationState>(
-    Arrays.asList(RepresentationState.ORIGINAL));
+  public static final boolean REPRESENTATION_1_ORIGINAL = true;
 
   public static final String REPRESENTATION_1_FILE_1_ID = "METS.xml";
   public static final String REPRESENTATION_1_FILE_1_FORMAT_MIMETYPE = "application/xml";
@@ -50,8 +43,7 @@ public class CorporaConstants {
 
   public static final String REPRESENTATION_2_ID = "representation_2";
   public static final String REPRESENTATION_2_TYPE = "digitalized_work";
-  public static final Set<RepresentationState> REPRESENTATION_2_STATUSES = new HashSet<RepresentationState>(
-    Arrays.asList(RepresentationState.NORMALIZED));
+  public static final boolean REPRESENTATION_2_ORIGINAL = false;
 
   public static final String REPRESENTATION_2_FILE_1_ID = "fil_7516.jpg.tiff";
   public static final String REPRESENTATION_2_FILE_1_FORMAT_MIMETYPE = "image/tiff";
@@ -108,7 +100,5 @@ public class CorporaConstants {
 
   public static final int YEAR_1213 = 1213;
   public static final int YEAR_2003 = 2003;
-  
-  
 
 }

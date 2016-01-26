@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -31,6 +32,7 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -125,27 +127,29 @@ public class VeraPDFPlugin implements Plugin<AIP> {
           logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
 
           Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          for (String fileID : representation.getFileIds()) {
-            logger.debug(
-              "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          for (File file : allFiles) {
+            logger.debug("Processing file: " + file);
 
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            if (file.getOriginalName().endsWith(".pdf") && (file.getSize() <= maxKbytes * 1024)) {
-              Binary binary = storage.getBinary(file.getStoragePath());
+            if (!file.isDirectory()) {
+              // TODO filter by file type and size
+              // file.getOriginalName().endsWith(".pdf") && (file.getSize() <=
+              // maxKbytes * 1024)
+              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              Binary binary = storage.getBinary(storagePath);
 
               // FIXME file that doesn't get deleted afterwards
-              logger.debug("Running veraPDF validator on " + fileID);
-              Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent().createInputStream(),
-                file.getStoragePath().asString(), profile, hasFeatures);
+              logger.debug("Running veraPDF validator on " + file.getId());
+              Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent().createInputStream(), file.getId(),
+                profile, hasFeatures);
 
               if (veraPDFResult != null) {
-                resourceList.put(fileID, veraPDFResult);
+                resourceList.put(file.getId(), veraPDFResult);
               } else {
                 state = 2; // partial success or failure
               }
             } else {
-              logger.debug("veraPDF validation did not run on file " + fileID + " of representation " + representationID
-                + " from AIP " + aip.getId());
+              logger.debug("veraPDF validation did not run on file: " + file);
             }
           }
         } catch (Throwable e) {

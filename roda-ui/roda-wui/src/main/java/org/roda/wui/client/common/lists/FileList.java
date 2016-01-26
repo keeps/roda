@@ -22,7 +22,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -61,10 +60,10 @@ public class FileList extends AsyncTableCell<IndexedFile> {
       @Override
       public SafeHtml getValue(IndexedFile file) {
         if (file != null) {
-          if (file.isFile()) {
-            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
-          } else {
+          if (file.isDirectory()) {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+          } else {
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
           }
         } else {
           logger.error("Trying to display a NULL item");

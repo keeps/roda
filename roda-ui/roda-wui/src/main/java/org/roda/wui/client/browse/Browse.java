@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -24,8 +23,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
@@ -534,18 +533,14 @@ public class Browse extends Composite {
   }
 
   @SuppressWarnings("unused")
-  private Widget createRepresentationDownloadPanel(Representation rep) {
+  private Widget createRepresentationDownloadPanel(IndexedRepresentation rep) {
     FlowPanel downloadPanel = new FlowPanel();
     HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
 
     SafeHtml labelText;
-    Set<RepresentationState> statuses = rep.getStatuses();
-    if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
-      labelText = messages.downloadTitleOriginalAndNormalized();
-    } else if (statuses.contains(RepresentationState.ORIGINAL)) {
+
+    if (rep.isOriginal()) {
       labelText = messages.downloadTitleOriginal();
-    } else if (statuses.contains(RepresentationState.NORMALIZED)) {
-      labelText = messages.downloadTitleNormalized();
     } else {
       labelText = messages.downloadTitleDefault();
     }
@@ -554,8 +549,8 @@ public class Browse extends Composite {
 
     Anchor label = new Anchor(labelText,
       Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId()));
-    Label subLabel = new Label(
-      messages.downloadRepresentationInfo(rep.getFileIds().size(), Humanize.readableFileSize(rep.getSizeInBytes())));
+    Label subLabel = new Label(messages.downloadRepresentationInfo(rep.getTotalNumberOfFiles(),
+      Humanize.readableFileSize(rep.getSizeInBytes())));
 
     labelsPanel.add(label);
     labelsPanel.add(subLabel);
@@ -576,13 +571,9 @@ public class Browse extends Composite {
     final String repId = rep.getId();
 
     SafeHtml labelText;
-    Set<RepresentationState> statuses = rep.getStatuses();
-    if (statuses.containsAll(Arrays.asList(RepresentationState.ORIGINAL, RepresentationState.NORMALIZED))) {
-      labelText = messages.downloadTitleOriginalAndNormalized();
-    } else if (statuses.contains(RepresentationState.ORIGINAL)) {
+
+    if (rep.isOriginal()) {
       labelText = messages.downloadTitleOriginal();
-    } else if (statuses.contains(RepresentationState.NORMALIZED)) {
-      labelText = messages.downloadTitleNormalized();
     } else {
       labelText = messages.downloadTitleDefault();
     }

@@ -383,7 +383,6 @@ public final class PluginHelper {
       apo.setAgentName(agentName);
       apo.setAgentType(agentType);
       apo.setId(agentID);
-      apo.setCreatedDate(new Date());
 
       byte[] serializedPremisAgent = new PremisAgentHelper(apo).saveToByteArray();
       Path agentFile = Files.createTempFile("agent_preservation", ".xml");

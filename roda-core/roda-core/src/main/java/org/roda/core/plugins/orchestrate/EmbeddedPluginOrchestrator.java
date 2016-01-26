@@ -265,7 +265,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
         while (repIter.hasNext()) {
           Representation rep = repIter.next();
 
-          Iterable<File> files = model.listFiles(aip.getId(), rep.getId());
+          Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), rep.getId());
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {

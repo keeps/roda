@@ -22,7 +22,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -33,6 +33,7 @@ import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -115,22 +116,21 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
       try {
         for (String representationID : aip.getRepresentationIds()) {
           LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
           List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
-          for (String fileID : representation.getFileIds()) {
-            LOGGER.debug(
-              "Processing file " + fileID + " of representation " + representationID + " from AIP " + aip.getId());
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            Binary binary = storage.getBinary(file.getStoragePath());
+          for (File file : allFiles) {
+            LOGGER.debug("Processing file: " + file);
+            StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+            Binary binary = storage.getBinary(storagePath);
 
             // FIXME file that doesn't get deleted afterwards
             Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
             Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + OUTPUT_EXT,
-              APP_NAME, resource);
+            model.createOtherMetadata(aip.getId(), representationID, file.getId() + OUTPUT_EXT, APP_NAME, resource);
             try {
-              IndexedFile f = index.retrieve(IndexedFile.class, SolrUtils.getId(aip.getId(), representationID, fileID));
+              IndexedFile f = index.retrieve(IndexedFile.class,
+                SolrUtils.getId(aip.getId(), representationID, file.getId()));
 
               Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
               if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {

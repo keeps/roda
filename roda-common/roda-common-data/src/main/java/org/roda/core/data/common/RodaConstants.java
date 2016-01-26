@@ -306,6 +306,7 @@ public final class RodaConstants {
   public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
   public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
   public static final String SRO_SIZE_IN_BYTES = "sizeInBytes";
+  public static final String SRO_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
 
   /*
    * SEPM FIELDS
@@ -445,7 +446,7 @@ public final class RodaConstants {
   public static final String FILE_UUID = "uuid";
   public static final String FILE_ORIGINALNAME = "originalName";
   public static final String FILE_SIZE = "size";
-  public static final String FILE_ISFILE = "isFile";
+  public static final String FILE_ISDIRECTORY = "isDirectory";
   public static final String FILE_PRONOM = "formatPronom";
   public static final String FILE_EXTENSION = "extension";
   public static final String FILE_CREATING_APPLICATION_NAME = "creatingApplicationName";

@@ -7,15 +7,17 @@ public class IndexedRepresentation extends Representation {
   private static final long serialVersionUID = -950545608880793468L;
 
   private long sizeInBytes;
+  private long totalNumberOfFiles;
 
   public IndexedRepresentation() {
     super();
   }
 
-  public IndexedRepresentation(String id, String aipId, boolean original, List<String> directFileIds,
-    long sizeInBytes) {
+  public IndexedRepresentation(String id, String aipId, boolean original, List<String> directFileIds, long sizeInBytes,
+    long totalNumberOfFiles) {
     super(id, aipId, original, directFileIds);
     this.sizeInBytes = sizeInBytes;
+    this.totalNumberOfFiles = totalNumberOfFiles;
   }
 
   public long getSizeInBytes() {
@@ -26,11 +28,20 @@ public class IndexedRepresentation extends Representation {
     this.sizeInBytes = sizeInBytes;
   }
 
+  public long getTotalNumberOfFiles() {
+    return totalNumberOfFiles;
+  }
+
+  public void setTotalNumberOfFiles(long totalNumberOfFiles) {
+    this.totalNumberOfFiles = totalNumberOfFiles;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + (int) (sizeInBytes ^ (sizeInBytes >>> 32));
+    result = prime * result + (int) (totalNumberOfFiles ^ (totalNumberOfFiles >>> 32));
     return result;
   }
 
@@ -45,13 +56,15 @@ public class IndexedRepresentation extends Representation {
     IndexedRepresentation other = (IndexedRepresentation) obj;
     if (sizeInBytes != other.sizeInBytes)
       return false;
+    if (totalNumberOfFiles != other.totalNumberOfFiles)
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "IndexedRepresentation [sizeInBytes=" + sizeInBytes + ", getId()=" + getId() + ", getAipId()=" + getAipId()
-      + ", isOriginal()=" + isOriginal() + ", getFilesDirectlyUnder()=" + getFilesDirectlyUnder() + "]";
+    return "IndexedRepresentation [sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles=" + totalNumberOfFiles
+      + ", super.toString()=" + super.toString() + "]";
   }
 
 }

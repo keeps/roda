@@ -35,12 +35,13 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -104,17 +105,19 @@ public class FFProbePlugin implements Plugin<AIP> {
       for (String representationID : aip.getRepresentationIds()) {
         LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
         try {
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          for (String fileID : representation.getFileIds()) {
-            LOGGER.debug("Processing file " + fileID + " from " + representationID + " of AIP " + aip.getId());
-            File file = model.retrieveFile(aip.getId(), representationID, fileID);
-            Binary binary = storage.getBinary(file.getStoragePath());
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          for (File file : allFiles) {
+            if (!file.isDirectory()) {
+              // TODO check if file is a video
+              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              Binary binary = storage.getBinary(storagePath);
 
-            Path ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());
-            Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
-            model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
-              "FFProbe", resource);
-            ffProbeResults.toFile().delete();
+              Path ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());
+              Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
+              // TODO support file path
+              model.createOtherMetadata(aip.getId(), representationID, file + ".xml", "FFProbe", resource);
+              ffProbeResults.toFile().delete();
+            }
           }
         } catch (RODAException | IOException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());

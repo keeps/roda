@@ -44,18 +44,5 @@ public interface Binary extends Resource {
    */
   public Map<String, String> getContentDigest();
 
-  /**
-   * OTHER METHODS TO CONSIDER:
-   * 
-   * 
-   * * Get file format of the binary content.
-   * 
-   * Example: {("mime", "application/pdf"), ("pronom", "fmt/13")}
-   * 
-   * public Map<String, String> getContentFileFormat();
-   * 
-   * Chance also to just add the getMimeType() as more systems support this
-   * out-of-the-box.
-   * 
-   */
+
 }

@@ -32,7 +32,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.mutable.MutableLong;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -48,8 +47,6 @@ import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jersey.repackaged.com.google.common.collect.Sets;
 
 /**
  * File System related utility class
@@ -419,7 +416,6 @@ public final class FSUtils {
           }
         });
 
-        metadata.put(RodaConstants.STORAGE_META_SIZE_IN_BYTES, Sets.newHashSet(Long.toString(size.longValue())));
         resource = new DefaultDirectory(storagePath, metadata);
       } catch (IOException e) {
         throw new GenericException("Could not get file size", e);
@@ -429,27 +425,13 @@ public final class FSUtils {
       long sizeInBytes;
       try {
         sizeInBytes = Files.size(path);
-        Map<String, String> contentDigest = FSUtils.obtainContentDigest(metadata);
+        Map<String, String> contentDigest = null;
         resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
       } catch (IOException e) {
         throw new GenericException("Could not get file size", e);
       }
     }
     return resource;
-  }
-
-  private static Map<String, String> obtainContentDigest(Map<String, Set<String>> metadata) {
-    Map<String, String> digest = new HashMap<String, String>();
-
-    if (metadata != null) {
-      Set<String> digestValue = metadata.get(RodaConstants.STORAGE_META_DIGEST_SHA1);
-
-      if (digestValue != null && digestValue.size() == 1) {
-        digest.put(RodaConstants.STORAGE_META_DIGEST_SHA1, digestValue.iterator().next());
-      }
-    }
-
-    return digest;
   }
 
   /**
@@ -480,30 +462,6 @@ public final class FSUtils {
       throw new GenericException("A file is not a container!");
     }
     return resource;
-  }
-
-  /**
-   * Method for computing a file content digest (a.k.a. hash) using
-   * <code>MD5</code> algorithm.
-   * 
-   * @param path
-   *          file which digest will be computed
-   * @throws GenericException
-   */
-  public static String computeContentDigestMD5(Path path) throws GenericException {
-    return computeContentDigest(path, RodaConstants.MD5);
-  }
-
-  /**
-   * Method for computing a file content digest (a.k.a. hash) using
-   * <code>SHA-1</code> algorithm.
-   * 
-   * @param path
-   *          file which digest will be computed
-   * @throws GenericException
-   */
-  public static String computeContentDigestSHA1(Path path) throws GenericException {
-    return computeContentDigest(path, RodaConstants.SHA1);
   }
 
   private static String computeContentDigest(Path path, String algorithm) throws GenericException {
@@ -555,13 +513,15 @@ public final class FSUtils {
    *          file which digests will be computed
    * @throws GenericException
    */
-  public static Map<String, String> generateContentDigest(Path path) throws GenericException {
-    Map<String, String> digest = new HashMap<String, String>(1);
+  public static Map<String, String> generateContentDigest(Path path, String... algorithms) throws GenericException {
+    Map<String, String> digests = new HashMap<String, String>();
 
-    String pathDigest = computeContentDigestSHA1(path);
-    digest.put(RodaConstants.STORAGE_META_DIGEST_SHA1, pathDigest);
+    for (String algorithm : algorithms) {
+      String digest = computeContentDigest(path, algorithm);
+      digests.put(algorithm, digest);
+    }
 
-    return digest;
+    return digests;
   }
 
   public static Path createRandomDirectory(Path parent) throws IOException {
