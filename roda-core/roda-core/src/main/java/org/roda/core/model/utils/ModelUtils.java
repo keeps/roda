@@ -50,7 +50,6 @@ import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
@@ -217,7 +216,7 @@ public final class ModelUtils {
    *          metadata
    * @param key
    *          metadata key
-   * @throws ModelServiceException
+   * @throws GenericException
    */
   public static String getString(Map<String, Set<String>> metadata, String key) throws GenericException {
     String ret;

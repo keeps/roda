@@ -32,7 +32,7 @@ import edu.harvard.hul.ois.fits.FitsOutput;
 import edu.harvard.hul.ois.fits.exceptions.FitsException;
 
 public class FITSPluginUtils {
-  static final private Logger logger = LoggerFactory.getLogger(FITSPluginUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(FITSPluginUtils.class);
 
   public static Path inspect(File f) throws FitsException {
     try {

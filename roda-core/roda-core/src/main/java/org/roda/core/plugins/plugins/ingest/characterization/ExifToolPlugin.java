@@ -25,13 +25,11 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
@@ -128,8 +126,8 @@ public class ExifToolPlugin implements Plugin<AIP> {
           }
           FSUtils.deletePath(data);
           FSUtils.deletePath(metadata);
-        } catch (RODAException | IOException | CommandException sse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } catch (RODAException | IOException | CommandException e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
         }
       }
     }

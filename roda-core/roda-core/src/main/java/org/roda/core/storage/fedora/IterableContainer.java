@@ -22,7 +22,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 
 /**

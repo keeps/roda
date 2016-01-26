@@ -39,7 +39,6 @@ import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -188,8 +187,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-      } catch (PluginException | IOException | ModelServiceException | NotFoundException | GenericException
-        | RequestNotValidException | AuthorizationDeniedException | AlreadyExistsException e) {
+      } catch (PluginException | IOException | NotFoundException | GenericException | RequestNotValidException
+        | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;

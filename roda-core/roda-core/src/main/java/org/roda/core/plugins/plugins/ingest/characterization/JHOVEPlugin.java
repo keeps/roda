@@ -22,12 +22,10 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,13 +93,8 @@ public class JHOVEPlugin implements Plugin<AIP> {
             jhoveResults.toFile().delete();
           }
         }
-      } catch (ModelServiceException mse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
-      } catch (StorageServiceException sse) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
       } catch (Exception e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
       }
     }
     return null;

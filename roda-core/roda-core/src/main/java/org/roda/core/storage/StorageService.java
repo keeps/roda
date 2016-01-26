@@ -10,8 +10,8 @@ package org.roda.core.storage;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -42,7 +42,6 @@ public interface StorageService {
   /**
    * List all existing containers.
    * 
-   * @return
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -73,8 +72,7 @@ public interface StorageService {
    * 
    * @param name
    *          storage path that identifies the container.
-   * @return
-   * @throws StorageServiceException
+   * 
    * @throws GenericException
    * @throws RequestNotValidException
    * @throws NotFoundException
@@ -88,7 +86,7 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the container.
-   * @return
+   * 
    * @throws GenericException
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
@@ -101,7 +99,6 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the container.
-   * @return
    * 
    * @throws GenericException
    * @throws NotFoundException
@@ -116,9 +113,7 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the container.
-   * @return
    * 
-   * @throws StorageServiceException
    * @throws AuthorizationDeniedException
    * @throws GenericException
    * @throws NotFoundException
@@ -168,7 +163,6 @@ public interface StorageService {
    * @param storagePath
    *          storage path that identifies the directory
    * 
-   * @return
    * @throws RequestNotValidException
    * @throws GenericException
    * @throws NotFoundException
@@ -182,7 +176,6 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the directory
-   * @return
    * 
    * @throws GenericException
    * @throws NotFoundException
@@ -197,7 +190,6 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the directory
-   * @return
    * 
    * @throws GenericException
    * @throws NotFoundException
@@ -220,6 +212,7 @@ public interface StorageService {
    *          create the binary as a reference to the real content, which is
    *          managed externally. If false, content should be copied into the
    *          storage service.
+   *
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws RequestNotValidException
@@ -243,7 +236,7 @@ public interface StorageService {
    *          create the binary as a reference to the real content, which is
    *          managed externally. If false, content should be copied into the
    *          storage service.
-   * @throws StorageServiceException
+   *
    * @throws GenericException
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
@@ -258,11 +251,11 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the binary
-   * @return
+   *
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
-   * @throws StorageServiceException
+   * 
    */
   public Binary getBinary(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
@@ -285,7 +278,6 @@ public interface StorageService {
    *          {@link StorageServiceException} will be thrown with code
    *          <code>StorageActionException.NOT_FOUND</code>.
    * 
-   * @return
    * @throws GenericException
    * @throws NotFoundException
    * @throws RequestNotValidException
@@ -313,7 +305,7 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the resource
-   * @return
+   *
    * @throws GenericException
    * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
@@ -332,19 +324,22 @@ public interface StorageService {
    *          replaced by the new one; false indicates that existing metadata
    *          will be updated to the new values (by replacing the old values
    *          with the new ones)
+   *
    * @throws GenericException
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
   public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
+    boolean replaceAll)
+      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Get entity class
    * 
    * @param storagePath
    *          storage path that identifies the resource
+   *
    * @throws GenericException
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
@@ -358,17 +353,13 @@ public interface StorageService {
    * 
    * @param fromService
    * @param fromContainer
-   * @param fromPath
-   * @param fromName
-   * @param toContainer
-   * @param toPath
-   * @param toName
+   * @param toStoragePath
+   * 
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws NotFoundException
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
-   * @throws StorageServiceException
    */
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
@@ -378,12 +369,9 @@ public interface StorageService {
    * TODO
    * 
    * @param fromService
-   * @param fromContainer
-   * @param fromPath
-   * @param fromName
-   * @param toContainer
-   * @param toPath
-   * @param toName
+   * @param fromStoragePath
+   * @param toStoragePath
+   * 
    * @throws GenericException
    * @throws AlreadyExistsException
    * @throws NotFoundException

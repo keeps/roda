@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 public class SiegfriedPluginUtils {
 
-  static final private Logger logger = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
@@ -52,7 +52,7 @@ public class SiegfriedPluginUtils {
         return siegfriedOutput.split("\\n")[0].split(" ")[1];
       }
     } catch (CommandException ce) {
-      logger.error("Error getting siegfried version: " + ce.getMessage(), ce);
+      LOGGER.error("Error getting siegfried version: " + ce.getMessage(), ce);
     }
     return version;
   }

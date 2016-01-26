@@ -38,6 +38,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
@@ -50,7 +51,6 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -1852,7 +1852,7 @@ public class ModelService extends ModelObservable {
     notifyJobReportUpdated(jobReport);
   }
 
-  public void updateFileFormats(List<IndexedFile> updatedFiles) throws ModelServiceException {
+  public void updateFileFormats(List<IndexedFile> updatedFiles) {
     for (IndexedFile file : updatedFiles) {
       // update PREMIS
       try {
