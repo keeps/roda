@@ -18,7 +18,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
-import org.roda.core.data.common.RODAClientException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +62,9 @@ public abstract class CacheController {
    * @param cacheFile
    *          the cache directory, where resources must be created
    */
-//  protected abstract void createResources(HttpServletRequest request, RepresentationObject rep, String cacheURL,
-//    File cacheFile) throws Exception;
+  // protected abstract void createResources(HttpServletRequest request,
+  // RepresentationObject rep, String cacheURL,
+  // File cacheFile) throws Exception;
 
   /**
    * After creating resources, if needed send a response to user
@@ -89,13 +89,12 @@ public abstract class CacheController {
    * @param response
    *          the servlet response
    * @throws IOException
-   * @throws RODAClientException
    * @throws NoSuchRODAObjectException
    * @throws LoginException
    * @throws BrowserException
    */
-  public void get(String pid, final HttpServletRequest request, HttpServletResponse response) throws IOException,
-    BrowserException, LoginException, NotFoundException, RODAClientException {
+  public void get(String pid, final HttpServletRequest request, HttpServletResponse response)
+    throws IOException, BrowserException, LoginException, NotFoundException {
     // String servletUrl = RodaClientFactory.getServletUrl(request);
     // final String cacheURL = Cache.getCacheUrl(request);
     // if (waitingForResources.contains(pid)) {

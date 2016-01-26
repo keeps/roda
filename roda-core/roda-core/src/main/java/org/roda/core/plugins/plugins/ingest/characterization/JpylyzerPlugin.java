@@ -31,7 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -116,8 +116,8 @@ public class JpylyzerPlugin implements Plugin<AIP> {
               model.createOtherMetadata(aip.getId(), representationID, file.getStoragePath().getName() + ".xml",
                 "jpylyzer", resource);
               ffProbeResults.toFile().delete();
-            } catch (RODAException | IOException | PluginException sse) {
-              LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+            } catch (RODAException | IOException e) {
+              LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
             }
           }
         } catch (RODAException mse) {

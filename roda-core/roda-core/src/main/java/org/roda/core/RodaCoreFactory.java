@@ -71,7 +71,6 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
 import org.roda.core.data.common.RodaConstants.SolrType;
@@ -79,6 +78,7 @@ import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -537,7 +537,7 @@ public class RodaCoreFactory {
     essentialDirectories
       .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
-      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve("html"));
+      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve(RodaConstants.CORE_HTML_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));

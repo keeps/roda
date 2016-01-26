@@ -14,20 +14,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -132,7 +131,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), state, success ? "" : "Error", outcomeDetail);
       }
-    } catch (PremisMetadataException | IOException | RODAException e) {
+    } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
 

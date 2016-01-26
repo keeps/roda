@@ -11,6 +11,10 @@
 	</parent>
 	<dependencies>
 		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-common-data</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 		</dependency>

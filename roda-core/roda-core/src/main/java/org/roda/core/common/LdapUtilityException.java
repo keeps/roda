@@ -10,7 +10,7 @@
  */
 package org.roda.core.common;
 
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 
 /**
  * @author Rui Castro

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -119,8 +119,8 @@ public class FITSPlugin implements Plugin<AIP> {
           }
           FSUtils.deletePath(data);
           FSUtils.deletePath(output);
-        } catch (RODAException | PluginException | IOException sse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } catch (RODAException | IOException e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
         }
       }
 

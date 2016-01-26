@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that the specified email was is already used.

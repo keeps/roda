@@ -13,7 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.roda.core.common.ServiceException;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.common.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.client.GenericException;

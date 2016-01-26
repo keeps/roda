@@ -26,7 +26,7 @@ import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.management.statistics.client.Segmentation;

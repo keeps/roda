@@ -357,7 +357,7 @@ public final class PluginHelper {
         PluginHelper.createPluginEvent(aip.getId(), representationID, model, eventType, eventDetails, agentRole,
           agent.getId(), Arrays.asList(representationID), state, success ? "" : "Error", detailExtension);
       }
-    } catch (PremisMetadataException | IOException | RODAException e) {
+    } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }

@@ -12,8 +12,8 @@ package org.roda.wui.client.common;
 
 import java.util.Map;
 
-import org.roda.core.data.common.AuthenticationDeniedException;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.client.GenericException;
 

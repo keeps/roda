@@ -157,39 +157,9 @@
 			org.roda.wui.server.browse.BrowserServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>ReportService</servlet-name>
-		<servlet-class>org.roda.wui.common.server.ReportServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<description>
-		Download report in PDF</description>
-		<display-name>ReportDownload</display-name>
-		<servlet-name>ReportDownload</servlet-name>
-		<servlet-class>org.roda.wui.common.server.ReportDownload</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>StatisticsService</servlet-name>
 		<servlet-class>
 			org.roda.wui.management.statistics.server.StatisticsServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
-		<description>
-		Download metadata in XML</description>
-		<display-name>MetadataDownload</display-name>
-		<servlet-name>MetadataDownload</servlet-name>
-		<servlet-class>org.roda.wui.common.server.MetadataDownload</servlet-class>
-	</servlet>
-	<servlet>
-		<description>Download complete AIP</description>
-		<display-name>AIPDownload</display-name>
-		<servlet-name>AIPDownload</servlet-name>
-		<servlet-class>org.roda.wui.common.server.AIPDownload</servlet-class>
-	</servlet>
-	<servlet>
-		<description>Download complete DIP</description>
-		<display-name>DIPDownload</display-name>
-		<servlet-name>DIPDownload</servlet-name>
-		<servlet-class>org.roda.wui.common.server.DIPDownload</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -217,28 +187,8 @@
 		<url-pattern>/org.roda.wui.RodaWUI/browserservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>ReportService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/reportservice</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>ReportDownload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/ReportDownload</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
 		<servlet-name>StatisticsService</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/StatisticsService</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>MetadataDownload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/MetadataDownload</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>AIPDownload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/AIPDownload</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>DIPDownload</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/DIPDownload</url-pattern>
 	</servlet-mapping>
 
 

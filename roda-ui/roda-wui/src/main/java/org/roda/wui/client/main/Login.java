@@ -13,7 +13,7 @@ package org.roda.wui.client.main;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.welcome.Welcome;

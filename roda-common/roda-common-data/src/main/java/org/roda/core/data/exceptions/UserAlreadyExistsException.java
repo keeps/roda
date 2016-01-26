@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 /**
  * Thrown to indicate that an User with the same name already exists when a new

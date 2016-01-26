@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;

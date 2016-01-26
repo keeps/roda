@@ -7,7 +7,7 @@
  */
 package org.roda.core.plugins;
 
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 
 /**
  * Thrown to indicate that some went wrong inside a {@link PluginManager}.

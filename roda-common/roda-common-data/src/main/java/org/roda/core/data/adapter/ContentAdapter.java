@@ -19,6 +19,10 @@ import org.roda.core.data.adapter.sublist.Sublist;
  * to parameters specified in the {@link ContentAdapter}.
  * 
  * @author Rui Castro
+ * 
+ * @deprecated 20160125 hsilva: there is no need to use contentadapter anymore,
+ *             so any code that still uses it should be changed
+ * 
  */
 public class ContentAdapter implements Serializable {
   private static final long serialVersionUID = -8788804279413264171L;

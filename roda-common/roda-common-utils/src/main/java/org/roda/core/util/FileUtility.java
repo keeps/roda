@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.transaction.util.FileHelper;
+import org.roda.core.data.common.RodaConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +45,11 @@ public class FileUtility {
       } catch (FileNotFoundException e) {
         LOGGER.debug("Couldn't find static configuration file - " + staticConfig);
         LOGGER.debug("Using internal configuration");
-        ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
+        ret = FileUtility.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + relativePath);
       }
     } else {
       LOGGER.debug("Using internal configuration");
-      ret = FileUtility.class.getResourceAsStream("/config/" + relativePath);
+      ret = FileUtility.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + relativePath);
     }
     return ret;
   }

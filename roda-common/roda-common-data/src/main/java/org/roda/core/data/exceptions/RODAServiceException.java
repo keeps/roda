@@ -5,26 +5,21 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 /**
  * Thrown when something wrong happens inside a RODA service and the request
  * could not be complete.
- * <p>
- * This class is abstract and cannot be instantiated. Specific service runtime
- * exceptions must extend {@link RODAServiceRuntimeException} to provide more
- * detailed error information.
- * </p>
  * 
  * @author Rui Castro
  */
-public abstract class RODAServiceRuntimeException extends RODARuntimeException {
-  private static final long serialVersionUID = 3043032404754693116L;
+public class RODAServiceException extends RODAException {
+  private static final long serialVersionUID = 4068129466745626125L;
 
   /**
    * Constructs a new RODAServiceException.
    */
-  public RODAServiceRuntimeException() {
+  public RODAServiceException() {
   }
 
   /**
@@ -32,7 +27,7 @@ public abstract class RODAServiceRuntimeException extends RODARuntimeException {
    * 
    * @param message
    */
-  public RODAServiceRuntimeException(String message) {
+  public RODAServiceException(String message) {
     super(message);
   }
 
@@ -41,7 +36,7 @@ public abstract class RODAServiceRuntimeException extends RODARuntimeException {
    * 
    * @param cause
    */
-  public RODAServiceRuntimeException(Throwable cause) {
+  public RODAServiceException(Throwable cause) {
     super(cause);
   }
 
@@ -52,7 +47,7 @@ public abstract class RODAServiceRuntimeException extends RODARuntimeException {
    * @param message
    * @param cause
    */
-  public RODAServiceRuntimeException(String message, Throwable cause) {
+  public RODAServiceException(String message, Throwable cause) {
     super(message, cause);
   }
 

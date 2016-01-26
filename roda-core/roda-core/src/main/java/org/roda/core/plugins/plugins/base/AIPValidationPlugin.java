@@ -15,7 +15,7 @@ import java.util.Map;
 
 import org.roda.core.common.ValidationReport;
 import org.roda.core.common.ValidationUtils;
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
@@ -151,7 +151,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), success ? PluginState.SUCCESS : PluginState.FAILURE, "Report", "");
       }
-    } catch (PremisMetadataException | IOException | RODAException e) {
+    } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
 

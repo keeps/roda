@@ -10,8 +10,8 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.common.LoggerException;
 import org.roda.core.data.common.LoginException;
+import org.roda.core.data.exceptions.LoggerException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.RemoteService;

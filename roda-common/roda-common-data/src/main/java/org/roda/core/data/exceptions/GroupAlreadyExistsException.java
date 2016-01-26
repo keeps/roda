@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 import org.roda.core.data.v2.user.Group;
 

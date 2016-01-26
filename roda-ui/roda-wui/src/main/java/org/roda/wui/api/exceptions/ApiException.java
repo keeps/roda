@@ -7,7 +7,7 @@
  */
 package org.roda.wui.api.exceptions;
 
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 
 public class ApiException extends RODAException {
   private static final long serialVersionUID = 4667937307148805083L;

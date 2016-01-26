@@ -17,7 +17,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;

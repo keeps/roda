@@ -7,7 +7,7 @@
  */
 package org.roda.core.plugins;
 
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 

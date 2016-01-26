@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -30,11 +30,11 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -114,7 +114,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
             new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-        } catch (RODAException | PremisMetadataException e) {
+        } catch (RODAException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;

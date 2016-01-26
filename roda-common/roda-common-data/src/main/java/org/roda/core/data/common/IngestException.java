@@ -11,6 +11,9 @@ package org.roda.core.data.common;
  * Thrown to indicate that an ingest error occurred.
  * 
  * @author Rui Castro
+ * 
+ * @deprecated 20160126 hsilva: this exception should not be used and therefore
+ *             will be removed ASAP
  */
 public class IngestException extends EditorException {
   private static final long serialVersionUID = -3123133514163489091L;

@@ -20,7 +20,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;

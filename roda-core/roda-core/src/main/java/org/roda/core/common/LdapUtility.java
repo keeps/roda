@@ -38,16 +38,15 @@ import javax.naming.directory.SearchResult;
 import javax.naming.ldap.LdapName;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.common.AuthenticationDeniedException;
-import org.roda.core.data.common.EmailAlreadyExistsException;
-import org.roda.core.data.common.GroupAlreadyExistsException;
-import org.roda.core.data.common.IllegalOperationException;
-import org.roda.core.data.common.InvalidTokenException;
-import org.roda.core.data.common.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.GroupAlreadyExistsException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
@@ -253,12 +252,12 @@ public class LdapUtility {
   // }
 
   /**
-   * Return the users that match the given {@link ContentAdapter}.
+   * Return the users that match the given.
    * 
-   * @param contentAdapter
-   *          the {@link ContentAdapter}.
+   * @param filter
+   *          the {@link Filter}.
    * 
-   * @return an array of {@link User}'s.
+   * @return a list of {@link User}'s.
    * 
    * @throws LdapUtilityException
    */
@@ -700,9 +699,9 @@ public class LdapUtility {
   // }
 
   /**
-   * Return groups that match the given {@link ContentAdapter}.
+   * Return groups that match the given {@link Filter}.
    * 
-   * @param contentAdapter
+   * @param filter
    * 
    * @return an array of {@link Group}'s.
    * 

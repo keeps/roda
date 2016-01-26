@@ -26,8 +26,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;

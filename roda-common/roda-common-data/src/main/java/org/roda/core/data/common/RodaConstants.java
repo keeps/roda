@@ -70,6 +70,7 @@ public final class RodaConstants {
   public static final String CORE_AIP_FOLDER = "aip";
   public static final String CORE_PLUGINS_FOLDER = "plugins";
   public static final String CORE_DISSEMINATION_FOLDER = "dissemination";
+  public static final String CORE_HTML_FOLDER = "html";
   public static final String CORE_INGEST_FOLDER = "ingest";
   public static final String CORE_LOG_FOLDER = "log";
   public static final String CORE_SCHEMAS_FOLDER = "schemas";

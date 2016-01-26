@@ -7,11 +7,15 @@
  */
 package org.roda.core.data.common;
 
+import org.roda.core.data.exceptions.RODAServiceException;
+
 /**
  * Thrown to indicate that an error occurred in the Editor service.
  * 
  * @author Rui Castro
  * 
+ * @deprecated 20160126 hsilva: this exception should not be used and therefore
+ *             will be removed ASAP
  */
 public class EditorException extends RODAServiceException {
   private static final long serialVersionUID = -7078545640376891807L;

@@ -39,7 +39,6 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -175,7 +174,7 @@ public class IndexModelObserver implements ModelObserver {
         file.getId() + ".premis.xml");
     } catch (NotFoundException e) {
       LOGGER.warn("On indexing representations, did not find PREMIS for file: " + file);
-    } catch (PremisMetadataException | RODAException | IOException e) {
+    } catch (RODAException | IOException e) {
       LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
     }
 

@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.common;
 
+import org.roda.core.data.exceptions.RODAServiceException;
+
 /**
  * Thrown to indicate that the login failed because of invalid credentials.
  * 

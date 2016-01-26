@@ -5,10 +5,10 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.exceptions;
 
 /**
- * Thrown to indicate that some error occured in the Logger.
+ * Thrown to indicate that some error occurred in the Logger.
  * 
  * @author Rui Castro
  */

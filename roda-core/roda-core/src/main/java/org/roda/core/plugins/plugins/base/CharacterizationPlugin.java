@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;

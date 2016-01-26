@@ -16,7 +16,7 @@ import java.util.List;
 import org.roda.core.data.StatisticData;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.common.client.PrintReportException;
 
 import com.google.gwt.core.client.GWT;

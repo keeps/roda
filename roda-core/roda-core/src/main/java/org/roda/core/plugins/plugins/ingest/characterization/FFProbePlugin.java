@@ -31,7 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -41,12 +41,10 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -118,8 +116,8 @@ public class FFProbePlugin implements Plugin<AIP> {
               "FFProbe", resource);
             ffProbeResults.toFile().delete();
           }
-        } catch (RODAException | IOException | PluginException sse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } catch (RODAException | IOException e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
         }
 
       }

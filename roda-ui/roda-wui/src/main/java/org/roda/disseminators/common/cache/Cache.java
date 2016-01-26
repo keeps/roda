@@ -21,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.roda.core.data.common.BrowserException;
 import org.roda.core.data.common.LoginException;
-import org.roda.core.data.common.RODAClientException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +34,8 @@ import org.slf4j.LoggerFactory;
 public class Cache extends HttpServlet implements Servlet {
 
   /**
-	 * 
-	 */
+   * 
+   */
   private static final long serialVersionUID = 1L;
 
   private static File cacheDir = null;
@@ -124,10 +123,9 @@ public class Cache extends HttpServlet implements Servlet {
    * @throws NoSuchRODAObjectException
    * @throws GWTServiceException
    * @throws RemoteException
-   * @throws RODAClientException
    */
-  public boolean isCached(HttpServletRequest request, String pid, String disseminatorName) throws BrowserException,
-    LoginException, NotFoundException, RemoteException, RODAClientException {
+  public boolean isCached(HttpServletRequest request, String pid, String disseminatorName)
+    throws BrowserException, LoginException, NotFoundException, RemoteException {
     return isCached(pid, disseminatorName);
   }
 
@@ -158,11 +156,10 @@ public class Cache extends HttpServlet implements Servlet {
    * @throws LoginException
    * @throws RemoteException
    * @throws NoSuchRODAObjectException
-   * @throws RODAClientException
    * @throws GWTServiceException
    */
   public static File getCacheFile(HttpServletRequest request, final String pid, final String disseminatorName)
-    throws BrowserException, LoginException, RemoteException, NotFoundException, RODAClientException {
+    throws BrowserException, LoginException, RemoteException, NotFoundException {
     return getCacheFile(pid, disseminatorName);
   }
 
@@ -176,15 +173,13 @@ public class Cache extends HttpServlet implements Servlet {
    * @param path
    * @return the cached resource
    * @throws GWTServiceException
-   * @throws RODAClientException
    * @throws NoSuchRODAObjectException
    * @throws RemoteException
    * @throws LoginException
    * @throws BrowserException
    */
   public static File getCacheResource(HttpServletRequest request, final String pid, final String disseminatorName,
-    String path) throws BrowserException, LoginException, RemoteException, NotFoundException,
-    RODAClientException {
+    String path) throws BrowserException, LoginException, RemoteException, NotFoundException {
     return new File(getCacheFile(request, pid, disseminatorName).getAbsolutePath() + path);
 
   }

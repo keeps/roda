@@ -16,8 +16,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.tika.exception.TikaException;
-import org.roda.core.data.common.InvalidParameterException;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
-import org.roda.core.data.common.InvalidParameterException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -31,7 +31,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
@@ -160,7 +159,7 @@ public class FixityPlugin implements Plugin<AIP> {
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
             }
-          } catch (IOException | RODAException | PremisMetadataException e) {
+          } catch (IOException | RODAException e) {
             LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             EventPreservationObject epo;
             try {
@@ -171,7 +170,7 @@ public class FixityPlugin implements Plugin<AIP> {
                 Arrays.asList(representationID), PluginState.PARTIAL_SUCCESS, "Reason",
                 "<p>" + e.getMessage() + "</p>");
               notifyUserOfFixityCheckUndetermined(representationID, epo, e.getMessage());
-            } catch (PremisMetadataException | RODAException | IOException e1) {
+            } catch (RODAException | IOException e1) {
               LOGGER
                 .error("Error creating premis event for representation " + representationID + " of AIP " + aip.getId());
             }

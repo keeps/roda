@@ -7,7 +7,7 @@
  */
 package org.roda.wui.common.client;
 
-import org.roda.core.data.common.RODAException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.jobs.Report;
 
 import com.google.gwt.core.client.GWT;
