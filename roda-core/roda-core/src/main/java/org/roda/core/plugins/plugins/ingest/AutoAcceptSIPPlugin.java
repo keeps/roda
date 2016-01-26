@@ -126,7 +126,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       boolean success = (state == PluginState.SUCCESS);
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), state, success ? "" : "Error", outcomeDetail);

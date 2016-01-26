@@ -27,8 +27,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.RepresentationPreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -162,7 +162,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
     helper.saveToFile(premisRepresentation.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID, "representation.premis.xml",
+    model.createPreservationMetadata(aip.getId(), representationID,null, "representation.premis.xml",
       (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
 
     FSUtils.deletePath(premisRepresentation);
@@ -185,7 +185,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premis = Files.createTempFile(file.getId(), ".premis.xml");
     PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
     helper.saveToFile(premis.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID, file.getId() + ".premis.xml",
+    model.createPreservationMetadata(aip.getId(), representationID,file.getId(), file.getId() + ".premis.xml",
       (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
     if (pObject.getRootFile() == null) {
       pObject.setRootFile(premisObject);

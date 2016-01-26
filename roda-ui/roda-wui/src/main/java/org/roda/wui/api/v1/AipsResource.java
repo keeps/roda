@@ -480,12 +480,13 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, inputStream, fileDetail);
+    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId,inputStream, fileDetail);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -500,12 +501,13 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, inputStream, fileDetail);
+    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId, inputStream, fileDetail);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -524,10 +526,8 @@ public class AipsResource {
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-    // delegate action to controller
-    Browser.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(user, aipId, representationId, fileId);
-
-    // FIXME give a better answer
+   
+    //TODO implement...
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 }

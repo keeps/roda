@@ -201,7 +201,7 @@ public final class PluginHelper {
 
   }
 
-  public static EventPreservationObject createPluginEvent(String aipID, String representationID, ModelService model,
+  public static EventPreservationObject createPluginEvent(String aipID, String representationID, String fileID, ModelService model,
     String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs,
     PluginState outcome, String detailNote, String detailExtension) throws PremisMetadataException, IOException,
       RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
@@ -233,11 +233,7 @@ public final class PluginHelper {
     Path file = Files.createTempFile("preservation", ".xml");
     Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
     Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-    if (representationID == null) { // "AIP Event"
-      model.createPreservationMetadata(aipID, name, resource);
-    } else { // "Representation Event"
-      model.createPreservationMetadata(aipID, representationID, name, resource);
-    }
+    model.createPreservationMetadata(aipID,representationID,fileID, name, resource);
     return epo;
   }
 
@@ -335,9 +331,8 @@ public final class PluginHelper {
         Path agentFile = Files.createTempFile("agent_preservation", ".xml");
         Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
         Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-        model.createAgentMetadata(agent.getId(), agentResource);
-      } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
-        | AlreadyExistsException | AuthorizationDeniedException ee) {
+        model.createPreservationMetadata(null, null, null, agent.getId(), agentResource);
+      } catch (RequestNotValidException | PremisMetadataException | IOException | GenericException | NotFoundException | AuthorizationDeniedException ee) {
         LOGGER.error("Error creating PREMIS agent", e);
       }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
@@ -354,7 +349,7 @@ public final class PluginHelper {
 
       for (String representationID : aip.getRepresentationIds()) {
 
-        PluginHelper.createPluginEvent(aip.getId(), representationID, model, eventType, eventDetails, agentRole,
+        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model, eventType, eventDetails, agentRole,
           agent.getId(), Arrays.asList(representationID), state, success ? "" : "Error", detailExtension);
       }
     } catch (IOException | RODAException e) {
@@ -393,7 +388,7 @@ public final class PluginHelper {
       Path agentFile = Files.createTempFile("agent_preservation", ".xml");
       Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
       Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-      model.createAgentMetadata(agentID, agentResource);
+      model.createPreservationMetadata(null, null, null, agentID, agentResource);
     }
 
     byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
@@ -401,11 +396,6 @@ public final class PluginHelper {
     Files.copy(new ByteArrayInputStream(serializedPremisEvent), eventFile, StandardCopyOption.REPLACE_EXISTING);
     Binary eventResource = (Binary) FSUtils.convertPathToResource(eventFile.getParent(), eventFile);
 
-    if (representationID == null) { // "AIP Event"
-      model.createPreservationMetadata(aipID, name, eventResource);
-    } else { // "Representation Event"
-      model.createPreservationMetadata(aipID, representationID, name, eventResource);
-    }
-
+    model.createPreservationMetadata(aipID, representationID,null, name, eventResource);
   }
 }

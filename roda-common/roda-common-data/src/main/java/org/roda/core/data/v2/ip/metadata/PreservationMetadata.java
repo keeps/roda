@@ -10,18 +10,19 @@ package org.roda.core.data.v2.ip.metadata;
 import org.roda.core.data.v2.ip.StoragePath;
 
 public class PreservationMetadata {
-
   private final String id;
-  private final String aipId;
+  private final String aipID;
   private final String representationID;
+  private final String fileID;
   private final StoragePath storagePath;
   private final String type;
 
-  public PreservationMetadata(String id, String aipId, String representationId, StoragePath storagePath, String type) {
+  public PreservationMetadata(String id, String aipID, String representationId, String fileID, StoragePath storagePath, String type) {
     super();
     this.id = id;
-    this.aipId = aipId;
+    this.aipID = aipID;
     this.representationID = representationId;
+    this.fileID = fileID;
     this.storagePath = storagePath;
     this.type = type;
   }
@@ -36,8 +37,8 @@ public class PreservationMetadata {
   /**
    * @return the aipId
    */
-  public String getAipId() {
-    return aipId;
+  public String getAipID() {
+    return aipID;
   }
 
   public String getRepresentationID() {
@@ -57,7 +58,7 @@ public class PreservationMetadata {
 
   @Override
   public String toString() {
-    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationID
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipID + ", representationID=" + representationID
       + ", storagePath=" + storagePath + ", type=" + type + "]";
   }
 
@@ -65,7 +66,7 @@ public class PreservationMetadata {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((aipID == null) ? 0 : aipID.hashCode());
     result = prime * result + ((getRepresentationID() == null) ? 0 : getRepresentationID().hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
@@ -84,11 +85,11 @@ public class PreservationMetadata {
       return false;
     }
     PreservationMetadata other = (PreservationMetadata) obj;
-    if (aipId == null) {
-      if (other.aipId != null) {
+    if (aipID == null) {
+      if (other.aipID != null) {
         return false;
       }
-    } else if (!aipId.equals(other.aipId)) {
+    } else if (!aipID.equals(other.aipID)) {
       return false;
     }
     if (getRepresentationID() == null) {

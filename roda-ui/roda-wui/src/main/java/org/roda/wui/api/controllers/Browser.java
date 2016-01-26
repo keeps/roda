@@ -352,7 +352,7 @@ public class Browser extends RodaCoreService {
     return aipRepresentationPreservationMetadataFile;
   }
 
-  public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+  public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId, String fileId,
     InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
@@ -363,7 +363,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, is, fileDetail,
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is, fileDetail,
       true);
 
     // register action
@@ -373,7 +373,7 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId, String fileId,
     InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
@@ -383,7 +383,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, is, fileDetail,
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId,fileId, is, fileDetail,
       false);
 
     // register action
@@ -394,7 +394,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(RodaUser user, String aipId,
-    String representationId, String fileId)
+    String representationId, String fileId, String preservationId)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -403,7 +403,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectRemovePermissions(user, aip);
 
     // delegate
-    BrowserHelper.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId);
+    BrowserHelper.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId, preservationId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

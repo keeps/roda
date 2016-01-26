@@ -36,9 +36,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
@@ -107,7 +107,7 @@ public class PremisUtils {
     String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
       RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     // TODO make this method add "premis.xml" to the file id!
-    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
+    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID,null, fileID));
     return PremisFileObjectHelper.newInstance(binary.getContent().createInputStream())
       .getRepresentationFilePreservationObject();
   }
@@ -247,5 +247,10 @@ public class PremisUtils {
     }
 
     return rfpo;
+  }
+
+  public static String getPremisType(Binary binary) {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

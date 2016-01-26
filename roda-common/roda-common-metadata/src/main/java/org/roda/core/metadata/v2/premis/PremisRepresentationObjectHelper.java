@@ -21,8 +21,8 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.RepresentationPreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.w3c.util.DateParser;
 
 import lc.xmlns.premisV2.LinkingEventIdentifierComplexType;

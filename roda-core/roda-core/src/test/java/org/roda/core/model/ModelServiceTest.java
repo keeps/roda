@@ -47,12 +47,12 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.RepresentationPreservationObject;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.model.utils.ModelUtils;
@@ -227,7 +227,7 @@ public class ModelServiceTest {
     assertEquals(rfpo.getFormatDesignationName(), CorporaConstants.TEXT_XML);
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+      null,CorporaConstants.EVENT_RODA_398_PREMIS_XML);
     assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
     assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
 
@@ -582,7 +582,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+    EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,null,
       CorporaConstants.EVENT_RODA_398_PREMIS_XML);
     assertEquals(epo.getAgentID(), CorporaConstants.AGENT_RODA_8);
     assertEquals(epo.getType(), CorporaConstants.INGESTION);

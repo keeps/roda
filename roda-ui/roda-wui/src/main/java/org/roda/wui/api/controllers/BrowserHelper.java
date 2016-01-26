@@ -576,7 +576,7 @@ public class BrowserHelper {
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary binary;
 
-    binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId, fileId));
+    binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId,null, fileId));
 
     String filename = binary.getStoragePath().getName();
     StreamingOutput stream = new StreamingOutput() {
@@ -589,7 +589,7 @@ public class BrowserHelper {
     return new StreamResponse(filename, MediaType.APPLICATION_OCTET_STREAM, stream);
   }
 
-  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
+  public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId, String fileId,
     InputStream is, FormDataContentDisposition fileDetail, boolean create)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Path file = null;
@@ -599,9 +599,9 @@ public class BrowserHelper {
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
       if (create) {
-        model.createPreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource);
+        model.createPreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource);
       } else {
-        model.updatePreservationMetadata(aipId, representationId, fileDetail.getFileName(), resource, false);
+        model.updatePreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
@@ -617,8 +617,8 @@ public class BrowserHelper {
   }
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
-    String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId);
+    String fileId, String preservationId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId, preservationId);
   }
 
   public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,

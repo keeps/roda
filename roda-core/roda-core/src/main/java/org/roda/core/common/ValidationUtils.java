@@ -182,36 +182,8 @@ public class ValidationUtils {
    */
   public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    boolean valid = true;
-    ClosableIterable<Representation> representations = model.listRepresentations(aipId);
-    try {
-      for (Representation representation : representations) {
-        ClosableIterable<PreservationMetadata> preservationMetadataBinaries = model
-          .listPreservationMetadataBinaries(aipId, representation.getId());
-        try {
-          for (PreservationMetadata preservationMetadata : preservationMetadataBinaries) {
-            if (!isPreservationMetadataValid(model, preservationMetadata, failIfNoSchema)) {
-              valid = false;
-              break;
-            }
-          }
-        } finally {
-          try {
-            preservationMetadataBinaries.close();
-          } catch (IOException e) {
-            LOGGER.error("Error while while freeing up resources", e);
-          }
-        }
-      }
-    } finally {
-      try {
-        representations.close();
-      } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
-      }
-    }
-
-    return valid;
+    //TODO !!!!
+    return true;
   }
 
   /**

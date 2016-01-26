@@ -179,7 +179,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
           "All the files from the SIP were verified against an antivirus.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",

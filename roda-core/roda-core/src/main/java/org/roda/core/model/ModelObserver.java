@@ -10,7 +10,6 @@ package org.roda.core.model;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.AgentMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -64,13 +63,7 @@ public interface ModelObserver {
 
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadataBinary);
 
-  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId);
-
-  public void agentMetadataCreated(AgentMetadata agentMetadataBinary);
-
-  public void agentMetadataUpdated(AgentMetadata agentMetadataBinary);
-
-  public void agentMetadataDeleted(String agentMetadataBinaryId);
+  public void preservationMetadataDeleted(String aipId, String representationId, String fileId, String preservationMetadataBinaryId);
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
 

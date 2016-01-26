@@ -5,12 +5,10 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2.ip;
+package org.roda.core.data.v2.ip.metadata;
 
 import java.util.Arrays;
 import java.util.Date;
-
-import org.roda.core.data.v2.ip.metadata.PreservationObject;
 
 /**
  * This is a representation preservation object. It contains preservation

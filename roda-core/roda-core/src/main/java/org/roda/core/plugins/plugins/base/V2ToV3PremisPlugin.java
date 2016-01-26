@@ -95,7 +95,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
       temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
         logger.debug("Processing AIP " + aip.getId());
-        try {
+        
           for (String representationID : aip.getRepresentationIds()) {
             logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
             ClosableIterable<PreservationMetadata> preservationMetadata = model
@@ -109,7 +109,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
                   Path pathFile = Paths.get(temp.toString(), pm.getStoragePath().getName());
                   Files.copy(binary.getContent().createInputStream(), pathFile, StandardCopyOption.REPLACE_EXISTING);
                   binary = PremisUtils.updatePremisToV3IfNeeded(binary, configPath);
-                  model.updatePreservationMetadata(aip.getId(), representationID, pm.getId(), binary, true);
+                  model.updatePreservationMetadata(aip.getId(), representationID,null, pm.getId(), binary);
                 } catch (RODAException | SAXException | TransformerException sse) {
                   logger.error(
                     "Error processing premis metadata " + pm.getStoragePath().asString() + ": " + sse.getMessage(),
@@ -125,9 +125,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
             }
 
           }
-        } catch (RODAException mse) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
-        }
+
       }
     } catch (IOException e) {
 

@@ -22,10 +22,10 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -142,7 +142,7 @@ public class FixityPlugin implements Plugin<AIP> {
                   sb.append("<li>" + s + "</li>");
                 }
                 sb.append("</ul>");
-                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
                   EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                   "Checksums recorded in PREMIS were compared with the files in the repository",
                   EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
@@ -150,7 +150,7 @@ public class FixityPlugin implements Plugin<AIP> {
                 notifyUserOfFixityCheckError(representationID, okFileIDS, koFileIDS, epo);
               } else {
                 LOGGER.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
-                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null,model,
                   EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                   "Checksums recorded in PREMIS were compared with the files in the repository",
                   EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
@@ -163,7 +163,7 @@ public class FixityPlugin implements Plugin<AIP> {
             LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             EventPreservationObject epo;
             try {
-              epo = PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+              epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
                 EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
                 EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),

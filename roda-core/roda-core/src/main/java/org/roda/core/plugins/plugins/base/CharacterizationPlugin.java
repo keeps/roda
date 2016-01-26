@@ -84,7 +84,7 @@ public class CharacterizationPlugin implements Plugin<AIP> {
         String representationID = entry.getKey();
         for (String fileID : entry.getValue()) {
           try {
-            StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), representationID, fileID);
+            StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), representationID,null, fileID);
             Binary binary = storage.getBinary(filePath);
             Map<String, String> characteristics = CharacterizationPluginUtils.getObjectCharacteristicsFields(
               aip.getId(), representationID, fileID, binary, RodaCoreFactory.getConfigPath());

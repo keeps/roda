@@ -146,7 +146,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       boolean success = descriptiveValid && preservationValid;
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginHelper.createPluginEvent(aip.getId(), representationID, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), success ? PluginState.SUCCESS : PluginState.FAILURE, "Report", "");

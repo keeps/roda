@@ -27,12 +27,11 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -81,7 +80,7 @@ public class IndexModelObserver implements ModelObserver {
     for (Map.Entry<String, List<String>> eventEntry : preservationEventsIds.entrySet()) {
       try {
         for (String fileId : eventEntry.getValue()) {
-          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventEntry.getKey(), fileId);
+          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventEntry.getKey(),null, fileId);
           Binary binary = model.getStorage().getBinary(filePath);
 
           SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), eventEntry.getKey(), fileId,
@@ -352,20 +351,17 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
-      AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
+      AIP aip = model.retrieveAIP(preservationMetadata.getAipID());
       indexAIP(aip);
 
       Binary binary = model.getStorage().getBinary(preservationMetadata.getStoragePath());
-      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
+      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipID(),
         preservationMetadata.getRepresentationID(), preservationMetadata.getId(), binary);
 
       String type = preservationMetadata.getType();
       if (type.equalsIgnoreCase("event")) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
-      } else if (type.equalsIgnoreCase("agent")) {
-        index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
       }
-      // TODO reindex file...
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
     } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException
@@ -378,37 +374,19 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadata) {
     try {
-      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
+      aipUpdated(model.retrieveAIP(preservationMetadata.getAipID()));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata updated on retrieving the full AIP", e);
     }
   }
 
   @Override
-  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId) {
+  public void preservationMetadataDeleted(String aipId, String representationId, String fileID, String preservationMetadataBinaryId) {
     try {
       aipUpdated(model.retrieveAIP(aipId));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }
-  }
-
-  @Override
-  public void agentMetadataCreated(AgentMetadata agentMetadata) {
-    // TODO handle indexing...
-  }
-
-  @Override
-  public void agentMetadataUpdated(AgentMetadata agentMetadata) {
-    agentMetadataDeleted(agentMetadata.getId());
-    agentMetadataCreated(agentMetadata);
-
-  }
-
-  @Override
-  public void agentMetadataDeleted(String agentMetadataId) {
-    // TODO: handle deleting
-
   }
 
   @Override

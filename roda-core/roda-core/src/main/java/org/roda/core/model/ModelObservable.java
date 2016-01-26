@@ -13,7 +13,6 @@ import java.util.List;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.AgentMetadata;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -153,7 +152,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadataBinary) {
+  protected void notifyPreservationMetadataCreated(String aipId, String representationId, String fileId, PreservationMetadata preservationMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.preservationMetadataCreated(preservationMetadataBinary);
     }
@@ -165,28 +164,10 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyPreservationMetadataDeleted(String aipId, String representationId,
+  protected void notifyPreservationMetadataDeleted(String aipId, String representationId, String fileID,
     String preservationMetadataBinaryId) {
     for (ModelObserver observer : observers) {
-      observer.preservationMetadataDeleted(aipId, representationId, preservationMetadataBinaryId);
-    }
-  }
-
-  protected void notifyAgentMetadataCreated(AgentMetadata agentMetadataBinary) {
-    for (ModelObserver observer : observers) {
-      observer.agentMetadataCreated(agentMetadataBinary);
-    }
-  }
-
-  protected void notifyAgentMetadataUpdated(AgentMetadata agentMetadataBinary) {
-    for (ModelObserver observer : observers) {
-      observer.agentMetadataUpdated(agentMetadataBinary);
-    }
-  }
-
-  protected void notifyAgentMetadataDeleted(String agentMetadataBinaryId) {
-    for (ModelObserver observer : observers) {
-      observer.agentMetadataDeleted(agentMetadataBinaryId);
+      observer.preservationMetadataDeleted(aipId, representationId, fileID, preservationMetadataBinaryId);
     }
   }
 

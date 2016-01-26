@@ -376,11 +376,20 @@ public final class ModelUtils {
 
   }
 
-  public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID)
+  public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID, String preservationFileID)
     throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID, fileID);
-
+    if(aipId==null){    //agent
+      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,preservationFileID);
+    }else if(representationID==null){
+      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,preservationFileID);
+    }else if(fileID==null){
+      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,preservationFileID);
+    }else{
+      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,fileID, preservationFileID);
+    }
   }
 
   public static StoragePath getPreservationFilePath(String aipId, String fileID) throws RequestNotValidException {
