@@ -40,7 +40,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -70,7 +69,7 @@ public final class HTMLUtils {
   }
 
   public static String descriptiveMetadataToHtml(Binary binary, String descriptiveMetadataType, final Locale locale)
-    throws ModelServiceException, TransformerException {
+    throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
     Map<String, Object> translations;
@@ -85,8 +84,7 @@ public final class HTMLUtils {
     return binaryToHtml(binary, descriptiveMetadataType, translations);
   }
 
-  public static String preservationObjectToHtml(Binary binary, final Locale locale)
-    throws ModelServiceException, TransformerException {
+  public static String preservationObjectToHtml(Binary binary, final Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     Map<String, Object> stylesheetOpt = messages.getTranslations(
       RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class, true);
@@ -219,43 +217,40 @@ public final class HTMLUtils {
   }
 
   private static String binaryToHtml(Binary binary, String metadataType, Map<String, Object> stylesheetOpt)
-    throws TransformerException, ModelServiceException {
+    throws GenericException {
     try {
       Reader reader = new InputStreamReader(binary.getContent().createInputStream());
-
-      InputStream transformerStream = getStylesheetInputStream(RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
-        metadataType);
-      // TODO support the use of scripts for non-xml transformers
-      Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
-      RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);
-      reader.close();
-      return transformerResult.toString();
+      return fileToHtml(reader, metadataType, stylesheetOpt);
     } catch (TransformerException | IOException e) {
-      LOGGER.error("Error transforming binary file into HTML (type=" + metadataType + ")", e);
-      throw new ModelServiceException("Error transforming binary file into HTML (type=" + metadataType + ")",
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      LOGGER.error("Error transforming binary into HTML (type=" + metadataType + ")", e);
+      throw new GenericException("Error transforming binary into HTML (type=" + metadataType + ")", e);
     }
   }
 
   private static String fileToHtml(File file, String metadataType, Map<String, Object> stylesheetOpt)
-    throws TransformerException, ModelServiceException {
+    throws GenericException {
     try {
       Reader reader = new InputStreamReader(new FileInputStream(file));
-
-      InputStream transformerStream = getStylesheetInputStream(RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
-        metadataType);
-      // TODO support the use of scripts for non-xml transformers
-      Reader xsltReader = new InputStreamReader(transformerStream);
-      CharArrayWriter transformerResult = new CharArrayWriter();
-      RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);
-      reader.close();
-      return transformerResult.toString();
+      return fileToHtml(reader, metadataType, stylesheetOpt);
     } catch (TransformerException | IOException e) {
-      LOGGER.error("Error transforming binary file into HTML (type=" + metadataType + ")", e);
-      throw new ModelServiceException("Error transforming binary file into HTML (type=" + metadataType + ")",
-        ModelServiceException.INTERNAL_SERVER_ERROR, e);
+      LOGGER.error("Error transforming file into HTML (type=" + metadataType + ")", e);
+
+      throw new GenericException("Error transforming file into HTML (type=" + metadataType + ")", e);
     }
+  }
+
+  private static String fileToHtml(Reader reader, String metadataType, Map<String, Object> stylesheetOpt)
+    throws GenericException, IOException, TransformerException {
+
+    InputStream transformerStream = getStylesheetInputStream(RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
+      metadataType);
+    // TODO support the use of scripts for non-xml transformers
+    Reader xsltReader = new InputStreamReader(transformerStream);
+    CharArrayWriter transformerResult = new CharArrayWriter();
+    RodaUtils.applyStylesheet(xsltReader, reader, stylesheetOpt, transformerResult);
+    reader.close();
+
+    return transformerResult.toString();
   }
 
   private static InputStream getStylesheetInputStream(String xsltFolder, String metadataType) {

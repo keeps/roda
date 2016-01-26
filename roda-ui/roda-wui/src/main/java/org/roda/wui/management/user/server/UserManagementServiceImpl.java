@@ -38,7 +38,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.common.I18nUtility;
-import org.roda.wui.common.LogUtility;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
 import org.roda.wui.management.user.client.UserManagementService;
@@ -113,8 +112,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       User result = UserUtility.getLdapUtility().addUser(user);
       UserUtility.getLdapUtility().setUserPassword(result.getName(), password);
       long duration = new Date().getTime() - start.getTime();
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.createUser",
-        new String[] {"user", user.toString()}, "User %username% called method UM.createUser(" + user + ")", duration);
+      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+      // "UM.createUser",
+      // new String[] {"user", user.toString()}, "User %username% called method
+      // UM.createUser(" + user + ")", duration);
     } catch (LdapUtilityException e) {
       throw new GenericException("Error creating user", e);
     }
@@ -131,9 +132,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
           UserUtility.getClientUserPassword(getThreadLocalRequest().getSession()), password);
         long duration = new Date().getTime() - start.getTime();
 
-        LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editMyUser",
-          new String[] {"modifiedUser", modifiedUser + "", "newPassword", "*"},
-          "User %username% called method UM.editMyUser(" + modifiedUser + ", " + "*" + ")", duration);
+        // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+        // "UM.editMyUser",
+        // new String[] {"modifiedUser", modifiedUser + "", "newPassword", "*"},
+        // "User %username% called method UM.editMyUser(" + modifiedUser + ", "
+        // + "*" + ")", duration);
       } else {
         throw new IllegalOperationException("Trying to modify user information for another user");
       }
@@ -171,9 +174,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       Date start = new Date();
       Group result = UserUtility.getLdapUtility().addGroup(group);
       long duration = new Date().getTime() - start.getTime();
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.createGroup",
-        new String[] {"group", result.toString()}, "User %username% called method UM.createGroup(" + result + ")",
-        duration);
+      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+      // "UM.createGroup",
+      // new String[] {"group", result.toString()}, "User %username% called
+      // method UM.createGroup(" + result + ")",
+      // duration);
     } catch (LdapUtilityException e) {
       throw new GenericException("Error creating group", e);
     }
@@ -187,9 +192,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       Date start = new Date();
       UserUtility.getLdapUtility().modifyGroup(group);
       long duration = new Date().getTime() - start.getTime();
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.editGroup",
-        new String[] {"group", group.toString()}, "User %username% called method UM.editGroup(" + group + ")",
-        duration);
+      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+      // "UM.editGroup",
+      // new String[] {"group", group.toString()}, "User %username% called
+      // method UM.editGroup(" + group + ")",
+      // duration);
     } catch (LdapUtilityException e) {
       throw new GenericException("Error editting group", e);
     }
@@ -213,8 +220,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       }
 
       long duration = new Date().getTime() - start.getTime();
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()), "UM.removeUser",
-        new String[] {"user", username}, "User %username% called method UM.removeUser(" + username + ")", duration);
+      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+      // "UM.removeUser",
+      // new String[] {"user", username}, "User %username% called method
+      // UM.removeUser(" + username + ")", duration);
     } catch (LdapUtilityException e) {
       throw new GenericException("Error removing user", e);
     }
@@ -228,9 +237,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       UserUtility.getLdapUtility().removeGroup(groupname);
       long duration = new Date().getTime() - start.getTime();
 
-      LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-        "UserManagement.removeGroup", new String[] {"groupname", groupname},
-        "User %username% called method UserManagement.removeGroup(" + groupname + ")", duration);
+      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+      // "UserManagement.removeGroup", new String[] {"groupname", groupname},
+      // "User %username% called method UserManagement.removeGroup(" + groupname
+      // + ")", duration);
     } catch (LdapUtilityException e) {
       throw new GenericException("Error removing group", e);
     }
@@ -377,9 +387,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
       if (error == null) {
         // success = sendEmailVerification(user);
         long duration = new Date().getTime() - start.getTime();
-        LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-          "UM.resendEmailVerification", new String[] {"username", username},
-          "User %username% called method UM.resendEmailVerification(" + username + ")", duration);
+        // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
+        // "UM.resendEmailVerification", new String[] {"username", username},
+        // "User %username% called method UM.resendEmailVerification(" +
+        // username + ")", duration);
       }
 
     } catch (LdapUtilityException e) {

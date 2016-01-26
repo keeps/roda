@@ -31,11 +31,9 @@ import java.util.stream.Collectors;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.StreamingOutput;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.common.SolrException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -69,7 +67,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.model.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -174,7 +171,7 @@ public class BrowserHelper {
       try {
         listDescriptiveMetadataBinaries.close();
       } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
+        LOGGER.warn("Error closing resources, possible leak", e);
       }
     }
 
@@ -207,7 +204,7 @@ public class BrowserHelper {
         try {
           inputStream.close();
         } catch (IOException e) {
-          LOGGER.warn("Error closing input stream", e);
+          LOGGER.warn("Error closing resources, possible leak", e);
         }
       }
     }
@@ -216,9 +213,7 @@ public class BrowserHelper {
   }
 
   protected static List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException, NotFoundException {
-
     return RodaCoreFactory.getIndexService().getAncestors(aip);
-
   }
 
   protected static IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
@@ -354,8 +349,8 @@ public class BrowserHelper {
   }
 
   public static StreamResponse getAipDescritiveMetadata(String aipId, String metadataId, String acceptFormat,
-    String language) throws GenericException, TransformerException, RequestNotValidException, NotFoundException,
-      AuthorizationDeniedException {
+    String language)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     final String filename;
     final String mediaType;
@@ -364,50 +359,42 @@ public class BrowserHelper {
 
     ModelService model = RodaCoreFactory.getModelService();
     Binary descriptiveMetadataBinary;
-    try {
-      descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
-      if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
-        filename = descriptiveMetadataBinary.getStoragePath().getName();
-        mediaType = MediaType.TEXT_XML;
-        stream = new StreamingOutput() {
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
-          }
-        };
-        ret = new StreamResponse(filename, mediaType, stream);
+    descriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aipId, metadataId);
 
-      } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-        filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
-        DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
-        mediaType = MediaType.TEXT_HTML;
-        String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-          descriptiveMetadata.getType(), ServerTools.parseLocale(language));
-        stream = new StreamingOutput() {
+    if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML.equals(acceptFormat)) {
+      filename = descriptiveMetadataBinary.getStoragePath().getName();
+      mediaType = MediaType.TEXT_XML;
+      stream = new StreamingOutput() {
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          IOUtils.copy(descriptiveMetadataBinary.getContent().createInputStream(), os);
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
 
-          @Override
-          public void write(OutputStream os) throws IOException, WebApplicationException {
-            PrintStream printStream = new PrintStream(os);
-            printStream.print(htmlDescriptive);
-            printStream.close();
-          }
-        };
-        ret = new StreamResponse(filename, mediaType, stream);
+    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
+      filename = descriptiveMetadataBinary.getStoragePath().getName() + ".html";
+      DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
+      mediaType = MediaType.TEXT_HTML;
+      String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
+        descriptiveMetadata.getType(), ServerTools.parseLocale(language));
+      stream = new StreamingOutput() {
 
-      } else {
-        new GenericException("Unsupported accept format: " + acceptFormat);
-      }
-    } catch (ModelServiceException e) {
-      String message = e.getMessage();
-      if (e.getCause() != null) {
-        message += ": " + e.getCause().getMessage();
-      }
-      throw new GenericException(message);
+        @Override
+        public void write(OutputStream os) throws IOException, WebApplicationException {
+          PrintStream printStream = new PrintStream(os);
+          printStream.print(htmlDescriptive);
+          printStream.close();
+        }
+      };
+      ret = new StreamResponse(filename, mediaType, stream);
+
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
 
     return ret;
-
   }
 
   protected static void validateListAipPreservationMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -496,8 +483,8 @@ public class BrowserHelper {
   // FIXME 100 lines of method
   public static StreamResponse getAipRepresentationPreservationMetadata(String aipId, String representationId,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
-    String acceptFormat, String language) throws GenericException, TransformerException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException {
+    String acceptFormat, String language)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
@@ -553,8 +540,7 @@ public class BrowserHelper {
           try {
             preservationFiles.close();
           } catch (IOException e) {
-            // FIXME see what better exception should be thrown
-            throw new GenericException("");
+            LOGGER.warn("Error closing resources, possible leak", e);
           }
         }
       }
@@ -576,7 +562,8 @@ public class BrowserHelper {
         }
       };
       response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
-
+    } else {
+      throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
 
     return response;
@@ -639,16 +626,17 @@ public class BrowserHelper {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-    if (parentId == null || parentId.trim().equals("")) {
+    Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
+
+    if (StringUtils.isBlank(parentId)) {
       StoragePath parentPath = ModelUtils.getAIPpath(parentId);
       storage.getDirectory(parentPath);
-    }
-    Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
-    if (parentId == null || parentId.trim().equalsIgnoreCase("")) {
+
       metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
     } else {
       metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
     }
+
     storage.updateMetadata(aipPath, metadata, true);
     model.updateAIP(aipId, storage, aipPath);
 
@@ -659,7 +647,6 @@ public class BrowserHelper {
   public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException,
     RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
-    // IndexService index = RodaCoreFactory.getIndexService();
 
     Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
     if (parentAipId != null) {
@@ -693,14 +680,8 @@ public class BrowserHelper {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataIdBinary, descriptiveMetadataType, false);
 
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      return model.updateDescriptiveMetadata(aipId, descriptiveMetadataId, descriptiveMetadataIdBinary,
-        descriptiveMetadataType);
-    } catch (SolrException e) {
-      // TODO check this exception, see if it should be a RODAException
-      throw new ValidationException(e.getMessage());
-    }
+    return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
+      descriptiveMetadataIdBinary, descriptiveMetadataType);
 
   }
 
@@ -714,6 +695,7 @@ public class BrowserHelper {
     return RodaCoreFactory.getModelService().retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
   }
 
+  // FIXME allow to create a zip without files/directories???
   private static StreamResponse createZipStreamResponse(List<ZipEntryInfo> zipEntries, String zipName) {
     final String filename;
     final StreamingOutput stream;
