@@ -66,6 +66,7 @@ import com.google.common.collect.Sets;
 
 public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
+  public static int OPENOFFICE_PORT = 8100;
 
   private PluginHelper() {
   }

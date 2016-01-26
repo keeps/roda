@@ -31,6 +31,7 @@ public class FFMPEGVideoConvertPluginUtils {
     // filling a list of the command line arguments
     List<String> command = new ArrayList<String>();
     command.add("/usr/bin/ffmpeg");
+    command.add("-y");
     command.add("-i");
     command.add(input.toString());
     command.add(output.toString());
@@ -48,6 +49,7 @@ public class FFMPEGVideoConvertPluginUtils {
     // filling a list of the command line arguments
     List<String> command = new ArrayList<String>();
     command.add("/usr/bin/ffmpeg");
+    command.add("-y");
     command.add("-i");
     command.add(input.toString());
     command.add(output.toString());

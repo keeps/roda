@@ -25,6 +25,10 @@ import java.util.Map;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.PluginParameter;
 import org.roda.core.data.Report;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.AgentPreservationObject;
 import org.roda.core.data.v2.EventPreservationObject;
 import org.roda.core.data.v2.Fixity;
@@ -37,12 +41,10 @@ import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageServiceException;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -168,7 +170,8 @@ public class FixityAction implements Plugin<AIP> {
                 notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
               }
             }
-          } catch (ModelServiceException | IOException | StorageServiceException e) {
+          } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+            | AuthorizationDeniedException e) {
             LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
             epo.setOutcome("undetermined");
             epo.setOutcomeDetailNote("Reason");
@@ -186,14 +189,22 @@ public class FixityAction implements Plugin<AIP> {
             Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
             Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
             model.createPreservationMetadata(aip.getId(), representationID, name, resource);
-          } catch (ModelServiceException e) {
-            LOGGER.error(e.getMessage(), e);
           } catch (PremisMetadataException e) {
             LOGGER.error(e.getMessage(), e);
           } catch (IOException e) {
             LOGGER.error(e.getMessage(), e);
-          } catch (StorageServiceException e) {
-            LOGGER.error(e.getMessage(), e);
+          } catch (RequestNotValidException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (NotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (GenericException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+          } catch (AuthorizationDeniedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
           }
 
         }
@@ -203,8 +214,7 @@ public class FixityAction implements Plugin<AIP> {
     return null;
   }
 
-  private void notifyUserOfFixityCheckUndetermined(String representationID, EventPreservationObject epo,
-    String message) {
+  private void notifyUserOfFixityCheckUndetermined(String representationID, EventPreservationObject epo, String message) {
     // TODO Auto-generated method stub
 
   }

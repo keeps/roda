@@ -155,17 +155,14 @@ class CaptureOutputThread extends Thread {
     try {
 
       // output = StreamUtility.inputStreamToString(is);
-
       BufferedReader reader = new BufferedReader(new InputStreamReader(is));
 
       String line = null;
-      do {
-        line = reader.readLine();
-        if (line != null) {
-          outputBuffer.append(line + "\n"); //$NON-NLS-1$
-          logger.trace(line);
-        }
-      } while (line != null);
+
+      while ((line = reader.readLine()) != null) {
+        outputBuffer.append(line + "\n"); //$NON-NLS-1$
+        logger.trace(line);
+      }
 
     } catch (IOException e) {
       logger.error("Exception reading from input stream - " //$NON-NLS-1$

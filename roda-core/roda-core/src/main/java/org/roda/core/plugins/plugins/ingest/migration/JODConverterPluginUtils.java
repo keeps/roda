@@ -8,6 +8,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.util.CommandException;
 
 import com.artofsolving.jodconverter.DocumentConverter;
@@ -35,7 +36,10 @@ public class JODConverterPluginUtils {
     File outputFile = new File(output.toString());
 
     // connect to an OpenOffice.org instance running on port 8100
-    OpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);
+    // command to start an open office connection:
+    // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
+    // -nofirststartwizard
+    OpenOfficeConnection connection = new SocketOpenOfficeConnection(PluginHelper.OPENOFFICE_PORT);
     connection.connect();
 
     // convert
@@ -56,8 +60,11 @@ public class JODConverterPluginUtils {
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
-    // connect to an OpenOffice.org instance running on port 8100
-    OpenOfficeConnection connection = new SocketOpenOfficeConnection(8100);
+    // connect to an OpenOffice.org instance running on port 8100 eg
+    // command to start an open office connection:
+    // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
+    // -nofirststartwizard
+    OpenOfficeConnection connection = new SocketOpenOfficeConnection(PluginHelper.OPENOFFICE_PORT);
     connection.connect();
 
     // convert
