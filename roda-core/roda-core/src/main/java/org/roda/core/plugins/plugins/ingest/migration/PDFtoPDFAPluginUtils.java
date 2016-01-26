@@ -46,64 +46,14 @@ public class PDFtoPDFAPluginUtils {
     os.close();
     pdfInputStream.close();
 
-    // pdfa - file to save the GS output; fixed - file to save the metadata
-    // fixed output
-    Path pdfa = Files.createTempFile("pdfa", ".pdf");
-    Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
-    String pdfPath = p.toString();
-    String pdfaPath = pdfa.toString();
-    String pdfPathFixed = fixed.toString();
-
-    // GhostScript transformation command
-    String[] gsArgs = new String[10];
-    gsArgs[0] = "gs";
-    gsArgs[1] = "-dPDFA";
-    gsArgs[2] = "-dBATCH";
-    gsArgs[3] = "-dNOPAUSE";
-    gsArgs[4] = "-dUseCIEColor";
-    gsArgs[5] = "-sProcessColorModel=DeviceCMYK";
-    gsArgs[6] = "-sDEVICE=pdfwrite";
-    gsArgs[7] = "-sPDFACompatibilityPolicy=1";
-    gsArgs[8] = "-sOutputFile=" + pdfaPath;
-    gsArgs[9] = pdfPath;
-
-    Ghostscript gs = Ghostscript.getInstance();
-
-    try {
-      gs.initialize(gsArgs);
-      gs.exit();
-    } catch (GhostscriptException e) {
-      throw new GhostscriptException("Exception when using GhostScript: ", e);
-    }
-
-    // metadata fixer transformation
-    InputStream is = new FileInputStream(pdfaPath);
-
-    try (ModelParser loader = new ModelParser(is)) {
-
-      // validation code
-      ValidationProfile profile = Profiles.getVeraProfileDirectory()
-        .getValidationProfileByFlavour(PDFAFlavour.PDFA_1_B);
-      PDFAValidator validator = Validators.createValidator(profile, true);
-      ValidationResult result = validator.validate(loader);
-      is.close();
-
-      // fixing metadata
-      OutputStream fixedOutputStream = new FileOutputStream(pdfPathFixed);
-      FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
-      MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
-      fixedOutputStream.close();
-      loader.close();
-
-    } catch (ValidationException | FileNotFoundException e) {
-      throw new VeraPDFException("Exception when fixing metadata: ", e);
-    }
-
-    return fixed;
+    return executePDFtoPDFA(p);
   }
 
   public static Path runPDFtoPDFA(Path p) throws IOException, VeraPDFException, GhostscriptException {
+    return executePDFtoPDFA(p);
+  }
 
+  private static Path executePDFtoPDFA(Path p) throws IOException, VeraPDFException, GhostscriptException {
     // pdfa - file to save the GS output; fixed - file to save the metadata
     // fixed output
     Path pdfa = Files.createTempFile("pdfa", ".pdf");

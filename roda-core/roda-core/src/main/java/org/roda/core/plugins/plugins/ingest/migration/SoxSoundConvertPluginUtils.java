@@ -6,9 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
@@ -28,15 +29,7 @@ public class SoxSoundConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
-    // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/sox");
-    command.add(input.toString());
-    command.add(output.toString());
-
-    // running the command
-    CommandUtility.execute(command);
-    return output;
+    return executeSox(input, output);
   }
 
   public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat) throws IOException,
@@ -44,14 +37,21 @@ public class SoxSoundConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
+    return executeSox(input, output);
+  }
+
+  private static Path executeSox(Path input, Path output) throws CommandException {
+
+    // FIXME replace error
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxsoundconvert", "commandLine");
+    command.replace("{input_file}", input.toString());
+    command.replace("{output_file}", output.toString());
+
     // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/sox");
-    command.add(input.toString());
-    command.add(output.toString());
+    List<String> commandList = Arrays.asList(command.split(" "));
 
     // running the command
-    CommandUtility.execute(command);
+    CommandUtility.execute(commandList);
     return output;
   }
 

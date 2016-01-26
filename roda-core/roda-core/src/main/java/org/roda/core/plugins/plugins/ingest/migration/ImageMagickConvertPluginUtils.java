@@ -6,9 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
@@ -28,16 +29,7 @@ public class ImageMagickConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
-    // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/convert");
-    command.add("-regard-warnings");
-    command.add(inputFormat + ":" + input.toString());
-    command.add(outputFormat + ":" + output.toString());
-
-    // running the command
-    CommandUtility.execute(command);
-    return output;
+    return executeImageMagick(input, output, inputFormat, outputFormat);
   }
 
   public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat) throws IOException,
@@ -45,15 +37,22 @@ public class ImageMagickConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
+    return executeImageMagick(input, output, inputFormat, outputFormat);
+  }
+
+  private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat)
+    throws CommandException {
+
+    // FIXME replace error
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
+    command.replace("{input_file}", inputFormat + ":" + input.toString());
+    command.replace("{output_file}", outputFormat + ":" + output.toString());
+
     // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/convert");
-    command.add("-regard-warnings");
-    command.add(inputFormat + ":" + input.toString());
-    command.add(outputFormat + ":" + output.toString());
+    List<String> commandList = Arrays.asList(command.split(" "));
 
     // running the command
-    CommandUtility.execute(command);
+    CommandUtility.execute(commandList);
     return output;
   }
 

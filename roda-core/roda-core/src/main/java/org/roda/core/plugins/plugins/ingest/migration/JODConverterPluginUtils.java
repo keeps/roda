@@ -5,10 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 
 import com.artofsolving.jodconverter.DocumentConverter;
@@ -32,31 +33,17 @@ public class JODConverterPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
-    File inputFile = new File(input.toString());
-    File outputFile = new File(output.toString());
-
-    // connect to an OpenOffice.org instance running on port 8100
-    // command to start an open office connection:
-    // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
-    // -nofirststartwizard
-    OpenOfficeConnection connection = new SocketOpenOfficeConnection(PluginHelper.OPENOFFICE_PORT);
-    connection.connect();
-
-    // convert
-    DocumentConverter converter = new OpenOfficeDocumentConverter(connection);
-    converter.convert(inputFile, outputFile);
-
-    // close the connection
-    connection.disconnect();
-
-    return output;
+    return executeJODConverter(input, output);
   }
 
   public static Path runJODConverter(Path input, String inputFormat, String outputFormat) throws IOException,
     CommandException {
-
     Path output = Files.createTempFile("result", "." + outputFormat);
 
+    return executeJODConverter(input, output);
+  }
+
+  private static Path executeJODConverter(Path input, Path output) throws ConnectException {
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
@@ -64,7 +51,9 @@ public class JODConverterPluginUtils {
     // command to start an open office connection:
     // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
     // -nofirststartwizard
-    OpenOfficeConnection connection = new SocketOpenOfficeConnection(PluginHelper.OPENOFFICE_PORT);
+    int OOPort = Integer.parseInt(RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert",
+      "commandLine"));
+    OpenOfficeConnection connection = new SocketOpenOfficeConnection(OOPort);
     connection.connect();
 
     // convert

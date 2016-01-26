@@ -6,9 +6,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
@@ -28,17 +29,7 @@ public class FFMPEGVideoConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
-    // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/ffmpeg");
-    command.add("-y");
-    command.add("-i");
-    command.add(input.toString());
-    command.add(output.toString());
-
-    // running the command
-    CommandUtility.execute(command);
-    return output;
+    return executeFFMPEG(input, output);
   }
 
   public static Path runFFMPEGVideoConvert(Path input, String inputFormat, String outputFormat) throws IOException,
@@ -46,17 +37,22 @@ public class FFMPEGVideoConvertPluginUtils {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
 
-    // filling a list of the command line arguments
-    List<String> command = new ArrayList<String>();
-    command.add("/usr/bin/ffmpeg");
-    command.add("-y");
-    command.add("-i");
-    command.add(input.toString());
-    command.add(output.toString());
-
-    // running the command
-    CommandUtility.execute(command);
-    return output;
+    return executeFFMPEG(input, output);
   }
 
+  private static Path executeFFMPEG(Path input, Path output) throws CommandException {
+
+    // FIXME replace error
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert", "commandLine");
+    command.replace("{input_file}", input.toString());
+    command.replace("{output_file}", output.toString());
+    System.out.println("COMMAND: " + command);
+
+    // filling a list of the command line arguments
+    List<String> commandList = Arrays.asList(command.split(" "));
+
+    // running the command
+    CommandUtility.execute(commandList);
+    return output;
+  }
 }
