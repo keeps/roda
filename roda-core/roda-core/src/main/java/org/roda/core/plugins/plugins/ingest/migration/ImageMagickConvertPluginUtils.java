@@ -45,8 +45,9 @@ public class ImageMagickConvertPluginUtils {
 
     // FIXME replace error
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
-    command.replace("{input_file}", inputFormat + ":" + input.toString());
-    command.replace("{output_file}", outputFormat + ":" + output.toString());
+    command = command.replace("{input_file}", inputFormat + ":" + input.toString());
+    command = command.replace("{output_file}", outputFormat + ":" + output.toString());
+    command = command.replace("\"", "");
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));

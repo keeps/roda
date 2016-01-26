@@ -44,8 +44,9 @@ public class SoxSoundConvertPluginUtils {
 
     // FIXME replace error
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxsoundconvert", "commandLine");
-    command.replace("{input_file}", input.toString());
-    command.replace("{output_file}", output.toString());
+    command = command.replace("{input_file}", input.toString());
+    command = command.replace("{output_file}", output.toString());
+    command = command.replace("\"", "");
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));
