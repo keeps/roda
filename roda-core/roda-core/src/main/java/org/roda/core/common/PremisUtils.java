@@ -106,8 +106,7 @@ public class PremisUtils {
   public static RepresentationFilePreservationObject getPremisFile(StorageService storage, String aipID,
     String representationID, String fileID) throws IOException, PremisMetadataException, GenericException,
       RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    // TODO make this method add "premis.xml" to the file id!
-    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID,null, fileID));
+    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID,fileID));
     return PremisFileObjectHelper.newInstance(binary.getContent().createInputStream())
       .getRepresentationFilePreservationObject();
   }
@@ -247,10 +246,5 @@ public class PremisUtils {
     }
 
     return rfpo;
-  }
-
-  public static String getPremisType(Binary binary) {
-    // TODO Auto-generated method stub
-    return null;
   }
 }

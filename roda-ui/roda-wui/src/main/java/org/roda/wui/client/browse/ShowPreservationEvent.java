@@ -179,21 +179,25 @@ public class ShowPreservationEvent extends Composite {
     eventDetailLabel.setText(event.getEventDetail());
 
     // AGENTS
+    // TODO... update with new structure (list of agents instead of single agent...)
+    
+    /*
     eventAgentIdLabel.setText(event.getAgentIdentifierValue());
     
     eventAgentRoleLabel.setVisible(StringUtils.isNotBlank(event.getAgentRole()));
     eventAgentRoleValue.setVisible(StringUtils.isNotBlank(event.getAgentRole()));
     eventAgentRoleValue.setText(event.getAgentRole());
-    // TODO fetch agent information
+    */
 
     // OBJECTS
     // TODO set links
+    // TODO... update with new structure (list of objects instead of single agent...)
+    /*
     eventObjectIdValue.setText(event.getObjectIdentifierValue());
-
     eventObjectRoleLabel.setVisible(StringUtils.isNotBlank(event.getObjectRole()));
     eventObjectRoleValue.setVisible(StringUtils.isNotBlank(event.getObjectRole()));
     eventObjectRoleValue.setText(event.getObjectRole());
-
+    */
     // OUTCOME
     eventOutcomeLabel.setText(event.getEventOutcome());
 

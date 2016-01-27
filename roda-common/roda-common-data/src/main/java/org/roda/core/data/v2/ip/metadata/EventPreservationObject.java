@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 /**
  * This is an event preservation object
@@ -24,8 +25,8 @@ public class EventPreservationObject extends PreservationObject implements Seria
   private String outcomeDetails;
   private String targetID;
   private static final long serialVersionUID = 1555211337883930542L;
-  private String targetPID = null;
-  private String agentPID = null;
+  private List<PreservationLinkingObject> linkingObjects = null;
+  private List<PreservationLinkingAgent> linkingAgent = null;
 
   /*
    * accession adding emulation information appraisal capture compression
@@ -290,20 +291,22 @@ public class EventPreservationObject extends PreservationObject implements Seria
     this.targetID = targetID;
   }
 
-  public String getTargetPID() {
-    return targetPID;
+  public List<PreservationLinkingObject> getLinkingObjects() {
+    return linkingObjects;
   }
 
-  public void setTargetPID(String targetPID) {
-    this.targetPID = targetPID;
+  public void setLinkingObjects(List<PreservationLinkingObject> linkingObjects) {
+    this.linkingObjects = linkingObjects;
   }
 
-  public String getAgentPID() {
-    return agentPID;
+  public List<PreservationLinkingAgent> getLinkingAgent() {
+    return linkingAgent;
   }
 
-  public void setAgentPID(String agentPID) {
-    this.agentPID = agentPID;
+  public void setLinkingAgent(List<PreservationLinkingAgent> linkingAgent) {
+    this.linkingAgent = linkingAgent;
   }
+
+  
 
 }

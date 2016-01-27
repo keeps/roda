@@ -1142,12 +1142,6 @@ public class SolrUtils {
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     final String eventOutcomeDetailExtension = objectToString(
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
-    final String agentIdentifierType = objectToString(RodaConstants.PRESERVATION_EVENT_AGENT_IDENTIFIER_TYPE);
-    final String agentIdentifierValue = objectToString(RodaConstants.PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE);
-    final String agentRole = objectToString(RodaConstants.PRESERVATION_EVENT_AGENT_ROLE);
-    final String objectIdentifierType = objectToString(RodaConstants.PRESERVATION_EVENT_OBJECT_IDENTIFIER_TYPE);
-    final String objectIdentifierValue = objectToString(RodaConstants.PRESERVATION_EVENT_OBJECT_IDENTIFIER_VALUE);
-    final String objectRole = objectToString(RodaConstants.PRESERVATION_EVENT_OBJECT_ROLE);
 
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
@@ -1159,12 +1153,7 @@ public class SolrUtils {
     ipe.setEventType(eventType);
     ipe.setEventOutcome(eventOutcome);
     ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
-    ipe.setAgentIdentifierType(agentIdentifierType);
-    ipe.setAgentIdentifierValue(agentIdentifierValue);
-    ipe.setAgentRole(agentRole);
-    ipe.setObjectIdentifierType(objectIdentifierType);
-    ipe.setObjectIdentifierValue(objectIdentifierValue);
-    ipe.setObjectRole(objectRole);
+    
     return ipe;
   }
 
@@ -1183,9 +1172,15 @@ public class SolrUtils {
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      stylesheetOpt.put("aipID", aipID);
-      stylesheetOpt.put("representationID", representationID);
-      stylesheetOpt.put("fileID", fileID);
+      if(aipID!=null){
+        stylesheetOpt.put("aipID", aipID);
+      }
+      if(representationID!=null){
+        stylesheetOpt.put("representationID", representationID);
+      }
+      if(fileID!=null){
+        stylesheetOpt.put("fileID", fileID);
+      }
       RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
       descMetadataReader.close();
 

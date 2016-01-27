@@ -88,7 +88,8 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Path configPath = null;
+    // TODO re-implement...
+    /*Path configPath = null;
     Path temp = null;
     try {
       configPath = RodaCoreFactory.getConfigPath();
@@ -135,7 +136,7 @@ public class V2ToV3PremisPlugin implements Plugin<AIP> {
       } catch (GenericException | NotFoundException e) {
         logger.error("Error removing temp files: " + e.getMessage(), e);
       }
-    }
+    }*/
     return null;
   }
 

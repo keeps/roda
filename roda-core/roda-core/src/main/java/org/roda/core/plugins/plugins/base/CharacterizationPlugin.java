@@ -77,7 +77,7 @@ public class CharacterizationPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Map<String, Map<String, Integer>> total = new HashMap<String, Map<String, Integer>>();
+    /*Map<String, Map<String, Integer>> total = new HashMap<String, Map<String, Integer>>();
     for (AIP aip : list) {
       Map<String, List<String>> premisFiles = aip.getPreservationFileObjectsIds();
       for (Map.Entry<String, List<String>> entry : premisFiles.entrySet()) {
@@ -101,8 +101,9 @@ public class CharacterizationPlugin implements Plugin<AIP> {
       for (Map.Entry<String, Integer> entry2 : entry.getValue().entrySet()) {
         System.out.println(entry2.getKey() + " - " + entry2.getValue());
       }
-    }
+    }*/
     return null;
+    //TODO implement if needed...
   }
 
   private Map<String, Map<String, Integer>> join(Map<String, Map<String, Integer>> total,

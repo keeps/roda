@@ -39,6 +39,8 @@ import org.roda.core.data.v2.ip.RepresentationState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
+import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Report;
@@ -69,6 +71,7 @@ import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.File;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
+import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
 
 /**
@@ -80,7 +83,7 @@ public final class ModelUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
   public enum PREMIS_TYPE {
-    OBJECT, EVENT, AGENT, UNKNOWN
+    REPRESENTATION, FILE, EVENT, AGENT, UNKNOWN
   }
 
   /**
@@ -364,40 +367,6 @@ public final class ModelUtils {
     }
   }
 
-  public static StoragePath getPreservationPath(String aipId, String representationID) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID);
-
-  }
-
-  public static StoragePath getPreservationPath(String aipId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
-
-  }
-
-  public static StoragePath getPreservationFilePath(String aipId, String representationID, String fileID, String preservationFileID)
-    throws RequestNotValidException {
-    if(aipId==null){    //agent
-      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,preservationFileID);
-    }else if(representationID==null){
-      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,preservationFileID);
-    }else if(fileID==null){
-      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,preservationFileID);
-    }else{
-      return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,fileID, preservationFileID);
-    }
-  }
-
-  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
-
-  }
-
   public static Representation getPreservationRepresentationObject(Binary preservationBinary) {
     Representation representation = null;
     InputStream binaryInputStream = null;
@@ -476,11 +445,6 @@ public final class ModelUtils {
       }
     }
     return agent;
-  }
-
-  public static StoragePath getPreservationAgentPath(String agentID) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID);
   }
 
   public static StoragePath getLogPath(String logFile) throws RequestNotValidException {
@@ -650,17 +614,22 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static <T> List<String> extractAgentIdsFromPreservationBinary(Binary b, Class<T> c) {
-    List<String> ids = new ArrayList<String>();
+  public static <T> List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b, Class<T> c) {
+    List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
     if (c.equals(File.class)) {
-      // TODO
       LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
       EventComplexType event = getPreservationEvent(b);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
-          ids.add(laict.getLinkingAgentIdentifierValue());
+          PreservationLinkingAgent agent = new PreservationLinkingAgent();
+          agent.setTitle(laict.getTitle());
+          agent.setIdentifierType(laict.getLinkingAgentIdentifierType());
+          agent.setIdentifierValue(laict.getLinkingAgentIdentifierValue());
+          agent.setRole(laict.getRole());
+          agent.setType(laict.getType());
+          agents.add(agent);
         }
       }
     } else if (c.equals(Representation.class)) {
@@ -670,9 +639,38 @@ public final class ModelUtils {
       // TODO
       LOGGER.error("Not implemented!");
     }
-    return ids;
+    return agents;
   }
 
+  public static <T> List<PreservationLinkingObject> extractLinkingObjectsFromPreservationBinary(Binary b, Class<T> c) {
+    List<PreservationLinkingObject> objects = new ArrayList<PreservationLinkingObject>();
+    if (c.equals(File.class)) {
+      LOGGER.error("Not implemented!");
+    } else if (c.equals(EventComplexType.class)) {
+      EventComplexType event = getPreservationEvent(b);
+      List<LinkingObjectIdentifierComplexType> identifiers = event.getLinkingObjectIdentifierList();
+      if (identifiers != null) {
+        for (LinkingObjectIdentifierComplexType loict : identifiers) {
+          PreservationLinkingObject object = new PreservationLinkingObject();
+          
+          object.setTitle(loict.getTitle());
+          object.setIdentifierType(loict.getLinkingObjectIdentifierType());
+          object.setIdentifierValue(loict.getLinkingObjectIdentifierValue());
+          object.setRole(loict.getRole());
+          object.setType(loict.getType());
+          objects.add(object);
+        }
+      }
+    } else if (c.equals(Representation.class)) {
+      // TODO
+      LOGGER.error("Not implemented!");
+    } else {
+      // TODO
+      LOGGER.error("Not implemented!");
+    }
+    return objects;
+  }
+  
   public static String getPreservationType(Binary binary) {
     String type = "";
     EventComplexType event = ModelUtils.getPreservationEvent(binary);
@@ -768,6 +766,60 @@ public final class ModelUtils {
       }
     }
     return node;
+  }
+
+  //agent path -> /Preservation/Agents/[agentID].agent.premis.xml
+  public static StoragePath getPreservationAgentPath(String agentID) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,agentID+".agent.premis.xml");
+  }
+
+  //aip metadata path -> /AIP/[aipId]/Metadata/Preservation
+  public static StoragePath getAIPPreservationMetadataPath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+  }
+
+  //representation metadata path -> /AIP/[aipId]/Metadata/Preservation/[representationId]
+  public static StoragePath getAIPRepresentationPreservationPath(String aipId, String representationID) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,representationID);
+  }
+
+  public static StoragePath getPreservationRepresentationPath(String aipID, String representationID) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
+      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION,representationID,representationID+".representation.premis.xml");
+  }
+
+  public static StoragePath getPath(StoragePath parent, String children) throws RequestNotValidException {
+    return DefaultStoragePath.parse(parent, children);
+  }
+
+  // TODO right now, all premis for files are saved under the representation folder... if need, add parameter "fileID"...
+  public static StoragePath getPreservationFilePathRaw(String aipId, String representationId, String preservationID) throws RequestNotValidException {
+     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
+  }
+
+  public static StoragePath getPreservationFilePath(String aipId, String representationId, String fileId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), fileId+".file.premis.xml");
+  }
+
+  public static StoragePath buildPreservationPath(PREMIS_TYPE type, String aipId, String representationId,
+    String fileId, String preservationId) throws RequestNotValidException {
+    StoragePath path = null;
+    if(type.toString().equalsIgnoreCase(PREMIS_TYPE.AGENT.toString())){
+      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,RodaConstants.STORAGE_DIRECTORY_AGENTS,preservationId+".agent.premis.xml");
+    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.REPRESENTATION.toString())){
+      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,representationId+".representation.premis.xml");
+    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.EVENT.toString())){
+      // TODO HANDLE AIP and REPRESENTATION EVENTS
+      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,preservationId+".event.premis.xml");
+    }else if(type.toString().equalsIgnoreCase(PREMIS_TYPE.FILE.toString())){
+      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,fileId+".file.premis.xml");
+    }
+    return path;
   }
 
 }

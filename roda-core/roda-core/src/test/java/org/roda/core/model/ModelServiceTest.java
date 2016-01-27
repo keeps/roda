@@ -231,8 +231,7 @@ public class ModelServiceTest {
     assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
     assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
 
-    RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,
-      CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
+    RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
   }
 
@@ -606,8 +605,7 @@ public class ModelServiceTest {
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-    RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,
-      CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_PREMIS_XML);
+    RepresentationPreservationObject rpo = model.getRepresentationPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
   }
 

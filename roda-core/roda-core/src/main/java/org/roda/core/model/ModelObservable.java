@@ -152,7 +152,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyPreservationMetadataCreated(String aipId, String representationId, String fileId, PreservationMetadata preservationMetadataBinary) {
+  protected void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadataBinary) {
     for (ModelObserver observer : observers) {
       observer.preservationMetadataCreated(preservationMetadataBinary);
     }

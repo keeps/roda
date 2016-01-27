@@ -138,7 +138,7 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
                 if (!newRepresentations.contains(newRepresentationID)) {
                   logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
                   model.createRepresentation(aip.getId(), newRepresentationID, model.getStorage(), storagePath);
-                  StoragePath storagePreservationPath = ModelUtils.getPreservationPath(aip.getId(),
+                  StoragePath storagePreservationPath = ModelUtils.getPreservationRepresentationPath(aip.getId(),
                     newRepresentationID);
                   model.getStorage().createDirectory(storagePreservationPath, new HashMap<String, Set<String>>());
                 }

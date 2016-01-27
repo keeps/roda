@@ -116,4 +116,8 @@ public class PreservationMetadata {
     return true;
   }
 
+  public String getFileID() {
+    return fileID;
+  }
+
 }

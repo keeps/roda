@@ -17,6 +17,8 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.metadata.IndexedObject;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.browse.BrowserService;
 
@@ -103,9 +105,16 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       public String getValue(IndexedPreservationEvent event) {
         String ret = null;
         if (event != null) {
-          ret = event.getAgentIdentifierValue();
+          //TODO IMPROVE...
+          if(event.getAgents()!=null){
+            ret = "";
+            for(IndexedPreservationAgent ipa : event.getAgents()){
+              ret+=ipa.getId();
+              ret+=" ";
+            }
+            ret = ret.trim();
+          }
         }
-
         return ret;
       }
     };
@@ -117,7 +126,15 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
         String ret = null;
         // TODO define link
         if (event != null) {
-          ret = event.getObjectIdentifierValue();
+          if(event.getSource()!=null){
+            ret = "";
+            for(IndexedObject io : event.getSource()){
+              ret+=io.getIdentifierValue();
+              ret+=" ";
+            }
+            ret = ret.trim();
+          }
+          
         }
 
         return ret;
@@ -164,6 +181,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     Map<Column<IndexedPreservationEvent, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, String>();
     columnSortingKeyMap.put(eventDateTimeColumn, RodaConstants.PRESERVATION_EVENT_DATETIME);
+    //TODO an event can now have multiple agents... sort by agent id should maybe be removed...
     columnSortingKeyMap.put(eventAgentColumn, RodaConstants.PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE);
     columnSortingKeyMap.put(eventTypeColumn, RodaConstants.PRESERVATION_EVENT_TYPE);
     columnSortingKeyMap.put(eventDetailColumn, RodaConstants.PRESERVATION_EVENT_DETAIL);

@@ -9,6 +9,7 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 public class IndexedPreservationEvent implements Serializable {
   private static final long serialVersionUID = 7328069950706217131L;
@@ -21,12 +22,9 @@ public class IndexedPreservationEvent implements Serializable {
   private String eventType;
   private String eventOutcome;
   private String eventOutcomeDetailExtension;
-  private String agentIdentifierType;
-  private String agentIdentifierValue;
-  private String agentRole;
-  private String objectIdentifierType;
-  private String objectIdentifierValue;
-  private String objectRole;
+  private List<IndexedPreservationAgent> agents;
+  private List<IndexedObject> outcome;
+  private List<IndexedObject> source;
 
   public String getAipId() {
     return aipId;
@@ -100,52 +98,28 @@ public class IndexedPreservationEvent implements Serializable {
     this.eventOutcomeDetailExtension = eventOutcomeDetailExtension;
   }
 
-  public String getAgentIdentifierType() {
-    return agentIdentifierType;
+  public List<IndexedPreservationAgent> getAgents() {
+    return agents;
   }
 
-  public void setAgentIdentifierType(String agentIdentifierType) {
-    this.agentIdentifierType = agentIdentifierType;
+  public void setAgents(List<IndexedPreservationAgent> agents) {
+    this.agents = agents;
   }
 
-  public String getAgentIdentifierValue() {
-    return agentIdentifierValue;
+  public List<IndexedObject> getOutcome() {
+    return outcome;
   }
 
-  public void setAgentIdentifierValue(String agentIdentifierValue) {
-    this.agentIdentifierValue = agentIdentifierValue;
+  public void setOutcome(List<IndexedObject> outcome) {
+    this.outcome = outcome;
   }
 
-  public String getAgentRole() {
-    return agentRole;
+  public List<IndexedObject> getSource() {
+    return source;
   }
 
-  public void setAgentRole(String agentRole) {
-    this.agentRole = agentRole;
-  }
-
-  public String getObjectIdentifierType() {
-    return objectIdentifierType;
-  }
-
-  public void setObjectIdentifierType(String objectIdentifierType) {
-    this.objectIdentifierType = objectIdentifierType;
-  }
-
-  public String getObjectIdentifierValue() {
-    return objectIdentifierValue;
-  }
-
-  public void setObjectIdentifierValue(String objectIdentifierValue) {
-    this.objectIdentifierValue = objectIdentifierValue;
-  }
-
-  public String getObjectRole() {
-    return objectRole;
-  }
-
-  public void setObjectRole(String objectRole) {
-    this.objectRole = objectRole;
+  public void setSource(List<IndexedObject> source) {
+    this.source = source;
   }
 
   public String toString() {

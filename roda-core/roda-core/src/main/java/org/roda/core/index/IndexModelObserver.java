@@ -30,6 +30,8 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
+import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
@@ -41,12 +43,15 @@ import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import lc.xmlns.premisV2.EventComplexType;
 
 /**
  * 
@@ -80,7 +85,9 @@ public class IndexModelObserver implements ModelObserver {
     for (Map.Entry<String, List<String>> eventEntry : preservationEventsIds.entrySet()) {
       try {
         for (String fileId : eventEntry.getValue()) {
-          StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(), eventEntry.getKey(),null, fileId);
+          
+          StoragePath filePath = ModelUtils.buildPreservationPath(PREMIS_TYPE.EVENT, aip.getId(), eventEntry.getKey(), null, fileId);
+          LOGGER.debug("FILEPATH: "+filePath);
           Binary binary = model.getStorage().getBinary(filePath);
 
           SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), eventEntry.getKey(), fileId,
@@ -170,7 +177,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
       // TODO remove file id PREMIS suffix
       premisFile = PremisUtils.getPremisFile(model.getStorage(), file.getAipId(), file.getRepresentationId(),
-        file.getId() + ".premis.xml");
+        file.getId());
     } catch (NotFoundException e) {
       LOGGER.warn("On indexing representations, did not find PREMIS for file: " + file);
     } catch (RODAException | IOException e) {
@@ -351,8 +358,10 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
-      AIP aip = model.retrieveAIP(preservationMetadata.getAipID());
-      indexAIP(aip);
+      if(preservationMetadata.getAipID()!=null){
+        AIP aip = model.retrieveAIP(preservationMetadata.getAipID());
+        indexAIP(aip);
+      }
 
       Binary binary = model.getStorage().getBinary(preservationMetadata.getStoragePath());
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipID(),
@@ -361,6 +370,10 @@ public class IndexModelObserver implements ModelObserver {
       String type = preservationMetadata.getType();
       if (type.equalsIgnoreCase("event")) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
+        
+        List<PreservationLinkingAgent> linkingAgents = ModelUtils.extractAgentsFromPreservationBinary(binary,EventComplexType.class);
+        List<PreservationLinkingObject> linkingObjects = ModelUtils.extractLinkingObjectsFromPreservationBinary(binary,EventComplexType.class);
+        
       }
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));

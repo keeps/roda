@@ -52,6 +52,7 @@ import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -233,7 +234,7 @@ public final class PluginHelper {
     Path file = Files.createTempFile("preservation", ".xml");
     Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
     Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-    model.createPreservationMetadata(aipID,representationID,fileID, name, resource);
+    model.createPreservationMetadata(aipID,representationID,fileID, name, resource, PREMIS_TYPE.EVENT);
     return epo;
   }
 
@@ -261,12 +262,12 @@ public final class PluginHelper {
       LOGGER.error("Error creating directories", sse);
     }
     try {
-      model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId), new HashMap<String, Set<String>>());
+      model.getStorage().createDirectory(ModelUtils.getAIPPreservationMetadataPath(aipId), new HashMap<String, Set<String>>());
     } catch (RODAException sse) {
       LOGGER.error("Error creating directories", sse);
     }
     try {
-      model.getStorage().createDirectory(ModelUtils.getPreservationPath(aipId, representationID),
+      model.getStorage().createDirectory(ModelUtils.getAIPRepresentationPreservationPath(aipId, representationID),
         new HashMap<String, Set<String>>());
     } catch (RODAException sse) {
       LOGGER.error("Error creating directories", sse);
@@ -331,7 +332,7 @@ public final class PluginHelper {
         Path agentFile = Files.createTempFile("agent_preservation", ".xml");
         Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
         Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-        model.createPreservationMetadata(null, null, null, agent.getId(), agentResource);
+        model.createPreservationMetadata(null, null, null, agent.getId(), agentResource, PREMIS_TYPE.AGENT);
       } catch (RequestNotValidException | PremisMetadataException | IOException | GenericException | NotFoundException | AuthorizationDeniedException ee) {
         LOGGER.error("Error creating PREMIS agent", e);
       }
@@ -388,7 +389,7 @@ public final class PluginHelper {
       Path agentFile = Files.createTempFile("agent_preservation", ".xml");
       Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
       Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-      model.createPreservationMetadata(null, null, null, agentID, agentResource);
+      model.createPreservationMetadata(null, null, null, agentID, agentResource, PREMIS_TYPE.AGENT);
     }
 
     byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
@@ -396,6 +397,6 @@ public final class PluginHelper {
     Files.copy(new ByteArrayInputStream(serializedPremisEvent), eventFile, StandardCopyOption.REPLACE_EXISTING);
     Binary eventResource = (Binary) FSUtils.convertPathToResource(eventFile.getParent(), eventFile);
 
-    model.createPreservationMetadata(aipID, representationID,null, name, eventResource);
+    model.createPreservationMetadata(aipID, representationID,null, name, eventResource, PREMIS_TYPE.EVENT);
   }
 }

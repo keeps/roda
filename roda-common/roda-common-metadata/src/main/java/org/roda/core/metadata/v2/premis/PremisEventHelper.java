@@ -228,9 +228,7 @@ public class PremisEventHelper {
 
     // <linkingAgentIdentifier>
     if (getEvent().getLinkingAgentIdentifierList() != null && getEvent().getLinkingAgentIdentifierList().size() > 0) {
-
       LinkingAgentIdentifierComplexType linkingAgentIdentifier = getEvent().getLinkingAgentIdentifierArray(0);
-
       pObject.setAgentID(linkingAgentIdentifier.getLinkingAgentIdentifierValue());
 
       if (linkingAgentIdentifier.getLinkingAgentRoleList() != null

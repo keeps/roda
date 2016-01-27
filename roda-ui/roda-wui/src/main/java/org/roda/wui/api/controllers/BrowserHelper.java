@@ -69,6 +69,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
@@ -549,7 +550,7 @@ public class BrowserHelper {
       String filename = aipId + "_" + representationId + ".html";
 
       String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
-        ModelUtils.getPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
+        ModelUtils.getAIPRepresentationPreservationPath(aipId, representationId), storage, ServerTools.parseLocale(language),
         ApiUtils.processPagingParams(startAgent, limitAgent), ApiUtils.processPagingParams(startEvent, limitEvent),
         ApiUtils.processPagingParams(startFile, limitFile));
 
@@ -576,7 +577,7 @@ public class BrowserHelper {
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary binary;
 
-    binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipId, representationId,null, fileId));
+    binary = storage.getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
 
     String filename = binary.getStoragePath().getName();
     StreamingOutput stream = new StreamingOutput() {
@@ -599,9 +600,9 @@ public class BrowserHelper {
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
       if (create) {
-        model.createPreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource);
+        model.createPreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource, PREMIS_TYPE.FILE);
       } else {
-        model.updatePreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource);
+        model.updatePreservationMetadata(aipId, representationId, fileId, fileDetail.getFileName(), resource, PREMIS_TYPE.FILE);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
@@ -618,7 +619,7 @@ public class BrowserHelper {
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
     String fileId, String preservationId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId, preservationId);
+    RodaCoreFactory.getModelService().deletePreservationMetadata(aipId, representationId, fileId, preservationId, PREMIS_TYPE.FILE);
   }
 
   public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,

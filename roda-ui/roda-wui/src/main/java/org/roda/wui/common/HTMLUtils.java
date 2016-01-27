@@ -128,7 +128,7 @@ public final class HTMLUtils {
       for (String representationId : aip.getRepresentationIds()) {
         try {
           String html = getRepresentationPreservationMetadataHtml(
-            ModelUtils.getPreservationPath(aipId, representationId), storage, locale, pagingParametersAgents,
+            ModelUtils.getAIPRepresentationPreservationPath(aipId, representationId), storage, locale, pagingParametersAgents,
             pagingParametersEvents, pagingParametersFile);
           s.append(html);
         } finally {
