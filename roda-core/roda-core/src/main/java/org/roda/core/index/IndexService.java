@@ -169,15 +169,19 @@ public class IndexService {
     }
   }
 
-  private void reindexActionLog(BufferedReader br) throws IOException {
+  private void reindexActionLog(BufferedReader br) throws GenericException {
     String line;
-    while ((line = br.readLine()) != null) {
-      LogEntry entry = ModelUtils.getLogEntry(line);
-      if (entry != null) {
-        reindexActionLog(entry);
+    try {
+      while ((line = br.readLine()) != null) {
+        LogEntry entry = ModelUtils.getObjectFromJson(line, LogEntry.class);
+        if (entry != null) {
+          reindexActionLog(entry);
+        }
       }
+      br.close();
+    } catch (IOException e) {
+      throw new GenericException("Error reading log", e);
     }
-    br.close();
   }
 
   private void reindexActionLog(LogEntry entry) {

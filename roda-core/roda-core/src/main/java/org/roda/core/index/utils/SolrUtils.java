@@ -105,7 +105,9 @@ import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaGroup;
@@ -1010,7 +1012,12 @@ public class SolrUtils {
     entry.setDatetime(datetime);
     entry.setDuration(duration);
     entry.setId(id);
-    entry.setParameters(ModelUtils.getLogEntryParameters(parameters == null ? "" : parameters));
+    try {
+      entry.setParameters(ModelUtils.getListFromJson(parameters == null ? "" : parameters, LogEntryParameter.class));
+    } catch (GenericException e) {
+      LOGGER.error("Error parsing log entry parameters", e);
+    }
+
     entry.setRelatedObjectID(relatedObjectId);
     entry.setUsername(username);
 
@@ -1025,7 +1032,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
     doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
     doc.addField(RodaConstants.LOG_ID, logEntry.getId());
-    doc.addField(RodaConstants.LOG_PARAMETERS, ModelUtils.getJsonLogEntryParameters(logEntry.getParameters()));
+    doc.addField(RodaConstants.LOG_PARAMETERS, ModelUtils.getJsonFromObject(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     return doc;
@@ -1509,7 +1516,12 @@ public class SolrUtils {
     jobReport.setLastPluginRan(objectToString(doc.get(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN)));
     jobReport.setLastPluginRanState(
       PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE))));
-    jobReport.setReport(ModelUtils.getJobReportFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORT))));
+    try {
+      jobReport.setReport(
+        ModelUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORT)), Report.class));
+    } catch (GenericException e) {
+      LOGGER.error("Error parsing report in job report", e);
+    }
 
     return jobReport;
   }

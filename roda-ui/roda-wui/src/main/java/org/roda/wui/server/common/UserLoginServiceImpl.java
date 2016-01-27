@@ -11,16 +11,16 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.UserLogin;
 import org.roda.wui.client.common.UserLoginService;
-import org.roda.wui.common.client.GenericException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 

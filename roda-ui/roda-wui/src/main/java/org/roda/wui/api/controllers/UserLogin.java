@@ -13,9 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
-import org.roda.wui.common.client.GenericException;
 
 public class UserLogin extends RodaCoreService {
 

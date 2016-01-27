@@ -44,9 +44,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -593,66 +591,27 @@ public final class ModelUtils {
     return ret;
   }
 
-  @Deprecated
-  public static Map<String, Report> getJobReportsFromJson(String json) {
-    Map<String, Report> ret = new HashMap<String, Report>();
+  public static <T> T getObjectFromJson(String json, Class<T> objectClass) throws GenericException {
+    T ret;
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<Map<String, Report>>() {
+      ret = mapper.readValue(json, objectClass);
+    } catch (IOException e) {
+      throw new GenericException("Error while parsing JSON", e);
+    }
+    return ret;
+  }
+
+  public static <T> List<T> getListFromJson(String json, Class<T> objectClass) throws GenericException {
+    List<T> ret;
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<List<T>>() {
       });
     } catch (IOException e) {
-      LOGGER.error("Error transforming json string to job reports", e);
-    }
-    return ret;
-  }
-
-  public static Report getJobReportFromJson(String json) {
-    Report ret = new Report();
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<Report>() {
-      });
-    } catch (IOException e) {
-      LOGGER.error("Error transforming json string to job reports", e);
-    }
-    return ret;
-  }
-
-  public static String getJsonLogEntryParameters(List<LogEntryParameter> parameters) {
-    String ret = "";
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.writeValueAsString(parameters);
-    } catch (IOException e) {
-      LOGGER.error("Error transforming log entry parameter to json string", e);
-    }
-    return ret;
-  }
-
-  public static List<LogEntryParameter> getLogEntryParameters(String json) {
-    List<LogEntryParameter> ret = new ArrayList<LogEntryParameter>();
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<List<LogEntryParameter>>() {
-      });
-    } catch (IOException e) {
-      LOGGER.error("Error transforming json string to log entry parameters", e);
-    }
-    return ret;
-  }
-
-  public static LogEntry getLogEntry(String json) {
-    LogEntry ret = null;
-    try {
-      JsonFactory factory = new JsonFactory();
-      ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, LogEntry.class);
-    } catch (IOException e) {
-      LOGGER.error("Error transforming json string to log entry", e);
+      throw new GenericException("Error while parsing JSON", e);
     }
     return ret;
   }
