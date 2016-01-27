@@ -981,15 +981,13 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(fulltextPlugin);
   }
 
-  private static void runVeraPDFPlugin(String profile, String hasFeatures, String maxKbytes,
-    String hasPartialSuccessOnOutcome) {
+  private static void runVeraPDFPlugin(String profile, String hasFeatures, String maxKbytes) {
     try {
       Plugin<AIP> veraPDFPlugin = new VeraPDFPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("profile", profile);
       params.put("hasFeatures", hasFeatures);
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       veraPDFPlugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAllAIPs(veraPDFPlugin);
     } catch (InvalidParameterException e) {
@@ -997,12 +995,11 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runPDFtoPDFAPlugin(String maxKbytes, String hasPartialSuccessOnOutcome) {
+  private static void runPDFtoPDFAPlugin(String maxKbytes) {
     try {
       Plugin<AIP> plugin = new PDFtoPDFAPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       params.put("inputFormat", "pdf");
       params.put("outputFormat", "pdf");
       plugin.setParameterValues(params);
@@ -1012,15 +1009,15 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runImageMagickConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome,
-    String inputFormat, String outputFormat) {
+  private static void runImageMagickConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String conversionProfile) {
     try {
       Plugin<AIP> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
+      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1028,15 +1025,15 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runSoxSoundConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome, String inputFormat,
-    String outputFormat) {
+  private static void runSoxSoundConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String conversionProfile) {
     try {
       Plugin<AIP> plugin = new SoxSoundConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
+      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1044,15 +1041,15 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runFFMPEGVideoConvertPlugin(String maxKbytes, String hasPartialSuccessOnOutcome,
-    String inputFormat, String outputFormat) {
+  private static void runFFMPEGVideoConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String conversionProfile) {
     try {
       Plugin<AIP> plugin = new FFMPEGVideoConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
+      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1060,15 +1057,48 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runJODConverterPlugin(String maxKbytes, String hasPartialSuccessOnOutcome, String inputFormat,
-    String outputFormat) {
+  private static void runJODConverterPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String conversionProfile) {
     try {
       Plugin<AIP> plugin = new JODConverterPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("hasPartialSuccessOnOutcome", hasPartialSuccessOnOutcome);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
+      params.put("conversionProfile", conversionProfile);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runGhostScriptConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String device, String conversionProfile) {
+    try {
+      Plugin<AIP> plugin = new GhostScriptConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      params.put("device", device);
+      params.put("conversionProfile", conversionProfile);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runMencoderConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
+    String conversionProfile) {
+    try {
+      Plugin<AIP> plugin = new MencoderConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
+      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1241,6 +1271,8 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar soxsoundconvert");
     System.err.println("java -jar x.jar ffmpegvideoconvert");
     System.err.println("java -jar x.jar jodconverter");
+    System.err.println("java -jar x.jar ghostscriptconvert");
+    System.err.println("java -jar x.jar mencoderconvert");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1344,9 +1376,9 @@ public class RodaCoreFactory {
     } else if ("fulltext".equals(args.get(0))) {
       runFulltextPlugin();
     } else if ("verapdf".equals(args.get(0))) {
-      runVeraPDFPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+      runVeraPDFPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("pdftopdfa".equals(args.get(0))) {
-      runPDFtoPDFAPlugin(args.get(1), args.get(2));
+      runPDFtoPDFAPlugin(args.get(1));
     } else if ("imagemagickconvert".equals(args.get(0))) {
       runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("soxsoundconvert".equals(args.get(0))) {
@@ -1355,6 +1387,10 @@ public class RodaCoreFactory {
       runFFMPEGVideoConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("jodconverter".equals(args.get(0))) {
       runJODConverterPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+    } else if ("ghostscriptconvert".equals(args.get(0))) {
+      runGhostScriptConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4), args.get(5));
+    } else if ("mencoderconvert".equals(args.get(0))) {
+      runMencoderConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("jhove".equals(args.get(0))) {
       runJhovePlugin();
     } else if ("fits".equals(args.get(0))) {

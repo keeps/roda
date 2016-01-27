@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Report;
@@ -54,20 +53,14 @@ public class FFMPEGVideoConvertPlugin extends AbstractConvertPlugin {
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = FFMPEGVideoConvertPluginUtils.runFFMPEGVideoConvert(uriPath, inputFormat, outputFormat);
+      pluginResult = FFMPEGVideoConvertPluginUtils.runFFMPEGVideoConvert(uriPath, inputFormat, outputFormat,
+        conversionProfile);
     } else {
       pluginResult = FFMPEGVideoConvertPluginUtils.runFFMPEGVideoConvert(binary.getContent().createInputStream(),
-        inputFormat, outputFormat);
+        inputFormat, outputFormat, conversionProfile);
     }
 
     return pluginResult;
-  }
-
-  @Override
-  public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
-    ModelService model, int state) throws PluginException {
-    // TODO Auto-generated method stub
-
   }
 
   @Override

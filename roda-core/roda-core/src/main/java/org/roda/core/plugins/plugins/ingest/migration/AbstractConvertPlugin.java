@@ -3,31 +3,39 @@ package org.roda.core.plugins.plugins.ingest.migration;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
+import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +45,10 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
   public final Logger logger = LoggerFactory.getLogger(getClass());
   public String inputFormat;
   public String outputFormat;
-  public long maxKbytes = 20000;
-  public boolean hasPartialSuccessOnOutcome = true;
+  public long maxKbytes = 20000; // default value: 20000 kb
+  public boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
+    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  public String conversionProfile = "general"; // default conversion profile
 
   public abstract void init() throws PluginException;
 
@@ -70,6 +80,7 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     parametersMap.put("outputFormat", outputFormat);
     parametersMap.put("maxKbytes", Long.toString(maxKbytes));
     parametersMap.put("hasPartialSuccessOnOutcome", Boolean.toString(hasPartialSuccessOnOutcome));
+    parametersMap.put("conversionProfile", conversionProfile);
     return parametersMap;
   }
 
@@ -77,11 +88,6 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     // indicates the maximum kbytes the files that will be processed must have
     if (parameters.containsKey("maxKbytes")) {
       maxKbytes = Long.parseLong(parameters.get("maxKbytes"));
-    }
-
-    // indicates outcome types: success, partial success (if true), failure
-    if (parameters.containsKey("hasPartialSuccessOnOutcome")) {
-      hasPartialSuccessOnOutcome = Boolean.parseBoolean(parameters.get("hasPartialSuccessOnOutcome"));
     }
 
     // input image format
@@ -92,6 +98,11 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     // output image format
     if (parameters.containsKey("outputFormat")) {
       outputFormat = parameters.get("outputFormat");
+    }
+
+    // conversion profile
+    if (parameters.containsKey("conversionProfile")) {
+      conversionProfile = parameters.get("conversionProfile");
     }
   }
 
@@ -172,8 +183,46 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
 
   public abstract Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException;
 
-  public abstract void createEvent(List<String> alteredFiles, AIP aip, String representationID,
-    String newRepresentionID, ModelService model, int state) throws PluginException;
+  public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
+    ModelService model, int state) throws PluginException {
+
+    // building the detail extension for the plugin event
+    String outcome = "success";
+    StringBuilder stringBuilder = new StringBuilder();
+    if (alteredFiles.size() == 0) {
+      stringBuilder.append("No file was converted on this representation.");
+    } else {
+      stringBuilder.append("The following files were converted on a new representation (ID: " + newRepresentionID
+        + "): ");
+      for (String fileID : alteredFiles) {
+        stringBuilder.append(fileID + ", ");
+      }
+      stringBuilder.setLength(stringBuilder.length() - 2);
+    }
+
+    // Conversion plugin did not run correctly
+    if (state == 0 || (state == 2 && hasPartialSuccessOnOutcome == false)) {
+      outcome = "failure";
+      stringBuilder.setLength(0);
+    }
+    // some files were not converted
+    if (state == 2 && hasPartialSuccessOnOutcome == true) {
+      outcome = "partial success";
+    }
+
+    // FIXME revise PREMIS generation
+    try {
+      PluginHelper.createPluginEventAndAgent(aip.getId(), representationID, model,
+        EventPreservationObject.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
+        EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK, getClass().getName(),
+        Arrays.asList(representationID), outcome, stringBuilder.toString(), null, getClass().getName() + "@"
+          + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
+
+    } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
+      | AlreadyExistsException | AuthorizationDeniedException e) {
+      throw new PluginException(e.getMessage(), e);
+    }
+  }
 
   public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException;

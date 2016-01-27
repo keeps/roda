@@ -15,8 +15,8 @@ import org.roda.core.util.CommandUtility;
 
 public class FFMPEGVideoConvertPluginUtils {
 
-  public static Path runFFMPEGVideoConvert(InputStream is, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runFFMPEGVideoConvert(InputStream is, String inputFormat, String outputFormat,
+    String conversionProfile) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,25 +28,22 @@ public class FFMPEGVideoConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeFFMPEG(input, output);
+    return executeFFMPEG(input, output, conversionProfile);
   }
 
-  public static Path runFFMPEGVideoConvert(Path input, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runFFMPEGVideoConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeFFMPEG(input, output);
+    return executeFFMPEG(input, output, conversionProfile);
   }
 
-  private static Path executeFFMPEG(Path input, Path output) throws CommandException {
+  private static Path executeFFMPEG(Path input, Path output, String conversionProfile) throws CommandException {
 
-    // FIXME replace error
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert", conversionProfile,
+      "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
-    command = command.replace("\"", "");
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));
@@ -54,5 +51,14 @@ public class FFMPEGVideoConvertPluginUtils {
     // running the command
     CommandUtility.execute(commandList);
     return output;
+  }
+
+  public static String getVersion() throws CommandException {
+    String version = CommandUtility.execute("ffmpeg", "-version");
+    version = version.replace("Copyright", "?");
+    if (version.indexOf('\n') > 0) {
+      version = version.substring(0, version.indexOf('?'));
+    }
+    return version;
   }
 }

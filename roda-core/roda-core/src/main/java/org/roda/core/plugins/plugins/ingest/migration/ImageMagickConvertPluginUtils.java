@@ -15,8 +15,8 @@ import org.roda.core.util.CommandUtility;
 
 public class ImageMagickConvertPluginUtils {
 
-  public static Path runImageMagickConvert(InputStream is, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runImageMagickConvert(InputStream is, String inputFormat, String outputFormat,
+    String conversionProfile) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,26 +28,22 @@ public class ImageMagickConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeImageMagick(input, output, inputFormat, outputFormat);
+    return executeImageMagick(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
-
+  public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeImageMagick(input, output, inputFormat, outputFormat);
+    return executeImageMagick(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat)
-    throws CommandException {
+  private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat,
+    String conversionProfile) throws CommandException {
 
-    // FIXME replace error
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", conversionProfile,
+      "commandLine");
     command = command.replace("{input_file}", inputFormat + ":" + input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
-    command = command.replace("\"", "");
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));
@@ -55,6 +51,14 @@ public class ImageMagickConvertPluginUtils {
     // running the command
     CommandUtility.execute(commandList);
     return output;
+  }
+
+  public static String getVersion() throws CommandException {
+    String version = CommandUtility.execute("convert", "--version");
+    if (version.indexOf('\n') > 0) {
+      version = version.substring(0, version.indexOf('\n'));
+    }
+    return version;
   }
 
 }

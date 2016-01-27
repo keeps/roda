@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Report;
@@ -54,31 +53,22 @@ public class JODConverterPlugin extends AbstractConvertPlugin {
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = JODConverterPluginUtils.runJODConverter(uriPath, inputFormat, outputFormat);
+      pluginResult = JODConverterPluginUtils.runJODConverter(uriPath, inputFormat, outputFormat, conversionProfile);
     } else {
       pluginResult = JODConverterPluginUtils.runJODConverter(binary.getContent().createInputStream(), inputFormat,
-        outputFormat);
+        outputFormat, conversionProfile);
     }
 
     return pluginResult;
   }
 
   @Override
-  public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
-    ModelService model, int state) throws PluginException {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
     return null;
   }
 

@@ -24,13 +24,13 @@ public class AgentPreservationObject extends PreservationMetadata {
   public static final String PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN = "software:plugin:characterization";
   public static final String PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN = "software:plugin:virus_check";
   public static final String PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN = "software:plugin:verapdf_check";
-  public static final String PRESERVATION_AGENT_TYPE_PDFTOPDFA_CONVERSION_PLUGIN = "software:plugin:pdftopdfa_conversion";
+  public static final String PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN = "software:plugin:conversion";
   public static final String PRESERVATION_AGENT_TYPE_UNKNOWN_PREFIX = "unknown:";
 
   public static final String[] PRESERVATION_AGENT_TYPES = new String[] {PRESERVATION_AGENT_TYPE_INGEST_TASK,
     PRESERVATION_AGENT_TYPE_MIGRATOR, PRESERVATION_AGENT_TYPE_DIGITALIZATION,
     PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN, PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN,
-    PRESERVATION_AGENT_TYPE_PDFTOPDFA_CONVERSION_PLUGIN, PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN};
+    PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN};
 
   private String agentName = null;
   private String agentType = null;

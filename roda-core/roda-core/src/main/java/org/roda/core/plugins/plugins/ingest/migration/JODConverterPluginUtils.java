@@ -19,8 +19,8 @@ import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConv
 
 public class JODConverterPluginUtils {
 
-  public static Path runJODConverter(InputStream is, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runJODConverter(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -32,18 +32,16 @@ public class JODConverterPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeJODConverter(input, output);
+    return executeJODConverter(input, output, conversionProfile);
   }
 
-  public static Path runJODConverter(Path input, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runJODConverter(Path input, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeJODConverter(input, output);
+    return executeJODConverter(input, output, conversionProfile);
   }
 
-  private static Path executeJODConverter(Path input, Path output) throws ConnectException {
+  private static Path executeJODConverter(Path input, Path output, String conversionProfile) throws ConnectException {
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
@@ -51,8 +49,10 @@ public class JODConverterPluginUtils {
     // command to start an open office connection:
     // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
     // -nofirststartwizard
-    int OOPort = Integer.parseInt(RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert",
-      "commandLine"));
+    String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", conversionProfile,
+      "openOfficePort");
+    int OOPort = Integer.parseInt(port);
+
     OpenOfficeConnection connection = new SocketOpenOfficeConnection(OOPort);
     connection.connect();
 

@@ -15,8 +15,8 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxSoundConvertPluginUtils {
 
-  public static Path runSoxSoundConvert(InputStream is, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runSoxSoundConvert(InputStream is, String inputFormat, String outputFormat,
+    String conversionProfile) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,25 +28,22 @@ public class SoxSoundConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeSox(input, output);
+    return executeSox(input, output, conversionProfile);
   }
 
-  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
+  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-
-    return executeSox(input, output);
+    return executeSox(input, output, conversionProfile);
   }
 
-  private static Path executeSox(Path input, Path output) throws CommandException {
+  private static Path executeSox(Path input, Path output, String conversionProfile) throws CommandException {
 
-    // FIXME replace error
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxsoundconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxsoundconvert", conversionProfile,
+      "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
-    command = command.replace("\"", "");
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));
@@ -56,4 +53,12 @@ public class SoxSoundConvertPluginUtils {
     return output;
   }
 
+  public static String getVersion() throws CommandException {
+    String version = CommandUtility.execute("sox", "--version");
+    if (version.indexOf('\n') > 0) {
+      version = version.replace(" ", "");
+      version = version.substring(0, version.indexOf('\n'));
+    }
+    return version;
+  }
 }

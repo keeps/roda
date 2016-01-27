@@ -18,6 +18,7 @@ import java.nio.file.Path;
 
 import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
+import org.roda.core.RodaCoreFactory;
 import org.verapdf.core.ValidationException;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.metadata.fixer.impl.MetadataFixerImpl;
@@ -58,23 +59,13 @@ public class PDFtoPDFAPluginUtils {
     // fixed output
     Path pdfa = Files.createTempFile("pdfa", ".pdf");
     Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
-    String pdfPath = p.toString();
-    String pdfaPath = pdfa.toString();
-    String pdfPathFixed = fixed.toString();
+
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "pdftopdfa", "commandLine");
+    command = command.replace("{input_file}", p.toString());
+    command = command.replace("{output_file}", pdfa.toString());
 
     // GhostScript transformation command
-    String[] gsArgs = new String[10];
-    gsArgs[0] = "gs";
-    gsArgs[1] = "-dPDFA";
-    gsArgs[2] = "-dBATCH";
-    gsArgs[3] = "-dNOPAUSE";
-    gsArgs[4] = "-dUseCIEColor";
-    gsArgs[5] = "-sProcessColorModel=DeviceCMYK";
-    gsArgs[6] = "-sDEVICE=pdfwrite";
-    gsArgs[7] = "-sPDFACompatibilityPolicy=1";
-    gsArgs[8] = "-sOutputFile=" + pdfaPath;
-    gsArgs[9] = pdfPath;
-
+    String[] gsArgs = command.split(" ");
     Ghostscript gs = Ghostscript.getInstance();
 
     try {
@@ -85,7 +76,7 @@ public class PDFtoPDFAPluginUtils {
     }
 
     // metadata fixer transformation
-    InputStream is = new FileInputStream(pdfaPath);
+    InputStream is = new FileInputStream(pdfa.toString());
 
     try (ModelParser loader = new ModelParser(is)) {
 
@@ -97,7 +88,7 @@ public class PDFtoPDFAPluginUtils {
       is.close();
 
       // fixing metadata
-      OutputStream fixedOutputStream = new FileOutputStream(pdfPathFixed);
+      OutputStream fixedOutputStream = new FileOutputStream(fixed.toString());
       FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
       MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
       fixedOutputStream.close();
