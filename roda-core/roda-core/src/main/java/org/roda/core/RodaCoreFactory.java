@@ -105,12 +105,10 @@ import org.roda.core.plugins.orchestrate.AkkaDistributedPluginWorker;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
-import org.roda.core.plugins.plugins.base.CharacterizationPlugin;
 import org.roda.core.plugins.plugins.base.FixityPlugin;
 import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexPlugin;
 import org.roda.core.plugins.plugins.base.RemoveOrphansPlugin;
-import org.roda.core.plugins.plugins.base.V2ToV3PremisPlugin;
 import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
@@ -1018,19 +1016,9 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnTransferredResources(bagitPlugin, bagitsList);
   }
 
-  private static void runCharacterizationPlugin() {
-    Plugin<AIP> characterizationPlugin = new CharacterizationPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(characterizationPlugin);
-  }
-
   private static void runPremisSkeletonPlugin() {
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(premisSkeletonPlugin);
-  }
-
-  private static void runPremisV2toV3Plugin() {
-    Plugin<AIP> premisUpdatePlugin = new V2ToV3PremisPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(premisUpdatePlugin);
   }
 
   private static void runValidationPlugin(String force, String forceOnly, String premis, String metadataType) {
@@ -1156,8 +1144,6 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar fulltext");
     System.err.println("java -jar x.jar jhove");
     System.err.println("java -jar x.jar fits");
-    System.err.println("java -jar x.jar characterization");
-    System.err.println("java -jar x.jar v2tov3");
     System.err.println("java -jar x.jar validation");
     System.err.println("java -jar x.jar logClean");
     System.err.println("java -jar x.jar exifTool");
@@ -1288,10 +1274,6 @@ public class RodaCoreFactory {
     } else if ("files".equals(args.get(0))) {
       Filter filter = null;
       printPreservationFiles(filter, null, new Sublist(0, 10000), null);
-    } else if ("characterization".equals(args.get(0))) {
-      runCharacterizationPlugin();
-    } else if ("v2tov3".equals(args.get(0))) {
-      runPremisV2toV3Plugin();
     } else if ("validation".equals(args.get(0))) {
       runValidationPlugin(args.get(1), args.get(2), args.get(3), args.get(3));
     } else if ("logClean".equals(args.get(0))) {
