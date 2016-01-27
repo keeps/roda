@@ -379,7 +379,7 @@ public class IndexModelObserver implements ModelObserver {
         AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
         indexAIP(aip);
       }
-
+      LOGGER.debug("preservationMetadataCreated");
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationMetadata);
       Binary binary = model.getStorage().getBinary(storagePath);
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
@@ -387,13 +387,13 @@ public class IndexModelObserver implements ModelObserver {
 
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
+        LOGGER.debug("INDEXING EVENT");
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
-        List<PreservationLinkingAgent> linkingAgents = ModelUtils.extractAgentsFromPreservationBinary(binary,
-          EventComplexType.class);
-        List<PreservationLinkingObject> linkingObjects = ModelUtils.extractLinkingObjectsFromPreservationBinary(binary,
-          EventComplexType.class);
+        index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
       } else if (type.equals(PreservationMetadataType.AGENT)) {
+        LOGGER.debug("INDEXING AGENT");
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
+        index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
       }
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
@@ -414,9 +414,11 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void preservationMetadataDeleted(String aipId, String representationId, String preservationMetadataBinaryId) {
+  public void preservationMetadataDeleted(PreservationMetadata preservationMetadata) {
     try {
-      aipUpdated(model.retrieveAIP(aipId));
+      if(preservationMetadata.getAipId()!=null){
+        aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
+      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }

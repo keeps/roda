@@ -164,10 +164,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyPreservationMetadataDeleted(String aipId, String representationId,
-    String preservationMetadataBinaryId) {
+  protected void notifyPreservationMetadataDeleted(PreservationMetadata pm) {
     for (ModelObserver observer : observers) {
-      observer.preservationMetadataDeleted(aipId, representationId, preservationMetadataBinaryId);
+      observer.preservationMetadataDeleted(pm);
     }
   }
 

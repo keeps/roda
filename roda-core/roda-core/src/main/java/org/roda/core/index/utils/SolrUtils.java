@@ -96,6 +96,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
@@ -607,19 +608,21 @@ public class SolrUtils {
   }
 
   public static Long objectToLong(Object object) {
-    Long ret;
-    if (object instanceof Long) {
-      ret = (Long) object;
-    } else if (object instanceof String) {
-      try {
-        ret = Long.parseLong((String) object);
-      } catch (NumberFormatException e) {
-        LOGGER.error("Could not convert Solr object to long", e);
+    Long ret = null;
+    if(object!=null){
+      if (object instanceof Long) {
+        ret = (Long) object;
+      } else if (object instanceof String) {
+        try {
+          ret = Long.parseLong((String) object);
+        } catch (NumberFormatException e) {
+          LOGGER.error("Could not convert Solr object to long", e);
+          ret = null;
+        }
+      } else {
+        LOGGER.error("Could not convert Solr object to long" + object.getClass().getName());
         ret = null;
       }
-    } else {
-      LOGGER.error("Could not convert Solr object to long" + object.getClass().getName());
-      ret = null;
     }
     return ret;
   }
@@ -707,6 +710,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_REPRESENTATION;
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
+    } else if (resultClass.equals(IndexedPreservationAgent.class)) {
+      indexName = RodaConstants.INDEX_PRESERVATION_AGENTS;
     } else if (resultClass.equals(LogEntry.class)) {
       indexName = RodaConstants.INDEX_ACTION_LOG;
     } else if (resultClass.equals(JobReport.class)) {
@@ -752,6 +757,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToSimpleFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc));
+    } else if (resultClass.equals(IndexedPreservationAgent.class)) {
+      ret = resultClass.cast(solrDocumentToIndexedPreservationAgent(doc));
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -1133,6 +1140,9 @@ public class SolrUtils {
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     final String eventOutcomeDetailExtension = objectToString(
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
+    final List<String> linkingAgentIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
+    final List<String> linkingOutcomeObjectIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
+    final List<String> linkingSourceObjectIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
 
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
@@ -1144,10 +1154,32 @@ public class SolrUtils {
     ipe.setEventType(eventType);
     ipe.setEventOutcome(eventOutcome);
     ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
-    
+    ipe.setLinkingAgentIds(linkingAgentIdentifiers);
+    ipe.setOutcomeObjectIds(linkingOutcomeObjectIdentifiers);
+    ipe.setSourcesObjectIds(linkingSourceObjectIdentifiers);
     return ipe;
   }
 
+  private static IndexedPreservationAgent solrDocumentToIndexedPreservationAgent(SolrDocument doc) {
+    final String id = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_ID));
+    final String role = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLE));
+    final String title = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TITLE));
+    final String type = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TYPE));
+    final String identifierType = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_IDENTIFIER_TYPE));
+    final String identifierValue = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_IDENTIFIER_VALUE));
+    final String version = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION));
+
+    IndexedPreservationAgent ipa = new IndexedPreservationAgent();
+    ipa.setId(id);
+    ipa.setIdentifierType(identifierType);
+    ipa.setIdentifierValue(identifierValue);
+    ipa.setRole(role);
+    ipa.setTitle(title);
+    ipa.setType(type);
+    ipa.setVersion(version);
+    return ipa;
+  }
+  
   public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
     throws GenericException {
     SolrInputDocument doc;
@@ -1408,15 +1440,17 @@ public class SolrUtils {
   }
 
   public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
+    LOGGER.debug(doc.toString());
+    
     IndexedFile file = null;
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
-    boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
+    //boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
 
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
-    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE));
+    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE))!=null?objectToLong(doc.get(RodaConstants.FILE_SIZE)):0;
     boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
     String path = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
@@ -1437,7 +1471,8 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
-    file = new IndexedFile(fileId, aipId, representationId, path, entryPoint, fileFormat, originalName, size,
+ // FIXME remove entrypoint from IndexedFile...
+    file = new IndexedFile(fileId, aipId, representationId, path, false, fileFormat, originalName, size,
       isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }

@@ -22,9 +22,9 @@ public class IndexedPreservationEvent implements Serializable {
   private String eventType;
   private String eventOutcome;
   private String eventOutcomeDetailExtension;
-  private List<IndexedPreservationAgent> agents;
-  private List<IndexedObject> outcome;
-  private List<IndexedObject> source;
+  private List<String> linkingAgentIds;
+  private List<String> outcomeObjectIds;
+  private List<String> sourcesObjectIds;
 
   public String getAipId() {
     return aipId;
@@ -98,28 +98,14 @@ public class IndexedPreservationEvent implements Serializable {
     this.eventOutcomeDetailExtension = eventOutcomeDetailExtension;
   }
 
-  public List<IndexedPreservationAgent> getAgents() {
-    return agents;
+  
+
+  public List<String> getLinkingAgentIds() {
+    return linkingAgentIds;
   }
 
-  public void setAgents(List<IndexedPreservationAgent> agents) {
-    this.agents = agents;
-  }
-
-  public List<IndexedObject> getOutcome() {
-    return outcome;
-  }
-
-  public void setOutcome(List<IndexedObject> outcome) {
-    this.outcome = outcome;
-  }
-
-  public List<IndexedObject> getSource() {
-    return source;
-  }
-
-  public void setSource(List<IndexedObject> source) {
-    this.source = source;
+  public void setLinkingAgentIds(List<String> linkingAgentIds) {
+    this.linkingAgentIds = linkingAgentIds;
   }
 
   public String toString() {
@@ -138,4 +124,22 @@ public class IndexedPreservationEvent implements Serializable {
     sb.append("}");
     return sb.toString();
   }
+
+  public List<String> getOutcomeObjectIds() {
+    return outcomeObjectIds;
+  }
+
+  public void setOutcomeObjectIds(List<String> outcomeObjectIds) {
+    this.outcomeObjectIds = outcomeObjectIds;
+  }
+
+  public List<String> getSourcesObjectIds() {
+    return sourcesObjectIds;
+  }
+
+  public void setSourcesObjectIds(List<String> sourcesObjectIds) {
+    this.sourcesObjectIds = sourcesObjectIds;
+  }
+  
+  
 }

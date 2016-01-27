@@ -425,6 +425,8 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.file", indexDataPath.resolve(RodaConstants.CORE_FILE_FOLDER).toString());
     System.setProperty("solr.data.dir.preservationevent",
       indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONEVENT_FOLDER).toString());
+    System.setProperty("solr.data.dir.preservationagent",
+      indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONAGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.actionlog",
       indexDataPath.resolve(RodaConstants.CORE_ACTIONLOG_FOLDER).toString());
     System.setProperty("solr.data.dir.members", indexDataPath.resolve(RodaConstants.CORE_MEMBERS_FOLDER).toString());

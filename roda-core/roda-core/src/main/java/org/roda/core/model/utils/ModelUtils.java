@@ -82,15 +82,6 @@ public final class ModelUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
   /**
-   * @deprecated
-   * @see PreservationMetadataType
-   */
-  @Deprecated
-  public enum PREMIS_TYPE {
-    REPRESENTATION, FILE, EVENT, AGENT, UNKNOWN
-  }
-
-  /**
    * Private empty constructor
    */
   private ModelUtils() {
@@ -372,7 +363,27 @@ public final class ModelUtils {
   public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
     throws RequestNotValidException {
     // TODO review this method
-    return getPreservationFilePath(pm.getAipId(), pm.getRepresentationID(), pm.getId());
+    StoragePath path = null;
+    if(pm.getType()!=null){
+      if (pm.getType().equals(PreservationMetadataType.AGENT)) {
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+          RodaConstants.STORAGE_DIRECTORY_AGENTS, pm.getId() + ".agent.premis.xml");
+      } else if (pm.getType().equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          pm.getId()+ ".representation.premis.xml");
+      } else if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+        // TODO HANDLE AIP and REPRESENTATION EVENTS
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          pm.getId() + ".event.premis.xml");
+      } else if (pm.getType().equals(PreservationMetadataType.OBJECT_FILE)) {
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          pm.getId() + ".file.premis.xml");
+      }
+    }
+    return path;
   }
 
   /**
@@ -397,12 +408,6 @@ public final class ModelUtils {
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId),
       fileId + ".file.premis.xml");
-  }
-
-  public static StoragePath getPreservationFilePath(String aipId, String fileID) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, fileID);
-
   }
 
   public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(Binary preservationBinary) {
@@ -652,12 +657,12 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static <T> List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b, Class<T> c) {
+  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b, PreservationMetadataType type) {
     List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
-    if (c.equals(lc.xmlns.premisV2.File.class)) {
+    if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
       // TODO check if files has agents
       LOGGER.error("Not implemented!");
-    } else if (c.equals(EventComplexType.class)) {
+    } else if (type.equals(PreservationMetadataType.EVENT)) {
       EventComplexType event = getPreservationEvent(b);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null) {
@@ -671,7 +676,7 @@ public final class ModelUtils {
           agents.add(agent);
         }
       }
-    } else if (c.equals(lc.xmlns.premisV2.Representation.class)) {
+    } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
       // TODO
       LOGGER.error("Not implemented!");
     } else {
@@ -846,32 +851,6 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
   }
 
-  /**
-   * @deprecated
-   * @see #getPreservationMetadataStoragePath(PreservationMetadata)
-   */
-  @Deprecated
-  public static StoragePath buildPreservationPath(PREMIS_TYPE type, String aipId, String representationId,
-    String fileId, String preservationId) throws RequestNotValidException {
-    StoragePath path = null;
-    if (type.toString().equalsIgnoreCase(PREMIS_TYPE.AGENT.toString())) {
-      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-        RodaConstants.STORAGE_DIRECTORY_AGENTS, preservationId + ".agent.premis.xml");
-    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.REPRESENTATION.toString())) {
-      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-        representationId + ".representation.premis.xml");
-    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.EVENT.toString())) {
-      // TODO HANDLE AIP and REPRESENTATION EVENTS
-      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-        preservationId + ".event.premis.xml");
-    } else if (type.toString().equalsIgnoreCase(PREMIS_TYPE.FILE.toString())) {
-      path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-        RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-        fileId + ".file.premis.xml");
-    }
-    return path;
-  }
+ 
 
 }

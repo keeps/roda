@@ -7,10 +7,12 @@
  */
 package org.roda.core.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -47,6 +49,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.Metadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
@@ -62,7 +65,6 @@ import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultBinary;
@@ -684,7 +686,7 @@ public class ModelService extends ModelObservable {
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Iterable<File> it = null;
 
-    final Iterator<Resource> iterator = storage.listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId))
+    final Iterator<Resource> iterator = storage.listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId))
       .iterator();
 
     it = new Iterable<File>() {
@@ -771,6 +773,7 @@ public class ModelService extends ModelObservable {
     final List<String> fileIds)
       throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
+    
     final Iterator<String> fileIdIterator = fileIds.iterator();
 
     Iterable<File> ret = new Iterable<File>() {
@@ -872,8 +875,9 @@ public class ModelService extends ModelObservable {
 
             if (nextFile.isDirectory()) {
               try {
-                it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder())
-                  .iterator();
+                if(nextFile.getFilesDirectlyUnder()!=null){
+                  it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder()).iterator();
+                }
 
               } catch (NotFoundException | GenericException | RequestNotValidException
                 | AuthorizationDeniedException e) {
@@ -1221,6 +1225,8 @@ public class ModelService extends ModelObservable {
 
     String id = resourcePath.getName();
     String aipId = ModelUtils.getAIPidFromStoragePath(resourcePath);
+    LOGGER.debug("convertResourceToRepresentationFile: "+resourcePath.asString());
+    LOGGER.debug("convertResourceToRepresentationFile2: "+resourcePath.getDirectoryPath());
     String representationId = ModelUtils.getRepresentationIdFromStoragePath(resourcePath);
     List<String> filePath = ModelUtils.getFilePathFromStoragePath(resourcePath);
 
@@ -1541,67 +1547,6 @@ public class ModelService extends ModelObservable {
     return aipsIterable;
   }
 
-  // TODO verify
-  public PreservationMetadata createPreservationMetadata(String aipId, String representationID,
-    String preservationMetadataId, Binary binary)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    PreservationMetadata preservationMetadataBinary;
-
-    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationID, preservationMetadataId);
-    boolean asReference = false;
-    Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
-    preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationID,
-      ModelUtils.getPreservationType(updatedBinary));
-    notifyPreservationMetadataCreated(preservationMetadataBinary);
-
-    return preservationMetadataBinary;
-  }
-
-  // TODO verify
-  public PreservationMetadata createPreservationMetadata(String aipId, String preservationMetadataId, Binary binary)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    PreservationMetadata preservationMetadataBinary;
-    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, preservationMetadataId);
-    boolean asReference = false;
-    Binary updatedBinary = storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, true);
-    preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, null,
-      ModelUtils.getPreservationType(updatedBinary));
-    notifyPreservationMetadataCreated(preservationMetadataBinary);
-    return preservationMetadataBinary;
-  }
-
-  // TODO verify
-  public PreservationMetadata updatePreservationMetadata(String aipId, String representationId,
-    String preservationMetadataId, Binary binary, boolean payloadOnly)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    PreservationMetadata preservationMetadataBinary;
-    PreservationMetadataType type = ModelUtils.getPreservationType(binary);
-    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
-    if (payloadOnly) {
-      storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, type);
-    } else {
-
-      boolean asReference = false;
-      boolean createIfNotExists = false;
-      storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
-      Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-      storage.updateMetadata(binaryPath, binaryMetadata, true);
-      preservationMetadataBinary = new PreservationMetadata(preservationMetadataId, aipId, representationId, type);
-    }
-    notifyPreservationMetadataUpdated(preservationMetadataBinary);
-
-    return preservationMetadataBinary;
-  }
-
-  // TODO verify
-  public void deletePreservationMetadata(String aipId, String representationId, String preservationMetadataId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getPreservationFilePath(aipId, representationId, preservationMetadataId);
-    storage.deleteResource(binaryPath);
-    notifyPreservationMetadataDeleted(aipId, representationId, preservationMetadataId);
-  }
-
   public void addLogEntry(LogEntry logEntry, Path logDirectory)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     addLogEntry(logEntry, logDirectory, true);
@@ -1879,34 +1824,62 @@ public class ModelService extends ModelObservable {
   }
 
   // TODO remove PREMIS type and file Id
-  public void createPreservationMetadata(String aipId, String representationId, String fileId, String fileName,
-    Binary binary, PREMIS_TYPE type)
+  public void createPreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
+    String id, Binary binary)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, fileName);
-    LOGGER.debug("createPreservationMetadata " + binaryPath.asString());
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setAipId(aipId);
+    pm.setId(id);
+    pm.setRepresentationID(representationId);
+    pm.setType(type);
+    StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId,
-      ModelUtils.getPreservationType(binary));
+    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(binary, type); 
+    if(agents!=null){
+      for(PreservationLinkingAgent pla : agents){
+        try{
+          AgentPreservationObject agent = new AgentPreservationObject();
+          agent.setAgentName(pla.getTitle() + "/" + pla.getVersion());
+          agent.setAgentType(pla.getType());
+          agent.setId(pla.getIdentifierValue());
+          byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
+          Path agentFile = Files.createTempFile("agent_preservation", ".xml");
+          Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
+          Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
+          createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), agentResource);
+        }catch(PremisMetadataException | IOException pme){
+          LOGGER.error("Error creating agent: "+pme.getMessage(),pme);
+        }
+      }
+    }
     notifyPreservationMetadataCreated(pm);
   }
 
   // TODO remove PREMIS type and file Id
-  public void updatePreservationMetadata(String aipId, String representationId, String fileId, String fileName,
-    Binary binary, PREMIS_TYPE type)
+  public void updatePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
+    String id, Binary binary)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, fileName);
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setAipId(aipId);
+    pm.setId(id);
+    pm.setRepresentationID(representationId);
+    pm.setType(type);
+    StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    PreservationMetadata pm = new PreservationMetadata(fileName, aipId, representationId,
-      ModelUtils.getPreservationType(binary));
     notifyPreservationMetadataUpdated(pm);
   }
 
   // TODO remove PREMIS type and file Id
-  public void deletePreservationMetadata(String aipId, String representationId, String fileId, String preservationId,
-    PREMIS_TYPE type)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.buildPreservationPath(type, aipId, representationId, fileId, preservationId);
+  public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
+    String id) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setAipId(aipId);
+    pm.setId(id);
+    pm.setRepresentationID(representationId);
+    pm.setType(type);
+
+    StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.deleteResource(binaryPath);
-    notifyPreservationMetadataDeleted(aipId, representationId, preservationId);
+    notifyPreservationMetadataDeleted(pm);
   }
 }

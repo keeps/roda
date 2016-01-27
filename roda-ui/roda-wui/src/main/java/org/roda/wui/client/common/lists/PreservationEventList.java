@@ -106,10 +106,10 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
         String ret = null;
         if (event != null) {
           //TODO IMPROVE...
-          if(event.getAgents()!=null){
+          if(event.getLinkingAgentIds()!=null){
             ret = "";
-            for(IndexedPreservationAgent ipa : event.getAgents()){
-              ret+=ipa.getId();
+            for(String agentID : event.getLinkingAgentIds()){
+              ret+=agentID;
               ret+=" ";
             }
             ret = ret.trim();
@@ -125,11 +125,12 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       public String getValue(IndexedPreservationEvent event) {
         String ret = null;
         // TODO define link
+        //TODO handle outcome objects
         if (event != null) {
-          if(event.getSource()!=null){
+          if(event.getSourcesObjectIds()!=null){
             ret = "";
-            for(IndexedObject io : event.getSource()){
-              ret+=io.getIdentifierValue();
+            for(String sourceID : event.getSourcesObjectIds()){
+              ret+=sourceID;
               ret+=" ";
             }
             ret = ret.trim();
@@ -182,7 +183,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     Map<Column<IndexedPreservationEvent, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, String>();
     columnSortingKeyMap.put(eventDateTimeColumn, RodaConstants.PRESERVATION_EVENT_DATETIME);
     //TODO an event can now have multiple agents... sort by agent id should maybe be removed...
-    columnSortingKeyMap.put(eventAgentColumn, RodaConstants.PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE);
+    columnSortingKeyMap.put(eventAgentColumn, RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER);
     columnSortingKeyMap.put(eventTypeColumn, RodaConstants.PRESERVATION_EVENT_TYPE);
     columnSortingKeyMap.put(eventDetailColumn, RodaConstants.PRESERVATION_EVENT_DETAIL);
     columnSortingKeyMap.put(eventOutcomeColumn, RodaConstants.PRESERVATION_EVENT_OUTCOME);

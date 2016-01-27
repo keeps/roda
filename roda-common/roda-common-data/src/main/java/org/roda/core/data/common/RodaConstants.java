@@ -7,6 +7,8 @@
  */
 package org.roda.core.data.common;
 
+import java.nio.file.Path;
+
 public final class RodaConstants {
 
   /*
@@ -65,6 +67,7 @@ public final class RodaConstants {
   public static final String CORE_MEMBERS_FOLDER = "members";
   public static final String CORE_ACTIONLOG_FOLDER = "actionlog";
   public static final String CORE_PRESERVATIONEVENT_FOLDER = "preservationevent";
+  public static final String CORE_PRESERVATIONAGENT_FOLDER = "preservationagent";
   public static final String CORE_FILE_FOLDER = "file";
   public static final String CORE_REPRESENTATION_FOLDER = "representation";
   public static final String CORE_AIP_FOLDER = "aip";
@@ -480,8 +483,18 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_TYPE = "eventType";
   public static final String PRESERVATION_EVENT_OUTCOME = "eventOutcome";
   public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION = "eventOutcomeDetailExtension";
-
-  public static final String PRESERVATION_EVENT_AGENT_IDENTIFIER_VALUE = "agentIdentifierValue";
+  public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
+  public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
+  public static final Object PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+  
+  /* Preservation agents fields */
+  public static final String PRESERVATION_AGENT_ID = "id";
+  public static final String PRESERVATION_AGENT_ROLE = "role";
+  public static final String PRESERVATION_AGENT_TITLE = "title";
+  public static final String PRESERVATION_AGENT_TYPE = "type";
+  public static final String PRESERVATION_AGENT_IDENTIFIER_TYPE = "identifierType";
+  public static final String PRESERVATION_AGENT_IDENTIFIER_VALUE = "identifierValue";
+  public static final String PRESERVATION_AGENT_VERSION = "version";
   
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";

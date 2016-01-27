@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -40,7 +41,6 @@ import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.model.utils.ModelUtils.PREMIS_TYPE;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -164,9 +164,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
     helper.saveToFile(premisRepresentation.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID, null, null,
-      (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation),
-      PREMIS_TYPE.REPRESENTATION);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationID,
+      null, (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
 
     FSUtils.deletePath(premisRepresentation);
   }
@@ -185,8 +184,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premis = Files.createTempFile(file.getId(), ".premis.xml");
     PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
     helper.saveToFile(premis.toFile());
-    model.createPreservationMetadata(aip.getId(), representationID, file.getId(), null,
-      (Binary) FSUtils.convertPathToResource(premis.getParent(), premis), PREMIS_TYPE.FILE);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationID, file.getId(),
+      (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
     if (pObject.getRootFile() == null) {
       pObject.setRootFile(premisObject);
     } else {

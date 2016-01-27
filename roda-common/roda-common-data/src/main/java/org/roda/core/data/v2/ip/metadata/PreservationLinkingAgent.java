@@ -9,8 +9,26 @@ public class PreservationLinkingAgent implements Serializable {
   private String type;
   private String identifierType;
   private String identifierValue;
+  private String agent;
+  private String version;
 
   public PreservationLinkingAgent() {
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
+  public String getAgent() {
+    return agent;
+  }
+
+  public void setAgent(String agent) {
+    this.agent = agent;
   }
 
   public String getRole() {
@@ -53,5 +71,4 @@ public class PreservationLinkingAgent implements Serializable {
     this.identifierValue = identifierValue;
   }
 
-  
 }

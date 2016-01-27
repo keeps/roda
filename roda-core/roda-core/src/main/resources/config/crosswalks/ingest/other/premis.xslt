@@ -81,38 +81,29 @@
 			</xsl:if>
 		</xsl:if>
 		<xsl:if test="prem:linkingAgentIdentifier">
-			<xsl:if test="prem:linkingAgentIdentifier/prem:linkingAgentIdentifierType">
-				<field name="agentIdentifierType">
-					<xsl:value-of select="prem:linkingAgentIdentifier/prem:linkingAgentIdentifierValue/text()" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:linkingAgentIdentifier/prem:linkingAgentIdentifierValue">
-				<field name="agentIdentifierValue">
-					<xsl:value-of select="prem:linkingAgentIdentifier/prem:linkingAgentIdentifierValue/text()" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:linkingAgentIdentifier/prem:linkingAgentRole">
-				<field name="agentRole">
-					<xsl:value-of select="prem:linkingAgentIdentifier/prem:linkingAgentRole/text()" />
-				</field>
-			</xsl:if>
+			<xsl:for-each select="prem:linkingAgentIdentifier">
+				<xsl:if test="prem:linkingAgentIdentifierValue">
+					<field name="linkingAgentIdentifier">
+						<xsl:value-of select="prem:linkingAgentIdentifierValue/text()" />
+					</field>
+				</xsl:if>
+			</xsl:for-each>
 		</xsl:if>
 		<xsl:if test="prem:linkingObjectIdentifier">
-			<xsl:if test="prem:linkingObjectIdentifier/prem:linkingObjectIdentifierType">
-				<field name="objectIdentifierType">
-					<xsl:value-of select="prem:linkingObjectIdentifier/prem:linkingObjectIdentifierType/text()" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:linkingObjectIdentifier/prem:linkingObjectIdentifierValue">
-				<field name="objectIdentifierValue">
-					<xsl:value-of select="prem:linkingObjectIdentifier/prem:linkingObjectIdentifierValue/text()" />
-				</field>
-			</xsl:if>
-			<xsl:if test="prem:linkingObjectIdentifier/prem:linkingObjectRole">
-				<field name="objectRole">
-					<xsl:value-of select="prem:linkingObjectIdentifier/prem:linkingObjectRole/text()" />
-				</field>
-			</xsl:if>
+			<xsl:for-each select="prem:linkingObjectIdentifier">
+				<xsl:if test="prem:linkingObjectIdentifierValue">
+					<xsl:if test="prem:linkingObjectIdentifierType/text()='outcome'">
+						<field name="linkingOutcomeObjectIdentifier">
+							<xsl:value-of select="prem:linkingObjectIdentifierValue/text()" />
+						</field>
+					</xsl:if>
+					<xsl:if test="prem:linkingObjectIdentifierType/text()='source'">
+						<field name="linkingSourceObjectIdentifier">
+							<xsl:value-of select="prem:linkingObjectIdentifierValue/text()" />
+						</field>
+					</xsl:if>
+				</xsl:if>
+			</xsl:for-each>
 		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>

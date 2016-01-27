@@ -104,12 +104,14 @@
      required, it is highly recommended. A <uniqueKey> is present in almost all Solr 
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
-
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />   
-   <field name="aipId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="representationId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="fileId" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    
+   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />   
+   <field name="role" type="string" indexed="true" stored="true" required="false" multiValued="false" />   
+   <field name="title" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="identifierType" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="identifierValue" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="version" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
