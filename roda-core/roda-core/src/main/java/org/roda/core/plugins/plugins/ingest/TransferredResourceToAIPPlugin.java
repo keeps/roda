@@ -17,19 +17,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -105,8 +102,14 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
-        HashMap<String, Set<String>> metadata = setAIPMetadata(model, jobDefinedParentId);
-        AIP aip = model.createAIP(metadata, false, true);
+
+        boolean active = false;
+        String parentId = jobDefinedParentId;
+        AIPPermissions permissions = new AIPPermissions();
+        boolean notify = true;
+
+        AIP aip = model.createAIP(active, parentId, permissions, notify);
+
         final String aipID = aip.getId();
         String representationID = "representation";
         PluginHelper.createDirectories(model, aip.getId(), representationID);
@@ -177,20 +180,6 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
     }
     return report;
-  }
-
-  private HashMap<String, Set<String>> setAIPMetadata(ModelService model, String parentId) {
-    HashMap<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    if (parentId != null) {
-      try {
-        // FIXME shouldn't this be changed by an index search instead?
-        model.retrieveAIP(parentId);
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
-      } catch (RODAException e) {
-        LOGGER.warn("Couldn't find parent AIP '{}'", parentId);
-      }
-    }
-    return metadata;
   }
 
   @Override

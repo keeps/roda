@@ -19,13 +19,9 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -92,6 +88,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * 
+ * @author Luis Faria <lfaria@keep.pt>
+ *
+ */
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
@@ -644,18 +645,20 @@ public class BrowserHelper {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     StoragePath aipPath = ModelUtils.getAIPpath(aipId);
-    Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
+    // TODO update setting AIP parent
+    // Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
 
     if (StringUtils.isBlank(parentId)) {
       StoragePath parentPath = ModelUtils.getAIPpath(parentId);
       storage.getDirectory(parentPath);
 
-      metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
+      // metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
     } else {
-      metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
+      // metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new
+      // HashSet<String>(Arrays.asList(parentId)));
     }
 
-    storage.updateMetadata(aipPath, metadata, true);
+    // storage.updateMetadata(aipPath, metadata, true);
     model.updateAIP(aipId, storage, aipPath);
 
     return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
@@ -666,12 +669,7 @@ public class BrowserHelper {
     RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
 
-    Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    if (parentAipId != null) {
-      metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentAipId)));
-    }
-
-    AIP aip = model.createAIP(metadata);
+    AIP aip = model.createAIP(parentAipId);
     return aip;
   }
 

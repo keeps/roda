@@ -19,20 +19,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Test;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.storage.fs.FSUtils;
 
 /**
  * 
@@ -71,16 +70,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 2) container list with one element (which implies creating one
     // container)
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     iterator = getStorage().listContainers().iterator();
     assertTrue(iterator.hasNext());
     Container next = iterator.next();
     assertNotNull(next);
     assertEquals(containerStoragePath, next.getStoragePath());
-    assertEquals(containerMetadata, next.getMetadata());
     assertFalse(iterator.hasNext());
 
     // 3) list after cleanup
@@ -93,18 +89,16 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testCreateGetDeleteContainer() throws RODAException {
     // 1) create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 2) get created container
     Container container = getStorage().getContainer(containerStoragePath);
     assertNotNull(container);
     assertEquals(containerStoragePath, container.getStoragePath());
-    assertEquals(containerMetadata, container.getMetadata());
 
     // 3) create container that already exists
     try {
-      getStorage().createContainer(containerStoragePath, containerMetadata);
+      getStorage().createContainer(containerStoragePath);
       fail("An exception should have been thrown while creating a container that already exists but it didn't happen!");
     } catch (AlreadyExistsException e) {
       // do nothing
@@ -138,13 +132,11 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetContainerThatIsActuallyADirectory() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     final StoragePath directoryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+    getStorage().createDirectory(directoryStoragePath);
 
     // get directory as it was a binary
     try {
@@ -163,13 +155,11 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetContainerThatIsActuallyABinary() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
     final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+    getStorage().createBinary(binaryStoragePath, payload, false);
 
     // get binary as it was a directory
     try {
@@ -189,8 +179,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 1) delete container that exists
     getStorage().deleteContainer(containerStoragePath);
@@ -210,11 +199,9 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testDeleteNonEmptyContaienr() throws RODAException {
     // Set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+    getStorage().createDirectory(directoryStoragePath);
 
     // 1) delete container recursively
     getStorage().deleteContainer(containerStoragePath);
@@ -240,8 +227,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testListResourcesUnderContainer() throws RODAException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 1) list empty container
     Iterable<Resource> resources = getStorage().listResourcesUnderContainer(containerStoragePath);
@@ -251,12 +237,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // 2) list container with 2 resources beneath (directories)
     StoragePath directoryStoragePath1 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata1 = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath1, directoryMetadata1);
+    getStorage().createDirectory(directoryStoragePath1);
 
     StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata2 = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath2, directoryMetadata2);
+    getStorage().createDirectory(directoryStoragePath2);
 
     resources = getStorage().listResourcesUnderContainer(containerStoragePath);
     assertNotNull(resources);
@@ -276,24 +260,21 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 1) create directory
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+    getStorage().createDirectory(directoryStoragePath);
 
     // 2) get created directory
     Directory directory = getStorage().getDirectory(directoryStoragePath);
     assertNotNull(directory);
     assertEquals(directoryStoragePath, directory.getStoragePath());
-    assertEquals(directoryMetadata, directory.getMetadata());
     assertTrue(directory.isDirectory());
 
     // 3) create directory that already exists
     try {
-      getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+      getStorage().createDirectory(directoryStoragePath);
       fail(
         "An exception should have been thrown while creating a directory that already exists but it didn't happened!");
     } catch (AlreadyExistsException e) {
@@ -320,8 +301,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
 
     // get directory that doesn't exist
@@ -340,13 +320,11 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetDirectoryThatIsActuallyABinary() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
     final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+    getStorage().createBinary(binaryStoragePath, payload, false);
 
     // get binary as it was a directory
     try {
@@ -365,8 +343,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetDirectoryThatIsActuallyAContainer() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // get container as it was a directory
     try {
@@ -386,13 +363,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // create directory
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+
+    getStorage().createDirectory(directoryStoragePath);
 
     // 1) list empty directory
     Iterable<Resource> resources = getStorage().listResourcesUnderDirectory(directoryStoragePath);
@@ -402,19 +379,16 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // 2) list directory with 2 resources beneath (directories)
     final StoragePath subDirectoryStoragePath1 = StorageTestUtils
       .generateRandomResourceStoragePathUnder(directoryStoragePath);
-    final Map<String, Set<String>> subDirectoryMetadata1 = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(subDirectoryStoragePath1, subDirectoryMetadata1);
+    getStorage().createDirectory(subDirectoryStoragePath1);
 
     final StoragePath subDirectoryStoragePath2 = StorageTestUtils
       .generateRandomResourceStoragePathUnder(directoryStoragePath);
-    final Map<String, Set<String>> subDirectoryMetadata2 = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(subDirectoryStoragePath2, subDirectoryMetadata2);
+    getStorage().createDirectory(subDirectoryStoragePath2);
 
     // add grand-child to ensure it is not listed
     final StoragePath subSubDirectoryStoragePath1 = StorageTestUtils
       .generateRandomResourceStoragePathUnder(subDirectoryStoragePath1);
-    final Map<String, Set<String>> subSubDirectoryMetadata1 = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(subSubDirectoryStoragePath1, subSubDirectoryMetadata1);
+    getStorage().createDirectory(subSubDirectoryStoragePath1);
 
     resources = getStorage().listResourcesUnderDirectory(directoryStoragePath);
     assertNotNull(resources);
@@ -430,7 +404,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().deleteContainer(containerStoragePath);
   }
 
-  public void testBinaryContent(Binary binary, ContentPayload providedPayload) throws IOException {
+  public void testBinaryContent(Binary binary, ContentPayload providedPayload) throws IOException, GenericException {
     // check if content is the same
     assertTrue(IOUtils.contentEquals(providedPayload.createInputStream(), binary.getContent().createInputStream()));
 
@@ -440,8 +414,12 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // check size in bytes
     assertEquals(Long.valueOf(Files.size(tempFile)), binary.getSizeInBytes());
 
-    // TODO test content digest properly
-    assertTrue(binary.getContentDigest() == null);
+    if (binary.getContentDigest() != null) {
+      for (Entry<String, String> entry : binary.getContentDigest().entrySet()) {
+        String digest = FSUtils.computeContentDigest(tempFile, entry.getKey());
+        assertEquals(digest, entry.getValue());
+      }
+    }
 
     // delete temp file
     Files.delete(tempFile);
@@ -452,27 +430,25 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 1) create binary
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
+
     final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+    getStorage().createBinary(binaryStoragePath, payload, false);
 
     // 2) get binary
     Binary binary = getStorage().getBinary(binaryStoragePath);
     assertNotNull(binary);
     assertEquals(binaryStoragePath, binary.getStoragePath());
-    assertEquals(binaryMetadata, binary.getMetadata());
     assertFalse(binary.isDirectory());
     assertFalse(binary.isReference());
     testBinaryContent(binary, payload);
 
     // 3) create binary that already exists
     try {
-      getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+      getStorage().createBinary(binaryStoragePath, payload, false);
       fail("An exception should have been thrown while creating a binary that already exists but it didn't happened!");
     } catch (AlreadyExistsException e) {
       // do nothing
@@ -498,29 +474,28 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // 1) create binary
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
+
     final ContentPayload payload = new RandomMockContentPayload();
 
     try {
-      getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, true);
+      getStorage().createBinary(binaryStoragePath, payload, true);
 
       // 2) get binary
       Binary binary = getStorage().getBinary(binaryStoragePath);
       assertNotNull(binary);
       assertEquals(binaryStoragePath, binary.getStoragePath());
-      assertEquals(binaryMetadata, binary.getMetadata());
       assertFalse(binary.isDirectory());
       assertTrue(binary.isReference());
       testBinaryContent(binary, payload);
 
       // 3) create binary that already exists
       try {
-        getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+        getStorage().createBinary(binaryStoragePath, payload, false);
         fail(
           "An exception should have been thrown while creating a binary that already exists but it didn't happened!");
       } catch (AlreadyExistsException e) {
@@ -551,14 +526,12 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // create binary
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
     final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+    getStorage().createBinary(binaryStoragePath, payload, false);
 
     // get created binary and save content to file
     final Binary binaryCreated = getStorage().getBinary(binaryStoragePath);
@@ -583,8 +556,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testUpdateBinaryThatDoesntExist() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // update binary content from binary that doesn't exist
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
@@ -614,8 +587,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
     StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
 
     // get binary that doesn't exist
@@ -634,13 +607,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetBinaryThatIsActuallyADirectory() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     final StoragePath directoryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+
+    getStorage().createDirectory(directoryStoragePath);
 
     // get directory as it was a binary
     try {
@@ -659,8 +632,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testGetBinaryThatIsActuallyAContainer() throws RODAException {
     // set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // get container as it was a binary
     try {
@@ -680,15 +653,14 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     // Set up
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
     StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
+
+    getStorage().createDirectory(directoryStoragePath);
     StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(directoryStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
     final ContentPayload binaryPayload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, binaryPayload, false);
+    getStorage().createBinary(binaryStoragePath, binaryPayload, false);
 
     // test recursively delete directory
     getStorage().deleteResource(directoryStoragePath);
@@ -706,147 +678,10 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   @Test
-  public void testGetMetadataFromContainer() throws RODAException, IOException {
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    // get directory metadata
-    Map<String, Set<String>> metadata = getStorage().getMetadata(containerStoragePath);
-    assertNotNull(metadata);
-    assertEquals(containerMetadata, metadata);
-
-    // test specific cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  @Test
-  public void testGetMetadataFromDirectory() throws RODAException {
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    // create directory
-    final StoragePath directoryStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
-
-    // get directory metadata
-    Map<String, Set<String>> metadata = getStorage().getMetadata(directoryStoragePath);
-    assertNotNull(metadata);
-    assertEquals(directoryMetadata, metadata);
-
-    // test specific cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  @Test
-  public void testGetMetadataFromBinary() throws RODAException {
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    // create directory
-    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
-    final ContentPayload binaryPayload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, binaryPayload, false);
-
-    // get directory metadata
-    Map<String, Set<String>> metadata = getStorage().getMetadata(binaryStoragePath);
-    assertNotNull(metadata);
-    assertEquals(binaryMetadata, metadata);
-
-    // test specific cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  // TODO test get metadata from binary using reference
-
-  @Test
-  public void testUpdateMetadataFromContainer() throws RODAException, IOException {
-
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    final Map<String, Set<String>> containerMetadata2 = StorageTestUtils.generateRandomMetadata();
-
-    // update metadata
-    getStorage().updateMetadata(containerStoragePath, containerMetadata2, true);
-
-    final Map<String, Set<String>> metadata = getStorage().getMetadata(containerStoragePath);
-    assertNotNull(metadata);
-    assertEquals(containerMetadata2, metadata);
-
-    // cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  @Test
-  public void testUpdateMetadataFromDirectory() throws RODAException, IOException {
-
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(directoryStoragePath, directoryMetadata);
-
-    final Map<String, Set<String>> directoryMetadata2 = StorageTestUtils.generateRandomMetadata();
-
-    // update metadata
-    getStorage().updateMetadata(directoryStoragePath, directoryMetadata2, true);
-
-    final Map<String, Set<String>> metadata = getStorage().getMetadata(directoryStoragePath);
-    assertNotNull(metadata);
-    assertEquals(directoryMetadata2, metadata);
-
-    // cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  @Test
-  public void testUpdateMetadataFromBinary() throws RODAException, IOException {
-
-    // create container
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
-    final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
-
-    final Map<String, Set<String>> binaryMetadata2 = StorageTestUtils.generateRandomMetadata();
-
-    // update metadata
-    getStorage().updateMetadata(binaryStoragePath, binaryMetadata2, true);
-
-    final Map<String, Set<String>> metadata = getStorage().getMetadata(binaryStoragePath);
-    assertNotNull(metadata);
-    assertEquals(binaryMetadata2, metadata);
-
-    // cleanup
-    getStorage().deleteContainer(containerStoragePath);
-  }
-
-  // TODO test update metadata from binary as reference
-  // TODO test update metadata with replaceAll=false
-
-  @Test
   public void testCopyContainerToSameStorage() throws RODAException, IOException {
     // create and populate source container
     final StoragePath sourceContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> sourceContainerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(sourceContainerStoragePath, sourceContainerMetadata);
+    getStorage().createContainer(sourceContainerStoragePath);
 
     StorageTestUtils.populate(getStorage(), sourceContainerStoragePath);
 
@@ -865,14 +700,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testCopyDirectoryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // create and populate source directory
     final StoragePath sourceDirectoryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> sourceDirectoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(sourceDirectoryStoragePath, sourceDirectoryMetadata);
+    getStorage().createDirectory(sourceDirectoryStoragePath);
 
     StorageTestUtils.populate(getStorage(), sourceDirectoryStoragePath);
 
@@ -891,15 +725,15 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testCopyBinaryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // create binary
     final StoragePath sourceBinaryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> sourceBinaryMetadata = StorageTestUtils.generateRandomMetadata();
+
     final ContentPayload sourcePayload = new RandomMockContentPayload();
-    getStorage().createBinary(sourceBinaryStoragePath, sourceBinaryMetadata, sourcePayload, false);
+    getStorage().createBinary(sourceBinaryStoragePath, sourcePayload, false);
 
     final StoragePath targetBinaryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
@@ -908,7 +742,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     final Binary sourceBinary = getStorage().getBinary(sourceBinaryStoragePath);
     final Binary targetBinary = getStorage().getBinary(targetBinaryStoragePath);
-    assertEquals(sourceBinary.getMetadata(), targetBinary.getMetadata());
     assertEquals(sourceBinary.isDirectory(), targetBinary.isDirectory());
     assertEquals(sourceBinary.getContentDigest(), targetBinary.getContentDigest());
     assertEquals(sourceBinary.getSizeInBytes(), targetBinary.getSizeInBytes());
@@ -926,8 +759,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testMoveContainerToSameStorage() throws RODAException, IOException {
     // create and populate source container
     final StoragePath sourceContainerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> sourceContainerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(sourceContainerStoragePath, sourceContainerMetadata);
+    getStorage().createContainer(sourceContainerStoragePath);
 
     StorageTestUtils.populate(getStorage(), sourceContainerStoragePath);
 
@@ -962,14 +794,13 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testMoveDirectoryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+
+    getStorage().createContainer(containerStoragePath);
 
     // create and populate source directory
     final StoragePath sourceDirectoryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> sourceDirectoryMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createDirectory(sourceDirectoryStoragePath, sourceDirectoryMetadata);
+    getStorage().createDirectory(sourceDirectoryStoragePath);
 
     StorageTestUtils.populate(getStorage(), sourceDirectoryStoragePath);
 
@@ -1004,15 +835,14 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   public void testMoveBinaryToSameStorage() throws RODAException, IOException {
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // create binary
     final StoragePath sourceBinaryStoragePath = StorageTestUtils
       .generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> sourceBinaryMetadata = StorageTestUtils.generateRandomMetadata();
+
     final ContentPayload sourcePayload = new RandomMockContentPayload();
-    getStorage().createBinary(sourceBinaryStoragePath, sourceBinaryMetadata, sourcePayload, false);
+    getStorage().createBinary(sourceBinaryStoragePath, sourcePayload, false);
 
     // copy for comparison test
     final StoragePath copyBinaryStoragePath = StorageTestUtils
@@ -1029,7 +859,6 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // check with copy
     final Binary copyBinary = getStorage().getBinary(copyBinaryStoragePath);
     final Binary targetBinary = getStorage().getBinary(targetBinaryStoragePath);
-    assertEquals(copyBinary.getMetadata(), targetBinary.getMetadata());
     assertEquals(copyBinary.isDirectory(), targetBinary.isDirectory());
     assertEquals(copyBinary.getContentDigest(), targetBinary.getContentDigest());
     assertEquals(copyBinary.getSizeInBytes(), targetBinary.getSizeInBytes());

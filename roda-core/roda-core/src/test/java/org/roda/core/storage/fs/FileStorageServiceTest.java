@@ -15,27 +15,18 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Map;
-import java.util.Set;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Matchers;
-import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.AbstractStorageServiceTest;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.RandomMockContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StorageTestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +40,7 @@ import org.slf4j.LoggerFactory;
  * @see FileStorageService
  */
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({FSYamlMetadataUtils.class, FSUtils.class})
+@PrepareForTest({FSUtils.class})
 public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStorageService> {
 
   private static Path basePathForTests;
@@ -153,104 +144,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
     }
   }
 
-  @Test
-  public void testCreateContainerWhileIOError() throws IOException, RODAException {
-
-    // Force IO error occur while creating some file or folder
-    PowerMockito.mockStatic(FSYamlMetadataUtils.class);
-    PowerMockito.doThrow(new IOException()).when(FSYamlMetadataUtils.class);
-    FSYamlMetadataUtils.createPropertiesDirectory(org.mockito.Matchers.any(Path.class));
-
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    try {
-      storage.createContainer(containerStoragePath, containerMetadata);
-      fail(
-        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (GenericException e) {
-      // do nothing
-    }
-
-    // check if container was not created
-    try {
-      getStorage().getContainer(containerStoragePath);
-      fail("Container should not have been created, and yet it was.");
-    } catch (NotFoundException e) {
-      // do nothing
-    }
-  }
-
-  @Test
-  public void testCreateDirectoryWhileIOError() throws IOException, RODAException {
-
-    // set up
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    // Force IO error occur while creating some file or folder
-    PowerMockito.mockStatic(FSYamlMetadataUtils.class);
-    PowerMockito.doThrow(new IOException()).when(FSYamlMetadataUtils.class);
-    FSYamlMetadataUtils.createPropertiesDirectory(org.mockito.Matchers.any(Path.class));
-
-    // create directory
-    StoragePath directoryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> directoryMetadata = StorageTestUtils.generateRandomMetadata();
-
-    try {
-      getStorage().createDirectory(directoryStoragePath, directoryMetadata);
-      fail(
-        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (GenericException e) {
-      // do nothing
-    }
-
-    // check if directory was not created
-    try {
-      getStorage().getDirectory(directoryStoragePath);
-      fail("Directory should not have been created, and yet it was.");
-    } catch (NotFoundException e) {
-      // do nothing
-    }
-  }
-
   // TODO test get binary while IO Error occurs
-
-  @Test
-  public void testCreateBinaryWhileIOError() throws IOException, RODAException {
-
-    // set up
-    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
-
-    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
-    final ContentPayload payload = new RandomMockContentPayload();
-
-    // Force IO error occur while creating some file or folder
-    final ContentPayload spyPayload = Mockito.spy(payload);
-    PowerMockito.doThrow(new IOException()).when(spyPayload);
-    spyPayload.writeToPath(Matchers.any(Path.class));
-
-    // create binary
-    try {
-      getStorage().createBinary(binaryStoragePath, binaryMetadata, spyPayload, false);
-      fail(
-        "An exception should have been thrown while creating a container because an IOException occured but it didn't happened!");
-    } catch (GenericException e) {
-      // do nothing
-    }
-
-    // check if binary was not created
-    try {
-      getStorage().getBinary(binaryStoragePath);
-      fail("Binary should not have been created, and yet it was.");
-    } catch (NotFoundException e) {
-      // do nothing
-    }
-  }
-
   // TODO test create binary as reference while IO Error occurs
   // TODO test update binary while IO Error occurs
 

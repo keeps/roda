@@ -84,12 +84,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -181,7 +181,8 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary) throws GenericException {
+  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, String metadataType)
+    throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
     String xsltFilename = null;
@@ -190,17 +191,12 @@ public class SolrUtils {
     try {
 
       // get xslt from metadata type if defined
-      if (binary.getMetadata() != null) {
-        if (binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE) != null
-          && binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).size() > 0) {
-          String metadataType = binary.getMetadata().get(RodaConstants.STORAGE_META_TYPE).iterator().next();
-          if (metadataType != null) {
-            String lowerCaseMetadataType = metadataType.toLowerCase();
-            transformerStream = RodaCoreFactory
-              .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
-          }
-        }
+      if (metadataType != null) {
+        String lowerCaseMetadataType = metadataType.toLowerCase();
+        transformerStream = RodaCoreFactory
+          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
       }
+
       // get xslt from filename
       if (transformerStream == null) {
         String filename = FilenameUtils.removeExtension(binary.getStoragePath().getName());
@@ -249,11 +245,17 @@ public class SolrUtils {
       }
       transformationResult.close();
 
-    } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
+    } catch (IOException | TransformerException | XMLStreamException |
+
+    FactoryConfigurationError e)
+
+    {
       throw new GenericException(
         "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename, e);
     }
-    return validateDescriptiveMetadataFields(doc);
+    return
+
+    validateDescriptiveMetadataFields(doc);
   }
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {
@@ -829,7 +831,7 @@ public class SolrUtils {
       doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
 
-    RODAObjectPermissions permissions = getPermissions(doc);
+    AIPPermissions permissions = getPermissions(doc);
 
     // FIXME this information is not being recorded. passing by empty
     // collections for easier processing
@@ -877,7 +879,7 @@ public class SolrUtils {
         StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
-          SolrInputDocument fields = getDescriptiveMetataFields(binary);
+          SolrInputDocument fields = getDescriptiveMetataFields(binary, metadata.getType());
           for (SolrInputField field : fields) {
             if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
               boolean added = usedNonRepeatableFields.add(field.getName());
@@ -900,8 +902,8 @@ public class SolrUtils {
     return ret;
   }
 
-  private static RODAObjectPermissions getPermissions(SolrDocument doc) {
-    RODAObjectPermissions permissions = new RODAObjectPermissions();
+  private static AIPPermissions getPermissions(SolrDocument doc) {
+    AIPPermissions permissions = new AIPPermissions();
     // TODO get information from aip.json or METS.xml
 
     // List<String> list =
@@ -939,7 +941,7 @@ public class SolrUtils {
   }
 
   private static void setPermissions(AIP aip, final SolrInputDocument ret) {
-    RODAObjectPermissions permissions = aip.getPermissions();
+    AIPPermissions permissions = aip.getPermissions();
     // TODO set this information into aip.json or METS.xml
     // ret.addField(RodaConstants.AIP_PERMISSION_GRANT_USERS,
     // permissions.getGrantUsers());
@@ -1157,6 +1159,7 @@ public class SolrUtils {
     ipe.setLinkingAgentIds(linkingAgentIdentifiers);
     ipe.setOutcomeObjectIds(linkingOutcomeObjectIdentifiers);
     ipe.setSourcesObjectIds(linkingSourceObjectIdentifiers);
+
     return ipe;
   }
 
@@ -1195,13 +1198,13 @@ public class SolrUtils {
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      if(aipID!=null){
+      if (aipID != null) {
         stylesheetOpt.put("aipID", aipID);
       }
-      if(representationID!=null){
+      if (representationID != null) {
         stylesheetOpt.put("representationID", representationID);
       }
-      if(fileID!=null){
+      if (fileID != null) {
         stylesheetOpt.put("fileID", fileID);
       }
       RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);

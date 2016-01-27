@@ -16,7 +16,6 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.mutable.MutableLong;
@@ -106,7 +104,6 @@ public final class FSUtils {
     } else {
       try {
         Files.move(sourcePath, targetPath, copyOptions);
-        FSYamlMetadataUtils.moveMetadata(sourcePath, targetPath, replaceExisting);
       } catch (IOException e) {
         throw new GenericException("Error while copying one file into another", e);
       }
@@ -166,7 +163,6 @@ public final class FSUtils {
         CopyOption[] copyOptions = replaceExisting ? new CopyOption[] {StandardCopyOption.REPLACE_EXISTING}
           : new CopyOption[] {};
         Files.copy(sourcePath, targetPath, copyOptions);
-        FSYamlMetadataUtils.copyMetadata(sourcePath, targetPath, replaceExisting);
       } catch (IOException e) {
         throw new GenericException("Error while copying one file into another", e);
       }
@@ -194,10 +190,6 @@ public final class FSUtils {
     try {
       Files.delete(path);
 
-      // if it is a file, try to delete associated metadata (if it exists)
-      if (Files.isRegularFile(path, LinkOption.NOFOLLOW_LINKS)) {
-        FSYamlMetadataUtils.deleteMetadata(path);
-      }
     } catch (NoSuchFileException e) {
       throw new NotFoundException("Could not delete path", e);
     } catch (DirectoryNotEmptyException e) {
@@ -251,7 +243,7 @@ public final class FSUtils {
     throws NotFoundException, GenericException {
     ClosableIterable<Resource> resourceIterable;
     try {
-      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path, FSYamlMetadataUtils.PATH_FILTER);
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path);
       final Iterator<Path> pathIterator = directoryStream.iterator();
       resourceIterable = new ClosableIterable<Resource>() {
 
@@ -299,8 +291,7 @@ public final class FSUtils {
   public static Long countPath(Path basePath, Path directoryPath) throws NotFoundException, GenericException {
     Long count = 0L;
     try {
-      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath,
-        FSYamlMetadataUtils.PATH_FILTER);
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath);
 
       final Iterator<Path> pathIterator = directoryStream.iterator();
       while (pathIterator.hasNext()) {
@@ -329,7 +320,7 @@ public final class FSUtils {
   public static ClosableIterable<Container> listContainers(final Path basePath) throws GenericException {
     ClosableIterable<Container> containerIterable;
     try {
-      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath, FSYamlMetadataUtils.PATH_FILTER);
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath);
       final Iterator<Path> pathIterator = directoryStream.iterator();
       containerIterable = new ClosableIterable<Container>() {
 
@@ -397,9 +388,6 @@ public final class FSUtils {
     Path relativePath = basePath.relativize(path);
     StoragePath storagePath = DefaultStoragePath.parse(relativePath.toString());
 
-    // metadata
-    Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(path);
-
     // construct
     if (Files.isDirectory(path)) {
       try {
@@ -407,16 +395,12 @@ public final class FSUtils {
         Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            if (!Files.isHidden(file) && !file.toAbsolutePath().toString().contains(".properties")) {
-              size.add(attrs.size());
-              return FileVisitResult.CONTINUE;
-            } else {
-              return FileVisitResult.SKIP_SUBTREE;
-            }
+            size.add(attrs.size());
+            return FileVisitResult.CONTINUE;
           }
         });
 
-        resource = new DefaultDirectory(storagePath, metadata);
+        resource = new DefaultDirectory(storagePath);
       } catch (IOException e) {
         throw new GenericException("Could not get file size", e);
       }
@@ -426,7 +410,7 @@ public final class FSUtils {
       try {
         sizeInBytes = Files.size(path);
         Map<String, String> contentDigest = null;
-        resource = new DefaultBinary(storagePath, metadata, content, sizeInBytes, false, contentDigest);
+        resource = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
       } catch (IOException e) {
         throw new GenericException("Could not get file size", e);
       }
@@ -452,19 +436,16 @@ public final class FSUtils {
     Path relativePath = basePath.relativize(path);
     StoragePath storagePath = DefaultStoragePath.parse(relativePath.toString());
 
-    // metadata
-    Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(path);
-
     // construct
     if (Files.isDirectory(path)) {
-      resource = new DefaultContainer(storagePath, metadata);
+      resource = new DefaultContainer(storagePath);
     } else {
       throw new GenericException("A file is not a container!");
     }
     return resource;
   }
 
-  private static String computeContentDigest(Path path, String algorithm) throws GenericException {
+  public static String computeContentDigest(Path path, String algorithm) throws GenericException {
     FileChannel fc = null;
     try {
       final int bufferSize = 1073741824;
@@ -488,7 +469,11 @@ public final class FSUtils {
       StringBuilder hexString = new StringBuilder();
 
       for (int i = 0; i < mdbytes.length; i++) {
-        hexString.append(Integer.toHexString((0xFF & mdbytes[i])));
+        String hexInt = Integer.toHexString((0xFF & mdbytes[i]));
+        if (hexInt.length() == 1) {
+          hexString.append('0');
+        }
+        hexString.append(hexInt);
       }
 
       return hexString.toString();

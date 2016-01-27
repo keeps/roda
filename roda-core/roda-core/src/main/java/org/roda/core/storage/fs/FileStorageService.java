@@ -12,10 +12,9 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-import java.util.Set;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -74,15 +73,12 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Container createContainer(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws GenericException, AlreadyExistsException {
+  public Container createContainer(StoragePath storagePath) throws GenericException, AlreadyExistsException {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
     Path directory = null;
     try {
       directory = Files.createDirectory(containerPath);
-      FSYamlMetadataUtils.createPropertiesDirectory(directory);
-      FSYamlMetadataUtils.writeMetadata(directory, metadata, true);
-      return new DefaultContainer(storagePath, metadata);
+      return new DefaultContainer(storagePath);
     } catch (FileAlreadyExistsException e) {
       // cleanup
       try {
@@ -114,8 +110,7 @@ public class FileStorageService implements StorageService {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
     Container container;
     if (Files.exists(containerPath)) {
-      Map<String, Set<String>> metadata = FSYamlMetadataUtils.readMetadata(containerPath);
-      container = new DefaultContainer(storagePath, metadata);
+      container = new DefaultContainer(storagePath);
     } else {
       throw new NotFoundException("Container not found: " + storagePath);
     }
@@ -142,15 +137,12 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
-    throws AlreadyExistsException, GenericException {
+  public Directory createDirectory(StoragePath storagePath) throws AlreadyExistsException, GenericException {
     Path dirPath = FSUtils.getEntityPath(basePath, storagePath);
     Path directory = null;
     try {
       directory = Files.createDirectory(dirPath);
-      FSYamlMetadataUtils.createPropertiesDirectory(directory);
-      FSYamlMetadataUtils.writeMetadata(directory, metadata, true);
-      return new DefaultDirectory(storagePath, metadata);
+      return new DefaultDirectory(storagePath);
     } catch (FileAlreadyExistsException e) {
       // cleanup
       try {
@@ -173,16 +165,14 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
+  public Directory createRandomDirectory(StoragePath parentStoragePath)
     throws RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException {
     Path parentDirPath = FSUtils.getEntityPath(basePath, parentStoragePath);
     Path directory = null;
 
     try {
       directory = FSUtils.createRandomDirectory(parentDirPath);
-      FSYamlMetadataUtils.createPropertiesDirectory(directory);
-      FSYamlMetadataUtils.writeMetadata(directory, metadata, true);
-      return new DefaultDirectory(DefaultStoragePath.parse(directory.toString()), metadata);
+      return new DefaultDirectory(DefaultStoragePath.parse(directory.toString()));
     } catch (FileAlreadyExistsException e) {
       // cleanup
       FSUtils.deletePath(directory);
@@ -227,8 +217,8 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
-    boolean asReference) throws GenericException, AlreadyExistsException {
+  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, AlreadyExistsException {
     if (asReference) {
       // TODO create binary as a reference
       throw new GenericException("Method not yet implemented");
@@ -247,11 +237,12 @@ public class FileStorageService implements StorageService {
 
           // writing file
           payload.writeToPath(binPath);
-          Map<String, String> contentDigest = FSUtils.generateContentDigest(binPath);
-          FSYamlMetadataUtils.addContentDigestToMetadata(metadata, contentDigest);
-          FSYamlMetadataUtils.writeMetadata(binPath, metadata, true);
-          return new DefaultBinary(storagePath, metadata, new FSPathContentPayload(binPath), Files.size(binPath), false,
-            contentDigest);
+          ContentPayload newPayload = new FSPathContentPayload(binPath);
+          Long sizeInBytes = Files.size(binPath);
+          boolean isReference = false;
+          Map<String, String> contentDigest = null;
+
+          return new DefaultBinary(storagePath, newPayload, sizeInBytes, isReference, contentDigest);
         } catch (IOException e) {
           throw new GenericException("Could not create binary", e);
         }
@@ -260,8 +251,8 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
-    ContentPayload payload, boolean asReference) throws GenericException, RequestNotValidException {
+  public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException {
     if (asReference) {
       // TODO create binary as a reference
       throw new GenericException("Method not yet implemented");
@@ -278,12 +269,13 @@ public class FileStorageService implements StorageService {
 
         // writing file
         payload.writeToPath(binPath);
-        Map<String, String> contentDigest = FSUtils.generateContentDigest(binPath);
-        FSYamlMetadataUtils.addContentDigestToMetadata(metadata, contentDigest);
-        FSYamlMetadataUtils.writeMetadata(binPath, metadata, true);
         StoragePath storagePath = DefaultStoragePath.parse(binPath.toString());
-        return new DefaultBinary(storagePath, metadata, new FSPathContentPayload(binPath), Files.size(binPath), false,
-          contentDigest);
+        ContentPayload newPayload = new FSPathContentPayload(binPath);
+        Long sizeInBytes = Files.size(binPath);
+        boolean isReference = false;
+        Map<String, String> contentDigest = null;
+
+        return new DefaultBinary(storagePath, newPayload, sizeInBytes, isReference, contentDigest);
       } catch (IOException e) {
         throw new GenericException("Could not create binary", e);
       }
@@ -299,8 +291,12 @@ public class FileStorageService implements StorageService {
     } else {
 
       Path binaryPath = FSUtils.getEntityPath(basePath, storagePath);
-      if (!Files.exists(binaryPath) && !createIfNotExists) {
+      boolean fileExists = Files.exists(binaryPath);
+
+      if (!fileExists && !createIfNotExists) {
         throw new NotFoundException("Binary does not exist: " + binaryPath);
+      } else if (fileExists && !Files.isRegularFile(binaryPath)) {
+        throw new GenericException("Looking for a binary but found something else");
       } else {
         try {
           payload.writeToPath(binaryPath);
@@ -308,17 +304,10 @@ public class FileStorageService implements StorageService {
           throw new GenericException("Could not update binary content", e);
         }
       }
+
       Resource resource = FSUtils.convertPathToResource(basePath, binaryPath);
       if (resource instanceof Binary) {
         DefaultBinary binary = (DefaultBinary) resource;
-        // calculate content digest
-        Map<String, String> contentDigest = FSUtils.generateContentDigest(binaryPath);
-        // merge with metadata & add to resource
-        FSYamlMetadataUtils.addContentDigestToMetadata(binary.getMetadata(), contentDigest);
-        binary.setContentDigest(contentDigest);
-        // update metadata
-        FSYamlMetadataUtils.writeMetadata(binaryPath, binary.getMetadata(), true);
-
         return binary;
       } else {
         throw new GenericException("Looking for a binary but found something else");
@@ -342,19 +331,6 @@ public class FileStorageService implements StorageService {
   public void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
     FSUtils.deletePath(resourcePath);
-  }
-
-  @Override
-  public Map<String, Set<String>> getMetadata(StoragePath storagePath) throws GenericException {
-    Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
-    return FSYamlMetadataUtils.readMetadata(resourcePath);
-  }
-
-  @Override
-  public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll) throws GenericException {
-    Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
-    return FSYamlMetadataUtils.writeMetadata(resourcePath, metadata, replaceAll);
   }
 
   @Override

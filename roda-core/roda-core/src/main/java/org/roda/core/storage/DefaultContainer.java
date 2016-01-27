@@ -7,9 +7,6 @@
  */
 package org.roda.core.storage;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -26,27 +23,16 @@ import org.roda.core.data.v2.ip.StoragePath;
  * 
  * @see Container
  *
- * */
+ */
 public class DefaultContainer extends AbstractEntity implements Container {
 
-  public DefaultContainer(StoragePath storagePath, Map<String, Set<String>> metadata) {
-    super(storagePath, metadata);
+  public DefaultContainer(StoragePath storagePath) {
+    super(storagePath);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("DefaultContainer [getStoragePath()=");
-    builder.append(getStoragePath());
-    builder.append(", getMetadata()=");
-    builder.append(getMetadata());
-    builder.append("]");
-    return builder.toString();
+    return "DefaultContainer [getStoragePath()=" + getStoragePath() + "]";
   }
 
 }

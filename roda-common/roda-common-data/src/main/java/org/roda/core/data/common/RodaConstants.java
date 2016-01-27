@@ -7,8 +7,6 @@
  */
 package org.roda.core.data.common;
 
-import java.nio.file.Path;
-
 public final class RodaConstants {
 
   /*
@@ -39,6 +37,7 @@ public final class RodaConstants {
   public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
   public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
   public static final String SHA1 = "SHA-1";
+  public static final String SHA256 = "SHA-256";
   public static final String MD5 = "MD5";
   public static final String LOCALE = "locale";
 
@@ -271,7 +270,8 @@ public final class RodaConstants {
   // STORAGE_META_PERMISSION_READ_GROUPS;
   // XXX the following two constants formerly were known as producers
   // permissions
-//  public static final String AIP_PERMISSION_INSERT_USERS = STORAGE_META_PERMISSION_INSERT_USERS;
+  // public static final String AIP_PERMISSION_INSERT_USERS =
+  // STORAGE_META_PERMISSION_INSERT_USERS;
   // public static final String AIP_PERMISSION_INSERT_GROUPS =
   // STORAGE_META_PERMISSION_INSERT_GROUPS;
   // public static final String AIP_PERMISSION_MODIFY_USERS =
@@ -486,7 +486,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
   public static final Object PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
-  
+
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
   public static final String PRESERVATION_AGENT_ROLE = "role";
@@ -495,7 +495,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_IDENTIFIER_TYPE = "identifierType";
   public static final String PRESERVATION_AGENT_IDENTIFIER_VALUE = "identifierValue";
   public static final String PRESERVATION_AGENT_VERSION = "version";
-  
+
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
   public static final String PRESERVATION_TYPE_EVENT = "type";

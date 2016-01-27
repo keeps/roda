@@ -26,10 +26,4 @@ public interface Entity {
    */
   public StoragePath getStoragePath();
 
-  /**
-   * The metadata of the current resource.
-   * 
-   * @return
-   */
-  public Map<String, Set<String>> getMetadata();
 }

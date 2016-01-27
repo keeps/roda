@@ -143,7 +143,7 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
                   model.createRepresentation(aip.getId(), newRepresentationID, model.getStorage(), storagePath);
                   StoragePath storagePreservationPath = ModelUtils.getPreservationRepresentationPath(aip.getId(),
                     newRepresentationID);
-                  model.getStorage().createDirectory(storagePreservationPath, new HashMap<String, Set<String>>());
+                  model.getStorage().createDirectory(storagePreservationPath);
                 }
 
                 // update file on new representation

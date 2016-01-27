@@ -19,7 +19,7 @@ public class AIP implements Serializable {
   private String id;
   private String parentId;
   private boolean active;
-  private RODAObjectPermissions permissions;
+  private AIPPermissions permissions;
 
   private Metadata metadata;
 
@@ -29,7 +29,7 @@ public class AIP implements Serializable {
     super();
   }
 
-  public AIP(String id, String parentId, boolean active, RODAObjectPermissions permissions, Metadata metadata,
+  public AIP(String id, String parentId, boolean active, AIPPermissions permissions, Metadata metadata,
     List<String> representationIds) {
     super();
     this.id = id;
@@ -79,11 +79,11 @@ public class AIP implements Serializable {
     this.active = active;
   }
 
-  public RODAObjectPermissions getPermissions() {
+  public AIPPermissions getPermissions() {
     return permissions;
   }
 
-  public void setPermissions(RODAObjectPermissions permissions) {
+  public void setPermissions(AIPPermissions permissions) {
     this.permissions = permissions;
   }
 

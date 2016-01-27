@@ -13,21 +13,16 @@ import java.io.StringWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
@@ -46,25 +41,17 @@ public class BagitToAIPPluginUtils {
   public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String parentId)
     throws BagitNotValidException, IOException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
-    AIP aip = null;
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
     Path metadataFile = Files.createTempFile("metadata", ".xml");
     generateMetadataFile(metadataFile, bagInfoTxt);
     Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
 
-    Map<String, Set<String>> metadata = new HashMap<String, Set<String>>();
-    if (parentId != null) {
-      try {
-        // FIXME shouldn't this be changed by an index search instead?
-        model.retrieveAIP(parentId);
-        metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new HashSet<String>(Arrays.asList(parentId)));
-      } catch (RODAException e) {
-        LOGGER.warn("Couldn't find parent AIP '{}'", parentId);
-      }
-    }
+    boolean active = false;
+    AIPPermissions permissions = new AIPPermissions();
+    boolean notify = true;
 
-    aip = model.createAIP(metadata, false, true);
+    AIP aip = model.createAIP(active, parentId, permissions, notify);
 
     String representationID = "representation";
     PluginHelper.createDirectories(model, aip.getId(), representationID);

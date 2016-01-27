@@ -23,5 +23,13 @@ public interface StoragePath {
   public String getName();
 
   public String asString();
+  
+  
+  // Force re-declaration of #hashCode() and #equals(Object)
+  
+  public int hashCode();
+  
+  public boolean equals(Object obj);
+  
 
 }

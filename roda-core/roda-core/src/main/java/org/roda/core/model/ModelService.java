@@ -16,12 +16,9 @@ import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.Stack;
 
 import org.roda.core.common.LdapUtilityException;
@@ -39,9 +36,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.RODAObjectPermissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
@@ -80,8 +77,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
-
-import com.google.common.collect.Sets;
 
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
@@ -143,7 +138,7 @@ public class ModelService extends ModelObservable {
   private void createContainerIfNotExists(String containerName)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException {
     try {
-      storage.createContainer(DefaultStoragePath.parse(containerName), new HashMap<String, Set<String>>());
+      storage.createContainer(DefaultStoragePath.parse(containerName));
     } catch (AlreadyExistsException e) {
       // do nothing
     }
@@ -161,7 +156,7 @@ public class ModelService extends ModelObservable {
   private void createDirectoryIfNotExists(StoragePath directoryPath)
     throws GenericException, AuthorizationDeniedException {
     try {
-      storage.createDirectory(directoryPath, new HashMap<String, Set<String>>());
+      storage.createDirectory(directoryPath);
     } catch (AlreadyExistsException e) {
       // do nothing
     }
@@ -272,30 +267,32 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(Map<String, Set<String>> metadata) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    return createAIP(metadata, true);
+  public AIP createAIP(String parentId) throws RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException {
+    boolean active = true;
+    AIPPermissions permissions = new AIPPermissions();
+    boolean notify = true;
+    return createAIP(active, parentId, permissions, notify);
   }
 
-  public AIP createAIP(Map<String, Set<String>> metadata, boolean notify) throws RequestNotValidException,
+  public AIP createAIP(boolean active, String parentId, AIPPermissions permissions) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    return createAIP(metadata, true, notify);
+    boolean notify = true;
+    return createAIP(active, parentId, permissions, notify);
   }
 
-  public AIP createAIP(Map<String, Set<String>> metadata, boolean active, boolean notify)
+  public AIP createAIP(boolean active, String parentId, AIPPermissions permissions, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
-    // set basic AIP information
-    // TODO set AIP as active
-    // ModelUtils.setAs(metadata, RodaConstants.STORAGE_META_ACTIVE, active);
-
-    // set default permissions
-    // TODO setPermissions(metadata, defaultPermissions);
-
     AIP aip;
-    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP),
-      metadata);
+    Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
+
+    // set basic AIP information
+    // TODO set AIP active state
+    // TODO set AIP parent if exists
+    // TODO set AIP permissions
+
     aip = convertResourceToAIP(directory);
     if (notify) {
       notifyAipCreated(aip);
@@ -337,13 +334,12 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP updateAIP(String aipId)
+  public AIP updateAIP(AIP aip)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    AIP aip;
-    StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+    StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
     Directory aipDirectory = storage.getDirectory(aipPath);
     if (isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
-      aip = convertResourceToAIP(aipDirectory);
+      // TODO save new AIP
       notifyAipUpdated(aip);
     } else {
       throw new GenericException("Error while updating AIP");
@@ -447,8 +443,6 @@ public class ModelService extends ModelObservable {
     return descriptiveMetadataBinary;
   }
 
-  // FIXME descriptiveMetadataType shouldn't be a parameter but instead be
-  // already present in the Binary metadata
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
     String descriptiveMetadataType) throws RequestNotValidException, GenericException, AlreadyExistsException,
       AuthorizationDeniedException, NotFoundException {
@@ -457,19 +451,16 @@ public class ModelService extends ModelObservable {
     // StoragePath binaryPath = binary.getStoragePath();
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     boolean asReference = false;
-    Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-    binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
 
-    storage.createBinary(binaryPath, binaryMetadata, binary.getContent(), asReference);
+    // TODO set descriptive metadata type
+
+    storage.createBinary(binaryPath, binary.getContent(), asReference);
     descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
     notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
 
     return descriptiveMetadataBinary;
   }
 
-  // FIXME descriptiveMetadataType shouldn't be a parameter but instead be
-  // already present in the Binary metadata (and therefore to be changed
-  // appropriated method should be called)
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
     String descriptiveMetadataType)
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -480,9 +471,8 @@ public class ModelService extends ModelObservable {
     boolean createIfNotExists = false;
 
     storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
-    Map<String, Set<String>> binaryMetadata = binary.getMetadata();
-    binaryMetadata.put(RodaConstants.STORAGE_META_TYPE, Sets.newHashSet(descriptiveMetadataType));
-    storage.updateMetadata(binaryPath, binaryMetadata, true);
+
+    // TODO set descriptive metadata type
 
     descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
     notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
@@ -686,8 +676,8 @@ public class ModelService extends ModelObservable {
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Iterable<File> it = null;
 
-    final Iterator<Resource> iterator = storage.listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId))
-      .iterator();
+    final Iterator<Resource> iterator = storage
+      .listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId)).iterator();
 
     it = new Iterable<File>() {
 
@@ -773,7 +763,6 @@ public class ModelService extends ModelObservable {
     final List<String> fileIds)
       throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    
     final Iterator<String> fileIdIterator = fileIds.iterator();
 
     Iterable<File> ret = new Iterable<File>() {
@@ -875,8 +864,9 @@ public class ModelService extends ModelObservable {
 
             if (nextFile.isDirectory()) {
               try {
-                if(nextFile.getFilesDirectlyUnder()!=null){
-                  it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder()).iterator();
+                if (nextFile.getFilesDirectlyUnder() != null) {
+                  it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder())
+                    .iterator();
                 }
 
               } catch (NotFoundException | GenericException | RequestNotValidException
@@ -914,7 +904,7 @@ public class ModelService extends ModelObservable {
 
     StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
-    final Binary createdBinary = storage.createBinary(filePath, binary.getMetadata(), binary.getContent(), asReference);
+    final Binary createdBinary = storage.createBinary(filePath, binary.getContent(), asReference);
     file = convertResourceToRepresentationFile(createdBinary);
     notifyFileCreated(file);
 
@@ -932,7 +922,6 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
 
     storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
-    storage.updateMetadata(filePath, binary.getMetadata(), true);
     Binary binaryUpdated = storage.getBinary(filePath);
     file = convertResourceToRepresentationFile(binaryUpdated);
     if (notify) {
@@ -1070,13 +1059,11 @@ public class ModelService extends ModelObservable {
 
       String aipId = storagePath.getName();
 
-      Map<String, Set<String>> resourceMetadata = resource.getMetadata();
-
       // obtain basic AIP information
       // TODO get basic AIP info from aip.json or METS.xml
-      String parentId = ModelUtils.getString(resourceMetadata, RodaConstants.STORAGE_META_PARENT_ID);
+      String parentId = null;
       boolean active = true;
-      RODAObjectPermissions permissions = null;
+      AIPPermissions permissions = null;
 
       // obtain descriptive metadata information
       List<String> descriptiveMetadataBinaryIds = ModelUtils.getChildIds(storage,
@@ -1174,12 +1161,15 @@ public class ModelService extends ModelObservable {
       String id = resource.getStoragePath().getName();
       String aipId = ModelUtils.getAIPidFromStoragePath(resource.getStoragePath());
       // TODO find another way to retrieve descriptive metadata type
-      String type = ModelUtils.getString(resource.getMetadata(), RodaConstants.STORAGE_META_TYPE);
+      // String type = ModelUtils.getString(resource.getMetadata(),
+      // RodaConstants.STORAGE_META_TYPE);
+      String type = null;
 
       return new DescriptiveMetadata(id, aipId, type);
     } else {
       throw new GenericException(
-        "Error while trying to convert something that it isn't a Binary into a descriptive metadata binary");
+        "Error while trying to convert something that it isn't a Binary into a descriptive metadata binary: "
+          + resource);
     }
   }
 
@@ -1225,8 +1215,8 @@ public class ModelService extends ModelObservable {
 
     String id = resourcePath.getName();
     String aipId = ModelUtils.getAIPidFromStoragePath(resourcePath);
-    LOGGER.debug("convertResourceToRepresentationFile: "+resourcePath.asString());
-    LOGGER.debug("convertResourceToRepresentationFile2: "+resourcePath.getDirectoryPath());
+    LOGGER.debug("convertResourceToRepresentationFile: " + resourcePath.asString());
+    LOGGER.debug("convertResourceToRepresentationFile2: " + resourcePath.getDirectoryPath());
     String representationId = ModelUtils.getRepresentationIdFromStoragePath(resourcePath);
     List<String> filePath = ModelUtils.getFilePathFromStoragePath(resourcePath);
 
@@ -1392,7 +1382,7 @@ public class ModelService extends ModelObservable {
     String fileId, Binary resource) throws GenericException {
     if (resource instanceof DefaultBinary) {
       try {
-        Map<String, Set<String>> directoryMetadata = resource.getMetadata();
+
         // retrieve needed information to instantiate Representation
 
         PremisEventHelper peh = PremisEventHelper.newInstance(resource.getContent().createInputStream());
@@ -1562,7 +1552,7 @@ public class ModelService extends ModelObservable {
         if (!path.equals(currentLogFile)) {
           try {
             StoragePath logPath = ModelUtils.getLogPath(path.getFileName().toString());
-            storage.createBinary(logPath, new HashMap<String, Set<String>>(), new FSPathContentPayload(path), false);
+            storage.createBinary(logPath, new FSPathContentPayload(path), false);
             Files.delete(path);
           } catch (IOException | GenericException | AlreadyExistsException e) {
             LOGGER.error("Error archiving log file", e);
@@ -1727,21 +1717,21 @@ public class ModelService extends ModelObservable {
       LOGGER.debug("Tool directory doesn't exist... Creating...");
       try {
         StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID);
-        storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
         // nothing to do
       }
 
       try {
         StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, type);
-        storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
         // nothing to do
       }
       try {
         StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId,
           type);
-        storage.createDirectory(otherMetadataPath, new HashMap<String, Set<String>>());
+        storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
         // nothing to do
       }
@@ -1834,10 +1824,10 @@ public class ModelService extends ModelObservable {
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(binary, type); 
-    if(agents!=null){
-      for(PreservationLinkingAgent pla : agents){
-        try{
+    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(binary, type);
+    if (agents != null) {
+      for (PreservationLinkingAgent pla : agents) {
+        try {
           AgentPreservationObject agent = new AgentPreservationObject();
           agent.setAgentName(pla.getTitle() + "/" + pla.getVersion());
           agent.setAgentType(pla.getType());
@@ -1847,8 +1837,8 @@ public class ModelService extends ModelObservable {
           Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
           Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
           createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), agentResource);
-        }catch(PremisMetadataException | IOException pme){
-          LOGGER.error("Error creating agent: "+pme.getMessage(),pme);
+        } catch (PremisMetadataException | IOException pme) {
+          LOGGER.error("Error creating agent: " + pme.getMessage(), pme);
         }
       }
     }

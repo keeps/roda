@@ -184,7 +184,7 @@ public class ValidationUtils {
    */
   public static boolean isAIPPreservationMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    //TODO !!!!
+    // TODO !!!!
     return true;
   }
 
@@ -203,12 +203,16 @@ public class ValidationUtils {
     boolean failIfNoSchema)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean ret;
-    try {
-      StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
-      Binary binary = model.getStorage().getBinary(storagePath);
-      validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
-      ret = true;
-    } catch (ValidationException e) {
+    if (metadata != null) {
+      try {
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
+        Binary binary = model.getStorage().getBinary(storagePath);
+        validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
+        ret = true;
+      } catch (ValidationException e) {
+        ret = false;
+      }
+    } else {
       ret = false;
     }
 

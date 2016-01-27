@@ -67,7 +67,7 @@ public class SolrUtilsTest {
       .parse(CorporaConstants.SOURCE_DESC_METADATA_CONTAINER, CorporaConstants.STRANGE_DESC_METADATA_FILE);
     Binary strangeMetadata = corporaService.getBinary(strangeMetadataPath);
 
-    SolrInputDocument descriptiveMetataFields = SolrUtils.getDescriptiveMetataFields(strangeMetadata);
+    SolrInputDocument descriptiveMetataFields = SolrUtils.getDescriptiveMetataFields(strangeMetadata, null);
 
     assertNotNull(descriptiveMetataFields);
     assertEquals(5, descriptiveMetataFields.size());

@@ -7,9 +7,6 @@
  */
 package org.roda.core.storage;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -55,8 +52,6 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path with a unique name for the new container.
-   * @param metadata
-   *          optional metadata for this container
    * 
    * @throws GenericException
    * @throws AlreadyExistsException
@@ -64,7 +59,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * 
    */
-  public Container createContainer(StoragePath storagePath, Map<String, Set<String>> metadata)
+  public Container createContainer(StoragePath storagePath)
     throws GenericException, AlreadyExistsException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
@@ -127,15 +122,13 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the directory
-   * @param metadata
-   *          optional metadata associated with this resource
    * 
    * @throws AlreadyExistsException
    * @throws GenericException
    * @throws AuthorizationDeniedException
    * 
    */
-  public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
+  public Directory createDirectory(StoragePath storagePath)
     throws AlreadyExistsException, GenericException, AuthorizationDeniedException;
 
   /**
@@ -143,8 +136,6 @@ public interface StorageService {
    * 
    * @param parentStoragePath
    *          storage path that identifies parent of the directory
-   * @param metadata
-   *          optional metadata associated with this resource
    * 
    * @throws RequestNotValidException
    * @throws GenericException
@@ -153,9 +144,8 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * 
    */
-  public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
-    throws RequestNotValidException, GenericException, NotFoundException, AlreadyExistsException,
-    AuthorizationDeniedException;
+  public Directory createRandomDirectory(StoragePath parentStoragePath) throws RequestNotValidException,
+    GenericException, NotFoundException, AlreadyExistsException, AuthorizationDeniedException;
 
   /**
    * Get an existing directory.
@@ -204,8 +194,6 @@ public interface StorageService {
    * 
    * @param storagePath
    *          storage path that identifies the binary
-   * @param metadata
-   *          optional associated metadata
    * @param payload
    *          the content payload
    * @param asReference
@@ -219,17 +207,15 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
-  public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
-    boolean asReference) throws GenericException, AlreadyExistsException, RequestNotValidException,
-      AuthorizationDeniedException, NotFoundException;
+  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, AlreadyExistsException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException;
 
   /**
    * Create a binary resource with a defined content with a generated id.
    * 
    * @param parentStoragePath
    *          storage path that identifies the parent of the binary
-   * @param metadata
-   *          optional associated metadata
    * @param payload
    *          the content payload
    * @param asReference
@@ -242,9 +228,8 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    */
-  public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
-    ContentPayload payload, boolean asReference)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
+  public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
    * Get an existing binary resource.
@@ -301,40 +286,6 @@ public interface StorageService {
     throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
-   * Get metadata associated to a resource.
-   * 
-   * @param storagePath
-   *          storage path that identifies the resource
-   *
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   * @throws RequestNotValidException
-   * @throws NotFoundException
-   */
-  public Map<String, Set<String>> getMetadata(StoragePath storagePath)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
-
-  /**
-   * Update metadata associated with a container.
-   * 
-   * @param storagePath
-   *          storage path that identifies the resource
-   * @param replaceAll
-   *          true indicates that existing metadata will be discarded and
-   *          replaced by the new one; false indicates that existing metadata
-   *          will be updated to the new values (by replacing the old values
-   *          with the new ones)
-   *
-   * @throws GenericException
-   * @throws RequestNotValidException
-   * @throws AuthorizationDeniedException
-   * @throws NotFoundException
-   */
-  public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
-
-  /**
    * Get entity class
    * 
    * @param storagePath
@@ -349,7 +300,7 @@ public interface StorageService {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException;
 
   /**
-   * TODO
+   * Copy resources from another (or the same) storage service.
    * 
    * @param fromService
    * @param fromContainer
@@ -366,7 +317,7 @@ public interface StorageService {
     AuthorizationDeniedException;
 
   /**
-   * TODO
+   * Move resources from another (or the same) storage service.
    * 
    * @param fromService
    * @param fromStoragePath

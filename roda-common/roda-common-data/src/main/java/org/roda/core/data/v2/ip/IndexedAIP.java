@@ -38,7 +38,7 @@ public class IndexedAIP implements Serializable {
   private String parentID = null;
   private int subElementsCount = 0;
 
-  private RODAObjectPermissions permissions = new RODAObjectPermissions();
+  private AIPPermissions permissions = new AIPPermissions();
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -76,7 +76,7 @@ public class IndexedAIP implements Serializable {
    * @param subElementsCount
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
-    String description, String parentID, int subElementsCount, RODAObjectPermissions permissions) {
+    String description, String parentID, int subElementsCount, AIPPermissions permissions) {
 
     setId(id);
     setState(state);
@@ -223,11 +223,11 @@ public class IndexedAIP implements Serializable {
     this.parentID = parentID;
   }
 
-  public RODAObjectPermissions getPermissions() {
+  public AIPPermissions getPermissions() {
     return permissions;
   }
 
-  public void setPermissions(RODAObjectPermissions permissions) {
+  public void setPermissions(AIPPermissions permissions) {
     this.permissions = permissions;
   }
 

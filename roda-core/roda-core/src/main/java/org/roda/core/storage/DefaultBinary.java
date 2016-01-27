@@ -22,7 +22,7 @@ import org.roda.core.data.v2.ip.StoragePath;
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Luis Faria <lfaria@keep.pt>
  * @see Binary
- * */
+ */
 public class DefaultBinary extends AbstractResource implements Binary {
 
   private ContentPayload content;
@@ -30,9 +30,9 @@ public class DefaultBinary extends AbstractResource implements Binary {
   private boolean reference;
   private Map<String, String> contentDigest;
 
-  public DefaultBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload content,
-    Long sizeInBytes, boolean reference, Map<String, String> contentDigest) {
-    super(storagePath, metadata, false);
+  public DefaultBinary(StoragePath storagePath, ContentPayload content, Long sizeInBytes, boolean reference,
+    Map<String, String> contentDigest) {
+    super(storagePath, false);
     this.content = content;
     this.sizeInBytes = sizeInBytes;
     this.reference = reference;
@@ -99,30 +99,6 @@ public class DefaultBinary extends AbstractResource implements Binary {
     this.contentDigest = contentDigest;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
-  @Override
-  public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("DefaultBinary [content=");
-    builder.append(content);
-    builder.append(", sizeInBytes=");
-    builder.append(sizeInBytes);
-    builder.append(", reference=");
-    builder.append(reference);
-    builder.append(", contentDigest=");
-    builder.append(contentDigest);
-    builder.append(", getStoragePath()=");
-    builder.append(getStoragePath());
-    builder.append(", getMetadata()=");
-    builder.append(getMetadata());
-    builder.append("]");
-    return builder.toString();
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -171,6 +147,13 @@ public class DefaultBinary extends AbstractResource implements Binary {
       return false;
     }
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "DefaultBinary [isDirectory()=" + isDirectory() + ", getStoragePath()=" + getStoragePath() + ", content="
+      + content + ", sizeInBytes=" + sizeInBytes + ", reference=" + reference + ", contentDigest=" + contentDigest
+      + "]";
   }
 
 }

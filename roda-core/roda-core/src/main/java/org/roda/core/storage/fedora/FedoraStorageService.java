@@ -8,10 +8,6 @@
 package org.roda.core.storage.fedora;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 import org.fcrepo.client.BadRequestException;
@@ -22,8 +18,8 @@ import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.impl.FedoraRepositoryImpl;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -119,13 +115,12 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public Container createContainer(StoragePath storagePath, Map<String, Set<String>> metadata)
+  public Container createContainer(StoragePath storagePath)
     throws AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException, GenericException {
 
     try {
-      FedoraObject container = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
-      addMetadataToResource(container, metadata);
-      return new DefaultContainer(storagePath, metadata);
+      fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
+      return new DefaultContainer(storagePath);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not create container", e);
     } catch (org.fcrepo.client.AlreadyExistsException e) {
@@ -196,13 +191,11 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public Directory createDirectory(StoragePath storagePath, Map<String, Set<String>> metadata)
+  public Directory createDirectory(StoragePath storagePath)
     throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
     try {
-      FedoraObject directory = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
-
-      addMetadataToResource(directory, metadata);
-      return new DefaultDirectory(storagePath, metadata);
+      fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
+      return new DefaultDirectory(storagePath);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not create directory", e);
     } catch (org.fcrepo.client.AlreadyExistsException e) {
@@ -214,7 +207,7 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public Directory createRandomDirectory(StoragePath parentStoragePath, Map<String, Set<String>> metadata)
+  public Directory createRandomDirectory(StoragePath parentStoragePath)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
 
     FedoraObject directory;
@@ -230,8 +223,7 @@ public class FedoraStorageService implements StorageService {
           LOGGER.warn("Got a colision when creating random directory", e);
         }
       } while (directory == null);
-      addMetadataToResource(directory, metadata);
-      return new DefaultDirectory(storagePath, metadata);
+      return new DefaultDirectory(storagePath);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Error creating random directory under " + parentStoragePath, e);
     } catch (org.fcrepo.client.NotFoundException e) {
@@ -288,9 +280,9 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public Binary createBinary(StoragePath storagePath, Map<String, Set<String>> metadata, ContentPayload payload,
-    boolean asReference) throws GenericException, RequestNotValidException, AuthorizationDeniedException,
-      AlreadyExistsException, NotFoundException {
+  public Binary createBinary(StoragePath storagePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException,
+    NotFoundException {
     if (asReference) {
       // TODO method to create binary as reference.
       throw new GenericException("Creating binary as reference not yet supported");
@@ -298,8 +290,6 @@ public class FedoraStorageService implements StorageService {
       try {
         FedoraDatastream binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
           FedoraConversionUtils.contentPayloadToFedoraContent(payload));
-
-        addMetadataToResource(binary, metadata);
 
         return FedoraConversionUtils.fedoraDatastreamToBinary(binary);
       } catch (ForbiddenException e) {
@@ -316,9 +306,8 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public Binary createRandomBinary(StoragePath parentStoragePath, Map<String, Set<String>> metadata,
-    ContentPayload payload, boolean asReference)
-      throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public Binary createRandomBinary(StoragePath parentStoragePath, ContentPayload payload, boolean asReference)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     if (asReference) {
       // TODO method to create binary as reference.
       throw new GenericException("Creating binary as reference not yet supported");
@@ -337,7 +326,6 @@ public class FedoraStorageService implements StorageService {
             LOGGER.warn("Got a colision when creating random bianry", e);
           }
         } while (binary == null);
-        addMetadataToResource(binary, metadata);
 
         return FedoraConversionUtils.fedoraDatastreamToBinary(binary);
       } catch (ForbiddenException e) {
@@ -369,7 +357,7 @@ public class FedoraStorageService implements StorageService {
       } catch (org.fcrepo.client.NotFoundException e) {
         if (createIfNotExists) {
           try {
-            return createBinary(storagePath, new HashMap<String, Set<String>>(), payload, asReference);
+            return createBinary(storagePath, payload, asReference);
           } catch (AlreadyExistsException e1) {
             throw new GenericException("Error updating binary content", e1);
           }
@@ -447,122 +435,6 @@ public class FedoraStorageService implements StorageService {
       throw new GenericException("Error deleting resource: " + storagePath, e);
     }
 
-  }
-
-  @Override
-  public Map<String, Set<String>> getMetadata(StoragePath storagePath)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
-    boolean exist = false;
-    try {
-      exist = fedoraRepository.exists(fedoraPath);
-    } catch (ForbiddenException e) {
-      throw new AuthorizationDeniedException(e.getMessage(), e);
-    } catch (FedoraException e) {
-      throw new RequestNotValidException(e.getMessage(), e);
-    }
-    if (!exist) {
-      throw new NotFoundException("The resource identified by the path \"" + storagePath + "\" was not found");
-    } else {
-      try {
-        FedoraObject fo = fedoraRepository.getObject(fedoraPath);
-        return FedoraConversionUtils.tripleIteratorToMap(fo.getProperties());
-      } catch (FedoraException fe) {
-        try {
-          FedoraDatastream fds = fedoraRepository.getDatastream(fedoraPath);
-          return FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());
-        } catch (ForbiddenException e) {
-          throw new AuthorizationDeniedException("Error getting metadata", e);
-        } catch (BadRequestException e) {
-          throw new RequestNotValidException("Error getting metadata", e);
-        } catch (org.fcrepo.client.NotFoundException e) {
-          throw new NotFoundException("Error getting metadata", e);
-        } catch (FedoraException e) {
-          throw new GenericException("Error getting metadata", e);
-        }
-      }
-    }
-
-  }
-
-  @Override
-  public Map<String, Set<String>> updateMetadata(StoragePath storagePath, Map<String, Set<String>> metadata,
-    boolean replaceAll)
-      throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
-
-    if (metadata != null) {
-      String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
-      boolean exist = false;
-      try {
-        exist = fedoraRepository.exists(fedoraPath);
-      } catch (ForbiddenException e) {
-        throw new AuthorizationDeniedException("Error updating metadata", e);
-      } catch (FedoraException e) {
-        throw new GenericException("Error updating metadata", e);
-      }
-      if (!exist) {
-        throw new NotFoundException("The resource identified by the path \"" + storagePath + "\" was not found");
-      } else {
-        try {
-          FedoraObject fo = fedoraRepository.getObject(fedoraPath);
-
-          Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fo.getProperties());
-
-          return updateMetadata(fo, old, metadata, replaceAll);
-        } catch (FedoraException fe) {
-          try {
-            FedoraDatastream fds = fedoraRepository.getDatastream(fedoraPath);
-            Map<String, Set<String>> old = FedoraConversionUtils.tripleIteratorToMap(fds.getProperties());
-            return updateMetadata(fds, old, metadata, replaceAll);
-          } catch (ForbiddenException e) {
-            throw new AuthorizationDeniedException("Error updating metadata", e);
-          } catch (BadRequestException e) {
-            throw new RequestNotValidException("Error updating metadata", e);
-          } catch (org.fcrepo.client.NotFoundException e) {
-            throw new NotFoundException("Error updating metadata", e);
-          } catch (FedoraException e) {
-            throw new GenericException("Error updating metadata", e);
-          }
-        }
-      }
-    } else {
-      throw new RequestNotValidException("Cannot update metadata to null");
-    }
-
-  }
-
-  private Map<String, Set<String>> updateMetadata(FedoraResource resource, Map<String, Set<String>> oldMetadata,
-    Map<String, Set<String>> newMetadata, boolean replaceAll) throws FedoraException {
-
-    String sparqlUpdate;
-    if (replaceAll) {
-      sparqlUpdate = FedoraUtils.createSparqlUpdateQuery(newMetadata, oldMetadata);
-    } else {
-      Map<String, Set<String>> metadataToDelete = new HashMap<String, Set<String>>();
-      for (Entry<String, Set<String>> entry : newMetadata.entrySet()) {
-        if (oldMetadata.containsKey(entry.getKey())) {
-          metadataToDelete.put(entry.getKey(), entry.getValue());
-        }
-      }
-      sparqlUpdate = FedoraUtils.createSparqlUpdateQuery(newMetadata, metadataToDelete);
-    }
-
-    if (sparqlUpdate != null) {
-      resource.updateProperties(sparqlUpdate);
-    }
-
-    return FedoraConversionUtils.tripleIteratorToMap(resource.getProperties());
-  }
-
-  private void addMetadataToResource(FedoraResource resource, Map<String, Set<String>> metadata)
-    throws FedoraException {
-    if (metadata != null) {
-      final String sparqlUpdate = FedoraUtils.createSparqlUpdateQuery(metadata, null);
-      if (sparqlUpdate != null) {
-        LOGGER.debug("Updating properties of resource: " + resource.getName() + "\n" + sparqlUpdate);
-        resource.updateProperties(sparqlUpdate);
-      }
-    }
   }
 
   @Override

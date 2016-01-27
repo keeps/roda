@@ -111,20 +111,17 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
 
     // create container
     final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
-    final Map<String, Set<String>> containerMetadata = StorageTestUtils.generateRandomMetadata();
-    getStorage().createContainer(containerStoragePath, containerMetadata);
+    getStorage().createContainer(containerStoragePath);
 
     // 1) create binary
     final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
-    final Map<String, Set<String>> binaryMetadata = StorageTestUtils.generateRandomMetadata();
     final ContentPayload payload = new RandomMockContentPayload();
-    getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+    getStorage().createBinary(binaryStoragePath, payload, false);
 
     // 2) get binary
     Binary binary = getStorage().getBinary(binaryStoragePath);
     assertNotNull(binary);
     assertEquals(binaryStoragePath, binary.getStoragePath());
-    assertEquals(binaryMetadata, binary.getMetadata());
     assertFalse(binary.isDirectory());
     assertFalse(binary.isReference());
     testBinaryContent(binary, payload);
@@ -134,7 +131,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     // datastream when it already exists, very well and therefore catching
     // the already exists exception will no be tested
     try {
-      getStorage().createBinary(binaryStoragePath, binaryMetadata, payload, false);
+      getStorage().createBinary(binaryStoragePath, payload, false);
       // fail("An exception should have been thrown while creating a binary that
       // already exists but it didn't happened!");
     } catch (AlreadyExistsException e) {

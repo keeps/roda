@@ -9,11 +9,9 @@ package org.roda.wui.server.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -29,16 +27,16 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
@@ -58,8 +56,6 @@ import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXParseException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
@@ -74,7 +70,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static final long serialVersionUID = 1L;
   static final String FONDLIST_PAGESIZE = "10";
-  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
+  // private static final Logger LOGGER =
+  // LoggerFactory.getLogger(BrowserServiceImpl.class);
 
   /**
    * Create a new BrowserService Implementation instance
@@ -193,13 +190,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String descriptiveMetadataType = bundle.getType();
 
     StoragePath storagePath = null;
-    Map<String, Set<String>> metadata = new HashMap<>();
     StringContentPayload payload = new StringContentPayload(bundle.getXml());
     Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
     boolean reference = false;
-    Map<String, String> contentDigest = new HashMap<>();
-    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference,
-      contentDigest);
+    Map<String, String> contentDigest = null;
+    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
 
     try {
       Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType,
@@ -218,12 +213,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     String metadataType = bundle.getType();
 
     StoragePath storagePath = null;
-    Map<String, Set<String>> metadata = new HashMap<>();
     StringContentPayload payload = new StringContentPayload(bundle.getXml());
     Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
     boolean reference = false;
-    Map<String, String> contentDigest = new HashMap<>();
-    Binary metadataBinary = new DefaultBinary(storagePath, metadata, payload, sizeInBytes, reference, contentDigest);
+    Map<String, String> contentDigest = null;
+    Binary metadataBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
 
     try {
       Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataBinary);

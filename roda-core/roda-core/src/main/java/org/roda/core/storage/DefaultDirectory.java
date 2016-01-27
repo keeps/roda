@@ -7,9 +7,6 @@
  */
 package org.roda.core.storage;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -22,24 +19,13 @@ import org.roda.core.data.v2.ip.StoragePath;
  */
 public class DefaultDirectory extends AbstractResource implements Directory {
 
-  public DefaultDirectory(StoragePath storagePath, Map<String, Set<String>> metadata) {
-    super(storagePath, metadata, true);
+  public DefaultDirectory(StoragePath storagePath) {
+    super(storagePath, true);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see java.lang.Object#toString()
-   */
   @Override
   public String toString() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("DefaultDirectory [getStoragePath()=");
-    builder.append(getStoragePath());
-    builder.append(", getMetadata()=");
-    builder.append(getMetadata());
-    builder.append("]");
-    return builder.toString();
+    return "DefaultDirectory [isDirectory()=" + isDirectory() + ", getStoragePath()=" + getStoragePath() + "]";
   }
 
 }

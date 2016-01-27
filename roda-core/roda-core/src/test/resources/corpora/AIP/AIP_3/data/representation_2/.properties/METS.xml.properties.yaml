@@ -1,7 +1,0 @@
-entryPoint: true
-format.mimetype: application/xml
-format.version: 1.0
-#format.registries:
-#	- 
-#	  key: PRONOM
-#	  value:  fmt/101

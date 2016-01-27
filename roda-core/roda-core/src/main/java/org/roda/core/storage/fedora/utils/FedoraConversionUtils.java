@@ -107,12 +107,10 @@ public final class FedoraConversionUtils {
   public static Binary fedoraDatastreamToBinary(FedoraDatastream datastream)
     throws GenericException, RequestNotValidException {
     try {
-      Map<String, Set<String>> properties = tripleIteratorToMap(datastream.getProperties());
       ContentPayload cp = new FedoraContentPayload(datastream);
       long sizeInBytes = datastream.getContentSize();
       URI contentDigest = datastream.getContentDigest();
-      return new DefaultBinary(getStoragePath(datastream), properties, cp, sizeInBytes, false,
-        extractContentDigest(contentDigest));
+      return new DefaultBinary(getStoragePath(datastream), cp, sizeInBytes, false, extractContentDigest(contentDigest));
     } catch (FedoraException e) {
       throw new GenericException("Error while converting a Fedora datastream into a Binary", e);
     }
@@ -138,14 +136,7 @@ public final class FedoraConversionUtils {
    */
   public static Directory fedoraObjectToDirectory(String fedoraRepositoryURL, FedoraObject object)
     throws GenericException, RequestNotValidException {
-    try {
-      Map<String, Set<String>> metadata = tripleIteratorToMap(fedoraRepositoryURL, object.getProperties(),
-        NodeFactory.createURI(object.getPath()));
-      return new DefaultDirectory(getStoragePath(object), metadata);
-    } catch (FedoraException e) {
-      throw new GenericException("Error while converting a Fedora object into a Directory", e);
-    }
-
+    return new DefaultDirectory(getStoragePath(object));
   }
 
   /**
@@ -218,11 +209,6 @@ public final class FedoraConversionUtils {
    */
   public static Container fedoraObjectToContainer(FedoraObject object)
     throws GenericException, RequestNotValidException {
-    try {
-      return new DefaultContainer(getStoragePath(object), tripleIteratorToMap(object.getProperties()));
-    } catch (FedoraException e) {
-
-      throw new GenericException("Error while converting a Fedora object into a Container", e);
-    }
+    return new DefaultContainer(getStoragePath(object));
   }
 }

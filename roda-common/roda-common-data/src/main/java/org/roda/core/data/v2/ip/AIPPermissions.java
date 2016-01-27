@@ -15,8 +15,9 @@ import java.util.Set;
 
 /**
  * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
-public class RODAObjectPermissions implements Serializable {
+public class AIPPermissions implements Serializable {
   private static final long serialVersionUID = -3534275853026959624L;
 
   private String objectPID = null;
@@ -37,9 +38,9 @@ public class RODAObjectPermissions implements Serializable {
   private Set<String> grantGroups = new HashSet<String>();
 
   /**
-   * Constructs an empty {@link RODAObjectPermissions}.
+   * Constructs an empty {@link AIPPermissions}.
    */
-  public RODAObjectPermissions() {
+  public AIPPermissions() {
   }
 
   @Override
@@ -70,8 +71,8 @@ public class RODAObjectPermissions implements Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof RODAObjectPermissions) {
-      RODAObjectPermissions other = (RODAObjectPermissions) obj;
+    if (obj instanceof AIPPermissions) {
+      AIPPermissions other = (AIPPermissions) obj;
       return (getObjectPID() == other.getObjectPID() || getObjectPID().equals(other.getObjectPID()))
         && insertUsers.equals(other.insertUsers) && insertGroups.equals(other.insertGroups)
         && readUsers.equals(other.readUsers) && readGroups.equals(other.readGroups)

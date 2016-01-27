@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -28,7 +26,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -92,13 +89,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP " + aip.getId());
-        StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
-        Map<String, Set<String>> aipMetadata = storage.getMetadata(aipPath);
-        // ModelUtils.setAs(aipMetadata, RodaConstants.STORAGE_META_ACTIVE,
-        // true);
-        // TODO set AIP active
-        storage.updateMetadata(aipPath, aipMetadata, true);
-        model.updateAIP(aip.getId());
+
+        aip.setActive(true);
+        aip = model.updateAIP(aip);
         state = PluginState.SUCCESS;
         reportItem.setItemId(aip.getId());
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
@@ -128,7 +121,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       boolean success = (state == PluginState.SUCCESS);
 
       for (String representationID : aip.getRepresentationIds()) {
-        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
+        PluginHelper.createPluginEvent(aip.getId(), representationID, null, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
           Arrays.asList(representationID), state, success ? "" : "Error", outcomeDetail);

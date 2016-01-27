@@ -8,25 +8,19 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.StorageService;
@@ -94,15 +88,8 @@ public class RemoveOrphansPlugin implements Plugin<IndexedAIP> {
         LOGGER.debug("Processing AIP " + indexedAIP.getId());
         if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
           AIP aip = model.retrieveAIP(indexedAIP.getId());
-          StoragePath aiPpath = ModelUtils.getAIPpath(aip.getId());
-
-          LOGGER.debug("  Moving orphan " + indexedAIP.getId() + " to under " + newParent.getId());
-          Map<String, Set<String>> simpleDescriptionObjectMetadata = storage.getMetadata(aiPpath);
-          simpleDescriptionObjectMetadata.put(RodaConstants.STORAGE_META_PARENT_ID,
-            new HashSet<String>(Arrays.asList(newParent.getId())));
-          storage.updateMetadata(aiPpath, simpleDescriptionObjectMetadata, true);
           aip.setParentId(newParent.getId());
-          index.reindexAIP(aip);
+          model.updateAIP(aip);
         } else {
           LOGGER.debug("  AIP doesn't need to be moved... Level: " + indexedAIP.getLevel());
         }

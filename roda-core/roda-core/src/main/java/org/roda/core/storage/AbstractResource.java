@@ -7,17 +7,14 @@
  */
 package org.roda.core.storage;
 
-import java.util.Map;
-import java.util.Set;
-
 import org.roda.core.data.v2.ip.StoragePath;
 
 public class AbstractResource extends AbstractEntity implements Resource {
 
   private boolean directory;
 
-  public AbstractResource(StoragePath storagePath, Map<String, Set<String>> metadata, boolean directory) {
-    super(storagePath, metadata);
+  public AbstractResource(StoragePath storagePath, boolean directory) {
+    super(storagePath);
     this.directory = directory;
   }
 

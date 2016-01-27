@@ -9,8 +9,8 @@ package org.roda.core.storage;
 
 import java.util.Iterator;
 
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -88,8 +88,7 @@ public final class StorageServiceUtils {
       throws GenericException, RequestNotValidException, NotFoundException, AlreadyExistsException,
       AuthorizationDeniedException {
     if (Container.class.isAssignableFrom(rootEntity)) {
-      Container container = fromService.getContainer(fromStoragePath);
-      toService.createContainer(toStoragePath, container.getMetadata());
+      toService.createContainer(toStoragePath);
       Iterator<Resource> childResourcesIterator = fromService.listResourcesUnderContainer(fromStoragePath).iterator();
       iterateAndCopyOrMoveResourcesRecursivelly(fromService, fromStoragePath, toService, toStoragePath,
         childResourcesIterator, copy);
@@ -97,8 +96,7 @@ public final class StorageServiceUtils {
         fromService.deleteContainer(fromStoragePath);
       }
     } else if (Directory.class.isAssignableFrom(rootEntity)) {
-      Directory directory = fromService.getDirectory(fromStoragePath);
-      toService.createDirectory(toStoragePath, directory.getMetadata());
+      toService.createDirectory(toStoragePath);
       Iterator<Resource> childResourcesIterator = fromService.listResourcesUnderDirectory(fromStoragePath).iterator();
       iterateAndCopyOrMoveResourcesRecursivelly(fromService, fromStoragePath, toService, toStoragePath,
         childResourcesIterator, copy);
@@ -109,7 +107,7 @@ public final class StorageServiceUtils {
       Binary binary = fromService.getBinary(fromStoragePath);
       // FIXME how to set this?
       boolean asReference = false;
-      toService.createBinary(toStoragePath, binary.getMetadata(), binary.getContent(), asReference);
+      toService.createBinary(toStoragePath, binary.getContent(), asReference);
       if (!copy) {
         fromService.deleteResource(fromStoragePath);
       }
