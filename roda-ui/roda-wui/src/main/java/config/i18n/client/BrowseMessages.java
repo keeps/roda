@@ -157,7 +157,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0,number} files, {1}")
   @AlternateMessage({"one", "One file, {1}"})
-  String downloadRepresentationInfo(@PluralCount long numberOfFiles, String readableFileSize);
+  String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
 
   @DefaultMessage("Original")
   SafeHtml downloadTitleOriginal();

@@ -549,7 +549,7 @@ public class Browse extends Composite {
 
     Anchor label = new Anchor(labelText,
       Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId()));
-    Label subLabel = new Label(messages.downloadRepresentationInfo(rep.getTotalNumberOfFiles(),
+    Label subLabel = new Label(messages.downloadRepresentationInfo((int) rep.getTotalNumberOfFiles(),
       Humanize.readableFileSize(rep.getSizeInBytes())));
 
     labelsPanel.add(label);
