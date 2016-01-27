@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.UserUtility;
@@ -71,6 +72,7 @@ import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -108,6 +110,8 @@ import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ModelService extends ModelObservable {
+
+  private static final String AIP_METADATA_FILENAME = "aip.json";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
@@ -165,6 +169,56 @@ public class ModelService extends ModelObservable {
 
   public StorageService getStorage() {
     return storage;
+  }
+
+  private void createAIPMetadata(AIP aip) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    createAIPMetadata(aip, ModelUtils.getAIPpath(aip.getId()));
+  }
+
+  private void createAIPMetadata(AIP aip, StoragePath storagePath) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    String json = ModelUtils.getJsonFromObject(aip);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath, AIP_METADATA_FILENAME);
+    boolean asReference = false;
+    storage.createBinary(metadataStoragePath, new StringContentPayload(json), asReference);
+  }
+
+  private void updateAIPMetadata(AIP aip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    updateAIPMetadata(aip, ModelUtils.getAIPpath(aip.getId()));
+  }
+
+  private void updateAIPMetadata(AIP aip, StoragePath storagePath)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    String json = ModelUtils.getJsonFromObject(aip);
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath, AIP_METADATA_FILENAME);
+    boolean asReference = false;
+    boolean createIfNotExists = true;
+    storage.updateBinaryContent(metadataStoragePath, new StringContentPayload(json), asReference, createIfNotExists);
+  }
+
+  private AIP getAIPMetadata(String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return readAIPMetadata(ModelUtils.getAIPpath(aipId));
+  }
+
+  private AIP readAIPMetadata(StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath, AIP_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+
+    String json;
+    AIP aip;
+    try {
+      json = IOUtils.toString(binary.getContent().createInputStream());
+      aip = ModelUtils.getObjectFromJson(json, AIP.class);
+    } catch (IOException e) {
+      throw new GenericException("Could not parse AIP metadata", e);
+    }
+
+    return aip;
   }
 
   public ClosableIterable<AIP> listAIPs()
@@ -285,15 +339,16 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
-    AIP aip;
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
 
-    // set basic AIP information
-    // TODO set AIP active state
-    // TODO set AIP parent if exists
-    // TODO set AIP permissions
+    String id = directory.getStoragePath().getName();
+    Metadata metadata = new Metadata();
+    List<String> representationIds = new ArrayList<>();
 
-    aip = convertResourceToAIP(directory);
+    AIP aip = new AIP(id, parentId, active, permissions, metadata, representationIds);
+
+    createAIPMetadata(aip, directory.getStoragePath());
+
     if (notify) {
       notifyAipCreated(aip);
     }
@@ -339,7 +394,7 @@ public class ModelService extends ModelObservable {
     StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
     Directory aipDirectory = storage.getDirectory(aipPath);
     if (isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
-      // TODO save new AIP
+      updateAIPMetadata(aip, aipPath);
       notifyAipUpdated(aip);
     } else {
       throw new GenericException("Error while updating AIP");
@@ -452,10 +507,13 @@ public class ModelService extends ModelObservable {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     boolean asReference = false;
 
-    // TODO set descriptive metadata type
-
     storage.createBinary(binaryPath, binary.getContent(), asReference);
     descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
+
+    AIP aip = getAIPMetadata(aipId);
+    aip.getMetadata().getDescriptiveMetadata().add(descriptiveMetadataBinary);
+    updateAIPMetadata(aip);
+
     notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
 
     return descriptiveMetadataBinary;
@@ -1057,35 +1115,39 @@ public class ModelService extends ModelObservable {
     if (resource instanceof DefaultDirectory) {
       StoragePath storagePath = resource.getStoragePath();
 
-      String aipId = storagePath.getName();
-
       // obtain basic AIP information
-      // TODO get basic AIP info from aip.json or METS.xml
-      String parentId = null;
-      boolean active = true;
-      AIPPermissions permissions = null;
+      aip = readAIPMetadata(storagePath);
+
+      // TODO remove code below
 
       // obtain descriptive metadata information
-      List<String> descriptiveMetadataBinaryIds = ModelUtils.getChildIds(storage,
-        ModelUtils.getDescriptiveMetadataPath(aipId), false);
-      List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
-      for (String descriptiveMetadataBinaryId : descriptiveMetadataBinaryIds) {
-        // TODO set type
-        String type = null;
-        descriptiveMetadata.add(new DescriptiveMetadata(descriptiveMetadataBinaryId, aipId, type));
-      }
+      // List<String> descriptiveMetadataBinaryIds =
+      // ModelUtils.getChildIds(storage,
+      // ModelUtils.getDescriptiveMetadataPath(aipId), false);
+      // List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
+      // for (String descriptiveMetadataBinaryId : descriptiveMetadataBinaryIds)
+      // {
+      // // TODO set type
+      // String type = null;
+      // descriptiveMetadata.add(new
+      // DescriptiveMetadata(descriptiveMetadataBinaryId, aipId, type));
+      // }
 
       // obtain representations information
-      List<String> representationIds = ModelUtils.getChildIds(storage, ModelUtils.getRepresentationsPath(aipId), false);
+      // List<String> representationIds = ModelUtils.getChildIds(storage,
+      // ModelUtils.getRepresentationsPath(aipId), false);
 
       // obtain preservation information
-      List<PreservationMetadata> preservationMetadata = retrieveAIPPreservationInformation(aipId, representationIds);
+      // List<PreservationMetadata> preservationMetadata =
+      // retrieveAIPPreservationInformation(aipId, representationIds);
 
       // TODO fetch other metadata
-      List<OtherMetadata> otherMetadata = null;
+      // List<OtherMetadata> otherMetadata = null;
 
-      Metadata metadata = new Metadata(descriptiveMetadata, preservationMetadata, otherMetadata);
-      aip = new AIP(aipId, parentId, active, permissions, metadata, representationIds);
+      // Metadata metadata = new Metadata(descriptiveMetadata,
+      // preservationMetadata, otherMetadata);
+      // aip = new AIP(aipId, parentId, active, permissions, metadata,
+      // representationIds);
 
     } else {
       throw new GenericException(

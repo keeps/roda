@@ -1,6 +1,7 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Metadata implements Serializable {
@@ -13,6 +14,9 @@ public class Metadata implements Serializable {
 
   public Metadata() {
     super();
+    descriptiveMetadata = new ArrayList<>();
+    preservationMetadata = new ArrayList<>();
+    othermetadata = new ArrayList<>();
   }
 
   public Metadata(List<DescriptiveMetadata> descriptiveMetadata, List<PreservationMetadata> preservationMetadata,
