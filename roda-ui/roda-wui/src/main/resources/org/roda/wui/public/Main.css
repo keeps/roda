@@ -668,9 +668,9 @@
 .browseItemMetadata .gwt-TabPanelBottom {
 	background-color: white;
 	padding: 5px 10px;
-	border-right: 1px solid rgba(167, 169, 172, 0.5);
-	border-left: 1px solid rgba(167, 169, 172, 0.5);
-	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+/* 	border-right: 1px solid rgba(167, 169, 172, 0.5); */
+/* 	border-left: 1px solid rgba(167, 169, 172, 0.5); */
+/* 	border-bottom: 1px solid rgba(167, 169, 172, 0.5); */
 	margin-bottom: 20px;
 	min-height: 25px;
 }
@@ -681,17 +681,50 @@
 
 .browseItemMetadata .gwt-TabBarItem-wrapper {
 	border-bottom: 1px solid rgba(167, 169, 172, 0.5);
+	padding-right: 20px;
 }
 
 .browseItemMetadata .gwt-TabBarItem {
-	background-color: #eee;
-	border-right: 1px solid white;
-	border-left: 1px solid white;
-	border-top: 1px solid white;
+/* 	background-color: #eee; */
+	background: white;
+/* 	border-right: 1px solid white; */
+/* 	border-left: 1px solid white; */
+/* 	border-top: 1px solid white; */
+	border: none;
 	margin: 0;
-	padding: 5px 10px;
+/* 	padding: 5px 10px; */
 	cursor: pointer;
 	cursor: hand;
+	
+	font-size: 15px;
+	padding-bottom: 0px;
+	padding-left: 0px;
+	padding-right: 0px;
+	position: relative;
+	color: #a7a9ac;
+}
+
+.browseItemMetadata .gwt-TabBarItem > div {
+	padding-bottom: 3px;
+}
+
+.browseItemMetadata .gwt-TabBarItem:after {
+	content: '';
+    display: block;
+    position: absolute;
+    height: 2px;
+    left: 50%;
+    background-color: #089de3;
+	-webkit-transition: all 0.2s;
+	-moz-transition: all 0.2s;
+	-o-transition: all 0.2s;
+	transition: all 0.2s;
+    width: 0px;
+    bottom: -1px;
+}
+
+.browseItemMetadata .gwt-TabBarItem:hover {
+	color: #089de3;
 }
 
 .browseItemMetadata .addTabWrapper {
@@ -699,8 +732,16 @@
 	color: #089de3;
 }
 
+.browseItemMetadata .addTabWrapper > div {
+	padding-bottom: 5px;
+}	
+
 .browseItemMetadata .addTabWrapper:hover {
 	color: #3998d0;
+}
+
+.browseItemMetadata .addTabWrapper:hover:after {
+	width: 0;
 }
 
 .browseItemMetadata .gwt-TabBarItem .premisTab, .browseItemMetadata .gwt-TabBarItem .addTab {
@@ -718,21 +759,29 @@
 }
 
 .browseItemMetadata .gwt-TabBarItem .gwt-Label {
-	color: #a7a9ac;
+	color: inherit;
 	font-weight: normal;
-	font-size: 1.3rem;
+	font-size: 1.5rem;
 }
 
 .browseItemMetadata .gwt-TabBarItem-wrapper-selected {
-	border-bottom: none;
+/* 	border-bottom: none; */
 }
 
 .browseItemMetadata .gwt-TabBarItem-selected {
 	margin: 0;
 	background-color: white;
-	border: 1px solid rgba(167, 169, 172, 0.5);
+/* 	border: 1px solid rgba(167, 169, 172, 0.5); */
+/* 	border-bottom: none; */
 	border-bottom: none;
-	padding-top: 6px
+/* 	padding-top: 6px */
+	color: #089de3;
+}
+
+/* .browseItemMetadata .gwt-TabBarItem:hover:after, */
+.browseItemMetadata .gwt-TabBarItem-selected:after {
+	width: 100%;
+	left: 0;
 }
 
 .browseItemMetadata .gwt-TabBarItem-selected .gwt-Label {

@@ -505,7 +505,9 @@ td.datePickerMonth, td.datePickerYear {
 .description-level:before {
 	/* Default */
 	/* fa-question-circle */
-	content: "\f059";
+	/* content: "\f059"; */
+	/* fa-archive */
+	content: "\f187";
 }
 
 .description-level-organizational:before {
