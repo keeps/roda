@@ -19,8 +19,10 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
 import org.roda.wui.client.ingest.Ingest;
@@ -122,7 +124,7 @@ public class IngestProcess extends Composite {
 
   private IngestProcess() {
 
-    Filter filter = null;
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME));

@@ -173,4 +173,16 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
+    // TODO Auto-generated method stub
+
+  }
+
 }

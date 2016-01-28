@@ -22,8 +22,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
@@ -34,8 +34,9 @@ import akka.pattern.Patterns;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
-  private static final List<ORCHESTRATOR_METHOD> ORCHESTRATOR_METHODS = Arrays
-    .asList(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
+  private static final List<ORCHESTRATOR_METHOD> ORCHESTRATOR_METHODS = Arrays.asList(
+    ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES, ORCHESTRATOR_METHOD.ON_AIPS, ORCHESTRATOR_METHOD.ON_ALL_AIPS,
+    ORCHESTRATOR_METHOD.RUN_PLUGIN);
 
   protected static void validateAndSetCreateJobInformation(RodaUser user, Job job) throws RequestNotValidException {
     if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
@@ -79,6 +80,7 @@ public class JobsHelper {
 
     // FIXME should we verify if the job was created with success???
     // FIXME correctly handle future returned by Patterns.ask
+    // FIXME actually one is assuming we are using akka
     Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
 
     return updatedJob;

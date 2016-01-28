@@ -8,9 +8,9 @@
 package org.roda.wui.api.v1;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -27,26 +27,32 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.plugins.orchestrate.akka.Master.Work;
+import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
+import org.roda.core.plugins.plugins.base.ReindexPlugin;
+import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.entities.TaskList;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.RodaCoreService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import akka.actor.ActorRef;
-import akka.pattern.Patterns;
-import akka.util.Timeout;
 import io.swagger.annotations.Api;
-import scala.concurrent.Await;
-import scala.concurrent.Future;
 
 @Api(value = ManagementTasksResource.SWAGGER_ENDPOINT)
 @Path(ManagementTasksResource.ENDPOINT)
 public class ManagementTasksResource extends RodaCoreService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ManagementTasksResource.class);
+
   public static final String ENDPOINT = "/v1/management_tasks";
   public static final String SWAGGER_ENDPOINT = "v1 management tasks";
-  private static final TaskList TASKS = new TaskList("index/reindex", "index/orphans", "orchestrator/execute");
+  private static final TaskList TASKS = new TaskList("index/reindex", "index/logclean");
 
   @Context
   private HttpServletRequest request;
@@ -60,8 +66,8 @@ public class ManagementTasksResource extends RodaCoreService {
   @POST
   @Path("/{sub_resource}/{task_id}")
   public Response executeTask(final @PathParam("sub_resource") String sub_resource,
-    final @PathParam("task_id") String task_id, @QueryParam("params") List<String> params)
-      throws AuthorizationDeniedException {
+    final @PathParam("task_id") String task_id, @QueryParam("entity") String entity,
+    @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
     // get user & check permissions
@@ -73,12 +79,12 @@ public class ManagementTasksResource extends RodaCoreService {
         "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
     }
 
-    return execute(user, startDate, sub_resource, task_id, params);
+    return execute(user, startDate, sub_resource, task_id, entity, params);
 
   }
 
   private Response execute(RodaUser user, Date startDate, final String sub_resource, final String task_id,
-    List<String> params) {
+    String entity, List<String> params) {
     if (!TASKS.getTasks().contains(sub_resource + "/" + task_id)) {
       return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
         "No task was found in the sub-resource \"" + sub_resource + "\" with the id \"" + task_id + "\"")).build();
@@ -87,50 +93,78 @@ public class ManagementTasksResource extends RodaCoreService {
       if ("index".equals(sub_resource)) {
         if ("reindex".equals(task_id)) {
           if (params.isEmpty()) {
-            RodaCoreFactory.runReindexAipsPlugin();
-            // register action
-            long duration = new Date().getTime() - startDate.getTime();
-            registerAction(user, "ManagementTasks", "reindex", null, duration);
+            response = createJobToReindexAllAIPs(user, startDate);
           } else {
-            RodaCoreFactory.runReindexAipsPlugin(params);
-            // register action
-            long duration = new Date().getTime() - startDate.getTime();
-            registerAction(user, "ManagementTasks", "reindex", null, duration, "params", params);
+            response = createJobToReindexAIPs(user, params, startDate);
           }
-        } else if ("orphans".equals(task_id)) {
-          if (!params.isEmpty()) {
-            RodaCoreFactory.runRemoveOrphansPlugin(params.get(0));
-            // register action
-            long duration = new Date().getTime() - startDate.getTime();
-            registerAction(user, "ManagementTasks", "orphans", null, duration, "params", params);
-          }
-        }
-      } else if ("orchestrator".equals(sub_resource)) {
-        // TODO shouldn't this have its own REST endpoint???
-        // FIXME to be removed
-        if ("execute".equals(task_id)) {
-          // invoke plugins
-
-          ActorRef frontend = RodaCoreFactory.getAkkaDistributedPluginOrchestrator().getCoordinator();
-
-          Timeout t = new Timeout(10, TimeUnit.SECONDS);
-          Future<Object> fut = Patterns.ask(frontend, new Work(params.get(0) + "-" + UUID.randomUUID().toString(), 1),
-            t);
-          Object futResponse;
-          try {
-            futResponse = (Object) Await.result(fut, t.duration());
-            System.out.println(futResponse);
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-
-          // register action
-          long duration = new Date().getTime() - startDate.getTime();
-          registerAction(user, "ManagementTasks", "execute", null, duration);
+          // } else if ("orphans".equals(task_id)) {
+          // if (!params.isEmpty()) {
+          // RodaCoreFactory.runRemoveOrphansPlugin(params.get(0));
+          // // register action
+          // long duration = new Date().getTime() - startDate.getTime();
+          // registerAction(user, "ManagementTasks", "orphans", null, duration,
+          // "params", params);
+          // }
+        } else if ("logclean".equals(task_id)) {
+          response = createJobForRunningLogCleaner(user, params);
         }
       }
       return Response.ok().entity(response).build();
     }
+  }
+
+  private ApiResponseMessage createJobToReindexAllAIPs(RodaUser user, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS)
+      .setPlugin(ReindexPlugin.class.getCanonicalName());
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToReindexAIPs(RodaUser user, List<String> params, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
+      .setPlugin(ReindexPlugin.class.getCanonicalName()).setObjectIds(params);
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex", null, duration, "params", params);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobForRunningLogCleaner(RodaUser user, List<String> params) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Log cleaner job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setPlugin(LogCleanerPlugin.class.getCanonicalName());
+    if (!params.isEmpty()) {
+      Map<String, String> pluginParameters = new HashMap<String, String>();
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, params.get(0));
+      job.setPluginParameters(pluginParameters);
+    }
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Log cleaner created (" + jobCreated + ")");
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating log cleaner job", e);
+    }
+
+    return response;
   }
 
 }

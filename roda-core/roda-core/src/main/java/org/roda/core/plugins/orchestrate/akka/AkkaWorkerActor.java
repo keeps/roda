@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate.akka;
 
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator.PluginMessage;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -35,13 +36,14 @@ public class AkkaWorkerActor extends UntypedActor {
       PluginMessage message = (PluginMessage) msg;
       // TODO should be init be done here as well as it is already being done in
       // the plugin manager???
-      message.getPlugin().init();
+      Plugin plugin = message.getPlugin();
+      plugin.init();
       try {
-        message.getPlugin().execute(index, model, storage, message.getList());
+        plugin.execute(index, model, storage, message.getList());
       } catch (Exception e) {
         logger.error("Error executing action!", e);
       }
-      message.getPlugin().shutdown();
+      plugin.shutdown();
       getSender().tell("Done!", getSelf());
     }
   }

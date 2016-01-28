@@ -89,6 +89,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -830,7 +831,7 @@ public class RodaCoreFactory {
     return rodaConfiguration;
   }
 
-  public static String getRodaConfigurationAsString(String... keyParts) {
+  private static String getConfigurationKey(String... keyParts) {
     StringBuilder sb = new StringBuilder();
     for (String part : keyParts) {
       if (sb.length() != 0) {
@@ -838,8 +839,19 @@ public class RodaCoreFactory {
       }
       sb.append(part);
     }
+    return sb.toString();
+  }
 
-    return rodaConfiguration.getString(sb.toString());
+  public static String getRodaConfigurationAsString(String... keyParts) {
+    return rodaConfiguration.getString(getConfigurationKey(keyParts));
+  }
+
+  public static int getRodaConfigurationAsInt(int defaultValue, String... keyParts) {
+    return rodaConfiguration.getInt(getConfigurationKey(keyParts), 0);
+  }
+
+  public static int getRodaConfigurationAsInt(String... keyParts) {
+    return getRodaConfigurationAsInt(0, keyParts);
   }
 
   public static Set<String> getFilenamesInsideConfigFolder(String folder) throws IOException {
@@ -1039,8 +1051,8 @@ public class RodaCoreFactory {
   }
 
   private static void runLogCleanPlugin() {
-    Plugin<AIP> logCleanPlugin = new LogCleanerPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(logCleanPlugin);
+    Plugin<LogEntry> logCleanPlugin = new LogCleanerPlugin();
+    getPluginOrchestrator().runPlugin(logCleanPlugin);
   }
 
   private static void runExifToolPlugin() {

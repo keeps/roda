@@ -8,17 +8,21 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -27,88 +31,94 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME this shouldn't be of the type AIP!!!
-public class LogCleanerPlugin implements Plugin<AIP> {
+public class LogCleanerPlugin implements Plugin<LogEntry> {
   private static final Logger LOGGER = LoggerFactory.getLogger(LogCleanerPlugin.class);
+  private int deleteOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
+    "delete_older_than_x_days");
 
   @Override
   public void init() throws PluginException {
-    // TODO Auto-generated method stub
-
+    // do nothing
   }
 
   @Override
   public void shutdown() {
-    // TODO Auto-generated method stub
-
+    // do nothing
   }
 
   @Override
   public String getName() {
-    // TODO Auto-generated method stub
-    return null;
+    return "Log entries cleaner";
   }
 
   @Override
   public String getVersion() {
-    // TODO Auto-generated method stub
-    return null;
+    return "1.0";
   }
 
   @Override
   public String getDescription() {
-    // TODO Auto-generated method stub
-    return null;
+    return "Removes, from the index, all log entries older than " + deleteOlderThanXDays + " days.";
   }
 
   @Override
   public List<PluginParameter> getParameters() {
-    // TODO Auto-generated method stub
-    return null;
+    // no parameters
+    return new ArrayList<>();
   }
 
   @Override
   public Map<String, String> getParameterValues() {
-    // TODO Auto-generated method stub
-    return null;
+    return new HashMap<>();
   }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // TODO Auto-generated method stub
-
+    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE) != null) {
+      try {
+        int deleteOlderThanXDays = Integer.parseInt(parameters.get(RodaConstants.PLUGIN_PARAMS_INT_VALUE));
+        this.deleteOlderThanXDays = deleteOlderThanXDays;
+      } catch (NumberFormatException e) {
+        // do nothing
+      }
+    }
   }
 
-  // TODO time interval must be a plugin configuration...
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<LogEntry> entries)
     throws PluginException {
-    Calendar cal = Calendar.getInstance();
-    // FIXME this value (6) should be a parameter
-    cal.add(Calendar.MONTH, -6);
-    Date until = cal.getTime();
-    try {
-      index.deleteActionLog(until);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Error deleting actionlog until " + until);
+
+    if (deleteOlderThanXDays > 0) {
+      Calendar cal = Calendar.getInstance();
+
+      cal.add(Calendar.DAY_OF_YEAR, -1 * deleteOlderThanXDays);
+      Date until = cal.getTime();
+      try {
+        index.deleteActionLog(until);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Error deleting actionlog until " + until);
+      }
+    } else {
+      // do nothing
     }
+
     return null;
   }
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<LogEntry> cloneMe() {
     return new LogCleanerPlugin();
   }
 

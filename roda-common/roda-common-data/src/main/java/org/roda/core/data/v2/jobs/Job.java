@@ -32,7 +32,8 @@ public class Job implements Serializable {
   }
 
   public static enum ORCHESTRATOR_METHOD {
-    ON_TRANSFERRED_RESOURCES;
+    RUN_PLUGIN, RUN_PLUGIN_ON_OBJECTS, ON_TRANSFERRED_RESOURCES, ON_AIPS, ON_ALL_AIPS, ON_ALL_REPRESENTATIONS,
+    ON_ALL_FILES;
   }
 
   // job identifier
@@ -101,8 +102,9 @@ public class Job implements Serializable {
     return name;
   }
 
-  public void setName(String name) {
+  public Job setName(String name) {
     this.name = name;
+    return this;
   }
 
   public String getUsername() {

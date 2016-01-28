@@ -45,7 +45,7 @@ import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEmbeddedPluginOrchestrator.class);
 
   private static final int BLOCK_SIZE = 100;
   private static final Sorter SORTER = null;
@@ -125,7 +125,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
       int multiplier = 0;
-      logger.info("Executing beforeExecute");
+      LOGGER.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
@@ -160,14 +160,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // FIXME catch proper exception
       e.printStackTrace();
     }
-    logger.info("End of method");
+    LOGGER.info("End of method");
   }
 
   @Override
   public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       int multiplier = 0;
-      logger.info("Executing beforeExecute");
+      LOGGER.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
       ClosableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
@@ -202,7 +202,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // FIXME catch proper exception
       e.printStackTrace();
     }
-    logger.info("End of method");
+    LOGGER.info("End of method");
 
   }
 
@@ -331,7 +331,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> resources) {
     try {
       int multiplier = 0;
-      logger.info("Executing beforeExecute");
+      LOGGER.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -362,7 +362,30 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // FIXME catch proper exception
       e.printStackTrace();
     }
-    logger.info("End of method");
+    LOGGER.info("End of method");
+
+  }
+
+  @Override
+  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+    try {
+      LOGGER.info("Executing beforeExecute");
+      plugin.beforeExecute(index, model, storage);
+
+      Future<Object> askFuture = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
+        new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT)));
+
+      plugin.afterExecute(index, model, storage);
+      LOGGER.info("End of method");
+    } catch (Exception e) {
+      // // FIXME catch proper exception
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
+    // TODO Auto-generated method stub
 
   }
 

@@ -30,11 +30,15 @@ public interface PluginOrchestrator {
 
   public void runPluginOnAllFiles(Plugin<File> plugin);
 
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths);
+
+  public <T extends Serializable> void runPlugin(Plugin<T> plugin);
+
+  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids);
+
   public void setup();
 
   public void shutdown();
-
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths);
 
   public ActorRef getCoordinator();
 }
