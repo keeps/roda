@@ -24,16 +24,17 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.LoadingPopup;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ChangeListener;
 import com.google.gwt.user.client.ui.CheckBox;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
-import com.google.gwt.user.client.ui.SourcesClickEvents;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
 
@@ -41,11 +42,11 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria
  * 
  */
-public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
+public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<String> {
 
-  private final List<ChangeListener> changelisteners;
+  // private final List<ChangeListener> changelisteners;
 
-  private class Permission extends HorizontalPanel implements SourcesClickEvents, Comparable<Permission> {
+  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<Boolean>, Comparable<Permission> {
 
     // functional attributes
     private final String sortingkeyword;
@@ -71,19 +72,32 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
       this.locked = false;
       this.enabled = true;
 
-      this.descriptionLabel.addClickListener(new ClickListener() {
+      this.descriptionLabel.addClickHandler(new ClickHandler() {
 
-        public void onClick(Widget sender) {
-          if (enabled) {
-            checkbox.setChecked(!checkbox.isChecked());
+        @Override
+        public void onClick(ClickEvent event) {
+          if (isEnabled() && !locked) {
+            checkbox.setValue(!checkbox.getValue());
+            onChange();
           }
         }
+      });
 
+      this.checkbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+        @Override
+        public void onValueChange(ValueChangeEvent<Boolean> event) {
+          onChange();
+        }
       });
 
       this.addStyleName("permission");
       checkbox.addStyleName("permission-checkbox");
       descriptionLabel.setStylePrimaryName("permission-description");
+    }
+
+    protected void onChange() {
+      ValueChangeEvent.fire(this, checkbox.getValue());
     }
 
     public boolean isLocked() {
@@ -93,15 +107,14 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
     public void setLocked(boolean locked) {
       this.locked = locked;
       checkbox.setEnabled(!locked);
-
     }
 
     public boolean isChecked() {
-      return checkbox.isChecked();
+      return checkbox.getValue();
     }
 
     public void setChecked(boolean checked) {
-      checkbox.setChecked(checked);
+      checkbox.setValue(checked);
     }
 
     public String getRole() {
@@ -126,25 +139,19 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
       }
     }
 
-    public void addClickListener(ClickListener listener) {
-      checkbox.addClickListener(listener);
-      descriptionLabel.addClickListener(listener);
-    }
-
-    public void removeClickListener(ClickListener listener) {
-      checkbox.removeClickListener(listener);
-      descriptionLabel.removeClickListener(listener);
-
-    }
-
     public int compareTo(Permission permission0) {
       return sortingkeyword.compareTo(permission0.sortingkeyword);
     }
 
+    @SuppressWarnings("unused")
     public String getSortingkeyword() {
       return sortingkeyword;
     }
 
+    @Override
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+      return addHandler(handler, ValueChangeEvent.getType());
+    }
   }
 
   private static UserManagementConstants constants = (UserManagementConstants) GWT
@@ -162,8 +169,6 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
    * 
    */
   public PermissionsPanel() {
-
-    this.changelisteners = new Vector<ChangeListener>();
     this.permissions = new Vector<Permission>();
     loading = new LoadingPopup(this);
     logger.debug("Getting permissions from RODA properties");
@@ -199,13 +204,12 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
         logger.debug("Adding permissions to panel");
         for (final Permission permission : permissions) {
           PermissionsPanel.this.add(permission);
-          permission.addClickListener(new ClickListener() {
-            public void onClick(Widget sender) {
-              if (permission.isEnabled()) {
-                onChange();
-              }
-            }
+          permission.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
 
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+              onChange();
+            }
           });
         }
         loading.hide();
@@ -314,19 +318,12 @@ public class PermissionsPanel extends FlowPanel implements SourcesChangeEvents {
     return specialRoles;
   }
 
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+
   protected void onChange() {
-    for (ChangeListener listener : changelisteners) {
-      listener.onChange(this);
-    }
+    ValueChangeEvent.fire(this, "");
   }
-
-  public void addChangeListener(ChangeListener listener) {
-    this.changelisteners.add(listener);
-
-  }
-
-  public void removeChangeListener(ChangeListener listener) {
-    this.changelisteners.remove(listener);
-  }
-
 }

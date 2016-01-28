@@ -131,6 +131,12 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editUserTitle();
 
   public String editUserCancel();
+  
+  public String editUserRemove();
+  
+  public String editUserActivate();
+  
+  public String editUserDeactivate();
 
   public String editUserApply();
 

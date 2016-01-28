@@ -17,6 +17,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -42,6 +43,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public interface UserManagementService extends RemoteService {
 
   /**
@@ -110,8 +112,7 @@ public interface UserManagementService extends RemoteService {
    * @throws NoSuchUserException
    * @throws IllegalOperationException
    */
-  public void createUser(User user, String password) throws RODAException, UserAlreadyExistsException,
-    EmailAlreadyExistsException, IllegalOperationException, NotFoundException;
+  public void addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
 
   /**
    * Modify a user
@@ -123,7 +124,19 @@ public interface UserManagementService extends RemoteService {
    * @throws RODAException
    * 
    */
-  public void editUser(User user, String password) throws RODAException;
+  public void modifyUser(User user, String password) throws RODAException;
+  
+  /**
+   * Try to remove a user, if user cannot be removed it will be deactivated
+   * 
+   * @param username
+   *          the user name
+   * @return true if user was removed, false if it was only deactivated
+   * @throws RODAException
+   * @throws IllegalOperationException
+   * @throws NoSuchUserException
+   */
+  public void removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException;
 
   /**
    * Modify the authenticated user
@@ -148,7 +161,7 @@ public interface UserManagementService extends RemoteService {
    * @throws RODAException
    * @throws GroupAlreadyExistsException
    */
-  public void createGroup(Group group) throws RODAException, GroupAlreadyExistsException;
+  public void addGroup(Group group) throws RODAException, GroupAlreadyExistsException;
 
   /**
    * Modify a group
@@ -159,19 +172,7 @@ public interface UserManagementService extends RemoteService {
    * @throws IllegalOperationException
    * @throws NoSuchGroupException
    */
-  public void editGroup(Group group) throws RODAException, NotFoundException, IllegalOperationException;
-
-  /**
-   * Try to remove a user, if user cannot be removed it will be deactivated
-   * 
-   * @param username
-   *          the user name
-   * @return true if user was removed, false if it was only deactivated
-   * @throws RODAException
-   * @throws IllegalOperationException
-   * @throws NoSuchUserException
-   */
-  public boolean removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException;
+  public void modifyGroup(Group group) throws RODAException, NotFoundException, IllegalOperationException;
 
   /**
    * Remove a group

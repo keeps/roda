@@ -16,6 +16,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -81,4 +82,28 @@ public class UserManagementHelper {
     }
   }
 
+  public static void addUser(User user, String password) throws GenericException, AlreadyExistsException {
+    RodaCoreFactory.getModelService().addUser(user, password, true, true);
+  }
+
+  public static void modifyUser(User user, String password)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
+  }
+
+  public static void removeUser(String username) throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().removeUser(username, true, true);
+  }
+
+  public static void addGroup(Group group) throws GenericException, AlreadyExistsException {
+    RodaCoreFactory.getModelService().addGroup(group, true, true);
+  }
+
+  public static void modifyGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().modifyGroup(group, true, true);
+  }
+
+  public static void removeGroup(String groupname) throws GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().removeGroup(groupname, true, true);
+  }
 }

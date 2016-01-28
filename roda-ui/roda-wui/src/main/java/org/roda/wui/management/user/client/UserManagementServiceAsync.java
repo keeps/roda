@@ -32,6 +32,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public interface UserManagementServiceAsync {
 
   public void getMemberCount(Filter filter, AsyncCallback<Long> callback);
@@ -54,7 +55,7 @@ public interface UserManagementServiceAsync {
    *          the user password
    * @throws RODAException
    */
-  public void createUser(User user, String password, AsyncCallback<Void> callback);
+  public void addUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Modify a user
@@ -66,7 +67,7 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    * 
    */
-  public void editUser(User user, String password, AsyncCallback<Void> callback);
+  public void modifyUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
@@ -78,25 +79,7 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    */
   public void editMyUser(User user, String password, AsyncCallback<Void> callback);
-
-  /**
-   * Create a group
-   * 
-   * @param group
-   *          the new group
-   * @throws RODAException
-   */
-  public void createGroup(Group group, AsyncCallback<Void> callback);
-
-  /**
-   * Modify a group
-   * 
-   * @param group
-   *          the modified group
-   * @throws RODAException
-   */
-  public void editGroup(Group group, AsyncCallback<Void> callback);
-
+  
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
    * 
@@ -105,7 +88,25 @@ public interface UserManagementServiceAsync {
    * @return true if user was removed, false if it was only deactivated
    * @throws RODAException
    */
-  public void removeUser(String username, AsyncCallback<Boolean> callback);
+  public void removeUser(String username, AsyncCallback<Void> callback);
+
+  /**
+   * Create a group
+   * 
+   * @param group
+   *          the new group
+   * @throws RODAException
+   */
+  public void addGroup(Group group, AsyncCallback<Void> callback);
+
+  /**
+   * Modify a group
+   * 
+   * @param group
+   *          the modified group
+   * @throws RODAException
+   */
+  public void modifyGroup(Group group, AsyncCallback<Void> callback);
 
   /**
    * Remove a group

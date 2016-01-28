@@ -62,10 +62,10 @@
 				</g:FlowPanel>
 				<g:FlowPanel>
 					<g:Label addStyleNames="h5">
-						<ui:msg>Actions</ui:msg>
+						<ui:msg>Add</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">Add user</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">Add group</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddUser">User</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAddGroup">Group</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

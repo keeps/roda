@@ -21,8 +21,6 @@ import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -32,6 +30,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
@@ -87,19 +86,23 @@ public class EditUser extends Composite {
   private final User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
-
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
   @UiField
   Button buttonApply;
+
+  @UiField
+  Button buttonDeActivate;
+
+  @UiField
+  Button buttonRemove;
 
   @UiField
   Button buttonCancel;
 
   @UiField(provided = true)
   UserDataPanel userDataPanel;
-
-  // private final PermissionsPanel permissionsPanel;
 
   /**
    * Create a new panel to edit a user
@@ -112,76 +115,72 @@ public class EditUser extends Composite {
 
     this.userDataPanel = new UserDataPanel(true, true, true);
     this.userDataPanel.setUser(user);
-    // this.permissionsPanel = new PermissionsPanel();
-    initWidget(uiBinder.createAndBindUi(this));
 
-    buttonApply.setEnabled(false);
+    initWidget(uiBinder.createAndBindUi(this));
 
     userDataPanel.setUsernameReadOnly(true);
 
-    userDataPanel.addValueChangeHandler(new ValueChangeHandler<User>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<User> event) {
-        buttonApply.setEnabled(userDataPanel.isValid());
-      }
-    });
-
-    // permissionsPanel.addChangeListener(new ChangeListener() {
-    // public void onChange(Widget sender) {
-    // apply.setEnabled(userDataPanel.isValid());
-    // }
-    // // });
-
-    // this.addTab(userDataPanel, constants.dataTabTitle());
-    // this.addTab(permissionsPanel, constants.permissionsTabTitle());
-
-    // this.getTabPanel().addTabListener(new TabListener() {
-    //
-    // public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex)
-    // {
-    // if (tabIndex == 1) {
-    // permissionsPanel.updateLockedPermissions(userDataPanel.getMemberGroups());
-    // }
-    // return true;
-    // }
-    //
-    // public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-    // }
-    //
-    // });
-    //
-    // this.selectTab(0);
-
-    // getTabPanel().addStyleName("office-edit-user-tabpanel");
+    buttonDeActivate.setEnabled(true);
+    if (user.isActive()) {
+      buttonDeActivate.setText(constants.editUserDeactivate());
+    }
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    final User user = userDataPanel.getUser();
-    final String password = userDataPanel.getPassword();
+    if (userDataPanel.isChanged()) {
+      if (userDataPanel.isValid()) {
+        final User user = userDataPanel.getUser();
+        final String password = userDataPanel.getPassword();
 
-    // final Set<String> specialroles = permissionsPanel.getDirectRoles();
-    // user.setDirectRoles(specialroles);
+        UserManagementService.Util.getInstance().modifyUser(user, password, new AsyncCallback<Void>() {
 
-    UserManagementService.Util.getInstance().editUser(user, password, new AsyncCallback<Void>() {
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-      public void onFailure(Throwable caught) {
-        if (caught instanceof NotFoundException) {
-          Window.alert(messages.editUserNotFound(user.getName()));
-          cancel();
-        } else if (caught instanceof EmailAlreadyExistsException) {
-          Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
-          cancel();
-        } else {
-          Window.alert(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
-        }
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
+        });
       }
+    } else {
+      Tools.newHistory(MemberManagement.RESOLVER);
+    }
+  }
 
+  @UiHandler("buttonDeActivate")
+  void buttonDeActivateHandler(ClickEvent e) {
+    user.setActive(!user.isActive());
+
+    UserManagementService.Util.getInstance().modifyUser(user, null, new AsyncCallback<Void>() {
+
+      @Override
       public void onSuccess(Void result) {
         Tools.newHistory(MemberManagement.RESOLVER);
       }
 
+      @Override
+      public void onFailure(Throwable caught) {
+        user.setActive(!user.isActive());
+        errorMessage(caught);
+      }
+    });
+  }
+
+  @UiHandler("buttonRemove")
+  void buttonRemoveHandler(ClickEvent e) {
+    UserManagementService.Util.getInstance().removeUser(user.getId(), new AsyncCallback<Void>() {
+
+      @Override
+      public void onSuccess(Void result) {
+        Tools.newHistory(MemberManagement.RESOLVER);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        errorMessage(caught);
+      }
     });
   }
 
@@ -194,4 +193,15 @@ public class EditUser extends Composite {
     Tools.newHistory(MemberManagement.RESOLVER);
   }
 
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof NotFoundException) {
+      Window.alert(messages.editUserNotFound(user.getName()));
+      cancel();
+    } else if (caught instanceof EmailAlreadyExistsException) {
+      Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
+      cancel();
+    } else {
+      Window.alert(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
+    }
+  }
 }

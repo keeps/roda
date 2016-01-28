@@ -15,7 +15,7 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Edit user</g:Label>
+				<g:Label styleName="h1">Create user</g:Label>
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
 
@@ -26,12 +26,6 @@
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
 						<ui:text from='{constants.editUserApply}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-check" ui:field="buttonDeActivate">
-						<ui:text from='{constants.editUserActivate}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
-						<ui:text from='{constants.editUserRemove}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
 						<ui:text from='{constants.editUserCancel}' />

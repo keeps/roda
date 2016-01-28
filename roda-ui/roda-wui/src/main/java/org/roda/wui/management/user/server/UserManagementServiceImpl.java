@@ -17,18 +17,16 @@ import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
@@ -104,21 +102,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void createUser(User user, String password) throws GenericException, UserAlreadyExistsException,
-    EmailAlreadyExistsException, IllegalOperationException, NotFoundException {
-    try {
-      logger.debug("Creating user " + user.getName());
-      Date start = new Date();
-      User result = UserUtility.getLdapUtility().addUser(user);
-      UserUtility.getLdapUtility().setUserPassword(result.getName(), password);
-      long duration = new Date().getTime() - start.getTime();
-      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-      // "UM.createUser",
-      // new String[] {"user", user.toString()}, "User %username% called method
-      // UM.createUser(" + user + ")", duration);
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error creating user", e);
-    }
+  public void addUser(User newUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.addUser(user, newUser, password);
   }
 
   @Override
@@ -148,102 +135,34 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void editUser(User user, String password) throws RODAException {
-    // try {
-    // UserManagement userManagementService = RodaClientFactory
-    // .getRodaClient(this.getThreadLocalRequest().getSession()).getUserManagementService();
-    //
-    // userManagementService.modifyUser(user);
-    // if (password != null) {
-    // userManagementService.setUserPassword(user.getName(), password);
-    // }
-    //
-    // logger.debug("Editing user: " + user);
-    //
-    // } catch (RemoteException e) {
-    // logger.error("Remote Exception", e);
-    // throw RODAClient.parseRemoteException(e);
-    // }
-
+  public void modifyUser(User modifiedUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyUser(user, modifiedUser, password);
   }
 
   @Override
-  public void createGroup(Group group) throws GenericException, GroupAlreadyExistsException {
-    try {
-      logger.debug("Creating group " + group.getName());
-      Date start = new Date();
-      Group result = UserUtility.getLdapUtility().addGroup(group);
-      long duration = new Date().getTime() - start.getTime();
-      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-      // "UM.createGroup",
-      // new String[] {"group", result.toString()}, "User %username% called
-      // method UM.createGroup(" + result + ")",
-      // duration);
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error creating group", e);
-    }
-
+  public void removeUser(String username) throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.removeUser(user, username);
   }
 
   @Override
-  public void editGroup(Group group) throws GenericException, NotFoundException, IllegalOperationException {
-    try {
-      logger.debug("Editing group " + group.getName());
-      Date start = new Date();
-      UserUtility.getLdapUtility().modifyGroup(group);
-      long duration = new Date().getTime() - start.getTime();
-      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-      // "UM.editGroup",
-      // new String[] {"group", group.toString()}, "User %username% called
-      // method UM.editGroup(" + group + ")",
-      // duration);
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error editting group", e);
-    }
+  public void addGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.addGroup(user, group);
   }
 
   @Override
-  public boolean removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException {
-    boolean result = false;
-    try {
-      logger.debug("Removing user " + username);
-      Date start = new Date();
-      long logEntriesCount = RodaCoreFactory.getIndexService().count(LogEntry.class,
-        new Filter(new SimpleFilterParameter("username", username)));
-
-      if (logEntriesCount > 0) {
-        UserUtility.getLdapUtility().deactivateUser(username);
-        result = false;
-      } else {
-        UserUtility.getLdapUtility().removeUser(username);
-        result = true;
-      }
-
-      long duration = new Date().getTime() - start.getTime();
-      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-      // "UM.removeUser",
-      // new String[] {"user", username}, "User %username% called method
-      // UM.removeUser(" + username + ")", duration);
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error removing user", e);
-    }
-    return result;
+  public void modifyGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyGroup(user, group);
   }
 
   @Override
-  public void removeGroup(String groupname) throws IllegalOperationException, GenericException {
-    try {
-      Date start = new Date();
-      UserUtility.getLdapUtility().removeGroup(groupname);
-      long duration = new Date().getTime() - start.getTime();
-
-      // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-      // "UserManagement.removeGroup", new String[] {"groupname", groupname},
-      // "User %username% called method UserManagement.removeGroup(" + groupname
-      // + ")", duration);
-    } catch (LdapUtilityException e) {
-      throw new GenericException("Error removing group", e);
-    }
+  public void removeGroup(String groupname) throws AuthorizationDeniedException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.removeGroup(user, groupname);
   }
 
   @Override

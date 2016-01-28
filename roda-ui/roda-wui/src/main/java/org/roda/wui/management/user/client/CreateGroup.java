@@ -75,23 +75,23 @@ public class CreateGroup extends WUIWindow {
         // group.setDirectGroups(memberGroups);
         group.setDirectRoles(directRoles);
 
-        UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
-
-          public void onFailure(Throwable caught) {
-            if (caught instanceof GroupAlreadyExistsException) {
-              Window.alert(messages.createGroupAlreadyExists(name));
-
-            } else {
-              Window.alert(messages.createGroupFailure(caught.getMessage()));
-            }
-          }
-
-          public void onSuccess(Void result) {
-            CreateGroup.this.hide();
-            CreateGroup.this.onSuccess();
-          }
-
-        });
+//        UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
+//
+//          public void onFailure(Throwable caught) {
+//            if (caught instanceof GroupAlreadyExistsException) {
+//              Window.alert(messages.createGroupAlreadyExists(name));
+//
+//            } else {
+//              Window.alert(messages.createGroupFailure(caught.getMessage()));
+//            }
+//          }
+//
+//          public void onSuccess(Void result) {
+//            CreateGroup.this.hide();
+//            CreateGroup.this.onSuccess();
+//          }
+//
+//        });
       }
 
     });

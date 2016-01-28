@@ -733,3 +733,11 @@
 .wui-resetPassword .invalid {
 	background-color: #d97570;
 }
+
+/** Data panel **/
+.wui-data-panel {
+	width: 100%;
+}
+.wui-data-panel .password {
+	margin-bottom: 5px;
+}

@@ -10,139 +10,126 @@
  */
 package org.roda.wui.management.user.client;
 
-import java.util.Set;
+import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.common.client.widgets.WUIWindow;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
  * 
  */
-public class CreateUser extends WUIWindow {
+public class CreateUser extends Composite {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      User user = new User();
+      CreateUser editUser = new CreateUser(user);
+      callback.onSuccess(editUser);
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "create_user";
+    }
+  };
+
+  interface MyUiBinder extends UiBinder<Widget, CreateUser> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private final User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-  private final WUIButton create;
+  @UiField
+  Button buttonApply;
 
-  private final WUIButton cancel;
+  @UiField
+  Button buttonCancel;
 
-  private final UserDataPanel userDataPanel;
-
-  private final PermissionsPanel permissionsPanel;
+  @UiField(provided = true)
+  UserDataPanel userDataPanel;
 
   /**
-   * Create new panel to create a user
+   * Create a new panel to edit a user
+   * 
+   * @param user
+   *          the user to edit
    */
-  public CreateUser() {
-    super(constants.createUserTitle(), 699, 630);
+  public CreateUser(User user) {
+    this.user = user;
 
-    create = new WUIButton(constants.createUserCreate(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
+    this.userDataPanel = new UserDataPanel(true, false, true);
+    this.userDataPanel.setUser(user);
 
-    cancel = new WUIButton(constants.createUserCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    initWidget(uiBinder.createAndBindUi(this));
+  }
 
-    create.addClickListener(new ClickListener() {
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    final User user = userDataPanel.getUser();
+    final String password = userDataPanel.getPassword();
 
-      public void onClick(Widget sender) {
-        final User user = userDataPanel.getValue();
-        final String password = userDataPanel.getPassword();
-        final Set<String> specialroles = permissionsPanel.getDirectRoles();
-        user.setDirectRoles(specialroles);
+    UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<Void>() {
 
-        UserManagementService.Util.getInstance().createUser(user, password, new AsyncCallback<Void>() {
+      public void onFailure(Throwable caught) {
+        errorMessage(caught);
+      }
 
-          public void onFailure(Throwable caught) {
-            if (caught instanceof UserAlreadyExistsException) {
-              Window.alert(messages.createUserAlreadyExists(user.getName()));
-
-            } else if (caught instanceof EmailAlreadyExistsException) {
-              Window.alert(messages.createUserEmailAlreadyExists(user.getEmail()));
-
-            } else {
-              Window.alert(messages.createUserFailure(caught.getMessage()));
-            }
-          }
-
-          public void onSuccess(Void result) {
-            CreateUser.this.hide();
-            CreateUser.this.onSuccess();
-          }
-
-        });
+      public void onSuccess(Void result) {
+        Tools.newHistory(MemberManagement.RESOLVER);
       }
 
     });
+  }
 
-    cancel.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-        CreateUser.this.cancel();
-      }
-
-    });
-
-    this.addToBottom(create);
-    this.addToBottom(cancel);
-
-    this.userDataPanel = new UserDataPanel(false, true);
-    this.permissionsPanel = new PermissionsPanel();
-
-    create.setEnabled(userDataPanel.isValid());
-
-    userDataPanel.addValueChangeHandler(new ValueChangeHandler<User>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<User> event) {
-        create.setEnabled(userDataPanel.isValid());
-      }
-    });
-
-    this.addTab(userDataPanel, constants.dataTabTitle());
-
-    this.addTab(permissionsPanel, constants.permissionsTabTitle());
-    this.getTabPanel().addTabListener(new TabListener() {
-
-      public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
-        if (tabIndex == 1) {
-          permissionsPanel.updateLockedPermissions(userDataPanel.getMemberGroups());
-        }
-        return true;
-      }
-
-      public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-
-      }
-
-    });
-
-    this.selectTab(0);
-
-    getTabPanel().addStyleName("office-create-user-tabpanel");
+  @UiHandler("buttonCancel")
+  void buttonCancelHandler(ClickEvent e) {
+    cancel();
   }
 
   private void cancel() {
-    this.hide();
-    super.onCancel();
+    Tools.newHistory(MemberManagement.RESOLVER);
   }
 
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof NotFoundException) {
+      Window.alert(messages.editUserNotFound(user.getName()));
+      cancel();
+    } else if (caught instanceof EmailAlreadyExistsException) {
+      Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
+      cancel();
+    } else {
+      Window.alert(messages.editUserFailure(CreateUser.this.user.getName(), caught.getMessage()));
+    }
+  }
 }

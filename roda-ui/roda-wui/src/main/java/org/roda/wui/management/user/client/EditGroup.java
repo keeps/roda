@@ -88,23 +88,23 @@ public class EditGroup extends WUIWindow {
         // EditGroup.this.group.setDirectGroups(memberGroups);
         EditGroup.this.group.setDirectRoles(directRoles);
 
-        UserManagementService.Util.getInstance().editGroup(EditGroup.this.group, new AsyncCallback<Void>() {
-
-          public void onFailure(Throwable caught) {
-            if (caught instanceof NotFoundException) {
-              Window.alert(messages.editGroupNotFound(name));
-              EditGroup.this.cancel();
-            } else {
-              Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
-            }
-          }
-
-          public void onSuccess(Void result) {
-            EditGroup.this.hide();
-            EditGroup.this.onSuccess();
-          }
-
-        });
+//        UserManagementService.Util.getInstance().editGroup(EditGroup.this.group, new AsyncCallback<Void>() {
+//
+//          public void onFailure(Throwable caught) {
+//            if (caught instanceof NotFoundException) {
+//              Window.alert(messages.editGroupNotFound(name));
+//              EditGroup.this.cancel();
+//            } else {
+//              Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
+//            }
+//          }
+//
+//          public void onSuccess(Void result) {
+//            EditGroup.this.hide();
+//            EditGroup.this.onSuccess();
+//          }
+//
+//        });
       }
 
     });
@@ -170,13 +170,13 @@ public class EditGroup extends WUIWindow {
     });
 
     permissionsPanel = new PermissionsPanel();
-    permissionsPanel.addChangeListener(new ChangeListener() {
-
-      public void onChange(Widget sender) {
-        apply.setEnabled(true);
-      }
-
-    });
+//    permissionsPanel.addChangeListener(new ChangeListener() {
+//
+//      public void onChange(Widget sender) {
+//        apply.setEnabled(true);
+//      }
+//
+//    });
 
     this.addTab(groupDataPanel, constants.dataTabTitle());
     this.addTab(permissionsPanel, constants.permissionsTabTitle());

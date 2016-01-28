@@ -24,9 +24,12 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -92,6 +95,12 @@ public class MemberManagement extends Composite {
 
   @UiField(provided = true)
   FlowPanel facetGroups;
+  
+  @UiField
+  Button buttonAddUser;
+  
+  @UiField
+  Button buttonAddGroup;
 
   public MemberManagement() {
     Filter filter = null;
@@ -127,14 +136,21 @@ public class MemberManagement extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      // TODO ?list.refresh();
+      list.refresh();
       callback.onSuccess(this);
+    } else if (historyTokens.size() == 1) {
+      if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {
+        CreateUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else {
+        Tools.newHistory(RESOLVER);
+        callback.onSuccess(null);
+      } 
     } else if (historyTokens.size() == 2) {
       if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
         // TODO EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-        Tools.newHistory(RESOLVER);
+//        Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
       } else {
         Tools.newHistory(RESOLVER);
@@ -144,5 +160,15 @@ public class MemberManagement extends Composite {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
+  }
+  
+  @UiHandler("buttonAddUser")
+  void buttonAddUserHandler(ClickEvent e) {
+    Tools.newHistory(RESOLVER, "create_user");
+  }
+  
+  @UiHandler("buttonAddGroup")
+  void buttonAddGroupHandler(ClickEvent e) {
+    Tools.newHistory(RESOLVER, "create_group");
   }
 }

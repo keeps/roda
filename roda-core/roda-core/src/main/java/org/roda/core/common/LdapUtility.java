@@ -1926,6 +1926,7 @@ public class LdapUtility {
   //
   // return attributesList;
   // }
+  
   // FIXME filter is not being used: see if it is needed
   private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
     throws NamingException {

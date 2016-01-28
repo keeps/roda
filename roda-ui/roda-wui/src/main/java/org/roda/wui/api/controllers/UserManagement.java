@@ -15,6 +15,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -188,5 +189,91 @@ public class UserManagement extends RodaCoreService {
 
     return ret;
   }
+  
+  public static void addUser(RodaUser user, User newUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    Date start = new Date();
 
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.addUser(newUser, password);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "addUser", null, duration, "username", newUser.getId());
+  }
+
+  public static void modifyUser(RodaUser user, User modifiedUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.modifyUser(modifiedUser, password);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "modifyUser", null, duration, "username", modifiedUser.getId());
+  }
+
+  public static void removeUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    UserManagementHelper.removeUser(username);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "removeUser", null, duration, "username", username);
+  }
+  
+  public static void addGroup(RodaUser user, Group group)
+    throws AuthorizationDeniedException, GenericException, AlreadyExistsException
+     {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.addGroup(group);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "addGroup", null, duration, "groupname", group.getId());
+  }
+
+  public static void modifyGroup(RodaUser user, Group group) throws AuthorizationDeniedException, GenericException, NotFoundException
+     {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.modifyGroup(group);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "modifyGroup", null, duration, "groupname", group.getId());
+  }
+
+  public static void removeGroup(RodaUser user, String groupname) throws AuthorizationDeniedException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    UserManagementHelper.removeGroup(groupname);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
+  }
 }

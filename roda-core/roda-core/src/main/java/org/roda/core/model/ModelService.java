@@ -973,6 +973,7 @@ public class ModelService extends ModelObservable {
     return report;
   }
 
+
   private ValidationReport isRepresentationValid(Directory directory) {
     return new ValidationReport();
   }
@@ -1437,11 +1438,20 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void addUser(User user, boolean useModel, boolean notify) throws AlreadyExistsException, GenericException {
+  public void addUser(User user, boolean useModel, boolean notify) throws GenericException, AlreadyExistsException {
+    addUser(user, null, useModel, notify);
+  }
+
+  public void addUser(User user, String password, boolean useModel, boolean notify)
+    throws GenericException, AlreadyExistsException {
     boolean success = true;
     try {
       if (useModel) {
         UserUtility.getLdapUtility().addUser(user);
+
+        if (password != null) {
+          // TODO change user password
+        }
       }
     } catch (LdapUtilityException e) {
       success = false;
@@ -1458,11 +1468,20 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void updateUser(User user, boolean useModel, boolean notify)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+  public void modifyUser(User user, boolean useModel, boolean notify)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
+    modifyUser(user, null, useModel, notify);
+  }
+
+  public void modifyUser(User user, String password, boolean useModel, boolean notify)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     boolean success = true;
     try {
       if (useModel) {
+        if (password != null) {
+          // TODO change user password
+        }
+
         UserUtility.getLdapUtility().modifyUser(user);
       }
     } catch (LdapUtilityException e) {
@@ -1483,7 +1502,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void deleteUser(String id, boolean useModel, boolean notify)
+  public void removeUser(String id, boolean useModel, boolean notify)
     throws GenericException, AuthorizationDeniedException {
     boolean success = true;
     try {
@@ -1520,7 +1539,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void updateGroup(Group group, boolean useModel, boolean notify)
+  public void modifyGroup(Group group, boolean useModel, boolean notify)
     throws GenericException, NotFoundException, AuthorizationDeniedException {
     boolean success = true;
     try {
@@ -1542,7 +1561,7 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void deleteGroup(String id, boolean useModel, boolean notify)
+  public void removeGroup(String id, boolean useModel, boolean notify)
     throws GenericException, AuthorizationDeniedException {
     boolean success = true;
     try {

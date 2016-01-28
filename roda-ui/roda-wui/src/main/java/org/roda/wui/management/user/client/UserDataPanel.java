@@ -18,6 +18,7 @@ import java.util.MissingResourceException;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -33,6 +34,7 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
@@ -109,15 +111,26 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   @UiField
   TextBox fax;
 
+  @UiField
+  FlowPanel groupSelectPanel;
+  
   @UiField(provided = true)
   GroupSelect groupSelect;
 
   @UiField
+  FlowPanel permissionsSelectPanel;
+  
+  @UiField
   PermissionsPanel permissionsPanel;
+  
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean enableGroupSelect;
 
   private boolean editmode;
+  
+  private boolean changed = false;
 
   /**
    * Create a new user data panel
@@ -162,8 +175,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.editmode = editmode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
+    
+    groupSelectPanel.setVisible(enableGroupSelect);
 
-    username.setReadOnly(editmode);
     businessCategory.setVisibleItemCount(1);
     for (String function : constants.getJobFunctions()) {
       businessCategory.addItem(function);
@@ -244,6 +258,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.addValueChangeHandler(valueChangedHandler);
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
+    
+    permissionsPanel.addValueChangeHandler(valueChangedHandler);
   }
 
   private int setSelected(ListBox listbox, String text) {
@@ -336,6 +352,8 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     if (enableGroupSelect) {
       user.setAllGroups(this.getMemberGroups());
     }
+    
+    user.setDirectRoles(permissionsPanel.getDirectRoles());
 
     return user;
   }
@@ -383,6 +401,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   }
 
   protected void onChange() {
+    changed = true;
     ValueChangeEvent.fire(this, getValue());
   }
 
@@ -489,7 +508,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     email.setText("");
     fax.setText("");
     phoneNumber.setText("");
-
   }
 
   /**
@@ -500,10 +518,18 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public boolean isEditmode() {
     return editmode;
   }
+  
+  /**
+   * Is user data panel has been changed
+   * 
+   * @return changed
+   */
+  public boolean isChanged() {
+    return changed;
+  }
 
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<User> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-
 }

@@ -668,9 +668,6 @@
 .browseItemMetadata .gwt-TabPanelBottom {
 	background-color: white;
 	padding: 5px 10px;
-/* 	border-right: 1px solid rgba(167, 169, 172, 0.5); */
-/* 	border-left: 1px solid rgba(167, 169, 172, 0.5); */
-/* 	border-bottom: 1px solid rgba(167, 169, 172, 0.5); */
 	margin-bottom: 20px;
 	min-height: 25px;
 }
@@ -685,17 +682,11 @@
 }
 
 .browseItemMetadata .gwt-TabBarItem {
-/* 	background-color: #eee; */
 	background: white;
-/* 	border-right: 1px solid white; */
-/* 	border-left: 1px solid white; */
-/* 	border-top: 1px solid white; */
 	border: none;
 	margin: 0;
-/* 	padding: 5px 10px; */
 	cursor: pointer;
 	cursor: hand;
-	
 	font-size: 15px;
 	padding-bottom: 0px;
 	padding-left: 0px;
@@ -771,14 +762,10 @@
 .browseItemMetadata .gwt-TabBarItem-selected {
 	margin: 0;
 	background-color: white;
-/* 	border: 1px solid rgba(167, 169, 172, 0.5); */
-/* 	border-bottom: none; */
 	border-bottom: none;
-/* 	padding-top: 6px */
 	color: #089de3;
 }
 
-/* .browseItemMetadata .gwt-TabBarItem:hover:after, */
 .browseItemMetadata .gwt-TabBarItem-selected:after {
 	width: 100%;
 	left: 0;
@@ -1924,7 +1911,7 @@
 	min-height: auto;
 	background-color: #eee;
 	margin-bottom: 20px;
-	border-top: 3px solid #089de3;
+	border-top: 2px solid #089de3;
 }
 
 .search-field-label {

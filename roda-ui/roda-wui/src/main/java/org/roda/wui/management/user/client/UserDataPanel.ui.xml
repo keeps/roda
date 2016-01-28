@@ -9,32 +9,40 @@
 	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
 
 	<ui:style>
-	.postalAddress {
+		.postalAddress {
 		min-height: 84px;
-	}
-	
-	.section {
+		}
+
+		.section {
 		margin-top: 20px;
-	}
+		}
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<!-- <g:FlowPanel addStyleNames="row full_width no_padding"> -->
+		<!-- <g:FlowPanel addStyleNames="col_6"> -->
+		<!-- <g:Label addStyleNames="form-label"> -->
+		<!-- <ui:text from='{constants.username}' /> -->
+		<!-- </g:Label> -->
+		<!-- <g:TextBox ui:field="username" addStyleNames="form-textbox" /> -->
+		<!-- </g:FlowPanel> -->
+		<!-- <g:FlowPanel addStyleNames="col_6 last"> -->
+		<!-- <g:Label addStyleNames="form-label"> -->
+		<!-- <ui:text from='{constants.password}' /> -->
+		<!-- </g:Label> -->
+		<!-- <u:PasswordPanel ui:field="password" /> -->
+		<!-- </g:FlowPanel> -->
+		<!-- </g:FlowPanel> -->
 		<g:FlowPanel addStyleNames="row full_width no_padding">
-			<g:FlowPanel addStyleNames="col_6">
+			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{constants.username}' />
 				</g:Label>
 				<g:TextBox ui:field="username" addStyleNames="form-textbox" />
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_6 last">
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{constants.password}' />
 				</g:Label>
 				<u:PasswordPanel ui:field="password" />
-			</g:FlowPanel>
-		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="row full_width no_padding">
-			<g:FlowPanel addStyleNames="col_6">
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{constants.fullname}' />
 				</g:Label>
@@ -64,8 +72,8 @@
 				<g:Label styleName="wui-user-data-note">
 					<ui:text from="{constants.userDataNote}" />
 				</g:Label>
-			</g:FlowPanel>
-			<g:FlowPanel addStyleNames="col_6 last">
+				<!-- </g:FlowPanel> -->
+				<!-- <g:FlowPanel addStyleNames="col_6 last"> -->
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{constants.email}' />
 				</g:Label>
@@ -93,13 +101,14 @@
 				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="row full_width no_padding">
+		<g:FlowPanel ui:field="groupSelectPanel" addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="col_12">
 				<g:Label styleName="h4">Groups</g:Label>
 				<u:GroupSelect ui:field="groupSelect" />
 			</g:FlowPanel>
 		</g:FlowPanel>
-		<g:FlowPanel addStyleNames="row full_width no_padding {style.section}">
+		<g:FlowPanel ui:field="permissionsSelectPanel"
+			addStyleNames="row full_width no_padding {style.section}">
 			<g:FlowPanel addStyleNames="col_12">
 				<g:Label styleName="h4">Permissions</g:Label>
 				<u:PermissionsPanel ui:field="permissionsPanel" />
