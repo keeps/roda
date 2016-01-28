@@ -15,7 +15,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public class SoxSoundConvertPlugin extends AbstractConvertPlugin {
+public abstract class SoxConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -43,9 +43,7 @@ public class SoxSoundConvertPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
-    return new SoxSoundConvertPlugin();
-  }
+  public abstract Plugin<AIP> cloneMe();
 
   @Override
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
@@ -53,11 +51,10 @@ public class SoxSoundConvertPlugin extends AbstractConvertPlugin {
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = SoxSoundConvertPluginUtils.runSoxSoundConvert(uriPath, inputFormat, outputFormat,
-        conversionProfile);
+      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(uriPath, inputFormat, outputFormat, conversionProfile);
     } else {
-      pluginResult = SoxSoundConvertPluginUtils.runSoxSoundConvert(binary.getContent().createInputStream(),
-        inputFormat, outputFormat, conversionProfile);
+      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(binary.getContent().createInputStream(), inputFormat,
+        outputFormat, conversionProfile);
     }
 
     return pluginResult;

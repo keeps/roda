@@ -979,7 +979,7 @@
 			<dependency>
 				<groupId>com.artofsolving</groupId>
 				<artifactId>jodconverter</artifactId>
-				<version>2.2.0</version>
+				<version>2.2.1</version>
 			</dependency>
 			<!-- Actions related dependencies - end -->
 			<!-- Akka related dependencies - start -->

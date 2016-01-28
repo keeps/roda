@@ -123,11 +123,14 @@ import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.FFMPEGVideoConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.JODConverterPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.PDFtoPDFAPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.SoxSoundConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralFfmpegConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralGhostScriptConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralImageMagickConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralJodConverterPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralMencoderConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralSoxConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.GeneralUnoconvConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
@@ -997,7 +1000,7 @@ public class RodaCoreFactory {
 
   private static void runPDFtoPDFAPlugin(String maxKbytes) {
     try {
-      Plugin<AIP> plugin = new PDFtoPDFAPlugin();
+      Plugin<AIP> plugin = new PdfToPdfaPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "pdf");
@@ -1009,15 +1012,13 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runImageMagickConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String conversionProfile) {
+  private static void runImageMagickConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
-      Plugin<AIP> plugin = new ImageMagickConvertPlugin();
+      Plugin<AIP> plugin = new GeneralImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
-      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1025,15 +1026,13 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runSoxSoundConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String conversionProfile) {
+  private static void runSoxConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
-      Plugin<AIP> plugin = new SoxSoundConvertPlugin();
+      Plugin<AIP> plugin = new GeneralSoxConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
-      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1041,15 +1040,13 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runFFMPEGVideoConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String conversionProfile) {
+  private static void runFfmpegConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
-      Plugin<AIP> plugin = new FFMPEGVideoConvertPlugin();
+      Plugin<AIP> plugin = new GeneralFfmpegConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
-      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1057,15 +1054,13 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runJODConverterPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String conversionProfile) {
+  private static void runJodConverterPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
-      Plugin<AIP> plugin = new JODConverterPlugin();
+      Plugin<AIP> plugin = new GeneralJodConverterPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
-      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1074,15 +1069,14 @@ public class RodaCoreFactory {
   }
 
   private static void runGhostScriptConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String device, String conversionProfile) {
+    String device) {
     try {
-      Plugin<AIP> plugin = new GhostScriptConvertPlugin();
+      Plugin<AIP> plugin = new GeneralGhostScriptConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
       params.put("device", device);
-      params.put("conversionProfile", conversionProfile);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1090,15 +1084,27 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runMencoderConvertPlugin(String maxKbytes, String inputFormat, String outputFormat,
-    String conversionProfile) {
+  private static void runMencoderConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
-      Plugin<AIP> plugin = new MencoderConvertPlugin();
+      Plugin<AIP> plugin = new GeneralMencoderConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
-      params.put("conversionProfile", conversionProfile);
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runUnoconvConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+    try {
+      Plugin<AIP> plugin = new GeneralUnoconvConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", inputFormat);
+      params.put("outputFormat", outputFormat);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList("267fdd12-b6c1-49a3-8f30-ec3731e3e4a3"));
     } catch (InvalidParameterException ipe) {
@@ -1268,11 +1274,12 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar verapdf");
     System.err.println("java -jar x.jar pdftopdfa");
     System.err.println("java -jar x.jar imagemagickconvert");
-    System.err.println("java -jar x.jar soxsoundconvert");
-    System.err.println("java -jar x.jar ffmpegvideoconvert");
+    System.err.println("java -jar x.jar soxconvert");
+    System.err.println("java -jar x.jar ffmpegconvert");
     System.err.println("java -jar x.jar jodconverter");
     System.err.println("java -jar x.jar ghostscriptconvert");
     System.err.println("java -jar x.jar mencoderconvert");
+    System.err.println("java -jar x.jar unoconvconvert");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1380,17 +1387,19 @@ public class RodaCoreFactory {
     } else if ("pdftopdfa".equals(args.get(0))) {
       runPDFtoPDFAPlugin(args.get(1));
     } else if ("imagemagickconvert".equals(args.get(0))) {
-      runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
-    } else if ("soxsoundconvert".equals(args.get(0))) {
-      runSoxSoundConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
-    } else if ("ffmpegvideoconvert".equals(args.get(0))) {
-      runFFMPEGVideoConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+      runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("soxconvert".equals(args.get(0))) {
+      runSoxConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("ffmpegconvert".equals(args.get(0))) {
+      runFfmpegConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("jodconverter".equals(args.get(0))) {
-      runJODConverterPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+      runJodConverterPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("ghostscriptconvert".equals(args.get(0))) {
-      runGhostScriptConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4), args.get(5));
+      runGhostScriptConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("mencoderconvert".equals(args.get(0))) {
-      runMencoderConvertPlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+      runMencoderConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("unoconvconvert".equals(args.get(0))) {
+      runUnoconvConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("jhove".equals(args.get(0))) {
       runJhovePlugin();
     } else if ("fits".equals(args.get(0))) {

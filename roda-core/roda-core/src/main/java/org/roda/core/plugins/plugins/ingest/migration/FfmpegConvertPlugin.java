@@ -15,7 +15,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public class JODConverterPlugin extends AbstractConvertPlugin {
+public abstract class FfmpegConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -29,12 +29,12 @@ public class JODConverterPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getName() {
-    return "Document conversion";
+    return "Video conversion";
   }
 
   @Override
   public String getDescription() {
-    return "Generates a document format file from other document format one using JODConverter.";
+    return "Generates a video format file from other video format one using FFMPEG.";
   }
 
   @Override
@@ -43,9 +43,7 @@ public class JODConverterPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
-    return new JODConverterPlugin();
-  }
+  public abstract Plugin<AIP> cloneMe();
 
   @Override
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
@@ -53,10 +51,11 @@ public class JODConverterPlugin extends AbstractConvertPlugin {
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = JODConverterPluginUtils.runJODConverter(uriPath, inputFormat, outputFormat, conversionProfile);
+      pluginResult = FfmpegConvertPluginUtils.runFfmpegVideoConvert(uriPath, inputFormat, outputFormat,
+        conversionProfile);
     } else {
-      pluginResult = JODConverterPluginUtils.runJODConverter(binary.getContent().createInputStream(), inputFormat,
-        outputFormat, conversionProfile);
+      pluginResult = FfmpegConvertPluginUtils.runFfmpegVideoConvert(binary.getContent().createInputStream(),
+        inputFormat, outputFormat, conversionProfile);
     }
 
     return pluginResult;

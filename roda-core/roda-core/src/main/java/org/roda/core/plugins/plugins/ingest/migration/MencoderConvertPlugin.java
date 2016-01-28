@@ -15,7 +15,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
+public abstract class MencoderConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -29,12 +29,12 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getName() {
-    return "Image conversion";
+    return "Mencoder video conversion";
   }
 
   @Override
   public String getDescription() {
-    return "Generates an image format file from other image format one using Imagemagick.";
+    return "Generates a video format file from other video format one using Mencoder.";
   }
 
   @Override
@@ -45,15 +45,16 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
   @Override
   public abstract Plugin<AIP> cloneMe();
 
+  @Override
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, inputFormat, outputFormat,
+      pluginResult = MencoderConvertPluginUtils.runMencoderConvert(uriPath, inputFormat, outputFormat,
         conversionProfile);
     } else {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(binary.getContent().createInputStream(),
+      pluginResult = MencoderConvertPluginUtils.runMencoderConvert(binary.getContent().createInputStream(),
         inputFormat, outputFormat, conversionProfile);
     }
 

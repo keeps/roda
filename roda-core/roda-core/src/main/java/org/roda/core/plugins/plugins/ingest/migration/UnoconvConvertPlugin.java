@@ -15,7 +15,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
+public abstract class UnoconvConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -29,12 +29,12 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getName() {
-    return "Image conversion";
+    return "Document conversion";
   }
 
   @Override
   public String getDescription() {
-    return "Generates an image format file from other image format one using Imagemagick.";
+    return "Generates a document format file from other document format one using Unoconv.";
   }
 
   @Override
@@ -45,16 +45,16 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
   @Override
   public abstract Plugin<AIP> cloneMe();
 
+  @Override
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, inputFormat, outputFormat,
-        conversionProfile);
+      pluginResult = UnoconvConvertPluginUtils.runUnoconvConvert(uriPath, inputFormat, outputFormat, conversionProfile);
     } else {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(binary.getContent().createInputStream(),
-        inputFormat, outputFormat, conversionProfile);
+      pluginResult = UnoconvConvertPluginUtils.runUnoconvConvert(binary.getContent().createInputStream(), inputFormat,
+        outputFormat, conversionProfile);
     }
 
     return pluginResult;
@@ -62,11 +62,13 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
     return null;
   }
 

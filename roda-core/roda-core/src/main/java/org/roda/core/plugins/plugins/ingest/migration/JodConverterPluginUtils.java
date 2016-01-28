@@ -17,9 +17,9 @@ import com.artofsolving.jodconverter.openoffice.connection.OpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConnection;
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 
-public class JODConverterPluginUtils {
+public class JodConverterPluginUtils {
 
-  public static Path runJODConverter(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runJodConverter(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
     throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
@@ -32,28 +32,27 @@ public class JODConverterPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeJODConverter(input, output, conversionProfile);
+    return executeJodConverter(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  public static Path runJODConverter(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runJodConverter(Path input, String inputFormat, String outputFormat, String conversionProfile)
     throws IOException, CommandException {
+
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeJODConverter(input, output, conversionProfile);
+    return executeJodConverter(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  private static Path executeJODConverter(Path input, Path output, String conversionProfile) throws ConnectException {
+  private static Path executeJodConverter(Path input, Path output, String inputFormat, String outputFormat,
+    String conversionProfile) throws ConnectException {
+
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
-    // connect to an OpenOffice.org instance running on port 8100 eg
-    // command to start an open office connection:
-    // soffice -headless -accept="socket,host=localhost,port=8100;urp;"
-    // -nofirststartwizard
     String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", conversionProfile,
       "openOfficePort");
-    int OOPort = Integer.parseInt(port);
+    int openOfficePort = Integer.parseInt(port);
 
-    OpenOfficeConnection connection = new SocketOpenOfficeConnection(OOPort);
+    OpenOfficeConnection connection = new SocketOpenOfficeConnection(openOfficePort);
     connection.connect();
 
     // convert
@@ -65,5 +64,4 @@ public class JODConverterPluginUtils {
 
     return output;
   }
-
 }

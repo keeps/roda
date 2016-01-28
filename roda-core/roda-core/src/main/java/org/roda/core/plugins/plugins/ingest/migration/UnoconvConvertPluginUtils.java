@@ -13,10 +13,10 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
-public class SoxSoundConvertPluginUtils {
+public class UnoconvConvertPluginUtils {
 
-  public static Path runSoxSoundConvert(InputStream is, String inputFormat, String outputFormat,
-    String conversionProfile) throws IOException, CommandException {
+  public static Path runUnoconvConvert(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
+    throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,22 +28,24 @@ public class SoxSoundConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeSox(input, output, conversionProfile);
+    return executeUnoconvConvert(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runUnoconvConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
     throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeSox(input, output, conversionProfile);
+    return executeUnoconvConvert(input, output, inputFormat, outputFormat, conversionProfile);
   }
 
-  private static Path executeSox(Path input, Path output, String conversionProfile) throws CommandException {
+  private static Path executeUnoconvConvert(Path input, Path output, String inputFormat, String outputFormat,
+    String conversionProfile) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxsoundconvert", conversionProfile,
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", conversionProfile,
       "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
+    command = command.replace("{output_format}", outputFormat);
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split(" "));
@@ -54,11 +56,11 @@ public class SoxSoundConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException {
-    String version = CommandUtility.execute("sox", "--version");
+    String version = CommandUtility.execute("soffice", "-h");
     if (version.indexOf('\n') > 0) {
-      version = version.replace(" ", "");
       version = version.substring(0, version.indexOf('\n'));
     }
     return version;
   }
+
 }

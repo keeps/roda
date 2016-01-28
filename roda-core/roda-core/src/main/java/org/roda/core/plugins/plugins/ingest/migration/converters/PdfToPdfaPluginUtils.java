@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.ingest.migration;
+package org.roda.core.plugins.plugins.ingest.migration.converters;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -32,9 +32,9 @@ import org.verapdf.pdfa.validation.Profiles;
 import org.verapdf.pdfa.validation.ValidationProfile;
 import org.verapdf.pdfa.validators.Validators;
 
-public class PDFtoPDFAPluginUtils {
+public class PdfToPdfaPluginUtils {
 
-  public static Path runPDFtoPDFA(InputStream pdfInputStream) throws IOException, VeraPDFException,
+  public static Path runPdfToPdfa(InputStream pdfInputStream) throws IOException, VeraPDFException,
     GhostscriptException {
 
     // write pdf inputstream data on a new file (absolute path needed when
@@ -47,20 +47,20 @@ public class PDFtoPDFAPluginUtils {
     os.close();
     pdfInputStream.close();
 
-    return executePDFtoPDFA(p);
+    return executePdfToPdfa(p);
   }
 
-  public static Path runPDFtoPDFA(Path p) throws IOException, VeraPDFException, GhostscriptException {
-    return executePDFtoPDFA(p);
+  public static Path runPdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
+    return executePdfToPdfa(p);
   }
 
-  private static Path executePDFtoPDFA(Path p) throws IOException, VeraPDFException, GhostscriptException {
+  private static Path executePdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
     // pdfa - file to save the GS output; fixed - file to save the metadata
     // fixed output
     Path pdfa = Files.createTempFile("pdfa", ".pdf");
     Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "pdftopdfa", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "pdfToPdfa", "commandLine");
     command = command.replace("{input_file}", p.toString());
     command = command.replace("{output_file}", pdfa.toString());
 

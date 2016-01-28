@@ -13,9 +13,9 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
-public class FFMPEGVideoConvertPluginUtils {
+public class FfmpegConvertPluginUtils {
 
-  public static Path runFFMPEGVideoConvert(InputStream is, String inputFormat, String outputFormat,
+  public static Path runFfmpegVideoConvert(InputStream is, String inputFormat, String outputFormat,
     String conversionProfile) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
@@ -28,19 +28,19 @@ public class FFMPEGVideoConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeFFMPEG(input, output, conversionProfile);
+    return executeFfmpeg(input, output, conversionProfile);
   }
 
-  public static Path runFFMPEGVideoConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runFfmpegVideoConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
     throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeFFMPEG(input, output, conversionProfile);
+    return executeFfmpeg(input, output, conversionProfile);
   }
 
-  private static Path executeFFMPEG(Path input, Path output, String conversionProfile) throws CommandException {
+  private static Path executeFfmpeg(Path input, Path output, String conversionProfile) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegvideoconvert", conversionProfile,
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", conversionProfile,
       "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());

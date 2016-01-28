@@ -38,7 +38,7 @@ import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.PDFtoPDFAPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.converters.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -339,7 +339,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
 
   private Report doPDFtoPDFAConversion(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, PDFtoPDFAPlugin.class.getName(), params);
+    return executePlugin(index, model, storage, aips, PdfToPdfaPlugin.class.getName(), params);
   }
 
   private Report doVeraPDFCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips,

@@ -80,7 +80,6 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     parametersMap.put("outputFormat", outputFormat);
     parametersMap.put("maxKbytes", Long.toString(maxKbytes));
     parametersMap.put("hasPartialSuccessOnOutcome", Boolean.toString(hasPartialSuccessOnOutcome));
-    parametersMap.put("conversionProfile", conversionProfile);
     return parametersMap;
   }
 
@@ -98,11 +97,6 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     // output image format
     if (parameters.containsKey("outputFormat")) {
       outputFormat = parameters.get("outputFormat");
-    }
-
-    // conversion profile
-    if (parameters.containsKey("conversionProfile")) {
-      conversionProfile = parameters.get("conversionProfile");
     }
   }
 

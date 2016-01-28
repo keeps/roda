@@ -1,18 +1,13 @@
-/**
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE file at the root of the source
- * tree and available online at
- *
- * https://github.com/keeps/roda
- */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -22,9 +17,10 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
-import org.verapdf.core.VeraPDFException;
 
-public class PDFtoPDFAPlugin extends AbstractConvertPlugin {
+public abstract class GhostScriptConvertPlugin extends AbstractConvertPlugin {
+
+  public String device;
 
   @Override
   public void init() throws PluginException {
@@ -38,12 +34,12 @@ public class PDFtoPDFAPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getName() {
-    return "PDF to PDFA conversion";
+    return "GhostScript conversion";
   }
 
   @Override
   public String getDescription() {
-    return "Generates PDFa format files from PDF files allowing them to pass on veraPDF validation";
+    return "Converts files using GhostScript.";
   }
 
   @Override
@@ -52,8 +48,16 @@ public class PDFtoPDFAPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
-    return new PDFtoPDFAPlugin();
+  public abstract Plugin<AIP> cloneMe();
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    // defines a ghostscript device
+    if (parameters.containsKey("device")) {
+      device = parameters.get("device");
+    }
   }
 
   @Override
@@ -62,13 +66,17 @@ public class PDFtoPDFAPlugin extends AbstractConvertPlugin {
     Path pluginResult = null;
 
     try {
+
       if (Files.exists(uriPath)) {
-        pluginResult = PDFtoPDFAPluginUtils.runPDFtoPDFA(uriPath);
+        pluginResult = GhostScriptConvertPluginUtils.runGhostScriptConvert(uriPath, inputFormat, outputFormat, device,
+          conversionProfile);
       } else {
-        pluginResult = PDFtoPDFAPluginUtils.runPDFtoPDFA(binary.getContent().createInputStream());
+        pluginResult = GhostScriptConvertPluginUtils.runGhostScriptConvert(binary.getContent().createInputStream(),
+          inputFormat, outputFormat, device, conversionProfile);
       }
-    } catch (VeraPDFException | GhostscriptException e) {
-      logger.error("Error when running PDFtoPDFAPluginUtils ", e);
+
+    } catch (GhostscriptException e) {
+      throw new CommandException("Exception when using GhostScript: ", e);
     }
 
     return pluginResult;
