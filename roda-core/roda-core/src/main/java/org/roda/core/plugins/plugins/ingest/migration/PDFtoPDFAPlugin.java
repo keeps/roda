@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
@@ -107,14 +108,14 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
       List<String> newRepresentations = new ArrayList<String>();
       String newRepresentationID = UUID.randomUUID().toString();
 
-      for (String representationID : aip.getRepresentationIds()) {
+      for (Representation representation : aip.getRepresentations()) {
         List<String> alteredFiles = new ArrayList<String>();
         int state = 1;
 
         try {
-          logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+          logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
 
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
 
@@ -135,12 +136,14 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
 
               if (pluginResult != null) {
                 Binary resource = (Binary) FSUtils.convertPathToResource(pluginResult.getParent(), pluginResult);
-                StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+                StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
 
                 // create a new representation if it does not exist
                 if (!newRepresentations.contains(newRepresentationID)) {
                   logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
-                  model.createRepresentation(aip.getId(), newRepresentationID, model.getStorage(), storagePath);
+                  boolean original = false;
+                  model.createRepresentation(aip.getId(), newRepresentationID, original, model.getStorage(),
+                    storagePath);
                   StoragePath storagePreservationPath = ModelUtils.getPreservationRepresentationPath(aip.getId(),
                     newRepresentationID);
                   model.getStorage().createDirectory(storagePreservationPath);
@@ -163,8 +166,8 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
           state = 0;
         }
 
-        logger.debug("Creating PDFtoPDFA plugin event for the representation " + representationID);
-        createEvent(alteredFiles, aip, representationID, newRepresentationID, model, state);
+        logger.debug("Creating PDFtoPDFA plugin event for the representation " + representation.getId());
+        createEvent(alteredFiles, aip, representation.getId(), newRepresentationID, model, state);
       }
     }
 

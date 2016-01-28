@@ -19,6 +19,7 @@ import java.util.Map;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -83,22 +84,22 @@ public class DroidPlugin implements Plugin<AIP> {
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-      for (String representationID : aip.getRepresentationIds()) {
-        LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+      for (Representation representation : aip.getRepresentations()) {
+        LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
         try {
           /*
            * Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representationID); for
+           * model.retrieveRepresentation(aip.getId(), representation.getId()); for
            * (String fileID : representation.getFileIds()) { LOGGER.debug(
            * "Processing file " + fileID + " of representation " +
-           * representationID + " from AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representationID, fileID); Binary
+           * representation.getId() + " from AIP " + aip.getId()); File file =
+           * model.retrieveFile(aip.getId(), representation.getId(), fileID); Binary
            * binary = storage.getBinary(file.getStoragePath());
            * 
            * Path fitsResult = FITSUtils.runFits(file, binary,
            * getParameterValues()); Binary resource = (Binary)
            * FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
-           * model.createOtherMetadata(aip.getId(), representationID,
+           * model.createOtherMetadata(aip.getId(), representation.getId(),
            * file.getStoragePath().getName() + ".xml", "FITS", resource);
            * FSUtils.deletePath(fitsResult);
            * 
@@ -106,7 +107,7 @@ public class DroidPlugin implements Plugin<AIP> {
            */
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
           tempStorage.copy(storage, representationPath, representationPath);
           String droidOutput = DroidPluginUtils.runDROIDOnPath(data.resolve(representationPath.asString()));
           LOGGER.debug("DROID OUTPUT: " + droidOutput);
@@ -122,9 +123,9 @@ public class DroidPlugin implements Plugin<AIP> {
             Path p = Files.createTempFile("temp", ".temp");
             Files.write(p, xmlOutput.getBytes());
             Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + filename + ")");
-            model.createOtherMetadata(aip.getId(), representationID, filename + ".xml", "DROID", resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), filename + ".xml", "DROID", resource);
           }
           FSUtils.deletePath(data);
         } catch (RODAException | IOException e) {

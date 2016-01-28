@@ -1,7 +1,5 @@
 package org.roda.core.data.v2.ip;
 
-import java.util.List;
-
 public class IndexedRepresentation extends Representation {
 
   private static final long serialVersionUID = -950545608880793468L;
@@ -13,9 +11,8 @@ public class IndexedRepresentation extends Representation {
     super();
   }
 
-  public IndexedRepresentation(String id, String aipId, boolean original, List<String> directFileIds, long sizeInBytes,
-    long totalNumberOfFiles) {
-    super(id, aipId, original, directFileIds);
+  public IndexedRepresentation(String id, String aipId, boolean original, long sizeInBytes, long totalNumberOfFiles) {
+    super(id, aipId, original);
     this.sizeInBytes = sizeInBytes;
     this.totalNumberOfFiles = totalNumberOfFiles;
   }

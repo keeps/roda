@@ -305,7 +305,6 @@ public final class RodaConstants {
   public static final String SRO_ID = "id";
   public static final String SRO_AIP_ID = "aipId";
   public static final String SRO_ORIGINAL = "original";
-  public static final String SRO_FILE_IDS = "fileId";
   public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
   public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
   public static final String SRO_SIZE_IN_BYTES = "sizeInBytes";

@@ -112,6 +112,7 @@
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="sizeInBytes" type="long" indexed="true" stored="true" /> 
+   <field name="totalNumberOfFiles" type="long" indexed="true" stored="true" /> 
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

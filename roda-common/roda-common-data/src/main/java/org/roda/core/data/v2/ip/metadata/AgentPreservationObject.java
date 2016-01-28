@@ -54,7 +54,7 @@ public class AgentPreservationObject extends PreservationMetadata {
    * @param agent
    */
   public AgentPreservationObject(AgentPreservationObject agent) {
-    this(agent.getId(), agent.getAipId(), agent.getRepresentationID());
+    this(agent.getId(), agent.getAipId(), agent.getRepresentationId());
 
     setAgentName(agent.getAgentName());
     setAgentType(agent.getAgentType());

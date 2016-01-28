@@ -613,7 +613,7 @@ public class SolrUtils {
 
   public static Long objectToLong(Object object) {
     Long ret = null;
-    if(object!=null){
+    if (object != null) {
       if (object instanceof Long) {
         ret = (Long) object;
       } else if (object instanceof String) {
@@ -868,8 +868,10 @@ public class SolrUtils {
       .collect(Collectors.toList());
 
     ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
-    ret.addField(RodaConstants.AIP_REPRESENTATION_ID, aip.getRepresentationIds());
-    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !aip.getRepresentationIds().isEmpty());
+
+    List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
+    ret.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
+    ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
     setPermissions(aip, ret);
 
@@ -971,12 +973,11 @@ public class SolrUtils {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
     final boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
-    final List<String> fileIds = objectToListString(doc.get(RodaConstants.SRO_FILE_IDS));
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
-    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
+    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
 
-    return new IndexedRepresentation(id, aipId, original, fileIds, sizeInBytes, totalNumberOfFiles);
+    return new IndexedRepresentation(id, aipId, original, sizeInBytes, totalNumberOfFiles);
   }
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
@@ -984,13 +985,11 @@ public class SolrUtils {
     doc.addField(RodaConstants.SRO_UUID, getId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.SRO_ID, rep.getId());
     doc.addField(RodaConstants.SRO_AIP_ID, rep.getAipId());
+    doc.addField(RodaConstants.SRO_ORIGINAL, rep.isOriginal());
 
-    // TODO calculate all files or make it obvious it is only direct files
-    doc.addField(RodaConstants.SRO_FILE_IDS, rep.getFilesDirectlyUnder());
-
-    // TODO calculate representation storage size or get this information from
-    // somewhere
+    // TODO calculate storage size and number of files or get it from arguments
     doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, 0L);
+    doc.addField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES, 0L);
 
     return doc;
   }
@@ -1149,9 +1148,12 @@ public class SolrUtils {
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     final String eventOutcomeDetailExtension = objectToString(
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
-    final List<String> linkingAgentIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
-    final List<String> linkingOutcomeObjectIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
-    final List<String> linkingSourceObjectIdentifiers = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
+    final List<String> linkingAgentIdentifiers = objectToListString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
+    final List<String> linkingOutcomeObjectIdentifiers = objectToListString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
+    final List<String> linkingSourceObjectIdentifiers = objectToListString(
+      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
 
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
@@ -1189,7 +1191,7 @@ public class SolrUtils {
     ipa.setVersion(version);
     return ipa;
   }
-  
+
   public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
     throws GenericException {
     SolrInputDocument doc;
@@ -1451,16 +1453,18 @@ public class SolrUtils {
 
   public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
     LOGGER.debug(doc.toString());
-    
+
     IndexedFile file = null;
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
-    //boolean entryPoint = objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
+    // boolean entryPoint =
+    // objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
 
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
-    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE))!=null?objectToLong(doc.get(RodaConstants.FILE_SIZE)):0;
+    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE)) != null ? objectToLong(doc.get(RodaConstants.FILE_SIZE))
+      : 0;
     boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
     String path = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
@@ -1481,9 +1485,9 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
- // FIXME remove entrypoint from IndexedFile...
-    file = new IndexedFile(fileId, aipId, representationId, path, false, fileFormat, originalName, size,
-      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
+    // FIXME remove entrypoint from IndexedFile...
+    file = new IndexedFile(fileId, aipId, representationId, path, false, fileFormat, originalName, size, isDirectory,
+      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
     return file;
   }
 

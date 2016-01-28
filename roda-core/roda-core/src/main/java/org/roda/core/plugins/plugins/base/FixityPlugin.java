@@ -93,88 +93,83 @@ public class FixityPlugin implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      List<String> representationIds = aip.getRepresentationIds();
-      if (representationIds != null && representationIds.size() > 0) {
-        for (String representationID : representationIds) {
-          LOGGER.debug("Checking fixity for files in representation " + representationID + " of AIP " + aip.getId());
-          try {
-            Representation r = model.retrieveRepresentation(aip.getId(), representationID);
-            Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
 
-            List<String> okFileIDS = new ArrayList<String>();
-            List<String> koFileIDS = new ArrayList<String>();
-            for (File currentFile : allFiles) {
-              StoragePath storagePath = ModelUtils.getRepresentationFilePath(currentFile);
-              Binary currentFileBinary = storage.getBinary(storagePath);
-              RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(),
-                representationID, currentFile.getId());
-              if (rfpo.getFixities() != null) {
-                boolean fixityOK = true;
-                for (Fixity f : rfpo.getFixities()) {
-                  try {
-                    Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
-                      "FixityCheck action");
-                    if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
-                      fixityOK = false;
-                      break;
-                    }
-                  } catch (NoSuchAlgorithmException nsae) {
+      for (Representation r : aip.getRepresentations()) {
+        LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
+        try {
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), r.getId());
+
+          List<String> okFileIDS = new ArrayList<String>();
+          List<String> koFileIDS = new ArrayList<String>();
+          for (File currentFile : allFiles) {
+            StoragePath storagePath = ModelUtils.getRepresentationFilePath(currentFile);
+            Binary currentFileBinary = storage.getBinary(storagePath);
+            RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(), r.getId(),
+              currentFile.getId());
+            if (rfpo.getFixities() != null) {
+              boolean fixityOK = true;
+              for (Fixity f : rfpo.getFixities()) {
+                try {
+                  Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
+                    "FixityCheck action");
+                  if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
                     fixityOK = false;
                     break;
                   }
-                }
-                if (fixityOK) {
-                  // TODO support file path
-                  okFileIDS.add(currentFile.getId());
-                } else {
-                  koFileIDS.add(currentFile.getId());
+                } catch (NoSuchAlgorithmException nsae) {
+                  fixityOK = false;
+                  break;
                 }
               }
-
-              if (koFileIDS.size() > 0) {
-                LOGGER.debug("Fixity error for representation " + representationID + " of AIP " + aip.getId());
-                StringBuilder sb = new StringBuilder();
-                sb.append("<p>The following file have bad checksums:</p>");
-                sb.append("<ul>");
-                for (String s : koFileIDS) {
-                  sb.append("<li>" + s + "</li>");
-                }
-                sb.append("</ul>");
-                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
-                  EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                  "Checksums recorded in PREMIS were compared with the files in the repository",
-                  EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                  Arrays.asList(representationID), PluginState.FAILURE, "Reason", sb.toString());
-                notifyUserOfFixityCheckError(representationID, okFileIDS, koFileIDS, epo);
+              if (fixityOK) {
+                // TODO support file path
+                okFileIDS.add(currentFile.getId());
               } else {
-                LOGGER.debug("Fixity OK for representation " + representationID + " of AIP " + aip.getId());
-                EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null,model,
-                  EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                  "Checksums recorded in PREMIS were compared with the files in the repository",
-                  EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                  Arrays.asList(representationID), PluginState.SUCCESS,
-                  okFileIDS.size() + " files checked successfully", okFileIDS.toString());
-                notifyUserOfFixityCheckSucess(representationID, okFileIDS, koFileIDS, epo);
+                koFileIDS.add(currentFile.getId());
               }
             }
-          } catch (IOException | RODAException e) {
-            LOGGER.error("Error processing Representation " + representationID + " - " + e.getMessage(), e);
-            EventPreservationObject epo;
-            try {
-              epo = PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
+
+            if (koFileIDS.size() > 0) {
+              LOGGER.debug("Fixity error for representation " + r.getId() + " of AIP " + aip.getId());
+              StringBuilder sb = new StringBuilder();
+              sb.append("<p>The following file have bad checksums:</p>");
+              sb.append("<ul>");
+              for (String s : koFileIDS) {
+                sb.append("<li>" + s + "</li>");
+              }
+              sb.append("</ul>");
+              EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
                 EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
                 EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                Arrays.asList(representationID), PluginState.PARTIAL_SUCCESS, "Reason",
-                "<p>" + e.getMessage() + "</p>");
-              notifyUserOfFixityCheckUndetermined(representationID, epo, e.getMessage());
-            } catch (RODAException | IOException e1) {
-              LOGGER
-                .error("Error creating premis event for representation " + representationID + " of AIP " + aip.getId());
+                Arrays.asList(r.getId()), PluginState.FAILURE, "Reason", sb.toString());
+              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, epo);
+            } else {
+              LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
+              EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+                EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+                "Checksums recorded in PREMIS were compared with the files in the repository",
+                EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
+                Arrays.asList(r.getId()), PluginState.SUCCESS, okFileIDS.size() + " files checked successfully",
+                okFileIDS.toString());
+              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, epo);
             }
           }
-
+        } catch (IOException | RODAException e) {
+          LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
+          EventPreservationObject epo;
+          try {
+            epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+              EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+              "Checksums recorded in PREMIS were compared with the files in the repository",
+              EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
+              Arrays.asList(r.getId()), PluginState.PARTIAL_SUCCESS, "Reason", "<p>" + e.getMessage() + "</p>");
+            notifyUserOfFixityCheckUndetermined(r.getId(), epo, e.getMessage());
+          } catch (RODAException | IOException e1) {
+            LOGGER.error("Error creating premis event for representation " + r.getId() + " of AIP " + aip.getId());
+          }
         }
+
       }
     }
 

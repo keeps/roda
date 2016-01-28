@@ -8,7 +8,6 @@
 package org.roda.core.index;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -30,8 +29,6 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
-import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
@@ -50,8 +47,6 @@ import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
-import lc.xmlns.premisV2.EventComplexType;
 
 /**
  * 
@@ -88,7 +83,7 @@ public class IndexModelObserver implements ModelObserver {
           StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
           Binary binary = model.getStorage().getBinary(filePath);
 
-          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationID(),
+          SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationId(),
             pm.getId(), binary);
           LOGGER.debug(premisEventDocument.toString());
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
@@ -107,51 +102,21 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexOtherMetadata(final AIP aip) {
-    // TODO...
+    // TODO index other metadata
   }
 
-  // private void indexPreservationFileObjects(final AIP aip) {
-  // final Map<String, List<String>> preservationFileObjectsIds =
-  // aip.getPreservationFileObjectsIds();
-  // for (Map.Entry<String, List<String>> eventPreservationMap :
-  // preservationFileObjectsIds.entrySet()) {
-  // try {
-  // for (String fileId : eventPreservationMap.getValue()) {
-  //
-  // StoragePath filePath = ModelUtils.getPreservationFilePath(aip.getId(),
-  // eventPreservationMap.getKey(), fileId);
-  // Binary binary = model.getStorage().getBinary(filePath);
-  // SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(aip.getId(),
-  // eventPreservationMap.getKey(),
-  // fileId, binary);
-  // index.add(RodaConstants.INDEX_PRESERVATION_OBJECTS, premisFileDocument);
-  // }
-  // } catch (SolrServerException | IOException | RequestNotValidException |
-  // GenericException | NotFoundException
-  // | AuthorizationDeniedException e) {
-  // LOGGER.error("Could not index premis object", e);
-  // }
-  // try {
-  // index.commit(RodaConstants.INDEX_PRESERVATION_OBJECTS);
-  // } catch (SolrServerException | IOException e) {
-  // LOGGER.error("Could not commit indexed representations", e);
-  // }
-  // }
-  // }
-
   private void indexRepresentations(final AIP aip) {
-    final List<String> representationIds = aip.getRepresentationIds();
-    for (String representationId : representationIds) {
+
+    for (Representation representation : aip.getRepresentations()) {
       try {
-        Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
-        if (representation.getFilesDirectlyUnder() != null && !representation.getFilesDirectlyUnder().isEmpty()) {
-          for (String fileId : representation.getFilesDirectlyUnder()) {
-            File file = model.retrieveFile(aip.getId(), representationId, fileId);
-            indexFile(file, false);
-          }
+        Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+        for (File file : allFiles) {
+          boolean commit = false;
+          boolean recursive = true;
+          indexFile(file, commit, recursive);
         }
 
       } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
@@ -171,7 +136,7 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexFile(File file, boolean commit) {
+  private void indexFile(File file, boolean commit, boolean recursive) {
     RepresentationFilePreservationObject premisFile = null;
     try {
       // TODO remove file id PREMIS suffix
@@ -185,9 +150,10 @@ public class IndexModelObserver implements ModelObserver {
 
     String fulltext = null;
     try {
-      OtherMetadata fulltextMetadata = model.retrieveOtherMetadata(file.getAipId(), file.getRepresentationId(),
+
+      Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
         file.getId() + TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
-      Binary fulltextBinary = model.getStorage().getBinary(fulltextMetadata.getStoragePath());
+
       Map<String, String> properties = TikaFullTextPluginUtils
         .extractPropertiesFromResult(fulltextBinary.getContent().createInputStream());
       fulltext = properties.get(RodaConstants.FILE_FULLTEXT);
@@ -206,15 +172,13 @@ public class IndexModelObserver implements ModelObserver {
       LOGGER.error("Could not index file: " + file, e);
     }
 
-    if (file.getFilesDirectlyUnder() != null && !file.getFilesDirectlyUnder().isEmpty()) {
-      for (String fileUnderId : file.getFilesDirectlyUnder()) {
-        File fileUnder;
-        try {
-          fileUnder = model.retrieveFile(file.getAipId(), file.getId(), fileUnderId);
-          indexFile(fileUnder, false);
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-          LOGGER.error("Could not index files under: " + file, e);
+    if (recursive && file.isDirectory()) {
+      try {
+        for (File subfile : model.listAllFiles(file)) {
+          indexFile(subfile, false, false);
         }
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not index file sub-resources: " + file, e);
       }
     }
 
@@ -317,7 +281,9 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void fileCreated(File file) {
-    indexFile(file, true);
+    boolean commit = true;
+    boolean recursive = true;
+    indexFile(file, commit, recursive);
   }
 
   @Override
@@ -383,7 +349,7 @@ public class IndexModelObserver implements ModelObserver {
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationMetadata);
       Binary binary = model.getStorage().getBinary(storagePath);
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
-        preservationMetadata.getRepresentationID(), preservationMetadata.getId(), binary);
+        preservationMetadata.getRepresentationId(), preservationMetadata.getId(), binary);
 
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
@@ -416,7 +382,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataDeleted(PreservationMetadata preservationMetadata) {
     try {
-      if(preservationMetadata.getAipId()!=null){
+      if (preservationMetadata.getAipId() != null) {
         aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {

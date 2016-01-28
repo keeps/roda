@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
@@ -115,12 +116,12 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation {} of AIP {}", representationID, aip.getId());
+        for (Representation representation : aip.getRepresentations()) {
+          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
 
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
           tempStorage.copy(storage, representationPath, representationPath);
           String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(data.resolve(representationPath.asString()));
 
@@ -137,10 +138,10 @@ public class SiegfriedPlugin implements Plugin<AIP> {
             Path p = Files.createTempFile("temp", ".temp");
             Files.write(p, fileObject.toString().getBytes());
             Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + fileName + ")");
 
-            model.createOtherMetadata(aip.getId(), representationID, fileName + ".json", "Siegfried", resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), fileName + ".json", "Siegfried", resource);
 
             p.toFile().delete();
 
@@ -158,7 +159,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
                     extension = fileName.substring(fileName.lastIndexOf('.'));
                   }
                   IndexedFile f = index.retrieve(IndexedFile.class,
-                    SolrUtils.getId(aip.getId(), representationID, fileName));
+                    SolrUtils.getId(aip.getId(), representation.getId(), fileName));
                   FileFormat ff = new FileFormat();
                   ff.setFormatDesignationName(format);
                   ff.setFormatDesignationVersion(version);

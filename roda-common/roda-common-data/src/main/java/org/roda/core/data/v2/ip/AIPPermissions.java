@@ -20,8 +20,6 @@ import java.util.Set;
 public class AIPPermissions implements Serializable {
   private static final long serialVersionUID = -3534275853026959624L;
 
-  private String objectPID = null;
-
   private Set<String> insertUsers = new HashSet<String>();
   private Set<String> insertGroups = new HashSet<String>();
 
@@ -41,62 +39,6 @@ public class AIPPermissions implements Serializable {
    * Constructs an empty {@link AIPPermissions}.
    */
   public AIPPermissions() {
-  }
-
-  @Override
-  public String toString() {
-    return "RODAObjectPermissions [objectPID=" + objectPID + ", insertUsers=" + insertUsers + ", insertGroups="
-      + insertGroups + ", readUsers=" + readUsers + ", readGroups=" + readGroups + ", modifyUsers=" + modifyUsers
-      + ", modifyGroups=" + modifyGroups + ", removeUsers=" + removeUsers + ", removeGroups=" + removeGroups
-      + ", grantUsers=" + grantUsers + ", grantGroups=" + grantGroups + "]";
-  }
-
-  @Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = 1;
-    result = prime * result + ((grantGroups == null) ? 0 : grantGroups.hashCode());
-    result = prime * result + ((grantUsers == null) ? 0 : grantUsers.hashCode());
-    result = prime * result + ((insertGroups == null) ? 0 : insertGroups.hashCode());
-    result = prime * result + ((insertUsers == null) ? 0 : insertUsers.hashCode());
-    result = prime * result + ((modifyGroups == null) ? 0 : modifyGroups.hashCode());
-    result = prime * result + ((modifyUsers == null) ? 0 : modifyUsers.hashCode());
-    result = prime * result + ((objectPID == null) ? 0 : objectPID.hashCode());
-    result = prime * result + ((readGroups == null) ? 0 : readGroups.hashCode());
-    result = prime * result + ((readUsers == null) ? 0 : readUsers.hashCode());
-    result = prime * result + ((removeGroups == null) ? 0 : removeGroups.hashCode());
-    result = prime * result + ((removeUsers == null) ? 0 : removeUsers.hashCode());
-    return result;
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (obj instanceof AIPPermissions) {
-      AIPPermissions other = (AIPPermissions) obj;
-      return (getObjectPID() == other.getObjectPID() || getObjectPID().equals(other.getObjectPID()))
-        && insertUsers.equals(other.insertUsers) && insertGroups.equals(other.insertGroups)
-        && readUsers.equals(other.readUsers) && readGroups.equals(other.readGroups)
-        && modifyUsers.equals(other.modifyUsers) && modifyGroups.equals(other.modifyGroups)
-        && removeUsers.equals(other.removeUsers) && removeGroups.equals(other.removeGroups)
-        && grantUsers.equals(other.grantUsers) && grantGroups.equals(other.grantGroups);
-    } else {
-      return false;
-    }
-  }
-
-  /**
-   * @return the objectPID
-   */
-  public String getObjectPID() {
-    return objectPID;
-  }
-
-  /**
-   * @param objectPID
-   *          the objectPID to set
-   */
-  public void setObjectPID(String objectPID) {
-    this.objectPID = objectPID;
   }
 
   /**
@@ -469,4 +411,90 @@ public class AIPPermissions implements Serializable {
     this.grantGroups.remove(groupname);
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((grantGroups == null) ? 0 : grantGroups.hashCode());
+    result = prime * result + ((grantUsers == null) ? 0 : grantUsers.hashCode());
+    result = prime * result + ((insertGroups == null) ? 0 : insertGroups.hashCode());
+    result = prime * result + ((insertUsers == null) ? 0 : insertUsers.hashCode());
+    result = prime * result + ((modifyGroups == null) ? 0 : modifyGroups.hashCode());
+    result = prime * result + ((modifyUsers == null) ? 0 : modifyUsers.hashCode());
+    result = prime * result + ((readGroups == null) ? 0 : readGroups.hashCode());
+    result = prime * result + ((readUsers == null) ? 0 : readUsers.hashCode());
+    result = prime * result + ((removeGroups == null) ? 0 : removeGroups.hashCode());
+    result = prime * result + ((removeUsers == null) ? 0 : removeUsers.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    AIPPermissions other = (AIPPermissions) obj;
+    if (grantGroups == null) {
+      if (other.grantGroups != null)
+        return false;
+    } else if (!grantGroups.equals(other.grantGroups))
+      return false;
+    if (grantUsers == null) {
+      if (other.grantUsers != null)
+        return false;
+    } else if (!grantUsers.equals(other.grantUsers))
+      return false;
+    if (insertGroups == null) {
+      if (other.insertGroups != null)
+        return false;
+    } else if (!insertGroups.equals(other.insertGroups))
+      return false;
+    if (insertUsers == null) {
+      if (other.insertUsers != null)
+        return false;
+    } else if (!insertUsers.equals(other.insertUsers))
+      return false;
+    if (modifyGroups == null) {
+      if (other.modifyGroups != null)
+        return false;
+    } else if (!modifyGroups.equals(other.modifyGroups))
+      return false;
+    if (modifyUsers == null) {
+      if (other.modifyUsers != null)
+        return false;
+    } else if (!modifyUsers.equals(other.modifyUsers))
+      return false;
+    if (readGroups == null) {
+      if (other.readGroups != null)
+        return false;
+    } else if (!readGroups.equals(other.readGroups))
+      return false;
+    if (readUsers == null) {
+      if (other.readUsers != null)
+        return false;
+    } else if (!readUsers.equals(other.readUsers))
+      return false;
+    if (removeGroups == null) {
+      if (other.removeGroups != null)
+        return false;
+    } else if (!removeGroups.equals(other.removeGroups))
+      return false;
+    if (removeUsers == null) {
+      if (other.removeUsers != null)
+        return false;
+    } else if (!removeUsers.equals(other.removeUsers))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "AIPPermissions [insertUsers=" + insertUsers + ", insertGroups=" + insertGroups + ", readUsers=" + readUsers
+      + ", readGroups=" + readGroups + ", modifyUsers=" + modifyUsers + ", modifyGroups=" + modifyGroups
+      + ", removeUsers=" + removeUsers + ", removeGroups=" + removeGroups + ", grantUsers=" + grantUsers
+      + ", grantGroups=" + grantGroups + "]";
+  }
 }

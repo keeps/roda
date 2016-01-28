@@ -35,6 +35,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
@@ -347,10 +348,11 @@ public final class PluginHelper {
     try {
       boolean success = (state == PluginState.SUCCESS);
 
-      for (String representationID : aip.getRepresentationIds()) {
+      for (Representation representation : aip.getRepresentations()) {
 
-        PluginHelper.createPluginEvent(aip.getId(), representationID, null, model, eventType, eventDetails, agentRole,
-          agent.getId(), Arrays.asList(representationID), state, success ? "" : "Error", detailExtension);
+        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
+          agentRole, agent.getId(), Arrays.asList(representation.getId()), state, success ? "" : "Error",
+          detailExtension);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

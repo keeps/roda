@@ -21,20 +21,17 @@ public class File implements Serializable {
   private String representationId;
 
   private boolean isDirectory;
-  private List<String> filesDirectlyUnder;
 
   public File() {
     super();
   }
 
-  public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory,
-    List<String> filesDirectlyUnder) {
+  public File(String id, String aipId, String representationId, List<String> path, boolean isDirectory) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
     this.isDirectory = isDirectory;
-    this.filesDirectlyUnder = filesDirectlyUnder;
   }
 
   public String getId() {
@@ -77,20 +74,11 @@ public class File implements Serializable {
     this.isDirectory = isDirectory;
   }
 
-  public List<String> getFilesDirectlyUnder() {
-    return filesDirectlyUnder;
-  }
-
-  public void setFilesDirectlyUnder(List<String> filesDirectlyUnder) {
-    this.filesDirectlyUnder = filesDirectlyUnder;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-    result = prime * result + ((filesDirectlyUnder == null) ? 0 : filesDirectlyUnder.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (isDirectory ? 1231 : 1237);
     result = prime * result + ((path == null) ? 0 : path.hashCode());
@@ -111,11 +99,6 @@ public class File implements Serializable {
       if (other.aipId != null)
         return false;
     } else if (!aipId.equals(other.aipId))
-      return false;
-    if (filesDirectlyUnder == null) {
-      if (other.filesDirectlyUnder != null)
-        return false;
-    } else if (!filesDirectlyUnder.equals(other.filesDirectlyUnder))
       return false;
     if (id == null) {
       if (other.id != null)
@@ -140,7 +123,7 @@ public class File implements Serializable {
   @Override
   public String toString() {
     return "File [id=" + id + ", path=" + path + ", aipId=" + aipId + ", representationId=" + representationId
-      + ", isDirectory=" + isDirectory + ", filesDirectlyUnder=" + filesDirectlyUnder + "]";
+      + ", isDirectory=" + isDirectory + "]";
   }
 
 }

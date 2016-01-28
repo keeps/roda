@@ -34,6 +34,7 @@ import javax.xml.xpath.XPathFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -104,21 +105,21 @@ public class MediaInfoPlugin implements Plugin<AIP> {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
 
-      for (String representationID : aip.getRepresentationIds()) {
-        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+      for (Representation representation : aip.getRepresentations()) {
+        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
           tempStorage.copy(storage, representationPath, representationPath);
           String mediaInfoOutput = MediaInfoPluginUtils.runMediaInfoOnPath(data.resolve(representationPath.asString()));
 
           Map<String, Path> mediaInfoParsed = parseMediaInfoOutput(mediaInfoOutput);
           for (Map.Entry<String, Path> entry : mediaInfoParsed.entrySet()) {
             Binary resource = (Binary) FSUtils.convertPathToResource(entry.getValue().getParent(), entry.getValue());
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + entry.getValue().toFile().getName() + ")");
-            model.createOtherMetadata(aip.getId(), representationID, entry.getKey() + ".xml", "MediaInfo", resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), entry.getKey() + ".xml", "MediaInfo", resource);
           }
           FSUtils.deletePath(data);
         } catch (RODAException | IOException | CommandException | XPathExpressionException

@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -114,9 +115,9 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
       LOGGER.debug("Processing AIP " + aip.getId());
       try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation " + representationID + " of AIP " + aip.getId());
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+        for (Representation representation : aip.getRepresentations()) {
+          LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (File file : allFiles) {
             LOGGER.debug("Processing file: " + file);
@@ -127,10 +128,10 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
             Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-            model.createOtherMetadata(aip.getId(), representationID, file.getId() + OUTPUT_EXT, APP_NAME, resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME, resource);
             try {
               IndexedFile f = index.retrieve(IndexedFile.class,
-                SolrUtils.getId(aip.getId(), representationID, file.getId()));
+                SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
 
               Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
               if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {

@@ -10,12 +10,18 @@ package org.roda.core.data.v2.ip;
 import java.io.Serializable;
 import java.util.List;
 
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.Metadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class AIP implements Serializable {
 
   private static final long serialVersionUID = 430629679119752757L;
 
+  @JsonIgnore
   private String id;
   private String parentId;
   private boolean active;
@@ -23,14 +29,14 @@ public class AIP implements Serializable {
 
   private Metadata metadata;
 
-  private List<String> representationIds;
+  private List<Representation> representations;
 
   public AIP() {
     super();
   }
 
   public AIP(String id, String parentId, boolean active, AIPPermissions permissions, Metadata metadata,
-    List<String> representationIds) {
+    List<Representation> representations) {
     super();
     this.id = id;
     this.parentId = parentId;
@@ -39,7 +45,7 @@ public class AIP implements Serializable {
 
     this.metadata = metadata;
 
-    this.representationIds = representationIds;
+    this.representations = representations;
 
   }
 
@@ -69,6 +75,26 @@ public class AIP implements Serializable {
 
   public void setId(String id) {
     this.id = id;
+
+    if (metadata != null) {
+      if (metadata.getDescriptiveMetadata() != null) {
+        for (DescriptiveMetadata descriptiveMetadata : metadata.getDescriptiveMetadata()) {
+          descriptiveMetadata.setAipId(id);
+        }
+      }
+
+      if (metadata.getPreservationMetadata() != null) {
+        for (PreservationMetadata preservationMetadata : metadata.getPreservationMetadata()) {
+          preservationMetadata.setAipId(id);
+        }
+      }
+
+      if (metadata.getOtherMetadata() != null) {
+        for (OtherMetadata otherMetadata : metadata.getOtherMetadata()) {
+          otherMetadata.setAipId(id);
+        }
+      }
+    }
   }
 
   public void setParentId(String parentId) {
@@ -95,15 +121,12 @@ public class AIP implements Serializable {
     this.metadata = metadata;
   }
 
-  /**
-   * @return the representationIds
-   */
-  public List<String> getRepresentationIds() {
-    return representationIds;
+  public List<Representation> getRepresentations() {
+    return representations;
   }
 
-  public void setRepresentationIds(List<String> representationIds) {
-    this.representationIds = representationIds;
+  public void setRepresentations(List<Representation> representations) {
+    this.representations = representations;
   }
 
   @Override
@@ -115,7 +138,7 @@ public class AIP implements Serializable {
     result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
-    result = prime * result + ((representationIds == null) ? 0 : representationIds.hashCode());
+    result = prime * result + ((representations == null) ? 0 : representations.hashCode());
     return result;
   }
 
@@ -150,10 +173,10 @@ public class AIP implements Serializable {
         return false;
     } else if (!permissions.equals(other.permissions))
       return false;
-    if (representationIds == null) {
-      if (other.representationIds != null)
+    if (representations == null) {
+      if (other.representations != null)
         return false;
-    } else if (!representationIds.equals(other.representationIds))
+    } else if (!representations.equals(other.representations))
       return false;
     return true;
   }
@@ -161,7 +184,7 @@ public class AIP implements Serializable {
   @Override
   public String toString() {
     return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", permissions=" + permissions
-      + ", metadata=" + metadata + ", representationIds=" + representationIds + "]";
+      + ", metadata=" + metadata + ", representations=" + representations + "]";
   }
 
 }

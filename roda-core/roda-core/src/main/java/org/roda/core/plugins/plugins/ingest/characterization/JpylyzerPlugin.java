@@ -103,10 +103,10 @@ public class JpylyzerPlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-      for (String representationID : aip.getRepresentationIds()) {
-        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+      for (Representation representation : aip.getRepresentations()) {
+        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is JPEG2000
@@ -118,7 +118,7 @@ public class JpylyzerPlugin implements Plugin<AIP> {
                 Path ffProbeResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
 
                 Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
-                model.createOtherMetadata(aip.getId(), representationID, file.getId() + ".xml", "jpylyzer", resource);
+                model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "jpylyzer", resource);
                 ffProbeResults.toFile().delete();
               } catch (RODAException | IOException sse) {
                 LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());

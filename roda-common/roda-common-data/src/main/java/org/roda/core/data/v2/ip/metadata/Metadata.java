@@ -10,13 +10,13 @@ public class Metadata implements Serializable {
 
   private List<DescriptiveMetadata> descriptiveMetadata;
   private List<PreservationMetadata> preservationMetadata;
-  private List<OtherMetadata> othermetadata;
+  private List<OtherMetadata> otherMetadata;
 
   public Metadata() {
     super();
     descriptiveMetadata = new ArrayList<>();
     preservationMetadata = new ArrayList<>();
-    othermetadata = new ArrayList<>();
+    otherMetadata = new ArrayList<>();
   }
 
   public Metadata(List<DescriptiveMetadata> descriptiveMetadata, List<PreservationMetadata> preservationMetadata,
@@ -24,7 +24,7 @@ public class Metadata implements Serializable {
     super();
     this.descriptiveMetadata = descriptiveMetadata;
     this.preservationMetadata = preservationMetadata;
-    this.othermetadata = othermetadata;
+    this.otherMetadata = othermetadata;
   }
 
   public List<DescriptiveMetadata> getDescriptiveMetadata() {
@@ -43,12 +43,12 @@ public class Metadata implements Serializable {
     this.preservationMetadata = preservationMetadata;
   }
 
-  public List<OtherMetadata> getOthermetadata() {
-    return othermetadata;
+  public List<OtherMetadata> getOtherMetadata() {
+    return otherMetadata;
   }
 
-  public void setOthermetadata(List<OtherMetadata> othermetadata) {
-    this.othermetadata = othermetadata;
+  public void setOtherMetadata(List<OtherMetadata> otherMetadata) {
+    this.otherMetadata = otherMetadata;
   }
 
   public static long getSerialversionuid() {
@@ -60,7 +60,7 @@ public class Metadata implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
-    result = prime * result + ((othermetadata == null) ? 0 : othermetadata.hashCode());
+    result = prime * result + ((otherMetadata == null) ? 0 : otherMetadata.hashCode());
     result = prime * result + ((preservationMetadata == null) ? 0 : preservationMetadata.hashCode());
     return result;
   }
@@ -79,10 +79,10 @@ public class Metadata implements Serializable {
         return false;
     } else if (!descriptiveMetadata.equals(other.descriptiveMetadata))
       return false;
-    if (othermetadata == null) {
-      if (other.othermetadata != null)
+    if (otherMetadata == null) {
+      if (other.otherMetadata != null)
         return false;
-    } else if (!othermetadata.equals(other.othermetadata))
+    } else if (!otherMetadata.equals(other.otherMetadata))
       return false;
     if (preservationMetadata == null) {
       if (other.preservationMetadata != null)
@@ -95,7 +95,7 @@ public class Metadata implements Serializable {
   @Override
   public String toString() {
     return "Metadata [descriptiveMetadata=" + descriptiveMetadata + ", preservationMetadata=" + preservationMetadata
-      + ", othermetadata=" + othermetadata + "]";
+      + ", othermetadata=" + otherMetadata + "]";
   }
 
 }

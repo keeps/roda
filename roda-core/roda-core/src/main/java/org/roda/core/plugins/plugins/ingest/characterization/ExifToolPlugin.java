@@ -19,6 +19,7 @@ import java.util.Map;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -84,24 +85,24 @@ public class ExifToolPlugin implements Plugin<AIP> {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
 
-      for (String representationID : aip.getRepresentationIds()) {
+      for (Representation representation : aip.getRepresentations()) {
 
-        LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
           /*
            * OLD VERSION... FILE BY FILE Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representationID); for
+           * model.retrieveRepresentation(aip.getId(), representation.getId()); for
            * (String fileID : representation.getFileIds()) { LOGGER.debug(
-           * "Processing file " + fileID + " from " + representationID +
+           * "Processing file " + fileID + " from " + representation.getId() +
            * " of AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representationID, fileID); Binary
+           * model.retrieveFile(aip.getId(), representation.getId(), fileID); Binary
            * binary = storage.getBinary(file.getStoragePath());
            * 
            * Path exifToolResults = ExifToolUtils.runExifTool(file, binary,
            * getParameterValues()); Binary resource = (Binary)
            * FSUtils.convertPathToResource(exifToolResults.getParent(),
            * exifToolResults); model.createOtherMetadata(aip.getId(),
-           * representationID, file.getStoragePath().getName() + ".xml",
+           * representation.getId(), file.getStoragePath().getName() + ".xml",
            * "ExifTool", resource); exifToolResults.toFile().delete(); }
            */
           // NEW VERSION
@@ -109,7 +110,7 @@ public class ExifToolPlugin implements Plugin<AIP> {
           // "temp" FileStorageService
           Path data = Files.createTempDirectory("data");
           StorageService tempStorage = new FileStorageService(data);
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representationID);
+          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
           tempStorage.copy(storage, representationPath, representationPath);
           Path metadata = Files.createTempDirectory("metadata");
           String exifOutput = ExifToolPluginUtils.runExifToolOnPath(data.resolve(representationPath.asString()),
@@ -119,9 +120,9 @@ public class ExifToolPlugin implements Plugin<AIP> {
           try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
             for (Path path : directoryStream) {
               Binary resource = (Binary) FSUtils.convertPathToResource(path.getParent(), path);
-              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representationID
+              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
                 + ", FILE: " + path.toFile().getName() + ")");
-              model.createOtherMetadata(aip.getId(), representationID, path.toFile().getName(), "ExifTool", resource);
+              model.createOtherMetadata(aip.getId(), representation.getId(), path.toFile().getName(), "ExifTool", resource);
             }
           }
           FSUtils.deletePath(data);

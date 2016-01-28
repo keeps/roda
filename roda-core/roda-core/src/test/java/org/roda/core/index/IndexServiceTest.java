@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
@@ -135,7 +136,7 @@ public class IndexServiceTest {
     assertEquals(RodaUtils.parseDate("0002-01-01T00:00:00.000+0000"), indexedAip.getDateFinal());
 
     // Retrieve, count and list SRO
-    String rep1Id = aip.getRepresentationIds().get(0);
+    String rep1Id = aip.getRepresentations().get(0).getId();
     Representation rep1 = index.retrieve(Representation.class, aipId, rep1Id);
     assertEquals(rep1Id, rep1.getId());
 
@@ -143,14 +144,15 @@ public class IndexServiceTest {
     filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
     IndexResult<Representation> sros = index.find(Representation.class, filterParentTheAIP, null, new Sublist(0, 10),
       null);
-    assertEquals(aip.getRepresentationIds().size(), sros.getTotalCount());
+    assertEquals(aip.getRepresentations().size(), sros.getTotalCount());
 
     List<String> sro_IDs = new ArrayList<>();
     for (Representation sro : sros.getResults()) {
       sro_IDs.add(sro.getId());
     }
 
-    assertThat(sro_IDs, Matchers.contains(aip.getRepresentationIds().toArray()));
+    List<String> representationIds = aip.getRepresentations().stream().map(r -> r.getId()).collect(Collectors.toList());
+    assertThat(sro_IDs, Matchers.contains(representationIds.toArray()));
 
     /*
      * filterMimetype.add(new SimpleFilterParameter(RodaConstants.SRFM_MIMETYPE,

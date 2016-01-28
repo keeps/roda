@@ -8,29 +8,28 @@
 package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
-import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Representation implements Serializable {
 
   private static final long serialVersionUID = 3658011895150894795L;
 
-  private String id;
+  @JsonIgnore
   private String aipId;
 
+  private String id;
   private boolean original;
-
-  private List<String> filesDirectlyUnder;
 
   public Representation() {
     super();
   }
 
-  public Representation(String id, String aipId, boolean original, List<String> filesDirectlyUnder) {
+  public Representation(String id, String aipId, boolean original) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.original = original;
-    this.filesDirectlyUnder = filesDirectlyUnder;
   }
 
   public String getId() {
@@ -57,20 +56,11 @@ public class Representation implements Serializable {
     this.original = original;
   }
 
-  public List<String> getFilesDirectlyUnder() {
-    return filesDirectlyUnder;
-  }
-
-  public void setFilesDirectlyUnder(List<String> filesDirectlyUnder) {
-    this.filesDirectlyUnder = filesDirectlyUnder;
-  }
-
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
-    result = prime * result + ((filesDirectlyUnder == null) ? 0 : filesDirectlyUnder.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (original ? 1231 : 1237);
     return result;
@@ -90,11 +80,6 @@ public class Representation implements Serializable {
         return false;
     } else if (!aipId.equals(other.aipId))
       return false;
-    if (filesDirectlyUnder == null) {
-      if (other.filesDirectlyUnder != null)
-        return false;
-    } else if (!filesDirectlyUnder.equals(other.filesDirectlyUnder))
-      return false;
     if (id == null) {
       if (other.id != null)
         return false;
@@ -107,8 +92,7 @@ public class Representation implements Serializable {
 
   @Override
   public String toString() {
-    return "Representation [id=" + id + ", aipId=" + aipId + ", original=" + original + ", filesDirectlyUnder="
-      + filesDirectlyUnder + "]";
+    return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + "]";
   }
 
 }

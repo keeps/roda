@@ -37,6 +37,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -97,24 +98,24 @@ public final class HTMLUtils {
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     AIP aip = model.retrieveAIP(aipId);
     List<RepresentationPreservationMetadataBundle> representations = new ArrayList<RepresentationPreservationMetadataBundle>();
-    if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
-      for (String representationId : aip.getRepresentationIds()) {
-        ClosableIterable<PreservationMetadata> preservationMetadata = model
-          .listPreservationMetadataBinaries(aip.getId(), representationId);
-        try {
-          RepresentationPreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(
-            representationId, preservationMetadata, storage);
-          representations.add(representationPreservationMetadataBundle);
 
-        } finally {
-          try {
-            preservationMetadata.close();
-          } catch (IOException e) {
-            LOGGER.error("Error while while freeing up resources", e);
-          }
+    for (Representation representation : aip.getRepresentations()) {
+      ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(),
+        representation.getId());
+      try {
+        RepresentationPreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(
+          representation.getId(), preservationMetadata, storage);
+        representations.add(representationPreservationMetadataBundle);
+
+      } finally {
+        try {
+          preservationMetadata.close();
+        } catch (IOException e) {
+          LOGGER.error("Error while while freeing up resources", e);
         }
       }
     }
+
     return new PreservationMetadataBundle(representations);
   }
 
@@ -125,19 +126,17 @@ public final class HTMLUtils {
     AIP aip = model.retrieveAIP(aipId);
     StringBuilder s = new StringBuilder();
     s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");
-    if (aip.getRepresentationIds() != null && aip.getRepresentationIds().size() > 0) {
-      for (String representationId : aip.getRepresentationIds()) {
-        try {
-          String html = getRepresentationPreservationMetadataHtml(
-            ModelUtils.getAIPRepresentationPreservationPath(aipId, representationId), storage, locale, pagingParametersAgents,
-            pagingParametersEvents, pagingParametersFile);
-          s.append(html);
-        } finally {
+    for (Representation representation : aip.getRepresentations()) {
+      try {
+        String html = getRepresentationPreservationMetadataHtml(
+          ModelUtils.getAIPRepresentationPreservationPath(aipId, representation.getId()), storage, locale,
+          pagingParametersAgents, pagingParametersEvents, pagingParametersFile);
+        s.append(html);
+      } finally {
 
-        }
       }
-
     }
+
     s.append("</span>");
 
     return s.toString();

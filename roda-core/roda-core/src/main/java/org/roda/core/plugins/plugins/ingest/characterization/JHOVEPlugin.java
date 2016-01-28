@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -83,9 +84,9 @@ public class JHOVEPlugin implements Plugin<AIP> {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
       try {
-        for (String representationID : aip.getRepresentationIds()) {
-          LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+        for (Representation representation : aip.getRepresentations()) {
+          LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               LOGGER.debug("Processing file: " + file);
@@ -94,7 +95,7 @@ public class JHOVEPlugin implements Plugin<AIP> {
 
               Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
               Binary resource = (Binary) FSUtils.convertPathToResource(jhoveResults.getParent(), jhoveResults);
-              model.createOtherMetadata(aip.getId(), representationID, file.getId() + ".xml", "JHOVE", resource);
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "JHOVE", resource);
               jhoveResults.toFile().delete();
             }
           }

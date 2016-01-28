@@ -107,8 +107,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
         ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Creating base PREMIS", aip.getId(), null);
 
         try {
-          for (String representationID : aip.getRepresentationIds()) {
-            createPremisForRepresentation(model, storage, temp, aip, representationID);
+          for (Representation representation : aip.getRepresentations()) {
+            createPremisForRepresentation(model, storage, temp, aip, representation.getId());
           }
 
           state = PluginState.SUCCESS;
@@ -136,26 +136,26 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   }
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
-    String representationID) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
+    String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
       NotFoundException, AuthorizationDeniedException {
-    LOGGER.debug("Processing representation " + representationID + " from AIP " + aip.getId());
+    LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     RepresentationPreservationObject pObject = new RepresentationPreservationObject();
-    pObject.setId(representationID);
+    pObject.setId(representationId);
     pObject.setPreservationLevel("");
 
     List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
-    Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+    Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
+    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
     for (File file : allFiles) {
-      pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationID, pObject,
+      pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationId, pObject,
         pObjectPartFiles, file);
     }
 
-    createPremisObjectForRepresentation(model, aip, representationID, pObject, pObjectPartFiles);
+    createPremisObjectForRepresentation(model, aip, representationId, pObject, pObjectPartFiles);
   }
 
-  private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationID,
+  private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationId,
     RepresentationPreservationObject pObject, List<RepresentationFilePreservationObject> pObjectPartFiles)
       throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
       AuthorizationDeniedException {
@@ -164,14 +164,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
     helper.saveToFile(premisRepresentation.toFile());
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationID,
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
       null, (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
 
     FSUtils.deletePath(premisRepresentation);
   }
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
-    StorageService storage, Path temp, AIP aip, String representationID, RepresentationPreservationObject pObject,
+    StorageService storage, Path temp, AIP aip, String representationId, RepresentationPreservationObject pObject,
     List<RepresentationFilePreservationObject> pObjectPartFiles, File file) throws IOException, PremisMetadataException,
       RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing file: " + file);
@@ -184,7 +184,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     Path premis = Files.createTempFile(file.getId(), ".premis.xml");
     PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
     helper.saveToFile(premis.toFile());
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationID, file.getId(),
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId, file.getId(),
       (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
     if (pObject.getRootFile() == null) {
       pObject.setRootFile(premisObject);

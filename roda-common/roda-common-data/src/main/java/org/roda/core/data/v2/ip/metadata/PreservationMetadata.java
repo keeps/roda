@@ -9,6 +9,8 @@ package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class PreservationMetadata implements Serializable {
   private static final long serialVersionUID = -4312941542769679721L;
 
@@ -17,8 +19,9 @@ public class PreservationMetadata implements Serializable {
   }
 
   private String id;
+  @JsonIgnore
   private String aipId;
-  private String representationID;
+  private String representationId;
   private PreservationMetadataType type;
 
   public PreservationMetadata() {
@@ -29,7 +32,7 @@ public class PreservationMetadata implements Serializable {
     super();
     this.id = id;
     this.aipId = aipId;
-    this.representationID = representationId;
+    this.representationId = representationId;
     this.type = type;
   }
 
@@ -46,17 +49,17 @@ public class PreservationMetadata implements Serializable {
   public String getAipId() {
     return aipId;
   }
-  
+
   public void setAipId(String aipId) {
     this.aipId = aipId;
   }
 
-  public String getRepresentationID() {
-    return representationID;
+  public String getRepresentationId() {
+    return representationId;
   }
-  
-  public void setRepresentationID(String representationID) {
-    this.representationID = representationID;
+
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
   }
 
   public PreservationMetadataType getType() {
@@ -66,7 +69,6 @@ public class PreservationMetadata implements Serializable {
   public void setId(String id) {
     this.id = id;
   }
-
 
   public void setType(PreservationMetadataType type) {
     this.type = type;
@@ -78,7 +80,7 @@ public class PreservationMetadata implements Serializable {
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((representationID == null) ? 0 : representationID.hashCode());
+    result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
@@ -102,10 +104,10 @@ public class PreservationMetadata implements Serializable {
         return false;
     } else if (!id.equals(other.id))
       return false;
-    if (representationID == null) {
-      if (other.representationID != null)
+    if (representationId == null) {
+      if (other.representationId != null)
         return false;
-    } else if (!representationID.equals(other.representationID))
+    } else if (!representationId.equals(other.representationId))
       return false;
     if (type != other.type)
       return false;
@@ -114,7 +116,7 @@ public class PreservationMetadata implements Serializable {
 
   @Override
   public String toString() {
-    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationID + ", type="
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationId + ", type="
       + type + "]";
   }
 

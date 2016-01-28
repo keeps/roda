@@ -24,14 +24,15 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
@@ -178,12 +179,12 @@ public class AntivirusPlugin implements Plugin<AIP> {
     try {
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
 
-      for (String representationID : aip.getRepresentationIds()) {
-        PluginHelper.createPluginEvent(aip.getId(), representationID,null, model,
+      for (Representation representation : aip.getRepresentations()) {
+        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           EventPreservationObject.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
           "All the files from the SIP were verified against an antivirus.",
           EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representationID), state, success ? "Report" : "Error",
+          Arrays.asList(representation.getId()), state, success ? "Report" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage());
       }
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException

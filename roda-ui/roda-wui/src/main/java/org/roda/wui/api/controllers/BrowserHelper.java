@@ -88,6 +88,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import opennlp.tools.util.model.ModelUtil;
+
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -277,9 +279,9 @@ public class BrowserHelper {
       Representation representation = model.retrieveRepresentation(aipId, representationId);
 
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      List<String> fileIds = representation.getFilesDirectlyUnder();
-      for (String fileId : fileIds) {
-        addToZip(zipEntries, aipId, representationId, fileId);
+      Iterable<org.roda.core.data.v2.ip.File> allFiles = model.listAllFiles(aipId, representationId);
+      for (org.roda.core.data.v2.ip.File file : allFiles) {
+        addToZip(zipEntries, file);
       }
 
       return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
@@ -290,22 +292,18 @@ public class BrowserHelper {
 
   }
 
-  private static void addToZip(List<ZipEntryInfo> zipEntries, String aipId, String representationId, String... fileId)
+  private static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     StorageService storage = RodaCoreFactory.getStorageService();
 
-    ModelService model = RodaCoreFactory.getModelService();
-    org.roda.core.data.v2.ip.File file = model.retrieveFile(aipId, representationId, fileId);
-
     if (!file.isDirectory()) {
-      StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+      StoragePath filePath = ModelUtils.getRepresentationFilePath(file);
       Binary binary = storage.getBinary(filePath);
       ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
       zipEntries.add(info);
     } else {
       // TODO add directory zip entry
     }
-
   }
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {

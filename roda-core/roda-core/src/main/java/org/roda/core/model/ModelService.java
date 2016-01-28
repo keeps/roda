@@ -200,10 +200,15 @@ public class ModelService extends ModelObservable {
 
   private AIP getAIPMetadata(String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return readAIPMetadata(ModelUtils.getAIPpath(aipId));
+    return getAIPMetadata(aipId, ModelUtils.getAIPpath(aipId));
   }
 
-  private AIP readAIPMetadata(StoragePath storagePath)
+  private AIP getAIPMetadata(StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return getAIPMetadata(storagePath.getName(), storagePath);
+  }
+
+  private AIP getAIPMetadata(String aipId, StoragePath storagePath)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath, AIP_METADATA_FILENAME);
@@ -217,6 +222,9 @@ public class ModelService extends ModelObservable {
     } catch (IOException e) {
       throw new GenericException("Could not parse AIP metadata", e);
     }
+
+    // Setting information that does not come in JSON
+    aip.setId(aipId);
 
     return aip;
   }
@@ -343,9 +351,9 @@ public class ModelService extends ModelObservable {
 
     String id = directory.getStoragePath().getName();
     Metadata metadata = new Metadata();
-    List<String> representationIds = new ArrayList<>();
+    List<Representation> representations = new ArrayList<>();
 
-    AIP aip = new AIP(id, parentId, active, permissions, metadata, representationIds);
+    AIP aip = new AIP(id, parentId, active, permissions, metadata, representations);
 
     createAIPMetadata(aip, directory.getStoragePath());
 
@@ -489,13 +497,25 @@ public class ModelService extends ModelObservable {
     return binary;
   }
 
+  // TODO check if this method has become superfluous
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    Binary binary = retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
-    DescriptiveMetadata descriptiveMetadataBinary = convertResourceToDescriptiveMetadata(binary);
+    AIP aip = getAIPMetadata(aipId);
 
-    return descriptiveMetadataBinary;
+    DescriptiveMetadata ret = null;
+    for (DescriptiveMetadata descriptiveMetadata : aip.getMetadata().getDescriptiveMetadata()) {
+      if (descriptiveMetadata.getId().equals(descriptiveMetadataId)) {
+        ret = descriptiveMetadata;
+        break;
+      }
+    }
+
+    if (ret == null) {
+      throw new NotFoundException("Could not find descriptive metadata: " + descriptiveMetadataId);
+    }
+
+    return ret;
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
@@ -596,19 +616,31 @@ public class ModelService extends ModelObservable {
     return it;
   }
 
+  // TODO check if this method is now superfluous
   public Representation retrieveRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    Representation representation;
-    Directory directory = storage.getDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
-    representation = convertResourceToRepresentation(directory);
 
-    return representation;
+    AIP aip = getAIPMetadata(aipId);
+
+    Representation ret = null;
+    for (Representation representation : aip.getRepresentations()) {
+      if (representation.getId().equals(representationId)) {
+        ret = representation;
+        break;
+      }
+    }
+
+    if (ret == null) {
+      throw new NotFoundException("Could not find representation: " + representationId);
+    }
+
+    return ret;
   }
 
   // TODO support asReference
-  public Representation createRepresentation(String aipId, String representationId, StorageService sourceStorage,
-    StoragePath sourcePath) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, AlreadyExistsException {
+  public Representation createRepresentation(String aipId, String representationId, boolean original,
+    StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
+      NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
     Representation representation;
 
     StoragePath directoryPath = ModelUtils.getRepresentationPath(aipId, representationId);
@@ -617,9 +649,14 @@ public class ModelService extends ModelObservable {
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
     if (isRepresentationValid(sourceDirectory)) {
       storage.copy(sourceStorage, sourcePath, directoryPath);
-      Directory directory = storage.getDirectory(directoryPath);
 
-      representation = convertResourceToRepresentation(directory);
+      representation = new Representation(representationId, aipId, original);
+
+      // update AIP metadata
+      AIP aip = getAIPMetadata(aipId);
+      aip.getRepresentations().add(representation);
+      updateAIP(aip);
+
       notifyRepresentationCreated(representation);
     } else {
       throw new GenericException("Error while creating representation, reason: representation is not valid");
@@ -645,7 +682,7 @@ public class ModelService extends ModelObservable {
     boolean original = true;
 
     // build return object
-    Representation representation = new Representation(representationId, aipId, original, fileIDsToUpdate);
+    Representation representation = new Representation(representationId, aipId, original);
 
     notifyRepresentationUpdated(representation);
     return representation;
@@ -728,8 +765,6 @@ public class ModelService extends ModelObservable {
 
   }
 
-  // FIXME under a certain representation may exist files but also folders.
-  // how to handle that in this method?
   public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Iterable<File> it = null;
@@ -771,6 +806,19 @@ public class ModelService extends ModelObservable {
     };
 
     return it;
+  }
+
+  public Iterable<File> listFilesDirectlyUnder(File f)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    // TODO get a better method for getting the path
+    List<String> path = new ArrayList<>();
+    if (f.getPath() != null) {
+      path.addAll(f.getPath());
+    }
+    path.add(f.getId());
+
+    return listFilesDirectlyUnder(f.getAipId(), f.getRepresentationId(), path.toArray(new String[] {}));
   }
 
   public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId, String... fileId)
@@ -817,11 +865,11 @@ public class ModelService extends ModelObservable {
     return it;
   }
 
-  public Iterable<File> listAllFiles(final String aipId, final String representationId, final List<String> basePath,
-    final List<String> fileIds)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+  public Iterable<File> listAllFiles(File file)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    final Iterator<String> fileIdIterator = fileIds.iterator();
+    final Iterator<File> directlyUnder = listFilesDirectlyUnder(file).iterator();
+    // final Iterator<String> fileIdIterator = fileIds.iterator();
 
     Iterable<File> ret = new Iterable<File>() {
 
@@ -836,7 +884,7 @@ public class ModelService extends ModelObservable {
             boolean hasNext;
 
             if (itStack.isEmpty()) {
-              hasNext = fileIdIterator.hasNext();
+              hasNext = directlyUnder.hasNext();
             } else {
               hasNext = false;
               // find a non-empty iterator or empty stack
@@ -856,28 +904,15 @@ public class ModelService extends ModelObservable {
           public File next() {
             File file = null;
             if (itStack.isEmpty()) {
-              String nextFileId = fileIdIterator.next();
-              List<String> fileIdPath = new ArrayList<>(basePath);
-              fileIdPath.add(nextFileId);
-              try {
-                file = retrieveFile(aipId, representationId, fileIdPath.toArray(new String[] {}));
-              } catch (RequestNotValidException | GenericException | NotFoundException
-                | AuthorizationDeniedException e) {
-                LOGGER.error("Error listing files", e);
-              }
+              file = directlyUnder.next();
             } else {
               file = itStack.peek().iterator().next();
             }
 
             try {
               if (file != null && file.isDirectory()) {
-                List<String> filesDirectlyUnder = file.getFilesDirectlyUnder();
-                if (!filesDirectlyUnder.isEmpty()) {
-                  List<String> fileIdPath = new ArrayList<>(file.getPath());
-                  fileIdPath.add(file.getId());
-                  Iterable<File> subIterable = listAllFiles(aipId, representationId, fileIdPath, filesDirectlyUnder);
-                  itStack.push(subIterable);
-                }
+                Iterable<File> subIterable = listFilesDirectlyUnder(file);
+                itStack.push(subIterable);
               }
             } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
               LOGGER.warn("Error while listing all files", e);
@@ -922,10 +957,7 @@ public class ModelService extends ModelObservable {
 
             if (nextFile.isDirectory()) {
               try {
-                if (nextFile.getFilesDirectlyUnder() != null) {
-                  it = listAllFiles(aipId, representationId, new ArrayList<>(), nextFile.getFilesDirectlyUnder())
-                    .iterator();
-                }
+                it = listAllFiles(nextFile).iterator();
 
               } catch (NotFoundException | GenericException | RequestNotValidException
                 | AuthorizationDeniedException e) {
@@ -939,6 +971,7 @@ public class ModelService extends ModelObservable {
     };
 
     return it;
+
   }
 
   public File retrieveFile(String aipId, String representationId, String... fileId)
@@ -1116,7 +1149,7 @@ public class ModelService extends ModelObservable {
       StoragePath storagePath = resource.getStoragePath();
 
       // obtain basic AIP information
-      aip = readAIPMetadata(storagePath);
+      aip = getAIPMetadata(storagePath);
 
       // TODO remove code below
 
@@ -1249,19 +1282,19 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  @Deprecated
   private Representation convertResourceToRepresentation(Resource resource)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     if (resource instanceof DefaultDirectory) {
       StoragePath directoryPath = resource.getStoragePath();
 
-      List<String> fileIds = ModelUtils.getChildIds(storage, resource.getStoragePath(), true);
-
       String id = directoryPath.getName();
       String aipId = ModelUtils.getAIPidFromStoragePath(directoryPath);
+
       // TODO infer original
       boolean original = true;
 
-      return new Representation(id, aipId, original, fileIds);
+      return new Representation(id, aipId, original);
 
     } else {
       throw new GenericException(
@@ -1283,26 +1316,13 @@ public class ModelService extends ModelObservable {
     List<String> filePath = ModelUtils.getFilePathFromStoragePath(resourcePath);
 
     if (resource instanceof DefaultBinary) {
-      boolean isFile = true;
-      List<String> filesDirectlyUnder = null;
+      boolean isDirectory = false;
 
-      ret = new File(id, aipId, representationId, filePath, isFile, filesDirectlyUnder);
+      ret = new File(id, aipId, representationId, filePath, isDirectory);
     } else if (resource instanceof DefaultDirectory) {
-      boolean isFile = false;
-      List<String> filesDirectlyUnder = new ArrayList<>();
+      boolean isDirectory = true;
 
-      ClosableIterable<Resource> iterable = storage.listResourcesUnderDirectory(resourcePath);
-
-      for (Resource fileUnder : iterable) {
-        filesDirectlyUnder.add(fileUnder.getStoragePath().getName());
-      }
-      try {
-        iterable.close();
-      } catch (IOException e) {
-        LOGGER.warn("Error closing iterable, possible file leak", e);
-      }
-
-      ret = new File(resourcePath.getName(), aipId, representationId, filePath, isFile, filesDirectlyUnder);
+      ret = new File(resourcePath.getName(), aipId, representationId, filePath, isDirectory);
     } else {
       throw new GenericException(
         "Error while trying to convert something that it isn't a Binary into a representation file");
@@ -1349,7 +1369,7 @@ public class ModelService extends ModelObservable {
 
         RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
         rfpo.setAipId(aipId);
-        rfpo.setRepresentationID(representationId);
+        rfpo.setRepresentationId(representationId);
         rfpo.setFileId(fileId);
         rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
         rfpo.setCompositionLevel(pfoh.getRepresentationFilePreservationObject().getCompositionLevel());
@@ -1375,7 +1395,7 @@ public class ModelService extends ModelObservable {
         rfpo.setRepresentationObjectId(pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
         rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
         rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
-        rfpo.setRepresentationID(representationId);
+        rfpo.setRepresentationId(representationId);
         return rfpo;
 
       } catch (PremisMetadataException e) {
@@ -1401,7 +1421,7 @@ public class ModelService extends ModelObservable {
           .newInstance(resource.getContent().createInputStream());
         RepresentationPreservationObject rpo = new RepresentationPreservationObject();
         rpo.setAipId(aipId);
-        rpo.setRepresentationID(representationId);
+        rpo.setRepresentationId(representationId);
         rpo.setId(proh.getRepresentationPreservationObject().getId());
 
         rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
@@ -1453,7 +1473,7 @@ public class ModelService extends ModelObservable {
         EventPreservationObject epo = new EventPreservationObject();
         epo.setId(fileId);
         epo.setAipId(aipId);
-        epo.setRepresentationID(representationId);
+        epo.setRepresentationId(representationId);
         epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList() != null
           && peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
             ? peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue() : null);
@@ -1761,37 +1781,30 @@ public class ModelService extends ModelObservable {
     return binary;
   }
 
-  public OtherMetadata retrieveOtherMetadata(String aipId, String representationId, String fileId, String type)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
-    StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileId, type);
-    return new OtherMetadata(type + "_" + aipId + "_" + representationId + "_" + fileId, aipId, type, binaryPath);
-  }
-
-  public OtherMetadata createOtherMetadata(String aipID, String representationId, String fileName, String type,
+  public OtherMetadata createOtherMetadata(String aipId, String representationId, String fileName, String type,
     Binary binary) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     OtherMetadata otherMetadataBinary = null;
     try {
-      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId, type);
+      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipId, representationId, type);
       storage.getDirectory(otherMetadataPath);
       LOGGER.debug("Tool directory already exists...");
     } catch (NotFoundException e) {
       LOGGER.debug("Tool directory doesn't exist... Creating...");
       try {
-        StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipID);
+        StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipId);
         storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
         // nothing to do
       }
 
       try {
-        StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipID, type);
+        StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipId, type);
         storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
         // nothing to do
       }
       try {
-        StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipID, representationId,
+        StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipId, representationId,
           type);
         storage.createDirectory(otherMetadataPath);
       } catch (AlreadyExistsException e1) {
@@ -1799,16 +1812,16 @@ public class ModelService extends ModelObservable {
       }
     }
 
-    StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipID, representationId, fileName, type);
+    StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileName, type);
     boolean asReference = false;
     boolean createIfNotExists = true;
     storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
-    otherMetadataBinary = new OtherMetadata(type + "_" + aipID + "_" + representationId + "_" + fileName, aipID, type,
-      binaryPath);
+    // TODO create a better id
+    String id = type + "_" + aipId + "_" + representationId + "_" + fileName;
+    otherMetadataBinary = new OtherMetadata(id, aipId, representationId, type);
     notifyOtherMetadataCreated(otherMetadataBinary);
 
     return otherMetadataBinary;
-
   }
 
   public void createJob(Job job) throws GenericException {
@@ -1882,7 +1895,7 @@ public class ModelService extends ModelObservable {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
     pm.setId(id);
-    pm.setRepresentationID(representationId);
+    pm.setRepresentationId(representationId);
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
@@ -1914,7 +1927,7 @@ public class ModelService extends ModelObservable {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
     pm.setId(id);
-    pm.setRepresentationID(representationId);
+    pm.setRepresentationId(representationId);
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
@@ -1927,7 +1940,7 @@ public class ModelService extends ModelObservable {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
     pm.setId(id);
-    pm.setRepresentationID(representationId);
+    pm.setRepresentationId(representationId);
     pm.setType(type);
 
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);

@@ -368,16 +368,16 @@ public final class ModelUtils {
           RodaConstants.STORAGE_DIRECTORY_AGENTS, pm.getId() + ".agent.premis.xml");
       } else if (pm.getType().equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
           pm.getId()+ ".representation.premis.xml");
       } else if (pm.getType().equals(PreservationMetadataType.EVENT)) {
         // TODO HANDLE AIP and REPRESENTATION EVENTS
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
           pm.getId() + ".event.premis.xml");
       } else if (pm.getType().equals(PreservationMetadataType.OBJECT_FILE)) {
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationID(),
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
           pm.getId() + ".file.premis.xml");
       }
     }

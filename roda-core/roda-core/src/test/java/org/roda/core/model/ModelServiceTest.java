@@ -64,6 +64,8 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jersey.repackaged.com.google.common.collect.Lists;
+
 /**
  * Unit tests for ModelService
  * 
@@ -128,7 +130,11 @@ public class ModelServiceTest {
     List<String> descriptiveMetadataIds = aip.getMetadata().getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
     assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
-    assertThat(aip.getRepresentationIds(),
+
+    List<String> representationIds = aip.getRepresentations().stream().map(rep -> rep.getId())
+      .collect(Collectors.toList());
+
+    assertThat(representationIds,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_2_ID));
 
     // testing descriptive metadata
@@ -151,14 +157,24 @@ public class ModelServiceTest {
     assertEquals(aipId, representation1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, representation1.getId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ORIGINAL, representation1.isOriginal());
-    assertThat(representation1.getFilesDirectlyUnder(),
+
+    Iterable<File> allRep1Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().map(f -> f.getId())
+      .collect(Collectors.toList());
+
+    assertThat(allRep1FileIds,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_FILE_1_ID, CorporaConstants.REPRESENTATION_1_FILE_2_ID));
 
     final Representation representation2 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_2_ID);
     assertEquals(aipId, representation2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, representation2.getId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ORIGINAL, representation2.isOriginal());
-    assertThat(representation2.getFilesDirectlyUnder(),
+
+    Iterable<File> allRep2Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_2_ID);
+    List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().map(f -> f.getId())
+      .collect(Collectors.toList());
+
+    assertThat(allRep2FileIds,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_2_FILE_1_ID, CorporaConstants.REPRESENTATION_2_FILE_2_ID));
 
     // testing files
@@ -215,11 +231,12 @@ public class ModelServiceTest {
     assertEquals(rfpo.getFormatDesignationName(), CorporaConstants.TEXT_XML);
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      null,CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+      null, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
     assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
     assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
 
-    RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,CorporaConstants.REPRESENTATION_1_ID);
+    RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,
+      CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
   }
 
@@ -437,7 +454,9 @@ public class ModelServiceTest {
     final String newRepresentationId = UUID.randomUUID().toString();
     final StoragePath corporaRepresentationPath = DefaultStoragePath
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
-    Representation createdRepresentation = model.createRepresentation(aipId, newRepresentationId, corporaService,
+
+    Representation createdRepresentation = model.createRepresentation(aipId, newRepresentationId,
+      CorporaConstants.REPRESENTATION_1_ORIGINAL, corporaService,
       DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
 
     // check if it is connected
@@ -570,8 +589,8 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,null,
-      CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+    EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+      null, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
     assertEquals(CorporaConstants.AGENT_RODA_8, epo.getAgentID());
     assertEquals(CorporaConstants.INGESTION, epo.getType());
   }
@@ -594,7 +613,8 @@ public class ModelServiceTest {
     final String aipId = UUID.randomUUID().toString();
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
-    RepresentationPreservationObject rpo = model.getRepresentationPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    RepresentationPreservationObject rpo = model.getRepresentationPreservationObject(aipId,
+      CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
   }
 

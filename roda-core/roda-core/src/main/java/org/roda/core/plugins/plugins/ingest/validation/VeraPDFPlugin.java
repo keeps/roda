@@ -119,15 +119,14 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     for (AIP aip : list) {
       logger.debug("Processing AIP " + aip.getId());
 
-      for (String representationID : aip.getRepresentationIds()) {
+      for (Representation representation : aip.getRepresentations()) {
         Map<String, Path> resourceList = new HashMap<>();
         int state = 1; // success
 
         try {
-          logger.debug("Processing representation " + representationID + " of AIP " + aip.getId());
+          logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
 
-          Representation representation = model.retrieveRepresentation(aip.getId(), representationID);
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationID);
+          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
 
@@ -157,15 +156,15 @@ public class VeraPDFPlugin implements Plugin<AIP> {
           state = 0; // failure
         }
 
-        logger.debug("Creating veraPDF event for the representation " + representationID);
-        createEvent(resourceList, aip, representationID, model, state);
+        logger.debug("Creating veraPDF event for the representation " + representation.getId());
+        createEvent(resourceList, aip, representation.getId(), model, state);
       }
     }
 
     return null;
   }
 
-  private void createEvent(Map<String, Path> resourceList, AIP aip, String representationID, ModelService model,
+  private void createEvent(Map<String, Path> resourceList, AIP aip, String representationId, ModelService model,
     int state) throws PluginException {
 
     try {
@@ -213,15 +212,15 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         outcome = "partial success";
       }
 
-      logger.debug("The veraPDF validation on the representation " + representationID + " of AIP " + aip.getId()
+      logger.debug("The veraPDF validation on the representation " + representationId + " of AIP " + aip.getId()
         + " finished with a status: " + outcome + ".");
 
       // FIXME revise PREMIS generation
-      PluginHelper.createPluginEventAndAgent(aip.getId(), representationID, model,
+      PluginHelper.createPluginEventAndAgent(aip.getId(), representationId, model,
         EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
         "All the files from the AIP were submitted to a veraPDF validation.",
         EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, "veraPDFChecker",
-        Arrays.asList(representationID), outcome, noteStringBuilder.toString(), detailsStringBuilder.toString(),
+        Arrays.asList(representationId), outcome, noteStringBuilder.toString(), detailsStringBuilder.toString(),
         getClass().getName() + "@" + getVersion(),
         AgentPreservationObject.PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN);
 

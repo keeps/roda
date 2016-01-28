@@ -7,11 +7,21 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-public class DescriptiveMetadata {
+import java.io.Serializable;
 
-  private final String id;
-  private final String aipId;
-  private final String type;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class DescriptiveMetadata implements Serializable {
+  private static final long serialVersionUID = 5460845130599998867L;
+
+  private String id;
+  @JsonIgnore
+  private String aipId;
+  private String type;
+
+  public DescriptiveMetadata() {
+    super();
+  }
 
   public DescriptiveMetadata(String id, String aipId, String type) {
     super();
@@ -39,6 +49,18 @@ public class DescriptiveMetadata {
    */
   public String getType() {
     return type;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 
   @Override
