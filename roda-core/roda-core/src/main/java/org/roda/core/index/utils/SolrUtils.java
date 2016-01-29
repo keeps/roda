@@ -169,11 +169,11 @@ public class SolrUtils {
     FacetFieldResult facetResult;
     if (facetFields != null) {
       for (FacetField facet : facetFields) {
-        LOGGER.trace("facet:" + facet.getName() + " count:" + facet.getValueCount());
+        LOGGER.trace("facet:{} count:{}", facet.getName(), facet.getValueCount());
         facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(),
           facets.getParameters().get(facet.getName()).getValues());
         for (Count count : facet.getValues()) {
-          LOGGER.trace("   value:" + count.getName() + " value:" + count.getCount());
+          LOGGER.trace("   value:{} value:{}", count.getName(), count.getCount());
           facetResult.addFacetValue(count.getName(), count.getName(), count.getCount());
         }
         ret.add(facetResult);

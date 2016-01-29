@@ -425,6 +425,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
   public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
+  public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";

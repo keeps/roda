@@ -108,7 +108,7 @@ import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
 import org.roda.core.plugins.plugins.base.FixityPlugin;
 import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
-import org.roda.core.plugins.plugins.base.ReindexPlugin;
+import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.RemoveOrphansPlugin;
 import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
@@ -939,13 +939,13 @@ public class RodaCoreFactory {
    * Command-line accessible functionalities
    */
   public static void runReindexAipsPlugin() {
-    Plugin<AIP> reindexPlugin = new ReindexPlugin();
+    Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(reindexPlugin);
   }
 
   public static void runReindexAipsPlugin(List<String> aipIds) {
-    Plugin<AIP> reindexPlugin = new ReindexPlugin();
-    ((ReindexPlugin) reindexPlugin).setClearIndexes(false);
+    Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
+    ((ReindexAIPPlugin) reindexPlugin).setClearIndexes(false);
     getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds);
   }
 

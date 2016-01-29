@@ -125,6 +125,8 @@
    
    <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+   <!-- XXX the field 'title_sort' with the type 'string' was added in order to have correct sorting 
+   (because 'title' is tokenized and might have other type of transformations that influence sorting)-->
    <field name="title_sort" type="string" indexed="true" stored="false" required="false" multiValued="false" />
    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="dateInitial" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />

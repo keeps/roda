@@ -44,7 +44,9 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -491,8 +493,16 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG, logFile);
   }
 
+  public static StoragePath getJobContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB);
+  }
+
   public static StoragePath getJobPath(String jobId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId);
+  }
+
+  public static StoragePath getJobReportContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
   }
 
   public static StoragePath getJobReportPath(String jobReportId) throws RequestNotValidException {
@@ -590,6 +600,19 @@ public final class ModelUtils {
     return ret;
   }
 
+  public static <T> T getObjectFromJson(InputStream json, Class<T> objectClass) throws GenericException {
+    T ret;
+    try {
+      String jsonString = IOUtils.toString(json);
+      ret = getObjectFromJson(jsonString, objectClass);
+    } catch (IOException e) {
+      throw new GenericException(e);
+    } finally {
+      IOUtils.closeQuietly(json);
+    }
+    return ret;
+  }
+
   public static <T> T getObjectFromJson(String json, Class<T> objectClass) throws GenericException {
     T ret;
     try {
@@ -611,6 +634,33 @@ public final class ModelUtils {
       });
     } catch (IOException e) {
       throw new GenericException("Error while parsing JSON", e);
+    }
+    return ret;
+  }
+
+  @Deprecated
+  public static Map<String, Report> getJobReportsFromJson(String json) {
+    Map<String, Report> ret = new HashMap<String, Report>();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<Map<String, Report>>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to job reports", e);
+    }
+    return ret;
+  }
+
+  public static Report getJobReportFromJson(String json) {
+    Report ret = new Report();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<Report>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to job reports", e);
     }
     return ret;
   }

@@ -372,6 +372,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       LOGGER.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
 
+      // FIXME what to do with the askFuture???
       Future<Object> askFuture = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
         new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT)));
 
@@ -385,7 +386,40 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
-    // TODO Auto-generated method stub
+//    try {
+//      int multiplier = 0;
+//      LOGGER.info("Executing beforeExecute");
+//      plugin.beforeExecute(index, model, storage);
+//      List<Future<Object>> futures = new ArrayList<Future<Object>>();
+//
+//      List<String> block = new ArrayList<String>();
+//      for (String id : ids) {
+//        if (block.size() == BLOCK_SIZE) {
+//          futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block, plugin),
+//            new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+//          block = new ArrayList<String>();
+//          multiplier++;
+//        }
+//
+//        block.add(id);
+//      }
+//
+//      if (!block.isEmpty()) {
+//        futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block, plugin),
+//          new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+//        multiplier++;
+//      }
+//
+//      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
+//      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+//
+//      plugin.afterExecute(index, model, storage);
+//
+//    } catch (Exception e) {
+//      // FIXME catch proper exception
+//      e.printStackTrace();
+//    }
+//    LOGGER.info("End of method");
 
   }
 

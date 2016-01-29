@@ -27,9 +27,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexPlugin implements Plugin<AIP> {
+public class ReindexAIPPlugin implements Plugin<AIP> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAIPPlugin.class);
   private boolean clearIndexes = true;
 
   @Override
@@ -44,12 +44,12 @@ public class ReindexPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Reindex";
+    return "Reindex AIP";
   }
 
   @Override
   public String getDescription() {
-    return "Clean-up index and re-create it from original data";
+    return "Clean-up index and re-create it from data in storage";
   }
 
   @Override
@@ -116,6 +116,9 @@ public class ReindexPlugin implements Plugin<AIP> {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_AIP);
+      index.optimizeIndex(RodaConstants.INDEX_REPRESENTATION);
+      index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      index.optimizeIndex(RodaConstants.INDEX_FILE);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
@@ -125,7 +128,7 @@ public class ReindexPlugin implements Plugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new ReindexPlugin();
+    return new ReindexAIPPlugin();
   }
 
   @Override
