@@ -972,12 +972,12 @@ public class SolrUtils {
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
-    final boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
+    final Boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
 
-    return new IndexedRepresentation(id, aipId, original, sizeInBytes, totalNumberOfFiles);
+    return new IndexedRepresentation(id, aipId, Boolean.TRUE.equals(original), sizeInBytes, totalNumberOfFiles);
   }
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
