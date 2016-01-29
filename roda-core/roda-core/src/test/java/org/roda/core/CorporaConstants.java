@@ -73,7 +73,7 @@ public class CorporaConstants {
   public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
   public static final String PRESERVATION_LEVEL_FULL = "full";
 
-  public static final String AGENT_RODA_8 = "roda:8";
+  public static final String AGENT_RODA_8 = "roda_8";
   public static final String METS_XML = "METS.xml";
   public static final String SOFTWARE_INGEST_TASK = "software:ingest_task";
   public static final String INGEST_CREATE_AIP = "Ingest/Create AIP/1.0";

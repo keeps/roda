@@ -18,7 +18,7 @@
   </eventOutcomeInformation>
   <linkingAgentIdentifier>
     <linkingAgentIdentifierType>RODAObjectPID</linkingAgentIdentifierType>
-    <linkingAgentIdentifierValue>roda:8</linkingAgentIdentifierValue>
+    <linkingAgentIdentifierValue>roda_8</linkingAgentIdentifierValue>
     <linkingAgentRole>ingest task</linkingAgentRole>
   </linkingAgentIdentifier>
   <linkingObjectIdentifier>

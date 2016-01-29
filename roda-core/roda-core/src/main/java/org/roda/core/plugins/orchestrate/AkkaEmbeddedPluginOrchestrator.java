@@ -218,11 +218,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        ClosableIterable<Representation> reps = model.listRepresentations(aip.getId());
-        Iterator<Representation> repIter = reps.iterator();
-
-        while (repIter.hasNext()) {
-
+        List<Representation> reps = model.listRepresentations(aip.getId());
+        for (Representation representation : reps) {
           if (block.size() == BLOCK_SIZE) {
             futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, plugin),
               new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
@@ -230,10 +227,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
             multiplier++;
           }
 
-          block.add(repIter.next());
+          block.add(representation);
         }
-
-        reps.close();
       }
 
       if (!block.isEmpty()) {
@@ -268,13 +263,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        ClosableIterable<Representation> reps = model.listRepresentations(aip.getId());
-        Iterator<Representation> repIter = reps.iterator();
-
-        while (repIter.hasNext()) {
-          Representation rep = repIter.next();
-
-          Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), rep.getId());
+        List<Representation> reps = model.listRepresentations(aip.getId());
+        for (Representation representation : reps) {
+          Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), representation.getId());
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {
@@ -289,7 +280,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           }
         }
 
-        reps.close();
       }
 
       if (!block.isEmpty()) {

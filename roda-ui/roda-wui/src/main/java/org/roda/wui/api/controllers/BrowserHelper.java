@@ -404,7 +404,7 @@ public class BrowserHelper {
   public static StreamResponse aipsAipIdPreservationMetadataGet(String aipId, String start, String limit)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
-    ClosableIterable<Representation> representations = null;
+    List<Representation> representations = null;
     ClosableIterable<PreservationMetadata> preservationFiles = null;
 
     try {
@@ -438,13 +438,6 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error getting AIP preservation metadata", e);
     } finally {
-      if (representations != null) {
-        try {
-          representations.close();
-        } catch (IOException e) {
-          LOGGER.warn("Error closing resources, possible leak", e);
-        }
-      }
       if (preservationFiles != null) {
         try {
           preservationFiles.close();
@@ -754,8 +747,9 @@ public class BrowserHelper {
   }
 
   public static void createOrUpdateAipDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
-    InputStream is, FormDataContentDisposition fileDetail, boolean create) throws GenericException,
-      RequestNotValidException, NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+    InputStream is, FormDataContentDisposition fileDetail, boolean create)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+      AlreadyExistsException, ValidationException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();

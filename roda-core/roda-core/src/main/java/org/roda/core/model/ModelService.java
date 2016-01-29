@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -258,7 +259,7 @@ public class ModelService extends ModelObservable {
           public AIP next() {
             try {
               Resource next = resourcesIterator.next();
-              return convertResourceToAIP(next);
+              return getAIPMetadata(next.getStoragePath());
             } catch (NoSuchElementException | NotFoundException | GenericException | RequestNotValidException
               | AuthorizationDeniedException e) {
               LOGGER.error("Error while listing AIPs", e);
@@ -285,7 +286,7 @@ public class ModelService extends ModelObservable {
   public AIP retrieveAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     Directory directory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
-    return convertResourceToAIP(directory);
+    return getAIPMetadata(directory.getStoragePath());
   }
 
   /**
@@ -323,7 +324,7 @@ public class ModelService extends ModelObservable {
       storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
       Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
 
-      aip = convertResourceToAIP(newDirectory);
+      aip = getAIPMetadata(newDirectory.getStoragePath());
       if (notify) {
         notifyAipCreated(aip);
       }
@@ -395,7 +396,7 @@ public class ModelService extends ModelObservable {
       storage.copy(sourceStorage, sourcePath, aipPath);
       Directory directoryUpdated = storage.getDirectory(aipPath);
 
-      aip = convertResourceToAIP(directoryUpdated);
+      aip = getAIPMetadata(directoryUpdated.getStoragePath());
       notifyAipUpdated(aip);
     } else {
       throw new ValidationException(validationReport);
@@ -502,9 +503,9 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
-    String descriptiveMetadataType)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    DescriptiveMetadata descriptiveMetadataBinary = null;
+    String descriptiveMetadataType) throws RequestNotValidException, GenericException, NotFoundException,
+      AuthorizationDeniedException, ValidationException {
+    DescriptiveMetadata ret = null;
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     boolean asReference = false;
@@ -512,12 +513,23 @@ public class ModelService extends ModelObservable {
 
     storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
 
-    // TODO set descriptive metadata type
+    // set descriptive metadata type
+    AIP aip = getAIPMetadata(aipId);
+    List<DescriptiveMetadata> descriptiveMetadata = aip.getMetadata().getDescriptiveMetadata();
+    Optional<DescriptiveMetadata> odm = descriptiveMetadata.stream()
+      .filter(dm -> dm.getId().equals(descriptiveMetadataId)).findFirst();
+    if (odm.isPresent()) {
+      ret = odm.get();
+      ret.setType(descriptiveMetadataType);
+    } else {
+      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
+      descriptiveMetadata.add(ret);
+    }
+    updateAIP(aip);
 
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
-    notifyDescriptiveMetadataUpdated(descriptiveMetadataBinary);
+    notifyDescriptiveMetadataUpdated(ret);
 
-    return descriptiveMetadataBinary;
+    return ret;
   }
 
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId)
@@ -525,57 +537,27 @@ public class ModelService extends ModelObservable {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
 
     storage.deleteResource(binaryPath);
+
+    // update AIP metadata
+    AIP aip = getAIPMetadata(aipId);
+    for (Iterator<DescriptiveMetadata> it = aip.getMetadata().getDescriptiveMetadata().iterator(); it.hasNext();) {
+      DescriptiveMetadata descriptiveMetadata = it.next();
+      if (descriptiveMetadata.getId().equals(descriptiveMetadataId)) {
+        it.remove();
+        break;
+      }
+    }
+    updateAIPMetadata(aip);
+
     notifyDescriptiveMetadataDeleted(aipId, descriptiveMetadataId);
 
   }
 
-  public ClosableIterable<Representation> listRepresentations(String aipId)
+  // TODO check if this method as not become superfluous
+  public List<Representation> listRepresentations(String aipId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    ClosableIterable<Representation> it = null;
+    return getAIPMetadata(aipId).getRepresentations();
 
-    ClosableIterable<Resource> resourcesIterable = storage
-      .listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId));
-    final Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
-
-    it = new ClosableIterable<Representation>() {
-
-      @Override
-      public Iterator<Representation> iterator() {
-        return new Iterator<Representation>() {
-
-          @Override
-          public boolean hasNext() {
-            if (resourcesIterator == null) {
-              return true;
-            }
-            return resourcesIterator.hasNext();
-          }
-
-          @Override
-          public Representation next() {
-            try {
-              return convertResourceToRepresentation(resourcesIterator.next());
-            } catch (NotFoundException | NoSuchElementException | GenericException | AuthorizationDeniedException
-              | RequestNotValidException e) {
-              LOGGER.error("Error while listing representations", e);
-              return null;
-            }
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-
-      @Override
-      public void close() throws IOException {
-        resourcesIterable.close();
-      }
-    };
-
-    return it;
   }
 
   // TODO check if this method is now superfluous
@@ -723,6 +705,18 @@ public class ModelService extends ModelObservable {
     StoragePath representationPath = ModelUtils.getRepresentationPath(aipId, representationId);
 
     storage.deleteResource(representationPath);
+
+    // update AIP metadata
+    AIP aip = getAIPMetadata(aipId);
+    for (Iterator<Representation> it = aip.getRepresentations().iterator(); it.hasNext();) {
+      Representation representation = it.next();
+      if (representation.getId().equals(representationId)) {
+        it.remove();
+        break;
+      }
+    }
+    updateAIPMetadata(aip);
+
     notifyRepresentationDeleted(aipId, representationId);
 
   }
@@ -1007,7 +1001,7 @@ public class ModelService extends ModelObservable {
     while (resourceIterator.hasNext()) {
       Resource resource = resourceIterator.next();
       Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(
-        ModelUtils.getPreservationRepresentationPath(aipId, resource.getStoragePath().getName())).iterator();
+        ModelUtils.getAIPRepresentationPreservationPath(aipId, resource.getStoragePath().getName())).iterator();
       while (preservationIterator.hasNext()) {
         Resource preservationObject = preservationIterator.next();
         Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
@@ -1108,54 +1102,6 @@ public class ModelService extends ModelObservable {
   private boolean isRepresentationValid(Directory directory) {
     // FIXME implement this
     return true;
-  }
-
-  private AIP convertResourceToAIP(Resource resource)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    AIP aip;
-    if (resource instanceof DefaultDirectory) {
-      StoragePath storagePath = resource.getStoragePath();
-
-      // obtain basic AIP information
-      aip = getAIPMetadata(storagePath);
-
-      // TODO remove code below
-
-      // obtain descriptive metadata information
-      // List<String> descriptiveMetadataBinaryIds =
-      // ModelUtils.getChildIds(storage,
-      // ModelUtils.getDescriptiveMetadataPath(aipId), false);
-      // List<DescriptiveMetadata> descriptiveMetadata = new ArrayList<>();
-      // for (String descriptiveMetadataBinaryId : descriptiveMetadataBinaryIds)
-      // {
-      // // TODO set type
-      // String type = null;
-      // descriptiveMetadata.add(new
-      // DescriptiveMetadata(descriptiveMetadataBinaryId, aipId, type));
-      // }
-
-      // obtain representations information
-      // List<String> representationIds = ModelUtils.getChildIds(storage,
-      // ModelUtils.getRepresentationsPath(aipId), false);
-
-      // obtain preservation information
-      // List<PreservationMetadata> preservationMetadata =
-      // retrieveAIPPreservationInformation(aipId, representationIds);
-
-      // TODO fetch other metadata
-      // List<OtherMetadata> otherMetadata = null;
-
-      // Metadata metadata = new Metadata(descriptiveMetadata,
-      // preservationMetadata, otherMetadata);
-      // aip = new AIP(aipId, parentId, active, permissions, metadata,
-      // representationIds);
-
-    } else {
-      throw new GenericException(
-        "Error while trying to convert something that it isn't a Directory into an AIP (" + resource + ")");
-
-    }
-    return aip;
   }
 
   // TODO to improve...
@@ -1440,6 +1386,7 @@ public class ModelService extends ModelObservable {
 
         // TODO premisevent to EventPreservationObject
         EventPreservationObject epo = new EventPreservationObject();
+        epo.setType(PreservationMetadataType.EVENT);
         epo.setId(fileId);
         epo.setAipId(aipId);
         epo.setRepresentationId(representationId);

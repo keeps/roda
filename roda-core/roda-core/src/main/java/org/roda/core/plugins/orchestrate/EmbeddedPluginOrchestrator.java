@@ -217,20 +217,15 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        ClosableIterable<Representation> reps = model.listRepresentations(aip.getId());
-        Iterator<Representation> repIter = reps.iterator();
-
-        while (repIter.hasNext()) {
-
+        List<Representation> reps = model.listRepresentations(aip.getId());
+        for (Representation representation : reps) {
           if (block.size() == BLOCK_SIZE) {
             submitPlugin(block, plugin);
             block = new ArrayList<Representation>();
           }
 
-          block.add(repIter.next());
+          block.add(representation);
         }
-
-        reps.close();
       }
 
       if (!block.isEmpty()) {
@@ -259,12 +254,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        ClosableIterable<Representation> reps = model.listRepresentations(aip.getId());
-        Iterator<Representation> repIter = reps.iterator();
-
-        while (repIter.hasNext()) {
-          Representation rep = repIter.next();
-
+        List<Representation> reps = model.listRepresentations(aip.getId());
+        for (Representation rep : reps) {
           Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), rep.getId());
           Iterator<File> fileIter = files.iterator();
 
@@ -277,8 +268,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
             block.add(fileIter.next());
           }
         }
-
-        reps.close();
       }
 
       if (!block.isEmpty()) {

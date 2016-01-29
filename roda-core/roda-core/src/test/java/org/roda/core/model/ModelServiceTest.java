@@ -595,7 +595,7 @@ public class ModelServiceTest {
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
       null, CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     assertEquals(CorporaConstants.AGENT_RODA_8, epo.getAgentID());
-    assertEquals(CorporaConstants.INGESTION, epo.getType());
+    assertEquals(CorporaConstants.INGESTION, epo.getEventType());
   }
 
   @Test
@@ -636,8 +636,8 @@ public class ModelServiceTest {
       RepresentationPreservationObject rpo = it.next();
       fileIDs.add(rpo.getId());
     }
-    assertThat(fileIDs,
-      containsInAnyOrder(CorporaConstants.REPRESENTATION_PREMIS_XML, CorporaConstants.REPRESENTATION_PREMIS_XML));
+
+    assertThat(fileIDs, containsInAnyOrder(CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_2_ID));
   }
 
   @Test
@@ -649,7 +649,7 @@ public class ModelServiceTest {
     // storage.deleteContainer(preservationContainerPath);
     storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
-    AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8_PREMIS_XML);
+    AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8);
     assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
     assertEquals(apo.getAgentName(), CorporaConstants.INGEST_CREATE_AIP);
   }

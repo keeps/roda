@@ -47,7 +47,8 @@ public class ValidationUtils {
 
   public static ValidationReport<String> isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, boolean validatePremis, ModelService model,
-    String aipID) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    String aipID) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+      ValidationException {
     ValidationReport<String> report = new ValidationReport<String>();
     report.setValid(false);
     List<DescriptiveMetadata> descriptiveMetadata = model.listDescriptiveMetadata(aipID);

@@ -631,7 +631,7 @@ public class Browser extends RodaCoreService {
 
   public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
     InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException,
-      NotFoundException, RequestNotValidException, AlreadyExistsException {
+      NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -650,7 +650,7 @@ public class Browser extends RodaCoreService {
 
   public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
     InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException,
-      NotFoundException, RequestNotValidException, AlreadyExistsException {
+      NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions

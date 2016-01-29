@@ -24,7 +24,7 @@ public class ValidationException extends RODAException {
   }
 
   public ValidationException(ValidationReport<? extends Serializable> report) {
-    super(report.getMessage());
+    super(report.getMessage() != null ? report.getMessage() : report.getIssues().toString());
     this.report = report;
   }
 

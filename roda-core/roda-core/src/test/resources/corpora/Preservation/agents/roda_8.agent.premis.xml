@@ -2,7 +2,7 @@
 <agent xmlns="info:lc/xmlns/premis-v2">
   <agentIdentifier>
     <agentIdentifierType>RODAObjectPID</agentIdentifierType>
-    <agentIdentifierValue>roda:8</agentIdentifierValue>
+    <agentIdentifierValue>roda_8</agentIdentifierValue>
   </agentIdentifier>
   <agentName>Ingest/Create AIP/1.0</agentName>
   <agentType>software:ingest_task</agentType>
