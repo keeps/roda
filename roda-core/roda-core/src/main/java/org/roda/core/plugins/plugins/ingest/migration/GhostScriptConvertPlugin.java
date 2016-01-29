@@ -4,11 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.ghost4j.GhostscriptException;
-import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -18,7 +22,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public abstract class GhostScriptConvertPlugin extends AbstractConvertPlugin {
+public class GhostScriptConvertPlugin extends GeneralCommandConvertPlugin {
 
   public String device;
 
@@ -44,20 +48,36 @@ public abstract class GhostScriptConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getVersion() {
-    return "1.0";
+    try {
+      return GhostScriptConvertPluginUtils.getVersion();
+    } catch (CommandException e) {
+      logger.debug("Error getting GhostScript version");
+      return new String();
+    }
   }
 
   @Override
-  public abstract Plugin<AIP> cloneMe();
+  public Plugin<AIP> cloneMe() {
+    return new GhostScriptConvertPlugin();
+  }
 
   @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
+  public List<PluginParameter> getParameters() {
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "general",
+      "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
 
-    // defines a ghostscript device
-    if (parameters.containsKey("device")) {
-      device = parameters.get("device");
-    }
+    List<PluginParameter> params = new ArrayList<PluginParameter>();
+
+    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
+      "", convertableTo, true, true, "Lists the possible output formats");
+
+    PluginParameter commandArgs = new PluginParameter("commandArgs", "Command arguments", PluginParameterType.STRING,
+      "", true, true, "Command arguments to modify the command to execute");
+
+    params.add(outputParam);
+    params.add(commandArgs);
+    return params;
   }
 
   @Override
@@ -68,11 +88,11 @@ public abstract class GhostScriptConvertPlugin extends AbstractConvertPlugin {
     try {
 
       if (Files.exists(uriPath)) {
-        pluginResult = GhostScriptConvertPluginUtils.runGhostScriptConvert(uriPath, inputFormat, outputFormat, device,
-          conversionProfile);
+        pluginResult = GhostScriptConvertPluginUtils.runGhostScriptConvert(uriPath, inputFormat, outputFormat,
+          commandArguments);
       } else {
         pluginResult = GhostScriptConvertPluginUtils.runGhostScriptConvert(binary.getContent().createInputStream(),
-          inputFormat, outputFormat, device, conversionProfile);
+          inputFormat, outputFormat, commandArguments);
       }
 
     } catch (GhostscriptException e) {

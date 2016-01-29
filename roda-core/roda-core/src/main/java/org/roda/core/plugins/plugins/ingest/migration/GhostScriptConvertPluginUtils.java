@@ -15,8 +15,8 @@ import org.roda.core.util.CommandUtility;
 
 public class GhostScriptConvertPluginUtils {
 
-  public static Path runGhostScriptConvert(InputStream is, String inputFormat, String outputFormat, String device,
-    String conversionProfile) throws IOException, GhostscriptException {
+  public static Path runGhostScriptConvert(InputStream is, String inputFormat, String outputFormat,
+    String commandArguments) throws IOException, GhostscriptException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,27 +28,31 @@ public class GhostScriptConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeGS(input, output, device, conversionProfile);
+    return executeGS(input, output, commandArguments);
   }
 
-  public static Path runGhostScriptConvert(Path input, String inputFormat, String outputFormat, String device,
-    String conversionProfile) throws IOException, CommandException, GhostscriptException {
+  public static Path runGhostScriptConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
+    throws IOException, CommandException, GhostscriptException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeGS(input, output, device, conversionProfile);
+    return executeGS(input, output, commandArguments);
   }
 
-  private static Path executeGS(Path input, Path output, String device, String conversionProfile)
-    throws GhostscriptException {
+  private static Path executeGS(Path input, Path output, String commandArguments) throws GhostscriptException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", conversionProfile,
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "general",
       "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
-    command = command.replace("{device}", device);
+
+    if (commandArguments.length() > 0) {
+      command = command.replace("{arguments}", commandArguments);
+    } else {
+      command = command.replace("{arguments}", "-sDEVICE=pdfwrite");
+    }
 
     // GhostScript transformation command
-    String[] gsArgs = command.split(" ");
+    String[] gsArgs = command.split("\\s+");
     Ghostscript gs = Ghostscript.getInstance();
 
     try {

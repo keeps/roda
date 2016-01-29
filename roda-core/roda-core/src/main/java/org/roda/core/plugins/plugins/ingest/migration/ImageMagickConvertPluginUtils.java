@@ -16,7 +16,7 @@ import org.roda.core.util.CommandUtility;
 public class ImageMagickConvertPluginUtils {
 
   public static Path runImageMagickConvert(InputStream is, String inputFormat, String outputFormat,
-    String conversionProfile) throws IOException, CommandException {
+    String commandArguments) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,25 +28,26 @@ public class ImageMagickConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeImageMagick(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeImageMagick(input, output, inputFormat, outputFormat, commandArguments);
   }
 
-  public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
     throws IOException, CommandException {
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeImageMagick(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeImageMagick(input, output, inputFormat, outputFormat, commandArguments);
   }
 
   private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat,
-    String conversionProfile) throws CommandException {
+    String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", conversionProfile,
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
       "commandLine");
     command = command.replace("{input_file}", inputFormat + ":" + input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
+    command = command.replace("{arguments}", commandArguments);
 
     // filling a list of the command line arguments
-    List<String> commandList = Arrays.asList(command.split(" "));
+    List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
     CommandUtility.execute(commandList);

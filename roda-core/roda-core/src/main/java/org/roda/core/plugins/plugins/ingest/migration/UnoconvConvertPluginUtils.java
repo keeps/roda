@@ -15,7 +15,7 @@ import org.roda.core.util.CommandUtility;
 
 public class UnoconvConvertPluginUtils {
 
-  public static Path runUnoconvConvert(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runUnoconvConvert(InputStream is, String inputFormat, String outputFormat, String commandArguments)
     throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
@@ -28,27 +28,27 @@ public class UnoconvConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeUnoconvConvert(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeUnoconvConvert(input, output, inputFormat, outputFormat, commandArguments);
   }
 
-  public static Path runUnoconvConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runUnoconvConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
     throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeUnoconvConvert(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeUnoconvConvert(input, output, inputFormat, outputFormat, commandArguments);
   }
 
   private static Path executeUnoconvConvert(Path input, Path output, String inputFormat, String outputFormat,
-    String conversionProfile) throws CommandException {
+    String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", conversionProfile,
-      "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "general", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{output_format}", outputFormat);
+    command = command.replace("{arguments}", commandArguments);
 
     // filling a list of the command line arguments
-    List<String> commandList = Arrays.asList(command.split(" "));
+    List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
     CommandUtility.execute(commandList);

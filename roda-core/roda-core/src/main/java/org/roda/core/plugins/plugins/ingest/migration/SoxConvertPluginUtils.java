@@ -15,8 +15,8 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxConvertPluginUtils {
 
-  public static Path runSoxSoundConvert(InputStream is, String inputFormat, String outputFormat,
-    String conversionProfile) throws IOException, CommandException {
+  public static Path runSoxSoundConvert(InputStream is, String inputFormat, String outputFormat, String commandArguments)
+    throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,25 +28,30 @@ public class SoxConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeSox(input, output, conversionProfile);
+    return executeSox(input, output, commandArguments);
   }
 
-  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
     throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeSox(input, output, conversionProfile);
+    return executeSox(input, output, commandArguments);
   }
 
-  private static Path executeSox(Path input, Path output, String conversionProfile) throws CommandException {
+  private static Path executeSox(Path input, Path output, String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", conversionProfile,
-      "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "general", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
+    if (commandArguments.length() > 0) {
+      command = command.replace("{arguments}", commandArguments);
+    } else {
+      command = command.replace("{arguments}", "-e gsm-full-rate");
+    }
+
     // filling a list of the command line arguments
-    List<String> commandList = Arrays.asList(command.split(" "));
+    List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
     CommandUtility.execute(commandList);

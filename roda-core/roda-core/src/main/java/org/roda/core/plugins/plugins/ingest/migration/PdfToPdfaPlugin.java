@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
@@ -5,13 +12,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
+import org.ghost4j.GhostscriptException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -20,8 +27,9 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
+import org.verapdf.core.VeraPDFException;
 
-public class JodConverterPlugin extends AbstractConvertPlugin {
+public class PdfToPdfaPlugin extends AbstractConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -35,12 +43,12 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getName() {
-    return "Document conversion";
+    return "PDF to PDFA conversion";
   }
 
   @Override
   public String getDescription() {
-    return "Generates a document format file from other document format one using JODConverter.";
+    return "Generates a PDF/A file format from a PDF one that passes veraPDF validation.";
   }
 
   @Override
@@ -50,38 +58,34 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new JodConverterPlugin();
+    return new PdfToPdfaPlugin();
   }
 
   @Override
   public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
-      "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
+    return new ArrayList<PluginParameter>();
+  }
 
-    List<PluginParameter> params = new ArrayList<PluginParameter>();
-
-    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
-      "", convertableTo, true, true, "Lists the possible output formats");
-
-    PluginParameter commandArgs = new PluginParameter("commandArgs", "Command arguments", PluginParameterType.STRING,
-      "", true, true, "Command arguments to modify the command to execute");
-
-    params.add(outputParam);
-    params.add(commandArgs);
-    return params;
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    inputFormat = "pdf";
+    outputFormat = "pdf";
   }
 
   @Override
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
-    Path pluginResult;
+    Path pluginResult = null;
 
-    if (Files.exists(uriPath)) {
-      pluginResult = JodConverterPluginUtils.runJodConverter(uriPath, inputFormat, outputFormat);
-    } else {
-      pluginResult = JodConverterPluginUtils.runJodConverter(binary.getContent().createInputStream(), inputFormat,
-        outputFormat);
+    try {
+      if (Files.exists(uriPath)) {
+        pluginResult = PdfToPdfaPluginUtils.runPdfToPdfa(uriPath);
+      } else {
+        pluginResult = PdfToPdfaPluginUtils.runPdfToPdfa(binary.getContent().createInputStream());
+      }
+    } catch (VeraPDFException | GhostscriptException e) {
+      logger.error("Error when running PDFtoPDFAPluginUtils ", e);
     }
 
     return pluginResult;

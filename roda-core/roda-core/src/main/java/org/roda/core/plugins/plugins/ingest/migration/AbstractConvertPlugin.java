@@ -46,9 +46,12 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
   public String inputFormat;
   public String outputFormat;
   public long maxKbytes = 20000; // default value: 20000 kb
+
+  public List<String> applicableTo = new ArrayList<>();
+  public List<String> convertableTo = new ArrayList<>();
+
   public boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
     "tools", "allplugins", "hasPartialSuccessOnOutcome"));
-  public String conversionProfile = "general"; // default conversion profile
 
   public abstract void init() throws PluginException;
 
@@ -70,9 +73,7 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     return true;
   }
 
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
+  public abstract List<PluginParameter> getParameters();
 
   public Map<String, String> getParameterValues() {
     Map<String, String> parametersMap = new HashMap<String, String>();

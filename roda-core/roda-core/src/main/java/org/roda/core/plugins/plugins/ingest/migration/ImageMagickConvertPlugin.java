@@ -4,8 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -15,7 +21,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
+public class ImageMagickConvertPlugin extends GeneralCommandConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -39,11 +45,37 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
 
   @Override
   public String getVersion() {
-    return "1.0";
+    try {
+      return ImageMagickConvertPluginUtils.getVersion();
+    } catch (CommandException e) {
+      logger.debug("Error getting ImageMagick version");
+      return new String();
+    }
   }
 
   @Override
-  public abstract Plugin<AIP> cloneMe();
+  public Plugin<AIP> cloneMe() {
+    return new ImageMagickConvertPlugin();
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
+      "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
+
+    List<PluginParameter> params = new ArrayList<PluginParameter>();
+
+    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
+      "", convertableTo, true, true, "Lists the possible output formats");
+
+    PluginParameter commandArgs = new PluginParameter("commandArgs", "Command arguments", PluginParameterType.STRING,
+      "", true, true, "Command arguments to modify the command to execute");
+
+    params.add(outputParam);
+    params.add(commandArgs);
+    return params;
+  }
 
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
@@ -51,10 +83,10 @@ public abstract class ImageMagickConvertPlugin extends AbstractConvertPlugin {
 
     if (Files.exists(uriPath)) {
       pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, inputFormat, outputFormat,
-        conversionProfile);
+        commandArguments);
     } else {
       pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(binary.getContent().createInputStream(),
-        inputFormat, outputFormat, conversionProfile);
+        inputFormat, outputFormat, commandArguments);
     }
 
     return pluginResult;

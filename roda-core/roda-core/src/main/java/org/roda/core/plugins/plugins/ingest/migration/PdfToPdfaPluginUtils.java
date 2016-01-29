@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.ingest.migration.converters;
+package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

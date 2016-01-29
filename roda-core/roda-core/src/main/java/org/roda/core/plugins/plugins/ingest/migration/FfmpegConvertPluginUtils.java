@@ -16,7 +16,7 @@ import org.roda.core.util.CommandUtility;
 public class FfmpegConvertPluginUtils {
 
   public static Path runFfmpegVideoConvert(InputStream is, String inputFormat, String outputFormat,
-    String conversionProfile) throws IOException, CommandException {
+    String commandArguments) throws IOException, CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -28,25 +28,25 @@ public class FfmpegConvertPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeFfmpeg(input, output, conversionProfile);
+    return executeFfmpeg(input, output, commandArguments);
   }
 
-  public static Path runFfmpegVideoConvert(Path input, String inputFormat, String outputFormat, String conversionProfile)
+  public static Path runFfmpegVideoConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
     throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeFfmpeg(input, output, conversionProfile);
+    return executeFfmpeg(input, output, commandArguments);
   }
 
-  private static Path executeFfmpeg(Path input, Path output, String conversionProfile) throws CommandException {
+  private static Path executeFfmpeg(Path input, Path output, String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", conversionProfile,
-      "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "general", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
+    command = command.replace("{arguments}", commandArguments);
 
     // filling a list of the command line arguments
-    List<String> commandList = Arrays.asList(command.split(" "));
+    List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
     CommandUtility.execute(commandList);

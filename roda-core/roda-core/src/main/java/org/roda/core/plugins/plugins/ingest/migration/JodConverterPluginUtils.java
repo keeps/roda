@@ -19,8 +19,8 @@ import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConv
 
 public class JodConverterPluginUtils {
 
-  public static Path runJodConverter(InputStream is, String inputFormat, String outputFormat, String conversionProfile)
-    throws IOException, CommandException {
+  public static Path runJodConverter(InputStream is, String inputFormat, String outputFormat) throws IOException,
+    CommandException {
 
     // write the inputstream data on a new file (absolute path needed)
     Path input = Files.createTempFile("copy", "." + inputFormat);
@@ -32,24 +32,23 @@ public class JodConverterPluginUtils {
     is.close();
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeJodConverter(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeJodConverter(input, output, inputFormat, outputFormat);
   }
 
-  public static Path runJodConverter(Path input, String inputFormat, String outputFormat, String conversionProfile)
-    throws IOException, CommandException {
+  public static Path runJodConverter(Path input, String inputFormat, String outputFormat) throws IOException,
+    CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeJodConverter(input, output, inputFormat, outputFormat, conversionProfile);
+    return executeJodConverter(input, output, inputFormat, outputFormat);
   }
 
-  private static Path executeJodConverter(Path input, Path output, String inputFormat, String outputFormat,
-    String conversionProfile) throws ConnectException {
+  private static Path executeJodConverter(Path input, Path output, String inputFormat, String outputFormat)
+    throws ConnectException {
 
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
-    String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", conversionProfile,
-      "openOfficePort");
+    String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general", "openOfficePort");
     int openOfficePort = Integer.parseInt(port);
 
     OpenOfficeConnection connection = new SocketOpenOfficeConnection(openOfficePort);
