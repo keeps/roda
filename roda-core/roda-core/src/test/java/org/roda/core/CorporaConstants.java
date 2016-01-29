@@ -66,7 +66,7 @@ public class CorporaConstants {
 
   public static final String F0_PREMIS_XML = "F0";
   public static final String TEXT_XML = "text/xml";
-  public static final String EVENT_RODA_398_PREMIS_XML = "event_roda_398.premis.xml";
+  public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "roda_398";
   public static final String INGESTION = "ingestion";
   public static final String RODA_8 = "roda:8";
   public static final String SUCCESS = "success";

@@ -17,6 +17,7 @@ import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.validation.ValidationException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -35,7 +36,6 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -352,8 +352,8 @@ public class Browser extends RodaCoreService {
     return aipRepresentationPreservationMetadataFile;
   }
 
-  public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId, String fileId,
-    InputStream is, FormDataContentDisposition fileDetail)
+  public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+    String fileId, InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
 
     Date startDate = new Date();
@@ -363,8 +363,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is, fileDetail,
-      true);
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is,
+      fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -373,8 +373,8 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId, String fileId,
-    InputStream is, FormDataContentDisposition fileDetail)
+  public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
+    String fileId, InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -383,8 +383,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId,fileId, is, fileDetail,
-      false);
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is,
+      fileDetail, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -403,7 +403,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectRemovePermissions(user, aip);
 
     // delegate
-    BrowserHelper.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId, preservationId);
+    BrowserHelper.aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(aipId, representationId, fileId,
+      preservationId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -421,7 +422,7 @@ public class Browser extends RodaCoreService {
 
   public static IndexedAIP moveInHierarchy(RodaUser user, String aipId, String parentId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException {
+    AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -39,6 +41,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.validation.ValidationException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -231,7 +234,7 @@ public class ModelServiceTest {
     assertEquals(rfpo.getFormatDesignationName(), CorporaConstants.TEXT_XML);
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      null, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+      null, CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
     assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
 
@@ -352,7 +355,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Iterable<DescriptiveMetadata> list = model.listDescriptiveMetadataBinaries(aipId);
+    Iterable<DescriptiveMetadata> list = model.listDescriptiveMetadata(aipId);
     DescriptiveMetadata descriptiveMetadata1 = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
@@ -590,7 +593,7 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     EventPreservationObject epo = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      null, CorporaConstants.EVENT_RODA_398_PREMIS_XML);
+      null, CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     assertEquals(CorporaConstants.AGENT_RODA_8, epo.getAgentID());
     assertEquals(CorporaConstants.INGESTION, epo.getType());
   }

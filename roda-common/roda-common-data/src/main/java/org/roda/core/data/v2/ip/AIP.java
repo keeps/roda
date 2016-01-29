@@ -76,6 +76,7 @@ public class AIP implements Serializable {
   public void setId(String id) {
     this.id = id;
 
+    // As id is not serialized to JSON, set the AIP id in metadata and data
     if (metadata != null) {
       if (metadata.getDescriptiveMetadata() != null) {
         for (DescriptiveMetadata descriptiveMetadata : metadata.getDescriptiveMetadata()) {
@@ -95,6 +96,13 @@ public class AIP implements Serializable {
         }
       }
     }
+
+    if (representations != null) {
+      for (Representation representation : representations) {
+        representation.setAipId(id);
+      }
+    }
+
   }
 
   public void setParentId(String parentId) {

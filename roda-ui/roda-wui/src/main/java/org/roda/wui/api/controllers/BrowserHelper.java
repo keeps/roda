@@ -33,7 +33,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
-import org.roda.core.common.ValidationUtils;
+import org.roda.core.common.validation.ValidationException;
+import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
@@ -63,7 +64,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -87,8 +87,6 @@ import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import opennlp.tools.util.model.ModelUtil;
 
 /**
  * 
@@ -147,34 +145,27 @@ public class BrowserHelper {
   }
 
   private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService()
-      .listDescriptiveMetadataBinaries(aipId);
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+    List<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService()
+      .listDescriptiveMetadata(aipId);
 
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
-    try {
-      Messages messages = RodaCoreFactory.getI18NMessages(locale);
-      for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-        DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
-        bundle.setId(descriptiveMetadata.getId());
-        if (descriptiveMetadata.getType() != null) {
-          try {
 
-            bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
-              + descriptiveMetadata.getType().toLowerCase()));
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
+      DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
+      bundle.setId(descriptiveMetadata.getId());
+      if (descriptiveMetadata.getType() != null) {
+        try {
 
-          } catch (MissingResourceException e) {
-            bundle.setLabel(descriptiveMetadata.getId());
-          }
+          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
+            + descriptiveMetadata.getType().toLowerCase()));
+
+        } catch (MissingResourceException e) {
+          bundle.setLabel(descriptiveMetadata.getId());
         }
-        descriptiveMetadataList.add(bundle);
       }
-    } finally {
-      try {
-        listDescriptiveMetadataBinaries.close();
-      } catch (IOException e) {
-        LOGGER.warn("Error closing resources, possible leak", e);
-      }
+      descriptiveMetadataList.add(bundle);
     }
 
     return descriptiveMetadataList;
@@ -315,11 +306,11 @@ public class BrowserHelper {
 
   protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    ClosableIterable<DescriptiveMetadata> metadata = null;
+    List<DescriptiveMetadata> metadata = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
-      metadata = model.listDescriptiveMetadataBinaries(aipId);
+      metadata = model.listDescriptiveMetadata(aipId);
       Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
       int startInt = pagingParams.getFirst();
       int limitInt = pagingParams.getSecond();
@@ -341,14 +332,6 @@ public class BrowserHelper {
 
     } catch (IOException e) {
       throw new GenericException("Error listing AIP descriptive metadata", e);
-    } finally {
-      try {
-        if (metadata != null) {
-          metadata.close();
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
-      }
     }
   }
 
@@ -639,7 +622,7 @@ public class BrowserHelper {
   }
 
   public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
     StoragePath aipPath = ModelUtils.getAIPpath(aipId);

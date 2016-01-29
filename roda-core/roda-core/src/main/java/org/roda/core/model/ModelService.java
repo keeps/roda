@@ -20,12 +20,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.ValidationUtils;
+import org.roda.core.common.validation.ParseError;
+import org.roda.core.common.validation.ValidationException;
+import org.roda.core.common.validation.ValidationReport;
+import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -69,7 +73,6 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
-import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
@@ -313,7 +316,9 @@ public class ModelService extends ModelObservable {
     AIP aip;
 
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+    ValidationReport<String> validationReport = isAIPvalid(sourceModelService, sourceDirectory,
+      FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
+    if (validationReport.isValid()) {
 
       storage.copy(sourceStorage, sourcePath, ModelUtils.getAIPpath(aipId));
       Directory newDirectory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
@@ -373,13 +378,15 @@ public class ModelService extends ModelObservable {
   // TODO support asReference
   public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-    AlreadyExistsException {
+    AlreadyExistsException, ValidationException {
     // TODO verify structure of source AIP and update it in the storage
     ModelService sourceModelService = new ModelService(sourceStorage);
     AIP aip;
 
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    if (isAIPvalid(sourceModelService, sourceDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+    ValidationReport<String> validationReport = isAIPvalid(sourceModelService, sourceDirectory,
+      FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
+    if (validationReport.isValid()) {
       StoragePath aipPath = ModelUtils.getAIPpath(aipId);
 
       // FIXME is this the best way?
@@ -391,21 +398,22 @@ public class ModelService extends ModelObservable {
       aip = convertResourceToAIP(directoryUpdated);
       notifyAipUpdated(aip);
     } else {
-      throw new GenericException("Error while updating AIP");
+      throw new ValidationException(validationReport);
     }
 
     return aip;
   }
 
-  public AIP updateAIP(AIP aip)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+  public AIP updateAIP(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
+    AuthorizationDeniedException, ValidationException {
     StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
     Directory aipDirectory = storage.getDirectory(aipPath);
-    if (isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA)) {
+    ValidationReport<String> validationReport = isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
+    if (validationReport.isValid()) {
       updateAIPMetadata(aip, aipPath);
       notifyAipUpdated(aip);
     } else {
-      throw new GenericException("Error while updating AIP");
+      throw new ValidationException(validationReport);
     }
 
     return aip;
@@ -418,58 +426,12 @@ public class ModelService extends ModelObservable {
     notifyAipDeleted(aipId);
   }
 
-  public ClosableIterable<DescriptiveMetadata> listDescriptiveMetadataBinaries(String aipId)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+  // TODO check if this method has become superfluous
+  public List<DescriptiveMetadata> listDescriptiveMetadata(String aipId)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ClosableIterable<DescriptiveMetadata> it;
 
-    try {
-      final ClosableIterable<Resource> resourcesIterable = storage
-        .listResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
-      final Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
-
-      it = new ClosableIterable<DescriptiveMetadata>() {
-
-        @Override
-        public Iterator<DescriptiveMetadata> iterator() {
-          return new Iterator<DescriptiveMetadata>() {
-
-            @Override
-            public boolean hasNext() {
-              if (resourcesIterator == null) {
-                return false;
-              }
-              return resourcesIterator.hasNext();
-            }
-
-            @Override
-            public DescriptiveMetadata next() {
-              try {
-                return convertResourceToDescriptiveMetadata(resourcesIterator.next());
-              } catch (GenericException | NoSuchElementException e) {
-                LOGGER.error("Error while listing descriptive metadata binaries", e);
-                return null;
-              }
-
-            }
-
-            @Override
-            public void remove() {
-              throw new UnsupportedOperationException();
-            }
-          };
-        }
-
-        @Override
-        public void close() throws IOException {
-          resourcesIterable.close();
-        }
-      };
-
-    } catch (NotFoundException e) {
-      it = new EmptyClosableIterable<DescriptiveMetadata>();
-    }
-
-    return it;
+    return getAIPMetadata(aipId).getMetadata().getDescriptiveMetadata();
   }
 
   public Long countDescriptiveMetadataBinaries(String aipId)
@@ -640,7 +602,7 @@ public class ModelService extends ModelObservable {
   // TODO support asReference
   public Representation createRepresentation(String aipId, String representationId, boolean original,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, AlreadyExistsException {
+      NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Representation representation;
 
     StoragePath directoryPath = ModelUtils.getRepresentationPath(aipId, representationId);
@@ -1125,16 +1087,22 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private boolean isAIPvalid(ModelService model, Directory directory, boolean failIfNoDescriptiveMetadataSchema)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    boolean valid = true;
+  private ValidationReport<String> isAIPvalid(ModelService model, Directory directory,
+    boolean failIfNoDescriptiveMetadataSchema)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ValidationReport<String> report = new ValidationReport<>();
+
     // validate metadata (against schemas)
-    valid = ValidationUtils.isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(),
-      failIfNoDescriptiveMetadataSchema);
+    ValidationReport<ParseError> descriptiveMetadataValidationReport = ValidationUtils
+      .isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(), failIfNoDescriptiveMetadataSchema);
+
+    report.setValid(descriptiveMetadataValidationReport.isValid());
+    report.setIssues(
+      descriptiveMetadataValidationReport.getIssues().stream().map(r -> r.toString()).collect(Collectors.toList()));
 
     // FIXME validate others aspects
 
-    return valid;
+    return report;
   }
 
   private boolean isRepresentationValid(Directory directory) {
@@ -1451,8 +1419,9 @@ public class ModelService extends ModelObservable {
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     EventPreservationObject eventPreservationObject = null;
 
-    StoragePath filePath = ModelUtils.getPreservationFilePathRaw(aipId, representationId, preservationID);
-    Binary binary = storage.getBinary(filePath);
+    StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(aipId, representationId, preservationID,
+      PreservationMetadataType.EVENT);
+    Binary binary = storage.getBinary(storagePath);
     eventPreservationObject = convertResourceToEventPreservationObject(aipId, representationId, fileId, binary);
     eventPreservationObject.setId(fileId);
 

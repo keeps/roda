@@ -360,25 +360,30 @@ public final class ModelUtils {
 
   public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
     throws RequestNotValidException {
+    return getPreservationMetadataStoragePath(pm.getAipId(), pm.getRepresentationId(), pm.getId(), pm.getType());
+  }
+
+  public static StoragePath getPreservationMetadataStoragePath(String aipId, String representationId, String id,
+    PreservationMetadataType type) throws RequestNotValidException {
     // TODO review this method
     StoragePath path = null;
-    if(pm.getType()!=null){
-      if (pm.getType().equals(PreservationMetadataType.AGENT)) {
+    if (type != null) {
+      if (type.equals(PreservationMetadataType.AGENT)) {
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-          RodaConstants.STORAGE_DIRECTORY_AGENTS, pm.getId() + ".agent.premis.xml");
-      } else if (pm.getType().equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
-        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
-          pm.getId()+ ".representation.premis.xml");
-      } else if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          RodaConstants.STORAGE_DIRECTORY_AGENTS, id + ".agent.premis.xml");
+      } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+          id + ".representation.premis.xml");
+      } else if (type.equals(PreservationMetadataType.EVENT)) {
         // TODO HANDLE AIP and REPRESENTATION EVENTS
-        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
-          pm.getId() + ".event.premis.xml");
-      } else if (pm.getType().equals(PreservationMetadataType.OBJECT_FILE)) {
-        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, pm.getAipId(),
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, pm.getRepresentationId(),
-          pm.getId() + ".file.premis.xml");
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+          id + ".event.premis.xml");
+      } else if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
+        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
+          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
+          id + ".file.premis.xml");
       }
     }
     return path;
@@ -616,7 +621,8 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b, PreservationMetadataType type) {
+  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b,
+    PreservationMetadataType type) {
     List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
     if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
       // TODO check if files has agents
@@ -805,11 +811,13 @@ public final class ModelUtils {
 
   // TODO right now, all premis for files are saved under the representation
   // folder... if need, add parameter "fileID"...
+  /**
+   * @deprecated this is not using preservation metadata type
+   */
+  @Deprecated
   public static StoragePath getPreservationFilePathRaw(String aipId, String representationId, String preservationID)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
   }
-
- 
 
 }

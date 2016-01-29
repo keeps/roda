@@ -9,6 +9,7 @@ package org.roda.wui.client.browse;
 
 import java.util.List;
 
+import org.roda.core.common.validation.ValidationException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -115,7 +116,7 @@ public interface BrowserService extends RemoteService {
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
   IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException;
+    NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
 
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, AlreadyExistsException;
@@ -127,12 +128,12 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
+    throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
     RequestNotValidException;
 
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException;
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException;
 
   IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;

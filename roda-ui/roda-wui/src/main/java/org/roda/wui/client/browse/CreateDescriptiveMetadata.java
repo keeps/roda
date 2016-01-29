@@ -10,9 +10,12 @@
  */
 package org.roda.wui.client.browse;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.common.validation.ParseError;
+import org.roda.core.common.validation.ValidationException;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -193,8 +196,8 @@ public class CreateDescriptiveMetadata extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          if (caught instanceof MetadataParseException) {
-            MetadataParseException e = (MetadataParseException) caught;
+          if (caught instanceof ValidationException) {
+            ValidationException e = (ValidationException) caught;
             updateErrors(e);
           } else {
             // TODO show error
@@ -218,12 +221,20 @@ public class CreateDescriptiveMetadata extends Composite {
 
   }
 
-  protected void updateErrors(MetadataParseException e) {
+  protected void updateErrors(ValidationException e) {
     SafeHtmlBuilder b = new SafeHtmlBuilder();
-    for (ParseError error : e.getErrors()) {
-      b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
-      b.append(messages.metadataParseError(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
-      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    for (Serializable s : e.getReport().getIssues()) {
+      if (s instanceof ParseError) {
+        ParseError error = (ParseError) s;
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+        b.append(messages.metadataParseError(error.getLineNumber(), error.getColumnNumber(), error.getMessage()));
+        b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      } else {
+        String error = s.toString();
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='error'>"));
+        b.append(SafeHtmlUtils.fromString(error));
+        b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+      }
     }
 
     errors.setHTML(b.toSafeHtml());

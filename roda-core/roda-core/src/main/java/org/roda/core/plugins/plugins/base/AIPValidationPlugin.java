@@ -13,8 +13,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.ValidationReport;
-import org.roda.core.common.ValidationUtils;
+import org.roda.core.common.validation.ValidationReport;
+import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -39,20 +39,20 @@ import org.slf4j.LoggerFactory;
 public class AIPValidationPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
-  public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
-    "Validate Premis", PluginParameterType.BOOLEAN, "true", true, false, "Validate Premis");
-
-  public static final PluginParameter PARAMETER_VALIDATION_FORCE = new PluginParameter("parameter.validation_force",
-    "Enforce metadata type", PluginParameterType.BOOLEAN, "false", true, false,
-    "If true, bypass current metadata type with metadata type passed as parameter and validate. If false, if metadata type passed as parameter is defined, fallback, else no fallback ");
-
-  public static final PluginParameter PARAMETER_VALIDATION_FORCE_ONLY = new PluginParameter(
-    "parameter.validation_force_only", "Only enforce metadata type", PluginParameterType.BOOLEAN, "false", true, false,
-    "If true, the validation doesn't run");
+  public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
+    "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
+    true, false, "If true the descriptive metadata is validated against existing schemas.");
 
   public static final PluginParameter PARAMETER_METADATA_TYPE = new PluginParameter("parameter.metadata_type",
-    "EAD-2002", PluginParameterType.METADATA_TYPE, "EAD-2002", false, false,
-    "Fall if no metadatatype defined or if definded metadata fails.");
+    "Descriptive metadata type", PluginParameterType.METADATA_TYPE, null, false, false,
+    "Descriptive metadata type to be used as fallback or if metadata type is forced.");
+
+  public static final PluginParameter PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE = new PluginParameter(
+    "parameter.force_type", "Force metadata type in all", PluginParameterType.BOOLEAN, "false", true, false,
+    "If true, bypass current metadata type with metadata type passed as parameter. If false, if metadata type passed as parameter is defined use as fallback, else no fallback");
+
+  public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
+    "Validate Premis", PluginParameterType.BOOLEAN, "true", true, false, "Validate Premis");
 
   private Map<String, String> parameters;
 
@@ -84,10 +84,10 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
-    pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
-    pluginParameters.add(PARAMETER_VALIDATION_FORCE);
+    pluginParameters.add(PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
     pluginParameters.add(PARAMETER_METADATA_TYPE);
-    pluginParameters.add(PARAMETER_VALIDATION_FORCE_ONLY);
+    pluginParameters.add(PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
+    pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
     return pluginParameters;
   }
 
@@ -105,23 +105,23 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
+    boolean validateDescriptiveMetadata = Boolean.parseBoolean(parameters.getOrDefault(
+      PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getId(), PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getDefaultValue()));
     boolean validatePremis = Boolean.parseBoolean(
       parameters.getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(), PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
-    boolean force = Boolean.parseBoolean(
-      parameters.getOrDefault(PARAMETER_VALIDATION_FORCE.getId(), PARAMETER_VALIDATION_FORCE.getDefaultValue()));
-    boolean forceOnly = Boolean.parseBoolean(parameters.getOrDefault(PARAMETER_VALIDATION_FORCE_ONLY.getId(),
-      PARAMETER_VALIDATION_FORCE_ONLY.getDefaultValue()));
+    boolean forceDescriptiveMetadataType = Boolean.parseBoolean(parameters.getOrDefault(
+      PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getId(), PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getDefaultValue()));
     String metadataType = parameters.getOrDefault(PARAMETER_METADATA_TYPE.getId(),
       PARAMETER_METADATA_TYPE.getDefaultValue());
 
-    List<ValidationReport> reports = new ArrayList<ValidationReport>();
+    List<ValidationReport<String>> reports = new ArrayList<ValidationReport<String>>();
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, "SIP syntax check", aip.getId(), null);
 
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
-        ValidationReport report = ValidationUtils.isAIPMetadataValid(force, forceOnly, metadataType, validatePremis,
-          model, aip.getId());
+        ValidationReport<String> report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
+          validateDescriptiveMetadata, metadataType, validatePremis, model, aip.getId());
         reports.add(report);
         // createEvent(aip, model, descriptiveValid, preservationValid);
       } catch (RODAException mse) {

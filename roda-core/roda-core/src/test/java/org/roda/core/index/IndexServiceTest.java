@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.validation.ValidationException;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -209,7 +210,7 @@ public class IndexServiceTest {
 
   @Test
   public void testAIPUpdate() throws NotFoundException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException {
+    AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 

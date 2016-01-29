@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.validation.ValidationException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -38,7 +39,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.RodaUser;
-import org.roda.core.model.ValidationException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.StringContentPayload;
@@ -47,8 +47,6 @@ import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
-import org.roda.wui.client.browse.MetadataParseException;
-import org.roda.wui.client.browse.ParseError;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -56,7 +54,6 @@ import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
-import org.xml.sax.SAXParseException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -160,7 +157,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);
   }
@@ -182,8 +179,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
     String metadataId = bundle.getId();
@@ -196,18 +193,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Map<String, String> contentDigest = null;
     Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
 
-    try {
-      Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType,
-        descriptiveMetadataIdBinary);
-    } catch (ValidationException e) {
-      throw convertValidationException(e);
-    }
+    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType,
+      descriptiveMetadataIdBinary);
   }
 
   @Override
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
-    throws AuthorizationDeniedException, GenericException, MetadataParseException, NotFoundException,
-    RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String metadataId = bundle.getId();
     String metadataType = bundle.getType();
@@ -219,32 +212,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Map<String, String> contentDigest = null;
     Binary metadataBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
 
-    try {
-      Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataBinary);
-    } catch (ValidationException e) {
-      throw convertValidationException(e);
-    }
-  }
+    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataBinary);
 
-  private MetadataParseException convertValidationException(ValidationException e) {
-    MetadataParseException ex = new MetadataParseException(e.getMessage());
-    List<SAXParseException> errors = e.getErrors();
-    List<ParseError> mappedList = new ArrayList<>();
-
-    if (errors != null) {
-      for (SAXParseException saxParseException : errors) {
-        ParseError parseError = new ParseError();
-        parseError.setMessage(saxParseException.getMessage());
-        parseError.setLineNumber(saxParseException.getLineNumber());
-        parseError.setColumnNumber(saxParseException.getColumnNumber());
-        parseError.setPublicId(saxParseException.getPublicId());
-        parseError.setSystemId(saxParseException.getSystemId());
-        mappedList.add(parseError);
-      }
-    }
-    ex.setErrors(mappedList);
-
-    return ex;
   }
 
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)

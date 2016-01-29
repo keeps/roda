@@ -5,26 +5,28 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.common;
+package org.roda.core.common.validation;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ValidationReport {
+public class ValidationReport<T extends Serializable> {
 
-  private List<String> issues;
+  private List<T> issues;
   private boolean valid;
+  private String message;
 
   public ValidationReport() {
     this.valid = true;
-    this.issues = new ArrayList<String>();
+    this.issues = new ArrayList<T>();
   }
 
-  public List<String> getIssues() {
+  public List<T> getIssues() {
     return issues;
   }
 
-  public void setIssues(List<String> issues) {
+  public void setIssues(List<T> issues) {
     this.issues = issues;
   }
 
@@ -36,9 +38,17 @@ public class ValidationReport {
     this.valid = valid;
   }
 
-  public void addIssue(String issue) {
+  public String getMessage() {
+    return message;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+
+  public void addIssue(T issue) {
     if (issues == null) {
-      issues = new ArrayList<String>();
+      issues = new ArrayList<T>();
     }
     issues.add(issue);
   }
