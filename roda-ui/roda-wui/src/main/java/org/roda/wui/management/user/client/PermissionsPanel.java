@@ -44,11 +44,8 @@ import config.i18n.client.UserManagementConstants;
  */
 public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<String> {
 
-  // private final List<ChangeListener> changelisteners;
-
   private class Permission extends HorizontalPanel implements HasValueChangeHandlers<Boolean>, Comparable<Permission> {
 
-    // functional attributes
     private final String sortingkeyword;
 
     private final String role;
@@ -57,7 +54,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
     private boolean enabled;
 
-    // UI attributes
     private final CheckBox checkbox;
 
     private final Label descriptionLabel;
@@ -139,8 +135,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       }
     }
 
-    public int compareTo(Permission permission0) {
-      return sortingkeyword.compareTo(permission0.sortingkeyword);
+    public int compareTo(Permission permission) {
+      return sortingkeyword.compareTo(permission.sortingkeyword);
     }
 
     @SuppressWarnings("unused")
@@ -157,7 +153,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
+  @SuppressWarnings("unused")
+  private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final List<Permission> permissions;
 
@@ -171,18 +168,22 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   public PermissionsPanel() {
     this.permissions = new Vector<Permission>();
     loading = new LoadingPopup(this);
-    logger.debug("Getting permissions from RODA properties");
     loading.show();
 
+    this.enabled = true;
+
+    this.addStyleName("permissions");
+  }
+
+  public void init(final AsyncCallback<Boolean> callback) {
     UserLogin.getRodaProperties(new AsyncCallback<Map<String, String>>() {
 
       public void onFailure(Throwable caught) {
         loading.hide();
-        logger.fatal("Error getting RODA properties", caught);
+        callback.onFailure(caught);
       }
 
       public void onSuccess(Map<String, String> rodaProperties) {
-        logger.debug("Creating permissions list");
         for (String key : rodaProperties.keySet()) {
           if (key.startsWith("ui.role.")) {
             String role = (String) rodaProperties.get(key);
@@ -198,10 +199,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
           }
         }
 
-        logger.debug("Sorting permissions list");
         Collections.sort(permissions);
 
-        logger.debug("Adding permissions to panel");
         for (final Permission permission : permissions) {
           PermissionsPanel.this.add(permission);
           permission.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
@@ -213,13 +212,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
           });
         }
         loading.hide();
+        callback.onSuccess(true);
       }
-
     });
-
-    this.enabled = true;
-
-    this.addStyleName("permissions");
   }
 
   /**
@@ -266,37 +261,9 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   public void updateLockedPermissions(Set<String> memberGroups) {
     if (memberGroups.size() > 0) {
-      logger.debug("Getting group permissions");
       this.setEnabled(false);
       loading.show();
-      // UserManagementService.Util.getInstance().getGroupsRoles(
-      // memberGroups, new AsyncCallback<Set<String>>() {
-      //
-      // public void onFailure(Throwable caught) {
-      // loading.hide();
-      // logger.error("Error while getting member"
-      // + "groups permissions", caught);
-      // }
-      //
-      // public void onSuccess(Set<String> inheritedRoles) {
-      // logger.info("got " + inheritedRoles.size()
-      // + " permissions to add");
-      //
-      // // unlock all
-      // for (Permission p : permissions) {
-      // p.setLocked(false);
-      //
-      // }
-      // // Lock inherited roles
-      // checkPermissions(inheritedRoles, true);
-      //
-      // PermissionsPanel.this.setEnabled(true);
-      // loading.hide();
-      // }
-      //
-      // });
     }
-
   }
 
   /**

@@ -249,6 +249,37 @@
 	cursor: hand;
 }
 
+/** Groups Panel **/
+.groups {
+	width: 100%;
+}
+
+.groups .group {
+	margin: 5px;
+}
+
+.groups .group .group-checkbox {
+	
+}
+
+.groups .group .group-description,
+.groups .group .group-description-on {
+	width: 100%;
+	vertical-align: middle;
+	cursor: pointer;
+	cursor: hand;
+	margin-left: 3px;
+	color: #000;
+}
+
+.groups .group .group-description-off {
+	width: 100%;
+	vertical-align: middle;
+	cursor: default;
+	margin-left: 3px;
+	color: #999;
+}
+
 /** Permissions Panel **/
 .permissions {
 	width: 100%;

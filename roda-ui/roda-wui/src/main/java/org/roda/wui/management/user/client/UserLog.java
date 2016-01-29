@@ -43,9 +43,6 @@ import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
-import config.i18n.client.UserManagementConstants;
-import config.i18n.client.UserManagementMessages;
-
 /**
  * @author Luis Faria
  * 
@@ -92,11 +89,7 @@ public class UserLog extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
-
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
-
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField

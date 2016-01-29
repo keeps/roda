@@ -7,49 +7,118 @@
  */
 package org.roda.wui.management.user.client;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.Vector;
 
-import org.roda.wui.common.client.images.CommonImageBundle;
+import org.roda.core.data.v2.user.Group;
+import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.widgets.LoadingPopup;
 
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.SourcesChangeEvents;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-
-import config.i18n.client.UserManagementConstants;
 
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class GroupSelect extends HorizontalPanel implements SourcesChangeEvents {
+public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<String> {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  private class GroupCheckbox extends HorizontalPanel
+    implements HasValueChangeHandlers<Boolean>, Comparable<GroupCheckbox> {
 
-  private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);
+    private final String sortingkeyword;
 
-  private final List<ChangeListener> changeListeners;
+    private final String group;
 
-  private final GroupListBox allGroups;
+    private final CheckBox checkbox;
 
-  private final ListBox memberGroups;
+    private final Label descriptionLabel;
 
-  private final Image addGroup;
+    public GroupCheckbox(String group, String description, String sortingkeyword) {
+      this.group = group;
+      this.checkbox = new CheckBox();
+      this.descriptionLabel = new Label(description);
+      this.sortingkeyword = sortingkeyword;
+      this.add(checkbox);
+      this.add(descriptionLabel);
 
-  private final Image removeGroup;
+      this.descriptionLabel.addClickHandler(new ClickHandler() {
+
+        @Override
+        public void onClick(ClickEvent event) {
+          checkbox.setValue(!checkbox.getValue());
+          onChange();
+        }
+      });
+
+      this.checkbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+        @Override
+        public void onValueChange(ValueChangeEvent<Boolean> event) {
+          onChange();
+        }
+      });
+
+      this.addStyleName("group");
+      checkbox.addStyleName("group-checkbox");
+      descriptionLabel.setStylePrimaryName("group-description");
+    }
+
+    protected void onChange() {
+      ValueChangeEvent.fire(this, checkbox.getValue());
+    }
+
+    public boolean isChecked() {
+      return checkbox.getValue();
+    }
+
+    public void setChecked(boolean checked) {
+      checkbox.setValue(checked);
+    }
+
+    public String getGroup() {
+      return group;
+    }
+
+    public int compareTo(GroupCheckbox groupCheckbox) {
+      return sortingkeyword.compareTo(groupCheckbox.sortingkeyword);
+    }
+
+    @SuppressWarnings("unused")
+    public String getSortingkeyword() {
+      return sortingkeyword;
+    }
+
+    @Override
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+      return addHandler(handler, ValueChangeEvent.getType());
+    }
+  }
+
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private final List<String> blacklist;
+
+  private final List<GroupCheckbox> groups;
 
   private boolean enabled;
+
+  private final LoadingPopup loading;
 
   /**
    * Create a new group selection widget
@@ -58,168 +127,91 @@ public class GroupSelect extends HorizontalPanel implements SourcesChangeEvents 
    *          start as visible or wait until its initialized
    */
   public GroupSelect(boolean visible) {
-
-    this.setVisible(visible);
-    changeListeners = new Vector<ChangeListener>();
-
-    VerticalPanel allGroupsPanel = new VerticalPanel();
-    Label allGroupsLabel = new Label(constants.allGroups());
-    allGroupsLabel.setWordWrap(false);
-
-    allGroups = new GroupListBox(false);
-    allGroups.setMultipleSelect(true);
-    allGroupsPanel.add(allGroupsLabel);
-    allGroupsPanel.add(allGroups);
-
-    this.add(allGroupsPanel);
-
-    VerticalPanel groupControlButtons = new VerticalPanel();
-
-    addGroup = commonImageBundle.plus().createImage();
-    removeGroup = commonImageBundle.minus().createImage();
-
-    groupControlButtons.add(addGroup);
-    groupControlButtons.add(removeGroup);
-
-    this.add(groupControlButtons);
-
-    VerticalPanel memberGroupsPanel = new VerticalPanel();
-    Label memberGroupsLabel = new Label(constants.memberGroups());
-    memberGroupsLabel.setWordWrap(false);
-
-    memberGroups = new ListBox();
-    memberGroups.setVisibleItemCount(allGroups.getItemCount());
-    memberGroups.setMultipleSelect(true);
-
-    memberGroupsPanel.add(memberGroupsLabel);
-    memberGroupsPanel.add(memberGroups);
-
-    this.add(memberGroupsPanel);
-
-    addGroup.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-
-        for (int i = allGroups.getItemCount() - 1; i >= 0; i--) {
-          if (allGroups.isItemSelected(i)) {
-            String groupName = allGroups.getValue(i);
-            memberGroups.addItem(groupName, groupName);
-            allGroups.removeItem(i);
-            GroupSelect.this.onChange();
-          }
-        }
-
-      }
-
-    });
-
-    removeGroup.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-
-        for (int i = memberGroups.getItemCount() - 1; i >= 0; i--) {
-          if (memberGroups.isItemSelected(i)) {
-            String groupName = memberGroups.getValue(i);
-            allGroups.addItem(groupName, groupName);
-            memberGroups.removeItem(i);
-            GroupSelect.this.onChange();
-          }
-        }
-      }
-
-    });
-
-    this.setCellVerticalAlignment(groupControlButtons, HorizontalPanel.ALIGN_MIDDLE);
-
-    this.addStyleName("groupselect");
-    allGroupsLabel.addStyleName("group-label");
-    memberGroupsLabel.addStyleName("group-label");
-
-    allGroups.addStyleName("group-box");
-    memberGroups.addStyleName("group-box");
-
-    groupControlButtons.addStyleName("group-button-panel");
-    addGroup.addStyleName("group-button-add");
-    removeGroup.addStyleName("group-button-remove");
+    this.groups = new Vector<GroupCheckbox>();
+    this.blacklist = new Vector<String>();
+    loading = new LoadingPopup(this);
+    loading.show();
 
     enabled = true;
+
+    this.addStyleName("groups");
+  }
+
+  public void init(final AsyncCallback<Boolean> callback) {
+    UserManagementService.Util.getInstance().listAllGroups(new AsyncCallback<List<Group>>() {
+      @Override
+      public void onFailure(Throwable caught) {
+        loading.hide();
+        callback.onFailure(caught);
+      }
+
+      @Override
+      public void onSuccess(List<Group> allGroups) {
+        for (Group group : allGroups) {
+          if (!blacklist.contains(group.getId())) {
+            GroupCheckbox groupCheckbox = new GroupCheckbox(group.getId(), group.getFullName(), group.getId());
+            groups.add(groupCheckbox);
+          }
+        }
+
+        Collections.sort(groups);
+
+        for (final GroupCheckbox groupCheckbox : groups) {
+          GroupSelect.this.add(groupCheckbox);
+          groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+            @Override
+            public void onValueChange(ValueChangeEvent<Boolean> event) {
+              onChange();
+            }
+          });
+        }
+        loading.hide();
+        callback.onSuccess(true);
+      }
+    });
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
   }
 
   protected void onChange() {
-    for (ChangeListener listener : changeListeners) {
-      listener.onChange(this);
-    }
+    ValueChangeEvent.fire(this, "");
   }
 
-  public void addChangeListener(ChangeListener listener) {
-    this.changeListeners.add(listener);
-
-  }
-
-  public void removeChangeListener(ChangeListener listener) {
-    this.changeListeners.remove(listener);
-  }
-
-  /**
-   * Get selected groups
-   * 
-   * @return
-   */
-  public Set<String> getMemberGroups() {
-    Set<String> ret = new HashSet<String>();
-    for (int i = 0; i < memberGroups.getItemCount(); i++) {
-      ret.add(memberGroups.getValue(i));
-    }
-    return ret;
-  }
-
-  /**
-   * Set selected groups
-   * 
-   * @param superGroups
-   */
-  public void setMemberGroups(Set<String> superGroups) {
-    for (String groupname : superGroups) {
-      this.memberGroups.addItem(groupname);
-      allGroups.exclude(groupname);
-    }
-  }
-
-  /**
-   * Set group list box enabled
-   * 
-   * @param enabled
-   */
-  public void setEnabled(boolean enabled) {
-    this.enabled = enabled;
-    this.addGroup.setVisible(enabled);
-    this.removeGroup.setVisible(enabled);
-    this.allGroups.setEnabled(enabled);
-    this.memberGroups.setEnabled(enabled);
-  }
-
-  /**
-   * Is group list box enabled
-   * 
-   * @return
-   */
   public boolean isEnabled() {
     return enabled;
   }
 
-  /**
-   * Exclude possible selectable groups
-   * 
-   * @param groupname
-   */
-  public void exclude(String groupname) {
-    allGroups.exclude(groupname);
-    boolean foundit = false;
-    for (int i = memberGroups.getItemCount() - 1; i >= 0 && !foundit; i--) {
-      if (memberGroups.getValue(i).equals(groupname)) {
-        memberGroups.removeItem(i);
-        foundit = true;
+  public void setMemberGroups(Set<String> memberGroups) {
+    Iterator<String> it = memberGroups.iterator();
+
+    while (it.hasNext()) {
+      String group = it.next();
+      boolean foundit = false;
+      for (Iterator<GroupCheckbox> j = groups.iterator(); j.hasNext() && !foundit;) {
+        GroupCheckbox g = j.next();
+        if (g.getGroup().equals(group)) {
+          foundit = true;
+          g.setChecked(true);
+        }
       }
     }
+  }
+
+  public Set<String> getMemberGroups() {
+    Set<String> memberGroups = new HashSet<String>();
+    for (GroupCheckbox g : groups) {
+      if (g.isChecked()) {
+        memberGroups.add(g.getGroup());
+      }
+    }
+    return memberGroups;
+  }
+
+  public void addGroupToBlacklist(String group) {
+    blacklist.add(group);
   }
 }

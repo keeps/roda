@@ -22,12 +22,14 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.WUIButton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.KeyboardListener;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -102,9 +104,10 @@ public class VerifyEmail implements HistoryResolver {
 
       changeEmail = new WUIButton(constants.verifyEmailChange(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_UP);
 
-      verifyEmail.addClickListener(new ClickListener() {
+      verifyEmail.addClickHandler(new ClickHandler() {
 
-        public void onClick(Widget sender) {
+        @Override
+        public void onClick(ClickEvent event) {
           UserManagementService.Util.getInstance().verifyemail(userInputBox.getText(), tokenInputBox.getText(),
             new AsyncCallback<Boolean>() {
 
@@ -130,12 +133,12 @@ public class VerifyEmail implements HistoryResolver {
 
           });
         }
-
       });
 
-      resendEmail.addClickListener(new ClickListener() {
+      resendEmail.addClickHandler(new ClickHandler() {
 
-        public void onClick(Widget sender) {
+        @Override
+        public void onClick(ClickEvent event) {
           UserManagementService.Util.getInstance().resendEmailVerification(userInputBox.getText(),
             new AsyncCallback<Boolean>() {
 
@@ -154,12 +157,12 @@ public class VerifyEmail implements HistoryResolver {
 
           });
         }
-
       });
 
-      changeEmail.addClickListener(new ClickListener() {
+      changeEmail.addClickHandler(new ClickHandler() {
 
-        public void onClick(Widget sender) {
+        @Override
+        public void onClick(ClickEvent event) {
           String email = "";
           do {
             email = Window.prompt(constants.verifyEmailChangePrompt(), email);
@@ -196,27 +199,25 @@ public class VerifyEmail implements HistoryResolver {
           }
 
         }
-
       });
 
-      updateVisibles();
-      KeyboardListener updateListener = new KeyboardListener() {
+      updateVisibles();  
 
-        public void onKeyDown(Widget sender, char keyCode, int modifiers) {
-
-        }
-
-        public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-        }
-
-        public void onKeyUp(Widget sender, char keyCode, int modifiers) {
+      userInputBox.addKeyUpHandler(new KeyUpHandler() {
+        
+        @Override
+        public void onKeyUp(KeyUpEvent event) {
           updateVisibles();
         }
-
-      };
-
-      userInputBox.addKeyboardListener(updateListener);
-      tokenInputBox.addKeyboardListener(updateListener);
+      });
+      
+      tokenInputBox.addKeyUpHandler(new KeyUpHandler() {
+        
+        @Override
+        public void onKeyUp(KeyUpEvent event) {
+          updateVisibles();
+        }
+      });
 
       layout.add(inputvalues);
       layout.add(bottomButtons);

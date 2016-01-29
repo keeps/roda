@@ -28,6 +28,7 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -142,6 +143,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     fullname.addChangeHandler(changeHandler);
         
     permissionsPanel.addValueChangeHandler(valueChangedHandler);
+    groupSelect.addValueChangeHandler(valueChangedHandler);
   }
 
   /**
@@ -152,19 +154,29 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   public void setGroup(Group group) {
     this.groupname.setText(group.getName());
     this.fullname.setText(group.getFullName());
-
+    this.groupSelect.addGroupToBlacklist(group.getId());
+   
     this.setMemberGroups(group.getAllGroups());
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
-
   }
 
-  private void setPermissions(Set<String> directRoles, Set<String> allRoles) {
+  private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
+    permissionsPanel.init(new AsyncCallback<Boolean>() {
+      
+      @Override
+      public void onSuccess(Boolean result) {
+        Set<String> indirectRoles = new HashSet<String>(allRoles);
+        indirectRoles.removeAll(directRoles);
 
-    Set<String> indirectRoles = new HashSet<String>(allRoles);
-    indirectRoles.removeAll(directRoles);
-
-    permissionsPanel.checkPermissions(directRoles, false);
-    permissionsPanel.checkPermissions(indirectRoles, true);
+        permissionsPanel.checkPermissions(directRoles, false);
+        permissionsPanel.checkPermissions(indirectRoles, true);
+      }
+      
+      @Override
+      public void onFailure(Throwable caught) {
+        // TODO Auto-generated method stub
+      }
+    });
   }
 
   /**
@@ -196,9 +208,20 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    * 
    * @param groups
    */
-  public void setMemberGroups(Set<String> groups) {
+  public void setMemberGroups(final Set<String> groups) {
     if (enableGroupSelect) {
-      groupSelect.setMemberGroups(groups);
+      groupSelect.init(new AsyncCallback<Boolean>() {
+        
+        @Override
+        public void onSuccess(Boolean result) {
+          groupSelect.setMemberGroups(groups);
+        }
+        
+        @Override
+        public void onFailure(Throwable caught) {
+          // TODO Auto-generated method stub
+        }
+      });
     }
   }
 

@@ -33,6 +33,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
@@ -113,23 +114,23 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   @UiField
   FlowPanel groupSelectPanel;
-  
+
   @UiField(provided = true)
   GroupSelect groupSelect;
 
   @UiField
   FlowPanel permissionsSelectPanel;
-  
+
   @UiField
   PermissionsPanel permissionsPanel;
-  
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean enableGroupSelect;
 
   private boolean editmode;
-  
+
   private boolean changed = false;
 
   /**
@@ -175,7 +176,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.editmode = editmode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
-    
+
     groupSelectPanel.setVisible(enableGroupSelect);
 
     businessCategory.setVisibleItemCount(1);
@@ -258,7 +259,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     country.addValueChangeHandler(valueChangedHandler);
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
-    
+
     permissionsPanel.addValueChangeHandler(valueChangedHandler);
   }
 
@@ -313,13 +314,23 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   }
 
-  private void setPermissions(Set<String> directRoles, Set<String> allRoles) {
+  private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
+    permissionsPanel.init(new AsyncCallback<Boolean>() {
 
-    Set<String> indirectRoles = new HashSet<String>(allRoles);
-    indirectRoles.removeAll(directRoles);
+      @Override
+      public void onSuccess(Boolean result) {
+        Set<String> indirectRoles = new HashSet<String>(allRoles);
+        indirectRoles.removeAll(directRoles);
 
-    permissionsPanel.checkPermissions(directRoles, false);
-    permissionsPanel.checkPermissions(indirectRoles, true);
+        permissionsPanel.checkPermissions(directRoles, false);
+        permissionsPanel.checkPermissions(indirectRoles, true);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // TODO Auto-generated method stub
+      }
+    });
   }
 
   /**
@@ -353,7 +364,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     if (enableGroupSelect) {
       user.setDirectGroups(this.getMemberGroups());
     }
-    
+
     user.setDirectRoles(permissionsPanel.getDirectRoles());
 
     return user;
@@ -368,9 +379,20 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * 
    * @param groups
    */
-  public void setMemberGroups(Set<String> groups) {
+  public void setMemberGroups(final Set<String> groups) {
     if (enableGroupSelect) {
-      groupSelect.setMemberGroups(groups);
+      groupSelect.init(new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean result) {
+          groupSelect.setMemberGroups(groups);
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // TODO Auto-generated method stub
+        }
+      });
     }
   }
 
@@ -519,7 +541,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   public boolean isEditmode() {
     return editmode;
   }
-  
+
   /**
    * Is user data panel has been changed
    * 

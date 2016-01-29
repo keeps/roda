@@ -15,8 +15,8 @@ import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 
 import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
@@ -51,13 +51,12 @@ public class ActionReportWindow extends WUIWindow {
     this.selectTab(0);
 
     close = new WUIButton(constants.actionReportClose(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
+    close.addClickHandler(new ClickHandler() {
 
-    close.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
+      @Override
+      public void onClick(ClickEvent event) {
         hide();
       }
-
     });
 
     this.addToBottom(close);
