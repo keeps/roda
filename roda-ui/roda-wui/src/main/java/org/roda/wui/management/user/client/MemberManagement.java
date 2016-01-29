@@ -141,6 +141,8 @@ public class MemberManagement extends Composite {
     } else if (historyTokens.size() == 1) {
       if (historyTokens.get(0).equals(CreateUser.RESOLVER.getHistoryToken())) {
         CreateUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(CreateGroup.RESOLVER.getHistoryToken())) {
+        CreateGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
@@ -149,9 +151,7 @@ public class MemberManagement extends Composite {
       if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(EDIT_GROUP_HISTORY_TOKEN)) {
-        // TODO EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-//        Tools.newHistory(RESOLVER);
-        callback.onSuccess(null);
+        EditGroup.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
         Tools.newHistory(RESOLVER);
         callback.onSuccess(null);

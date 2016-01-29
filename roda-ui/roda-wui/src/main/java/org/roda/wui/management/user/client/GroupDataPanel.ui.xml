@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:u="urn:import:org.roda.wui.management.user.client">
+
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
+
+	<ui:style>
+		.postalAddress {
+		min-height: 84px;
+		}
+
+		.section {
+		margin-top: 20px;
+		}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.groupName}' />
+				</g:Label>
+				<g:TextBox ui:field="groupname" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					<ui:text from='{constants.groupFullname}' />
+				</g:Label>
+				<g:TextBox ui:field="fullname" addStyleNames="form-textbox" />
+				<g:Label styleName="wui-user-data-note">
+					<ui:text from="{constants.userDataNote}" />
+				</g:Label>
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel ui:field="groupSelectPanel" addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="col_12">
+				<g:Label styleName="h4">Groups</g:Label>
+				<u:GroupSelect ui:field="groupSelect" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+		<g:FlowPanel ui:field="permissionsSelectPanel"
+			addStyleNames="row full_width no_padding {style.section}">
+			<g:FlowPanel addStyleNames="col_12">
+				<g:Label styleName="h4">Permissions</g:Label>
+				<u:PermissionsPanel ui:field="permissionsPanel" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

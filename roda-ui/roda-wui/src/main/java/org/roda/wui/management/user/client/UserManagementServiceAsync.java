@@ -22,7 +22,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.PrintReportException;
 
@@ -40,7 +39,7 @@ public interface UserManagementServiceAsync {
   void findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<RODAMember>> callback);
 
-  void getGroup(String groupname, AsyncCallback<RodaGroup> callback);
+  void getGroup(String groupname, AsyncCallback<Group> callback);
 
   void listAllGroups(AsyncCallback<List<Group>> callback);
 

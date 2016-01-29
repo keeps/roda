@@ -24,7 +24,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.RodaCoreService;
@@ -157,7 +156,7 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static RodaGroup retrieveGroup(RodaUser user, String groupname)
+  public static Group retrieveGroup(RodaUser user, String groupname)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
@@ -165,7 +164,7 @@ public class UserManagement extends RodaCoreService {
     UserUtility.checkRoles(user, ROLE);
 
     // delegate
-    RodaGroup ret = UserManagementHelper.retrieveGroup(groupname);
+    Group ret = UserManagementHelper.retrieveGroup(groupname);
 
     // register action
     long duration = new Date().getTime() - start.getTime();

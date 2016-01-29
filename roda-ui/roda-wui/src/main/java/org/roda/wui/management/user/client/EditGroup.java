@@ -10,56 +10,90 @@
  */
 package org.roda.wui.management.user.client;
 
-import java.util.Set;
+import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
-import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.common.client.widgets.WUIWindow;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ChangeListener;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.KeyboardListener;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
  * 
  */
-public class EditGroup extends WUIWindow {
+public class EditGroup extends Composite {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        String groupname = historyTokens.get(0);
+        UserManagementService.Util.getInstance().getGroup(groupname, new AsyncCallback<Group>() {
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
+
+          @Override
+          public void onSuccess(Group group) {
+            EditGroup editGroup = new EditGroup(group);
+            callback.onSuccess(editGroup);
+          }
+        });
+      } else {
+        Tools.newHistory(MemberManagement.RESOLVER);
+        callback.onSuccess(null);
+      }
+
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "edit_group";
+    }
+  };
+
+  interface MyUiBinder extends UiBinder<Widget, EditGroup> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final Group group;
 
-  private final WUIButton apply;
+  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-  private final WUIButton cancel;
+  @UiField
+  Button buttonApply;
 
-  private TextBox groupName;
+  @UiField
+  Button buttonCancel;
 
-  private final TextBox groupFullname;
-
-  // private final GroupSelect groupSelect;
-
-  private final PermissionsPanel permissionsPanel;
+  @UiField(provided = true)
+  GroupDataPanel groupDataPanel;
 
   /**
    * Create a new panel to edit a group
@@ -68,176 +102,67 @@ public class EditGroup extends WUIWindow {
    *          the group to edit
    */
   public EditGroup(Group group) {
-    super(constants.editGroupTitle(), 690, 346);
     this.group = group;
 
-    apply = new WUIButton(constants.editGroupApply(), WUIButton.Left.ROUND, WUIButton.Right.REC);
+    this.groupDataPanel = new GroupDataPanel(true, false, true);
+    this.groupDataPanel.setGroup(group);
 
-    cancel = new WUIButton(constants.editGroupCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
-
-    apply.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-        final String name = groupName.getText();
-        String fullname = groupFullname.getText();
-
-        // Set<String> memberGroups = groupSelect.getMemberGroups();
-        Set<String> directRoles = permissionsPanel.getDirectRoles();
-
-        EditGroup.this.group.setFullName(fullname);
-        // EditGroup.this.group.setDirectGroups(memberGroups);
-        EditGroup.this.group.setDirectRoles(directRoles);
-
-//        UserManagementService.Util.getInstance().editGroup(EditGroup.this.group, new AsyncCallback<Void>() {
-//
-//          public void onFailure(Throwable caught) {
-//            if (caught instanceof NotFoundException) {
-//              Window.alert(messages.editGroupNotFound(name));
-//              EditGroup.this.cancel();
-//            } else {
-//              Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
-//            }
-//          }
-//
-//          public void onSuccess(Void result) {
-//            EditGroup.this.hide();
-//            EditGroup.this.onSuccess();
-//          }
-//
-//        });
-      }
-
-    });
-
-    cancel.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-        EditGroup.this.cancel();
-      }
-
-    });
-
-    this.addToBottom(apply);
-    this.addToBottom(cancel);
-
-    VerticalPanel groupDataPanel = new VerticalPanel();
-
-    VerticalPanel basicInfoPanel = new VerticalPanel();
-
-    groupName = new TextBox();
-    groupFullname = new TextBox();
-
-    groupName.setEnabled(false);
-
-    VerticalPanel namePanel = concatInPanel(constants.groupName(), groupName);
-    VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(), groupFullname);
-
-    basicInfoPanel.add(namePanel);
-    basicInfoPanel.add(fullnamePanel);
-
-    // groupSelect = new GroupSelect(false);
-
-    groupDataPanel.add(basicInfoPanel);
-    // groupDataPanel.add(groupSelect);
-
-    // groupSelect.addChangeListener(new ChangeListener() {
-    //
-    // public void onChange(Widget sender) {
-    // apply.setEnabled(true);
-    // }
-    //
-    // });
-
-    apply.setEnabled(false);
-
-    groupFullname.addKeyboardListener(new KeyboardListener() {
-
-      public void onKeyDown(Widget sender, char keyCode, int modifiers) {
-      }
-
-      public void onKeyPress(Widget sender, char keyCode, int modifiers) {
-      }
-
-      public void onKeyUp(Widget sender, char keyCode, int modifiers) {
-        if (groupFullname.getText().length() > 0) {
-          apply.setEnabled(true);
-        } else {
-          apply.setEnabled(false);
-        }
-
-      }
-
-    });
-
-    permissionsPanel = new PermissionsPanel();
-//    permissionsPanel.addChangeListener(new ChangeListener() {
-//
-//      public void onChange(Widget sender) {
-//        apply.setEnabled(true);
-//      }
-//
-//    });
-
-    this.addTab(groupDataPanel, constants.dataTabTitle());
-    this.addTab(permissionsPanel, constants.permissionsTabTitle());
-
-    this.getTabPanel().addTabListener(new TabListener() {
-
-      public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
-        if (tabIndex == 1) {
-          // permissionsPanel.updateLockedPermissions(groupSelect.getMemberGroups());
-
-        }
-        return true;
-      }
-
-      public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-
-      }
-
-    });
-
-    this.selectTab(0);
-
-    this.init();
-
-    getTabPanel().addStyleName("office-edit-group-tabpanel");
-    basicInfoPanel.addStyleName("basicInfoPanel");
-    namePanel.addStyleName("namePanel");
-    fullnamePanel.addStyleName("fullnamePanel");
-
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
-  protected void init() {
-    groupName.setText(group.getName());
-    groupFullname.setText(group.getFullName());
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    if (groupDataPanel.isChanged()) {
+      if (groupDataPanel.isValid()) {
+        final Group group = groupDataPanel.getGroup();
 
-    Set<String> superGroups = group.getAllGroups();
-    // groupSelect.setMemberGroups(superGroups);
-    // groupSelect.exclude(group.getName());
-    // groupSelect.setVisible(true);
+        UserManagementService.Util.getInstance().modifyGroup(group, new AsyncCallback<Void>() {
 
-    permissionsPanel.setEnabled(false);
-    Set<String> roles = group.getAllRoles();
-    permissionsPanel.checkPermissions(roles, false);
-    permissionsPanel.setEnabled(true);
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
+
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
+        });
+      }
+    } else {
+      Tools.newHistory(MemberManagement.RESOLVER);
+    }
+  }
+  
+  @UiHandler("buttonRemove")
+  void buttonRemoveHandler(ClickEvent e) {
+    UserManagementService.Util.getInstance().removeGroup(group.getId(), new AsyncCallback<Void>() {
+
+      @Override
+      public void onSuccess(Void result) {
+        Tools.newHistory(MemberManagement.RESOLVER);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        errorMessage(caught);
+      }
+    });
   }
 
-  protected void cancel() {
-    this.hide();
-    super.onCancel();
+  @UiHandler("buttonCancel")
+  void buttonCancelHandler(ClickEvent e) {
+    cancel();
   }
 
-  private VerticalPanel concatInPanel(String title, Widget input) {
-    VerticalPanel vp = new VerticalPanel();
-    Label label = new Label(title);
-    vp.add(label);
-    vp.add(input);
+  private void cancel() {
+    Tools.newHistory(MemberManagement.RESOLVER);
+  }
 
-    vp.addStyleName("office-input-panel");
-    label.addStyleName("office-input-title");
-    input.addStyleName("office-input-widget");
-
-    return vp;
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof NotFoundException) {
+      Window.alert(messages.editUserNotFound(group.getName()));
+      cancel();
+    } else {
+      Window.alert(messages.editUserFailure(EditGroup.this.group.getName(), caught.getMessage()));
+    }
   }
 }

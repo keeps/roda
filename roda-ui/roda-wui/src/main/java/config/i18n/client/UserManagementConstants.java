@@ -159,6 +159,8 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editGroupTitle();
 
   public String editGroupApply();
+  
+  public String editGroupRemove();
 
   public String editGroupCancel();
 

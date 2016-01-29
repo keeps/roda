@@ -1,0 +1,296 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+/**
+ * 
+ */
+package org.roda.wui.management.user.client;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.roda.core.data.v2.user.Group;
+import org.roda.wui.common.client.ClientLogger;
+
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyPressEvent;
+import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.Widget;
+
+/**
+ * @author Luis Faria
+ * 
+ */
+public class GroupDataPanel extends Composite implements HasValueChangeHandlers<Group> {
+
+  interface MyUiBinder extends UiBinder<Widget, GroupDataPanel> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  @UiField
+  TextBox groupname;
+
+  @UiField
+  TextBox fullname;
+
+  @UiField
+  FlowPanel groupSelectPanel;
+  
+  @UiField(provided = true)
+  GroupSelect groupSelect;
+
+  @UiField
+  FlowPanel permissionsSelectPanel;
+  
+  @UiField
+  PermissionsPanel permissionsPanel;
+  
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private boolean enableGroupSelect;
+
+  private boolean editmode;
+  
+  private boolean changed = false;
+
+  /**
+   * Create a new group data panel
+   * 
+   * @param editmode
+   *          if group name should be editable
+   * @param enableGroupSelect
+   *          if the list of groups to which the group belong to should be
+   *          editable
+   * 
+   */
+  public GroupDataPanel(boolean editmode, boolean enableGroupSelect) {
+    this(true, editmode, enableGroupSelect);
+  }
+
+  /**
+   * 
+   * @param visible
+   * @param editmode
+   * @param enableGroupSelect
+   */
+  public GroupDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
+
+    groupSelect = new GroupSelect(enableGroupSelect);
+
+    // TODO add change handler
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    this.editmode = editmode;
+    super.setVisible(visible);
+    this.enableGroupSelect = enableGroupSelect;
+    
+    groupSelectPanel.setVisible(enableGroupSelect);
+    
+    ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        onChange();
+      }
+    };
+
+    ChangeHandler changeHandler = new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        GroupDataPanel.this.onChange();
+      }
+    };
+
+    groupname.addKeyPressHandler(new KeyPressHandler() {
+
+      @Override
+      public void onKeyPress(KeyPressEvent event) {
+        char keyCode = event.getCharCode();
+
+        if (!(keyCode >= '0' && keyCode <= '9') && !(keyCode >= 'A' && keyCode <= 'Z')
+          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_'
+          && (keyCode != (char) KeyCodes.KEY_TAB) && (keyCode != (char) KeyCodes.KEY_BACKSPACE)
+          && (keyCode != (char) KeyCodes.KEY_DELETE) && (keyCode != (char) KeyCodes.KEY_ENTER)
+          && (keyCode != (char) KeyCodes.KEY_HOME) && (keyCode != (char) KeyCodes.KEY_END)
+          && (keyCode != (char) KeyCodes.KEY_LEFT) && (keyCode != (char) KeyCodes.KEY_UP)
+          && (keyCode != (char) KeyCodes.KEY_RIGHT) && (keyCode != (char) KeyCodes.KEY_DOWN)) {
+          ((TextBox) event.getSource()).cancelKey();
+        }
+      }
+    });
+    groupname.addChangeHandler(changeHandler);
+    fullname.addChangeHandler(changeHandler);
+        
+    permissionsPanel.addValueChangeHandler(valueChangedHandler);
+  }
+
+  /**
+   * Set group information of group
+   * 
+   * @param group
+   */
+  public void setGroup(Group group) {
+    this.groupname.setText(group.getName());
+    this.fullname.setText(group.getFullName());
+
+    this.setMemberGroups(group.getAllGroups());
+    this.setPermissions(group.getDirectRoles(), group.getAllRoles());
+
+  }
+
+  private void setPermissions(Set<String> directRoles, Set<String> allRoles) {
+
+    Set<String> indirectRoles = new HashSet<String>(allRoles);
+    indirectRoles.removeAll(directRoles);
+
+    permissionsPanel.checkPermissions(directRoles, false);
+    permissionsPanel.checkPermissions(indirectRoles, true);
+  }
+
+  /**
+   * Get group defined by this panel. This panel defines: name, fullname
+   * 
+   * @return the group modified by this panel
+   */
+  public Group getGroup() {
+    Group group = new Group();
+    group.setId(groupname.getText());
+    group.setName(groupname.getText());
+    group.setFullName(fullname.getText());
+   
+    if (enableGroupSelect) {
+      group.setDirectGroups(this.getMemberGroups());
+    }
+    
+    group.setDirectRoles(permissionsPanel.getDirectRoles());
+
+    return group;
+  }
+
+  public Group getValue() {
+    return getGroup();
+  }
+
+  /**
+   * Set the groups of which this group is member of
+   * 
+   * @param groups
+   */
+  public void setMemberGroups(Set<String> groups) {
+    if (enableGroupSelect) {
+      groupSelect.setMemberGroups(groups);
+    }
+  }
+
+  /**
+   * Get the groups of which this group is member of
+   * 
+   * @return a list of group names
+   */
+  public Set<String> getMemberGroups() {
+    return enableGroupSelect ? groupSelect.getMemberGroups() : null;
+  }
+
+  protected void onChange() {
+    changed = true;
+    ValueChangeEvent.fire(this, getValue());
+  }
+
+  /**
+   * Is group data panel valid
+   * 
+   * @return true if valid
+   */
+  public boolean isValid() {
+    boolean valid = true;
+
+    if (groupname.getText().length() == 0) {
+      valid = false;
+      groupname.addStyleName("isWrong");
+    } else {
+      groupname.removeStyleName("isWrong");
+    }
+
+    if (fullname.getText().length() == 0) {
+      valid = false;
+      fullname.addStyleName("isWrong");
+    } else {
+      fullname.removeStyleName("isWrong");
+    }
+
+    return valid;
+  }
+
+  /**
+   * Is group name read only
+   * 
+   * @return true if read only
+   */
+  public boolean isGroupnameReadOnly() {
+    return groupname.isReadOnly();
+  }
+
+  /**
+   * Set group name read only
+   * 
+   * @param readonly
+   */
+  public void setGroupnameReadOnly(boolean readonly) {
+    groupname.setReadOnly(readonly);
+  }
+
+  public void setVisible(boolean visible) {
+    super.setVisible(visible);
+    if (enableGroupSelect) {
+      groupSelect.setVisible(visible);
+    }
+  }
+
+  public void clear() {
+    groupname.setText("");
+    fullname.setText("");
+  }
+
+  /**
+   * Is group data panel editable, i.e. on create group mode
+   * 
+   * @return true if editable
+   */
+  public boolean isEditmode() {
+    return editmode;
+  }
+  
+  /**
+   * Is group data panel has been changed
+   * 
+   * @return changed
+   */
+  public boolean isChanged() {
+    return changed;
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Group> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+}

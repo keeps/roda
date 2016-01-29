@@ -13,7 +13,7 @@ package org.roda.wui.management.user.client;
 import java.util.List;
 import java.util.Vector;
 
-import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.Group;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.management.user.client.images.UserManagementImageBundle;
 
@@ -106,7 +106,7 @@ public class GroupMiniPanel {
    * @param callback
    *          the callback to handle the asynchronously returned group
    */
-  public void getGroup(AsyncCallback<RodaGroup> callback) {
+  public void getGroup(AsyncCallback<Group> callback) {
     UserManagementService.Util.getInstance().getGroup(groupName, callback);
   }
 

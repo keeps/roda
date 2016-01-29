@@ -31,7 +31,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.PrintReportException;
 
@@ -84,7 +83,7 @@ public interface UserManagementService extends RemoteService {
    * @return the group
    * @throws RODAException
    */
-  public RodaGroup getGroup(String groupname) throws RODAException;
+  public Group getGroup(String groupname) throws RODAException;
 
   public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException;
 

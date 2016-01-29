@@ -43,8 +43,8 @@ public class CreateUser extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       User user = new User();
-      CreateUser editUser = new CreateUser(user);
-      callback.onSuccess(editUser);
+      CreateUser createUser = new CreateUser(user);
+      callback.onSuccess(createUser);
     }
 
     @Override
@@ -80,10 +80,10 @@ public class CreateUser extends Composite {
   UserDataPanel userDataPanel;
 
   /**
-   * Create a new panel to edit a user
+   * Create a new panel to create a user
    * 
    * @param user
-   *          the user to edit
+   *          the user to create
    */
   public CreateUser(User user) {
     this.user = user;
@@ -96,20 +96,26 @@ public class CreateUser extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    final User user = userDataPanel.getUser();
-    final String password = userDataPanel.getPassword();
+    if (userDataPanel.isChanged()) {
+      if (userDataPanel.isValid()) {
+        final User user = userDataPanel.getUser();
+        final String password = userDataPanel.getPassword();
 
-    UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<Void>() {
 
-      public void onFailure(Throwable caught) {
-        errorMessage(caught);
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
+
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
+
+        });
       }
-
-      public void onSuccess(Void result) {
-        Tools.newHistory(MemberManagement.RESOLVER);
-      }
-
-    });
+    } else {
+      Tools.newHistory(MemberManagement.RESOLVER);
+    }
   }
 
   @UiHandler("buttonCancel")

@@ -1649,6 +1649,9 @@ public class LdapUtility {
     if (userAttributes.get("postalCode") != null) {
       user.setPostalCode(userAttributes.get("postalCode").get().toString());
     }
+    if (userAttributes.get("localityName") != null) {
+      user.setLocalityName(userAttributes.get("localityName").get().toString());
+    }
     if (userAttributes.get("l") != null) {
       user.setLocalityName(userAttributes.get("l").get().toString());
     }
@@ -1658,8 +1661,8 @@ public class LdapUtility {
     if (userAttributes.get("telephoneNumber") != null) {
       user.setTelephoneNumber(userAttributes.get("telephoneNumber").get().toString());
     }
-    if (userAttributes.get("facsimileTelephoneNumber") != null) {
-      user.setFax(userAttributes.get("facsimileTelephoneNumber").get().toString());
+    if (userAttributes.get("fax") != null) {
+      user.setFax(userAttributes.get("fax").get().toString());
     }
 
     if (userAttributes.get("email") != null) {
@@ -1668,6 +1671,13 @@ public class LdapUtility {
 
     if (userAttributes.get("businessCategory") != null) {
       user.setBusinessCategory(userAttributes.get("businessCategory").get().toString());
+    }
+    
+    if (userAttributes.get("friendlyCountryName") != null) {
+      user.setBirthCountry(userAttributes.get("friendlyCountryName").get().toString());
+    }
+    if (userAttributes.get("countryName") != null) {
+      user.setCountryName(userAttributes.get("countryName").get().toString());
     }
 
     if (userAttributes.get("info") != null) {
@@ -1890,7 +1900,7 @@ public class LdapUtility {
     return group;
   }
 
-  @SuppressWarnings("unchecked")
+  // @SuppressWarnings("unchecked")
   // private List<Attributes> searchAttributes(DirContext ctxRoot, String
   // ctxDN, String keyAttribute,
   // JndiContentAdapterEngine<? extends JndiEntityAdapter, ? extends

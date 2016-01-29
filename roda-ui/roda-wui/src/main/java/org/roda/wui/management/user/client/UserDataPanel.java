@@ -331,6 +331,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    */
   public User getUser() {
     User user = new User();
+    user.setId(username.getText());
     user.setName(username.getText());
     user.setFullName(fullname.getText());
     user.setBusinessCategory(businessCategory.getValue(businessCategory.getSelectedIndex()));
@@ -350,7 +351,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setFax(fax.getText());
 
     if (enableGroupSelect) {
-      user.setAllGroups(this.getMemberGroups());
+      user.setDirectGroups(this.getMemberGroups());
     }
     
     user.setDirectRoles(permissionsPanel.getDirectRoles());

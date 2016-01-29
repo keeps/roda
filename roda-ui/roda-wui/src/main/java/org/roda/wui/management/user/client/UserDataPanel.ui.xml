@@ -69,9 +69,6 @@
 					<ui:text from="{constants.nif}" />
 				</g:Label>
 				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
-				<g:Label styleName="wui-user-data-note">
-					<ui:text from="{constants.userDataNote}" />
-				</g:Label>
 				<!-- </g:FlowPanel> -->
 				<!-- <g:FlowPanel addStyleNames="col_6 last"> -->
 				<g:Label addStyleNames="form-label">
@@ -99,6 +96,9 @@
 					<ui:text from='{constants.fax}' />
 				</g:Label>
 				<g:TextBox ui:field="fax" addStyleNames="form-textbox" />
+				<g:Label styleName="wui-user-data-note">
+					<ui:text from="{constants.userDataNote}" />
+				</g:Label>
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel ui:field="groupSelectPanel" addStyleNames="row full_width no_padding">
@@ -114,6 +114,5 @@
 				<u:PermissionsPanel ui:field="permissionsPanel" />
 			</g:FlowPanel>
 		</g:FlowPanel>
-
 	</g:FlowPanel>
 </ui:UiBinder>

@@ -70,7 +70,12 @@ public class UserManagementHelper {
 
   protected static Group retrieveGroup(String groupname)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(Group.class, groupname);
+    try {
+      return UserUtility.getLdapUtility().getGroup(groupname);
+    } catch (LdapUtilityException e) {
+      LOGGER.error("Error getting user", e);
+      throw new GenericException("Error getting user: " + e.getMessage());
+    }
   }
 
   protected static List<Group> listAllGroups() throws GenericException {

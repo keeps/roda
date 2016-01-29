@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
@@ -216,13 +216,13 @@ public class UserDisclosurePanel extends SimplePanel implements AlphabetListItem
     if (isSelected() && this.selectedGroupPanel == null) {
       callback.onSuccess(user);
     } else if (isSelected()) {
-      this.selectedGroupPanel.getGroup(new AsyncCallback<RodaGroup>() {
+      this.selectedGroupPanel.getGroup(new AsyncCallback<Group>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
         }
 
-        public void onSuccess(RodaGroup group) {
+        public void onSuccess(Group group) {
           callback.onSuccess(group);
         }
 

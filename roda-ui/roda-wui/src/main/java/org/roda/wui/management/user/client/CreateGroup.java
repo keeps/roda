@@ -10,164 +10,126 @@
  */
 package org.roda.wui.management.user.client;
 
-import java.util.Set;
+import java.util.List;
 
-import org.roda.core.data.exceptions.GroupAlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
-import org.roda.wui.common.client.widgets.WUIButton;
-import org.roda.wui.common.client.widgets.WUIWindow;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SourcesTabEvents;
-import com.google.gwt.user.client.ui.TabListener;
-import com.google.gwt.user.client.ui.TextBox;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
  * 
  */
-public class CreateGroup extends WUIWindow {
+public class CreateGroup extends Composite {
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      Group group = new Group();
+      CreateGroup createGroup = new CreateGroup(group);
+      callback.onSuccess(createGroup);
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "create_group";
+    }
+  };
+
+  interface MyUiBinder extends UiBinder<Widget, CreateGroup> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private final Group group;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
-  private final WUIButton create;
+  @UiField
+  Button buttonApply;
 
-  private final WUIButton cancel;
+  @UiField
+  Button buttonCancel;
 
-  private final TextBox groupName;
+  @UiField(provided = true)
+  GroupDataPanel groupDataPanel;
 
-  private final TextBox groupFullname;
+  /**
+   * Create a new panel to create a group
+   * 
+   * @param group
+   *          the group to create
+   */
+  public CreateGroup(Group group) {
+    this.group = group;
 
-  // private final GroupSelect groupSelect;
+    this.groupDataPanel = new GroupDataPanel(true, false, true);
+    this.groupDataPanel.setGroup(group);
 
-  private final PermissionsPanel permissionsPanel;
-
-  public CreateGroup() {
-    super(constants.createGroupTitle(), 690, 346);
-
-    create = new WUIButton(constants.createGroupCreate(), WUIButton.Left.ROUND, WUIButton.Right.ARROW_DOWN);
-
-    cancel = new WUIButton(constants.createGroupCancel(), WUIButton.Left.ROUND, WUIButton.Right.CROSS);
-
-    create.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-        final String name = groupName.getText();
-        String fullname = groupFullname.getText();
-
-        // Set<String> memberGroups = groupSelect.getMemberGroups();
-        Set<String> directRoles = permissionsPanel.getDirectRoles();
-
-        Group group = new Group(name);
-        group.setFullName(fullname);
-        // group.setDirectGroups(memberGroups);
-        group.setDirectRoles(directRoles);
-
-//        UserManagementService.Util.getInstance().createGroup(group, new AsyncCallback<Void>() {
-//
-//          public void onFailure(Throwable caught) {
-//            if (caught instanceof GroupAlreadyExistsException) {
-//              Window.alert(messages.createGroupAlreadyExists(name));
-//
-//            } else {
-//              Window.alert(messages.createGroupFailure(caught.getMessage()));
-//            }
-//          }
-//
-//          public void onSuccess(Void result) {
-//            CreateGroup.this.hide();
-//            CreateGroup.this.onSuccess();
-//          }
-//
-//        });
-      }
-
-    });
-
-    cancel.addClickListener(new ClickListener() {
-
-      public void onClick(Widget sender) {
-        CreateGroup.this.cancel();
-      }
-
-    });
-
-    this.addToBottom(create);
-    this.addToBottom(cancel);
-
-    VerticalPanel groupDataPanel = new VerticalPanel();
-
-    VerticalPanel basicInfoPanel = new VerticalPanel();
-    groupName = new TextBox();
-    groupFullname = new TextBox();
-
-    VerticalPanel namePanel = concatInPanel(constants.groupName(), groupName);
-    VerticalPanel fullnamePanel = concatInPanel(constants.groupFullname(), groupFullname);
-
-    basicInfoPanel.add(namePanel);
-    basicInfoPanel.add(fullnamePanel);
-
-    // groupSelect = new GroupSelect(true);
-    groupDataPanel.add(basicInfoPanel);
-    // groupDataPanel.add(groupSelect);
-
-    permissionsPanel = new PermissionsPanel();
-
-    this.addTab(groupDataPanel, constants.dataTabTitle());
-    this.addTab(permissionsPanel, constants.permissionsTabTitle());
-
-    this.getTabPanel().addTabListener(new TabListener() {
-
-      public boolean onBeforeTabSelected(SourcesTabEvents sender, int tabIndex) {
-        if (tabIndex == 1) {
-          // permissionsPanel.updateLockedPermissions(groupSelect.getMemberGroups());
-        }
-        return true;
-      }
-
-      public void onTabSelected(SourcesTabEvents sender, int tabIndex) {
-
-      }
-
-    });
-
-    this.selectTab(0);
-
-    this.getTabPanel().addStyleName("office-create-group-tabpanel");
-    basicInfoPanel.addStyleName("basicInfoPanel");
-    namePanel.addStyleName("namePanel");
-    fullnamePanel.addStyleName("fullnamePanel");
-
+    initWidget(uiBinder.createAndBindUi(this));
   }
 
-  protected void cancel() {
-    this.hide();
-    super.onCancel();
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    if (groupDataPanel.isChanged()) {
+      if (groupDataPanel.isValid()) {
+        final Group group = groupDataPanel.getGroup();
+
+        UserManagementService.Util.getInstance().addGroup(group, new AsyncCallback<Void>() {
+
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
+
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
+        });
+      }
+    } else {
+      Tools.newHistory(MemberManagement.RESOLVER);
+    }
   }
 
-  private VerticalPanel concatInPanel(String title, Widget input) {
-    VerticalPanel vp = new VerticalPanel();
-    Label label = new Label(title);
-    vp.add(label);
-    vp.add(input);
-
-    vp.addStyleName("office-input-panel");
-    label.addStyleName("office-input-title");
-    input.addStyleName("office-input-widget");
-
-    return vp;
+  @UiHandler("buttonCancel")
+  void buttonCancelHandler(ClickEvent e) {
+    cancel();
   }
 
+  private void cancel() {
+    Tools.newHistory(MemberManagement.RESOLVER);
+  }
+
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof NotFoundException) {
+      Window.alert(messages.editUserNotFound(group.getName()));
+      cancel();
+    } else {
+      Window.alert(messages.editUserFailure(CreateGroup.this.group.getName(), caught.getMessage()));
+    }
+  }
 }
