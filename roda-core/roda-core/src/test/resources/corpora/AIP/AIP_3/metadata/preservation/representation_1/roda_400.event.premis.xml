@@ -2,7 +2,7 @@
 <event xmlns="info:lc/xmlns/premis-v2">
   <eventIdentifier>
     <eventIdentifierType>RODAObjectPID</eventIdentifierType>
-    <eventIdentifierValue>roda:400</eventIdentifierValue>
+    <eventIdentifierValue>roda_400</eventIdentifierValue>
   </eventIdentifier>
   <eventType>normalization</eventType>
   <eventDateTime>2013-09-17T10:56:02.74Z</eventDateTime>

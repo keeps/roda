@@ -13,7 +13,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.validation.ValidationReport;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -23,6 +22,7 @@ import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
@@ -114,13 +114,13 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     String metadataType = parameters.getOrDefault(PARAMETER_METADATA_TYPE.getId(),
       PARAMETER_METADATA_TYPE.getDefaultValue());
 
-    List<ValidationReport<String>> reports = new ArrayList<ValidationReport<String>>();
+    List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, "SIP syntax check", aip.getId(), null);
 
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
-        ValidationReport<String> report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
+        ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
           validateDescriptiveMetadata, metadataType, validatePremis, model, aip.getId());
         reports.add(report);
         // createEvent(aip, model, descriptiveValid, preservationValid);

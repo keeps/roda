@@ -21,15 +21,11 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.validation.ParseError;
-import org.roda.core.common.validation.ValidationException;
-import org.roda.core.common.validation.ValidationReport;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -62,6 +58,8 @@ import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -317,7 +315,7 @@ public class ModelService extends ModelObservable {
     AIP aip;
 
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    ValidationReport<String> validationReport = isAIPvalid(sourceModelService, sourceDirectory,
+    ValidationReport validationReport = isAIPvalid(sourceModelService, sourceDirectory,
       FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
     if (validationReport.isValid()) {
 
@@ -385,7 +383,7 @@ public class ModelService extends ModelObservable {
     AIP aip;
 
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    ValidationReport<String> validationReport = isAIPvalid(sourceModelService, sourceDirectory,
+    ValidationReport validationReport = isAIPvalid(sourceModelService, sourceDirectory,
       FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
     if (validationReport.isValid()) {
       StoragePath aipPath = ModelUtils.getAIPpath(aipId);
@@ -409,7 +407,7 @@ public class ModelService extends ModelObservable {
     AuthorizationDeniedException, ValidationException {
     StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
     Directory aipDirectory = storage.getDirectory(aipPath);
-    ValidationReport<String> validationReport = isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
+    ValidationReport validationReport = isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
     if (validationReport.isValid()) {
       updateAIPMetadata(aip, aipPath);
       notifyAipUpdated(aip);
@@ -1081,18 +1079,17 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private ValidationReport<String> isAIPvalid(ModelService model, Directory directory,
+  private ValidationReport isAIPvalid(ModelService model, Directory directory,
     boolean failIfNoDescriptiveMetadataSchema)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ValidationReport<String> report = new ValidationReport<>();
+    ValidationReport report = new ValidationReport();
 
     // validate metadata (against schemas)
-    ValidationReport<ParseError> descriptiveMetadataValidationReport = ValidationUtils
-      .isAIPDescriptiveMetadataValid(model, directory.getStoragePath().getName(), failIfNoDescriptiveMetadataSchema);
+    ValidationReport descriptiveMetadataValidationReport = ValidationUtils.isAIPDescriptiveMetadataValid(model,
+      directory.getStoragePath().getName(), failIfNoDescriptiveMetadataSchema);
 
     report.setValid(descriptiveMetadataValidationReport.isValid());
-    report.setIssues(
-      descriptiveMetadataValidationReport.getIssues().stream().map(r -> r.toString()).collect(Collectors.toList()));
+    report.setIssues(descriptiveMetadataValidationReport.getIssues());
 
     // FIXME validate others aspects
 

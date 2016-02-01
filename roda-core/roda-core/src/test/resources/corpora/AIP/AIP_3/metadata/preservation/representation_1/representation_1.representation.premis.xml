@@ -2,7 +2,7 @@
 <prem:object xsi:type="prem:representation" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
     <prem:objectIdentifierType>RODAObjectPID</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>roda:396</prem:objectIdentifierValue>
+    <prem:objectIdentifierValue>representation_1</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue>full</prem:preservationLevelValue>

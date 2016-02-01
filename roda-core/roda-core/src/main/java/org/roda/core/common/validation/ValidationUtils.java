@@ -11,7 +11,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
@@ -27,6 +26,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -45,11 +47,11 @@ public class ValidationUtils {
 
   }
 
-  public static ValidationReport<String> isAIPMetadataValid(boolean forceDescriptiveMetadataType,
+  public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, boolean validatePremis, ModelService model,
     String aipID) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
       ValidationException {
-    ValidationReport<String> report = new ValidationReport<String>();
+    ValidationReport report = new ValidationReport();
     report.setValid(false);
     List<DescriptiveMetadata> descriptiveMetadata = model.listDescriptiveMetadata(aipID);
     for (DescriptiveMetadata dm : descriptiveMetadata) {
@@ -57,10 +59,9 @@ public class ValidationUtils {
       Binary binary = model.getStorage().getBinary(storagePath);
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
-          ValidationReport<ParseError> dmReport = validateDescriptiveBinary(binary, fallbackMetadataType, true);
+          ValidationReport dmReport = validateDescriptiveBinary(binary, fallbackMetadataType, true);
           report.setValid(report.isValid() && dmReport.isValid());
-          report.getIssues()
-            .addAll(dmReport.getIssues().stream().map(pe -> pe.toString()).collect(Collectors.toList()));
+          report.getIssues().addAll(dmReport.getIssues());
         }
         model.updateDescriptiveMetadata(aipID, dm.getId(), binary, fallbackMetadataType);
         report.setValid(true);
@@ -68,9 +69,9 @@ public class ValidationUtils {
 
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;
-        ValidationReport<ParseError> dmReport = validateDescriptiveBinary(binary, metadataType, true);
+        ValidationReport dmReport = validateDescriptiveBinary(binary, metadataType, true);
         report.setValid(report.isValid() && dmReport.isValid());
-        report.getIssues().addAll(dmReport.getIssues().stream().map(pe -> pe.toString()).collect(Collectors.toList()));
+        report.getIssues().addAll(dmReport.getIssues());
       }
 
     }
@@ -90,19 +91,18 @@ public class ValidationUtils {
    * 
    * @throws ValidationException
    */
-  public static ValidationReport<ParseError> isAIPDescriptiveMetadataValid(ModelService model, String aipId,
-    boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static ValidationReport isAIPDescriptiveMetadataValid(ModelService model, String aipId, boolean failIfNoSchema)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean valid = true;
-    List<ParseError> issues = new ArrayList<>();
+    List<ValidationIssue> issues = new ArrayList<>();
     List<DescriptiveMetadata> descriptiveMetadata = model.listDescriptiveMetadata(aipId);
     for (DescriptiveMetadata dm : descriptiveMetadata) {
-      ValidationReport<ParseError> report = isDescriptiveMetadataValid(model, dm, failIfNoSchema);
+      ValidationReport report = isDescriptiveMetadataValid(model, dm, failIfNoSchema);
       valid &= report.isValid();
       issues.addAll(report.getIssues());
     }
 
-    ValidationReport<ParseError> ret = new ValidationReport<>();
+    ValidationReport ret = new ValidationReport();
     ret.setValid(valid);
     ret.setIssues(issues);
     return ret;
@@ -135,16 +135,16 @@ public class ValidationUtils {
    * @throws GenericException
    * @throws ValidationException
    */
-  public static ValidationReport<ParseError> isDescriptiveMetadataValid(ModelService model,
-    DescriptiveMetadata metadata, boolean failIfNoSchema)
+  public static ValidationReport isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
+    boolean failIfNoSchema)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    ValidationReport<ParseError> ret;
+    ValidationReport ret;
     if (metadata != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
       Binary binary = model.getStorage().getBinary(storagePath);
       ret = validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
     } else {
-      ret = new ValidationReport<>();
+      ret = new ValidationReport();
       ret.setValid(false);
       ret.setMessage("Metadata is NULL");
     }
@@ -152,15 +152,13 @@ public class ValidationUtils {
     return ret;
   }
 
-  private static ParseError convertSAXParseException(SAXParseException e) {
-    ParseError parseError = new ParseError();
-    parseError.setMessage(e.getMessage());
-    parseError.setLineNumber(e.getLineNumber());
-    parseError.setColumnNumber(e.getColumnNumber());
-    parseError.setPublicId(e.getPublicId());
-    parseError.setSystemId(e.getSystemId());
+  private static ValidationIssue convertSAXParseException(SAXParseException e) {
+    ValidationIssue issue = new ValidationIssue();
+    issue.setMessage(e.getMessage());
+    issue.setLineNumber(e.getLineNumber());
+    issue.setColumnNumber(e.getColumnNumber());
 
-    return parseError;
+    return issue;
   }
 
   /**
@@ -174,8 +172,8 @@ public class ValidationUtils {
    * @throws GenericException
    * @throws ValidationException
    */
-  public static ValidationReport<ParseError> isPreservationMetadataValid(ModelService model,
-    PreservationMetadata metadata, boolean failIfNoSchema)
+  public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
+    boolean failIfNoSchema)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
@@ -192,9 +190,9 @@ public class ValidationUtils {
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static ValidationReport<ParseError> validateDescriptiveBinary(Binary binary, String descriptiveMetadataType,
+  public static ValidationReport validateDescriptiveBinary(Binary binary, String descriptiveMetadataType,
     boolean failIfNoSchema) {
-    ValidationReport<ParseError> ret = new ValidationReport<>();
+    ValidationReport ret = new ValidationReport();
     try {
       InputStream inputStream = binary.getContent().createInputStream();
       InputStream schemaStream = null;
@@ -251,8 +249,8 @@ public class ValidationUtils {
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static ValidationReport<ParseError> validatePreservationBinary(Binary binary, boolean failIfNoSchema) {
-    ValidationReport<ParseError> report = new ValidationReport<>();
+  public static ValidationReport validatePreservationBinary(Binary binary, boolean failIfNoSchema) {
+    ValidationReport report = new ValidationReport();
     try {
       InputStream inputStream = binary.getContent().createInputStream();
       InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
