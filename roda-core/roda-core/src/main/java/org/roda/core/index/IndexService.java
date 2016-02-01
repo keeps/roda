@@ -62,16 +62,20 @@ public class IndexService {
     return SolrUtils.retrieve(index, IndexedAIP.class, aip.getParentID());
   }
 
-  public List<IndexedAIP> getAncestors(IndexedAIP aip) throws NotFoundException, GenericException {
+  public List<IndexedAIP> getAncestors(IndexedAIP aip) throws GenericException {
     List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
     IndexedAIP parent = null, actual = aip;
 
-    while (actual != null && actual.getParentID() != null) {
-      parent = getParent(actual);
-      if (parent != null) {
-        ancestors.add(parent);
-        actual = parent;
+    while (actual != null && actual.getParentID() != null && !ancestors.contains(actual)) {
+      try {
+        parent = getParent(actual);
+      } catch (NotFoundException e) {
+        parent = null;
+        LOGGER.warn("Ancestor not found: " + actual.getParentID());
       }
+
+      ancestors.add(parent);
+      actual = parent;
     }
 
     return ancestors;

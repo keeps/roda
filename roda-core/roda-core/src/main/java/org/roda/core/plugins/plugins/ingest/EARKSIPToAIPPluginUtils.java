@@ -40,6 +40,8 @@ public class EARKSIPToAIPPluginUtils {
     AIPPermissions permissions = new AIPPermissions();
     boolean notify = true;
 
+    // TODO check if parent exists
+
     AIP aip = model.createAIP(active, parentId, permissions, notify);
 
     if (sip.getRepresentations() != null && sip.getRepresentations().size() > 0) {

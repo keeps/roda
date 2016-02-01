@@ -64,6 +64,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
@@ -512,10 +513,23 @@ public class Browse extends Composite {
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
-        SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
-        BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
-          getViewItemHistoryToken(ancestor.getId()));
-        ret.add(1, ancestorBreadcrumb);
+        if (ancestor != null) {
+          SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
+          BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,
+            getViewItemHistoryToken(ancestor.getId()));
+          ret.add(1, ancestorBreadcrumb);
+        } else {
+          SafeHtml breadcrumbLabel = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-question-circle'></i>");
+          BreadcrumbItem unknownAncestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel, new Command() {
+
+            @Override
+            public void execute() {
+              // TODO find better error message
+              Toast.showError("Unknown ancestor");
+            }
+          });
+          ret.add(unknownAncestorBreadcrumb);
+        }
       }
     }
 

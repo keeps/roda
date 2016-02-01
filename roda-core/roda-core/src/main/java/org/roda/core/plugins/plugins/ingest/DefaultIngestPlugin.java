@@ -15,14 +15,12 @@ import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -169,7 +167,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     // transferred resources
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, pluginReport);
-    List<AIP> aips = getAIPsFromReports(index, reports);
+    List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
       completionPercentageStep, parameters);
 
@@ -262,20 +260,17 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     return 100 / effectiveTotalSteps;
   }
 
-  private List<AIP> getAIPsFromReports(IndexService index, Map<String, Report> reports) {
+  private List<AIP> getAIPsFromReports(IndexService index, ModelService model, StorageService storage,
+    Map<String, Report> reports) {
     List<AIP> aips = new ArrayList<>();
     List<String> aipIds = getAIPsIdsFromReport(reports);
 
     LOGGER.debug("Getting AIPs: {}", aipIds);
 
-    if (!aipIds.isEmpty()) {
-      int maxAips = 200;
-      IndexResult<AIP> aipsFromIndex;
+    for (String aipId : aipIds) {
       try {
-        aipsFromIndex = index.find(AIP.class, new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, aipIds)),
-          null, new Sublist(0, maxAips));
-        aips = aipsFromIndex.getResults();
-      } catch (GenericException | RequestNotValidException e) {
+        aips.add(model.retrieveAIP(aipId));
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
         LOGGER.error("Error retrieving AIPs", e);
       }
     }

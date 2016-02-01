@@ -172,7 +172,8 @@ public class FileStorageService implements StorageService {
 
     try {
       directory = FSUtils.createRandomDirectory(parentDirPath);
-      return new DefaultDirectory(DefaultStoragePath.parse(directory.toString()));
+
+      return new DefaultDirectory(DefaultStoragePath.parse(basePath.relativize(directory).toString()));
     } catch (FileAlreadyExistsException e) {
       // cleanup
       FSUtils.deletePath(directory);
