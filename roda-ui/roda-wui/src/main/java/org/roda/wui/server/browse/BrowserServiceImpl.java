@@ -51,6 +51,8 @@ import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 
@@ -64,8 +66,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static final long serialVersionUID = 1L;
   static final String FONDLIST_PAGESIZE = "10";
-  // private static final Logger LOGGER =
-  // LoggerFactory.getLogger(BrowserServiceImpl.class);
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
+
+  private static String GANALYTICS_ACCOUNT_CODE = null;
+  private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
   /**
    * Create a new BrowserService Implementation instance
@@ -73,6 +78,24 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
    */
   public BrowserServiceImpl() {
 
+  }
+
+  @Override
+  public String getGoogleAnalyticsAccount() {
+    if (GANALYTICS_ACCOUNT_CODE == null) {
+      GANALYTICS_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString("ui.google.analytics.code", "");
+      LOGGER.debug("Google Analytics Account Code: " + GANALYTICS_ACCOUNT_CODE);
+    }
+    return GANALYTICS_ACCOUNT_CODE;
+  }
+
+  @Override
+  public String getGoogleReCAPTCHAAccount() {
+    if (GRECAPTCHA_ACCOUNT_CODE == null) {
+      GRECAPTCHA_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", "");
+      LOGGER.debug("Google ReCAPTCHA Account Code: " + GRECAPTCHA_ACCOUNT_CODE);
+    }
+    return GRECAPTCHA_ACCOUNT_CODE;
   }
 
   @Override

@@ -28,6 +28,7 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.client.Management;
 import org.roda.wui.management.user.client.MemberManagement;
 import org.roda.wui.management.user.client.Preferences;
+import org.roda.wui.management.user.client.Register;
 import org.roda.wui.management.user.client.UserLog;
 
 import com.google.gwt.core.client.GWT;
@@ -209,8 +210,7 @@ public class Menu extends Composite {
     // User
     if (user.isGuest()) {
       rightMenu.addItem(constants.loginLogin(), createLoginCommand());
-      // rightMenu.addItem(constants.loginRegister(),
-      // createCommand(Register.getInstance().getHistoryPath()));
+      rightMenu.addItem(constants.loginRegister(), createCommand(Register.RESOLVER.getHistoryPath()));
     } else {
       rightMenu.addItem(user.getName(), userMenu);
     }

@@ -96,8 +96,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
     groupSelect = new GroupSelect(enableGroupSelect);
 
-    // TODO add change handler
-
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;

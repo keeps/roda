@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
  * 
  * @author Luis Faria
  */
+@SuppressWarnings("deprecation")
 public class UserMiniPanel {
 
   protected static UserManagementImageBundle userManagementImageBundle = (UserManagementImageBundle) GWT
@@ -43,6 +44,7 @@ public class UserMiniPanel {
   protected Label userNameLabel;
 
   protected boolean selected;
+
 
   protected List<ChangeListener> changeListeners;
 

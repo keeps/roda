@@ -35,6 +35,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -43,9 +44,11 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -172,11 +175,13 @@ public class IngestTransfer extends Composite {
         if (r != null && !r.isFile()) {
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
         } else if (r != null && r.isFile()) {
+          // SafeUri downloadUri =
+          // RestUtils.createTransferredResourceDownloadUri(
+          // transferredResourceList.getSelectionModel().getSelectedObject().getId());
+          // Window.Location.assign(downloadUri.asString());
+          
           // disable selection
           transferredResourceList.getSelectionModel().clear();
-
-          // TODO download file
-
         }
       }
     });

@@ -231,6 +231,8 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String registerCaptchaTitle();
 
   public String registerSubmit();
+  
+  public String registerCancel();
 
   public String registerUserExists();
 

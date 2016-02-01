@@ -126,10 +126,10 @@ public class CreateGroup extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Window.alert(messages.editUserNotFound(group.getName()));
+      Window.alert(messages.editGroupNotFound(group.getName()));
       cancel();
     } else {
-      Window.alert(messages.editUserFailure(CreateGroup.this.group.getName(), caught.getMessage()));
+      Window.alert(messages.editGroupFailure(CreateGroup.this.group.getName(), caught.getMessage()));
     }
   }
 }

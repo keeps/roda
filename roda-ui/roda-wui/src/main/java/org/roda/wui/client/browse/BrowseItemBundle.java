@@ -25,7 +25,6 @@ public class BrowseItemBundle implements Serializable {
 
   public BrowseItemBundle() {
     super();
-
   }
 
   public BrowseItemBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,

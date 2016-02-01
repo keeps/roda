@@ -130,7 +130,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
     this.groups = new Vector<GroupCheckbox>();
     this.blacklist = new Vector<String>();
     loading = new LoadingPopup(this);
-    loading.show();
 
     enabled = true;
 
@@ -138,6 +137,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
   }
 
   public void init(final AsyncCallback<Boolean> callback) {
+    loading.show();
     UserManagementService.Util.getInstance().listAllGroups(new AsyncCallback<List<Group>>() {
       @Override
       public void onFailure(Throwable caught) {

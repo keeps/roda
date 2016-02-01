@@ -15,9 +15,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.images.CommonImageBundle;
@@ -43,6 +42,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class UserDisclosurePanel extends SimplePanel implements AlphabetListItem {
 
   private static CommonImageBundle commonImageBundle = (CommonImageBundle) GWT.create(CommonImageBundle.class);

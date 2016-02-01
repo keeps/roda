@@ -32,6 +32,7 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
+@SuppressWarnings("deprecation")
 public class GroupSelectListBox extends HorizontalPanel implements SourcesChangeEvents {
 
   private static UserManagementConstants constants = (UserManagementConstants) GWT

@@ -90,6 +90,7 @@ public class Login extends Composite {
     return instance;
   }
 
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField

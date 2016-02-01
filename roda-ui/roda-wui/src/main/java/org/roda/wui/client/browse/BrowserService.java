@@ -178,4 +178,13 @@ public interface BrowserService extends RemoteService {
   IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  /**
+   * Get Google Analytics account id
+   */
+  String getGoogleAnalyticsAccount();
+  
+  /**
+   * Get Google reCAPTCHA account id
+   */
+  String getGoogleReCAPTCHAAccount();
 }

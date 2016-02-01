@@ -7,6 +7,8 @@
  */
 package org.roda.wui.client.main;
 
+import org.roda.wui.client.browse.BrowserService;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -22,7 +24,7 @@ public class GAnalyticsTracker {
 
   private static void getAccountId(final AsyncCallback<String> callback) {
     if (ACCOUNT_ID == null) {
-      GAnalyticsServiceAsync.INSTANCE.getGoogleAnalyticsAccount(new AsyncCallback<String>() {
+      BrowserService.Util.getInstance().getGoogleAnalyticsAccount(new AsyncCallback<String>() {
 
         public void onFailure(Throwable caught) {
           callback.onFailure(caught);
@@ -31,7 +33,6 @@ public class GAnalyticsTracker {
         public void onSuccess(String result) {
           ACCOUNT_ID = result;
           callback.onSuccess(ACCOUNT_ID);
-
         }
       });
     } else {

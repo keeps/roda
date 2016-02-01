@@ -25,7 +25,6 @@ import org.roda.wui.common.client.widgets.WUIButton;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.ClickListener;
@@ -39,6 +38,7 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class Preferences implements HistoryResolver {
   private static Preferences instance = null;
 

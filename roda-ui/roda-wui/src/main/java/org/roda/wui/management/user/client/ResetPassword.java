@@ -41,6 +41,7 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class ResetPassword implements HistoryResolver {
 
   private static ResetPassword instance = null;

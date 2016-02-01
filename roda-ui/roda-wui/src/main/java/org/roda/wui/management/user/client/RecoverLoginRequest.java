@@ -36,6 +36,7 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class RecoverLoginRequest implements HistoryResolver {
 
   private static RecoverLoginRequest instance = null;
@@ -55,6 +56,7 @@ public class RecoverLoginRequest implements HistoryResolver {
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean initialized;

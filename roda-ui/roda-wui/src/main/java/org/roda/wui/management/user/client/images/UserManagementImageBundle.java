@@ -17,6 +17,7 @@ import com.google.gwt.user.client.ui.ImageBundle;
  * @author Luis Faria
  *
  */
+@SuppressWarnings("deprecation")
 public interface UserManagementImageBundle extends ImageBundle {
 
   public AbstractImagePrototype user();

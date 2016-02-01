@@ -30,6 +30,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
+@SuppressWarnings("deprecation")
 public class GroupMiniPanel {
   private static UserManagementImageBundle userManagementImageBundle = (UserManagementImageBundle) GWT
     .create(UserManagementImageBundle.class);

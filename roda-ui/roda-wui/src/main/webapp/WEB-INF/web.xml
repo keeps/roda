@@ -132,11 +132,6 @@
 		<load-on-startup>2</load-on-startup>
 	</servlet>
 	<servlet>
-		<servlet-name>GAnalyticsService</servlet-name>
-		<servlet-class>
-			org.roda.wui.server.main.GAnalyticsServiceImpl</servlet-class>
-	</servlet>
-	<servlet>
 		<servlet-name>DescriptionLevelService</servlet-name>
 		<servlet-class>
 			org.roda.wui.server.main.DescriptionLevelServiceImpl</servlet-class>
@@ -165,10 +160,6 @@
 	<servlet-mapping>
 		<servlet-name>ClientLogger</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/wuilogger</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>GAnalyticsService</servlet-name>
-		<url-pattern>/org.roda.wui.RodaWUI/gaservice</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>DescriptionLevelService</servlet-name>

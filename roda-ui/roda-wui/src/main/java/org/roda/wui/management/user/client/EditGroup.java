@@ -131,7 +131,7 @@ public class EditGroup extends Composite {
       Tools.newHistory(MemberManagement.RESOLVER);
     }
   }
-  
+
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
     UserManagementService.Util.getInstance().removeGroup(group.getId(), new AsyncCallback<Void>() {
@@ -159,10 +159,10 @@ public class EditGroup extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Window.alert(messages.editUserNotFound(group.getName()));
+      Window.alert(messages.editGroupNotFound(group.getName()));
       cancel();
     } else {
-      Window.alert(messages.editUserFailure(EditGroup.this.group.getName(), caught.getMessage()));
+      Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
     }
   }
 }

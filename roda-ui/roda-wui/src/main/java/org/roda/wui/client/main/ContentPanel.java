@@ -94,7 +94,7 @@ public class ContentPanel extends SimplePanel {
     // User Management
     resolvers.add(Preferences.getInstance());
     resolvers.add(RecoverLoginRequest.getInstance());
-    resolvers.add(Register.getInstance());
+    resolvers.add(Register.RESOLVER);
     resolvers.add(ResetPassword.getInstance());
     resolvers.add(VerifyEmail.getInstance());
   }

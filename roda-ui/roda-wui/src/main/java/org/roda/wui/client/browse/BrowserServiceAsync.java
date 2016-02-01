@@ -113,4 +113,8 @@ public interface BrowserServiceAsync {
 
   void retrieveIndexedPreservationEvent(String indexedPreservationEventId,
     AsyncCallback<IndexedPreservationEvent> callback);
+
+  void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
+
+  void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
 }

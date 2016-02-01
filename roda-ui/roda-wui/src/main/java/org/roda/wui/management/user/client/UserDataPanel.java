@@ -144,16 +144,32 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * 
    */
   public UserDataPanel(boolean editmode, boolean enableGroupSelect) {
-    this(true, editmode, enableGroupSelect);
+    this(true, editmode, enableGroupSelect, true);
   }
 
   /**
+   * Create a new user data panel
+   * 
+   * @param editmode
+   *          if user name should be editable
+   * @param enableGroupSelect
+   *          if the list of groups to which the user belong to should be
+   *          editable
+   * 
+   */
+  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
+    this(visible, editmode, enableGroupSelect, true);
+  }
+
+  /**
+   * Create a new user data panel
    * 
    * @param visible
    * @param editmode
    * @param enableGroupSelect
+   * @param enablePermissions
    */
-  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
+  public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect, boolean enablePermissions) {
 
     password = new PasswordPanel(editmode);
 
@@ -169,8 +185,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
     groupSelect = new GroupSelect(enableGroupSelect);
 
-    // TODO add change handler
-
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
@@ -178,6 +192,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     this.enableGroupSelect = enableGroupSelect;
 
     groupSelectPanel.setVisible(enableGroupSelect);
+    permissionsSelectPanel.setVisible(enablePermissions);
 
     businessCategory.setVisibleItemCount(1);
     for (String function : constants.getJobFunctions()) {
