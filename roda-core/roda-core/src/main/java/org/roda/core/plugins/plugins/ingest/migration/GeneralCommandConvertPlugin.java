@@ -1,11 +1,17 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -15,27 +21,54 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public abstract class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
+public class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
 
   public String commandArguments;
 
   @Override
-  public abstract void init() throws PluginException;
+  public void init() throws PluginException {
+    // do nothing
+  }
 
   @Override
-  public abstract void shutdown();
+  public void shutdown() {
+    // do nothing
+  }
 
   @Override
-  public abstract String getName();
+  public String getName() {
+    return "name";
+  }
 
   @Override
-  public abstract String getDescription();
+  public String getDescription() {
+    return "description";
+  }
 
   @Override
-  public abstract String getVersion();
+  public String getVersion() {
+    return "1.0";
+  }
 
   @Override
-  public abstract Plugin<AIP> cloneMe();
+  public Plugin<Serializable> cloneMe() {
+    return new GeneralCommandConvertPlugin();
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    List<PluginParameter> params = new ArrayList<PluginParameter>();
+
+    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
+      "", true, true, "Output format");
+
+    PluginParameter commandArgs = new PluginParameter("command", "Command arguments", PluginParameterType.STRING, "",
+      true, true, "Command to execute");
+
+    params.add(outputParam);
+    params.add(commandArgs);
+    return params;
+  }
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
@@ -48,14 +81,29 @@ public abstract class GeneralCommandConvertPlugin extends AbstractConvertPlugin 
   }
 
   @Override
-  public abstract Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException;
+  public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
+    Path uriPath = Paths.get(binary.getContent().getURI());
+    Path pluginResult;
+
+    if (Files.exists(uriPath)) {
+      pluginResult = GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, inputFormat, outputFormat,
+        commandArguments);
+    } else {
+      pluginResult = GeneralCommandConvertPluginUtils.runGeneralCommandConvert(binary.getContent().createInputStream(),
+        inputFormat, outputFormat, commandArguments);
+    }
+
+    return pluginResult;
+  }
 
   @Override
-  public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
+  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    return null;
+  }
 
   @Override
-  public abstract Report afterExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
+  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    return null;
+  }
 
 }

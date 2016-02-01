@@ -1,12 +1,14 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
@@ -23,6 +25,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -36,11 +39,12 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class AbstractConvertPlugin implements Plugin<AIP> {
+public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public final Logger logger = LoggerFactory.getLogger(getClass());
   public String inputFormat;
@@ -50,8 +54,8 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
   public List<String> applicableTo = new ArrayList<>();
   public List<String> convertableTo = new ArrayList<>();
 
-  public boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
-    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  public boolean hasPartialSuccessOnOutcome = Boolean
+    .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
   public abstract void init() throws PluginException;
 
@@ -63,7 +67,7 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
 
   public abstract String getVersion();
 
-  public abstract Plugin<AIP> cloneMe();
+  public abstract Plugin<Serializable> cloneMe();
 
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
@@ -73,7 +77,15 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     return true;
   }
 
-  public abstract List<PluginParameter> getParameters();
+  public List<PluginParameter> getParameters() {
+    List<PluginParameter> params = new ArrayList<PluginParameter>();
+
+    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
+      "", convertableTo, true, true, "Lists the possible output formats");
+
+    params.add(outputParam);
+    return params;
+  }
 
   public Map<String, String> getParameterValues() {
     Map<String, String> parametersMap = new HashMap<String, String>();
@@ -101,7 +113,20 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     }
   }
 
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Serializable> list)
+    throws PluginException {
+
+    if (list.size() > 0) {
+      if (list.get(0) instanceof AIP)
+        return executeOnAIP(index, model, storage, (List<AIP>) (List<?>) list);
+      else
+        return executeOnFile(index, model, storage, (List<File>) (List<?>) list);
+    }
+
+    return null;
+  }
+
+  private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
     for (AIP aip : list) {
@@ -176,6 +201,60 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     return null;
   }
 
+  private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+
+    int state = 1;
+
+    for (File file : list) {
+      try {
+        logger.debug("Processing file " + file.getId());
+
+        String newRepresentationID = UUID.randomUUID().toString();
+
+        if (!file.isDirectory()) {
+          // TODO filter by file type and size
+          // && file.getId().endsWith("." + inputFormat)
+          // && (file.getSize() <= maxKbytes * 1024)
+          StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+          Binary binary = storage.getBinary(fileStoragePath);
+
+          // FIXME file that doesn't get deleted afterwards
+          logger.debug("Running a ConvertPlugin (" + inputFormat + " to " + outputFormat + ") on " + file.getId());
+          Path pluginResult = executePlugin(binary);
+
+          if (pluginResult != null) {
+            ContentPayload payload = new FSPathContentPayload(pluginResult);
+            StoragePath storagePath = ModelUtils.getRepresentationPath(file.getAipId(), file.getRepresentationId());
+
+            // create a new representation if it does not exist
+            logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());
+            boolean original = false;
+            model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(), storagePath);
+
+            StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(), newRepresentationID);
+            model.getStorage().createDirectory(storagePreservationPath);
+
+            // update file on new representation
+            String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
+            model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId());
+            model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload);
+
+          } else {
+            logger.debug("Conversion (" + inputFormat + " to " + outputFormat + ") failed on file " + file.getId()
+              + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
+            state = 2;
+          }
+        }
+      } catch (Throwable e) {
+        logger.error("Error processing file " + file.getId() + ": " + e.getMessage(), e);
+        state = 0;
+      }
+    }
+
+    return null;
+  }
+
   public abstract Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
@@ -187,8 +266,8 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
     if (alteredFiles.size() == 0) {
       stringBuilder.append("No file was converted on this representation.");
     } else {
-      stringBuilder.append("The following files were converted on a new representation (ID: " + newRepresentionID
-        + "): ");
+      stringBuilder
+        .append("The following files were converted on a new representation (ID: " + newRepresentionID + "): ");
       for (String fileID : alteredFiles) {
         stringBuilder.append(fileID + ", ");
       }
@@ -210,8 +289,8 @@ public abstract class AbstractConvertPlugin implements Plugin<AIP> {
       PluginHelper.createPluginEventAndAgent(aip.getId(), representationID, model,
         EventPreservationObject.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
         EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK, getClass().getName(),
-        Arrays.asList(representationID), outcome, stringBuilder.toString(), null, getClass().getName() + "@"
-          + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
+        Arrays.asList(representationID), outcome, stringBuilder.toString(), null,
+        getClass().getName() + "@" + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
 
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
       | AlreadyExistsException | AuthorizationDeniedException e) {

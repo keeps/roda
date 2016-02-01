@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -57,7 +58,7 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<Serializable> cloneMe() {
     return new PdfToPdfaPlugin();
   }
 
@@ -71,6 +72,8 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
     super.setParameterValues(parameters);
     inputFormat = "pdf";
     outputFormat = "pdf";
+    applicableTo.add(inputFormat);
+    convertableTo.add(outputFormat);
   }
 
   @Override

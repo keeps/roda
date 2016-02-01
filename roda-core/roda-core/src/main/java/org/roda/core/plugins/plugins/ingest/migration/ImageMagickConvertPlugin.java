@@ -1,17 +1,17 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -21,7 +21,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
-public class ImageMagickConvertPlugin extends GeneralCommandConvertPlugin {
+public class ImageMagickConvertPlugin extends CommandConvertPlugin {
 
   @Override
   public void init() throws PluginException {
@@ -54,7 +54,7 @@ public class ImageMagickConvertPlugin extends GeneralCommandConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<Serializable> cloneMe() {
     return new ImageMagickConvertPlugin();
   }
 
@@ -62,19 +62,21 @@ public class ImageMagickConvertPlugin extends GeneralCommandConvertPlugin {
   public List<PluginParameter> getParameters() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
       "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
 
-    List<PluginParameter> params = new ArrayList<PluginParameter>();
+    return super.getParameters();
+  }
 
-    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
-      "", convertableTo, true, true, "Lists the possible output formats");
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
 
-    PluginParameter commandArgs = new PluginParameter("commandArgs", "Command arguments", PluginParameterType.STRING,
-      "", true, true, "Command arguments to modify the command to execute");
+    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
+      "inputFormats");
+    applicableTo.addAll(Arrays.asList(inputFormats.split("\\s+")));
 
-    params.add(outputParam);
-    params.add(commandArgs);
-    return params;
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
+      "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 
   public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {

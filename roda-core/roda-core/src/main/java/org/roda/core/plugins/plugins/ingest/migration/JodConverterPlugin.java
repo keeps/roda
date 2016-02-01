@@ -1,15 +1,17 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.Report;
@@ -49,7 +51,7 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
+  public Plugin<Serializable> cloneMe() {
     return new JodConverterPlugin();
   }
 
@@ -57,7 +59,7 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   public List<PluginParameter> getParameters() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
       "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
 
     List<PluginParameter> params = new ArrayList<PluginParameter>();
 
@@ -70,6 +72,19 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
     params.add(outputParam);
     params.add(commandArgs);
     return params;
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
+      "inputFormats");
+    applicableTo.addAll(Arrays.asList(inputFormats.split(" ")));
+
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
+      "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
   }
 
   @Override
