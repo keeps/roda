@@ -12,6 +12,7 @@ import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -22,9 +23,15 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
+import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.StreamResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,10 +44,24 @@ public class TransferredResource {
   public static final String ENDPOINT = "/v1/transferred";
   public static final String SWAGGER_ENDPOINT = "v1 transferred";
 
+  @SuppressWarnings("unused")
   private Logger logger = LoggerFactory.getLogger(getClass());
 
   @Context
   private HttpServletRequest request;
+
+  @GET
+  public Response getResource(
+    @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId)
+      throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+
+    StreamResponse response = Browser.getTransferredResource(user, resourceId);
+
+    return ApiUtils.okResponse(response);
+  }
 
   @POST
   public Response createResource(

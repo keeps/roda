@@ -179,8 +179,7 @@ public class IngestTransfer extends Composite {
         } else if (r != null && r.isFile()) {
 
           SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(
-            transferredResourceList.getSelectionModel().getSelectedObject().getId(),
-            transferredResourceList.getSelectionModel().getSelectedObject().getParentId());
+            transferredResourceList.getSelectionModel().getSelectedObject().getId());
           Window.Location.assign(downloadUri.asString());
 
           // disable selection

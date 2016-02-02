@@ -868,4 +868,20 @@ public class Browser extends RodaCoreService {
     return resource;
   }
 
+  public static StreamResponse getTransferredResource(RodaUser user, String resourceId)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
+
+    StreamResponse response = BrowserHelper
+      .getTransferredResource(BrowserHelper.retrieveTransferredResource(resourceId));
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getTransferredResource", null, duration, "resourceId", resourceId);
+
+    return response;
+  }
 }

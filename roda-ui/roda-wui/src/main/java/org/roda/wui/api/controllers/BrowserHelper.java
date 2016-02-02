@@ -896,4 +896,19 @@ public class BrowserHelper {
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, indexedPreservationEventId);
   }
+
+  public static StreamResponse getTransferredResource(TransferredResource transferredResource)
+    throws NotFoundException, RequestNotValidException, GenericException {
+    InputStream retrieveFile = RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
+
+    StreamingOutput streamingOutput = new StreamingOutput() {
+
+      @Override
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        IOUtils.copy(retrieveFile, os);
+      }
+    };
+
+    return new StreamResponse(transferredResource.getName(), MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
+  }
 }

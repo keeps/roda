@@ -533,6 +533,7 @@ public class AipsResource {
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
+    @SuppressWarnings("unused")
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
 
     // TODO implement...
