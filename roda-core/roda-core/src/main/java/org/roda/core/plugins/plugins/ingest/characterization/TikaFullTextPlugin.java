@@ -121,7 +121,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
           List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (File file : allFiles) {
             LOGGER.debug("Processing file: " + file);
-            StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+            StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
             Binary binary = storage.getBinary(storagePath);
 
             // FIXME file that doesn't get deleted afterwards

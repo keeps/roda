@@ -1373,8 +1373,7 @@ public class SolrUtils {
 
     // extra-fields
     try {
-      StoragePath filePath = ModelUtils.getRepresentationFilePath(file.getAipId(), file.getRepresentationId(),
-        file.getId());
+      StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(file);
       doc.addField(RodaConstants.FILE_STORAGEPATH, filePath.asString());
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);

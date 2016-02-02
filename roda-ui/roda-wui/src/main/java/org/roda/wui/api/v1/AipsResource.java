@@ -9,6 +9,8 @@ package org.roda.wui.api.v1;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -231,8 +233,10 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId, fileId,
-      acceptFormat);
+    List<String> directoryPath = new ArrayList<>();
+    // TODO get directory path from request
+    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId,
+      directoryPath, fileId, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentationFile);
   }
@@ -283,7 +287,9 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.removeRepresentationFile(user, aipId, representationId, fileId);
+    List<String> directoryPath = new ArrayList<>();
+    // TODO get directory path from request
+    Browser.removeRepresentationFile(user, aipId, representationId, directoryPath, fileId);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -486,7 +492,8 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId,inputStream, fileDetail);
+    Browser.postAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId, inputStream,
+      fileDetail);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -507,7 +514,8 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId, inputStream, fileDetail);
+    Browser.putAipRepresentationPreservationMetadataFile(user, aipId, representationId, fileId, inputStream,
+      fileDetail);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
@@ -526,8 +534,8 @@ public class AipsResource {
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-   
-    //TODO implement...
+
+    // TODO implement...
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 }

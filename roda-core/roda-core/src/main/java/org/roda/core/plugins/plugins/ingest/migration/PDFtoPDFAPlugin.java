@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -126,7 +125,7 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
                */
               // TODO filter by file type and size
 
-              StoragePath fileStoragePath = ModelUtils.getRepresentationFilePath(file);
+              StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
               Binary binary = storage.getBinary(fileStoragePath);
 
               // FIXME file that doesn't get deleted afterwards
@@ -150,7 +149,7 @@ public class PDFtoPDFAPlugin implements Plugin<AIP> {
                 }
 
                 // update file on new representation
-                model.updateFile(aip.getId(), newRepresentationID, file.getId(), resource, true, true);
+                model.updateFile(aip.getId(), newRepresentationID, file.getPath(), file.getId(), resource, true, true);
                 alteredFiles.add(file.getId());
                 newRepresentations.add(newRepresentationID);
 

@@ -57,8 +57,6 @@ public interface BrowserServiceAsync {
    */
   public void getIndexedAIP(String pid, AsyncCallback<IndexedAIP> callback);
 
-  void countDescriptiveMetadataBinaries(String aipId, AsyncCallback<Long> callback);
-
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
   void moveInHierarchy(String aipId, String parentId, AsyncCallback<IndexedAIP> callback);

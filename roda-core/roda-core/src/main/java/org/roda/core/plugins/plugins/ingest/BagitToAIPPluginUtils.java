@@ -7,12 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -25,9 +23,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +33,8 @@ import gov.loc.repository.bagit.BagFile;
 import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
+  private static final String METADATA_TYPE = "key-value";
+  private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
   public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String parentId)
@@ -43,9 +42,8 @@ public class BagitToAIPPluginUtils {
     AlreadyExistsException, AuthorizationDeniedException {
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
-    Path metadataFile = Files.createTempFile("metadata", ".xml");
-    generateMetadataFile(metadataFile, bagInfoTxt);
-    Resource descriptiveMetadataResource = FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
+    String metadataAsString = generateMetadataFile(bagInfoTxt);
+    ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
     boolean active = false;
     AIPPermissions permissions = new AIPPermissions();
@@ -56,36 +54,31 @@ public class BagitToAIPPluginUtils {
     String representationID = "representation";
     PluginHelper.createDirectories(model, aip.getId(), representationID);
 
-    model.createDescriptiveMetadata(aip.getId(), metadataFilename, (Binary) descriptiveMetadataResource, "key-value");
-
-    Path tempFolder = Files.createTempDirectory("temp");
+    model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE);
     if (bag.getPayload() != null) {
       for (BagFile bagFile : bag.getPayload()) {
-        // FIXME this is being done because we don't support folders in a
-        // representation
-        String fileName = bagFile.getFilepath().replace("/", "_");
-        File f = new File(tempFolder.toFile(), fileName);
-        Files.copy(bagFile.newInputStream(), f.toPath(), StandardCopyOption.REPLACE_EXISTING);
-        Binary resource = (Binary) FSUtils.convertPathToResource(f.toPath().getParent(), f.toPath());
-        model.createFile(aip.getId(), representationID, fileName, resource);
+        List<String> split = Arrays.asList(bagFile.getFilepath().split(BAGIT_FILE_PATH_SEPARATOR));
+        List<String> directoryPath = split.subList(0, split.size() - 1);
+        String fileId = split.get(split.size() - 1);
+
+        ContentPayload payload = new BagFileContentPayload(bagFile);
+        model.createFile(aip.getId(), representationID, directoryPath, fileId, payload);
       }
     }
     bag.close();
-    FSUtils.deletePath(tempFolder);
-    FSUtils.deletePath(metadataFile);
     return model.retrieveAIP(aip.getId());
 
   }
 
-  private static void generateMetadataFile(Path metadataFile, BagInfoTxt bagInfoTxt) throws IOException {
-    StringWriter sw = new StringWriter();
-    sw.append("<metadata>");
+  private static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
+    StringBuilder b = new StringBuilder();
+    b.append("<metadata>");
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
       if (!entry.getKey().equalsIgnoreCase("parent")) {
-        sw.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
+        b.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
       }
     }
-    sw.append("</metadata>");
-    Files.write(metadataFile, sw.toString().getBytes("UTF-8"));
+    b.append("</metadata>");
+    return b.toString();
   }
 }

@@ -102,7 +102,7 @@ public class FixityPlugin implements Plugin<AIP> {
           List<String> okFileIDS = new ArrayList<String>();
           List<String> koFileIDS = new ArrayList<String>();
           for (File currentFile : allFiles) {
-            StoragePath storagePath = ModelUtils.getRepresentationFilePath(currentFile);
+            StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(currentFile);
             Binary currentFileBinary = storage.getBinary(storagePath);
             RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(), r.getId(),
               currentFile.getId());

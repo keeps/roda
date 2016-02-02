@@ -9,6 +9,8 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -20,7 +22,9 @@ import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
@@ -49,8 +53,16 @@ public class EARKSIPToAIPPluginUtils {
         PluginHelper.createDirectories(model, aip.getId(), sr.getObjectID());
         if (sr.getData() != null && sr.getData().size() > 0) {
           for (Path p : sr.getData()) {
-            Binary fileBinary = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-            model.createFile(aip.getId(), sr.getObjectID(), p.getFileName().toString(), fileBinary);
+
+            String fileId = p.getFileName().toString();
+            List<String> directoryPath = new ArrayList<String>();
+            for (int i = 0; i < p.getNameCount() - 1; i++) {
+              directoryPath.add(p.getName(i).toString());
+            }
+
+            ContentPayload payload = new FSPathContentPayload(p);
+
+            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload);
           }
         }
         /*
@@ -80,9 +92,11 @@ public class EARKSIPToAIPPluginUtils {
 
     if (sip.getDescriptiveMetadata() != null && sip.getDescriptiveMetadata().size() > 0) {
       for (SIPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
-        Binary fileBinary = (Binary) FSUtils.convertPathToResource(dm.getMetadata().getParent(), dm.getMetadata());
+        String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
+        ContentPayload payload = new FSPathContentPayload(dm.getMetadata());
         String type = (dm.getMetadataType() != null) ? dm.getMetadataType().toString() : "";
-        model.createDescriptiveMetadata(aip.getId(), dm.getMetadata().getFileName().toString(), fileBinary, type);
+
+        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type);
       }
     }
     /*

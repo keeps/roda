@@ -68,6 +68,7 @@ import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
@@ -90,19 +91,6 @@ import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 
 /**
  * Class that "relates" Model & Storage
- * 
- * XXX assumptions:
- * 
- * 1) when creating or updating stuff, metadata will be already set and
- * therefore to instantiate {@link DescriptiveMetadata}, {@link File} and
- * {@link Representation} one just need to read those values from
- * object.getMetadata()
- * 
- * 2) ATM, files beneath a certain representation can be represented as a flat
- * list and therefore no folders are supported. to support folders, we need to
- * re-think how to represent files in a representation (ATM those are
- * represented by a list of strings<=>name) and change all methods that deal
- * with representation
  * 
  * FIXME questions:
  * 
@@ -283,8 +271,7 @@ public class ModelService extends ModelObservable {
 
   public AIP retrieveAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    Directory directory = storage.getDirectory(ModelUtils.getAIPpath(aipId));
-    return getAIPMetadata(directory.getStoragePath());
+    return getAIPMetadata(aipId);
   }
 
   /**
@@ -304,11 +291,11 @@ public class ModelService extends ModelObservable {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    * @throws AlreadyExistsException
+   * @throws ValidationException
    */
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath, boolean notify)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException {
-    // TODO verify structure of source AIP and copy it to the storage
+    NotFoundException, ValidationException {
     // XXX possible optimization would be to allow move between storage
     // TODO support asReference
     ModelService sourceModelService = new ModelService(sourceStorage);
@@ -327,7 +314,7 @@ public class ModelService extends ModelObservable {
         notifyAipCreated(aip);
       }
     } else {
-      throw new GenericException("Error while creating AIP, reason: AIP is not valid");
+      throw new ValidationException(validationReport);
     }
 
     return aip;
@@ -370,7 +357,7 @@ public class ModelService extends ModelObservable {
 
   public AIP createAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws RequestNotValidException, GenericException, AuthorizationDeniedException, AlreadyExistsException,
-    NotFoundException {
+    NotFoundException, ValidationException {
     return createAIP(aipId, sourceStorage, sourcePath, true);
   }
 
@@ -388,7 +375,8 @@ public class ModelService extends ModelObservable {
     if (validationReport.isValid()) {
       StoragePath aipPath = ModelUtils.getAIPpath(aipId);
 
-      // FIXME is this the best way?
+      // XXX possible optimization only creating new files, updating changed and
+      // removing deleted ones.
       storage.deleteResource(aipPath);
 
       storage.copy(sourceStorage, sourcePath, aipPath);
@@ -403,17 +391,10 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP updateAIP(AIP aip) throws RequestNotValidException, NotFoundException, GenericException,
-    AuthorizationDeniedException, ValidationException {
-    StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
-    Directory aipDirectory = storage.getDirectory(aipPath);
-    ValidationReport validationReport = isAIPvalid(this, aipDirectory, FAIL_IF_NO_DESCRIPTIVE_METADATA_SCHEMA);
-    if (validationReport.isValid()) {
-      updateAIPMetadata(aip, aipPath);
-      notifyAipUpdated(aip);
-    } else {
-      throw new ValidationException(validationReport);
-    }
+  public AIP updateAIP(AIP aip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    updateAIPMetadata(aip);
+    notifyAipUpdated(aip);
 
     return aip;
   }
@@ -425,30 +406,6 @@ public class ModelService extends ModelObservable {
     notifyAipDeleted(aipId);
   }
 
-  // TODO check if this method has become superfluous
-  public List<DescriptiveMetadata> listDescriptiveMetadata(String aipId)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    ClosableIterable<DescriptiveMetadata> it;
-
-    return getAIPMetadata(aipId).getMetadata().getDescriptiveMetadata();
-  }
-
-  public Long countDescriptiveMetadataBinaries(String aipId)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    try {
-      return storage.countResourcesUnderDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
-    } catch (NotFoundException e) {
-      try {
-        storage.getDirectory(ModelUtils.getAIPpath(aipId));
-        // AIP is there but metadata directory is not
-        return 0L;
-      } catch (NotFoundException e1) {
-        // AIP is not there, sending exception
-        throw new NotFoundException("Could not find AIP: " + aipId, e1);
-      }
-    }
-  }
-
   public Binary retrieveDescriptiveMetadataBinary(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Binary binary;
@@ -458,7 +415,6 @@ public class ModelService extends ModelObservable {
     return binary;
   }
 
-  // TODO check if this method has become superfluous
   public DescriptiveMetadata retrieveDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
@@ -479,16 +435,16 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
-    String descriptiveMetadataType) throws RequestNotValidException, GenericException, AlreadyExistsException,
-      AuthorizationDeniedException, NotFoundException {
+  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
+    ContentPayload payload, String descriptiveMetadataType) throws RequestNotValidException, GenericException,
+      AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     DescriptiveMetadata descriptiveMetadataBinary = null;
 
     // StoragePath binaryPath = binary.getStoragePath();
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     boolean asReference = false;
 
-    storage.createBinary(binaryPath, binary.getContent(), asReference);
+    storage.createBinary(binaryPath, payload, asReference);
     descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
 
     AIP aip = getAIPMetadata(aipId);
@@ -500,16 +456,16 @@ public class ModelService extends ModelObservable {
     return descriptiveMetadataBinary;
   }
 
-  public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId, Binary binary,
-    String descriptiveMetadataType) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, ValidationException {
+  public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId,
+    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType) throws RequestNotValidException,
+      GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
     DescriptiveMetadata ret = null;
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     boolean asReference = false;
     boolean createIfNotExists = false;
 
-    storage.updateBinaryContent(binaryPath, binary.getContent(), asReference, createIfNotExists);
+    storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists);
 
     // set descriptive metadata type
     AIP aip = getAIPMetadata(aipId);
@@ -551,14 +507,6 @@ public class ModelService extends ModelObservable {
 
   }
 
-  // TODO check if this method as not become superfluous
-  public List<Representation> listRepresentations(String aipId)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    return getAIPMetadata(aipId).getRepresentations();
-
-  }
-
-  // TODO check if this method is now superfluous
   public Representation retrieveRepresentation(String aipId, String representationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
@@ -589,7 +537,8 @@ public class ModelService extends ModelObservable {
 
     // verify structure of source representation
     Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    if (isRepresentationValid(sourceDirectory)) {
+    ValidationReport validationReport = isRepresentationValid(sourceDirectory);
+    if (validationReport.isValid()) {
       storage.copy(sourceStorage, sourcePath, directoryPath);
 
       representation = new Representation(representationId, aipId, original);
@@ -601,101 +550,42 @@ public class ModelService extends ModelObservable {
 
       notifyRepresentationCreated(representation);
     } else {
-      throw new GenericException("Error while creating representation, reason: representation is not valid");
+      throw new ValidationException(validationReport);
     }
 
     return representation;
   }
 
-  public Representation updateRepresentation(String aipId, String representationId, StorageService sourceStorage,
-    StoragePath sourcePath)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+  public Representation updateRepresentation(String aipId, String representationId, boolean original,
+    StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, NotFoundException,
+      GenericException, AuthorizationDeniedException, ValidationException {
+    Representation representation;
 
     // verify structure of source representation
-    Directory sourceDirectory = verifySourceRepresentation(sourceStorage, sourcePath);
+    Directory sourceDirectory = sourceStorage.getDirectory(sourcePath);
+    ValidationReport validationReport = isRepresentationValid(sourceDirectory);
 
-    // update each representation file (from source representation)
-    final List<String> fileIDsToUpdate = updateRepresentationFiles(aipId, representationId, sourceStorage, sourcePath);
+    if (validationReport.isValid()) {
+      // XXX possible optimization only creating new files, updating changed and
+      // removing deleted
 
-    // delete files that were removed on representation update
-    deleteUnneededFilesFromRepresentation(aipId, representationId, fileIDsToUpdate);
+      StoragePath representationPath = ModelUtils.getRepresentationPath(aipId, representationId);
+      storage.deleteResource(representationPath);
+      try {
+        storage.copy(sourceStorage, sourcePath, representationPath);
+      } catch (AlreadyExistsException e) {
+        throw new GenericException("Copying after delete gave an unexpected already exists exception", e);
+      }
 
-    // TODO how to known if representation is original?
-    boolean original = true;
+      // build return object
+      representation = new Representation(representationId, aipId, original);
 
-    // build return object
-    Representation representation = new Representation(representationId, aipId, original);
+      notifyRepresentationUpdated(representation);
+    } else {
+      throw new ValidationException(validationReport);
+    }
 
-    notifyRepresentationUpdated(representation);
     return representation;
-  }
-
-  private Directory verifySourceRepresentation(StorageService sourceStorage, StoragePath sourcePath)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    Directory sourceDirectory;
-
-    sourceDirectory = sourceStorage.getDirectory(sourcePath);
-    if (!isRepresentationValid(sourceDirectory)) {
-      throw new GenericException("Error while updating AIP, reason: representation is not valid");
-    }
-
-    return sourceDirectory;
-  }
-
-  private void deleteUnneededFilesFromRepresentation(String aipId, String representationId,
-    final List<String> fileIDsToUpdate)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    ClosableIterable<Resource> filesToRemoveIterable = null;
-    try {
-      filesToRemoveIterable = storage
-        .listResourcesUnderDirectory(ModelUtils.getRepresentationPath(aipId, representationId));
-      for (Resource fileToRemove : filesToRemoveIterable) {
-        StoragePath fileToRemovePath = fileToRemove.getStoragePath();
-        if (!fileIDsToUpdate.contains(fileToRemovePath.getName())) {
-          storage.deleteResource(fileToRemovePath);
-        }
-      }
-
-    } finally {
-      try {
-        if (filesToRemoveIterable != null) {
-          filesToRemoveIterable.close();
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
-      }
-    }
-  }
-
-  private List<String> updateRepresentationFiles(String aipId, String representationId, StorageService sourceStorage,
-    StoragePath sourcePath)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    final List<String> fileIDsToUpdate = new ArrayList<String>();
-    ClosableIterable<Resource> filesIterable = null;
-    try {
-      filesIterable = sourceStorage.listResourcesUnderDirectory(sourcePath);
-      for (Resource file : filesIterable) {
-        if (file instanceof DefaultBinary) {
-          boolean createIfNotExists = true;
-          boolean notify = false;
-          File fileUpdated = updateFile(aipId, representationId, file.getStoragePath().getName(), (Binary) file,
-            createIfNotExists, notify);
-          notifyFileUpdated(fileUpdated);
-          fileIDsToUpdate.add(fileUpdated.getId());
-        } else {
-          // FIXME log error and continue???
-        }
-      }
-    } finally {
-      try {
-        if (filesIterable != null) {
-          filesIterable.close();
-        }
-      } catch (IOException e) {
-        LOGGER.error("Error while while freeing up resources", e);
-      }
-    }
-    return fileIDsToUpdate;
   }
 
   public void deleteRepresentation(String aipId, String representationId)
@@ -764,22 +654,14 @@ public class ModelService extends ModelObservable {
 
   public Iterable<File> listFilesDirectlyUnder(File f)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-
-    // TODO get a better method for getting the path
-    List<String> path = new ArrayList<>();
-    if (f.getPath() != null) {
-      path.addAll(f.getPath());
-    }
-    path.add(f.getId());
-
-    return listFilesDirectlyUnder(f.getAipId(), f.getRepresentationId(), path.toArray(new String[] {}));
+    return listFilesDirectlyUnder(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId());
   }
 
-  public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId, String... fileId)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+  public Iterable<File> listFilesDirectlyUnder(String aipId, String representationId, List<String> directoryPath,
+    String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Iterable<File> it = null;
 
-    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+    StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
 
     final Iterator<Resource> iterator = storage.listResourcesUnderDirectory(filePath).iterator();
 
@@ -928,43 +810,40 @@ public class ModelService extends ModelObservable {
 
   }
 
-  public File retrieveFile(String aipId, String representationId, String... fileId)
+  public File retrieveFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file;
-    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+    StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
     Binary binary = storage.getBinary(filePath);
     file = convertResourceToRepresentationFile(binary);
 
     return file;
   }
 
-  // FIXME under a certain representation may exist files but also folders.
-  // how to handle that in this method?
-  public File createFile(String aipId, String representationId, String fileId, Binary binary)
-    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    NotFoundException {
+  public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
+    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
+      AuthorizationDeniedException, NotFoundException {
     File file;
     // FIXME how to set this?
     boolean asReference = false;
 
-    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+    StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
 
-    final Binary createdBinary = storage.createBinary(filePath, binary.getContent(), asReference);
+    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
     file = convertResourceToRepresentationFile(createdBinary);
     notifyFileCreated(file);
 
     return file;
   }
 
-  // FIXME under a certain representation may exist files but also folders.
-  // how to handle that in this method?
-  public File updateFile(String aipId, String representationId, String fileId, Binary binary, boolean createIfNotExists,
-    boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public File updateFile(String aipId, String representationId, List<String> directoryPath, String fileId,
+    Binary binary, boolean createIfNotExists, boolean notify)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file = null;
     // FIXME how to set this?
     boolean asReference = false;
 
-    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+    StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
 
     storage.updateBinaryContent(filePath, binary.getContent(), asReference, createIfNotExists);
     Binary binaryUpdated = storage.getBinary(filePath);
@@ -976,12 +855,10 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  // FIXME under a certain representation may exist files but also folders.
-  // how to handle that in this method?
-  public void deleteFile(String aipId, String representationId, String fileId)
+  public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
-    StoragePath filePath = ModelUtils.getRepresentationFilePath(aipId, representationId, fileId);
+    StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.deleteResource(filePath);
     notifyFileDeleted(aipId, representationId, fileId);
 
@@ -1096,9 +973,8 @@ public class ModelService extends ModelObservable {
     return report;
   }
 
-  private boolean isRepresentationValid(Directory directory) {
-    // FIXME implement this
-    return true;
+  private ValidationReport isRepresentationValid(Directory directory) {
+    return new ValidationReport();
   }
 
   // TODO to improve...

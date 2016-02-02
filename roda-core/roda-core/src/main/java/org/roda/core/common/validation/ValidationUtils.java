@@ -18,6 +18,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -49,27 +51,27 @@ public class ValidationUtils {
 
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, boolean validatePremis, ModelService model,
-    String aipID) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+    String aipId) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
       ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(false);
-    List<DescriptiveMetadata> descriptiveMetadata = model.listDescriptiveMetadata(aipID);
+    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
       Binary binary = model.getStorage().getBinary(storagePath);
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
-          ValidationReport dmReport = validateDescriptiveBinary(binary, fallbackMetadataType, true);
+          ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType, true);
           report.setValid(report.isValid() && dmReport.isValid());
           report.getIssues().addAll(dmReport.getIssues());
         }
-        model.updateDescriptiveMetadata(aipID, dm.getId(), binary, fallbackMetadataType);
+        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType);
         report.setValid(true);
         LOGGER.debug(storagePath + " valid for metadata type " + fallbackMetadataType);
 
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;
-        ValidationReport dmReport = validateDescriptiveBinary(binary, metadataType, true);
+        ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType, true);
         report.setValid(report.isValid() && dmReport.isValid());
         report.getIssues().addAll(dmReport.getIssues());
       }
@@ -95,7 +97,7 @@ public class ValidationUtils {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean valid = true;
     List<ValidationIssue> issues = new ArrayList<>();
-    List<DescriptiveMetadata> descriptiveMetadata = model.listDescriptiveMetadata(aipId);
+    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       ValidationReport report = isDescriptiveMetadataValid(model, dm, failIfNoSchema);
       valid &= report.isValid();
@@ -142,7 +144,7 @@ public class ValidationUtils {
     if (metadata != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
       Binary binary = model.getStorage().getBinary(storagePath);
-      ret = validateDescriptiveBinary(binary, metadata.getType(), failIfNoSchema);
+      ret = validateDescriptiveBinary(binary.getContent(), metadata.getType(), failIfNoSchema);
     } else {
       ret = new ValidationReport();
       ret.setValid(false);
@@ -190,19 +192,20 @@ public class ValidationUtils {
    * @param failIfNoSchema
    * @throws ValidationException
    */
-  public static ValidationReport validateDescriptiveBinary(Binary binary, String descriptiveMetadataType,
-    boolean failIfNoSchema) {
+  public static ValidationReport validateDescriptiveBinary(ContentPayload descriptiveMetadataPayload,
+    String descriptiveMetadataType, boolean failIfNoSchema) {
     ValidationReport ret = new ValidationReport();
+    InputStream inputStream = null;
+    InputStream schemaStream = null;
     try {
-      InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = null;
+      inputStream = descriptiveMetadataPayload.createInputStream();
+
       if (descriptiveMetadataType != null) {
         schemaStream = RodaCoreFactory
           .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase() + ".xsd");
       }
 
       if (schemaStream != null) {
-        // FIXME is inputstream closed???
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
         Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
@@ -232,6 +235,9 @@ public class ValidationUtils {
       LOGGER.error("Error validating descriptive metadata", e);
       ret.setValid(false);
       ret.setMessage(e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+      IOUtils.closeQuietly(schemaStream);
     }
 
     return ret;

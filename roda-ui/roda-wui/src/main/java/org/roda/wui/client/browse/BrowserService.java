@@ -23,7 +23,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -109,9 +108,6 @@ public interface BrowserService extends RemoteService {
    * @throws AuthorizationDeniedException
    */
   IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException;
-
-  Long countDescriptiveMetadataBinaries(String aipId)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 

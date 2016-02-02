@@ -176,7 +176,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing file: " + file);
 
-    StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+    StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
     Binary binary = storage.getBinary(storagePath);
 
     RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,

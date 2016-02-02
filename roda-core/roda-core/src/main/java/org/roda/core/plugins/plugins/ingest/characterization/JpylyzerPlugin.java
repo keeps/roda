@@ -112,7 +112,7 @@ public class JpylyzerPlugin implements Plugin<AIP> {
               // TODO check if file is JPEG2000
               try {
                 LOGGER.debug("Processing file: " + file);
-                StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+                StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
                 Binary binary = storage.getBinary(storagePath);
 
                 Path ffProbeResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());

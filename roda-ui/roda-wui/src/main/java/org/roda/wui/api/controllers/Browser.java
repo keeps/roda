@@ -36,7 +36,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
@@ -62,7 +62,6 @@ public class Browser extends RodaCoreService {
 
   private static final String PARENT_PARAM = "parent";
   private static final String FOLDERNAME_PARAM = "folderName";
-  private static final String PARENT_PATH = "path";
   private static final String FILENAME_PARAM = "filename";
   private static final String PATH_PARAM = "path";
   private static final Object CLASSIFICATION_PLAN_TYPE_PARAMETER = "classificationPlanType";
@@ -183,23 +182,6 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "getAncestors", aip.getId(), duration, AIP_PARAM, aip.toString());
 
     return ancestors;
-  }
-
-  public static Long countDescriptiveMetadataBinaries(RodaUser user, String aipId)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
-    Date startDate = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // delegate
-    Long count = BrowserHelper.countDescriptiveMetadataBinaries(aipId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "countDescriptiveMetadataBinaries", aipId, duration);
-
-    return count;
   }
 
   /*
@@ -486,7 +468,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
-    String metadataType, Binary metadataBinary) throws AuthorizationDeniedException, GenericException,
+    String metadataType, ContentPayload metadataPayload) throws AuthorizationDeniedException, GenericException,
       ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     Date start = new Date();
 
@@ -497,7 +479,7 @@ public class Browser extends RodaCoreService {
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataBinary);
+      metadataPayload);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -508,7 +490,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
-    String metadataType, Binary metadataBinary) throws AuthorizationDeniedException, GenericException,
+    String metadataType, ContentPayload metadataPayload) throws AuthorizationDeniedException, GenericException,
       ValidationException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
@@ -519,7 +501,7 @@ public class Browser extends RodaCoreService {
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataBinary);
+      metadataPayload);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -586,8 +568,9 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static void removeRepresentationFile(RodaUser user, String aipId, String representationId, String fileId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static void removeRepresentationFile(RodaUser user, String aipId, String representationId,
+    List<String> directoryPath, String fileId)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -596,7 +579,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
-    BrowserHelper.removeRepresentationFile(aipId, representationId, fileId);
+    BrowserHelper.removeRepresentationFile(aipId, representationId, directoryPath, fileId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -606,7 +589,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
-    String fileId, String acceptFormat)
+    List<String> directoryPath, String fileId, String acceptFormat)
       throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -618,8 +601,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
-    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId, fileId,
-      acceptFormat);
+    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId,
+      directoryPath, fileId, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

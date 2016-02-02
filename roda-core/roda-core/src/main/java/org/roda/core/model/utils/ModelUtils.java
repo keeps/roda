@@ -310,29 +310,23 @@ public final class ModelUtils {
       representationId);
   }
 
-  public static StoragePath getRepresentationFilePath(String aipId, String representationId, String... fileId)
-    throws RequestNotValidException {
+  public static StoragePath getRepresentationFileStoragePath(String aipId, String representationId,
+    List<String> directoryPath, String fileId) throws RequestNotValidException {
     List<String> path = new ArrayList<>();
     path.add(RodaConstants.STORAGE_CONTAINER_AIP);
     path.add(aipId);
     path.add(RodaConstants.STORAGE_DIRECTORY_DATA);
     path.add(representationId);
-    for (String fileIdPartial : fileId) {
-      path.add(fileIdPartial);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
     }
+    path.add(fileId);
 
     return DefaultStoragePath.parse(path);
   }
 
-  public static StoragePath getRepresentationFilePath(File f) throws RequestNotValidException {
-    // TODO make a better method for getting file path
-    List<String> fileId = new ArrayList<>();
-    if (f.getPath() != null) {
-      fileId.addAll(f.getPath());
-    }
-    fileId.add(f.getId());
-    return getRepresentationFilePath(f.getAipId(), f.getRepresentationId(), fileId.toArray(new String[] {}));
-
+  public static StoragePath getRepresentationFileStoragePath(File f) throws RequestNotValidException {
+    return getRepresentationFileStoragePath(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId());
   }
 
   public static String getAIPidFromStoragePath(StoragePath path) {

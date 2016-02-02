@@ -218,8 +218,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        List<Representation> reps = model.listRepresentations(aip.getId());
-        for (Representation representation : reps) {
+        for (Representation representation : aip.getRepresentations()) {
           if (block.size() == BLOCK_SIZE) {
             futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, plugin),
               new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
@@ -263,8 +262,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        List<Representation> reps = model.listRepresentations(aip.getId());
-        for (Representation representation : reps) {
+        for (Representation representation : aip.getRepresentations()) {
           Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), representation.getId());
           Iterator<File> fileIter = files.iterator();
 

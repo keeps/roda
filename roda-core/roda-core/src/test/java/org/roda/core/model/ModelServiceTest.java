@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +30,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -182,47 +180,47 @@ public class ModelServiceTest {
 
     // testing files
     final File file_1_1 = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
     assertEquals(aipId, file_1_1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
 
     // TODO test directories
 
-    final Binary binary_1_1 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_1_1));
+    final Binary binary_1_1 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_1_1));
     assertTrue(binary_1_1.getSizeInBytes() > 0);
     assertEquals(binary_1_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_1.getContent().createInputStream()).length);
 
     final File file_1_2 = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_FILE_2_ID);
+      CorporaConstants.REPRESENTATION_1_FILE_2_PATH, CorporaConstants.REPRESENTATION_1_FILE_2_ID);
     assertEquals(aipId, file_1_2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_ID, file_1_2.getId());
 
-    final Binary binary_1_2 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_1_2));
+    final Binary binary_1_2 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_1_2));
     assertTrue(binary_1_2.getSizeInBytes() > 0);
     assertEquals(binary_1_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_2.getContent().createInputStream()).length);
 
     final File file_2_1 = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_2_ID,
-      CorporaConstants.REPRESENTATION_2_FILE_1_ID);
+      CorporaConstants.REPRESENTATION_2_FILE_1_PATH, CorporaConstants.REPRESENTATION_2_FILE_1_ID);
     assertEquals(aipId, file_2_1.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_ID, file_2_1.getId());
 
-    final Binary binary_2_1 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_2_1));
+    final Binary binary_2_1 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_2_1));
     assertTrue(binary_2_1.getSizeInBytes() > 0);
     assertEquals(binary_2_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_1.getContent().createInputStream()).length);
 
     final File file_2_2 = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_2_ID,
-      CorporaConstants.REPRESENTATION_2_FILE_2_ID);
+      CorporaConstants.REPRESENTATION_2_FILE_2_PATH, CorporaConstants.REPRESENTATION_2_FILE_2_ID);
     assertEquals(aipId, file_2_2.getAipId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_ID, file_2_2.getId());
 
-    final Binary binary_2_2 = storage.getBinary(ModelUtils.getRepresentationFilePath(file_2_2));
+    final Binary binary_2_2 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_2_2));
     assertTrue(binary_2_2.getSizeInBytes() > 0);
     assertEquals(binary_2_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_2.getContent().createInputStream()).length);
@@ -284,7 +282,8 @@ public class ModelServiceTest {
     }
 
     try {
-      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
+        CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("File should have been deleted, but yet was retrieved.");
     } catch (NotFoundException e) {
       // do nothing as it was expected
@@ -355,7 +354,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Iterable<DescriptiveMetadata> list = model.listDescriptiveMetadata(aipId);
+    Iterable<DescriptiveMetadata> list = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
     DescriptiveMetadata descriptiveMetadata1 = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
@@ -374,7 +373,7 @@ public class ModelServiceTest {
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
-      binary, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
+      binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -400,7 +399,7 @@ public class ModelServiceTest {
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
-      CorporaConstants.DESCRIPTIVE_METADATA_ID, binary, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
+      CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -443,7 +442,7 @@ public class ModelServiceTest {
     final Representation representation1 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
     final Representation representation2 = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_2_ID);
 
-    final Iterable<Representation> list = model.listRepresentations(aipId);
+    final Iterable<Representation> list = model.retrieveAIP(aipId).getRepresentations();
     assertThat(list, containsInAnyOrder(representation1, representation2));
   }
 
@@ -481,7 +480,8 @@ public class ModelServiceTest {
     final StoragePath corporaRepresentationPath = DefaultStoragePath
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
     Representation updatedRepresentation = model.updateRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      corporaService, DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
+      CorporaConstants.REPRESENTATION_1_ORIGINAL, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
 
     // check if it is connected
     Representation retrievedRepresentation = model.retrieveRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
@@ -511,7 +511,8 @@ public class ModelServiceTest {
 
     // check if file under representation was deleted
     try {
-      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
+        CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("Representation deleted and yet one of its files still exist.");
     } catch (NotFoundException e) {
       // do nothing as it was expected
@@ -526,17 +527,20 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newFileId = UUID.randomUUID().toString();
+    final List<String> newFileDirectoryPath = new ArrayList<>();
     final StoragePath corporaFilePath = DefaultStoragePath.parse(CorporaConstants.OTHER_FILE_STORAGEPATH);
     final Binary binary = corporaService.getBinary(corporaFilePath);
 
-    File createdFile = model.createFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileId, binary);
+    File createdFile = model.createFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath, newFileId,
+      binary.getContent());
 
     // check if it is connected
-    File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileId);
+    File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath,
+      newFileId);
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFilePath(createdFile));
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -554,15 +558,16 @@ public class ModelServiceTest {
     final boolean createIfNotExists = false;
     final boolean notify = false;
     File createdFile = model.updateFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID, binary, createIfNotExists, notify);
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID, binary,
+      createIfNotExists, notify);
 
     // check if it is connected
     File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFilePath(createdFile));
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -574,11 +579,13 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+    model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
+      CorporaConstants.REPRESENTATION_1_FILE_1_ID);
 
     // check if it deleted
     try {
-      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
+        CorporaConstants.REPRESENTATION_1_FILE_1_ID);
       fail("File deleted and yet exists.");
     } catch (NotFoundException e) {
       // do nothing

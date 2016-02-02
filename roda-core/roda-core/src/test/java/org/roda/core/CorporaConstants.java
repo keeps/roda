@@ -7,6 +7,9 @@
  */
 package org.roda.core;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -31,11 +34,13 @@ public class CorporaConstants {
   public static final String REPRESENTATION_1_TYPE = "digitalized_work";
   public static final boolean REPRESENTATION_1_ORIGINAL = true;
 
+  public static final List<String> REPRESENTATION_1_FILE_1_PATH = new ArrayList<>();
   public static final String REPRESENTATION_1_FILE_1_ID = "METS.xml";
   public static final String REPRESENTATION_1_FILE_1_FORMAT_MIMETYPE = "application/xml";
   public static final String REPRESENTATION_1_FILE_1_FORMAT_VERSION = "1.0";
   // puid=fmt/101
 
+  public static final List<String> REPRESENTATION_1_FILE_2_PATH = new ArrayList<>();
   public static final String REPRESENTATION_1_FILE_2_ID = "fil_7516.jpg";
   public static final String REPRESENTATION_1_FILE_2_FORMAT_MIMETYPE = "image/jpeg";
   public static final String REPRESENTATION_1_FILE_2_FORMAT_VERSION = "1.01";
@@ -45,10 +50,12 @@ public class CorporaConstants {
   public static final String REPRESENTATION_2_TYPE = "digitalized_work";
   public static final boolean REPRESENTATION_2_ORIGINAL = false;
 
+  public static final List<String> REPRESENTATION_2_FILE_1_PATH = new ArrayList<>();
   public static final String REPRESENTATION_2_FILE_1_ID = "fil_7516.jpg.tiff";
   public static final String REPRESENTATION_2_FILE_1_FORMAT_MIMETYPE = "image/tiff";
   public static final String REPRESENTATION_2_FILE_1_FORMAT_VERSION = null;
 
+  public static final List<String> REPRESENTATION_2_FILE_2_PATH = new ArrayList<>();
   public static final String REPRESENTATION_2_FILE_2_ID = "METS.xml";
   public static final String REPRESENTATION_2_FILE_2_FORMAT_MIMETYPE = "application/xml";
   public static final String REPRESENTATION_2_FILE_2_FORMAT_VERSION = "1.0";

@@ -90,7 +90,7 @@ public class JHOVEPlugin implements Plugin<AIP> {
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               LOGGER.debug("Processing file: " + file);
-              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
               Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());

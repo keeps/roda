@@ -100,9 +100,15 @@ public class IndexServiceTest {
     FSUtils.deletePath(basePath);
   }
 
+  private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {
+    assertEquals(aip.getId(), indexedAIP.getId());
+    assertEquals(aip.getParentId(), indexedAIP.getParentID());
+    assertEquals(aip.getPermissions(), indexedAIP.getPermissions());
+    assertEquals(aip.isActive(), indexedAIP.getState().equals(AIPState.ACTIVE));
+  }
+
   @Test
-  public void testAIPIndexCreateDelete() throws ParseException, NotFoundException, RequestNotValidException,
-    GenericException, AuthorizationDeniedException, AlreadyExistsException {
+  public void testAIPIndexCreateDelete() throws RODAException, ParseException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -111,12 +117,8 @@ public class IndexServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     // Retrieve, count and list AIP
-    // FIXME improve the comparison between AIP (from model) and IndexAIP (from
-    // index)
     final IndexedAIP indexedAip = index.retrieve(IndexedAIP.class, aipId);
-    assertEquals(aip.getId(), indexedAip.getId());
-    assertEquals(aip.isActive(), AIPState.ACTIVE.equals(indexedAip.getState()));
-    assertEquals(aip.getParentId(), indexedAip.getParentID());
+    compareAIPWithIndexedAIP(aip, indexedAip);
 
     final IndexResult<IndexedAIP> indexAips = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null);
     assertEquals(1, indexAips.getTotalCount());
@@ -189,8 +191,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPIndexCreateDelete2() throws ParseException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+  public void testAIPIndexCreateDelete2() throws RODAException {
     final String aipId = UUID.randomUUID().toString();
 
     model.createAIP(aipId, corporaService,
@@ -209,8 +210,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testAIPUpdate() throws NotFoundException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, ValidationException {
+  public void testAIPUpdate() throws RODAException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -223,15 +223,14 @@ public class IndexServiceTest {
     final AIP updatedAIP = model.updateAIP(aipId, corporaService, otherAipPath);
 
     final IndexedAIP indexedAIP = index.retrieve(IndexedAIP.class, aipId);
-    // FIXME how to compare AIP (from model) and IndexAIP (from index)
-    // assertEquals(updatedAIP, indexedAIP);
+
+    compareAIPWithIndexedAIP(updatedAIP, indexedAIP);
 
     model.deleteAIP(aipId);
   }
 
   @Test
-  public void testListCollections() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException {
+  public void testListCollections() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -252,8 +251,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testSubElements() throws RequestNotValidException, GenericException, AuthorizationDeniedException,
-    AlreadyExistsException, NotFoundException {
+  public void testSubElements() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -276,8 +274,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetAncestors() throws NotFoundException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException {
+  public void testGetAncestors() throws RODAException {
     // set up
     model.createAIP(CorporaConstants.SOURCE_AIP_ID, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
@@ -291,8 +288,7 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetElementWithoutParentId() throws RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+  public void testGetElementWithoutParentId() throws RODAException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -409,7 +405,7 @@ public class IndexServiceTest {
 
   @Test
   public void testReindexAIP() throws ParseException, RequestNotValidException, GenericException,
-    AuthorizationDeniedException, AlreadyExistsException, NotFoundException {
+    AuthorizationDeniedException, AlreadyExistsException, NotFoundException, ValidationException {
     for (int i = 0; i < 10; i++) {
       final String aipId = UUID.randomUUID().toString();
       model.createAIP(aipId, corporaService,

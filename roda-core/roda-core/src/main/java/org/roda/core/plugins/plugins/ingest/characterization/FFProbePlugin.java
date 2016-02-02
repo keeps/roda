@@ -110,7 +110,7 @@ public class FFProbePlugin implements Plugin<AIP> {
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is a video
-              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
               Path ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());

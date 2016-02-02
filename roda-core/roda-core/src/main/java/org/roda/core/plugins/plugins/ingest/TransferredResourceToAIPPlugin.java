@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jgroups.util.UUID;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -39,9 +39,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.StringContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,21 +109,27 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         AIPPermissions permissions = new AIPPermissions();
         boolean notify = true;
 
-        AIP aip = model.createAIP(active, parentId, permissions, notify);
+        final AIP aip = model.createAIP(active, parentId, permissions, notify);
 
-        final String aipID = aip.getId();
-        String representationID = "representation";
-        PluginHelper.createDirectories(model, aip.getId(), representationID);
+        final String representationId = UUID.randomUUID().toString();
+        final boolean original = true;
 
-        Path metadataFile = Files.createTempFile("metadata", ".xml");
-        StringWriter sw = new StringWriter();
-        sw.append("<metadata>");
-        sw.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
+        // TODO create descriptive metadata and representations via model
+        // TODO set representation type
+        // TODO update AIP metadata
+
+        PluginHelper.createDirectories(model, aip.getId(), representationId);
+
+        StringBuilder b = new StringBuilder();
+        b.append("<metadata>");
+        b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
 
         if (transferredResource.isFile()) {
-          Binary fileBinary = (Binary) FSUtils.convertPathToResource(transferredResourcePath.getParent(),
-            transferredResourcePath);
-          model.createFile(aip.getId(), representationID, transferredResource.getName(), fileBinary);
+          String fileId = transferredResource.getName();
+          List<String> directoryPath = new ArrayList<>();
+          ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
+
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload);
         } else {
           EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
           Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -135,10 +142,18 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
               try {
                 Path relativePath = transferredResourcePath.relativize(file);
-                sw.append("<field name='dc.relation'>"
+                b.append("<field name='dc.relation'>"
                   + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
-                Binary fileBinary = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-                model.createFile(aipID, representationID, relativePath.toString().replace('/', '_'), fileBinary);
+
+                String fileId = file.getFileName().toString();
+                List<String> directoryPath = new ArrayList<>();
+                for (int i = 0; i < relativePath.getNameCount() - 1; i++) {
+                  directoryPath.add(relativePath.getName(i).toString());
+                }
+
+                ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
+
+                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload);
               } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }
@@ -156,12 +171,12 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             }
           });
         }
-        sw.append("</metadata>");
-        Files.write(metadataFile, sw.toString().getBytes("UTF-8"));
-        Binary metadataBinary = (Binary) FSUtils.convertPathToResource(metadataFile.getParent(), metadataFile);
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataBinary, "key-value");
+        b.append("</metadata>");
 
-        aip = model.retrieveAIP(aip.getId());
+        ContentPayload metadataPayload = new StringContentPayload(b.toString());
+
+        // TODO make the following strings contants
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value");
 
         state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),

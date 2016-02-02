@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -28,7 +27,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
@@ -39,8 +37,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.controllers.Jobs;
@@ -124,12 +121,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getAncestors(user, aip);
   }
 
-  public Long countDescriptiveMetadataBinaries(String aipId)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.countDescriptiveMetadataBinaries(user, aipId);
-  }
-
   // FIXME see if there is a best way to deal with "hierarchical" keys
   // FIXME deal with non-configured/badly-configured keys
   @Override
@@ -185,16 +176,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     String metadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
+    ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    StoragePath storagePath = null;
-    StringContentPayload payload = new StringContentPayload(bundle.getXml());
-    Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
-    boolean reference = false;
-    Map<String, String> contentDigest = null;
-    Binary descriptiveMetadataIdBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
-
-    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType,
-      descriptiveMetadataIdBinary);
+    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType, payload);
   }
 
   @Override
@@ -204,15 +188,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String metadataId = bundle.getId();
     String metadataType = bundle.getType();
+    ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    StoragePath storagePath = null;
-    StringContentPayload payload = new StringContentPayload(bundle.getXml());
-    Long sizeInBytes = Long.valueOf(bundle.getXml().getBytes().length);
-    boolean reference = false;
-    Map<String, String> contentDigest = null;
-    Binary metadataBinary = new DefaultBinary(storagePath, payload, sizeInBytes, reference, contentDigest);
-
-    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataBinary);
+    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, payload);
 
   }
 

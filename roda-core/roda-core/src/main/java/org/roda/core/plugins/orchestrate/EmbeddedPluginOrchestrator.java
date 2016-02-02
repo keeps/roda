@@ -217,8 +217,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        List<Representation> reps = model.listRepresentations(aip.getId());
-        for (Representation representation : reps) {
+        for (Representation representation : aip.getRepresentations()) {
           if (block.size() == BLOCK_SIZE) {
             submitPlugin(block, plugin);
             block = new ArrayList<Representation>();
@@ -254,8 +253,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
-        List<Representation> reps = model.listRepresentations(aip.getId());
-        for (Representation rep : reps) {
+        for (Representation rep : aip.getRepresentations()) {
           Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), rep.getId());
           Iterator<File> fileIter = files.iterator();
 

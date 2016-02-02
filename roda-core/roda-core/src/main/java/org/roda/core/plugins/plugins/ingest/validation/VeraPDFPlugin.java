@@ -134,7 +134,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
               // TODO filter by file type and size
               // file.getOriginalName().endsWith(".pdf") && (file.getSize() <=
               // maxKbytes * 1024)
-              StoragePath storagePath = ModelUtils.getRepresentationFilePath(file);
+              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
               // FIXME file that doesn't get deleted afterwards
