@@ -42,9 +42,9 @@ import config.i18n.client.UserManagementConstants;
  * @author Luis Faria
  * 
  */
-public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<String> {
+public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<List<String>> {
 
-  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<Boolean>, Comparable<Permission> {
+  private class Permission extends HorizontalPanel implements HasValueChangeHandlers<String>, Comparable<Permission> {
 
     private final String sortingkeyword;
 
@@ -90,10 +90,6 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
       this.addStyleName("permission");
       checkbox.addStyleName("permission-checkbox");
       descriptionLabel.setStylePrimaryName("permission-description");
-    }
-
-    protected void onChange() {
-      ValueChangeEvent.fire(this, checkbox.getValue());
     }
 
     public boolean isLocked() {
@@ -145,8 +141,16 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
     }
 
     @Override
-    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
       return addHandler(handler, ValueChangeEvent.getType());
+    }
+
+    protected void onChange() {
+      ValueChangeEvent.fire(this, getValue());
+    }
+
+    public String getValue() {
+      return getRole();
     }
   }
 
@@ -158,6 +162,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   private final List<Permission> permissions;
 
+  private List<String> userSelections;
+
   private boolean enabled;
 
   private final LoadingPopup loading;
@@ -167,6 +173,8 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
    */
   public PermissionsPanel() {
     this.permissions = new Vector<Permission>();
+    this.userSelections = new Vector<String>();
+
     loading = new LoadingPopup(this);
     loading.show();
 
@@ -203,10 +211,15 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
         for (final Permission permission : permissions) {
           PermissionsPanel.this.add(permission);
-          permission.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+          permission.addValueChangeHandler(new ValueChangeHandler<String>() {
 
             @Override
-            public void onValueChange(ValueChangeEvent<Boolean> event) {
+            public void onValueChange(ValueChangeEvent<String> event) {
+              if (userSelections.contains(event.getValue())) {
+                userSelections.remove(event.getValue());
+              } else {
+                userSelections.add(event.getValue());
+              }
               onChange();
             }
           });
@@ -215,6 +228,10 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
         callback.onSuccess(true);
       }
     });
+  }
+
+  public List<String> getUserSelections() {
+    return userSelections;
   }
 
   /**
@@ -286,11 +303,15 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<String>> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
 
   protected void onChange() {
-    ValueChangeEvent.fire(this, "");
+    ValueChangeEvent.fire(this, getValue());
+  }
+
+  public List<String> getValue() {
+    return getUserSelections();
   }
 }

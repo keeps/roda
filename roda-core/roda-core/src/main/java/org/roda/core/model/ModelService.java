@@ -1438,19 +1438,22 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void addUser(User user, boolean useModel, boolean notify) throws GenericException, AlreadyExistsException {
+  public void addUser(User user, boolean useModel, boolean notify)
+ throws GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     addUser(user, null, useModel, notify);
   }
 
   public void addUser(User user, String password, boolean useModel, boolean notify)
-    throws GenericException, AlreadyExistsException {
+ throws GenericException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     boolean success = true;
     try {
       if (useModel) {
         UserUtility.getLdapUtility().addUser(user);
 
         if (password != null) {
-          // TODO change user password
+          UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
         }
       }
     } catch (LdapUtilityException e) {
@@ -1458,10 +1461,10 @@ public class ModelService extends ModelObservable {
       throw new GenericException("Error adding user to LDAP", e);
     } catch (UserAlreadyExistsException e) {
       success = false;
-      throw new AlreadyExistsException("User already exists", e);
+      throw new UserAlreadyExistsException("User already exists", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
-      throw new AlreadyExistsException("Email already exists", e);
+      throw new EmailAlreadyExistsException("Email already exists", e);
     }
     if (success && notify) {
       notifyUserCreated(user);
@@ -1479,7 +1482,7 @@ public class ModelService extends ModelObservable {
     try {
       if (useModel) {
         if (password != null) {
-          // TODO change user password
+          UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
         }
 
         UserUtility.getLdapUtility().modifyUser(user);

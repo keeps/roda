@@ -1837,7 +1837,7 @@ public class LdapUtility {
 
     // Add all roles assigned to this group
     Set<String> memberRoles = getMemberRoles(ctxRoot, getGroupDN(name));
-    group.setDirectRoles(memberRoles);
+    group.setAllRoles(memberRoles);
 
     // Add direct roles assigned to this group
     for (String role : getMemberDirectRoles(ctxRoot, getGroupDN(name))) {

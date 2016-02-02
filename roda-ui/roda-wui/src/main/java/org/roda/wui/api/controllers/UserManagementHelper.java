@@ -18,9 +18,12 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
@@ -87,7 +90,9 @@ public class UserManagementHelper {
     }
   }
 
-  public static void addUser(User user, String password) throws GenericException, AlreadyExistsException {
+  public static void addUser(User user, String password)
+ throws GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     RodaCoreFactory.getModelService().addUser(user, password, true, true);
   }
 

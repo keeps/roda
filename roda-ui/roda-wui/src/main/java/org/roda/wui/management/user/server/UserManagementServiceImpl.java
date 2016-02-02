@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
@@ -102,7 +103,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void addUser(User newUser, String password)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+ throws AuthorizationDeniedException, NotFoundException,
+    GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     UserManagement.addUser(user, newUser, password);
   }

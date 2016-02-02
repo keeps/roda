@@ -20,6 +20,7 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.management.user.client.recaptcha.RecaptchaWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -27,7 +28,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -82,7 +82,7 @@ public class Register extends Composite {
     .create(UserManagementConstants.class);
 
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  
+
   @UiField
   FlowPanel registerPanel;
 
@@ -109,7 +109,7 @@ public class Register extends Composite {
       public void onSuccess(String result) {
         logger.debug("GRECAPTCHA " + result);
         if (result != null) {
-          registerPanel.add(new RecaptchaWidget(result));  
+          registerPanel.add(new RecaptchaWidget(result));
         }
       }
 
@@ -156,9 +156,9 @@ public class Register extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof EmailAlreadyExistsException) {
-      Window.alert(constants.registerEmailAlreadyExists());
+      Toast.showError(constants.registerEmailAlreadyExists());
     } else {
-      Window.alert(messages.editUserFailure(Register.this.user.getName(), caught.getMessage()));
+      Toast.showError(messages.editUserFailure(Register.this.user.getName(), caught.getMessage()));
     }
   }
 }

@@ -13,18 +13,18 @@ package org.roda.wui.management.user.client;
 import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
-import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -66,7 +66,7 @@ public class CreateUser extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final User user;
+  private User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
@@ -98,7 +98,7 @@ public class CreateUser extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isChanged()) {
       if (userDataPanel.isValid()) {
-        final User user = userDataPanel.getUser();
+        user = userDataPanel.getUser();
         final String password = userDataPanel.getPassword();
 
         UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<Void>() {
@@ -128,14 +128,12 @@ public class CreateUser extends Composite {
   }
 
   private void errorMessage(Throwable caught) {
-    if (caught instanceof NotFoundException) {
-      Window.alert(messages.editUserNotFound(user.getName()));
-      cancel();
-    } else if (caught instanceof EmailAlreadyExistsException) {
-      Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
-      cancel();
+    if (caught instanceof EmailAlreadyExistsException) {
+      Toast.showError(messages.createUserEmailAlreadyExists(user.getEmail()));
+    } else if (caught instanceof UserAlreadyExistsException) {
+      Toast.showError(messages.createUserAlreadyExists(user.getId()));
     } else {
-      Window.alert(messages.editUserFailure(CreateUser.this.user.getName(), caught.getMessage()));
+      Toast.showError(messages.createUserFailure(caught.getMessage()));
     }
   }
 }

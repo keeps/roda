@@ -17,9 +17,12 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
@@ -188,9 +191,10 @@ public class UserManagement extends RodaCoreService {
 
     return ret;
   }
-  
+
   public static void addUser(RodaUser user, User newUser, String password)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException {
     Date start = new Date();
 
     // check user permissions
@@ -231,10 +235,9 @@ public class UserManagement extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "removeUser", null, duration, "username", username);
   }
-  
+
   public static void addGroup(RodaUser user, Group group)
-    throws AuthorizationDeniedException, GenericException, AlreadyExistsException
-     {
+    throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
     Date start = new Date();
 
     // check user permissions
@@ -248,8 +251,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "addGroup", null, duration, "groupname", group.getId());
   }
 
-  public static void modifyGroup(RodaUser user, Group group) throws AuthorizationDeniedException, GenericException, NotFoundException
-     {
+  public static void modifyGroup(RodaUser user, Group group)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -263,7 +266,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "modifyGroup", null, duration, "groupname", group.getId());
   }
 
-  public static void removeGroup(RodaUser user, String groupname) throws AuthorizationDeniedException, GenericException {
+  public static void removeGroup(RodaUser user, String groupname)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions

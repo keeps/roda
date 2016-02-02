@@ -8,6 +8,7 @@
 package org.roda.wui.management.user.client;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -35,20 +36,20 @@ import com.google.gwt.user.client.ui.Label;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<String> {
+public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<List<Group>> {
 
   private class GroupCheckbox extends HorizontalPanel
-    implements HasValueChangeHandlers<Boolean>, Comparable<GroupCheckbox> {
+    implements HasValueChangeHandlers<Group>, Comparable<GroupCheckbox> {
 
     private final String sortingkeyword;
 
-    private final String group;
+    private final Group group;
 
     private final CheckBox checkbox;
 
     private final Label descriptionLabel;
 
-    public GroupCheckbox(String group, String description, String sortingkeyword) {
+    public GroupCheckbox(Group group, String description, String sortingkeyword) {
       this.group = group;
       this.checkbox = new CheckBox();
       this.descriptionLabel = new Label(description);
@@ -78,10 +79,6 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
       descriptionLabel.setStylePrimaryName("group-description");
     }
 
-    protected void onChange() {
-      ValueChangeEvent.fire(this, checkbox.getValue());
-    }
-
     public boolean isChecked() {
       return checkbox.getValue();
     }
@@ -90,7 +87,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
       checkbox.setValue(checked);
     }
 
-    public String getGroup() {
+    public Group getGroup() {
       return group;
     }
 
@@ -104,8 +101,16 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
     }
 
     @Override
-    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Boolean> handler) {
+    public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Group> handler) {
       return addHandler(handler, ValueChangeEvent.getType());
+    }
+
+    protected void onChange() {
+      ValueChangeEvent.fire(this, getValue());
+    }
+    
+    public Group getValue() {
+      return getGroup();
     }
   }
 
@@ -115,6 +120,8 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
   private final List<String> blacklist;
 
   private final List<GroupCheckbox> groups;
+  
+  private HashMap<String, Group> userSelections;
 
   private boolean enabled;
 
@@ -129,6 +136,8 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
   public GroupSelect(boolean visible) {
     this.groups = new Vector<GroupCheckbox>();
     this.blacklist = new Vector<String>();
+    this.userSelections = new HashMap<String, Group>();
+    
     loading = new LoadingPopup(this);
 
     enabled = true;
@@ -149,7 +158,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
       public void onSuccess(List<Group> allGroups) {
         for (Group group : allGroups) {
           if (!blacklist.contains(group.getId())) {
-            GroupCheckbox groupCheckbox = new GroupCheckbox(group.getId(), group.getFullName(), group.getId());
+            GroupCheckbox groupCheckbox = new GroupCheckbox(group, group.getFullName(), group.getId());
             groups.add(groupCheckbox);
           }
         }
@@ -158,10 +167,15 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
 
         for (final GroupCheckbox groupCheckbox : groups) {
           GroupSelect.this.add(groupCheckbox);
-          groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+          groupCheckbox.addValueChangeHandler(new ValueChangeHandler<Group>() {
 
             @Override
-            public void onValueChange(ValueChangeEvent<Boolean> event) {
+            public void onValueChange(ValueChangeEvent<Group> event) {
+              if (userSelections.keySet().contains(event.getValue().getId())) {
+                userSelections.remove(event.getValue().getId());
+              } else {
+                userSelections.put(event.getValue().getId(), event.getValue()); 
+              }
               onChange();
             }
           });
@@ -171,16 +185,11 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
       }
     });
   }
-
-  @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
+  
+  public HashMap<String, Group> getUserSelections() {
+    return userSelections;
   }
-
-  protected void onChange() {
-    ValueChangeEvent.fire(this, "");
-  }
-
+  
   public boolean isEnabled() {
     return enabled;
   }
@@ -193,9 +202,10 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
       boolean foundit = false;
       for (Iterator<GroupCheckbox> j = groups.iterator(); j.hasNext() && !foundit;) {
         GroupCheckbox g = j.next();
-        if (g.getGroup().equals(group)) {
+        if (g.getGroup().getId().equals(group)) {
           foundit = true;
           g.setChecked(true);
+          userSelections.put(group, g.getGroup());
         }
       }
     }
@@ -205,7 +215,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
     Set<String> memberGroups = new HashSet<String>();
     for (GroupCheckbox g : groups) {
       if (g.isChecked()) {
-        memberGroups.add(g.getGroup());
+        memberGroups.add(g.getGroup().getId());
       }
     }
     return memberGroups;
@@ -213,5 +223,18 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Str
 
   public void addGroupToBlacklist(String group) {
     blacklist.add(group);
+  }
+
+  @Override
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<List<Group>> handler) {
+    return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+  protected void onChange() {
+    ValueChangeEvent.fire(this, getValue());
+  }
+  
+  public List<Group> getValue() {
+    return new Vector<Group>(getUserSelections().values());
   }
 }

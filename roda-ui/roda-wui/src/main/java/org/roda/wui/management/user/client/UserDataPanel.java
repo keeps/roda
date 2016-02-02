@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.MissingResourceException;
 import java.util.Set;
 
+import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -275,7 +277,22 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
 
-    permissionsPanel.addValueChangeHandler(valueChangedHandler);
+    permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<List<String>> event) {
+        onChange();
+      }
+    });
+
+    groupSelect.addValueChangeHandler(new ValueChangeHandler<List<Group>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<List<Group>> event) {
+        updatePermissions(event.getValue());
+        onChange();
+      }
+    });
   }
 
   private int setSelected(ListBox listbox, String text) {
@@ -326,7 +343,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
     this.setMemberGroups(user.getAllGroups());
     this.setPermissions(user.getDirectRoles(), user.getAllRoles());
-
   }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
@@ -343,9 +359,17 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
       @Override
       public void onFailure(Throwable caught) {
-        // TODO Auto-generated method stub
+        Tools.newHistory(MemberManagement.RESOLVER);
       }
     });
+  }
+  
+  private void updatePermissions(List<Group> groups) {
+    permissionsPanel.clear();
+    permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
+    for (Group group : groups) {
+      permissionsPanel.checkPermissions(group.getAllRoles(), true);
+    }
   }
 
   /**
@@ -385,10 +409,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     return user;
   }
 
-  public User getValue() {
-    return getUser();
-  }
-
   /**
    * Set the groups of which this user is member of
    * 
@@ -405,7 +425,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
         @Override
         public void onFailure(Throwable caught) {
-          // TODO Auto-generated method stub
+          Tools.newHistory(MemberManagement.RESOLVER);
         }
       });
     }
@@ -436,11 +456,6 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    */
   public boolean isPasswordChanged() {
     return password.isChanged();
-  }
-
-  protected void onChange() {
-    changed = true;
-    ValueChangeEvent.fire(this, getValue());
   }
 
   /**
@@ -569,5 +584,14 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<User> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
+  }
+
+  protected void onChange() {
+    changed = true;
+    ValueChangeEvent.fire(this, getValue());
+  }
+
+  public User getValue() {
+    return getUser();
   }
 }

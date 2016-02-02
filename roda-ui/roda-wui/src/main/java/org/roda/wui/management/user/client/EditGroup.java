@@ -17,13 +17,13 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -82,7 +82,7 @@ public class EditGroup extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final Group group;
+  private Group group;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
 
@@ -114,7 +114,7 @@ public class EditGroup extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (groupDataPanel.isChanged()) {
       if (groupDataPanel.isValid()) {
-        final Group group = groupDataPanel.getGroup();
+        group = groupDataPanel.getGroup();
 
         UserManagementService.Util.getInstance().modifyGroup(group, new AsyncCallback<Void>() {
 
@@ -159,10 +159,10 @@ public class EditGroup extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Window.alert(messages.editGroupNotFound(group.getName()));
+      Toast.showError(messages.editGroupNotFound(group.getName()));
       cancel();
     } else {
-      Window.alert(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
+      Toast.showError(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
     }
   }
 }

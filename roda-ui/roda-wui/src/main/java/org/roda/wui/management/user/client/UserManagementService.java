@@ -21,7 +21,6 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
@@ -105,13 +104,14 @@ public interface UserManagementService extends RemoteService {
    *          the user
    * @param password
    *          the user password
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
    * @throws EmailAlreadyExistsException
    * @throws UserAlreadyExistsException
-   * @throws NoSuchUserException
-   * @throws IllegalOperationException
+   * @throws GenericException
    */
-  public void addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
+  public void addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException;
 
   /**
    * Modify a user
@@ -120,22 +120,24 @@ public interface UserManagementService extends RemoteService {
    *          the modified users
    * @param password
    *          the new user password, or null to stay the same
-   * @throws RODAException
-   * 
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws AlreadyExistsException
+   * @throws GenericException
    */
-  public void modifyUser(User user, String password) throws RODAException;
-  
+  public void modifyUser(User user, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
+
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
    * 
    * @param username
    *          the user name
    * @return true if user was removed, false if it was only deactivated
-   * @throws RODAException
-   * @throws IllegalOperationException
-   * @throws NoSuchUserException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
    */
-  public void removeUser(String username) throws RODAException, NotFoundException, IllegalOperationException;
+  public void removeUser(String username) throws AuthorizationDeniedException, GenericException;
 
   /**
    * Modify the authenticated user
@@ -157,31 +159,32 @@ public interface UserManagementService extends RemoteService {
    * 
    * @param group
    *          the new group
-   * @throws RODAException
-   * @throws GroupAlreadyExistsException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
+   * @throws AlreadyExistsException
    */
-  public void addGroup(Group group) throws RODAException, GroupAlreadyExistsException;
+  public void addGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException;
 
   /**
    * Modify a group
    * 
    * @param group
    *          the modified group
-   * @throws RODAException
-   * @throws IllegalOperationException
-   * @throws NoSuchGroupException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
+   * @throws NotFoundException
    */
-  public void modifyGroup(Group group) throws RODAException, NotFoundException, IllegalOperationException;
+  public void modifyGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Remove a group
    * 
    * @param groupname
    *          the group name
-   * @throws RODAException
-   * @throws IllegalOperationException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
    */
-  public void removeGroup(String groupname) throws RODAException, IllegalOperationException;
+  public void removeGroup(String groupname) throws AuthorizationDeniedException, GenericException;
 
   /**
    * Get the number log entries

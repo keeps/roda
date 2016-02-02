@@ -11,10 +11,12 @@
 package org.roda.wui.management.user.client;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -103,14 +105,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     this.enableGroupSelect = enableGroupSelect;
     
     groupSelectPanel.setVisible(enableGroupSelect);
-    
-    ValueChangeHandler<String> valueChangedHandler = new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        onChange();
-      }
-    };
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -140,8 +134,22 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     groupname.addChangeHandler(changeHandler);
     fullname.addChangeHandler(changeHandler);
         
-    permissionsPanel.addValueChangeHandler(valueChangedHandler);
-    groupSelect.addValueChangeHandler(valueChangedHandler);
+    permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
+      
+      @Override
+      public void onValueChange(ValueChangeEvent<List<String>> event) {
+        onChange(); 
+      }
+    });
+    
+    groupSelect.addValueChangeHandler(new ValueChangeHandler<List<Group>>() {
+      
+      @Override
+      public void onValueChange(ValueChangeEvent<List<Group>> event) {
+        updatePermissions(event.getValue());
+        onChange(); 
+      }
+    });
   }
 
   /**
@@ -165,16 +173,24 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       public void onSuccess(Boolean result) {
         Set<String> indirectRoles = new HashSet<String>(allRoles);
         indirectRoles.removeAll(directRoles);
-
+        
         permissionsPanel.checkPermissions(directRoles, false);
         permissionsPanel.checkPermissions(indirectRoles, true);
       }
       
       @Override
       public void onFailure(Throwable caught) {
-        // TODO Auto-generated method stub
+        Tools.newHistory(MemberManagement.RESOLVER);
       }
     });
+  }
+  
+  private void updatePermissions(List<Group> groups) {
+    permissionsPanel.clear();
+    permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
+    for (Group group : groups) {
+      permissionsPanel.checkPermissions(group.getAllRoles(), true);
+    }
   }
 
   /**
@@ -197,10 +213,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     return group;
   }
 
-  public Group getValue() {
-    return getGroup();
-  }
-
   /**
    * Set the groups of which this group is member of
    * 
@@ -217,7 +229,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
         
         @Override
         public void onFailure(Throwable caught) {
-          // TODO Auto-generated method stub
+          Tools.newHistory(MemberManagement.RESOLVER);
         }
       });
     }
@@ -230,11 +242,6 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
    */
   public Set<String> getMemberGroups() {
     return enableGroupSelect ? groupSelect.getMemberGroups() : null;
-  }
-
-  protected void onChange() {
-    changed = true;
-    ValueChangeEvent.fire(this, getValue());
   }
 
   /**
@@ -313,5 +320,14 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   @Override
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Group> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
+  }
+  
+  protected void onChange() {
+    changed = true;
+    ValueChangeEvent.fire(this, getValue());
+  }
+  
+  public Group getValue() {
+    return getGroup();
   }
 }

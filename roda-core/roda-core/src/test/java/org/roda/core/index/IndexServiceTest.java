@@ -40,10 +40,13 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -419,7 +422,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException {
+  public void indexMembers() throws AlreadyExistsException, GenericException, RequestNotValidException,
+    EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     Set<String> groups = new HashSet<String>();
     groups.add("administrators");
     Set<String> roles = new HashSet<String>();

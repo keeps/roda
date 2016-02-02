@@ -12,19 +12,19 @@ package org.roda.wui.management.user.client;
 
 import java.util.List;
 
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -195,13 +195,12 @@ public class EditUser extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Window.alert(messages.editUserNotFound(user.getName()));
+      Toast.showError(messages.editUserNotFound(user.getName()));
       cancel();
-    } else if (caught instanceof EmailAlreadyExistsException) {
-      Window.alert(messages.editUserEmailAlreadyExists(user.getEmail()));
-      cancel();
+    } else if (caught instanceof AlreadyExistsException) {
+      Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
     } else {
-      Window.alert(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
+      Toast.showError(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
     }
   }
 }
