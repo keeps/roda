@@ -19,20 +19,6 @@
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
-		<!-- <g:FlowPanel addStyleNames="row full_width no_padding"> -->
-		<!-- <g:FlowPanel addStyleNames="col_6"> -->
-		<!-- <g:Label addStyleNames="form-label"> -->
-		<!-- <ui:text from='{constants.username}' /> -->
-		<!-- </g:Label> -->
-		<!-- <g:TextBox ui:field="username" addStyleNames="form-textbox" /> -->
-		<!-- </g:FlowPanel> -->
-		<!-- <g:FlowPanel addStyleNames="col_6 last"> -->
-		<!-- <g:Label addStyleNames="form-label"> -->
-		<!-- <ui:text from='{constants.password}' /> -->
-		<!-- </g:Label> -->
-		<!-- <u:PasswordPanel ui:field="password" /> -->
-		<!-- </g:FlowPanel> -->
-		<!-- </g:FlowPanel> -->
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label addStyleNames="form-label">
@@ -69,8 +55,6 @@
 					<ui:text from="{constants.nif}" />
 				</g:Label>
 				<g:TextBox ui:field="nif" addStyleNames="form-textbox" />
-				<!-- </g:FlowPanel> -->
-				<!-- <g:FlowPanel addStyleNames="col_6 last"> -->
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{constants.email}' />
 				</g:Label>

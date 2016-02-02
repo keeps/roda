@@ -95,23 +95,19 @@ public class CreateGroup extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (groupDataPanel.isChanged()) {
-      if (groupDataPanel.isValid()) {
-        group = groupDataPanel.getGroup();
+    if (groupDataPanel.isValid()) {
+      group = groupDataPanel.getGroup();
 
-        UserManagementService.Util.getInstance().addGroup(group, new AsyncCallback<Void>() {
+      UserManagementService.Util.getInstance().addGroup(group, new AsyncCallback<Void>() {
 
-          public void onSuccess(Void result) {
-            Tools.newHistory(MemberManagement.RESOLVER);
-          }
+        public void onSuccess(Void result) {
+          Tools.newHistory(MemberManagement.RESOLVER);
+        }
 
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-        });
-      }
-    } else {
-      Tools.newHistory(MemberManagement.RESOLVER);
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
+      });
     }
   }
 

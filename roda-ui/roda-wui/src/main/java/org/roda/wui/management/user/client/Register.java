@@ -76,11 +76,16 @@ public class Register extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final User user;
+  
+  private boolean recaptchaActive = true;
+  
+  private RecaptchaWidget recaptchaWidget;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   @UiField
@@ -107,41 +112,45 @@ public class Register extends Composite {
 
       @Override
       public void onSuccess(String result) {
-        logger.debug("GRECAPTCHA " + result);
         if (result != null) {
-          registerPanel.add(new RecaptchaWidget(result));
+          recaptchaWidget = new RecaptchaWidget(result);
+          registerPanel.add(recaptchaWidget);
+        } else {
+          recaptchaActive = false;
         }
       }
 
       @Override
       public void onFailure(Throwable caught) {
-        // TODO Auto-generated method stub
+        recaptchaActive = false;
       }
     });
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (userDataPanel.isChanged()) {
-      if (userDataPanel.isValid()) {
-        final User user = userDataPanel.getUser();
-        final String password = userDataPanel.getPassword();
-
-        UserManagementService.Util.getInstance().register(user, password, "", new AsyncCallback<Boolean>() {
-
-          @Override
-          public void onSuccess(Boolean result) {
-            // TODO Auto-generated method stub
-          }
-
-          @Override
-          public void onFailure(Throwable caught) {
-            errorMessage(caught);
-          }
-        });
+    if (userDataPanel.isValid()) {
+      String recaptchaResponse = null; 
+      if (recaptchaActive) {
+        recaptchaResponse = recaptchaWidget.getResponse();
       }
-    } else {
-      Tools.newHistory(MemberManagement.RESOLVER);
+      
+      final User user = userDataPanel.getUser();
+      final String password = userDataPanel.getPassword();
+      final String recaptcha = recaptchaResponse;
+      
+      UserManagementService.Util.getInstance().register(user, password, recaptcha, new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean result) {
+          // TODO Auto-generated method stub
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          errorMessage(caught);
+        }
+      });
     }
   }
 

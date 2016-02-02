@@ -192,6 +192,18 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
+  public static void register(User user, String password) throws EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, GenericException, NotFoundException {
+    Date start = new Date();
+
+    // delegate
+    UserManagementHelper.addUser(user, password);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "register", null, duration, "username", user.getId());
+  }
+
   public static void addUser(RodaUser user, User newUser, String password)
     throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException {

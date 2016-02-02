@@ -77,7 +77,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
       @Override
       public String getValue(RODAMember member) {
-        return member != null ? member.getFullName() : null;
+        return member != null ? member.getName() : null;
       }
     };
     

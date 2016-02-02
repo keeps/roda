@@ -33,6 +33,7 @@ import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.CreateJob;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -119,7 +120,8 @@ public class IngestTransfer extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
@@ -175,11 +177,12 @@ public class IngestTransfer extends Composite {
         if (r != null && !r.isFile()) {
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
         } else if (r != null && r.isFile()) {
-          // SafeUri downloadUri =
-          // RestUtils.createTransferredResourceDownloadUri(
-          // transferredResourceList.getSelectionModel().getSelectedObject().getId());
-          // Window.Location.assign(downloadUri.asString());
-          
+
+          SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(
+            transferredResourceList.getSelectionModel().getSelectedObject().getId(),
+            transferredResourceList.getSelectionModel().getSelectedObject().getParentId());
+          Window.Location.assign(downloadUri.asString());
+
           // disable selection
           transferredResourceList.getSelectionModel().clear();
         }

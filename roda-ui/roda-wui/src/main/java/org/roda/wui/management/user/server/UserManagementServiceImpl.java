@@ -102,11 +102,47 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void addUser(User newUser, String password)
- throws AuthorizationDeniedException, NotFoundException,
+  public void addUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
     GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     UserManagement.addUser(user, newUser, password);
+  }
+
+  @Override
+  public boolean register(User user, String password, String captcha) throws RODAException {
+    boolean successful = false;
+
+    if (captcha != null) {
+      // UserManagement.register(user, password);
+    } else {
+      logger.debug(RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", ""));
+      logger.debug(RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.secret.code", ""));
+
+      // TODO Post to https://www.google.com/recaptcha/api/siteverify
+
+    }
+
+    // FIXME
+    // if
+    // (CaptchaServiceImpl.check(getThreadLocalRequest().getSession().getId(),
+    // captcha).booleanValue()) {
+    // UserRegistration userRegistrationService;
+    // User registeredUser;
+    // // try {
+    // userRegistrationService =
+    // RodaClientFactory.getRodaWuiClient().getUserRegistrationService();
+    // user.setAllGroups(new HashSet<String>(Arrays.asList("guests")));
+    // user.setAllRoles(new HashSet<String>());
+    // // registeredUser = userRegistrationService.registerUser(user,
+    // // password);
+    // // successful = sendEmailVerification(registeredUser);
+    //
+    // // } catch (RemoteException e) {
+    // // logger.error("Remote Exception", e);
+    // // throw RODAClient.parseRemoteException(e);
+    // // }
+    // }
+    return successful;
   }
 
   @Override
@@ -184,32 +220,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveLogEntry(user, logEntryId);
-  }
-
-  @Override
-  public boolean register(User user, String password, String captcha) throws RODAException {
-    boolean successful = false;
-    // FIXME
-    // if
-    // (CaptchaServiceImpl.check(getThreadLocalRequest().getSession().getId(),
-    // captcha).booleanValue()) {
-    // UserRegistration userRegistrationService;
-    // User registeredUser;
-    // // try {
-    // userRegistrationService =
-    // RodaClientFactory.getRodaWuiClient().getUserRegistrationService();
-    // user.setAllGroups(new HashSet<String>(Arrays.asList("guests")));
-    // user.setAllRoles(new HashSet<String>());
-    // // registeredUser = userRegistrationService.registerUser(user,
-    // // password);
-    // // successful = sendEmailVerification(registeredUser);
-    //
-    // // } catch (RemoteException e) {
-    // // logger.error("Remote Exception", e);
-    // // throw RODAClient.parseRemoteException(e);
-    // // }
-    // }
-    return successful;
   }
 
   private boolean sendEmailVerification(org.roda.core.data.v2.user.User user) throws RODAException {

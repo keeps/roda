@@ -14,7 +14,7 @@ public class Recaptcha {
     $wnd.grecaptcha.reset(div);
   }-*/;
   
-  public static native void getResponse(String div) /*-{
-    $wnd.grecaptcha.getResponse(div);
+  public static native String getResponse(String div) /*-{
+    return $wnd.grecaptcha.getResponse();
   }-*/;
 }

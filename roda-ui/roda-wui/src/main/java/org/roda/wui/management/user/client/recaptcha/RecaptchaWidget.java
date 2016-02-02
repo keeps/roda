@@ -36,15 +36,15 @@ public class RecaptchaWidget extends Composite {
   /**
    * This Method is used to create an default ReCAPTCHA widget
    */
-  protected void render() {
+  public void render() {
     Recaptcha.render(key, RECAPTCHA_DIV_ID, "en");
   }
 
-  protected void reset() {
+  public void reset() {
     Recaptcha.reset(RECAPTCHA_DIV_ID);
   }
   
-  protected void getResponse() {
-    Recaptcha.getResponse(RECAPTCHA_DIV_ID);
+  public String getResponse() {
+    return Recaptcha.getResponse(RECAPTCHA_DIV_ID);
   }
 }

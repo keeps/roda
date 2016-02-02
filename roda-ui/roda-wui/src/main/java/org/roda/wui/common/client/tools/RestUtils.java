@@ -150,4 +150,18 @@ public class RestUtils {
     return b.toString();
   }
 
+  public static SafeUri createTransferredResourceDownloadUri(String fileId, String parentId) {
+    // api/v1/transferred/fileId?parentId={parentId}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_TRANSFERRED).append(RodaConstants.API_SEP).append(fileId);
+
+    if (parentId != null) {
+      b.append(RodaConstants.API_QUERY_START).append("parentId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(parentId);
+    }
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
 }
