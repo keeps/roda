@@ -60,8 +60,7 @@ public class SoxConvertPlugin extends CommandConvertPlugin {
 
   @Override
   public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "general",
-      "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
 
     return super.getParameters();
@@ -70,24 +69,23 @@ public class SoxConvertPlugin extends CommandConvertPlugin {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    String inputFormats = RodaCoreFactory
-      .getRodaConfigurationAsString("tools", "soxconvert", "general", "inputFormats");
+    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "inputFormats");
     applicableTo.addAll(Arrays.asList(inputFormats.split("\\s+")));
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "general",
-      "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 
   @Override
-  public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
+  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(uriPath, inputFormat, outputFormat, commandArguments);
+      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(uriPath, fileFormat, outputFormat, commandArguments);
     } else {
-      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(binary.getContent().createInputStream(), inputFormat,
+      pluginResult = SoxConvertPluginUtils.runSoxSoundConvert(binary.getContent().createInputStream(), fileFormat,
         outputFormat, commandArguments);
     }
 

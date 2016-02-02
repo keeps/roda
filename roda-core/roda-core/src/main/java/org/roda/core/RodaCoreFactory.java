@@ -83,6 +83,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -1019,7 +1020,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1030,12 +1031,27 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void runImageMagickConvertFilePlugin(String maxKbytes, String inputFormat, String outputFormat) {
+    try {
+      Plugin<?> plugin = new ImageMagickConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", "");
+      params.put("outputFormat", outputFormat);
+      params.put("commandArguments", "");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllFiles((Plugin<File>) plugin);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
   private static void runSoxConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new SoxConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1051,7 +1067,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new FfmpegConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1067,7 +1083,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new JodConverterPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
@@ -1082,7 +1098,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new GhostScriptConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1098,7 +1114,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new MencoderConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1114,7 +1130,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new UnoconvConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1130,7 +1146,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new GeneralCommandConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
       plugin.setParameterValues(params);
@@ -1418,6 +1434,8 @@ public class RodaCoreFactory {
       runPDFtoPDFAPlugin(args.get(1));
     } else if ("imagemagickconvert".equals(args.get(0))) {
       runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("imagemagickfileconvert".equals(args.get(0))) {
+      runImageMagickConvertFilePlugin(args.get(1), args.get(2), args.get(3));
     } else if ("soxconvert".equals(args.get(0))) {
       runSoxConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("ffmpegconvert".equals(args.get(0))) {

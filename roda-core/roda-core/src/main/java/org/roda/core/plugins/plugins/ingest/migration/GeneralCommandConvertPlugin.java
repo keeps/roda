@@ -81,16 +81,17 @@ public class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
+  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, inputFormat, outputFormat,
+      pluginResult = GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, fileFormat, outputFormat,
         commandArguments);
     } else {
       pluginResult = GeneralCommandConvertPluginUtils.runGeneralCommandConvert(binary.getContent().createInputStream(),
-        inputFormat, outputFormat, commandArguments);
+        fileFormat, outputFormat, commandArguments);
     }
 
     return pluginResult;

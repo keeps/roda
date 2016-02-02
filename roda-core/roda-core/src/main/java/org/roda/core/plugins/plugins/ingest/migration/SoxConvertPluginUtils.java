@@ -40,7 +40,7 @@ public class SoxConvertPluginUtils {
 
   private static Path executeSox(Path input, Path output, String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "general", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
@@ -64,6 +64,7 @@ public class SoxConvertPluginUtils {
       version = version.replace(" ", "");
       version = version.substring(0, version.indexOf('\n'));
     }
-    return version;
+    version = version.replaceAll("sox:SoXv([0-9.])", "SoX v$1");
+    return version.trim();
   }
 }

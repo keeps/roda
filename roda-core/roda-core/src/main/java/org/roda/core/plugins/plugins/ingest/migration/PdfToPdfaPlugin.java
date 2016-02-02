@@ -70,14 +70,14 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    inputFormat = "pdf";
     outputFormat = "pdf";
-    applicableTo.add(inputFormat);
+    applicableTo.add("pdf");
     convertableTo.add(outputFormat);
   }
 
   @Override
-  public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
+  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult = null;
 

@@ -40,7 +40,7 @@ public class FfmpegConvertPluginUtils {
 
   private static Path executeFfmpeg(Path input, Path output, String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "general", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{arguments}", commandArguments);
@@ -59,6 +59,6 @@ public class FfmpegConvertPluginUtils {
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('?'));
     }
-    return version;
+    return version.trim();
   }
 }

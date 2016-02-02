@@ -48,7 +48,7 @@ public class JodConverterPluginUtils {
     File inputFile = new File(input.toString());
     File outputFile = new File(output.toString());
 
-    String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general", "openOfficePort");
+    String port = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "openOfficePort");
     int openOfficePort = Integer.parseInt(port);
 
     OpenOfficeConnection connection = new SocketOpenOfficeConnection(openOfficePort);

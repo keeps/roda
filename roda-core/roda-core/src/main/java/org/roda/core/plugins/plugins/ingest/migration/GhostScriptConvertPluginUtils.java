@@ -40,8 +40,7 @@ public class GhostScriptConvertPluginUtils {
 
   private static Path executeGS(Path input, Path output, String commandArguments) throws GhostscriptException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "general",
-      "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
@@ -70,7 +69,7 @@ public class GhostScriptConvertPluginUtils {
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }
-    return version;
+    return "GhostScript " + version.trim();
   }
 
 }

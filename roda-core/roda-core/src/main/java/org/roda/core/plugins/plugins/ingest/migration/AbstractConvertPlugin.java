@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
@@ -20,6 +19,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
@@ -29,6 +29,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.v2.premis.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -39,7 +40,6 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,8 +47,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public final Logger logger = LoggerFactory.getLogger(getClass());
-  public String inputFormat;
-  public String outputFormat;
+  public String inputFormat = "";
+  public String outputFormat = "";
   public long maxKbytes = 20000; // default value: 20000 kb
 
   public List<String> applicableTo = new ArrayList<>();
@@ -117,10 +117,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     throws PluginException {
 
     if (list.size() > 0) {
-      if (list.get(0) instanceof AIP)
+      if (list.get(0) instanceof AIP) {
         return executeOnAIP(index, model, storage, (List<AIP>) (List<?>) list);
-      else
+      } else {
         return executeOnFile(index, model, storage, (List<File>) (List<?>) list);
+      }
     }
 
     return null;
@@ -153,9 +154,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
               Binary binary = storage.getBinary(fileStoragePath);
 
+              // TODO get file format
+              String fileFormat = null;
+
               // FIXME file that doesn't get deleted afterwards
               logger.debug("Running a ConvertPlugin (" + inputFormat + " to " + outputFormat + ") on " + file.getId());
-              Path pluginResult = executePlugin(binary);
+              Path pluginResult = executePlugin(binary, fileFormat);
 
               if (pluginResult != null) {
                 ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -205,6 +209,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     throws PluginException {
 
     int state = 1;
+    // System.out.println("LENGTH: " + Arrays.toString(list.toArray()));
 
     for (File file : list) {
       try {
@@ -216,12 +221,17 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           // TODO filter by file type and size
           // && file.getId().endsWith("." + inputFormat)
           // && (file.getSize() <= maxKbytes * 1024)
+          // TODO check if this is the way to defined the file id
+          IndexedFile ifile = index.retrieve(IndexedFile.class,
+            SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+          String fileFormat = ifile.getFileFormat().getPronom();
+
           StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
           Binary binary = storage.getBinary(fileStoragePath);
 
           // FIXME file that doesn't get deleted afterwards
-          logger.debug("Running a ConvertPlugin (" + inputFormat + " to " + outputFormat + ") on " + file.getId());
-          Path pluginResult = executePlugin(binary);
+          logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+          Path pluginResult = executePlugin(binary, fileFormat);
 
           if (pluginResult != null) {
             ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -241,7 +251,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload);
 
           } else {
-            logger.debug("Conversion (" + inputFormat + " to " + outputFormat + ") failed on file " + file.getId()
+            logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
               + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
             state = 2;
           }
@@ -255,7 +265,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return null;
   }
 
-  public abstract Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException;
+  public abstract Path executePlugin(Binary binary, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
     ModelService model, int state) throws PluginException {

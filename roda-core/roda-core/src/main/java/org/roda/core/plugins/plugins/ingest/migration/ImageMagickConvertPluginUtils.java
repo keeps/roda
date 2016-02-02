@@ -40,8 +40,7 @@ public class ImageMagickConvertPluginUtils {
   private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat,
     String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "general",
-      "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
     command = command.replace("{input_file}", inputFormat + ":" + input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
     command = command.replace("{arguments}", commandArguments);
@@ -59,7 +58,8 @@ public class ImageMagickConvertPluginUtils {
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }
-    return version;
-  }
 
+    version = version.replaceAll("Version:\\s+([a-zA-Z]+\\s+[a-zA-Z0-9.-]+).*", "$1");
+    return version.trim();
+  }
 }

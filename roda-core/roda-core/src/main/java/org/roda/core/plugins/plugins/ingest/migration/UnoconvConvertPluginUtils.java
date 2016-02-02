@@ -41,7 +41,7 @@ public class UnoconvConvertPluginUtils {
   private static Path executeUnoconvConvert(Path input, Path output, String inputFormat, String outputFormat,
     String commandArguments) throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "general", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{output_format}", outputFormat);
@@ -60,7 +60,8 @@ public class UnoconvConvertPluginUtils {
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }
-    return version;
-  }
 
+    version = version.replaceAll("(LibreOffice\\s[0-9.]+).*", "$1");
+    return version.trim();
+  }
 }

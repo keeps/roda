@@ -64,7 +64,8 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public abstract Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException;
+  public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException;
 
   @Override
   public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)

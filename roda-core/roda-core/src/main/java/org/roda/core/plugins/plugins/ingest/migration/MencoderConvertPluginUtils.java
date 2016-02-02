@@ -47,7 +47,7 @@ public class MencoderConvertPluginUtils {
     if (commandArguments.length() > 0) {
       command = command.replace("{arguments}", commandArguments);
     } else {
-      command = command.replace("{arguments}", "-ovc lavc -oac lavc");
+      command = command.replace("{arguments}", "-ovc copy -oac copy");
     }
 
     // filling a list of the command line arguments
@@ -59,11 +59,13 @@ public class MencoderConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException {
-    String version = CommandUtility.execute("mencoder", "-v");
+    String version = CommandUtility.execute("mencoder", "-of", "help");
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }
-    return version;
+
+    version = version.replaceAll("(MEncoder\\s+[0-9.-]+).*", "$1");
+    return version.trim();
   }
 
 }

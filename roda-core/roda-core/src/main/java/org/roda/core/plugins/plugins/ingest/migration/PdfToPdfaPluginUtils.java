@@ -16,9 +16,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
-import org.roda.core.RodaCoreFactory;
 import org.verapdf.core.ValidationException;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.metadata.fixer.impl.MetadataFixerImpl;
@@ -55,28 +53,11 @@ public class PdfToPdfaPluginUtils {
   }
 
   private static Path executePdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
-    // pdfa - file to save the GS output; fixed - file to save the metadata
-    // fixed output
-    Path pdfa = Files.createTempFile("pdfa", ".pdf");
+    // final pdfa output
     Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "pdfToPdfa", "commandLine");
-    command = command.replace("{input_file}", p.toString());
-    command = command.replace("{output_file}", pdfa.toString());
-
-    // GhostScript transformation command
-    String[] gsArgs = command.split(" ");
-    Ghostscript gs = Ghostscript.getInstance();
-
-    try {
-      gs.initialize(gsArgs);
-      gs.exit();
-    } catch (GhostscriptException e) {
-      throw new GhostscriptException("Exception when using GhostScript: ", e);
-    }
-
     // metadata fixer transformation
-    InputStream is = new FileInputStream(pdfa.toString());
+    InputStream is = new FileInputStream(p.toString());
 
     try (ModelParser loader = new ModelParser(is)) {
 

@@ -57,8 +57,7 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
 
   @Override
   public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
-      "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
 
     List<PluginParameter> params = new ArrayList<PluginParameter>();
@@ -78,24 +77,23 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
-      "inputFormats");
+    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "inputFormats");
     applicableTo.addAll(Arrays.asList(inputFormats.split(" ")));
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "general",
-      "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
   }
 
   @Override
-  public Path executePlugin(Binary binary) throws UnsupportedOperationException, IOException, CommandException {
+  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException {
     Path uriPath = Paths.get(binary.getContent().getURI());
     Path pluginResult;
 
     if (Files.exists(uriPath)) {
-      pluginResult = JodConverterPluginUtils.runJodConverter(uriPath, inputFormat, outputFormat);
+      pluginResult = JodConverterPluginUtils.runJodConverter(uriPath, fileFormat, outputFormat);
     } else {
-      pluginResult = JodConverterPluginUtils.runJodConverter(binary.getContent().createInputStream(), inputFormat,
+      pluginResult = JodConverterPluginUtils.runJodConverter(binary.getContent().createInputStream(), fileFormat,
         outputFormat);
     }
 
