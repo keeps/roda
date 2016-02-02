@@ -19,17 +19,20 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.SIPDescriptiveMetadata;
 import org.roda_project.commons_ip.model.SIPRepresentation;
+import org.roda_project.commons_ip.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,31 +43,33 @@ public class EARKSIPToAIPPluginUtils {
     throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
 
+    // TODO check if parent exists
+
     boolean active = false;
     AIPPermissions permissions = new AIPPermissions();
     boolean notify = true;
 
-    // TODO check if parent exists
-
     AIP aip = model.createAIP(active, parentId, permissions, notify);
 
     if (sip.getRepresentations() != null && sip.getRepresentations().size() > 0) {
+
       for (SIPRepresentation sr : sip.getRepresentations()) {
+        boolean original = true;
+        model.createRepresentation(aip.getId(), sr.getObjectID(), original, false);
+
+        // TODO check if this is needed
         PluginHelper.createDirectories(model, aip.getId(), sr.getObjectID());
+
         if (sr.getData() != null && sr.getData().size() > 0) {
-          for (Path p : sr.getData()) {
-
-            String fileId = p.getFileName().toString();
-            List<String> directoryPath = new ArrayList<String>();
-            for (int i = 0; i < p.getNameCount() - 1; i++) {
-              directoryPath.add(p.getName(i).toString());
-            }
-
-            ContentPayload payload = new FSPathContentPayload(p);
-
+          for (Pair<Path, List<String>> entry : sr.getData()) {
+            Path filePath = entry.getFirst();
+            List<String> directoryPath = entry.getSecond();
+            String fileId = filePath.getFileName().toString();
+            ContentPayload payload = new FSPathContentPayload(filePath);
             model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload);
           }
         }
+
         /*
          * if(sr.getAdministrativeMetadata()!=null &&
          * sr.getAdministrativeMetadata().size()>0){ for (SIPMetadata dm :
@@ -96,7 +101,7 @@ public class EARKSIPToAIPPluginUtils {
         ContentPayload payload = new FSPathContentPayload(dm.getMetadata());
         String type = (dm.getMetadataType() != null) ? dm.getMetadataType().toString() : "";
 
-        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type);
+        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type, false);
       }
     }
     /*
@@ -113,6 +118,7 @@ public class EARKSIPToAIPPluginUtils {
      * dm.getMetadata()); model.createDescriptiveMetadata(aip.getId(),
      * dm.getMetadata().getFileName().toString(), fileBinary, "XXX"); } }
      */
+
     return model.retrieveAIP(aip.getId());
 
   }

@@ -438,6 +438,12 @@ public class ModelService extends ModelObservable {
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
     ContentPayload payload, String descriptiveMetadataType) throws RequestNotValidException, GenericException,
       AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType, false);
+  }
+
+  public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
+    ContentPayload payload, String descriptiveMetadataType, boolean notify) throws RequestNotValidException,
+      GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     DescriptiveMetadata descriptiveMetadataBinary = null;
 
     // StoragePath binaryPath = binary.getStoragePath();
@@ -451,7 +457,9 @@ public class ModelService extends ModelObservable {
     aip.getMetadata().getDescriptiveMetadata().add(descriptiveMetadataBinary);
     updateAIPMetadata(aip);
 
-    notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
+    if (notify) {
+      notifyDescriptiveMetadataCreated(descriptiveMetadataBinary);
+    }
 
     return descriptiveMetadataBinary;
   }
@@ -527,6 +535,24 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
+  public Representation createRepresentation(String aipId, String representationId, boolean original, boolean notify)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    AlreadyExistsException {
+    Representation representation = new Representation(representationId, aipId, original);
+
+    // update AIP metadata
+    AIP aip = getAIPMetadata(aipId);
+    aip.getRepresentations().add(representation);
+    updateAIPMetadata(aip);
+
+    if (notify) {
+      notifyRepresentationCreated(representation);
+    }
+
+    return representation;
+
+  }
+
   // TODO support asReference
   public Representation createRepresentation(String aipId, String representationId, boolean original,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
@@ -546,7 +572,7 @@ public class ModelService extends ModelObservable {
       // update AIP metadata
       AIP aip = getAIPMetadata(aipId);
       aip.getRepresentations().add(representation);
-      updateAIP(aip);
+      updateAIPMetadata(aip);
 
       notifyRepresentationCreated(representation);
     } else {
@@ -972,7 +998,6 @@ public class ModelService extends ModelObservable {
 
     return report;
   }
-
 
   private ValidationReport isRepresentationValid(Directory directory) {
     return new ValidationReport();
@@ -1438,14 +1463,12 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void addUser(User user, boolean useModel, boolean notify)
- throws GenericException, EmailAlreadyExistsException,
+  public void addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     addUser(user, null, useModel, notify);
   }
 
-  public void addUser(User user, String password, boolean useModel, boolean notify)
- throws GenericException,
+  public void addUser(User user, String password, boolean useModel, boolean notify) throws GenericException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     boolean success = true;
     try {
@@ -1758,4 +1781,5 @@ public class ModelService extends ModelObservable {
     storage.deleteResource(binaryPath);
     notifyPreservationMetadataDeleted(pm);
   }
+
 }
