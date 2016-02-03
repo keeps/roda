@@ -454,10 +454,11 @@ public class ViewRepresentation extends Composite {
         }
       }
 
+      String fileLabel = simpleFile.getOriginalName() != null ? simpleFile.getOriginalName() : simpleFile.getId();
+
       ret.add(new BreadcrumbItem(
-        simpleFile.isDirectory()
-          ? getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FOLDER)
-          : getBreadcrumbLabel(simpleFile.getOriginalName(), RodaConstants.VIEW_REPRESENTATION_FILE),
+        simpleFile.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
+          : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
         Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, simpleFile.getId())));
     }
 
@@ -638,8 +639,10 @@ public class ViewRepresentation extends Composite {
       }
     }
 
-    if (type == null && file.getOriginalName() != null && file.getOriginalName().lastIndexOf(".") != -1) {
-      String extension = file.getOriginalName().substring(file.getOriginalName().lastIndexOf("."));
+    String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+
+    if (type == null && fileName.lastIndexOf(".") != -1) {
+      String extension = fileName.substring(fileName.lastIndexOf("."));
       type = viewers.getExtensions().get(extension);
     }
 
@@ -817,9 +820,8 @@ public class ViewRepresentation extends Composite {
     infoFilePanel.clear();
 
     if (file != null) {
-      if (file.getOriginalName() != null) {
-        values.put(messages.viewRepresentationInfoFilename(), file.getOriginalName());
-      }
+      String fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+      values.put(messages.viewRepresentationInfoFilename(), fileName);
 
       values.put(messages.viewRepresentationInfoSize(), Humanize.readableFileSize(file.getSize()));
 

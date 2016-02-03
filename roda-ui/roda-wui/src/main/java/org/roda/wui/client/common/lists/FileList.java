@@ -76,7 +76,12 @@ public class FileList extends AsyncTableCell<IndexedFile> {
 
       @Override
       public String getValue(IndexedFile file) {
-        return (file != null) ? file.getOriginalName() : null;
+        String fileName = null;
+        if (file != null) {
+          fileName = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
+        }
+
+        return fileName;
       }
     };
 
