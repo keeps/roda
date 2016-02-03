@@ -34,6 +34,7 @@ import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -103,6 +104,7 @@ public class ModelServiceTest {
 
   @Before
   public void init() throws IOException, GenericException {
+    logger.info("init");
     basePath = Files.createTempDirectory("modelTests");
     System.setProperty("roda.home", basePath.toString());
     RodaCoreFactory.instantiateTest(true, true);
@@ -113,6 +115,7 @@ public class ModelServiceTest {
 
   @After
   public void cleanup() throws NotFoundException, GenericException {
+    logger.info("cleanup");
     FSUtils.deletePath(basePath);
   }
 
@@ -327,6 +330,9 @@ public class ModelServiceTest {
 
   @Test
   public void testListAIPs() throws RODAException {
+
+    logger.info("Initial state: " + Iterables.toString(model.listAIPs()));
+
     // generate AIP ID
     final String aip1Id = UUID.randomUUID().toString();
     final String aip2Id = UUID.randomUUID().toString();
@@ -342,7 +348,12 @@ public class ModelServiceTest {
     Iterable<AIP> listAIPs = model.listAIPs();
     List<AIP> reusableList = new ArrayList<>();
     Iterables.addAll(reusableList, listAIPs);
-    
+
+    logger.info("AIP1: " + aip1);
+    logger.info("AIP2: " + aip2);
+    logger.info("AIP3: " + aip3);
+    logger.info("List: " + reusableList);
+
     assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 
   }
@@ -688,8 +699,7 @@ public class ModelServiceTest {
     // pre-load the preservation container data
     DefaultStoragePath preservationContainerPath = DefaultStoragePath
       .parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER);
-    // 2016-01-11 hsilva commented out (why to delete if it doesn't exist?)
-    // storage.deleteContainer(preservationContainerPath);
+    storage.deleteContainer(preservationContainerPath);
     storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
     AgentPreservationObject apo = model.getAgentPreservationObject(CorporaConstants.AGENT_RODA_8);
