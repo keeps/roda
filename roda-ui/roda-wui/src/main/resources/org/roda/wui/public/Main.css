@@ -1703,7 +1703,7 @@
 }
 
 .dragover #drop {
-	border: 5px dashed #ddd;
+	border: 5px solid #ddd;
 }
 
 #drop {
