@@ -28,7 +28,7 @@ public class CorporaConstants {
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 
   public static final String DESCRIPTIVE_METADATA_ID = "ead-c.xml";
-  public static final String DESCRIPTIVE_METADATA_TYPE = "eadc-2008";
+  public static final String DESCRIPTIVE_METADATA_TYPE = "ead-c";
 
   public static final String REPRESENTATION_1_ID = "representation_1";
   public static final String REPRESENTATION_1_TYPE = "digitalized_work";
