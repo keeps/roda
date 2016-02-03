@@ -73,9 +73,6 @@
 		</profile>
 		<profile>
 			<id>roda-wui-docker</id>
-			<activation>
-				<activeByDefault>true</activeByDefault>
-			</activation>
 			<build>
 				<plugins>
 					<plugin>
