@@ -10,11 +10,11 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -28,8 +28,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -37,19 +35,15 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
-import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
+import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -117,20 +111,21 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
         try {
           for (Representation representation : aip.getRepresentations()) {
+            LOGGER.debug("createPremisForRepresentation  " + representation.getId());
             createPremisForRepresentation(model, storage, temp, aip, representation.getId());
           }
 
           state = PluginState.SUCCESS;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);
@@ -148,65 +143,25 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
+      NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
-    RepresentationPreservationObject pObject = new RepresentationPreservationObject();
-    pObject.setId(representationId);
-    pObject.setPreservationLevel("");
-
-    List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
-    Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
-    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
+      representationId, representationPremis);
+    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
     for (File file : allFiles) {
-      if (!file.isDirectory()) {
-        pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationId, pObject,
-          pObjectPartFiles, file);
+      try {
+        StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+        Binary currentFileBinary = storage.getBinary(storagePath);
+        ContentPayload filePreservation = PremisUtils.createBaseFile(currentFileBinary);
+        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
+          file.getId(), filePreservation);
+      } catch (NoSuchAlgorithmException nsae) {
+        LOGGER.error("Error creating premis object for file " + file.getId() + " of representation " + representationId
+          + " from AIP " + aip.getId());
       }
     }
-    IOUtils.closeQuietly(allFiles);
-
-    createPremisObjectForRepresentation(model, aip, representationId, pObject, pObjectPartFiles);
-  }
-
-  private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationId,
-    RepresentationPreservationObject pObject, List<RepresentationFilePreservationObject> pObjectPartFiles)
-    throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
-    pObject.setPartFiles(pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
-
-    PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
-    ContentPayload payload = new StringContentPayload(helper.saveToString());
-
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
-      null, payload);
-  }
-
-  private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
-    StorageService storage, Path temp, AIP aip, String representationId, RepresentationPreservationObject pObject,
-    List<RepresentationFilePreservationObject> pObjectPartFiles, File file) throws IOException,
-    PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
-    LOGGER.debug("Processing file: " + file);
-
-    StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
-    Binary binary = storage.getBinary(storagePath);
-
-    RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,
-      "PremisSkeletonAction");
-
-    PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
-    ContentPayload payload = new StringContentPayload(helper.saveToString());
-
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId, file.getId(),
-      payload);
-    if (pObject.getRootFile() == null) {
-      pObject.setRootFile(premisObject);
-    } else {
-      pObjectPartFiles.add(premisObject);
-    }
-
-    return pObjectPartFiles;
   }
 
   @Override

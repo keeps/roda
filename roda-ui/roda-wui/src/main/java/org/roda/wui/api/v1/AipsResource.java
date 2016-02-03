@@ -36,7 +36,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -406,8 +406,8 @@ public class AipsResource {
   @GET
   @Path("/{aip_id}/preservation_metadata/")
   @Produces({"application/json", "application/zip", "text/html"})
-  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = EventPreservationObject.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
+  @ApiOperation(value = "Get preservation metadata", notes = "Get preservation metadata (JSON info, ZIP file or HTML conversion).\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -427,8 +427,8 @@ public class AipsResource {
   @GET
   @Path("/{aip_id}/preservation_metadata/{representation_id}")
   @Produces({"application/json", "application/zip", "text/html"})
-  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file or HTML conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = EventPreservationObject.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
+  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file or HTML conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -460,8 +460,8 @@ public class AipsResource {
   @GET
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
   @Produces({"application/xml"})
-  @ApiOperation(value = "Get representation preservation metadata file", notes = "Get the preservation file (XML) for a given representation.", response = EventPreservationObject.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
+  @ApiOperation(value = "Get representation preservation metadata file", notes = "Get the preservation file (XML) for a given representation.", response = PreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
@@ -479,7 +479,7 @@ public class AipsResource {
 
   @POST
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
-  @ApiOperation(value = "Create representation preservation file", notes = "Upload a preservation file to a representation (create)", response = EventPreservationObject.class)
+  @ApiOperation(value = "Create representation preservation file", notes = "Upload a preservation file to a representation (create)", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
 
@@ -501,7 +501,7 @@ public class AipsResource {
 
   @PUT
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
-  @ApiOperation(value = "Update representation preservation file", notes = "Upload a preservation file to a representation (update)", response = EventPreservationObject.class)
+  @ApiOperation(value = "Update representation preservation file", notes = "Upload a preservation file to a representation (update)", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = DescriptiveMetadata.class),
     @ApiResponse(code = 404, message = "Not found", response = DescriptiveMetadata.class)})
 
@@ -523,8 +523,8 @@ public class AipsResource {
 
   @DELETE
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
-  @ApiOperation(value = "Delete representation preservation file", notes = "Delete a preservation file for a representation.", response = EventPreservationObject.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = EventPreservationObject.class)})
+  @ApiOperation(value = "Delete representation preservation file", notes = "Delete a preservation file for a representation.", response = PreservationMetadata.class)
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,

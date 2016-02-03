@@ -25,7 +25,9 @@ import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.net.util.Base64;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -46,11 +48,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.metadata.v2.premis.PremisAgentHelper;
-import org.roda.core.metadata.v2.premis.PremisEventHelper;
-import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
-import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -414,8 +411,8 @@ public final class ModelUtils {
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = payload.createInputStream();
-      representation = PremisRepresentationObjectHelper.newInstance(binaryInputStream).getRepresentation();
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      representation = PremisUtils.binaryToRepresentation(binaryInputStream);
+    } catch (IOException | ClassCastException | XmlException e) {
       representation = null;
     } finally {
       if (binaryInputStream != null) {
@@ -434,8 +431,8 @@ public final class ModelUtils {
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = payload.createInputStream();
-      event = PremisEventHelper.newInstance(binaryInputStream).getEvent();
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      event = PremisUtils.binaryToEvent(binaryInputStream);
+    } catch (IOException | ClassCastException | XmlException e) {
       event = null;
     } finally {
       if (binaryInputStream != null) {
@@ -454,8 +451,8 @@ public final class ModelUtils {
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = payload.createInputStream();
-      file = PremisFileObjectHelper.newInstance(binaryInputStream).getFile();
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      file = PremisUtils.binaryToFile(binaryInputStream);
+    } catch (IOException | ClassCastException | XmlException e) {
       file = null;
     } finally {
       if (binaryInputStream != null) {
@@ -474,8 +471,8 @@ public final class ModelUtils {
     InputStream binaryInputStream = null;
     try {
       binaryInputStream = payload.createInputStream();
-      agent = PremisAgentHelper.newInstance(binaryInputStream).getAgent();
-    } catch (PremisMetadataException | IOException | ClassCastException e) {
+      agent = PremisUtils.binaryToAgent(binaryInputStream);
+    } catch (IOException | ClassCastException | XmlException e) {
       agent = null;
     } finally {
       if (binaryInputStream != null) {

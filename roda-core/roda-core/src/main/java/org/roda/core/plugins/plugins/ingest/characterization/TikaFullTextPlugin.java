@@ -17,15 +17,20 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.tika.exception.TikaException;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -41,6 +46,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -58,15 +64,16 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   private Map<String, String> parameters;
 
   private boolean createsPluginEvent = true;
-
-  private AgentPreservationObject agent;
+  private ContentPayload agent;
 
   @Override
   public void init() throws PluginException {
-    agent = new AgentPreservationObject();
-    agent.setAgentName(getName() + "/" + getVersion());
-    agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    agent.setId("characterization-tika");
+    try {
+      agent = PremisUtils.createPremisAgentBinary(getName() + "/" + getVersion(), "characterization-tika",
+        RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
+    } catch (GenericException e) {
+      throw new PluginException("Error initializing agent", e);
+    }
   }
 
   @Override
@@ -116,7 +123,12 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    PluginHelper.createPremisAgentIfInexistent(model, agent);
+    try {
+      model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, getName() + "/" + getVersion(),
+        agent);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
+    }
 
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File metadata and full-text extraction",
@@ -129,6 +141,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
           ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (File file : allFiles) {
+
             if (!file.isDirectory()) {
               LOGGER.debug("Processing file: " + file);
               StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
@@ -176,9 +189,9 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString())).addAttribute(
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Error running Tika " + aip.getId() + ": "
-            + e.getMessage()));
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error running Tika " + aip.getId() + ": " + e.getMessage()));
       }
 
       report.addItem(reportItem);

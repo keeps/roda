@@ -13,7 +13,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -24,15 +24,13 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
+import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -75,8 +73,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     pronomToExtension = new HashMap<>();
     mimetypeToExtension = new HashMap<>();
 
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   public abstract void init() throws PluginException;
@@ -182,8 +180,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
               if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
                 && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-                  || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                    .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+                  || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+                  || (applicableTo.contains(fileFormat)))
+                && ifile.getSize() < (maxKbytes * 1024)) {
 
                 if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
                   fileFormat = pronomToExtension.get(filePronom).get(0);
@@ -306,8 +305,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
             && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))
+            && ifile.getSize() < (maxKbytes * 1024)) {
 
             if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
               && !applicableTo.contains(fileFormat)) {
@@ -336,8 +336,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils
-                .getPreservationPath(file.getAipId(), newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
+                newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -361,8 +361,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return null;
   }
 
-  public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException;
+  public abstract Path executePlugin(Binary binary, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
     ModelService model, int state) throws PluginException {
@@ -373,8 +373,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     if (alteredFiles.size() == 0) {
       stringBuilder.append("No file was converted on this representation.");
     } else {
-      stringBuilder.append("The following files were converted on a new representation (ID: " + newRepresentionID
-        + "): ");
+      stringBuilder
+        .append("The following files were converted on a new representation (ID: " + newRepresentionID + "): ");
       for (String fileID : alteredFiles) {
         stringBuilder.append(fileID + ", ");
       }
@@ -393,14 +393,15 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEventAndAgent(aip.getId(), representationID, model,
-        EventPreservationObject.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
-        EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK, getClass().getName(),
-        Arrays.asList(representationID), outcome, stringBuilder.toString(), null, getClass().getName() + "@"
-          + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
+      PluginHelper.createPluginAgent(model, getClass().getName() + "@" + getVersion(), getClass().getName(),
+        RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
+      PluginHelper.createPluginEvent(aip.getId(), representationID, null, model,
+        RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
+        RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, getClass().getName() + "@" + getVersion(),
+        Arrays.asList(representationID), null, outcome, stringBuilder.toString(), null);
 
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
-      | AlreadyExistsException | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }

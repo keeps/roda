@@ -27,6 +27,7 @@ import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.UserUtility;
@@ -47,16 +48,12 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.Metadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.ip.metadata.RepresentationPreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -64,12 +61,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
-import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.metadata.v2.premis.PremisAgentHelper;
-import org.roda.core.metadata.v2.premis.PremisEventHelper;
-import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
-import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
+import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -82,11 +74,8 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
-import org.w3c.util.InvalidDateException;
 
 /**
  * Class that "relates" Model & Storage
@@ -958,10 +947,10 @@ public class ModelService extends ModelObservable {
 
   // FIXME turn this into ClosableIterable
   // TODO to improve...
-  public Iterable<RepresentationPreservationObject> getAipPreservationObjects(String aipId)
+  public Iterable<PreservationMetadata> getAipPreservationObjects(String aipId)
     throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Iterable<RepresentationPreservationObject> it = null;
-    final List<RepresentationPreservationObject> rpos = new ArrayList<RepresentationPreservationObject>();
+    Iterable<PreservationMetadata> it = null;
+    final List<PreservationMetadata> rpos = new ArrayList<PreservationMetadata>();
 
     final Iterator<Resource> resourceIterator = storage
       .listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
@@ -971,82 +960,29 @@ public class ModelService extends ModelObservable {
         ModelUtils.getAIPRepresentationPreservationPath(aipId, resource.getStoragePath().getName())).iterator();
       while (preservationIterator.hasNext()) {
         Resource preservationObject = preservationIterator.next();
+
         Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
         lc.xmlns.premisV2.Representation r = ModelUtils
           .getPreservationRepresentationObject(preservationBinary.getContent());
         if (r != null) {
-          rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(),
-            preservationObject.getStoragePath().getName(), preservationBinary));
+          PreservationMetadata pm = new PreservationMetadata();
+          pm.setAipId(aipId);
+          pm.setRepresentationId(resource.getStoragePath().getName());
+          pm.setId(null);
+          pm.setType(PreservationMetadataType.OBJECT_REPRESENTATION);
+          rpos.add(pm);
         }
 
       }
     }
-    it = new Iterable<RepresentationPreservationObject>() {
+    it = new Iterable<PreservationMetadata>() {
       @Override
-      public Iterator<RepresentationPreservationObject> iterator() {
+      public Iterator<PreservationMetadata> iterator() {
         return rpos.iterator();
       }
     };
 
     return it;
-  }
-
-  public RepresentationPreservationObject getRepresentationPreservationObject(String aipId, String representationId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    RepresentationPreservationObject obj = null;
-
-    StoragePath sp = ModelUtils.getPreservationRepresentationPath(aipId, representationId);
-    Binary b = storage.getBinary(sp);
-    obj = convertResourceToRepresentationPreservationObject(aipId, representationId, b.getStoragePath().getName(), b);
-
-    return obj;
-  }
-
-  public EventPreservationObject getEventPreservationObject(String aipId, String representationId, String fileID,
-    String preservationObjectID)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    EventPreservationObject obj = null;
-
-    StoragePath sp = ModelUtils.getPreservationFilePathRaw(aipId, representationId, preservationObjectID);
-    Binary b = storage.getBinary(sp);
-    obj = convertResourceToEventPreservationObject(aipId, representationId, preservationObjectID, b);
-
-    return obj;
-  }
-
-  public AgentPreservationObject getAgentPreservationObject(String agentID)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    AgentPreservationObject apo = null;
-
-    StoragePath sp = ModelUtils.getPreservationAgentPath(agentID);
-    Binary b = storage.getBinary(sp);
-    apo = convertResourceToAgentPreservationObject(agentID, b);
-
-    return apo;
-  }
-
-  private AgentPreservationObject convertResourceToAgentPreservationObject(String agentID, Binary resource)
-    throws GenericException {
-    if (resource instanceof DefaultBinary) {
-      try {
-        PremisAgentHelper pah = PremisAgentHelper.newInstance(resource.getContent().createInputStream());
-        AgentPreservationObject apo = new AgentPreservationObject();
-        apo.setAgentName((pah.getAgent().getAgentNameList() != null && pah.getAgent().getAgentNameList().size() > 0)
-          ? pah.getAgent().getAgentNameList().get(0) : "");
-        apo.setAgentType(pah.getAgent().getAgentType());
-        apo
-          .setId((pah.getAgent().getAgentIdentifierList() != null && pah.getAgent().getAgentIdentifierList().size() > 0)
-            ? pah.getAgent().getAgentIdentifierList().get(0).getAgentIdentifierValue() : "");
-        apo.setType(PreservationMetadataType.AGENT);
-        return apo;
-      } catch (PremisMetadataException | IOException e) {
-        throw new GenericException("Error while trying to convert a binary into a representation preservation object",
-          e);
-      }
-    } else {
-      throw new GenericException(
-        "Error while trying to convert a binary into a representation preservation object because resource is not a DefaultBinary");
-    }
   }
 
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
@@ -1208,218 +1144,27 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public RepresentationPreservationObject retrieveRepresentationPreservationObject(String aipId,
-    String representationId)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    RepresentationPreservationObject representationPreservationObject = null;
+  public Binary retrieveRepresentationPreservationObject(String aipId, String representationId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath filePath = ModelUtils.getPreservationRepresentationPath(aipId, representationId);
-    Binary binary = storage.getBinary(filePath);
-    representationPreservationObject = convertResourceToRepresentationPreservationObject(aipId, representationId,
-      representationId, binary);
-    representationPreservationObject.setId(representationId);
+    return storage.getBinary(filePath);
 
-    return representationPreservationObject;
   }
 
   // FIXME support file path
-  public RepresentationFilePreservationObject retrieveRepresentationFileObject(String aipId, String representationId,
-    String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    RepresentationFilePreservationObject representationPreservationObject = null;
-
+  public Binary retrieveRepresentationFileObject(String aipId, String representationId, String fileId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath filePath = ModelUtils.getPreservationFilePath(aipId, representationId, fileId);
-    Binary binary = storage.getBinary(filePath);
-    representationPreservationObject = convertResourceToRepresentationFilePreservationObject(aipId, representationId,
-      fileId, binary);
-    representationPreservationObject.setId(fileId);
-
-    return representationPreservationObject;
+    return storage.getBinary(filePath);
   }
 
-  // FIXME verify/refactor this method
-  private RepresentationFilePreservationObject convertResourceToRepresentationFilePreservationObject(String aipId,
-    String representationId, String fileId, Binary resource) throws GenericException {
-    if (resource instanceof DefaultBinary) {
-      try {
-        // retrieve needed information to instantiate Representation
-        // FIXME check if inputstream gets closed
-        PremisFileObjectHelper pfoh = PremisFileObjectHelper.newInstance(resource.getContent().createInputStream());
-
-        RepresentationFilePreservationObject rfpo = new RepresentationFilePreservationObject();
-        rfpo.setAipId(aipId);
-        rfpo.setRepresentationId(representationId);
-        rfpo.setFileId(fileId);
-        rfpo.setId(pfoh.getRepresentationFilePreservationObject().getId());
-        rfpo.setCompositionLevel(pfoh.getRepresentationFilePreservationObject().getCompositionLevel());
-        rfpo.setContentLocationType(pfoh.getRepresentationFilePreservationObject().getContentLocationType());
-        rfpo.setContentLocationValue(pfoh.getRepresentationFilePreservationObject().getContentLocationValue());
-        rfpo.setCreatingApplicationName(pfoh.getRepresentationFilePreservationObject().getCreatingApplicationName());
-        rfpo.setCreatingApplicationVersion(
-          pfoh.getRepresentationFilePreservationObject().getCreatingApplicationVersion());
-        rfpo.setDateCreatedByApplication(pfoh.getRepresentationFilePreservationObject().getDateCreatedByApplication());
-        rfpo.setFixities(pfoh.getRepresentationFilePreservationObject().getFixities());
-        rfpo.setFormatDesignationName(pfoh.getRepresentationFilePreservationObject().getFormatDesignationName());
-        rfpo.setFormatDesignationVersion(pfoh.getRepresentationFilePreservationObject().getFormatDesignationVersion());
-        rfpo.setFormatRegistryKey(pfoh.getRepresentationFilePreservationObject().getFormatRegistryKey());
-        rfpo.setFormatRegistryName(pfoh.getRepresentationFilePreservationObject().getFormatRegistryName());
-        rfpo.setFormatRegistryRole(pfoh.getRepresentationFilePreservationObject().getFormatRegistryRole());
-        rfpo.setHash(pfoh.getRepresentationFilePreservationObject().getHash());
-        rfpo.setMimetype(pfoh.getRepresentationFilePreservationObject().getMimetype());
-        rfpo.setObjectCharacteristicsExtension(
-          pfoh.getRepresentationFilePreservationObject().getObjectCharacteristicsExtension());
-        rfpo.setOriginalName(pfoh.getRepresentationFilePreservationObject().getOriginalName());
-        rfpo.setPreservationLevel(pfoh.getRepresentationFilePreservationObject().getPreservationLevel());
-        rfpo.setPronomId(pfoh.getRepresentationFilePreservationObject().getPronomId());
-        rfpo.setRepresentationObjectId(pfoh.getRepresentationFilePreservationObject().getRepresentationObjectId());
-        rfpo.setSize(pfoh.getRepresentationFilePreservationObject().getSize());
-        rfpo.setType(pfoh.getRepresentationFilePreservationObject().getType());
-        rfpo.setRepresentationId(representationId);
-        return rfpo;
-
-      } catch (PremisMetadataException e) {
-        throw new GenericException("Error while trying to convert a binary into a representation preservation object",
-          e);
-      } catch (IOException e) {
-        throw new GenericException("Error while trying to convert a binary into a representation preservation object",
-          e);
-      }
-    } else {
-      throw new GenericException("Error while trying to convert a binary into a representation preservation object");
-    }
-  }
-
-  // FIXME verify/refactor this method
-  private RepresentationPreservationObject convertResourceToRepresentationPreservationObject(String aipId,
-    String representationId, String fileId, Binary resource) throws GenericException {
-    if (resource instanceof DefaultBinary) {
-      try {
-
-        // FIXME check if inputstream gets closed
-        PremisRepresentationObjectHelper proh = PremisRepresentationObjectHelper
-          .newInstance(resource.getContent().createInputStream());
-        RepresentationPreservationObject rpo = new RepresentationPreservationObject();
-        rpo.setAipId(aipId);
-        rpo.setRepresentationId(representationId);
-        rpo.setId(proh.getRepresentationPreservationObject().getId());
-
-        rpo.setDerivationEventID(proh.getRepresentationPreservationObject().getDerivationEventID());
-        rpo.setDerivedFromRepresentationObjectID(
-          proh.getRepresentationPreservationObject().getDerivedFromRepresentationObjectID());
-
-        rpo.setPartFiles(proh.getRepresentationPreservationObject().getPartFiles());
-        rpo.setPreservationEventIDs(proh.getRepresentationPreservationObject().getPreservationEventIDs());
-        rpo.setPreservationLevel(proh.getRepresentationPreservationObject().getPreservationLevel());
-        rpo.setRepresentationObjectID(proh.getRepresentationPreservationObject().getRepresentationObjectID());
-        rpo.setRootFile(proh.getRepresentationPreservationObject().getRootFile());
-        rpo.setType(proh.getRepresentationPreservationObject().getType());
-
-        return rpo;
-      } catch (PremisMetadataException e) {
-        throw new GenericException("Error while trying to convert a binary into a representation preservation object");
-      } catch (IOException e) {
-        throw new GenericException("Error while trying to convert a binary into a representation preservation object");
-      }
-    } else {
-      throw new GenericException("Error while trying to convert a binary into a representation preservation object");
-    }
-  }
-
-  public EventPreservationObject retrieveEventPreservationObject(String aipId, String representationId, String fileId,
+  public Binary retrieveEventPreservationObject(String aipId, String representationId, String fileId,
     String preservationID)
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    EventPreservationObject eventPreservationObject = null;
-
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(aipId, representationId, preservationID,
       PreservationMetadataType.EVENT);
-    Binary binary = storage.getBinary(storagePath);
-    eventPreservationObject = convertResourceToEventPreservationObject(aipId, representationId, fileId, binary);
-    eventPreservationObject.setId(fileId);
-
-    return eventPreservationObject;
-  }
-
-  // FIXME verify/refactor this method
-  private EventPreservationObject convertResourceToEventPreservationObject(String aipId, String representationId,
-    String fileId, Binary resource) throws GenericException {
-    if (resource instanceof DefaultBinary) {
-      try {
-
-        // retrieve needed information to instantiate Representation
-
-        PremisEventHelper peh = PremisEventHelper.newInstance(resource.getContent().createInputStream());
-
-        // TODO premisevent to EventPreservationObject
-        EventPreservationObject epo = new EventPreservationObject();
-        epo.setType(PreservationMetadataType.EVENT);
-        epo.setId(fileId);
-        epo.setAipId(aipId);
-        epo.setRepresentationId(representationId);
-        epo.setAgentID((peh.getEvent().getLinkingAgentIdentifierList() != null
-          && peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
-            ? peh.getEvent().getLinkingAgentIdentifierList().get(0).getLinkingAgentIdentifierValue() : null);
-        epo.setAgentRole((peh.getEvent().getLinkingAgentIdentifierList() != null
-          && peh.getEvent().getLinkingAgentIdentifierList().size() > 0)
-            ? peh.getEvent().getLinkingAgentIdentifierList().get(0).getRole() : null);
-        epo.setDate(new Date()); // TODO: ????
-        try {
-          epo.setDatetime(DateParser.parse(peh.getEvent().getEventDateTime().toString()));
-        } catch (InvalidDateException ide) {
-          epo.setDatetime(new Date());
-        }
-        epo.setDescription(""); // TODO: ????
-        epo.setEventDetail(peh.getEvent().getEventDetail());
-        epo.setEventType(peh.getEvent().getEventType());
-        epo.setName(""); // TODO: ???
-        List<LinkingObjectIdentifierComplexType> linkingObjects = peh.getEvent().getLinkingObjectIdentifierList();
-        if (linkingObjects != null && linkingObjects.size() > 0) {
-          List<String> objectIds = new ArrayList<String>();
-          for (LinkingObjectIdentifierComplexType loi : linkingObjects) {
-            objectIds.add(loi.getTitle());
-          }
-          epo.setObjectIDs(objectIds.toArray(new String[objectIds.size()]));
-        } else {
-          epo.setObjectIDs(null);
-        }
-        epo.setOutcome(peh.getEvent().getEventOutcomeInformationList().get(0).getEventOutcome());
-        if (peh.getEvent().getEventOutcomeInformationList() != null
-          && peh.getEvent().getEventOutcomeInformationList().size() > 0) {
-          EventOutcomeInformationComplexType eoict = peh.getEvent().getEventOutcomeInformationList().get(0);
-          epo.setOutcome(eoict.getEventOutcome());
-          if (eoict.getEventOutcomeDetailList() != null && eoict.getEventOutcomeDetailList().size() > 0) {
-            EventOutcomeDetailComplexType eodc = eoict.getEventOutcomeDetailList().get(0);
-            List<ExtensionComplexType> ects = eodc.getEventOutcomeDetailExtensionList();
-            if (ects != null && ects.size() > 0) {
-              String outcomeDetailExtension = "";
-              for (ExtensionComplexType ect : ects) {
-                outcomeDetailExtension += ect.xmlText();
-              }
-              epo.setOutcomeDetailExtension(outcomeDetailExtension);
-
-            }
-
-            epo.setOutcomeDetailNote(eodc.getEventOutcomeDetailNote());
-          } else {
-            epo.setOutcomeDetailExtension("");
-            epo.setOutcomeDetailNote("");
-          }
-        } else {
-          epo.setOutcome("");
-          epo.setOutcomeDetailExtension("");
-          epo.setOutcomeDetailNote("");
-        }
-        epo.setOutcomeDetails(""); // TODO: ???
-        epo.setOutcomeResult(""); // TODO: ???
-        epo.setTargetID(""); // TODO: ???
-        epo.setEventType(peh.getEvent().getEventType());
-        return epo;
-      } catch (PremisMetadataException e) {
-        throw new GenericException("Error while trying to convert a binary into a event preservation object");
-      } catch (IOException e) {
-        throw new GenericException("Error while trying to convert a binary into a event preservation object");
-      }
-    } else {
-      throw new GenericException("Error while trying to convert a binary into a event preservation object");
-    }
+    return storage.getBinary(storagePath);
   }
 
   // FIXME this should be synchronized (at least access to logFile)
@@ -1781,19 +1526,13 @@ public class ModelService extends ModelObservable {
     for (IndexedFile file : updatedFiles) {
       // update PREMIS
       try {
-        RepresentationFilePreservationObject rfpo = PremisUtils.getPremisFile(storage, file.getAipId(),
-          file.getRepresentationId(), file.getId());
-        rfpo = PremisUtils.updateFile(rfpo, file);
-        Path premisFile = Files.createTempFile("file", ".premis.xml");
-        PremisFileObjectHelper helper = new PremisFileObjectHelper(rfpo);
-        helper.saveToFile(premisFile.toFile());
-        Binary b = (Binary) FSUtils.convertPathToResource(premisFile.getParent(), premisFile);
-
+        Binary b = PremisUtils.getPremisFile(storage, file.getAipId(), file.getRepresentationId(), file.getId());
+        b = PremisUtils.updateFile(b, file);
         storage.updateBinaryContent(
           ModelUtils.getPreservationFilePath(file.getAipId(), file.getRepresentationId(), file.getId()), b.getContent(),
           false, true);
       } catch (IOException | PremisMetadataException | GenericException | RequestNotValidException | NotFoundException
-        | AuthorizationDeniedException e) {
+        | AuthorizationDeniedException | XmlException e) {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
       }
@@ -1815,19 +1554,9 @@ public class ModelService extends ModelObservable {
     List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type);
     if (agents != null) {
       for (PreservationLinkingAgent pla : agents) {
-        try {
-          AgentPreservationObject agent = new AgentPreservationObject();
-          agent.setAgentName(pla.getTitle() + "/" + pla.getVersion());
-          agent.setAgentType(pla.getType());
-          agent.setId(pla.getIdentifierValue());
-
-          String serializedPremisAgent = new PremisAgentHelper(agent).saveToString();
-          ContentPayload premisAgentPayload = new StringContentPayload(serializedPremisAgent);
-
-          createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), premisAgentPayload);
-        } catch (PremisMetadataException pme) {
-          LOGGER.error("Error creating agent: " + pme.getMessage(), pme);
-        }
+        ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
+        pla.getTitle() + "/" + pla.getVersion(), pla.getType());
+        createPreservationMetadata(PreservationMetadataType.AGENT, null, null, pla.getIdentifierValue(), b);
       }
     }
 

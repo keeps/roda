@@ -16,17 +16,16 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.Fixity;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -38,22 +37,25 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FixityPlugin implements Plugin<AIP> {
-  private AgentPreservationObject fixityAgent;
+  private ContentPayload agent;
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
 
   private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
-    fixityAgent = new AgentPreservationObject();
-    fixityAgent.setAgentName(getName() + "/" + getVersion()); //$NON-NLS-1$
-    fixityAgent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
-    fixityAgent.setId("fixityCheck");
+    try {
+      agent = PremisUtils.createPremisAgentBinary(getName() + "/" + getVersion(), "fixityCheck",
+        RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
+    } catch (GenericException e) {
+      throw new PluginException("Error initializing agent", e);
+    }
   }
 
   @Override
@@ -106,14 +108,18 @@ public class FixityPlugin implements Plugin<AIP> {
           for (File currentFile : allFiles) {
             StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(currentFile);
             Binary currentFileBinary = storage.getBinary(storagePath);
-            RepresentationFilePreservationObject rfpo = model.retrieveRepresentationFileObject(aip.getId(), r.getId(),
+
+            Binary premisFile = PremisUtils.getPremisFile(model.getStorage(), aip.getId(), r.getId(),
               currentFile.getId());
-            if (rfpo.getFixities() != null) {
+            List<Fixity> fixities = PremisUtils.extractFixities(premisFile);
+
+            if (fixities != null) {
               boolean fixityOK = true;
-              for (Fixity f : rfpo.getFixities()) {
+              for (Fixity f : fixities) {
                 try {
                   Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
                     "FixityCheck action");
+
                   if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
                     fixityOK = false;
                     break;
@@ -140,34 +146,33 @@ public class FixityPlugin implements Plugin<AIP> {
                 sb.append("<li>" + s + "</li>");
               }
               sb.append("</ul>");
-              EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
-                EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+                RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
-                EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                Arrays.asList(r.getId()), PluginState.FAILURE, "Reason", sb.toString());
-              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, epo);
+                RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
+                Arrays.asList(r.getId()), null, "failure", "Reason", sb.toString());
+              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {
               LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
-              EventPreservationObject epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
-                EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+                RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
-                EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-                Arrays.asList(r.getId()), PluginState.SUCCESS, okFileIDS.size() + " files checked successfully",
+                RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
+                Arrays.asList(r.getId()), null, "success", okFileIDS.size() + " files checked successfully",
                 okFileIDS.toString());
-              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, epo);
+              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);
             }
           }
           IOUtils.closeQuietly(allFiles);
         } catch (IOException | RODAException e) {
           LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
-          EventPreservationObject epo;
           try {
-            epo = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
-              EventPreservationObject.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+            PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+              RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
               "Checksums recorded in PREMIS were compared with the files in the repository",
-              EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, fixityAgent.getId(),
-              Arrays.asList(r.getId()), PluginState.PARTIAL_SUCCESS, "Reason", "<p>" + e.getMessage() + "</p>");
-            notifyUserOfFixityCheckUndetermined(r.getId(), epo, e.getMessage());
+              RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
+              Arrays.asList(r.getId()), null, "partial success", "Reason", "<p>" + e.getMessage() + "</p>");
+            notifyUserOfFixityCheckUndetermined(r.getId(), pm, e.getMessage());
           } catch (RODAException | IOException e1) {
             LOGGER.error("Error creating premis event for representation " + r.getId() + " of AIP " + aip.getId());
           }
@@ -179,20 +184,20 @@ public class FixityPlugin implements Plugin<AIP> {
     return null;
   }
 
-  private void notifyUserOfFixityCheckUndetermined(String representationID, EventPreservationObject epo,
+  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
     String message) {
     // TODO Auto-generated method stub
 
   }
 
   private void notifyUserOfFixityCheckSucess(String representationID, List<String> okFileIDS, List<String> koFileIDS,
-    EventPreservationObject epo) {
+    PreservationMetadata event) {
     // TODO Auto-generated method stub
 
   }
 
   private void notifyUserOfFixityCheckError(String representationID, List<String> okFileIDS, List<String> koFileIDS,
-    EventPreservationObject epo) {
+    PreservationMetadata event) {
     // TODO Auto-generated method stub
 
   }

@@ -87,9 +87,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -1369,26 +1367,6 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printPreservationEvents(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    index.find(EventPreservationObject.class, filter, sorter, sublist, facets);
-    IndexResult<EventPreservationObject> events = index.find(EventPreservationObject.class, filter, sorter, sublist,
-      facets);
-    for (EventPreservationObject event : events.getResults()) {
-      System.out.println("\t" + event);
-    }
-  }
-
-  private static void printPreservationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    index.find(RepresentationFilePreservationObject.class, filter, sorter, sublist, facets);
-    IndexResult<RepresentationFilePreservationObject> files = index.find(RepresentationFilePreservationObject.class,
-      filter, sorter, sublist, facets);
-    for (RepresentationFilePreservationObject file : files.getResults()) {
-      System.out.println("\t" + file);
-    }
-  }
-
   private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
@@ -1449,12 +1427,6 @@ public class RodaCoreFactory {
       runFitsPlugin();
     } else if ("bagit".equals(args.get(0))) {
       runBagitPlugin();
-    } else if ("events".equals(args.get(0))) {
-      Filter filter = null;
-      printPreservationEvents(filter, null, new Sublist(0, 10000), null);
-    } else if ("files".equals(args.get(0))) {
-      Filter filter = null;
-      printPreservationFiles(filter, null, new Sublist(0, 10000), null);
     } else if ("validation".equals(args.get(0))) {
       runValidationPlugin(args.get(1), args.get(2), args.get(3), args.get(3));
     } else if ("logClean".equals(args.get(0))) {

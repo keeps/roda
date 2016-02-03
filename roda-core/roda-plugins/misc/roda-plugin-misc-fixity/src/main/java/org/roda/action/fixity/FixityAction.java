@@ -37,7 +37,7 @@ import org.roda.core.data.v2.Representation;
 import org.roda.core.data.v2.RepresentationFilePreservationObject;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
+import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.AIP;
 import org.roda.core.model.File;
 import org.roda.core.model.ModelService;

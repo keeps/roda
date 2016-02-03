@@ -18,8 +18,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -28,8 +28,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Job;
@@ -40,15 +39,12 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.v2.premis.PremisAgentHelper;
-import org.roda.core.metadata.v2.premis.PremisEventHelper;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
+import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -183,38 +179,20 @@ public final class PluginHelper {
 
   }
 
-  public static EventPreservationObject createPluginEvent(String aipID, String representationID, String fileID,
-    ModelService model, String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs,
-    PluginState outcome, String detailNote, String detailExtension) throws PremisMetadataException, IOException,
-      RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    EventPreservationObject epo = new EventPreservationObject();
-    epo.setDatetime(new Date());
-    epo.setEventType(eventType);
-    epo.setEventDetail(eventDetails);
-    epo.setAgentRole(agentRole);
-    String name = UUID.randomUUID().toString();
-    epo.setId(name);
-    epo.setAgentID(agentID);
-    epo.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
-    switch (outcome) {
-      case SUCCESS:
-        epo.setOutcome("success");
-        break;
-      case PARTIAL_SUCCESS:
-        epo.setOutcome("partial success");
-        break;
-      case FAILURE:
-      default:
-        epo.setOutcome("failure");
-        break;
-    }
-
-    epo.setOutcomeDetailNote(detailNote);
-    epo.setOutcomeDetailExtension(detailExtension);
-    String serializedPremisEvent = new PremisEventHelper(epo).saveToString();
-    ContentPayload premisEventPayload = new StringContentPayload(serializedPremisEvent);
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, name, premisEventPayload);
-    return epo;
+  public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
+    ModelService model, String eventType, String eventDetails, String agentRole, String agentID, List<String> sources,
+    List<String> targets, String outcome, String detailNote, String detailExtension) throws PremisMetadataException,
+      IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    String id = UUID.randomUUID().toString();
+    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
+      targets, outcome, detailNote, detailExtension, agentID, agentRole);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, fileID, premisEvent);
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setAipId(aipID);
+    pm.setRepresentationId(representationID);
+    pm.setId(id);
+    pm.setType(PreservationMetadataType.EVENT);
+    return pm;
   }
 
   /**
@@ -304,97 +282,43 @@ public final class PluginHelper {
     }
   }
 
-  public static void createPremisAgentIfInexistent(ModelService model, AgentPreservationObject agent) {
-    try {
-      model.getAgentPreservationObject(agent.getId());
-    } catch (NotFoundException e) {
-      try {
-        String serializedPremisAgent = new PremisAgentHelper(agent).saveToString();
-        ContentPayload premisAgentPayload = new StringContentPayload(serializedPremisAgent);
-        model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), premisAgentPayload);
-      } catch (RequestNotValidException | PremisMetadataException | GenericException | NotFoundException
-        | AuthorizationDeniedException ee) {
-        LOGGER.error("Error creating PREMIS agent", e);
-      }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting PREMIS agent", e);
+  public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state, String agentID,
+    String eventType, String eventDetails, String agentRole, String detailExtension) throws PluginException {
+    String outcome = "";
+    switch (state) {
+      case SUCCESS:
+        outcome = "success";
+        break;
+      case PARTIAL_SUCCESS:
+        outcome = "partial success";
+        break;
+      case FAILURE:
+      default:
+        outcome = "failure";
+        break;
     }
-  }
-
-  public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
-    AgentPreservationObject agent, String eventType, String eventDetails, String agentRole, String detailExtension)
-      throws PluginException {
-
     try {
       boolean success = (state == PluginState.SUCCESS);
-
       for (Representation representation : aip.getRepresentations()) {
-
-        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
-          agentRole, agent.getId(), Arrays.asList(representation.getId()), state, success ? "" : "Error",
-          detailExtension);
+        createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails, agentRole, agentID,
+          Arrays.asList(representation.getId()), null, outcome, success ? "" : "Error", detailExtension);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }
 
-  public static void createPremisEventIfInexistent(ModelService model, EventPreservationObject event,
-    String representationID) {
-    try {
-      model.getEventPreservationObject(event.getAipId(), representationID, null, event.getId());
-    } catch (NotFoundException e) {
-      try {
-        String serializedPremisEvent = new PremisEventHelper(event).saveToString();
-        ContentPayload premisEventPayload = new StringContentPayload(serializedPremisEvent);
-
-        if (representationID == null) { // "AIP Event"
-          model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), null, event.getId(),
-            premisEventPayload);
-        } else { // "Representation Event"
-          model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), representationID,
-            event.getId(), premisEventPayload);
-        }
-
-      } catch (RequestNotValidException | PremisMetadataException | NotFoundException | GenericException
-        | AuthorizationDeniedException ee) {
-        LOGGER.error("Error creating PREMIS event", e);
-      }
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error getting PREMIS event", e);
-    }
-  }
-
-  // FIXME refactor this method (using others, from this class, that have this
-  // logic)
-  public static void createPluginEventAndAgent(String aipID, String representationID, ModelService model, String type,
-    String details, String agentRole, String agentID, List<String> objectIDs, String outcome, String detailNote,
-    String detailExtension, String agentName, String agentType)
-      throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException {
-
-    String name = UUID.randomUUID().toString();
-
-    EventPreservationObject epo = new EventPreservationObject();
-    epo.setDatetime(new Date());
-    epo.setAipId(aipID);
-    epo.setEventType(type);
-    epo.setEventDetail(details);
-    epo.setAgentRole(agentRole);
-    epo.setId(name);
-    epo.setAgentID(agentID);
-    epo.setObjectIDs(objectIDs.toArray(new String[objectIDs.size()]));
-    epo.setOutcome(outcome);
-    epo.setOutcomeDetailNote(detailNote);
-    epo.setOutcomeDetailExtension(detailExtension);
-
-    AgentPreservationObject apo = new AgentPreservationObject();
-    apo.setAgentName(agentName);
-    apo.setAgentType(agentType);
-    apo.setId(agentID);
-
-    createPremisAgentIfInexistent(model, apo);
-    createPremisEventIfInexistent(model, epo, representationID);
+  public static PreservationMetadata createPluginAgent(ModelService model, String agentId, String agentName,
+    String agentType)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    ContentPayload premisAgent = PremisUtils.createPremisAgentBinary(agentId, agentName, agentType);
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agentId, premisAgent);
+    PreservationMetadata pm = new PreservationMetadata();
+    pm.setAipId(null);
+    pm.setRepresentationId(null);
+    pm.setId(agentId);
+    pm.setType(PreservationMetadataType.AGENT);
+    return pm;
 
   }
 }

@@ -18,7 +18,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -123,9 +122,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
-          EventPreservationObject.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
-          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representation.getId()), state, success ? "" : "Error", outcomeDetail);
+          RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
+          RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID", Arrays.asList(representation.getId()),
+          null, success ? "success" : "failure", success ? "" : "Error", outcomeDetail);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

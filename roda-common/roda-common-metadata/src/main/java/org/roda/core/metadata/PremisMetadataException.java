@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.metadata.v2.premis;
+package org.roda.core.metadata;
 
 import org.roda.core.metadata.MetadataException;
 

@@ -14,18 +14,18 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.validation.ValidationUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
-import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -147,9 +147,9 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
-          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID",
-          Arrays.asList(representation.getId()), success ? PluginState.SUCCESS : PluginState.FAILURE, "Report", "");
+          RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
+          RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID", Arrays.asList(representation.getId()),
+          null, success ? "success" : "failure", "Report", "");
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

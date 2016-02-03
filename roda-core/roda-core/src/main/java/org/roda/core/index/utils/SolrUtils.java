@@ -58,6 +58,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
@@ -98,7 +99,6 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -750,8 +750,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -1361,7 +1361,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file, RepresentationFilePreservationObject premisFile,
+  public static SolrInputDocument fileToSolrDocument(File file, Binary premisFile,
     String fulltext) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1383,63 +1383,7 @@ public class SolrUtils {
     if (premisFile != null) {
       // TODO get entry point from PREMIS or remove it
       // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-
-      if (premisFile.getOriginalName() != null) {
-        doc.addField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName());
-      }
-
-      if (premisFile.getSize() != 0) {
-        doc.addField(RodaConstants.FILE_SIZE, premisFile.getSize());
-      }
-
-      if (premisFile.getFixities() != null && premisFile.getFixities().length > 0) {
-        List<String> hashes = new ArrayList<>();
-        for (Fixity fixity : premisFile.getFixities()) {
-          StringBuilder fixityPrint = new StringBuilder();
-          fixityPrint.append(fixity.getMessageDigest());
-          fixityPrint.append(" (");
-          fixityPrint.append(fixity.getMessageDigestAlgorithm());
-          // if (StringUtils.isNotBlank(fixity.getMessageDigestOriginator())) {
-          // fixityPrint.append(", ");
-          // fixityPrint.append(fixity.getMessageDigestOriginator());
-          // }
-          fixityPrint.append(")");
-
-          hashes.add(fixityPrint.toString());
-        }
-
-        doc.addField(RodaConstants.FILE_HASH, hashes);
-      }
-
-      if (premisFile.getFormatDesignationName() != null) {
-        doc.addField(RodaConstants.FILE_FILEFORMAT, premisFile.getFormatDesignationName());
-      }
-      if (premisFile.getFormatDesignationVersion() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_VERSION, premisFile.getFormatDesignationVersion());
-      }
-
-      if (premisFile.getMimetype() != null) {
-        doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, premisFile.getMimetype());
-      }
-
-      if (StringUtils.isNotBlank(premisFile.getPronomId())) {
-        doc.addField(RodaConstants.FILE_PRONOM, premisFile.getPronomId());
-      }
-      // TODO remove file extension
-      // if (format.getExtension() != null) {
-      // doc.addField(RodaConstants.FILE_EXTENSION, format.getExtension());
-      // }
-      // TODO add format registry
-
-      if (premisFile.getCreatingApplicationName() != null) {
-        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, premisFile.getCreatingApplicationName());
-      }
-      if (premisFile.getCreatingApplicationVersion() != null) {
-        doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, premisFile.getCreatingApplicationVersion());
-      }
-      if (premisFile.getDateCreatedByApplication() != null) {
-        doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, premisFile.getDateCreatedByApplication());
-      }
+      doc = PremisUtils.updateSolrDocument(doc,premisFile);
     }
 
     if (fulltext != null) {

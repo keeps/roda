@@ -21,14 +21,13 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -53,8 +52,8 @@ public class VeraPDFPlugin implements Plugin<AIP> {
   private String profile = "1b";
   private boolean hasFeatures = false;
   private long maxKbytes = 20000; // default 20000 kb
-  private boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
-    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  private boolean hasPartialSuccessOnOutcome = Boolean
+    .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
   @Override
   public void init() throws PluginException {
@@ -223,14 +222,14 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         + " finished with a status: " + outcome + ".");
 
       // FIXME revise PREMIS generation
-      PluginHelper
-        .createPluginEventAndAgent(aip.getId(), representationId, model,
-          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-          "All the files from the AIP were submitted to a veraPDF validation.",
-          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, "veraPDFChecker",
-          Arrays.asList(representationId), outcome, noteStringBuilder.toString(), detailsStringBuilder.toString(),
-          getClass().getName() + "@" + getVersion(),
-          AgentPreservationObject.PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN);
+
+      PluginHelper.createPluginAgent(model, getClass().getName() + "@" + getVersion(), "veraPDFChecker",
+        RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK);
+      PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,
+        RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
+        "All the files from the AIP were submitted to a veraPDF validation.",
+        RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, "veraPDFChecker", Arrays.asList(representationId),
+        null, outcome, noteStringBuilder.toString(), detailsStringBuilder.toString());
 
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);

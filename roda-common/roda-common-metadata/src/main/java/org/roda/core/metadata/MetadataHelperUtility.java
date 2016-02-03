@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
-import org.roda.core.metadata.v2.premis.PremisMetadataException;
 
 /**
  * This is an utility class for metadata helpers.
@@ -66,6 +65,14 @@ public class MetadataHelperUtility {
     saveToOutputStream(xmlObject, byteArrayStream, writeXMLDeclaration);
 
     return byteArrayStream.toByteArray();
+  }
+  
+  public static String saveToString(XmlObject xmlObject, boolean writeXMLDeclaration) throws MetadataException {
+
+    ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
+    saveToOutputStream(xmlObject, byteArrayStream, writeXMLDeclaration);
+
+    return byteArrayStream.toString();
   }
 
   /**

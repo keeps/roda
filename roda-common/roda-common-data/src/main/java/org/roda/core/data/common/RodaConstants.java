@@ -502,5 +502,71 @@ public final class RodaConstants {
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
   public static final String PRESERVATION_TYPE_EVENT = "type";
+  
+  
+  
+  
+  
+  
+  /*
+   * accession adding emulation information appraisal capture compression
+   * creation data carrier migration deaccession decompression decryption
+   * deletion deselection digital signature validation dissemination file
+   * extension change file system analysis file system extraction filename
+   * change
+   */
+  public static final String PRESERVATION_EVENT_TYPE_FIXITY_CHECK = "fixity check";
+  /*
+   * forensic feature analysis
+   */
+  public static final String PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION = "format identification";
+
+  public static final String PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION = "format validation";
+  /*
+   * identifier assignment imaging Information Package merging Information
+   * Package splitting ingest end ingest start
+   */
+  public static final String PRESERVATION_EVENT_TYPE_INGESTION = "ingestion";
+  /*
+   * message digest calculation metadata extraction (propertyExtraction)
+   * metadata modification
+   */
+  public static final String PRESERVATION_EVENT_TYPE_MIGRATION = "migration";
+  public static final String PRESERVATION_EVENT_TYPE_NORMALIZATION = "normalization";
+  /*
+   * object modification object validation quality review quarantine recovery
+   * redaction replication SIP creation storage migration unpacking unquarantine
+   */
+  public static final String PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK = "virus check";
+  /*
+   * wellformedness check
+   */
+
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK = "ingest task";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK = "preservation task";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK = "validation task";
+  public static final String PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK = "executing program task";
+
+  public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
+  
+  public static final String PRESERVATION_AGENT_TYPE_INGEST_TASK = "software:ingest_task";
+  public static final String PRESERVATION_AGENT_TYPE_MIGRATOR = "software:migrator";
+  public static final String PRESERVATION_AGENT_TYPE_DIGITALIZATION = "software:digitalization";
+  public static final String PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN = "software:plugin:fixity_check";
+  public static final String PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN = "software:plugin:characterization";
+  public static final String PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN = "software:plugin:virus_check";
+  public static final String PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN = "software:plugin:verapdf_check";
+  public static final String PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN = "software:plugin:conversion";
+  public static final String PRESERVATION_AGENT_TYPE_UNKNOWN_PREFIX = "unknown:";
+  
+  public static final String PRESERVATION_LEVEL_FULL = "full";
+
+  /**
+   * Only file integrity is preserved
+   */
+  public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
+  public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
+  
+  
 
 }

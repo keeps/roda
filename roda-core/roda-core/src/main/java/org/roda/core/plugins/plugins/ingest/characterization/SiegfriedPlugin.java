@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -28,9 +29,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
-import org.roda.core.data.v2.ip.metadata.EventPreservationObject;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -45,6 +45,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -57,14 +58,16 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   private Map<String, String> parameters;
   private boolean createsPluginEvent = true;
 
-  private AgentPreservationObject agent;
+  private ContentPayload agent;
 
   @Override
   public void init() throws PluginException {
-    agent = new AgentPreservationObject();
-    agent.setAgentName(getName() + "/" + getVersion());
-    agent.setAgentType(AgentPreservationObject.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    agent.setId("characterization-siegfried");
+    try {
+      agent = PremisUtils.createPremisAgentBinary(getClass().getName() + "@" + getVersion(),
+        "characterization-siegfried", RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
+    } catch (GenericException e) {
+      throw new PluginException("Error initializing agent", e);
+    }
   }
 
   @Override
@@ -114,11 +117,16 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    PluginHelper.createPremisAgentIfInexistent(model, agent);
+    try {
+      model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, getName() + "/" + getVersion(),
+        agent);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
+    }
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper
-        .createPluginReportItem(this, "File format identification", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File format identification", aip.getId(),
+        null);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       try {
@@ -182,10 +190,10 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           }
           model.updateFileFormats(updatedFiles);
 
-          PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS, agent,
-            EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
+          PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS,
+            getName() + "/" + getVersion(), RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
             "The files of the representation were successfully identified.",
-            EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, siegfriedOutput);
+            RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, siegfriedOutput);
 
           FSUtils.deletePath(data);
 
@@ -199,9 +207,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString())).addAttribute(
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Error running SIEGFRIED " + aip.getId() + ": "
-            + e.getMessage()));
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));
       }
 
       report.addItem(reportItem);

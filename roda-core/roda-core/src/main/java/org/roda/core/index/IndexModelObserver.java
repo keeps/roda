@@ -32,7 +32,6 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.ip.metadata.RepresentationFilePreservationObject;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
@@ -140,9 +139,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexFile(File file, boolean commit, boolean recursive) {
-    RepresentationFilePreservationObject premisFile = null;
+    Binary premisFile = null;
     try {
-      // TODO remove file id PREMIS suffix
       premisFile = PremisUtils.getPremisFile(model.getStorage(), file.getAipId(), file.getRepresentationId(),
         file.getId());
     } catch (NotFoundException e) {
