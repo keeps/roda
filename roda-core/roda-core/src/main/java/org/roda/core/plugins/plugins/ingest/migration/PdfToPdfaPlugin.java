@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -102,6 +101,11 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return null;
+  }
+
+  @Override
+  public void fillFileFormatStructures() {
+    return;
   }
 
 }

@@ -107,4 +107,9 @@ public class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
     return null;
   }
 
+  @Override
+  public void fillFileFormatStructures() {
+    return;
+  }
+
 }

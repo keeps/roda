@@ -76,12 +76,7 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "inputFormats");
-    applicableTo.addAll(Arrays.asList(inputFormats.split(" ")));
-
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split(" ")));
+    fillFileFormatStructures();
   }
 
   @Override
@@ -108,6 +103,16 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return null;
+  }
+
+  @Override
+  public void fillFileFormatStructures() {
+    pronomToExtension = JodConverterPluginUtils.getPronomToExtension();
+    mimetypeToExtension = JodConverterPluginUtils.getMimetypeToExtension();
+    applicableTo = JodConverterPluginUtils.getInputExtensions();
+
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 
 }

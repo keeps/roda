@@ -47,7 +47,7 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
   public String getVersion() {
     try {
       return FfmpegConvertPluginUtils.getVersion();
-    } catch (CommandException e) {
+    } catch (CommandException | IOException | UnsupportedOperationException e) {
       logger.debug("Error getting FFMPEG version");
       return new String();
     }
@@ -69,12 +69,7 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
 
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "inputFormats");
-    applicableTo.addAll(Arrays.asList(inputFormats.split("\\s+")));
-
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    fillFileFormatStructures();
   }
 
   @Override
@@ -104,4 +99,13 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
     return null;
   }
 
+  @Override
+  public void fillFileFormatStructures() {
+    pronomToExtension = FfmpegConvertPluginUtils.getPronomToExtension();
+    mimetypeToExtension = FfmpegConvertPluginUtils.getMimetypeToExtension();
+    applicableTo = FfmpegConvertPluginUtils.getInputExtensions();
+
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+  }
 }

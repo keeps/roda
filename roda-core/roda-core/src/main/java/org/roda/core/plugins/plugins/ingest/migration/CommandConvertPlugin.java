@@ -21,7 +21,12 @@ import org.roda.core.util.CommandException;
 
 public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
 
-  public String commandArguments = "";
+  public String commandArguments;
+
+  public CommandConvertPlugin() {
+    super();
+    commandArguments = "";
+  }
 
   @Override
   public abstract void init() throws PluginException;

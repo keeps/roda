@@ -6,6 +6,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
@@ -38,7 +43,8 @@ public class GhostScriptConvertPluginUtils {
     return executeGS(input, output, commandArguments);
   }
 
-  private static Path executeGS(Path input, Path output, String commandArguments) throws GhostscriptException {
+  private static Path executeGS(Path input, Path output, String commandArguments) throws GhostscriptException,
+    IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
@@ -64,12 +70,31 @@ public class GhostScriptConvertPluginUtils {
     return output;
   }
 
-  public static String getVersion() throws CommandException {
+  public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
     String version = CommandUtility.execute("gs", "--version");
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }
     return "GhostScript " + version.trim();
+  }
+
+  public static Map<String, List<String>> getPronomToExtension() {
+    Map<String, List<String>> map = new HashMap<>();
+    // TODO add missing pronoms
+    return map;
+  }
+
+  public static Map<String, List<String>> getMimetypeToExtension() {
+    Map<String, List<String>> map = new HashMap<>();
+    // TODO add missing mimetypes
+    map.put("application/pdf", new ArrayList<String>(Arrays.asList("pdf")));
+    map.put("application/postscript", new ArrayList<String>(Arrays.asList("ps")));
+    return map;
+  }
+
+  public static List<String> getInputExtensions() {
+    // TODO add missing extensions
+    return Arrays.asList("pdf", "ps");
   }
 
 }

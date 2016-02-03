@@ -108,8 +108,7 @@ public final class PluginHelper {
     return pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
-  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters,
-    PluginParameter pluginParameter) {
+  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters, PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(pluginParameters, pluginParameter);
   }
 
@@ -141,8 +140,8 @@ public final class PluginHelper {
     return ret;
   }
 
-  public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters)
-    throws NotFoundException, GenericException {
+  public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters) throws NotFoundException,
+    GenericException {
     return index.retrieve(Job.class, getJobId(pluginParameters));
   }
 
@@ -200,9 +199,10 @@ public final class PluginHelper {
   }
 
   public static EventPreservationObject createPluginEvent(String aipID, String representationID, String fileID,
-    ModelService model, String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs,
-    PluginState outcome, String detailNote, String detailExtension) throws PremisMetadataException, IOException,
-      RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    ModelService model, String eventType, String eventDetails, String agentRole, String agentID,
+    List<String> objectIDs, PluginState outcome, String detailNote, String detailExtension)
+    throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
+    AuthorizationDeniedException {
     EventPreservationObject epo = new EventPreservationObject();
     epo.setDatetime(new Date());
     epo.setEventType(eventType);
@@ -335,7 +335,7 @@ public final class PluginHelper {
 
   public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
     AgentPreservationObject agent, String eventType, String eventDetails, String agentRole, String detailExtension)
-      throws PluginException {
+    throws PluginException {
 
     try {
       boolean success = (state == PluginState.SUCCESS);
@@ -381,9 +381,8 @@ public final class PluginHelper {
   // logic)
   public static void createPluginEventAndAgent(String aipID, String representationID, ModelService model, String type,
     String details, String agentRole, String agentID, List<String> objectIDs, String outcome, String detailNote,
-    String detailExtension, String agentName, String agentType)
-      throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException {
+    String detailExtension, String agentName, String agentType) throws PremisMetadataException, IOException,
+    RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     String name = UUID.randomUUID().toString();
 

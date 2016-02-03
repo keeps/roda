@@ -37,7 +37,8 @@ public class GeneralCommandConvertPluginUtils {
     return executeGeneralCommand(input, output, commandArguments);
   }
 
-  private static Path executeGeneralCommand(Path input, Path output, String command) throws CommandException {
+  private static Path executeGeneralCommand(Path input, Path output, String command) throws CommandException,
+    IOException, UnsupportedOperationException {
 
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());

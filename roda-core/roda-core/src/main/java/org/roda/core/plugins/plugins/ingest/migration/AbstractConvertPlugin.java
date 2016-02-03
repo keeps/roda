@@ -46,16 +46,30 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
-  public final Logger logger = LoggerFactory.getLogger(getClass());
-  public String inputFormat = "";
-  public String outputFormat = "";
-  public long maxKbytes = 20000; // default value: 20000 kb
+  public Logger logger;
+  public String inputFormat;
+  public String outputFormat;
+  public long maxKbytes;
+  public boolean hasPartialSuccessOnOutcome;
+  public List<String> applicableTo;
+  public List<String> convertableTo;
+  public Map<String, List<String>> pronomToExtension;
+  public Map<String, List<String>> mimetypeToExtension;
 
-  public List<String> applicableTo = new ArrayList<>();
-  public List<String> convertableTo = new ArrayList<>();
+  protected AbstractConvertPlugin() {
+    logger = LoggerFactory.getLogger(getClass());
+    inputFormat = "";
+    outputFormat = "";
+    maxKbytes = 20000; // default value: 20000 kb
 
-  public boolean hasPartialSuccessOnOutcome = Boolean
-    .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    applicableTo = new ArrayList<>();
+    convertableTo = new ArrayList<>();
+    pronomToExtension = new HashMap<>();
+    mimetypeToExtension = new HashMap<>();
+
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
+      "allplugins", "hasPartialSuccessOnOutcome"));
+  }
 
   public abstract void init() throws PluginException;
 
@@ -137,6 +151,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
       for (Representation representation : aip.getRepresentations()) {
         List<String> alteredFiles = new ArrayList<String>();
+
         int state = 1;
 
         try {
@@ -148,46 +163,63 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             logger.debug("Processing file: " + file);
 
             if (!file.isDirectory()) {
-              // TODO filter by file type and size
-              // && file.getId().endsWith("." + inputFormat)
-              // && (file.getSize() <= maxKbytes * 1024)
-              StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
-              Binary binary = storage.getBinary(fileStoragePath);
 
-              // TODO get file format
-              String fileFormat = null;
+              IndexedFile ifile = index.retrieve(IndexedFile.class,
+                SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+              String fileMimetype = ifile.getFileFormat().getMimeType();
+              String filePronom = ifile.getFileFormat().getPronom();
+              String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
-              // FIXME file that doesn't get deleted afterwards
-              logger.debug("Running a ConvertPlugin (" + inputFormat + " to " + outputFormat + ") on " + file.getId());
-              Path pluginResult = executePlugin(binary, fileFormat);
+              if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
+                && ((filePronom != null && pronomToExtension.containsKey(filePronom))
+                  || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+                    .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
-              if (pluginResult != null) {
-                ContentPayload payload = new FSPathContentPayload(pluginResult);
-                StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-
-                // create a new representation if it does not exist
-                if (!newRepresentations.contains(newRepresentationID)) {
-                  logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
-                  boolean original = false;
-                  model.createRepresentation(aip.getId(), newRepresentationID, original, model.getStorage(),
-                    storagePath);
-
-                  StoragePath storagePreservationPath = ModelUtils.getPreservationPath(aip.getId(),
-                    newRepresentationID);
-                  model.getStorage().createDirectory(storagePreservationPath);
+                if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
+                  && !applicableTo.contains(fileFormat)) {
+                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                 }
 
-                // update file on new representation
-                String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
-                model.deleteFile(aip.getId(), newRepresentationID, file.getPath(), file.getId());
-                model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload);
-                newRepresentations.add(newRepresentationID);
-                alteredFiles.add(file.getId());
+                if (filePronom != null && pronomToExtension.containsKey(filePronom)
+                  && !mimetypeToExtension.containsKey(fileMimetype) && !applicableTo.contains(fileFormat)) {
+                  fileFormat = pronomToExtension.get(filePronom).get(0);
+                }
 
-              } else {
-                logger.debug("Conversion (" + inputFormat + " to " + outputFormat + ") failed on file " + file.getId()
-                  + " of representation " + representation.getId() + " from AIP " + aip.getId());
-                state = 2;
+                StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+                Binary binary = storage.getBinary(fileStoragePath);
+
+                // FIXME file that doesn't get deleted afterwards
+                logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+                Path pluginResult = executePlugin(binary, fileFormat);
+
+                if (pluginResult != null) {
+                  ContentPayload payload = new FSPathContentPayload(pluginResult);
+                  StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
+
+                  // create a new representation if it does not exist
+                  if (!newRepresentations.contains(newRepresentationID)) {
+                    logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
+                    boolean original = false;
+                    model.createRepresentation(aip.getId(), newRepresentationID, original, model.getStorage(),
+                      storagePath);
+
+                    StoragePath storagePreservationPath = ModelUtils.getPreservationPath(aip.getId(),
+                      newRepresentationID);
+                    model.getStorage().createDirectory(storagePreservationPath);
+                  }
+
+                  // update file on new representation
+                  String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
+                  model.deleteFile(aip.getId(), newRepresentationID, file.getPath(), file.getId());
+                  model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload);
+                  newRepresentations.add(newRepresentationID);
+                  alteredFiles.add(file.getId());
+
+                } else {
+                  logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
+                    + " of representation " + representation.getId() + " from AIP " + aip.getId());
+                  state = 2;
+                }
               }
             }
           }
@@ -209,7 +241,6 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     throws PluginException {
 
     int state = 1;
-    // System.out.println("LENGTH: " + Arrays.toString(list.toArray()));
 
     for (File file : list) {
       try {
@@ -218,42 +249,59 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         String newRepresentationID = UUID.randomUUID().toString();
 
         if (!file.isDirectory()) {
-          // TODO filter by file type and size
-          // && file.getId().endsWith("." + inputFormat)
-          // && (file.getSize() <= maxKbytes * 1024)
-          // TODO check if this is the way to defined the file id
+
           IndexedFile ifile = index.retrieve(IndexedFile.class,
             SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
-          String fileFormat = ifile.getFileFormat().getPronom();
+          String fileMimetype = ifile.getFileFormat().getMimeType();
+          String filePronom = ifile.getFileFormat().getPronom();
+          String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
-          StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
-          Binary binary = storage.getBinary(fileStoragePath);
+          if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
+            && ((filePronom != null && pronomToExtension.containsKey(filePronom))
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
-          // FIXME file that doesn't get deleted afterwards
-          logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-          Path pluginResult = executePlugin(binary, fileFormat);
+            if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
+              && !applicableTo.contains(fileFormat)) {
+              fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+            }
 
-          if (pluginResult != null) {
-            ContentPayload payload = new FSPathContentPayload(pluginResult);
-            StoragePath storagePath = ModelUtils.getRepresentationPath(file.getAipId(), file.getRepresentationId());
+            if (filePronom != null && pronomToExtension.containsKey(filePronom)
+              && !mimetypeToExtension.containsKey(fileMimetype) && !applicableTo.contains(fileFormat)) {
+              fileFormat = pronomToExtension.get(filePronom).get(0);
+            }
 
-            // create a new representation if it does not exist
-            logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());
-            boolean original = false;
-            model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(), storagePath);
+            StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+            Binary binary = storage.getBinary(fileStoragePath);
 
-            StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(), newRepresentationID);
-            model.getStorage().createDirectory(storagePreservationPath);
+            // FIXME file that doesn't get deleted afterwards
+            logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+            Path pluginResult = executePlugin(binary, fileFormat);
 
-            // update file on new representation
-            String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
-            model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId());
-            model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload);
+            if (pluginResult != null) {
+              ContentPayload payload = new FSPathContentPayload(pluginResult);
+              StoragePath storagePath = ModelUtils.getRepresentationPath(file.getAipId(), file.getRepresentationId());
 
-          } else {
-            logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
-              + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
-            state = 2;
+              // create a new representation if it does not exist
+              logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());
+              boolean original = false;
+              model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
+                storagePath);
+
+              StoragePath storagePreservationPath = ModelUtils
+                .getPreservationPath(file.getAipId(), newRepresentationID);
+              model.getStorage().createDirectory(storagePreservationPath);
+
+              // update file on new representation
+              String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
+              model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId());
+              model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload);
+
+            } else {
+              logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
+                + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
+              state = 2;
+            }
           }
         }
       } catch (Throwable e) {
@@ -265,8 +313,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return null;
   }
 
-  public abstract Path executePlugin(Binary binary, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException;
+  public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException;
 
   public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
     ModelService model, int state) throws PluginException {
@@ -277,8 +325,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     if (alteredFiles.size() == 0) {
       stringBuilder.append("No file was converted on this representation.");
     } else {
-      stringBuilder
-        .append("The following files were converted on a new representation (ID: " + newRepresentionID + "): ");
+      stringBuilder.append("The following files were converted on a new representation (ID: " + newRepresentionID
+        + "): ");
       for (String fileID : alteredFiles) {
         stringBuilder.append(fileID + ", ");
       }
@@ -300,8 +348,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       PluginHelper.createPluginEventAndAgent(aip.getId(), representationID, model,
         EventPreservationObject.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
         EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK, getClass().getName(),
-        Arrays.asList(representationID), outcome, stringBuilder.toString(), null,
-        getClass().getName() + "@" + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
+        Arrays.asList(representationID), outcome, stringBuilder.toString(), null, getClass().getName() + "@"
+          + getVersion(), AgentPreservationObject.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
 
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
       | AlreadyExistsException | AuthorizationDeniedException e) {
@@ -314,5 +362,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public abstract Report afterExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException;
+
+  public abstract void fillFileFormatStructures();
 
 }

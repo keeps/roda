@@ -24,6 +24,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.AgentPreservationObject;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -50,8 +52,8 @@ public class VeraPDFPlugin implements Plugin<AIP> {
   private String profile = "1b";
   private boolean hasFeatures = false;
   private long maxKbytes = 20000; // default 20000 kb
-  private boolean hasPartialSuccessOnOutcome = Boolean
-    .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  private boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
+    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
   @Override
   public void init() throws PluginException {
@@ -124,22 +126,30 @@ public class VeraPDFPlugin implements Plugin<AIP> {
           Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
+
             if (!file.isDirectory()) {
-              // TODO filter by file type and size
-              // file.getOriginalName().endsWith(".pdf") && (file.getSize() <=
-              // maxKbytes * 1024)
-              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
-              Binary binary = storage.getBinary(storagePath);
+              IndexedFile ifile = index.retrieve(IndexedFile.class,
+                SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+              String fileMimetype = ifile.getFileFormat().getMimeType();
+              String filePronom = ifile.getFileFormat().getPronom();
+              String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
-              // FIXME file that doesn't get deleted afterwards
-              logger.debug("Running veraPDF validator on " + file.getId());
-              Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent().createInputStream(), file.getId(),
-                profile, hasFeatures);
+              if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))
+                && ifile.getSize() < (maxKbytes * 1024)) {
 
-              if (veraPDFResult != null) {
-                resourceList.put(file.getId(), veraPDFResult);
-              } else {
-                state = 2; // partial success or failure
+                StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+                Binary binary = storage.getBinary(fileStoragePath);
+
+                // FIXME file that doesn't get deleted afterwards
+                logger.debug("Running veraPDF validator on " + file.getId());
+                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent().createInputStream(),
+                  file.getId(), profile, hasFeatures);
+
+                if (veraPDFResult != null) {
+                  resourceList.put(file.getId(), veraPDFResult);
+                } else {
+                  state = 2; // partial success or failure
+                }
               }
             } else {
 
@@ -211,13 +221,14 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         + " finished with a status: " + outcome + ".");
 
       // FIXME revise PREMIS generation
-      PluginHelper.createPluginEventAndAgent(aip.getId(), representationId, model,
-        EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-        "All the files from the AIP were submitted to a veraPDF validation.",
-        EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, "veraPDFChecker",
-        Arrays.asList(representationId), outcome, noteStringBuilder.toString(), detailsStringBuilder.toString(),
-        getClass().getName() + "@" + getVersion(),
-        AgentPreservationObject.PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN);
+      PluginHelper
+        .createPluginEventAndAgent(aip.getId(), representationId, model,
+          EventPreservationObject.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
+          "All the files from the AIP were submitted to a veraPDF validation.",
+          EventPreservationObject.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, "veraPDFChecker",
+          Arrays.asList(representationId), outcome, noteStringBuilder.toString(), detailsStringBuilder.toString(),
+          getClass().getName() + "@" + getVersion(),
+          AgentPreservationObject.PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN);
 
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);

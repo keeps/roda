@@ -45,12 +45,7 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
 
   @Override
   public String getVersion() {
-    try {
-      return UnoconvConvertPluginUtils.getVersion();
-    } catch (CommandException e) {
-      logger.debug("Error getting Unoconv version");
-      return new String();
-    }
+    return "1.0";
   }
 
   @Override
@@ -68,12 +63,7 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
 
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "inputFormats");
-    applicableTo.addAll(Arrays.asList(inputFormats.split("\\s+")));
-
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    fillFileFormatStructures();
   }
 
   @Override
@@ -101,6 +91,16 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return null;
+  }
+
+  @Override
+  public void fillFileFormatStructures() {
+    pronomToExtension = UnoconvConvertPluginUtils.getPronomToExtension();
+    mimetypeToExtension = UnoconvConvertPluginUtils.getMimetypeToExtension();
+    applicableTo = UnoconvConvertPluginUtils.getInputExtensions();
+
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 
 }

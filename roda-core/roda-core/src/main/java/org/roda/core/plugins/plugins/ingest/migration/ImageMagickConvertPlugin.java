@@ -47,7 +47,7 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   public String getVersion() {
     try {
       return ImageMagickConvertPluginUtils.getVersion();
-    } catch (CommandException e) {
+    } catch (CommandException | IOException | UnsupportedOperationException e) {
       logger.debug("Error getting ImageMagick version");
       return new String();
     }
@@ -68,12 +68,7 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
 
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    String inputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "inputFormats");
-    applicableTo.addAll(Arrays.asList(inputFormats.split("\\s+")));
-
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    fillFileFormatStructures();
   }
 
   public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
@@ -100,6 +95,16 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return null;
+  }
+
+  @Override
+  public void fillFileFormatStructures() {
+    pronomToExtension = ImageMagickConvertPluginUtils.getPronomToExtension();
+    mimetypeToExtension = ImageMagickConvertPluginUtils.getMimetypeToExtension();
+    applicableTo = ImageMagickConvertPluginUtils.getInputExtensions();
+
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 
 }
