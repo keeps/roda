@@ -16,10 +16,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -39,8 +37,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
@@ -50,8 +46,6 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
-import org.roda.wui.client.browse.PreservationMetadataBundle;
-import org.roda.wui.client.browse.RepresentationPreservationMetadataBundle;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -93,32 +87,6 @@ public final class HTMLUtils {
     return binaryToHtml(binary, "premis", stylesheetOpt);
   }
 
-  public static PreservationMetadataBundle getPreservationMetadataBundle(String aipId, ModelService model,
-    StorageService storage)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    AIP aip = model.retrieveAIP(aipId);
-    List<RepresentationPreservationMetadataBundle> representations = new ArrayList<RepresentationPreservationMetadataBundle>();
-
-    for (Representation representation : aip.getRepresentations()) {
-      ClosableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadataBinaries(aip.getId(),
-        representation.getId());
-      try {
-        RepresentationPreservationMetadataBundle representationPreservationMetadataBundle = getRepresentationPreservationMetadataBundle(
-          representation.getId(), preservationMetadata, storage);
-        representations.add(representationPreservationMetadataBundle);
-
-      } finally {
-        try {
-          preservationMetadata.close();
-        } catch (IOException e) {
-          LOGGER.error("Error while while freeing up resources", e);
-        }
-      }
-    }
-
-    return new PreservationMetadataBundle(representations);
-  }
-
   public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
     Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
     Pair<Integer, Integer> pagingParametersFile) throws TransformerException, RequestNotValidException,
@@ -140,31 +108,6 @@ public final class HTMLUtils {
     s.append("</span>");
 
     return s.toString();
-  }
-
-  private static RepresentationPreservationMetadataBundle getRepresentationPreservationMetadataBundle(
-    String representationID, ClosableIterable<PreservationMetadata> preservationMetadata, StorageService storage) {
-    RepresentationPreservationMetadataBundle representationBundle = new RepresentationPreservationMetadataBundle();
-    List<String> agentIds = new ArrayList<String>();
-    List<String> eventIds = new ArrayList<String>();
-    List<String> fileIds = new ArrayList<String>();
-    Iterator<PreservationMetadata> iterator = preservationMetadata.iterator();
-    while (iterator.hasNext()) {
-      PreservationMetadata pm = iterator.next();
-      PreservationMetadataType type = pm.getType();
-      if (type.equals(PreservationMetadataType.EVENT)) {
-        eventIds.add(pm.getId());
-      } else if (type.equals(PreservationMetadataType.AGENT)) {
-        agentIds.add(pm.getId());
-      } else if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
-        fileIds.add(pm.getId());
-      }
-    }
-    representationBundle.setAgentIds(agentIds);
-    representationBundle.setEventIds(eventIds);
-    representationBundle.setFileIds(fileIds);
-    representationBundle.setRepresentationID(representationID);
-    return representationBundle;
   }
 
   public static String getRepresentationPreservationMetadataHtml(StoragePath preservationPath, StorageService storage,

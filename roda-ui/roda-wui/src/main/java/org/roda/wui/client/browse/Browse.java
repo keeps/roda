@@ -358,6 +358,7 @@ public class Browse extends Composite {
     if (caught instanceof NotFoundException) {
       title = messages.notFoundErrorTitle();
       message = messages.notFoundErrorMessage(aipId);
+      GWT.log("Not found", caught);
     } else {
       title = messages.genericErrorTitle();
       message = messages.genericErrorMessage(caught.getMessage());
@@ -376,7 +377,6 @@ public class Browse extends Composite {
 
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
-      final PreservationMetadataBundle preservationMetadata = itemBundle.getPreservationMetadata();
       List<Representation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
@@ -456,9 +456,7 @@ public class Browse extends Composite {
       fondsPanel.setFilter(filter);
 
       sidebarData.setVisible(representations.size() > 0);
-      if (!preservationMetadata.getRepresentationsMetadata().isEmpty()) {
-        preservationSidebar.setVisible(true);
-      }
+      preservationSidebar.setVisible(true);
       actionsSidebar.setVisible(true);
       permissionsSidebar.setVisible(true);
 

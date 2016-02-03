@@ -70,7 +70,6 @@ import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -78,7 +77,6 @@ import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
-import org.roda.wui.client.browse.PreservationMetadataBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
@@ -116,12 +114,12 @@ public class BrowserHelper {
     }
 
     // set descriptive metadata
-    List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
-    itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
-
-    // set preservation metadata
-    PreservationMetadataBundle preservationMetadata = getPreservationMetadataBundle(aipId);
-    itemBundle.setPreservationMetadata(preservationMetadata);
+    try {
+      List<DescriptiveMetadataViewBundle> descriptiveMetadataList = getDescriptiveMetadataBundles(aipId, locale);
+      itemBundle.setDescriptiveMetadata(descriptiveMetadataList);
+    } catch (NotFoundException e) {
+      // do nothing
+    }
 
     // set representations
     // getting the last 2 representations
@@ -171,13 +169,6 @@ public class BrowserHelper {
     }
 
     return descriptiveMetadataList;
-  }
-
-  private static PreservationMetadataBundle getPreservationMetadataBundle(String aipId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    ModelService model = RodaCoreFactory.getModelService();
-    StorageService storage = RodaCoreFactory.getStorageService();
-    return HTMLUtils.getPreservationMetadataBundle(aipId, model, storage);
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,

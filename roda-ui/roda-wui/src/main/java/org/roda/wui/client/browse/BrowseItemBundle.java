@@ -20,7 +20,6 @@ public class BrowseItemBundle implements Serializable {
   private IndexedAIP aip;
   private List<IndexedAIP> aipAncestors;
   private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
-  private PreservationMetadataBundle preservationMetadata;
   private List<Representation> representations;
 
   public BrowseItemBundle() {
@@ -28,13 +27,11 @@ public class BrowseItemBundle implements Serializable {
   }
 
   public BrowseItemBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
-    List<DescriptiveMetadataViewBundle> descriptiveMetadata, PreservationMetadataBundle preservationMetadata,
-    List<Representation> representations) {
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<Representation> representations) {
     super();
     this.aip = aip;
     this.setAIPAncestors(aipAncestors);
     this.descriptiveMetadata = descriptiveMetadata;
-    this.preservationMetadata = preservationMetadata;
     this.representations = representations;
   }
 
@@ -52,14 +49,6 @@ public class BrowseItemBundle implements Serializable {
 
   public void setDescriptiveMetadata(List<DescriptiveMetadataViewBundle> descriptiveMetadata) {
     this.descriptiveMetadata = descriptiveMetadata;
-  }
-
-  public PreservationMetadataBundle getPreservationMetadata() {
-    return preservationMetadata;
-  }
-
-  public void setPreservationMetadata(PreservationMetadataBundle preservationMetadata) {
-    this.preservationMetadata = preservationMetadata;
   }
 
   public List<Representation> getRepresentations() {
