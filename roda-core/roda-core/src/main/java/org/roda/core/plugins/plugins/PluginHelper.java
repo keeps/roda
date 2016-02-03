@@ -7,11 +7,7 @@
  */
 package org.roda.core.plugins.plugins;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -56,8 +52,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
@@ -231,11 +227,9 @@ public final class PluginHelper {
 
     epo.setOutcomeDetailNote(detailNote);
     epo.setOutcomeDetailExtension(detailExtension);
-    byte[] serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
-    Path file = Files.createTempFile("preservation", ".xml");
-    Files.copy(new ByteArrayInputStream(serializedPremisEvent), file, StandardCopyOption.REPLACE_EXISTING);
-    Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, name, resource);
+    String serializedPremisEvent = new PremisEventHelper(epo).saveToString();
+    ContentPayload premisEventPayload = new StringContentPayload(serializedPremisEvent);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, name, premisEventPayload);
     return epo;
   }
 
@@ -327,12 +321,10 @@ public final class PluginHelper {
       model.getAgentPreservationObject(agent.getId());
     } catch (NotFoundException e) {
       try {
-        byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
-        Path agentFile = Files.createTempFile("agent_preservation", ".xml");
-        Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
-        Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-        model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), agentResource);
-      } catch (RequestNotValidException | PremisMetadataException | IOException | GenericException | NotFoundException
+        String serializedPremisAgent = new PremisAgentHelper(agent).saveToString();
+        ContentPayload premisAgentPayload = new StringContentPayload(serializedPremisAgent);
+        model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), premisAgentPayload);
+      } catch (RequestNotValidException | PremisMetadataException | GenericException | NotFoundException
         | AuthorizationDeniedException ee) {
         LOGGER.error("Error creating PREMIS agent", e);
       }
@@ -365,20 +357,18 @@ public final class PluginHelper {
       model.getEventPreservationObject(event.getAipId(), representationID, null, event.getId());
     } catch (NotFoundException e) {
       try {
-        byte[] serializedPremisEvent = new PremisEventHelper(event).saveToByteArray();
-        Path eventFile = Files.createTempFile("event_preservation", ".xml");
-        Files.copy(new ByteArrayInputStream(serializedPremisEvent), eventFile, StandardCopyOption.REPLACE_EXISTING);
-        Binary eventResource = (Binary) FSUtils.convertPathToResource(eventFile.getParent(), eventFile);
+        String serializedPremisEvent = new PremisEventHelper(event).saveToString();
+        ContentPayload premisEventPayload = new StringContentPayload(serializedPremisEvent);
 
         if (representationID == null) { // "AIP Event"
           model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), null, event.getId(),
-            eventResource);
+            premisEventPayload);
         } else { // "Representation Event"
           model.createPreservationMetadata(PreservationMetadataType.EVENT, event.getAipId(), representationID,
-            event.getId(), eventResource);
+            event.getId(), premisEventPayload);
         }
 
-      } catch (RequestNotValidException | PremisMetadataException | IOException | NotFoundException | GenericException
+      } catch (RequestNotValidException | PremisMetadataException | NotFoundException | GenericException
         | AuthorizationDeniedException ee) {
         LOGGER.error("Error creating PREMIS event", e);
       }

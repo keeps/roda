@@ -7,6 +7,7 @@
  */
 package org.roda.core.metadata.v2.premis;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -352,6 +353,19 @@ public class PremisEventHelper {
 
       return MetadataHelperUtility.saveToByteArray(getEventDocument());
 
+    } catch (MetadataException e) {
+      logger.debug(e.getMessage(), e);
+      throw new PremisMetadataException(e.getMessage(), e);
+    }
+  }
+
+  public String saveToString() throws PremisMetadataException {
+
+    try {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      MetadataHelperUtility.saveToOutputStream(getEventDocument(), outputStream, true);
+
+      return outputStream.toString();
     } catch (MetadataException e) {
       logger.debug(e.getMessage(), e);
       throw new PremisMetadataException(e.getMessage(), e);

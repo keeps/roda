@@ -19,9 +19,9 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.jgroups.util.UUID;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -115,14 +115,13 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         final boolean original = true;
 
         // TODO create descriptive metadata and representations via model
-        // TODO set representation type
         // TODO update AIP metadata
+
+        model.createRepresentation(aip.getId(), representationId, original, false);
 
         PluginHelper.createDirectories(model, aip.getId(), representationId);
 
-        StringBuilder b = new StringBuilder();
-        b.append("<metadata>");
-        b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
+        // create files
 
         if (transferredResource.isFile()) {
           String fileId = transferredResource.getName();
@@ -142,8 +141,6 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
               try {
                 Path relativePath = transferredResourcePath.relativize(file);
-                b.append("<field name='dc.relation'>"
-                  + StringEscapeUtils.escapeXml(relativePath.toString().replace('/', '_')) + "</field>");
 
                 String fileId = file.getFileName().toString();
                 List<String> directoryPath = new ArrayList<>();
@@ -171,11 +168,15 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
             }
           });
         }
+
+        StringBuilder b = new StringBuilder();
+        b.append("<metadata>");
+        b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
         b.append("</metadata>");
 
         ContentPayload metadataPayload = new StringContentPayload(b.toString());
 
-        // TODO make the following strings contants
+        // TODO make the following strings constants
         model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value");
 
         state = PluginState.SUCCESS;

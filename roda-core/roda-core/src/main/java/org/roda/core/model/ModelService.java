@@ -7,12 +7,10 @@
  */
 package org.roda.core.model;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -906,7 +904,8 @@ public class ModelService extends ModelObservable {
       while (preservationIterator.hasNext()) {
         Resource preservationObject = preservationIterator.next();
         Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
-        lc.xmlns.premisV2.Representation r = ModelUtils.getPreservationRepresentationObject(preservationBinary);
+        lc.xmlns.premisV2.Representation r = ModelUtils
+          .getPreservationRepresentationObject(preservationBinary.getContent());
         if (r != null) {
           rpos.add(convertResourceToRepresentationPreservationObject(aipId, resource.getStoragePath().getName(),
             preservationObject.getStoragePath().getName(), preservationBinary));
@@ -1035,17 +1034,17 @@ public class ModelService extends ModelObservable {
         Binary preservationBinary = storage.getBinary(binaryPath);
 
         lc.xmlns.premisV2.Representation representation = ModelUtils
-          .getPreservationRepresentationObject(preservationBinary);
+          .getPreservationRepresentationObject(preservationBinary.getContent());
         if (representation != null) {
           ret.add(new PreservationMetadata(preservationFileId, aipId, representationID,
             PreservationMetadataType.OBJECT_REPRESENTATION));
         } else {
-          EventComplexType event = ModelUtils.getPreservationEvent(preservationBinary);
+          EventComplexType event = ModelUtils.getPreservationEvent(preservationBinary.getContent());
           if (event != null) {
             ret.add(
               new PreservationMetadata(preservationFileId, aipId, representationID, PreservationMetadataType.EVENT));
           } else {
-            lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(preservationBinary);
+            lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(preservationBinary.getContent());
             if (file != null) {
               ret.add(new PreservationMetadata(preservationFileId, aipId, representationID,
                 PreservationMetadataType.OBJECT_FILE));
@@ -1086,7 +1085,7 @@ public class ModelService extends ModelObservable {
       String id = resource.getStoragePath().getName();
       String aipId = ModelUtils.getAIPidFromStoragePath(resource.getStoragePath());
       String representationId = ModelUtils.getRepresentationIdFromStoragePath(resource.getStoragePath());
-      PreservationMetadataType type = ModelUtils.getPreservationType((DefaultBinary) resource);
+      PreservationMetadataType type = ModelUtils.getPreservationType(((DefaultBinary) resource).getContent());
 
       return new PreservationMetadata(id, aipId, representationId, type);
     } else {
@@ -1724,7 +1723,7 @@ public class ModelService extends ModelObservable {
 
   // TODO remove PREMIS type and file Id
   public void createPreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
-    String id, Binary binary)
+    String id, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
@@ -1732,8 +1731,8 @@ public class ModelService extends ModelObservable {
     pm.setRepresentationId(representationId);
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
-    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(binary, type);
+    storage.updateBinaryContent(binaryPath, payload, false, true);
+    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type);
     if (agents != null) {
       for (PreservationLinkingAgent pla : agents) {
         try {
@@ -1741,12 +1740,12 @@ public class ModelService extends ModelObservable {
           agent.setAgentName(pla.getTitle() + "/" + pla.getVersion());
           agent.setAgentType(pla.getType());
           agent.setId(pla.getIdentifierValue());
-          byte[] serializedPremisAgent = new PremisAgentHelper(agent).saveToByteArray();
-          Path agentFile = Files.createTempFile("agent_preservation", ".xml");
-          Files.copy(new ByteArrayInputStream(serializedPremisAgent), agentFile, StandardCopyOption.REPLACE_EXISTING);
-          Binary agentResource = (Binary) FSUtils.convertPathToResource(agentFile.getParent(), agentFile);
-          createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), agentResource);
-        } catch (PremisMetadataException | IOException pme) {
+
+          String serializedPremisAgent = new PremisAgentHelper(agent).saveToString();
+          ContentPayload premisAgentPayload = new StringContentPayload(serializedPremisAgent);
+
+          createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agent.getId(), premisAgentPayload);
+        } catch (PremisMetadataException pme) {
           LOGGER.error("Error creating agent: " + pme.getMessage(), pme);
         }
       }
@@ -1756,7 +1755,7 @@ public class ModelService extends ModelObservable {
 
   // TODO remove PREMIS type and file Id
   public void updatePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
-    String id, Binary binary)
+    String id, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
@@ -1764,7 +1763,7 @@ public class ModelService extends ModelObservable {
     pm.setRepresentationId(representationId);
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    storage.updateBinaryContent(binaryPath, binary.getContent(), false, true);
+    storage.updateBinaryContent(binaryPath, payload, false, true);
     notifyPreservationMetadataUpdated(pm);
   }
 

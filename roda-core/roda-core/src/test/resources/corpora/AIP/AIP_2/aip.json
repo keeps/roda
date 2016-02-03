@@ -7,27 +7,7 @@
       "id": "dc.xml",
       "type": "DC"
     }],
-    "preservationMetadata": [{
-      "id": "roda_398",
-      "representationId": "representation_1",
-      "type": "EVENT"
-    }, {
-      "id": "roda_400",
-      "representationId": "representation_1",
-      "type": "EVENT"
-    }, {
-      "id": "representation_1",
-      "representationId": "representation_1",
-      "type": "OBJECT_REPRESENTATION"
-    }, {
-      "id": "F0",
-      "representationId": "representation_1",
-      "type": "OBJECT_FILE"
-    }, {
-      "id": "F1",
-      "representationId": "representation_1",
-      "type": "OBJECT_FILE"
-    }],
+    "preservationMetadata": [],
     "otherMetadata": []
   },
   "representations": [{

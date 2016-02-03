@@ -7,6 +7,7 @@
  */
 package org.roda.core.metadata.v2.premis;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -71,6 +72,19 @@ public abstract class PremisObjectHelper {
 
       return MetadataHelperUtility.saveToByteArray(getObjectDocument());
 
+    } catch (MetadataException e) {
+      logger.debug(e.getMessage(), e);
+      throw new PremisMetadataException(e.getMessage(), e);
+    }
+  }
+
+  public String saveToString() throws PremisMetadataException {
+
+    try {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      MetadataHelperUtility.saveToOutputStream(getObjectDocument(), outputStream, true);
+
+      return outputStream.toString();
     } catch (MetadataException e) {
       logger.debug(e.getMessage(), e);
       throw new PremisMetadataException(e.getMessage(), e);

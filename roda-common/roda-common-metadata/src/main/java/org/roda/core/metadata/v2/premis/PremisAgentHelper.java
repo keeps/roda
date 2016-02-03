@@ -7,6 +7,7 @@
  */
 package org.roda.core.metadata.v2.premis;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -50,8 +51,8 @@ public class PremisAgentHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisAgentHelper newInstance(File premisFile) throws PremisMetadataException, FileNotFoundException,
-    IOException {
+  public static PremisAgentHelper newInstance(File premisFile)
+    throws PremisMetadataException, FileNotFoundException, IOException {
     FileInputStream premisInputStream = new FileInputStream(premisFile);
     PremisAgentHelper instance = newInstance(premisInputStream);
     premisInputStream.close();
@@ -73,8 +74,8 @@ public class PremisAgentHelper {
    * @throws PremisMetadataException
    *           if the PREMIS XML document is invalid.
    */
-  public static PremisAgentHelper newInstance(InputStream premisInputStream) throws PremisMetadataException,
-    IOException {
+  public static PremisAgentHelper newInstance(InputStream premisInputStream)
+    throws PremisMetadataException, IOException {
 
     try {
 
@@ -252,6 +253,21 @@ public class PremisAgentHelper {
       throw new PremisMetadataException(e.getMessage(), e);
     }
   }
+
+  public String saveToString() throws PremisMetadataException {
+
+    try {
+      ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+      MetadataHelperUtility.saveToOutputStream(getAgentDocument(), outputStream, true);
+      
+      return outputStream.toString();
+    } catch (MetadataException e) {
+      logger.debug(e.getMessage(), e);
+      throw new PremisMetadataException(e.getMessage(), e);
+    }
+  }
+  
+  
 
   /**
    * Saves the current PREMIS document to a {@link File}.

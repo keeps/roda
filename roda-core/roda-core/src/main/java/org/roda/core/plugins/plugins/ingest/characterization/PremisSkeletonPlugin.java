@@ -45,8 +45,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -161,13 +162,11 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       AuthorizationDeniedException {
     pObject.setPartFiles(pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
 
-    Path premisRepresentation = Files.createTempFile("representation", ".premis.xml");
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
-    helper.saveToFile(premisRepresentation.toFile());
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
-      null, (Binary) FSUtils.convertPathToResource(premisRepresentation.getParent(), premisRepresentation));
+    ContentPayload payload = new StringContentPayload(helper.saveToString());
 
-    FSUtils.deletePath(premisRepresentation);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
+      null, payload);
   }
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
@@ -181,17 +180,17 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
     RepresentationFilePreservationObject premisObject = PremisUtils.createPremisFromFile(file, binary,
       "PremisSkeletonAction");
-    Path premis = Files.createTempFile(file.getId(), ".premis.xml");
+
     PremisFileObjectHelper helper = new PremisFileObjectHelper(premisObject);
-    helper.saveToFile(premis.toFile());
+    ContentPayload payload = new StringContentPayload(helper.saveToString());
+
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId, file.getId(),
-      (Binary) FSUtils.convertPathToResource(premis.getParent(), premis));
+      payload);
     if (pObject.getRootFile() == null) {
       pObject.setRootFile(premisObject);
     } else {
       pObjectPartFiles.add(premisObject);
     }
-    FSUtils.deletePath(premis);
 
     return pObjectPartFiles;
   }

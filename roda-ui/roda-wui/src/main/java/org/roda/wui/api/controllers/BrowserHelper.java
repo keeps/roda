@@ -582,13 +582,13 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
       file = Files.createTempFile("preservation", ".tmp");
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
-      Binary resource = (Binary) FSUtils.convertPathToResource(file.getParent(), file);
+      ContentPayload payload = new FSPathContentPayload(file);
       if (create) {
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId, fileId,
-          resource);
+          payload);
       } else {
         model.updatePreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId, fileId,
-          resource);
+          payload);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);

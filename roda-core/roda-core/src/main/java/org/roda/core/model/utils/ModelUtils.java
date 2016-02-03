@@ -46,7 +46,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -55,6 +54,7 @@ import org.roda.core.metadata.v2.premis.PremisRepresentationObjectHelper;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -409,11 +409,11 @@ public final class ModelUtils {
       fileId + ".file.premis.xml");
   }
 
-  public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(Binary preservationBinary) {
+  public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(ContentPayload payload) {
     lc.xmlns.premisV2.Representation representation = null;
     InputStream binaryInputStream = null;
     try {
-      binaryInputStream = preservationBinary.getContent().createInputStream();
+      binaryInputStream = payload.createInputStream();
       representation = PremisRepresentationObjectHelper.newInstance(binaryInputStream).getRepresentation();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
       representation = null;
@@ -429,11 +429,11 @@ public final class ModelUtils {
     return representation;
   }
 
-  public static EventComplexType getPreservationEvent(Binary preservationBinary) {
+  public static EventComplexType getPreservationEvent(ContentPayload payload) {
     EventComplexType event = null;
     InputStream binaryInputStream = null;
     try {
-      binaryInputStream = preservationBinary.getContent().createInputStream();
+      binaryInputStream = payload.createInputStream();
       event = PremisEventHelper.newInstance(binaryInputStream).getEvent();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
       event = null;
@@ -449,11 +449,11 @@ public final class ModelUtils {
     return event;
   }
 
-  public static lc.xmlns.premisV2.File getPreservationFileObject(Binary preservationBinary) {
+  public static lc.xmlns.premisV2.File getPreservationFileObject(ContentPayload payload) {
     lc.xmlns.premisV2.File file = null;
     InputStream binaryInputStream = null;
     try {
-      binaryInputStream = preservationBinary.getContent().createInputStream();
+      binaryInputStream = payload.createInputStream();
       file = PremisFileObjectHelper.newInstance(binaryInputStream).getFile();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
       file = null;
@@ -469,11 +469,11 @@ public final class ModelUtils {
     return file;
   }
 
-  public static AgentComplexType getPreservationAgentObject(Binary preservationBinary) {
+  public static AgentComplexType getPreservationAgentObject(ContentPayload payload) {
     AgentComplexType agent = null;
     InputStream binaryInputStream = null;
     try {
-      binaryInputStream = preservationBinary.getContent().createInputStream();
+      binaryInputStream = payload.createInputStream();
       agent = PremisAgentHelper.newInstance(binaryInputStream).getAgent();
     } catch (PremisMetadataException | IOException | ClassCastException e) {
       agent = null;
@@ -665,14 +665,14 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(Binary b,
+  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(ContentPayload payload,
     PreservationMetadataType type) {
     List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
     if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
       // TODO check if files has agents
       LOGGER.error("Not implemented!");
     } else if (type.equals(PreservationMetadataType.EVENT)) {
-      EventComplexType event = getPreservationEvent(b);
+      EventComplexType event = getPreservationEvent(payload);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
@@ -695,12 +695,13 @@ public final class ModelUtils {
     return agents;
   }
 
-  public static <T> List<PreservationLinkingObject> extractLinkingObjectsFromPreservationBinary(Binary b, Class<T> c) {
+  public static <T> List<PreservationLinkingObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
+    Class<T> c) {
     List<PreservationLinkingObject> objects = new ArrayList<PreservationLinkingObject>();
     if (c.equals(File.class)) {
       LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
-      EventComplexType event = getPreservationEvent(b);
+      EventComplexType event = getPreservationEvent(payload);
       List<LinkingObjectIdentifierComplexType> identifiers = event.getLinkingObjectIdentifierList();
       if (identifiers != null) {
         for (LinkingObjectIdentifierComplexType loict : identifiers) {
@@ -724,21 +725,21 @@ public final class ModelUtils {
     return objects;
   }
 
-  public static PreservationMetadataType getPreservationType(Binary binary) {
+  public static PreservationMetadataType getPreservationType(ContentPayload payload) {
     PreservationMetadataType type;
-    EventComplexType event = ModelUtils.getPreservationEvent(binary);
+    EventComplexType event = ModelUtils.getPreservationEvent(payload);
     if (event != null) {
       type = PreservationMetadataType.EVENT;
     } else {
-      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(binary);
+      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(payload);
       if (file != null) {
         type = PreservationMetadataType.OBJECT_FILE;
       } else {
-        AgentComplexType agent = ModelUtils.getPreservationAgentObject(binary);
+        AgentComplexType agent = ModelUtils.getPreservationAgentObject(payload);
         if (agent != null) {
           type = PreservationMetadataType.AGENT;
         } else {
-          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(binary);
+          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(payload);
           if (representation != null) {
             type = PreservationMetadataType.OBJECT_REPRESENTATION;
           } else {
