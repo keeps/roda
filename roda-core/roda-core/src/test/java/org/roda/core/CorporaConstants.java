@@ -24,6 +24,7 @@ public class CorporaConstants {
   public static final String SOURCE_AIP_ID_3 = "AIP_3";
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
   public static final String SOURCE_AIP_ID_REAL = "REAL";
+  public static final String SOURCE_AIP_REP_WITH_SUBFOLDERS = "AIP_REP_WITH_SUBFOLDERS";
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 

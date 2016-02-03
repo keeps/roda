@@ -69,29 +69,6 @@ public class EARKSIPToAIPPluginUtils {
             model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload);
           }
         }
-
-        /*
-         * if(sr.getAdministrativeMetadata()!=null &&
-         * sr.getAdministrativeMetadata().size()>0){ for (SIPMetadata dm :
-         * sr.getAdministrativeMetadata()) { Binary fileBinary = (Binary)
-         * FSUtils.convertPathToResource(dm.getMetadata().getParent(),
-         * dm.getMetadata()); model.createDescriptiveMetadata(aip.getId(),
-         * "rep_"+sr.getObjectID()+"_admin_"+dm.getMetadata().getFileName().
-         * toString(), fileBinary, "XXX"); } }
-         * if(sr.getDescriptiveMetadata()!=null &&
-         * sr.getDescriptiveMetadata().size()>0){ for (SIPMetadata dm :
-         * sr.getDescriptiveMetadata()) { Binary fileBinary = (Binary)
-         * FSUtils.convertPathToResource(dm.getMetadata().getParent(),
-         * dm.getMetadata()); model.createDescriptiveMetadata(aip.getId(),
-         * "rep_"+sr.getObjectID()+"_descriptive_"+dm.getMetadata().getFileName(
-         * ).toString(), fileBinary, "XXX"); } } if(sr.getOtherMetadata()!=null
-         * && sr.getOtherMetadata().size()>0){ for (SIPMetadata dm :
-         * sr.getOtherMetadata()) { Binary fileBinary = (Binary)
-         * FSUtils.convertPathToResource(dm.getMetadata().getParent(),
-         * dm.getMetadata()); model.createDescriptiveMetadata(aip.getId(),
-         * "rep_"+sr.getObjectID()+"_other_"+dm.getMetadata().getFileName().
-         * toString(), fileBinary, "XXX"); } }
-         */
       }
     }
 
@@ -104,20 +81,8 @@ public class EARKSIPToAIPPluginUtils {
         model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type, false);
       }
     }
-    /*
-     * if (sip.getAdministrativeMetadata() != null &&
-     * sip.getAdministrativeMetadata().size() > 0) { for (SIPMetadata dm :
-     * sip.getAdministrativeMetadata()) { Binary fileBinary = (Binary)
-     * FSUtils.convertPathToResource(dm.getMetadata().getParent(),
-     * dm.getMetadata());
-     * model.createDescriptiveMetadata(aip.getId(),dm.getMetadata().getFileName(
-     * ).toString(), fileBinary, "XXX"); } } if (sip.getOtherMetadata() != null
-     * && sip.getOtherMetadata().size() > 0) { for (SIPMetadata dm :
-     * sip.getOtherMetadata()) { Binary fileBinary = (Binary)
-     * FSUtils.convertPathToResource(dm.getMetadata().getParent(),
-     * dm.getMetadata()); model.createDescriptiveMetadata(aip.getId(),
-     * dm.getMetadata().getFileName().toString(), fileBinary, "XXX"); } }
-     */
+
+    // TODO add preservation metadata
 
     return model.retrieveAIP(aip.getId());
 

@@ -756,6 +756,9 @@ public class ModelService extends ModelObservable {
                 }
               } while (!hasNext && !itStack.isEmpty());
 
+              if (itStack.isEmpty()) {
+                hasNext = directlyUnder.hasNext();
+              }
             }
             return hasNext;
           }
@@ -803,6 +806,11 @@ public class ModelService extends ModelObservable {
 
           @Override
           public boolean hasNext() {
+
+            if (it != null && !it.hasNext()) {
+              it = null;
+            }
+
             return it != null ? it.hasNext() : filesDirectlyUnder.hasNext();
           }
 
@@ -811,19 +819,20 @@ public class ModelService extends ModelObservable {
             File nextFile;
             if (it == null) {
               nextFile = filesDirectlyUnder.next();
+
+              if (nextFile.isDirectory()) {
+                try {
+                  it = listAllFiles(nextFile).iterator();
+
+                } catch (NotFoundException | GenericException | RequestNotValidException
+                  | AuthorizationDeniedException e) {
+                  LOGGER.error("Error listing files", e);
+                }
+              }
             } else {
               nextFile = it.next();
             }
 
-            if (nextFile.isDirectory()) {
-              try {
-                it = listAllFiles(nextFile).iterator();
-
-              } catch (NotFoundException | GenericException | RequestNotValidException
-                | AuthorizationDeniedException e) {
-                LOGGER.error("Error listing files", e);
-              }
-            }
             return nextFile;
           }
         };

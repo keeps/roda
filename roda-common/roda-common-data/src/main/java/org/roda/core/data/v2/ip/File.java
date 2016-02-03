@@ -31,6 +31,7 @@ public class File implements Serializable {
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
+    this.path = path;
     this.isDirectory = isDirectory;
   }
 

@@ -1,0 +1,17 @@
+{
+  "parentId": "AIP_1",
+  "active": true,
+  "permissions": {},
+  "metadata": {
+    "descriptiveMetadata": [{
+      "id": "dc.xml",
+      "type": "DC"
+    }],
+    "preservationMetadata": [],
+    "otherMetadata": []
+  },
+  "representations": [{
+    "id": "representation_1",
+    "original": true
+  }]
+}

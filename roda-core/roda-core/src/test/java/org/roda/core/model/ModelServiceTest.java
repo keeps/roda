@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -64,6 +65,8 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.Iterables;
 
 import jersey.repackaged.com.google.common.collect.Lists;
 
@@ -185,8 +188,6 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
 
-    // TODO test directories
-
     final Binary binary_1_1 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_1_1));
     assertTrue(binary_1_1.getSizeInBytes() > 0);
     assertEquals(binary_1_1.getSizeInBytes().intValue(),
@@ -239,6 +240,38 @@ public class ModelServiceTest {
     RepresentationPreservationObject rpo = model.retrieveRepresentationPreservationObject(aipId,
       CorporaConstants.REPRESENTATION_1_ID);
     assertEquals(rpo.getPreservationLevel(), CorporaConstants.PRESERVATION_LEVEL_FULL);
+  }
+
+  @Test
+  public void testCreateAIPWithSubFolders() throws RODAException, ParseException, IOException {
+
+    // generate AIP ID
+    final String aipId = UUID.randomUUID().toString();
+
+    // testing AIP
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS));
+
+    Iterable<File> allFiles = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+
+    List<File> reusableList = new ArrayList<>();
+    Iterables.addAll(reusableList, allFiles);
+
+    assertTrue(reusableList.contains(
+      new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), false)));
+    assertTrue(
+      reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), true)));
+    assertTrue(reusableList
+      .contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), true)));
+    assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID,
+      Arrays.asList("folder", "subfolder"), false)));
+
+    assertTrue(reusableList.contains(new File("RODA 2 logo-circle-black.svg", aipId,
+      CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
+    assertTrue(reusableList.contains(new File("RODA 2 logo-circle-white.svg", aipId,
+      CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
+
+    // assertThat(allFiles, containsInAnyOrder());
   }
 
   @Test
@@ -307,7 +340,10 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     Iterable<AIP> listAIPs = model.listAIPs();
-    assertThat(listAIPs, containsInAnyOrder(aip1, aip2, aip3));
+    List<AIP> reusableList = new ArrayList<>();
+    Iterables.addAll(reusableList, listAIPs);
+    
+    assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 
   }
 
