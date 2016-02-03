@@ -17,7 +17,21 @@
 		</doc>
 	</xsl:template>
 	<xsl:template match="prem:agent">
-		<!-- INDEX AGENT PROPERTIES -->
+		<xsl:if test="prem:agentIdentifier/prem:agentIdentifierValue">
+			<field name="id">
+				<xsl:value-of select="prem:agentIdentifier/prem:agentIdentifierValue/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:agentName">
+			<field name="title">
+				<xsl:value-of select="prem:agentName/text()" />
+			</field>
+		</xsl:if>
+		<xsl:if test="prem:agentType">
+			<field name="type">
+				<xsl:value-of select="prem:agentType/text()" />
+			</field>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="prem:object">
 		<xsl:if
