@@ -47,6 +47,7 @@ import com.google.gwt.user.client.ui.MenuBar;
 import com.google.gwt.user.client.ui.MenuItem;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.LanguageSwitcherPanelConstants;
 import config.i18n.client.MainConstants;
 
 /**
@@ -58,6 +59,9 @@ public class Menu extends Composite {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private static MainConstants constants = (MainConstants) GWT.create(MainConstants.class);
+  private static LanguageSwitcherPanelConstants languagesConstants = (LanguageSwitcherPanelConstants) GWT
+    .create(LanguageSwitcherPanelConstants.class);
+
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
@@ -299,9 +303,9 @@ public class Menu extends Composite {
     
     // TODO externalize supported languages
     Map<String, String> supportedLanguages = new HashMap<String, String>();
-    supportedLanguages.put("en", "English");
-    supportedLanguages.put("pt_PT", "Português");
-    supportedLanguages.put("cs_CZ", "Čeština");
+    supportedLanguages.put("en", languagesConstants.lang_en());
+    supportedLanguages.put("pt_PT", languagesConstants.lang_pt());
+    supportedLanguages.put("cs_CZ", languagesConstants.lang_cz());
 
     languagesMenu.clearItems();
 

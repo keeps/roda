@@ -19,10 +19,10 @@ public interface LanguageSwitcherPanelConstants extends Constants, ConstantsWith
   public String lang_en();
 
   @Key("lang.pt")
-  @DefaultStringValue("Portuguese")
+  @DefaultStringValue("Português")
   public String lang_pt();
 
   @Key("lang.cz")
-  @DefaultStringValue("Czech")
+  @DefaultStringValue("Čeština")
   public String lang_cz();
 }
