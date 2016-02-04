@@ -89,11 +89,6 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     pronomToExtension = UnoconvConvertPluginUtils.getPronomToExtension();
     mimetypeToExtension = UnoconvConvertPluginUtils.getMimetypeToExtension();

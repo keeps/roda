@@ -227,7 +227,6 @@ public class RodaCoreFactory {
   public static void instantiateTest(boolean dontInstantiateSolr, boolean dontInstantiateLdap) {
     TEST_DONT_DEPLOY_SOLR = dontInstantiateSolr;
     TEST_DONT_DEPLOY_LDAP = dontInstantiateLdap;
-    instantiated = false;
     instantiate(NodeType.TEST);
   }
 

@@ -9,7 +9,6 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -19,11 +18,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
@@ -66,7 +61,7 @@ public class EARKSIPToAIPPluginUtils {
             List<String> directoryPath = entry.getSecond();
             String fileId = filePath.getFileName().toString();
             ContentPayload payload = new FSPathContentPayload(filePath);
-            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload);
+            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload, true);
           }
         }
       }

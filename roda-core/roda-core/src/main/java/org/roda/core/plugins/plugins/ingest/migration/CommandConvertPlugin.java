@@ -76,8 +76,4 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
   public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException;
 
-  @Override
-  public abstract Report afterExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
-
 }

@@ -128,7 +128,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
           List<String> directoryPath = new ArrayList<>();
           ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
 
-          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload);
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, true);
         } else {
           EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
           Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -150,7 +150,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
                 ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
 
-                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload);
+                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, true);
               } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }
@@ -180,15 +180,15 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value");
 
         state = PluginState.SUCCESS;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+          RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null, new Attribute(
+          RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
+          RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
       }
 
       report.addItem(reportItem);

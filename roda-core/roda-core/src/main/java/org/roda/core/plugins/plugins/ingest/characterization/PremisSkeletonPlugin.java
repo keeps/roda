@@ -55,6 +55,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   private Map<String, String> parameters;
+  private boolean createsPluginEvent = true;
 
   @Override
   public void init() throws PluginException {
@@ -93,6 +94,11 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     this.parameters = parameters;
+
+    // updates the flag responsible to allow plugin event creation
+    if (parameters.containsKey("createsPluginEvent")) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get("createsPluginEvent"));
+    }
   }
 
   @Override
@@ -113,22 +119,24 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           }
 
           state = PluginState.SUCCESS;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);
 
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-          aip.getId());
+        if (createsPluginEvent) {
+          PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+            aip.getId());
+        }
       }
     } catch (IOException ioe) {
       LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
@@ -138,7 +146,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException {
+    NotFoundException, AuthorizationDeniedException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     RepresentationPreservationObject pObject = new RepresentationPreservationObject();
@@ -158,8 +166,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisObjectForRepresentation(ModelService model, AIP aip, String representationId,
     RepresentationPreservationObject pObject, List<RepresentationFilePreservationObject> pObjectPartFiles)
-      throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException {
+    throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
     pObject.setPartFiles(pObjectPartFiles.toArray(new RepresentationFilePreservationObject[pObjectPartFiles.size()]));
 
     PremisRepresentationObjectHelper helper = new PremisRepresentationObjectHelper(pObject);
@@ -171,8 +179,9 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private List<RepresentationFilePreservationObject> createPremisForRepresentationFile(ModelService model,
     StorageService storage, Path temp, AIP aip, String representationId, RepresentationPreservationObject pObject,
-    List<RepresentationFilePreservationObject> pObjectPartFiles, File file) throws IOException, PremisMetadataException,
-      RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    List<RepresentationFilePreservationObject> pObjectPartFiles, File file) throws IOException,
+    PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
     LOGGER.debug("Processing file: " + file);
 
     StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);

@@ -93,11 +93,6 @@ public class MencoderConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     pronomToExtension = MencoderConvertPluginUtils.getPronomToExtension();
     mimetypeToExtension = MencoderConvertPluginUtils.getMimetypeToExtension();

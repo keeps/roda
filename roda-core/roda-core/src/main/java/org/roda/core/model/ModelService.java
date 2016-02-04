@@ -853,8 +853,8 @@ public class ModelService extends ModelObservable {
   }
 
   public File createFile(String aipId, String representationId, List<String> directoryPath, String fileId,
-    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
-    AuthorizationDeniedException, NotFoundException {
+    ContentPayload contentPayload, boolean notify) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     File file;
     // FIXME how to set this?
     boolean asReference = false;
@@ -863,7 +863,9 @@ public class ModelService extends ModelObservable {
 
     final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
     file = convertResourceToRepresentationFile(createdBinary);
-    notifyFileCreated(file);
+    if (notify) {
+      notifyFileCreated(file);
+    }
 
     return file;
   }
@@ -887,12 +889,14 @@ public class ModelService extends ModelObservable {
     return file;
   }
 
-  public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+  public void deleteFile(String aipId, String representationId, List<String> directoryPath, String fileId,
+    boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
     StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.deleteResource(filePath);
-    notifyFileDeleted(aipId, representationId, fileId);
+    if (notify) {
+      notifyFileDeleted(aipId, representationId, fileId);
+    }
 
   }
 

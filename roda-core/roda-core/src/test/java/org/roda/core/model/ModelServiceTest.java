@@ -30,11 +30,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import jersey.repackaged.com.google.common.collect.Lists;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
@@ -68,8 +69,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
-
-import jersey.repackaged.com.google.common.collect.Lists;
 
 /**
  * Unit tests for ModelService
@@ -260,14 +259,14 @@ public class ModelServiceTest {
     List<File> reusableList = new ArrayList<>();
     Iterables.addAll(reusableList, allFiles);
 
-    assertTrue(reusableList.contains(
-      new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), false)));
-    assertTrue(
-      reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), true)));
-    assertTrue(reusableList
-      .contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), true)));
-    assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID,
-      Arrays.asList("folder", "subfolder"), false)));
+    assertTrue(reusableList.contains(new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID,
+      new ArrayList<>(), false)));
+    assertTrue(reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(),
+      true)));
+    assertTrue(reusableList.contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays
+      .asList("folder"), true)));
+    assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays
+      .asList("folder", "subfolder"), false)));
 
     assertTrue(reusableList.contains(new File("RODA 2 logo-circle-black.svg", aipId,
       CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
@@ -416,8 +415,8 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newDescriptiveMetadataId = UUID.randomUUID().toString();
-    final Binary binary = corporaService
-      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService.getBinary(DefaultStoragePath
+      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
       binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -428,10 +427,10 @@ public class ModelServiceTest {
     assertEquals(newDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary newDescriptiveMetadataBinary = storage
-      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
-      newDescriptiveMetadataBinary.getContent().createInputStream()));
+    Binary newDescriptiveMetadataBinary = storage.getBinary(ModelUtils
+      .getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), newDescriptiveMetadataBinary.getContent()
+      .createInputStream()));
 
   }
 
@@ -442,8 +441,8 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    final Binary binary = corporaService
-      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService.getBinary(DefaultStoragePath
+      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -454,10 +453,10 @@ public class ModelServiceTest {
     assertEquals(updatedDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary updatedDescriptiveMetadataBinary = storage
-      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
-      updatedDescriptiveMetadataBinary.getContent().createInputStream()));
+    Binary updatedDescriptiveMetadataBinary = storage.getBinary(ModelUtils
+      .getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), updatedDescriptiveMetadataBinary
+      .getContent().createInputStream()));
 
   }
 
@@ -579,7 +578,7 @@ public class ModelServiceTest {
     final Binary binary = corporaService.getBinary(corporaFilePath);
 
     File createdFile = model.createFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath, newFileId,
-      binary.getContent());
+      binary.getContent(), true);
 
     // check if it is connected
     File retrievedFile = model.retrieveFile(aipId, CorporaConstants.REPRESENTATION_1_ID, newFileDirectoryPath,
@@ -588,8 +587,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
-      createdFileBinary.getContent().createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
+      .createInputStream()));
   }
 
   @Test
@@ -615,8 +614,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
-      createdFileBinary.getContent().createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
+      .createInputStream()));
   }
 
   @Test
@@ -627,7 +626,7 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     model.deleteFile(aipId, CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_1_FILE_1_PATH,
-      CorporaConstants.REPRESENTATION_1_FILE_1_ID);
+      CorporaConstants.REPRESENTATION_1_FILE_1_ID, true);
 
     // check if it deleted
     try {

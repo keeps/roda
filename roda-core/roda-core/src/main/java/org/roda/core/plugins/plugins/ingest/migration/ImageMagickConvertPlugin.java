@@ -93,11 +93,6 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     pronomToExtension = ImageMagickConvertPluginUtils.getPronomToExtension();
     mimetypeToExtension = ImageMagickConvertPluginUtils.getMimetypeToExtension();

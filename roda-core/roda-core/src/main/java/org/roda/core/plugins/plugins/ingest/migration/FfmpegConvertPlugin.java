@@ -63,7 +63,6 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
 
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
-
     return super.getParameters();
   }
 
@@ -91,11 +90,6 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return null;
   }
 

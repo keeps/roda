@@ -7,6 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import gov.loc.repository.bagit.Bag;
+import gov.loc.repository.bagit.BagFile;
+import gov.loc.repository.bagit.BagInfoTxt;
+
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -27,10 +31,6 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagFile;
-import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
   private static final String METADATA_TYPE = "key-value";
@@ -62,7 +62,7 @@ public class BagitToAIPPluginUtils {
         String fileId = split.get(split.size() - 1);
 
         ContentPayload payload = new BagFileContentPayload(bagFile);
-        model.createFile(aip.getId(), representationID, directoryPath, fileId, payload);
+        model.createFile(aip.getId(), representationID, directoryPath, fileId, payload, true);
       }
     }
     bag.close();

@@ -101,11 +101,6 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     pronomToExtension = GhostScriptConvertPluginUtils.getPronomToExtension();
     mimetypeToExtension = GhostScriptConvertPluginUtils.getMimetypeToExtension();

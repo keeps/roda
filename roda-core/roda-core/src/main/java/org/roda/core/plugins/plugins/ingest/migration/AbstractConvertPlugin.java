@@ -3,6 +3,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,7 +36,12 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.PluginOrchestrator;
+import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
@@ -148,6 +154,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       logger.debug("Processing AIP " + aip.getId());
       List<String> newRepresentations = new ArrayList<String>();
       String newRepresentationID = UUID.randomUUID().toString();
+      ArrayList<File> unchangedFiles = new ArrayList<File>();
+      boolean notify = true;
 
       for (Representation representation : aip.getRepresentations()) {
         List<String> alteredFiles = new ArrayList<String>();
@@ -175,14 +183,13 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
                     .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
-                if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
-                  && !applicableTo.contains(fileFormat)) {
-                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
+                  fileFormat = pronomToExtension.get(filePronom).get(0);
                 }
 
-                if (filePronom != null && pronomToExtension.containsKey(filePronom)
-                  && !mimetypeToExtension.containsKey(fileMimetype) && !applicableTo.contains(fileFormat)) {
-                  fileFormat = pronomToExtension.get(filePronom).get(0);
+                if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
+                  && !pronomToExtension.containsKey(filePronom)) {
+                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                 }
 
                 StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
@@ -200,8 +207,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   if (!newRepresentations.contains(newRepresentationID)) {
                     logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
                     boolean original = false;
-                    model.createRepresentation(aip.getId(), newRepresentationID, original, model.getStorage(),
-                      storagePath);
+                    model.createRepresentation(aip.getId(), newRepresentationID, original, notify);
 
                     StoragePath storagePreservationPath = ModelUtils.getPreservationPath(aip.getId(),
                       newRepresentationID);
@@ -210,8 +216,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
                   // update file on new representation
                   String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
-                  model.deleteFile(aip.getId(), newRepresentationID, file.getPath(), file.getId());
-                  model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload);
+                  // model.deleteFile(aip.getId(), newRepresentationID,
+                  // file.getPath(), file.getId());
+                  model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload, notify);
                   newRepresentations.add(newRepresentationID);
                   alteredFiles.add(file.getId());
 
@@ -220,7 +227,20 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                     + " of representation " + representation.getId() + " from AIP " + aip.getId());
                   state = 2;
                 }
+              } else {
+                unchangedFiles.add(file);
               }
+            }
+          }
+
+          // add unchanged files to the new representation
+          if (alteredFiles.size() > 0) {
+            for (File f : unchangedFiles) {
+              StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(f);
+              Binary binary = storage.getBinary(fileStoragePath);
+              Path uriPath = Paths.get(binary.getContent().getURI());
+              ContentPayload payload = new FSPathContentPayload(uriPath);
+              model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
             }
           }
 
@@ -232,6 +252,31 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         logger.debug("Creating convert plugin event for the representation " + representation.getId());
         createEvent(alteredFiles, aip, representation.getId(), newRepresentationID, model, state);
       }
+
+      try {
+
+        // TODO change to execute on the AIP with the new representation
+        Plugin<AIP> psp = new PremisSkeletonPlugin();
+        Plugin<AIP> sfp = new SiegfriedPlugin();
+        Plugin<AIP> ttp = new TikaFullTextPlugin();
+
+        Map<String, String> params = new HashMap<String, String>();
+        params.put("createsPluginEvent", "false");
+        psp.setParameterValues(params);
+        sfp.setParameterValues(params);
+        ttp.setParameterValues(params);
+
+        PluginOrchestrator pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+        pluginOrchestrator.runPluginOnAIPs(psp, Arrays.asList(aip.getId()));
+        pluginOrchestrator.runPluginOnAIPs(sfp, Arrays.asList(aip.getId()));
+        pluginOrchestrator.runPluginOnAIPs(ttp, Arrays.asList(aip.getId()));
+
+        index.reindexAIP(aip);
+
+      } catch (Exception e) {
+        logger.debug("Error re-indexing new representation " + newRepresentationID);
+      }
+
     }
 
     return null;
@@ -294,8 +339,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
               // update file on new representation
               String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
-              model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId());
-              model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload);
+              model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId(), false);
+              model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload, false);
 
             } else {
               logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
@@ -360,8 +405,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException;
 
-  public abstract Report afterExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
+  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    return null;
+  }
 
   public abstract void fillFileFormatStructures();
 

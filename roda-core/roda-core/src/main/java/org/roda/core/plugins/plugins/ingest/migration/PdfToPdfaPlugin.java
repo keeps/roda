@@ -99,11 +99,6 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     return;
   }

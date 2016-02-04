@@ -55,6 +55,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
 
   private Map<String, String> parameters;
+  private boolean createsPluginEvent = true;
 
   private AgentPreservationObject agent;
 
@@ -99,6 +100,11 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     this.parameters = parameters;
+
+    // updates the flag responsible to allow plugin event creation
+    if (parameters.containsKey("createsPluginEvent")) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get("createsPluginEvent"));
+    }
   }
 
   @Override
@@ -111,8 +117,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     PluginHelper.createPremisAgentIfInexistent(model, agent);
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File format identification", aip.getId(),
-        null);
+      ReportItem reportItem = PluginHelper
+        .createPluginReportItem(this, "File format identification", aip.getId(), null);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       try {
@@ -193,9 +199,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
-            "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage()));
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString())).addAttribute(
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Error running SIEGFRIED " + aip.getId() + ": "
+            + e.getMessage()));
       }
 
       report.addItem(reportItem);
@@ -203,8 +209,10 @@ public class SiegfriedPlugin implements Plugin<AIP> {
       // TODO Remove try catch... only added to run siegfried plugin via sh
       // script
       try {
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-          aip.getId());
+        if (createsPluginEvent) {
+          PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+            aip.getId());
+        }
       } catch (Throwable t) {
 
       }

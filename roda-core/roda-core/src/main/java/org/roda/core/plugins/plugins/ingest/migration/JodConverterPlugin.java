@@ -101,11 +101,6 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
-  }
-
-  @Override
   public void fillFileFormatStructures() {
     pronomToExtension = JodConverterPluginUtils.getPronomToExtension();
     mimetypeToExtension = JodConverterPluginUtils.getMimetypeToExtension();

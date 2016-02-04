@@ -55,6 +55,8 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
   private Map<String, String> parameters;
 
+  private boolean createsPluginEvent = true;
+
   private AgentPreservationObject agent;
 
   @Override
@@ -98,6 +100,11 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     this.parameters = parameters;
+
+    // updates the flag responsible to allow plugin event creation
+    if (parameters.containsKey("createsPluginEvent")) {
+      createsPluginEvent = Boolean.parseBoolean(parameters.get("createsPluginEvent"));
+    }
   }
 
   @Override
@@ -128,7 +135,8 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
             Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
             Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME, resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME,
+              resource);
             try {
               IndexedFile f = index.retrieve(IndexedFile.class,
                 SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
@@ -164,14 +172,16 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
-          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
-            "Error running Tika " + aip.getId() + ": " + e.getMessage()));
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString())).addAttribute(
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Error running Tika " + aip.getId() + ": "
+            + e.getMessage()));
       }
 
       report.addItem(reportItem);
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+      if (createsPluginEvent) {
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+          aip.getId());
+      }
     }
 
     return report;
