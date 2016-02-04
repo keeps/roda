@@ -6,14 +6,15 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -29,21 +30,22 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
-public class EditGroup extends Composite {
+public class EditUser extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        String groupname = historyTokens.get(0);
-        UserManagementService.Util.getInstance().getGroup(groupname, new AsyncCallback<Group>() {
+        String username = historyTokens.get(0);
+        UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<User>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -51,16 +53,15 @@ public class EditGroup extends Composite {
           }
 
           @Override
-          public void onSuccess(Group group) {
-            EditGroup editGroup = new EditGroup(group);
-            callback.onSuccess(editGroup);
+          public void onSuccess(User user) {
+            EditUser editUser = new EditUser(user);
+            callback.onSuccess(editUser);
           }
         });
       } else {
         Tools.newHistory(MemberManagement.RESOLVER);
         callback.onSuccess(null);
       }
-
     }
 
     @Override
@@ -73,57 +74,73 @@ public class EditGroup extends Composite {
     }
 
     public String getHistoryToken() {
-      return "edit_group";
+      return "edit_user";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, EditGroup> {
+  interface MyUiBinder extends UiBinder<Widget, EditUser> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private Group group;
+  private final User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
 
   @UiField
   Button buttonApply;
 
   @UiField
+  Button buttonDeActivate;
+
+  @UiField
+  Button buttonRemove;
+
+  @UiField
   Button buttonCancel;
 
   @UiField(provided = true)
-  GroupDataPanel groupDataPanel;
+  UserDataPanel userDataPanel;
 
   /**
-   * Create a new panel to edit a group
-   * 
-   * @param group
-   *          the group to edit
+   * Create a new panel to edit a user
+   *
+   * @param user
+   *          the user to edit
    */
-  public EditGroup(Group group) {
-    this.group = group;
+  public EditUser(User user) {
+    this.user = user;
 
-    this.groupDataPanel = new GroupDataPanel(true, false, true);
-    this.groupDataPanel.setGroup(group);
+    this.userDataPanel = new UserDataPanel(true, true, true);
+    this.userDataPanel.setUser(user);
 
     initWidget(uiBinder.createAndBindUi(this));
+
+    userDataPanel.setUsernameReadOnly(true);
+
+    buttonDeActivate.setEnabled(true);
+    if (user.isActive()) {
+      buttonDeActivate.setText(constants.editUserDeactivate());
+    }
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (groupDataPanel.isChanged()) {
-      if (groupDataPanel.isValid()) {
-        group = groupDataPanel.getGroup();
+    if (userDataPanel.isChanged()) {
+      if (userDataPanel.isValid()) {
+        final User user = userDataPanel.getUser();
+        final String password = userDataPanel.getPassword();
 
-        UserManagementService.Util.getInstance().modifyGroup(group, new AsyncCallback<Void>() {
-
-          public void onSuccess(Void result) {
-            Tools.newHistory(MemberManagement.RESOLVER);
-          }
+        UserManagementService.Util.getInstance().modifyUser(user, password, new AsyncCallback<Void>() {
 
           public void onFailure(Throwable caught) {
             errorMessage(caught);
+          }
+
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
           }
         });
       }
@@ -132,9 +149,28 @@ public class EditGroup extends Composite {
     }
   }
 
+  @UiHandler("buttonDeActivate")
+  void buttonDeActivateHandler(ClickEvent e) {
+    user.setActive(!user.isActive());
+
+    UserManagementService.Util.getInstance().modifyUser(user, null, new AsyncCallback<Void>() {
+
+      @Override
+      public void onSuccess(Void result) {
+        Tools.newHistory(MemberManagement.RESOLVER);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        user.setActive(!user.isActive());
+        errorMessage(caught);
+      }
+    });
+  }
+
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    UserManagementService.Util.getInstance().removeGroup(group.getId(), new AsyncCallback<Void>() {
+    UserManagementService.Util.getInstance().removeUser(user.getId(), new AsyncCallback<Void>() {
 
       @Override
       public void onSuccess(Void result) {
@@ -159,10 +195,12 @@ public class EditGroup extends Composite {
 
   private void errorMessage(Throwable caught) {
     if (caught instanceof NotFoundException) {
-      Toast.showError(messages.editGroupNotFound(group.getName()));
+      Toast.showError(messages.editUserNotFound(user.getName()));
       cancel();
+    } else if (caught instanceof AlreadyExistsException) {
+      Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
     } else {
-      Toast.showError(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
+      Toast.showError(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
     }
   }
 }

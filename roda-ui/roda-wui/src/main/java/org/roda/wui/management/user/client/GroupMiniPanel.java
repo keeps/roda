@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.roda.core.data.v2.user.Group;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import org.roda.wui.management.user.client.images.UserManagementImageBundle;
 

@@ -5,12 +5,19 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.management.user.server;
+package org.roda.wui.server.management;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.util.EntityUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -35,10 +42,10 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
-import org.roda.wui.management.user.client.UserManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,13 +55,13 @@ import config.i18n.server.UserLogMessages;
 
 /**
  * User Management service implementation
- * 
+ *
  * @author Luis Faria
  */
 public class UserManagementServiceImpl extends RemoteServiceServlet implements UserManagementService {
 
   /**
-   * 
+   *
    */
   private static final long serialVersionUID = 1L;
 
@@ -62,7 +69,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   /**
    * User Management Service implementation constructor
-   * 
+   *
    */
   public UserManagementServiceImpl() {
 
@@ -111,17 +118,47 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   public boolean register(User user, String password, String captcha) throws RODAException {
     boolean successful = false;
 
-    if (captcha != null) {
+    String code = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", "");
+    String secret = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code.secret", "");
+
+    if (captcha == null) {
       // UserManagement.register(user, password);
     } else {
-      logger.debug(RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", ""));
-      logger.debug(RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.secret.code", ""));
+
+
+//      try {
+//        String urlParameters = "secret=" + secret + "&response=" + captcha;
+////        byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
+////        int postDataLength = postData.length;
+//        String request = "https://www.google.com/recaptcha/api.js?" + urlParameters;
+//        URL url = new URL(request);
+//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+//        conn.setDoOutput(true);
+//        conn.setInstanceFollowRedirects(false);
+//        conn.setRequestMethod("GET");
+////        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+////        conn.setRequestProperty("charset", "utf-8");
+////        conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
+////        conn.setUseCaches(false);
+////        conn.getOutputStream().write(postData);
+//
+//        response = conn.get
+//
+//        EntityUtils.toString(response.getEntity());
+//
+//        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+//        logger.debug(in.toString());
+//      } catch (Exception e) {
+//        // TODO Auto-generated catch block
+//        e.printStackTrace();
+//      }
+
 
       // TODO Post to https://www.google.com/recaptcha/api/siteverify
 
-      UserManagement.register(user, password);
+      // UserManagement.register(user, password);
 
-      successful = true;
+      // successful = true;
     }
 
     // FIXME
@@ -498,13 +535,13 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
    * Arrays.asList("browse", "search", "administration.user")); private static
    * final Set<String> DIRECT_ROLES = new HashSet<>( Arrays.asList("browse",
    * "search", "administration.user"));
-   * 
+   *
    * private static final Set<String> LFARIA_GROUPS = new
    * HashSet<String>(Arrays.asList("admin")); private static final Set<String>
    * ADMIN_ALL_GROUPS = new HashSet<>( Arrays.asList("users", "producers",
    * "archivists")); private static final Set<String> ADMIN_DIRECT_GROUPS =
    * ADMIN_ALL_GROUPS;
-   * 
+   *
    * private static final List<RODAMember> TEST_MEMBERS = new
    * ArrayList<>(Arrays.asList( new RodaUser("lfaria", "Luis Faria",
    * "lfaria@keep.pt", false, ALL_ROLES, new HashSet<String>(), LFARIA_GROUPS,

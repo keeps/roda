@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.Arrays;
 import java.util.Date;
@@ -51,7 +51,7 @@ import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class UserDataPanel extends Composite implements HasValueChangeHandlers<User> {
 
@@ -137,13 +137,13 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Create a new user data panel
-   * 
+   *
    * @param editmode
    *          if user name should be editable
    * @param enableGroupSelect
    *          if the list of groups to which the user belong to should be
    *          editable
-   * 
+   *
    */
   public UserDataPanel(boolean editmode, boolean enableGroupSelect) {
     this(true, editmode, enableGroupSelect, true);
@@ -151,13 +151,13 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Create a new user data panel
-   * 
+   *
    * @param editmode
    *          if user name should be editable
    * @param enableGroupSelect
    *          if the list of groups to which the user belong to should be
    *          editable
-   * 
+   *
    */
   public UserDataPanel(boolean visible, boolean editmode, boolean enableGroupSelect) {
     this(visible, editmode, enableGroupSelect, true);
@@ -165,7 +165,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Create a new user data panel
-   * 
+   *
    * @param visible
    * @param editmode
    * @param enableGroupSelect
@@ -319,7 +319,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Set user information of user
-   * 
+   *
    * @param user
    */
   public void setUser(User user) {
@@ -363,7 +363,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       }
     });
   }
-  
+
   private void updatePermissions(List<Group> groups) {
     permissionsPanel.clear();
     permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
@@ -376,7 +376,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
    * Get user defined by this panel. This panel defines: name, fullname, title,
    * organization name, postal address, postal code, locality, country, email,
    * phone number, fax and which groups this user belongs to.
-   * 
+   *
    * @return the user modified by this panel
    */
   public User getUser() {
@@ -411,7 +411,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Set the groups of which this user is member of
-   * 
+   *
    * @param groups
    */
   public void setMemberGroups(final Set<String> groups) {
@@ -433,7 +433,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Get the groups of which this user is member of
-   * 
+   *
    * @return a list of group names
    */
   public Set<String> getMemberGroups() {
@@ -442,7 +442,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Get the password
-   * 
+   *
    * @return the password if changed, or null if it remains the same
    */
   public String getPassword() {
@@ -451,7 +451,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Check if password changed
-   * 
+   *
    * @return true if password changed, false otherwise
    */
   public boolean isPasswordChanged() {
@@ -460,7 +460,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Is user data panel valid
-   * 
+   *
    * @return true if valid
    */
   public boolean isValid() {
@@ -525,7 +525,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Is user name read only
-   * 
+   *
    * @return true if read only
    */
   public boolean isUsernameReadOnly() {
@@ -534,7 +534,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Set user name read only
-   * 
+   *
    * @param readonly
    */
   public void setUsernameReadOnly(boolean readonly) {
@@ -565,7 +565,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Is user data panel editable, i.e. on create user mode
-   * 
+   *
    * @return true if editable
    */
   public boolean isEditmode() {
@@ -574,7 +574,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   /**
    * Is user data panel has been changed
-   * 
+   *
    * @return changed
    */
   public boolean isChanged() {

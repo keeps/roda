@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -45,7 +45,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class UserLog extends Composite {
 
@@ -74,7 +74,7 @@ public class UserLog extends Composite {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static UserLog getInstance() {
@@ -112,7 +112,7 @@ public class UserLog extends Composite {
 
   /**
    * Create a new user log
-   * 
+   *
    * @param user
    */
   public UserLog() {

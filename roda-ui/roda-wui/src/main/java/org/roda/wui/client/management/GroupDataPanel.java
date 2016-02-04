@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.HashSet;
 import java.util.List;
@@ -38,7 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class GroupDataPanel extends Composite implements HasValueChangeHandlers<Group> {
 
@@ -55,41 +55,41 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   @UiField
   FlowPanel groupSelectPanel;
-  
+
   @UiField(provided = true)
   GroupSelect groupSelect;
 
   @UiField
   FlowPanel permissionsSelectPanel;
-  
+
   @UiField
   PermissionsPanel permissionsPanel;
-  
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private boolean enableGroupSelect;
 
   private boolean editmode;
-  
+
   private boolean changed = false;
 
   /**
    * Create a new group data panel
-   * 
+   *
    * @param editmode
    *          if group name should be editable
    * @param enableGroupSelect
    *          if the list of groups to which the group belong to should be
    *          editable
-   * 
+   *
    */
   public GroupDataPanel(boolean editmode, boolean enableGroupSelect) {
     this(true, editmode, enableGroupSelect);
   }
 
   /**
-   * 
+   *
    * @param visible
    * @param editmode
    * @param enableGroupSelect
@@ -103,7 +103,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     this.editmode = editmode;
     super.setVisible(visible);
     this.enableGroupSelect = enableGroupSelect;
-    
+
     groupSelectPanel.setVisible(enableGroupSelect);
 
     ChangeHandler changeHandler = new ChangeHandler() {
@@ -133,58 +133,58 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     });
     groupname.addChangeHandler(changeHandler);
     fullname.addChangeHandler(changeHandler);
-        
+
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
-      
+
       @Override
       public void onValueChange(ValueChangeEvent<List<String>> event) {
-        onChange(); 
+        onChange();
       }
     });
-    
+
     groupSelect.addValueChangeHandler(new ValueChangeHandler<List<Group>>() {
-      
+
       @Override
       public void onValueChange(ValueChangeEvent<List<Group>> event) {
         updatePermissions(event.getValue());
-        onChange(); 
+        onChange();
       }
     });
   }
 
   /**
    * Set group information of group
-   * 
+   *
    * @param group
    */
   public void setGroup(Group group) {
     this.groupname.setText(group.getName());
     this.fullname.setText(group.getFullName());
     this.groupSelect.addGroupToBlacklist(group.getId());
-   
+
     this.setMemberGroups(group.getAllGroups());
     this.setPermissions(group.getDirectRoles(), group.getAllRoles());
   }
 
   private void setPermissions(final Set<String> directRoles, final Set<String> allRoles) {
     permissionsPanel.init(new AsyncCallback<Boolean>() {
-      
+
       @Override
       public void onSuccess(Boolean result) {
         Set<String> indirectRoles = new HashSet<String>(allRoles);
         indirectRoles.removeAll(directRoles);
-        
+
         permissionsPanel.checkPermissions(directRoles, false);
         permissionsPanel.checkPermissions(indirectRoles, true);
       }
-      
+
       @Override
       public void onFailure(Throwable caught) {
         Tools.newHistory(MemberManagement.RESOLVER);
       }
     });
   }
-  
+
   private void updatePermissions(List<Group> groups) {
     permissionsPanel.clear();
     permissionsPanel.checkPermissions(new HashSet<String>(permissionsPanel.getUserSelections()), false);
@@ -195,7 +195,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Get group defined by this panel. This panel defines: name, fullname
-   * 
+   *
    * @return the group modified by this panel
    */
   public Group getGroup() {
@@ -203,11 +203,11 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     group.setId(groupname.getText());
     group.setName(groupname.getText());
     group.setFullName(fullname.getText());
-   
+
     if (enableGroupSelect) {
       group.setDirectGroups(this.getMemberGroups());
     }
-    
+
     group.setDirectRoles(permissionsPanel.getDirectRoles());
 
     return group;
@@ -215,18 +215,18 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Set the groups of which this group is member of
-   * 
+   *
    * @param groups
    */
   public void setMemberGroups(final Set<String> groups) {
     if (enableGroupSelect) {
       groupSelect.init(new AsyncCallback<Boolean>() {
-        
+
         @Override
         public void onSuccess(Boolean result) {
           groupSelect.setMemberGroups(groups);
         }
-        
+
         @Override
         public void onFailure(Throwable caught) {
           Tools.newHistory(MemberManagement.RESOLVER);
@@ -237,7 +237,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Get the groups of which this group is member of
-   * 
+   *
    * @return a list of group names
    */
   public Set<String> getMemberGroups() {
@@ -246,7 +246,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Is group data panel valid
-   * 
+   *
    * @return true if valid
    */
   public boolean isValid() {
@@ -271,7 +271,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Is group name read only
-   * 
+   *
    * @return true if read only
    */
   public boolean isGroupnameReadOnly() {
@@ -280,7 +280,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Set group name read only
-   * 
+   *
    * @param readonly
    */
   public void setGroupnameReadOnly(boolean readonly) {
@@ -301,16 +301,16 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   /**
    * Is group data panel editable, i.e. on create group mode
-   * 
+   *
    * @return true if editable
    */
   public boolean isEditmode() {
     return editmode;
   }
-  
+
   /**
    * Is group data panel has been changed
-   * 
+   *
    * @return changed
    */
   public boolean isChanged() {
@@ -321,12 +321,12 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Group> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-  
+
   protected void onChange() {
     changed = true;
     ValueChangeEvent.fire(this, getValue());
   }
-  
+
   public Group getValue() {
     return getGroup();
   }

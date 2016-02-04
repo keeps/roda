@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ import com.google.gwt.user.client.rpc.ServiceDefTarget;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 @SuppressWarnings("deprecation")
 public interface UserManagementService extends RemoteService {
@@ -56,7 +56,7 @@ public interface UserManagementService extends RemoteService {
 
     /**
      * Get a new instance of the service
-     * 
+     *
      * @return the instance
      */
     public static UserManagementServiceAsync getInstance() {
@@ -76,7 +76,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Get a group
-   * 
+   *
    * @param groupname
    *          the group name
    * @return the group
@@ -88,18 +88,18 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Get a user
-   * 
+   *
    * @param username
    *          the user name
    * @return the user
-   * 
+   *
    * @throws RODAException
    */
   public User getUser(String username) throws RODAException;
 
   /**
    * Create a new user
-   * 
+   *
    * @param user
    *          the user
    * @param password
@@ -115,7 +115,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Modify a user
-   * 
+   *
    * @param user
    *          the modified users
    * @param password
@@ -130,7 +130,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
-   * 
+   *
    * @param username
    *          the user name
    * @return true if user was removed, false if it was only deactivated
@@ -141,7 +141,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Modify the authenticated user
-   * 
+   *
    * @param user
    *          the modified user
    * @param password
@@ -156,7 +156,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Create a group
-   * 
+   *
    * @param group
    *          the new group
    * @throws AuthorizationDeniedException
@@ -167,7 +167,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Modify a group
-   * 
+   *
    * @param group
    *          the modified group
    * @throws AuthorizationDeniedException
@@ -178,7 +178,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Remove a group
-   * 
+   *
    * @param groupname
    *          the group name
    * @throws AuthorizationDeniedException
@@ -188,7 +188,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Get the number log entries
-   * 
+   *
    * @param filter
    * @return
    * @throws RODAException
@@ -203,7 +203,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Register a new user
-   * 
+   *
    * @param user
    *          The user to register
    * @param password
@@ -217,46 +217,46 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Verify a user email. If verified user will become active
-   * 
+   *
    * @param username
    *          the name of the user
    * @param token
    *          the token used in email verification
    * @return true if email verified, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public boolean verifyemail(String username, String token) throws RODAException;
 
   /**
    * Resend the email chalenge to a user email
-   * 
+   *
    * @param username
    *          the name of the user
    * @return true if email resent, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public boolean resendEmailVerification(String username) throws RODAException;
 
   /**
    * Change the email of a user that is still not active due to a email
    * unverified
-   * 
+   *
    * @param username
    *          the name of the user
    * @param email
    *          the new email
    * @return true if email was successfully changed, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public boolean changeUnverifiedEmail(String username, String email) throws RODAException;
 
   /**
    * Request to reset the password. An email will be sent to the user with the
    * password reset token.
-   * 
+   *
    * @param usernameOrEmail
    *          the user name or email
    * @param captcha
@@ -268,7 +268,7 @@ public interface UserManagementService extends RemoteService {
 
   /**
    * Reset a user password
-   * 
+   *
    * @param username
    *          the user name
    * @param resetPasswordToken
@@ -277,13 +277,13 @@ public interface UserManagementService extends RemoteService {
    * @param newPassword
    *          the new password
    * @throws RODAException
-   * 
+   *
    */
   public void resetPassword(String username, String resetPasswordToken, String newPassword) throws RODAException;
 
   /**
    * Set user log report info
-   * 
+   *
    * @param adapter
    * @param localeString
    * @throws PrintReportException

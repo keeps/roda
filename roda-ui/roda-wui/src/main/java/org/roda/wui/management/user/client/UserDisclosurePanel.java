@@ -18,6 +18,7 @@ import java.util.Set;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.widgets.AlphabetListItem;

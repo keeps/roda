@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class CreateUser extends Composite {
 
@@ -81,7 +81,7 @@ public class CreateUser extends Composite {
 
   /**
    * Create a new panel to create a user
-   * 
+   *
    * @param user
    *          the user to create
    */

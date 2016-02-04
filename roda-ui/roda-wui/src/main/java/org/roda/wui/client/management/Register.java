@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,12 +16,12 @@ import java.util.List;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.management.user.client.recaptcha.RecaptchaWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -38,7 +38,7 @@ import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class Register extends Composite {
 
@@ -76,9 +76,9 @@ public class Register extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private final User user;
-  
+
   private boolean recaptchaActive = true;
-  
+
   private RecaptchaWidget recaptchaWidget;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
@@ -96,7 +96,7 @@ public class Register extends Composite {
 
   /**
    * Create a new panel to edit a user
-   * 
+   *
    * @param user
    *          the user to edit
    */
@@ -130,15 +130,15 @@ public class Register extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (userDataPanel.isValid()) {
-      String recaptchaResponse = null; 
+      String recaptchaResponse = null;
       if (recaptchaActive) {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
-      
+
       final User user = userDataPanel.getUser();
       final String password = userDataPanel.getPassword();
       final String recaptcha = recaptchaResponse;
-      
+
       UserManagementService.Util.getInstance().register(user, password, recaptcha, new AsyncCallback<Boolean>() {
 
         @Override

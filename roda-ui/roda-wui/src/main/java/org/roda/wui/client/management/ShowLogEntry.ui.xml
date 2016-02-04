@@ -8,7 +8,7 @@
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
 	<ui:style>
-	
+
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">

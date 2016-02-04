@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 
 /**
- * 
+ *
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
@@ -108,7 +108,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     protected void onChange() {
       ValueChangeEvent.fire(this, getValue());
     }
-    
+
     public Group getValue() {
       return getGroup();
     }
@@ -120,7 +120,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
   private final List<String> blacklist;
 
   private final List<GroupCheckbox> groups;
-  
+
   private HashMap<String, Group> userSelections;
 
   private boolean enabled;
@@ -129,7 +129,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
 
   /**
    * Create a new group selection widget
-   * 
+   *
    * @param visible
    *          start as visible or wait until its initialized
    */
@@ -137,7 +137,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
     this.groups = new Vector<GroupCheckbox>();
     this.blacklist = new Vector<String>();
     this.userSelections = new HashMap<String, Group>();
-    
+
     loading = new LoadingPopup(this);
 
     enabled = true;
@@ -174,7 +174,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
               if (userSelections.keySet().contains(event.getValue().getId())) {
                 userSelections.remove(event.getValue().getId());
               } else {
-                userSelections.put(event.getValue().getId(), event.getValue()); 
+                userSelections.put(event.getValue().getId(), event.getValue());
               }
               onChange();
             }
@@ -185,11 +185,11 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
       }
     });
   }
-  
+
   public HashMap<String, Group> getUserSelections() {
     return userSelections;
   }
-  
+
   public boolean isEnabled() {
     return enabled;
   }
@@ -233,7 +233,7 @@ public class GroupSelect extends FlowPanel implements HasValueChangeHandlers<Lis
   protected void onChange() {
     ValueChangeEvent.fire(this, getValue());
   }
-  
+
   public List<Group> getValue() {
     return new Vector<Group>(getUserSelections().values());
   }

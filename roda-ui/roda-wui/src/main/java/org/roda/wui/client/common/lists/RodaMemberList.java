@@ -17,9 +17,9 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.StringUtility;
-import org.roda.wui.management.user.client.UserManagementService;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.i18n.client.LocaleInfo;

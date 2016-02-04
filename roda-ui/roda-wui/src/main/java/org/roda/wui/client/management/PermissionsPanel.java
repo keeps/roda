@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -40,7 +40,7 @@ import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class PermissionsPanel extends FlowPanel implements HasValueChangeHandlers<List<String>> {
 
@@ -169,7 +169,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
   private final LoadingPopup loading;
 
   /**
-   * 
+   *
    */
   public PermissionsPanel() {
     this.permissions = new Vector<Permission>();
@@ -236,7 +236,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   /**
    * Set all permissions defined by roles checked and set locked with parameters
-   * 
+   *
    * @param roles
    *          roles of the permissions to check
    * @param lock
@@ -285,7 +285,7 @@ public class PermissionsPanel extends FlowPanel implements HasValueChangeHandler
 
   /**
    * Get roles that are directly defined, i.e. are not inherited
-   * 
+   *
    * @return
    */
   public Set<String> getDirectRoles() {

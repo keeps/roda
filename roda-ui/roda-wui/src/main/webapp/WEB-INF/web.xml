@@ -139,7 +139,7 @@
 	<servlet>
 		<servlet-name>UserManagementService</servlet-name>
 		<servlet-class>
-			org.roda.wui.management.user.server.UserManagementServiceImpl</servlet-class>
+			org.roda.wui.server.management.UserManagementServiceImpl</servlet-class>
 	</servlet>
 	<servlet>
 		<servlet-name>UserLoginService</servlet-name>

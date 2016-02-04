@@ -1,4 +1,4 @@
-package org.roda.wui.management.user.client.recaptcha;
+package org.roda.wui.client.management.recaptcha;
 
 public class Recaptcha {
   public static native void render(String key, String div, String lang) /*-{
@@ -9,11 +9,11 @@ public class Recaptcha {
       'type': 'image'
     });
   }-*/;
-  
+
   public static native void reset(String div) /*-{
     $wnd.grecaptcha.reset(div);
   }-*/;
-  
+
   public static native String getResponse(String div) /*-{
     return $wnd.grecaptcha.getResponse();
   }-*/;

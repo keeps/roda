@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
@@ -29,7 +29,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 @SuppressWarnings("deprecation")
 public interface UserManagementServiceAsync {
@@ -47,7 +47,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Create a new user
-   * 
+   *
    * @param user
    *          the user
    * @param password
@@ -58,19 +58,19 @@ public interface UserManagementServiceAsync {
 
   /**
    * Modify a user
-   * 
+   *
    * @param user
    *          the modified users
    * @param password
    *          the new user password, or null to stay the same
    * @throws RODAException
-   * 
+   *
    */
   public void modifyUser(User user, String password, AsyncCallback<Void> callback);
 
   /**
    * Modify the authenticated user
-   * 
+   *
    * @param user
    *          the modified user
    * @param password
@@ -78,10 +78,10 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    */
   public void editMyUser(User user, String password, AsyncCallback<Void> callback);
-  
+
   /**
    * Try to remove a user, if user cannot be removed it will be deactivated
-   * 
+   *
    * @param username
    *          the user name
    * @return true if user was removed, false if it was only deactivated
@@ -91,7 +91,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Create a group
-   * 
+   *
    * @param group
    *          the new group
    * @throws RODAException
@@ -100,7 +100,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Modify a group
-   * 
+   *
    * @param group
    *          the modified group
    * @throws RODAException
@@ -109,7 +109,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Remove a group
-   * 
+   *
    * @param groupname
    *          the group name
    * @throws RODAException
@@ -118,7 +118,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Get the number log entries
-   * 
+   *
    * @param filter
    * @return
    * @throws RODAException
@@ -132,7 +132,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Register a new user
-   * 
+   *
    * @param user
    *          The user to register
    * @param password
@@ -146,46 +146,46 @@ public interface UserManagementServiceAsync {
 
   /**
    * Verify a user email. If verified user will become active
-   * 
+   *
    * @param username
    *          the name of the user
    * @param token
    *          the token used in email verification
    * @return true if email verified, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public void verifyemail(String username, String token, AsyncCallback<Boolean> callback);
 
   /**
    * Resend the email chalenge to a user email
-   * 
+   *
    * @param username
    *          the name of the user
    * @return true if email resent, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public void resendEmailVerification(String username, AsyncCallback<Boolean> callback);
 
   /**
    * Change the email of a user that is still not active due to a email
    * unverified
-   * 
+   *
    * @param username
    *          the name of the user
    * @param email
    *          the new email
    * @return true if email was successfully changed, false otherwise
    * @throws RODAException
-   * 
+   *
    */
   public void changeUnverifiedEmail(String username, String email, AsyncCallback<Boolean> callback);
 
   /**
    * Request to reset the password. An email will be sent to the user with the
    * password reset token.
-   * 
+   *
    * @param usernameOrEmail
    *          the user name or email
    * @param captcha
@@ -197,7 +197,7 @@ public interface UserManagementServiceAsync {
 
   /**
    * Reset a user password
-   * 
+   *
    * @param username
    *          the user name
    * @param resetPasswordToken
@@ -206,14 +206,14 @@ public interface UserManagementServiceAsync {
    * @param newPassword
    *          the new password
    * @throws RODAException
-   * 
+   *
    */
   public void resetPassword(String username, String resetPasswordToken, String newPassword,
     AsyncCallback<Void> callback);
 
   /**
    * Set user log report info
-   * 
+   *
    * @param adapter
    * @param localeString
    * @throws PrintReportException

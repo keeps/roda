@@ -6,13 +6,13 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.Group;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -33,17 +33,34 @@ import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
-public class CreateGroup extends Composite {
+public class EditGroup extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Group group = new Group();
-      CreateGroup createGroup = new CreateGroup(group);
-      callback.onSuccess(createGroup);
+      if (historyTokens.size() == 1) {
+        String groupname = historyTokens.get(0);
+        UserManagementService.Util.getInstance().getGroup(groupname, new AsyncCallback<Group>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
+
+          @Override
+          public void onSuccess(Group group) {
+            EditGroup editGroup = new EditGroup(group);
+            callback.onSuccess(editGroup);
+          }
+        });
+      } else {
+        Tools.newHistory(MemberManagement.RESOLVER);
+        callback.onSuccess(null);
+      }
+
     }
 
     @Override
@@ -56,11 +73,11 @@ public class CreateGroup extends Composite {
     }
 
     public String getHistoryToken() {
-      return "create_group";
+      return "edit_group";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateGroup> {
+  interface MyUiBinder extends UiBinder<Widget, EditGroup> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -79,12 +96,12 @@ public class CreateGroup extends Composite {
   GroupDataPanel groupDataPanel;
 
   /**
-   * Create a new panel to create a group
-   * 
+   * Create a new panel to edit a group
+   *
    * @param group
-   *          the group to create
+   *          the group to edit
    */
-  public CreateGroup(Group group) {
+  public EditGroup(Group group) {
     this.group = group;
 
     this.groupDataPanel = new GroupDataPanel(true, false, true);
@@ -95,20 +112,40 @@ public class CreateGroup extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (groupDataPanel.isValid()) {
-      group = groupDataPanel.getGroup();
+    if (groupDataPanel.isChanged()) {
+      if (groupDataPanel.isValid()) {
+        group = groupDataPanel.getGroup();
 
-      UserManagementService.Util.getInstance().addGroup(group, new AsyncCallback<Void>() {
+        UserManagementService.Util.getInstance().modifyGroup(group, new AsyncCallback<Void>() {
 
-        public void onSuccess(Void result) {
-          Tools.newHistory(MemberManagement.RESOLVER);
-        }
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
 
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
-      });
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
+        });
+      }
+    } else {
+      Tools.newHistory(MemberManagement.RESOLVER);
     }
+  }
+
+  @UiHandler("buttonRemove")
+  void buttonRemoveHandler(ClickEvent e) {
+    UserManagementService.Util.getInstance().removeGroup(group.getId(), new AsyncCallback<Void>() {
+
+      @Override
+      public void onSuccess(Void result) {
+        Tools.newHistory(MemberManagement.RESOLVER);
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        errorMessage(caught);
+      }
+    });
   }
 
   @UiHandler("buttonCancel")
@@ -121,10 +158,11 @@ public class CreateGroup extends Composite {
   }
 
   private void errorMessage(Throwable caught) {
-    if (caught instanceof AlreadyExistsException) {
-      Toast.showError(messages.createGroupAlreadyExists(group.getName()));
+    if (caught instanceof NotFoundException) {
+      Toast.showError(messages.editGroupNotFound(group.getName()));
+      cancel();
     } else {
-      Toast.showError(messages.createGroupFailure(caught.getMessage()));
+      Toast.showError(messages.editGroupFailure(EditGroup.this.group.getName(), caught.getMessage()));
     }
   }
 }

@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;

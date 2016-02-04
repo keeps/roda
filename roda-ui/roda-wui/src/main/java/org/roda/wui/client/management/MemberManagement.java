@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.HashMap;
 import java.util.List;
@@ -63,7 +63,7 @@ public class MemberManagement extends Composite {
 
   /**
    * Get the singleton instance
-   * 
+   *
    * @return the instance
    */
   public static MemberManagement getInstance() {
@@ -95,10 +95,10 @@ public class MemberManagement extends Composite {
 
   @UiField(provided = true)
   FlowPanel facetGroups;
-  
+
   @UiField
   Button buttonAddUser;
-  
+
   @UiField
   Button buttonAddGroup;
 
@@ -146,7 +146,7 @@ public class MemberManagement extends Composite {
       } else {
         Tools.newHistory(RESOLVER);
         callback.onSuccess(null);
-      } 
+      }
     } else if (historyTokens.size() == 2) {
       if (historyTokens.get(0).equals(EditUser.RESOLVER.getHistoryToken())) {
         EditUser.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -161,12 +161,12 @@ public class MemberManagement extends Composite {
       callback.onSuccess(null);
     }
   }
-  
+
   @UiHandler("buttonAddUser")
   void buttonAddUserHandler(ClickEvent e) {
     Tools.newHistory(RESOLVER, "create_user");
   }
-  
+
   @UiHandler("buttonAddGroup")
   void buttonAddGroupHandler(ClickEvent e) {
     Tools.newHistory(RESOLVER, "create_group");

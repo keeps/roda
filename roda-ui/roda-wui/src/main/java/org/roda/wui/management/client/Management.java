@@ -14,14 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.management.MemberManagement;
+import org.roda.wui.client.management.UserLog;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.management.editor.client.MetadataEditor;
 import org.roda.wui.management.statistics.client.Statistics;
-import org.roda.wui.management.user.client.MemberManagement;
-import org.roda.wui.management.user.client.UserLog;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -128,9 +128,9 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
 
   /**
    * Get the new password
-   * 
+   *
    * @return the new password or null if none set
-   * 
+   *
    */
   public String getValue() {
     return changed && isValid() ? editPassword.getText() : null;

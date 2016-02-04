@@ -1,4 +1,4 @@
-package org.roda.wui.management.user.client.recaptcha;
+package org.roda.wui.client.management.recaptcha;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
@@ -12,7 +12,7 @@ public class RecaptchaWidget extends Composite {
 
   /**
    * This Constructor is used to create an default ReCAPTCHA widget
-   * 
+   *
    * @param key
    *          Your public key
    */
@@ -43,7 +43,7 @@ public class RecaptchaWidget extends Composite {
   public void reset() {
     Recaptcha.reset(RECAPTCHA_DIV_ID);
   }
-  
+
   public String getResponse() {
     return Recaptcha.getResponse(RECAPTCHA_DIV_ID);
   }

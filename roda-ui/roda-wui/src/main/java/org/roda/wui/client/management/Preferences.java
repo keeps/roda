@@ -6,14 +6,16 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -30,55 +32,56 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
 import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
-public class EditUser extends Composite {
+public class Preferences extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        String username = historyTokens.get(0);
-        UserManagementService.Util.getInstance().getUser(username, new AsyncCallback<User>() {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
 
-          @Override
-          public void onSuccess(User user) {
-            EditUser editUser = new EditUser(user);
-            callback.onSuccess(editUser);
-          }
-        });
-      } else {
-        Tools.newHistory(MemberManagement.RESOLVER);
-        callback.onSuccess(null);
-      }
+        public void onSuccess(RodaUser user) {
+          Preferences preferences = new Preferences(new User(user));
+          callback.onSuccess(preferences);
+        }
+      });
+
     }
 
     @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        public void onSuccess(RodaUser user) {
+          callback.onSuccess(new Boolean(!user.isGuest()));
+        }
+      });
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Arrays.asList(getHistoryToken());
     }
 
     public String getHistoryToken() {
-      return "edit_user";
+      return "preferences";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, EditUser> {
+  interface MyUiBinder extends UiBinder<Widget, Preferences> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -86,17 +89,9 @@ public class EditUser extends Composite {
   private final User user;
 
   private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
 
   @UiField
   Button buttonApply;
-
-  @UiField
-  Button buttonDeActivate;
-
-  @UiField
-  Button buttonRemove;
 
   @UiField
   Button buttonCancel;
@@ -106,24 +101,19 @@ public class EditUser extends Composite {
 
   /**
    * Create a new panel to edit a user
-   * 
+   *
    * @param user
    *          the user to edit
    */
-  public EditUser(User user) {
+  public Preferences(User user) {
     this.user = user;
 
-    this.userDataPanel = new UserDataPanel(true, true, true);
+    this.userDataPanel = new UserDataPanel(true, true, false, false);
     this.userDataPanel.setUser(user);
 
     initWidget(uiBinder.createAndBindUi(this));
 
     userDataPanel.setUsernameReadOnly(true);
-
-    buttonDeActivate.setEnabled(true);
-    if (user.isActive()) {
-      buttonDeActivate.setText(constants.editUserDeactivate());
-    }
   }
 
   @UiHandler("buttonApply")
@@ -149,41 +139,6 @@ public class EditUser extends Composite {
     }
   }
 
-  @UiHandler("buttonDeActivate")
-  void buttonDeActivateHandler(ClickEvent e) {
-    user.setActive(!user.isActive());
-
-    UserManagementService.Util.getInstance().modifyUser(user, null, new AsyncCallback<Void>() {
-
-      @Override
-      public void onSuccess(Void result) {
-        Tools.newHistory(MemberManagement.RESOLVER);
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        user.setActive(!user.isActive());
-        errorMessage(caught);
-      }
-    });
-  }
-
-  @UiHandler("buttonRemove")
-  void buttonRemoveHandler(ClickEvent e) {
-    UserManagementService.Util.getInstance().removeUser(user.getId(), new AsyncCallback<Void>() {
-
-      @Override
-      public void onSuccess(Void result) {
-        Tools.newHistory(MemberManagement.RESOLVER);
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        errorMessage(caught);
-      }
-    });
-  }
-
   @UiHandler("buttonCancel")
   void buttonCancelHandler(ClickEvent e) {
     cancel();
@@ -200,7 +155,7 @@ public class EditUser extends Composite {
     } else if (caught instanceof AlreadyExistsException) {
       Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
     } else {
-      Toast.showError(messages.editUserFailure(EditUser.this.user.getName(), caught.getMessage()));
+      Toast.showError(messages.editUserFailure(Preferences.this.user.getName(), caught.getMessage()));
     }
   }
 }

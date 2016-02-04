@@ -6,9 +6,9 @@
  * https://github.com/keeps/roda
  */
 /**
- * 
+ *
  */
-package org.roda.wui.management.user.client;
+package org.roda.wui.client.management;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ import config.i18n.client.CommonMessages;
 
 /**
  * @author Luis Faria
- * 
+ *
  */
 public class ShowLogEntry extends Composite {
 
@@ -122,7 +122,7 @@ public class ShowLogEntry extends Composite {
 
   /**
    * Create a new panel to view a log entry
-   * 
+   *
    */
   public ShowLogEntry(LogEntry logEntry) {
     initWidget(uiBinder.createAndBindUi(this));

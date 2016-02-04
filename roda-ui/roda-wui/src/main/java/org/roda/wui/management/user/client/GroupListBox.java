@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.v2.user.Group;
+import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
