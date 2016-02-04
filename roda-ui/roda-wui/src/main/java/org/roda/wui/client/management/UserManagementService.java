@@ -31,6 +31,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.client.PrintReportException;
 
 import com.google.gwt.core.client.GWT;
@@ -211,9 +212,15 @@ public interface UserManagementService extends RemoteService {
    * @param captcha
    *          the captcha chalenge
    * @return true if passed the chalenge, false otherwise
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws EmailAlreadyExistsException
+   * @throws UserAlreadyExistsException
+   * @throws GenericException
+   * @throws RecaptchaException
    */
-  public boolean register(User user, String password, String captcha) throws RODAException;
+  public void register(User user, String password, String captcha) throws EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, GenericException, NotFoundException, RecaptchaException;
 
   /**
    * Verify a user email. If verified user will become active

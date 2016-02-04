@@ -142,7 +142,7 @@ public interface UserManagementServiceAsync {
    * @return true if passed the chalenge, false otherwise
    * @throws RODAException
    */
-  public void register(User user, String password, String captcha, AsyncCallback<Boolean> callback);
+  public void register(User user, String password, String captcha, AsyncCallback<Void> callback);
 
   /**
    * Verify a user email. If verified user will become active

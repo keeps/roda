@@ -7,11 +7,13 @@
  */
 package org.roda.wui.client.management;
 
+import org.roda.wui.common.client.ClientLogger;
+
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -42,6 +44,9 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
   private boolean buttonMode;
 
   private boolean changed;
+  
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public PasswordPanel(boolean editmode) {
     changed = false;
@@ -73,16 +78,16 @@ public class PasswordPanel extends SimplePanel implements HasValueChangeHandlers
       buttonMode = false;
     }
 
-    KeyPressHandler handler = new KeyPressHandler() {
+    KeyUpHandler handler = new KeyUpHandler() {
 
       @Override
-      public void onKeyPress(KeyPressEvent event) {
+      public void onKeyUp(KeyUpEvent event) {
         onChange();
       }
     };
 
-    editPassword.addKeyPressHandler(handler);
-    editPasswordRepeat.addKeyPressHandler(handler);
+    editPassword.addKeyUpHandler(handler);
+    editPasswordRepeat.addKeyUpHandler(handler);
 
     this.addStyleName("password");
     editPassword.addStyleName("password-input");

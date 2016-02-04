@@ -7,17 +7,10 @@
  */
 package org.roda.wui.server.management;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.apache.http.util.EntityUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -43,6 +36,7 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.api.controllers.UserManagement;
 import org.roda.wui.client.management.UserManagementService;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.client.PrintReportException;
 import org.roda.wui.common.server.ServerTools;
@@ -66,6 +60,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   private static final long serialVersionUID = 1L;
 
   private final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
+  
+  private static String RECAPTCHA_CODE_SECRET = "ui.google.recaptcha.code.secret";
 
   /**
    * User Management Service implementation constructor
@@ -115,73 +111,15 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     UserManagement.addUser(user, newUser, password);
   }
 
-  public boolean register(User user, String password, String captcha) throws RODAException {
-    boolean successful = false;
-
-    String code = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", "");
-    String secret = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code.secret", "");
-
-    if (captcha == null) {
-      // UserManagement.register(user, password);
+  public void register(User user, String password, String captcha) throws EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException, GenericException, NotFoundException, RecaptchaException {
+    if (captcha != null) {
+      RecaptchaUtils.recaptchaVerify(
+        RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET, ""), captcha);
+      UserManagement.register(user, password);
     } else {
-
-
-//      try {
-//        String urlParameters = "secret=" + secret + "&response=" + captcha;
-////        byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
-////        int postDataLength = postData.length;
-//        String request = "https://www.google.com/recaptcha/api.js?" + urlParameters;
-//        URL url = new URL(request);
-//        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//        conn.setDoOutput(true);
-//        conn.setInstanceFollowRedirects(false);
-//        conn.setRequestMethod("GET");
-////        conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-////        conn.setRequestProperty("charset", "utf-8");
-////        conn.setRequestProperty("Content-Length", Integer.toString(postDataLength));
-////        conn.setUseCaches(false);
-////        conn.getOutputStream().write(postData);
-//
-//        response = conn.get
-//
-//        EntityUtils.toString(response.getEntity());
-//
-//        Reader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-//        logger.debug(in.toString());
-//      } catch (Exception e) {
-//        // TODO Auto-generated catch block
-//        e.printStackTrace();
-//      }
-
-
-      // TODO Post to https://www.google.com/recaptcha/api/siteverify
-
-      // UserManagement.register(user, password);
-
-      // successful = true;
+      UserManagement.register(user, password);
     }
-
-    // FIXME
-    // if
-    // (CaptchaServiceImpl.check(getThreadLocalRequest().getSession().getId(),
-    // captcha).booleanValue()) {
-    // UserRegistration userRegistrationService;
-    // User registeredUser;
-    // // try {
-    // userRegistrationService =
-    // RodaClientFactory.getRodaWuiClient().getUserRegistrationService();
-    // user.setAllGroups(new HashSet<String>(Arrays.asList("guests")));
-    // user.setAllRoles(new HashSet<String>());
-    // // registeredUser = userRegistrationService.registerUser(user,
-    // // password);
-    // // successful = sendEmailVerification(registeredUser);
-    //
-    // // } catch (RemoteException e) {
-    // // logger.error("Remote Exception", e);
-    // // throw RODAClient.parseRemoteException(e);
-    // // }
-    // }
-    return successful;
   }
 
   @Override

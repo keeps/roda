@@ -139,16 +139,16 @@ public class Register extends Composite {
       final String password = userDataPanel.getPassword();
       final String recaptcha = recaptchaResponse;
 
-      UserManagementService.Util.getInstance().register(user, password, recaptcha, new AsyncCallback<Boolean>() {
-
-        @Override
-        public void onSuccess(Boolean result) {
-          // TODO Auto-generated method stub
-        }
+      UserManagementService.Util.getInstance().register(user, password, recaptcha, new AsyncCallback<Void>() {
 
         @Override
         public void onFailure(Throwable caught) {
           errorMessage(caught);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          
         }
       });
     }

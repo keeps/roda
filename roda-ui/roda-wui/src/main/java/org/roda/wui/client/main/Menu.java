@@ -98,6 +98,8 @@ public class Menu extends Composite {
   private final MenuBar languagesMenu;
 
   private final MenuBar settingsMenu;
+  
+  private String selectedLanguage;
 
   /**
    * Main menu constructor
@@ -236,7 +238,7 @@ public class Menu extends Composite {
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
     rightMenu
-      .addItem(customMenuItem("fa fa-globe", constants.title_language(), "menu-item-label", languagesMenu, null));
+      .addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
@@ -320,6 +322,7 @@ public class Menu extends Composite {
         MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
         languageMenuItem.addStyleName("menu-item-language-selected");
         languagesMenu.addItem(languageMenuItem);
+        selectedLanguage = supportedLanguages.get(key);
       } else {
         MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(supportedLanguages.get(key)),
           new ScheduledCommand() {
