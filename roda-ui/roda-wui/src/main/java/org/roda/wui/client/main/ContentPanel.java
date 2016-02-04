@@ -92,7 +92,7 @@ public class ContentPanel extends SimplePanel {
     // Management
     resolvers.add(Management.RESOLVER);
     // User Management
-    resolvers.add(Preferences.getInstance());
+    resolvers.add(Preferences.RESOLVER);
     resolvers.add(RecoverLoginRequest.getInstance());
     resolvers.add(Register.RESOLVER);
     resolvers.add(ResetPassword.getInstance());

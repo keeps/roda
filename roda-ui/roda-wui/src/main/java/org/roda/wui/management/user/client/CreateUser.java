@@ -38,15 +38,28 @@ import config.i18n.client.UserManagementMessages;
  */
 public class CreateUser extends Composite {
 
-  public static final HistoryResolver RESOLVER=new HistoryResolver(){
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
-  @Override public void resolve(List<String>historyTokens,final AsyncCallback<Widget>callback){User user=new User();CreateUser createUser=new CreateUser(user);callback.onSuccess(createUser);}
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      User user = new User();
+      CreateUser createUser = new CreateUser(user);
+      callback.onSuccess(createUser);
+    }
 
-  @Override public void isCurrentUserPermitted(AsyncCallback<Boolean>callback){UserLogin.getInstance().checkRoles(new HistoryResolver[]{MemberManagement.RESOLVER},false,callback);}
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
+    }
 
-  public List<String>getHistoryPath(){return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(),getHistoryToken());}
+    public List<String> getHistoryPath() {
+      return Tools.concat(MemberManagement.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
 
-  public String getHistoryToken(){return"create_user";}};
+    public String getHistoryToken() {
+      return "create_user";
+    }
+  };
 
   interface MyUiBinder extends UiBinder<Widget, CreateUser> {
   }

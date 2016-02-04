@@ -59,8 +59,8 @@
 					<g:Label styleName="{style.homeText}">RODA</g:Label>
 				</g:FlowPanel>
 			</wcag:AccessibleFocusPanel>
-			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}"
-				ui:field="languageSwitcherPanel" />
+<!-- 			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}" -->
+<!-- 				ui:field="languageSwitcherPanel" /> -->
 		</g:FlowPanel>
 
 		<!-- Menu -->

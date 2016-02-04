@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.roda.wui.client.common.utils.JavascriptUtils;
+
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -78,25 +80,10 @@ public class LanguageSwitcherPanel extends Composite {
     flag.addClickHandler(new ClickHandler() {
       @Override
       public void onClick(ClickEvent event) {
-        changeLocale(locale);
+        JavascriptUtils.changeLocale(locale);
       }
     });
 
     flag.addStyleName("languageSwitcher-flag");
   }
-
-  /**
-   * JSNI method to change the locale of the application - it effectively parses
-   * the existing URL and creates a new one for the chosen locale.
-   * 
-   * 
-   * @param newLocale
-   */
-  private native void changeLocale(String newLocale)/*-{
-                                                    var currLocation = $wnd.location.toString(); 
-                                                    var noHistoryCurrLocArray = currLocation.split("#"); 
-                                                    var noHistoryCurrLoc = noHistoryCurrLocArray[0]; 
-                                                    var locArray = noHistoryCurrLoc.split("?"); 
-                                                    $wnd.location.href = locArray[0]+"?locale="+newLocale+"#"+noHistoryCurrLocArray[1];
-                                                    }-*/;
 }

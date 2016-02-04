@@ -15,7 +15,7 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Create user</g:Label>
+				<g:Label styleName="h1">Edit personal details</g:Label>
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
 

@@ -35,7 +35,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.LanguageSwitcherPanel;
 import config.i18n.client.MainConstants;
 
 /**
@@ -87,8 +86,8 @@ public class Main extends Composite implements EntryPoint {
   @UiField
   AccessibleFocusPanel homeLinkArea;
 
-  @UiField(provided = true)
-  LanguageSwitcherPanel languageSwitcherPanel;
+//  @UiField(provided = true)
+//  LanguageSwitcherPanel languageSwitcherPanel;
 
   @UiField(provided = true)
   Menu menu;
@@ -102,7 +101,7 @@ public class Main extends Composite implements EntryPoint {
    * Create a new main
    */
   public Main() {
-    languageSwitcherPanel = new LanguageSwitcherPanel();
+    // languageSwitcherPanel = new LanguageSwitcherPanel();
     menu = new Menu();
     contentPanel = ContentPanel.getInstance();
 

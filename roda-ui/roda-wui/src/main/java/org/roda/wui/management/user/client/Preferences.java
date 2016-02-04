@@ -13,181 +13,149 @@ package org.roda.wui.management.user.client;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.common.client.widgets.WUIButton;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.user.client.Window;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.UserManagementConstants;
+import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
  * 
  */
-@SuppressWarnings("deprecation")
-public class Preferences implements HistoryResolver {
-  private static Preferences instance = null;
+public class Preferences extends Composite {
+
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        public void onSuccess(RodaUser user) {
+          Preferences preferences = new Preferences(new User(user));
+          callback.onSuccess(preferences);
+        }
+      });
+     
+    }
+
+    @Override
+    public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        public void onSuccess(RodaUser user) {
+          callback.onSuccess(new Boolean(!user.isGuest()));
+        }
+      });
+    }
+
+    public List<String> getHistoryPath() {
+      return Arrays.asList(getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "preferences";
+    }
+  };
+
+  interface MyUiBinder extends UiBinder<Widget, Preferences> {
+  }
+
+  private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  private final User user;
+
+  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
+
+  @UiField
+  Button buttonApply;
+
+  @UiField
+  Button buttonCancel;
+
+  @UiField(provided = true)
+  UserDataPanel userDataPanel;
 
   /**
-   * Get the singleton instance
+   * Create a new panel to edit a user
    * 
-   * @return the instance
+   * @param user
+   *          the user to edit
    */
-  public static Preferences getInstance() {
-    if (instance == null) {
-      instance = new Preferences();
-    }
-    return instance;
+  public Preferences(User user) {
+    this.user = user;
+
+    this.userDataPanel = new UserDataPanel(true, true, false, false);
+    this.userDataPanel.setUser(user);
+
+    initWidget(uiBinder.createAndBindUi(this));
+
+    userDataPanel.setUsernameReadOnly(true);
   }
 
-  private static UserManagementConstants constants = (UserManagementConstants) GWT
-    .create(UserManagementConstants.class);
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    if (userDataPanel.isChanged()) {
+      if (userDataPanel.isValid()) {
+        final User user = userDataPanel.getUser();
+        final String password = userDataPanel.getPassword();
 
-  private ClientLogger logger = new ClientLogger(getClass().getName());
+        UserManagementService.Util.getInstance().modifyUser(user, password, new AsyncCallback<Void>() {
 
-  private boolean initialized;
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-  private VerticalPanel layout;
-
-  private Label userdataTitle;
-
-  private UserDataPanel userdata;
-
-  private WUIButton submit;
-
-  private Preferences() {
-    initialized = false;
-  }
-
-  private void init() {
-    if (!initialized) {
-      initialized = true;
-
-      layout = new VerticalPanel();
-      userdataTitle = new Label(constants.preferencesUserDataTitle());
-      userdata = new UserDataPanel(true, false);
-      submit = new WUIButton(constants.preferencesSubmit(), WUIButton.Left.ROUND, WUIButton.Right.REC);
-      submit.setEnabled(false);
-
-      userdata.addValueChangeHandler(new ValueChangeHandler<User>() {
-
-        @Override
-        public void onValueChange(ValueChangeEvent<User> event) {
-          submit.setEnabled(userdata.isValid());
-        }
-      });
-
-      submit.addClickListener(new ClickListener() {
-
-        public void onClick(Widget sender) {
-          UserManagementService.Util.getInstance().editMyUser(userdata.getValue(), userdata.getPassword(),
-            new AsyncCallback<Void>() {
-
-            public void onFailure(Throwable caught) {
-              if (caught instanceof EmailAlreadyExistsException) {
-                Window.alert(constants.preferencesEmailAlreadyExists());
-              } else {
-                logger.error("Error saving preferences", caught);
-              }
-
-            }
-
-            public void onSuccess(Void result) {
-              Window.alert(constants.preferencesSubmitSuccess());
-              // UserLogin.getInstance()
-              // .checkForLoginReset();
-            }
-
-          });
-        }
-
-      });
-
-      layout.add(userdataTitle);
-      layout.add(userdata);
-      layout.add(submit);
-
-      update();
-
-      layout.addStyleName("wui-preferences");
-      userdataTitle.addStyleName("preferences-title");
-      userdata.addStyleName("preferences-userdata");
-      submit.addStyleName("preferences-submit");
+          public void onSuccess(Void result) {
+            Tools.newHistory(MemberManagement.RESOLVER);
+          }
+        });
+      }
     } else {
-      update();
+      Tools.newHistory(MemberManagement.RESOLVER);
     }
   }
 
-  private void update() {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
-
-      public void onFailure(Throwable caught) {
-        logger.error("Error getting authenticated user", caught);
-      }
-
-      public void onSuccess(RodaUser user) {
-        // FIXME
-        // userdata.setUser(user);
-      }
-
-    });
+  @UiHandler("buttonCancel")
+  void buttonCancelHandler(ClickEvent e) {
+    cancel();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryPath()
-   */
-  public List<String> getHistoryPath() {
-    return Arrays.asList(getHistoryToken());
+  private void cancel() {
+    Tools.newHistory(MemberManagement.RESOLVER);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.roda.office.common.client.HistoryResolver#getHistoryToken()
-   */
-  public String getHistoryToken() {
-    return "preferences";
-  }
-
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
-      init();
-      callback.onSuccess(layout);
+  private void errorMessage(Throwable caught) {
+    if (caught instanceof NotFoundException) {
+      Toast.showError(messages.editUserNotFound(user.getName()));
+      cancel();
+    } else if (caught instanceof AlreadyExistsException) {
+      Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
     } else {
-      Tools.newHistory(this);
-      callback.onSuccess(null);
+      Toast.showError(messages.editUserFailure(Preferences.this.user.getName(), caught.getMessage()));
     }
-  }
-
-  public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
-    UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
-
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      public void onSuccess(RodaUser user) {
-        callback.onSuccess(new Boolean(!user.isGuest()));
-      }
-
-    });
   }
 }

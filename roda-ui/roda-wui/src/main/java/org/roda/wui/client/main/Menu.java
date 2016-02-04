@@ -10,11 +10,14 @@
  */
 package org.roda.wui.client.main;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
@@ -33,6 +36,9 @@ import org.roda.wui.management.user.client.UserLog;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -85,6 +91,10 @@ public class Menu extends Composite {
 
   private final MenuBar userMenu;
 
+  private final MenuBar languagesMenu;
+
+  private final MenuBar settingsMenu;
+
   /**
    * Main menu constructor
    * 
@@ -123,7 +133,7 @@ public class Menu extends Composite {
     // createCommand(Management.RESOLVER + ".help"));
 
     userMenu = new MenuBar(true);
-    userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.getInstance().getHistoryPath()));
+    userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.RESOLVER.getHistoryPath()));
     userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
 
       @Override
@@ -132,11 +142,15 @@ public class Menu extends Composite {
       }
     });
 
+    languagesMenu = new MenuBar(true);
+    setLanguageMenu();
+
+    settingsMenu = new MenuBar(true);
+
     UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
 
       public void onFailure(Throwable caught) {
         logger.fatal("Error getting Authenticated user", caught);
-
       }
 
       public void onSuccess(RodaUser user) {
@@ -209,12 +223,39 @@ public class Menu extends Composite {
 
     // User
     if (user.isGuest()) {
-      rightMenu.addItem(constants.loginLogin(), createLoginCommand());
-      rightMenu.addItem(constants.loginRegister(), createCommand(Register.RESOLVER.getHistoryPath()));
+      rightMenu
+        .addItem(customMenuItem("fa fa-user", constants.loginLogin(), "menu-item-label", null, createLoginCommand()));
+      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label", null,
+        createCommand(Register.RESOLVER.getHistoryPath())));
     } else {
-      rightMenu.addItem(user.getName(), userMenu);
+      rightMenu.addItem(customMenuItem("fa fa-cog", constants.title_settings(), "menu-item-label", settingsMenu, null));
+      rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
+    rightMenu
+      .addItem(customMenuItem("fa fa-globe", constants.title_language(), "menu-item-label", languagesMenu, null));
+  }
 
+  private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
+    ScheduledCommand command) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    String iconHTML = "<i class='" + icon + "'></i>";
+
+    b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
+    if (label != null)
+      b.append(SafeHtmlUtils.fromSafeConstant(label));
+
+    MenuItem menuItem = null;
+    if (subMenu != null) {
+      menuItem = new MenuItem(b.toSafeHtml(), subMenu);
+    } else if (command != null) {
+      menuItem = new MenuItem(b.toSafeHtml(), command);
+    } else {
+      menuItem = new MenuItem(b.toSafeHtml());
+    }
+    menuItem.addStyleName("menu-item");
+    menuItem.addStyleName(styleNames);
+
+    return menuItem;
   }
 
   private void updateResolverTopItemVisibility(final HistoryResolver resolver, final MenuItem item, final int index) {
@@ -227,7 +268,6 @@ public class Menu extends Composite {
       public void onSuccess(Boolean asRole) {
         if (asRole) {
           insertIntoLeftMenu(item, index);
-
         }
       }
     });
@@ -243,7 +283,6 @@ public class Menu extends Composite {
       public void onSuccess(Boolean asRole) {
         item.setVisible(asRole);
       }
-
     });
   }
 
@@ -255,4 +294,39 @@ public class Menu extends Composite {
     leftMenuItemCount++;
   }
 
+  private void setLanguageMenu() {
+    String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+    
+    // TODO externalize supported languages
+    Map<String, String> supportedLanguages = new HashMap<String, String>();
+    supportedLanguages.put("en", "English");
+    supportedLanguages.put("pt_PT", "Português");
+    supportedLanguages.put("cs_CZ", "Čeština");
+
+    languagesMenu.clearItems();
+
+    for (final String key : supportedLanguages.keySet()) {
+      if (key.equals(locale)) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        String iconHTML = "<i class='fa fa-check'></i>";
+
+        b.append(SafeHtmlUtils.fromSafeConstant(supportedLanguages.get(key)));
+        b.append(SafeHtmlUtils.fromSafeConstant(iconHTML));
+
+        MenuItem languageMenuItem = new MenuItem(b.toSafeHtml());
+        languageMenuItem.addStyleName("menu-item-language-selected");
+        languagesMenu.addItem(languageMenuItem);
+      } else {
+        MenuItem languageMenuItem = new MenuItem(SafeHtmlUtils.fromSafeConstant(supportedLanguages.get(key)),
+          new ScheduledCommand() {
+
+            @Override
+            public void execute() {
+              JavascriptUtils.changeLocale(key);
+            }
+          });
+        languagesMenu.addItem(languageMenuItem);
+      }
+    }
+  }
 }

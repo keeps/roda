@@ -170,7 +170,15 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @Key("title.ingest.help")
   @DefaultStringValue("Help")
   public String title_ingest_help();
-
+  
+  @Key("title.ingest.settings")
+  @DefaultStringValue("Settings")
+  public String title_settings();
+  
+  @Key("title.ingest.language")
+  @DefaultStringValue("Language")
+  public String title_language();
+ 
   // Login Panel
 
   @DefaultStringValue("Welcome")

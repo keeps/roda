@@ -108,7 +108,6 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     UserManagement.addUser(user, newUser, password);
   }
 
-  @Override
   public boolean register(User user, String password, String captcha) throws RODAException {
     boolean successful = false;
 
@@ -120,6 +119,9 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
       // TODO Post to https://www.google.com/recaptcha/api/siteverify
 
+      UserManagement.register(user, password);
+
+      successful = true;
     }
 
     // FIXME
@@ -146,29 +148,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void editMyUser(User modifiedUser, String password)
-    throws EmailAlreadyExistsException, NotFoundException, IllegalOperationException, GenericException {
-    try {
-      Date start = new Date();
-      if (modifiedUser.getName().equals(UserUtility.getClientUser(getThreadLocalRequest().getSession()))) {
-
-        User user = UserUtility.getLdapUtility().modifySelfUser(modifiedUser,
-          UserUtility.getClientUserPassword(getThreadLocalRequest().getSession()), password);
-        long duration = new Date().getTime() - start.getTime();
-
-        // LogUtility.registerAction(UserUtility.getClientUser(getThreadLocalRequest().getSession()),
-        // "UM.editMyUser",
-        // new String[] {"modifiedUser", modifiedUser + "", "newPassword", "*"},
-        // "User %username% called method UM.editMyUser(" + modifiedUser + ", "
-        // + "*" + ")", duration);
-      } else {
-        throw new IllegalOperationException("Trying to modify user information for another user");
-      }
-    } catch (LdapUtilityException e) {
-      logger.error("LdapUtility Exception", e);
-      throw new GenericException("Error edit my user", e);
-    }
-
+  public void editMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException, GenericException, IllegalOperationException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyMyUser(user, modifiedUser, password);
   }
 
   @Override
@@ -222,7 +205,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     return UserManagement.retrieveLogEntry(user, logEntryId);
   }
 
-  private boolean sendEmailVerification(org.roda.core.data.v2.user.User user) throws RODAException {
+  private boolean sendEmailVerification(User user) throws RODAException {
     boolean success = false;
 
     // FIXME

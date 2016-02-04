@@ -201,7 +201,7 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "register", null, duration, "username", user.getId());
+    registerAction(user, "UserManagement", "register", null, duration, "user", user);
   }
 
   public static void addUser(RodaUser user, User newUser, String password)
@@ -217,7 +217,27 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addUser", null, duration, "username", newUser.getId());
+    registerAction(user, "UserManagement", "addUser", null, duration, "user", newUser);
+  }
+  
+  public static void modifyMyUser(RodaUser user, User modifiedUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
+    IllegalOperationException {
+    Date start = new Date();
+    
+    if (!user.getId().equals(modifiedUser.getId())) {
+      throw new IllegalOperationException("Trying to modify user information for another user");
+    }
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.modifyUser(modifiedUser, password);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "modifyUser", null, duration, "user", modifiedUser);
   }
 
   public static void modifyUser(RodaUser user, User modifiedUser, String password)
@@ -232,7 +252,7 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyUser", null, duration, "username", modifiedUser.getId());
+    registerAction(user, "UserManagement", "modifyUser", null, duration, "user", modifiedUser);
   }
 
   public static void removeUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
@@ -260,7 +280,7 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addGroup", null, duration, "groupname", group.getId());
+    registerAction(user, "UserManagement", "addGroup", null, duration, "group", group);
   }
 
   public static void modifyGroup(RodaUser user, Group group)
@@ -275,7 +295,7 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyGroup", null, duration, "groupname", group.getId());
+    registerAction(user, "UserManagement", "modifyGroup", null, duration, "group", group);
   }
 
   public static void removeGroup(RodaUser user, String groupname)

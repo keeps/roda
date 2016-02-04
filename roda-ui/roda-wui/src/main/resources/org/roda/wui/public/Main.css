@@ -336,6 +336,20 @@
 	background-color: #7e8a57;
 }
 
+.menu-item-label .fa {
+	margin-right: 5px;
+}
+
+.menu-item .fa {
+	font-size: 1.5rem;
+}
+
+.menu-item-language-selected .fa {
+	right: 10px;
+    position: absolute;
+    margin-top: 3px;
+}
+
 /* @end */
 
 /* @group Breadcrumb */

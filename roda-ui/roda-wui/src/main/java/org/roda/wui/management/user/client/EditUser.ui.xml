@@ -36,7 +36,6 @@
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
 						<ui:text from='{constants.editUserCancel}' />
 					</g:Button>
-
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

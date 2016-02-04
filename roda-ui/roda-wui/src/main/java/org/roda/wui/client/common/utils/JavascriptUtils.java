@@ -206,5 +206,11 @@ public class JavascriptUtils {
 	return true;
   }-*/;
   
-  
+  public static native void changeLocale(String newLocale)/*-{
+    var currLocation = $wnd.location.toString(); 
+    var noHistoryCurrLocArray = currLocation.split("#"); 
+    var noHistoryCurrLoc = noHistoryCurrLocArray[0]; 
+    var locArray = noHistoryCurrLoc.split("?"); 
+    $wnd.location.href = locArray[0]+"?locale="+newLocale+"#"+noHistoryCurrLocArray[1];
+  }-*/;
 }
