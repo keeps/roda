@@ -12,6 +12,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
@@ -44,6 +45,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -112,12 +114,13 @@ public class IndexModelObserver implements ModelObserver {
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
-        Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+        ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
         for (File file : allFiles) {
           boolean commit = false;
           boolean recursive = true;
           indexFile(file, commit, recursive);
         }
+        allFiles.close();
 
       } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException e) {
@@ -174,9 +177,12 @@ public class IndexModelObserver implements ModelObserver {
 
     if (recursive && file.isDirectory()) {
       try {
-        for (File subfile : model.listAllFiles(file)) {
+        ClosableIterable<File> allFiles = model.listAllFiles(file);
+        for (File subfile : allFiles) {
           indexFile(subfile, false, false);
         }
+        IOUtils.closeQuietly(allFiles);
+
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.error("Could not index file sub-resources: " + file, e);
       }
@@ -223,8 +229,10 @@ public class IndexModelObserver implements ModelObserver {
   // TODO Handle exceptions
   @Override
   public void aipDeleted(String aipId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId,
-      "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId, "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")",
+      forceCommit);
 
     // TODO delete included representations, descriptive metadata and other
   }
@@ -263,8 +271,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationCreated(Representation representation) {
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
     addDocumentToIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.representationToSolrDocument(representation),
-      "Error creating Representation");
+      "Error creating Representation", forceCommit);
   }
 
   @Override
@@ -275,8 +285,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationDeleted(String aipId, String representationId) {
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
     deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.getId(aipId, representationId),
-      "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")");
+      "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
   }
 
   @Override
@@ -296,19 +308,25 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void fileDeleted(String aipId, String representationId, String fileId) {
     String id = SolrUtils.getId(aipId, representationId, fileId);
-    deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")", forceCommit);
 
   }
 
   @Override
   public void logEntryCreated(LogEntry entry) {
+    boolean forceCommit = false;
     addDocumentToIndex(RodaConstants.INDEX_ACTION_LOG, SolrUtils.logEntryToSolrDocument(entry),
-      "Error creating Log entry");
+      "Error creating Log entry", forceCommit);
   }
 
   @Override
   public void userCreated(User user) {
-    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(user), "Error creating User");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(user), "Error creating User",
+      forceCommit);
   }
 
   @Override
@@ -319,12 +337,18 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void userDeleted(String userID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, userID, "Error deleting User (id=" + userID + ")");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, userID, "Error deleting User (id=" + userID + ")",
+      forceCommit);
   }
 
   @Override
   public void groupCreated(Group group) {
-    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(group), "Error creating Group");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(group), "Error creating Group",
+      forceCommit);
   }
 
   @Override
@@ -335,7 +359,10 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void groupDeleted(String groupID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, groupID, "Error deleting Group (id=" + groupID + ")");
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, groupID, "Error deleting Group (id=" + groupID + ")",
+      forceCommit);
   }
 
   @Override
@@ -401,7 +428,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobCreated(Job job) {
-    addDocumentToIndex(RodaConstants.INDEX_JOB, SolrUtils.jobToSolrDocument(job), "Error creating Job");
+    boolean forceCommit = false;
+    addDocumentToIndex(RodaConstants.INDEX_JOB, SolrUtils.jobToSolrDocument(job), "Error creating Job", forceCommit);
   }
 
   @Override
@@ -412,22 +440,28 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobDeleted(String jobId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_JOB, jobId, "Error deleting Job (id=" + jobId + ")");
+    boolean forceCommit = false;
+    deleteDocumentFromIndex(RodaConstants.INDEX_JOB, jobId, "Error deleting Job (id=" + jobId + ")", forceCommit);
   }
 
-  private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage) {
+  private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage,
+    boolean commit) {
     try {
       index.add(indexName, document);
-      index.commit(indexName);
+      if (commit) {
+        index.commit(indexName);
+      }
     } catch (SolrServerException | IOException e) {
       LOGGER.error(errorLogMessage, e);
     }
   }
 
-  private void deleteDocumentFromIndex(String indexName, String documentId, String errorLogMessage) {
+  private void deleteDocumentFromIndex(String indexName, String documentId, String errorLogMessage, boolean commit) {
     try {
       index.deleteById(indexName, documentId);
-      index.commit(indexName);
+      if (commit) {
+        index.commit(indexName);
+      }
     } catch (SolrServerException | IOException e) {
       LOGGER.error(errorLogMessage, e);
     }
@@ -435,9 +469,9 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobReportCreated(JobReport jobReport) {
+    boolean forceCommit = false;
     addDocumentToIndex(RodaConstants.INDEX_JOB_REPORT, SolrUtils.jobReportToSolrDocument(jobReport),
-      "Error creating Job Report");
-
+      "Error creating Job Report", forceCommit);
   }
 
   @Override
@@ -448,8 +482,9 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobReportDeleted(String jobReportId) {
+    boolean forceCommit = false;
     deleteDocumentFromIndex(RodaConstants.INDEX_JOB_REPORT, jobReportId,
-      "Error deleting Job Report(id=" + jobReportId + ")");
+      "Error deleting Job Report(id=" + jobReportId + ")", forceCommit);
   }
 
 }

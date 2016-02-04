@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -45,6 +46,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
@@ -155,11 +157,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
     List<RepresentationFilePreservationObject> pObjectPartFiles = new ArrayList<RepresentationFilePreservationObject>();
     Representation representation = model.retrieveRepresentation(aip.getId(), representationId);
-    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
     for (File file : allFiles) {
-      pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationId, pObject,
-        pObjectPartFiles, file);
+      if (!file.isDirectory()) {
+        pObjectPartFiles = createPremisForRepresentationFile(model, storage, temp, aip, representationId, pObject,
+          pObjectPartFiles, file);
+      }
     }
+    IOUtils.closeQuietly(allFiles);
 
     createPremisObjectForRepresentation(model, aip, representationId, pObject, pObjectPartFiles);
   }

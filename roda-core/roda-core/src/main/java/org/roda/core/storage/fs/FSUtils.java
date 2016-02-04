@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage.fs;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -29,6 +30,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.mutable.MutableLong;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -536,5 +538,6 @@ public final class FSUtils {
 
     return file;
   }
+  
 
 }

@@ -334,12 +334,16 @@ public class FileStorageService implements StorageService {
     FSUtils.deletePath(resourcePath);
   }
 
+  public Path resolve(StoragePath storagePath) {
+    return basePath.resolve(storagePath.asString());
+  }
+
   @Override
   public void copy(StorageService fromService, StoragePath fromStoragePath, StoragePath toStoragePath)
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
-      Path sourcePath = ((FileStorageService) fromService).basePath.resolve(fromStoragePath.asString());
+      Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
       Path targetPath = basePath.resolve(toStoragePath.asString());
       FSUtils.copy(sourcePath, targetPath, false);
 
@@ -354,7 +358,7 @@ public class FileStorageService implements StorageService {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
-      Path sourcePath = ((FileStorageService) fromService).basePath.resolve(fromStoragePath.asString());
+      Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
       Path targetPath = basePath.resolve(toStoragePath.asString());
       FSUtils.move(sourcePath, targetPath, false);
     } else {

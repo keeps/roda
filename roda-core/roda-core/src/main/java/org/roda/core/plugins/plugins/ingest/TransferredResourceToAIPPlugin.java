@@ -107,18 +107,17 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         boolean active = false;
         String parentId = jobDefinedParentId;
         AIPPermissions permissions = new AIPPermissions();
-        boolean notify = true;
+        boolean notifyCreatedAIP = false;
 
-        final AIP aip = model.createAIP(active, parentId, permissions, notify);
+        final AIP aip = model.createAIP(active, parentId, permissions, notifyCreatedAIP);
 
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
+        boolean notifyRepresentationCreated = false;
 
-        // TODO create descriptive metadata and representations via model
-        // TODO update AIP metadata
+        model.createRepresentation(aip.getId(), representationId, original, notifyRepresentationCreated);
 
-        model.createRepresentation(aip.getId(), representationId, original, false);
-
+        // TODO check if this method is indeed needed
         PluginHelper.createDirectories(model, aip.getId(), representationId);
 
         // create files
@@ -127,8 +126,8 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
           String fileId = transferredResource.getName();
           List<String> directoryPath = new ArrayList<>();
           ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
-
-          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, true);
+          boolean notifyFileCreated = false;
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
         } else {
           EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
           Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
@@ -149,8 +148,8 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
                 }
 
                 ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
-
-                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, true);
+                boolean notifyFileCreated = false;
+                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
               } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }
@@ -175,20 +174,24 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         b.append("</metadata>");
 
         ContentPayload metadataPayload = new StringContentPayload(b.toString());
+        boolean notifyDescriptiveMetadataCreated = false;
 
         // TODO make the following strings constants
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value");
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value",
+          notifyDescriptiveMetadataCreated);
+
+        model.notifyAIPCreated(aip.getId());
 
         state = PluginState.SUCCESS;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
-          RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null, new Attribute(
-          RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
-          RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
       }
 
       report.addItem(reportItem);

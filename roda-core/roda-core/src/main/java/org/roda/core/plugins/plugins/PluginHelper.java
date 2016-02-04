@@ -233,6 +233,10 @@ public final class PluginHelper {
     return epo;
   }
 
+  /**
+   * @deprecated This method shouldn't be needed
+   */
+  @Deprecated
   public static void createDirectories(ModelService model, String aipId, String representationID) {
     try {
       model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId));

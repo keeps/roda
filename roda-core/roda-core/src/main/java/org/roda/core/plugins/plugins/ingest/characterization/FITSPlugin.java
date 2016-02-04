@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -30,6 +31,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -111,14 +113,16 @@ public class FITSPlugin implements Plugin<AIP> {
           tempStorage.copy(storage, representationPath, representationPath);
           FITSPluginUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
 
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             Path p = output.resolve(file.getId() + ".fits.xml");
             Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + file.getId() + ")");
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "FITS", resource);
+            model.
+            createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "FITS", resource);
           }
+          IOUtils.closeQuietly(allFiles);
           FSUtils.deletePath(data);
           FSUtils.deletePath(output);
         } catch (RODAException | IOException e) {

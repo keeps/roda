@@ -312,8 +312,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testGetLogEntriesCount()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public void testGetLogEntriesCount() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException, InterruptedException {
     // cleaning up action log entries on index (if any)
     index.deleteAllActionLog();
 
@@ -332,6 +332,9 @@ public class IndexServiceTest {
     entry.setParameters(parameters);
     model.addLogEntry(entry, logPath);
 
+    // wait for index soft commit
+    Thread.sleep(6000);
+
     Filter filterDescription = new Filter();
     filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "ID"));
     assertThat(index.count(LogEntry.class, filterDescription), Matchers.is(1L));
@@ -342,8 +345,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testFindLogEntry()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public void testFindLogEntry() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException, InterruptedException {
     LogEntry entry = new LogEntry();
     entry.setActionComponent(RodaConstants.LOG_ACTION_COMPONENT);
     entry.setActionMethod("Method");
@@ -358,6 +361,9 @@ public class IndexServiceTest {
     parameters.add(new LogEntryParameter("NAME2", "VALUE2"));
     entry.setParameters(parameters);
     model.addLogEntry(entry, logPath);
+
+    // wait for index soft commit
+    Thread.sleep(6000);
 
     Filter filterDescription = new Filter();
     filterDescription.add(new SimpleFilterParameter(RodaConstants.LOG_ID, "id"));
@@ -374,8 +380,8 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testReindexLogEntry()
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+  public void testReindexLogEntry() throws GenericException, RequestNotValidException, AuthorizationDeniedException,
+    NotFoundException, InterruptedException {
     Long number = 10L;
 
     for (int i = 0; i < number; i++) {
@@ -394,8 +400,16 @@ public class IndexServiceTest {
       entry.setParameters(parameters);
       model.addLogEntry(entry, logPath, false);
     }
+
+    // wait for index soft commit
+    Thread.sleep(6000);
+
     model.findOldLogsAndMoveThemToStorage(logPath, null);
     index.reindexActionLogs();
+
+    // wait for index soft commit
+    Thread.sleep(6000);
+
     Filter f1 = new Filter();
     f1.add(new SimpleFilterParameter(RodaConstants.LOG_ACTION_COMPONENT, "ACTION:0"));
     IndexResult<LogEntry> entries1 = index.find(LogEntry.class, f1, null, new Sublist(0, 10), null);

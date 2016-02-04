@@ -257,10 +257,11 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
 
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      Iterable<org.roda.core.data.v2.ip.File> allFiles = model.listAllFiles(aipId, representationId);
+      ClosableIterable<org.roda.core.data.v2.ip.File> allFiles = model.listAllFiles(aipId, representationId);
       for (org.roda.core.data.v2.ip.File file : allFiles) {
         addToZip(zipEntries, file);
       }
+      IOUtils.closeQuietly(allFiles);
 
       return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 

@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -263,10 +264,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
         for (Representation representation : aip.getRepresentations()) {
-          Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), representation.getId());
+          ClosableIterable<File> files = model.listAllFiles(aip.getId(), representation.getId());
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {
+
             if (block.size() == BLOCK_SIZE) {
               futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, plugin),
                 new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
@@ -274,8 +276,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
               multiplier++;
             }
 
-            block.add(fileIter.next());
+            File file = fileIter.next();
+            if (!file.isDirectory()) {
+              block.add(file);
+            }
           }
+          IOUtils.closeQuietly(files);
+
         }
 
       }
@@ -386,40 +393,44 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
-//    try {
-//      int multiplier = 0;
-//      LOGGER.info("Executing beforeExecute");
-//      plugin.beforeExecute(index, model, storage);
-//      List<Future<Object>> futures = new ArrayList<Future<Object>>();
-//
-//      List<String> block = new ArrayList<String>();
-//      for (String id : ids) {
-//        if (block.size() == BLOCK_SIZE) {
-//          futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block, plugin),
-//            new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
-//          block = new ArrayList<String>();
-//          multiplier++;
-//        }
-//
-//        block.add(id);
-//      }
-//
-//      if (!block.isEmpty()) {
-//        futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block, plugin),
-//          new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
-//        multiplier++;
-//      }
-//
-//      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-//      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
-//
-//      plugin.afterExecute(index, model, storage);
-//
-//    } catch (Exception e) {
-//      // FIXME catch proper exception
-//      e.printStackTrace();
-//    }
-//    LOGGER.info("End of method");
+    // try {
+    // int multiplier = 0;
+    // LOGGER.info("Executing beforeExecute");
+    // plugin.beforeExecute(index, model, storage);
+    // List<Future<Object>> futures = new ArrayList<Future<Object>>();
+    //
+    // List<String> block = new ArrayList<String>();
+    // for (String id : ids) {
+    // if (block.size() == BLOCK_SIZE) {
+    // futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block,
+    // plugin),
+    // new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+    // block = new ArrayList<String>();
+    // multiplier++;
+    // }
+    //
+    // block.add(id);
+    // }
+    //
+    // if (!block.isEmpty()) {
+    // futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block,
+    // plugin),
+    // new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
+    // multiplier++;
+    // }
+    //
+    // final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures,
+    // workersSystem.dispatcher());
+    // Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT,
+    // TIMEOUT_UNIT));
+    //
+    // plugin.afterExecute(index, model, storage);
+    //
+    // } catch (Exception e) {
+    // // FIXME catch proper exception
+    // e.printStackTrace();
+    // }
+    // LOGGER.info("End of method");
 
   }
 

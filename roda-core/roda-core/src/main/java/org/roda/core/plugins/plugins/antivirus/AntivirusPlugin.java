@@ -120,7 +120,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
-    Path tempDirectory = null;
+    Path sourcePath = null;
+    boolean deleteSourcePath = false;
     PluginState state;
 
     for (AIP aip : list) {
@@ -130,12 +131,19 @@ public class AntivirusPlugin implements Plugin<AIP> {
       Exception exception = null;
       try {
         LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
-        tempDirectory = Files.createTempDirectory("temp");
-        StorageService tempStorage = new FileStorageService(tempDirectory);
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
-        tempStorage.copy(storage, aipPath, aipPath);
 
-        virusCheckResult = getAntiVirus().checkForVirus(tempDirectory);
+        if (storage instanceof FileStorageService) {
+          sourcePath = ((FileStorageService) storage).resolve(aipPath);
+          deleteSourcePath = false;
+        } else {
+          sourcePath = Files.createTempDirectory("temp");
+          StorageService tempStorage = new FileStorageService(sourcePath);
+          tempStorage.copy(storage, aipPath, aipPath);
+          deleteSourcePath = true;
+        }
+
+        virusCheckResult = getAntiVirus().checkForVirus(sourcePath);
 
         state = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
@@ -153,21 +161,32 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
+      } catch (Throwable e) {
+        LOGGER.error("Error processing AIP " + aip.getId(), e);
+        throw new PluginException(e);
       } finally {
         try {
-          if (tempDirectory != null) {
-            FSUtils.deletePath(tempDirectory);
+          if (deleteSourcePath && sourcePath != null) {
+            FSUtils.deletePath(sourcePath);
           }
         } catch (GenericException | NotFoundException e) {
           LOGGER.error("Error removing temp storage", e);
         }
       }
 
-      createEvent(virusCheckResult, exception, state, aip, model);
-      report.addItem(reportItem);
+      try {
+        LOGGER.info("Creating event");
+        createEvent(virusCheckResult, exception, state, aip, model);
+        report.addItem(reportItem);
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+        LOGGER.info("Updating job report");
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
+          aip.getId());
+
+        LOGGER.info("Done job report");
+      } catch (Throwable e) {
+        LOGGER.error("Error updating event and job", e);
+      }
     }
 
     return report;

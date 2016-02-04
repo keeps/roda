@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
@@ -36,6 +37,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,7 +99,7 @@ public class FixityPlugin implements Plugin<AIP> {
       for (Representation r : aip.getRepresentations()) {
         LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
         try {
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), r.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), r.getId());
 
           List<String> okFileIDS = new ArrayList<String>();
           List<String> koFileIDS = new ArrayList<String>();
@@ -155,6 +157,7 @@ public class FixityPlugin implements Plugin<AIP> {
               notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, epo);
             }
           }
+          IOUtils.closeQuietly(allFiles);
         } catch (IOException | RODAException e) {
           LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
           EventPreservationObject epo;

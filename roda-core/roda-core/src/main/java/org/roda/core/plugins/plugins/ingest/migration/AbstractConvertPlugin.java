@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -43,6 +44,7 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugi
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -165,7 +167,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         try {
           logger.debug("Processing representation: " + representation);
 
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
 
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
@@ -232,6 +234,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               }
             }
           }
+          IOUtils.closeQuietly(allFiles);
 
           // add unchanged files to the new representation
           if (alteredFiles.size() > 0) {

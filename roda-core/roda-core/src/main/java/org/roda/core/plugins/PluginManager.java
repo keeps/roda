@@ -9,6 +9,7 @@ package org.roda.core.plugins;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.DirectoryStream;
@@ -266,22 +267,23 @@ public class PluginManager {
     }
   }
 
+  @SuppressWarnings("rawtypes")
   private <T extends Serializable> void loadInternalPlugins() {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
     Set<Class<? extends Plugin>> plugins = reflections.getSubTypesOf(Plugin.class);
     for (Class<? extends Plugin> plugin : plugins) {
-
-      Plugin<?> p;
-      try {
-        p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getCanonicalName());
-        p.init();
-        internalPluginChache.put(plugin.getName(), p);
-        addPluginToPluginTypeMapping(p);
-      } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
-        LOGGER.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
+      if (!Modifier.isAbstract(plugin.getModifiers())) {
+        Plugin<?> p;
+        try {
+          p = (Plugin<?>) ClassLoaderUtility.createObject(plugin.getCanonicalName());
+          p.init();
+          internalPluginChache.put(plugin.getName(), p);
+          addPluginToPluginTypeMapping(p);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
+          LOGGER.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
+        }
       }
-
     }
     internalPluginStarted = true;
   }

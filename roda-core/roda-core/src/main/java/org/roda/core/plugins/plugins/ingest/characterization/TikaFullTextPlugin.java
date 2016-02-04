@@ -15,6 +15,7 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.tika.exception.TikaException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -39,6 +40,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -124,44 +126,46 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
       try {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
           for (File file : allFiles) {
-            LOGGER.debug("Processing file: " + file);
-            StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
-            Binary binary = storage.getBinary(storagePath);
+            if (!file.isDirectory()) {
+              LOGGER.debug("Processing file: " + file);
+              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+              Binary binary = storage.getBinary(storagePath);
 
-            // FIXME file that doesn't get deleted afterwards
-            Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
+              // FIXME file that doesn't get deleted afterwards
+              Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
-            Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME,
-              resource);
-            try {
-              IndexedFile f = index.retrieve(IndexedFile.class,
-                SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
+              Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME,
+                resource);
+              try {
+                IndexedFile f = index.retrieve(IndexedFile.class,
+                  SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
 
-              Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
-              if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {
-                f.setFulltext(properties.get(RodaConstants.FILE_FULLTEXT));
-              }
-              if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_NAME)) {
-                f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
-              }
-              if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_VERSION)) {
-                f.setCreatingApplicationVersion(properties.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
-              }
-              if (properties.containsKey(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION)) {
-                f.setDateCreatedByApplication(properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
-              }
-              LOGGER.info("Tika creating app name: " + f.getCreatingApplicationName() + " version: "
-                + f.getCreatingApplicationVersion() + " date: " + f.getDateCreatedByApplication());
-              updatedFiles.add(f);
-            } catch (ParserConfigurationException pce) {
+                Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
+                if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {
+                  f.setFulltext(properties.get(RodaConstants.FILE_FULLTEXT));
+                }
+                if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_NAME)) {
+                  f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
+                }
+                if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_VERSION)) {
+                  f.setCreatingApplicationVersion(properties.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
+                }
+                if (properties.containsKey(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION)) {
+                  f.setDateCreatedByApplication(properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
+                }
+                LOGGER.info("Tika creating app name: " + f.getCreatingApplicationName() + " version: "
+                  + f.getCreatingApplicationVersion() + " date: " + f.getDateCreatedByApplication());
+                updatedFiles.add(f);
+              } catch (ParserConfigurationException pce) {
 
+              }
             }
-
           }
+          IOUtils.closeQuietly(allFiles);
           model.updateFileFormats(updatedFiles);
         }
 

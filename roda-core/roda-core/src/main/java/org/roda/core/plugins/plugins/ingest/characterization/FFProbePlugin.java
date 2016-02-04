@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -46,6 +47,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -106,7 +108,7 @@ public class FFProbePlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is a video
@@ -120,6 +122,7 @@ public class FFProbePlugin implements Plugin<AIP> {
               ffProbeResults.toFile().delete();
             }
           }
+          IOUtils.closeQuietly(allFiles);
         } catch (RODAException | IOException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
         }

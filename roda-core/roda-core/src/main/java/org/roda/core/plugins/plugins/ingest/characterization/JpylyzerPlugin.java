@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -46,6 +47,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -106,7 +108,7 @@ public class JpylyzerPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is JPEG2000
@@ -118,13 +120,15 @@ public class JpylyzerPlugin implements Plugin<AIP> {
                 Path ffProbeResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
 
                 Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
-                model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "jpylyzer", resource);
+                model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "jpylyzer",
+                  resource);
                 ffProbeResults.toFile().delete();
               } catch (RODAException | IOException sse) {
                 LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
               }
             }
           }
+          IOUtils.closeQuietly(allFiles);
         } catch (RODAException mse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
         }

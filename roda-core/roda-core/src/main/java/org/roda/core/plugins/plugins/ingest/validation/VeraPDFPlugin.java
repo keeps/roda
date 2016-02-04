@@ -40,6 +40,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -123,7 +124,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         try {
           logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
 
-          Iterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
 
@@ -156,6 +157,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
               logger.debug("veraPDF validation did not run on file: " + file);
             }
           }
+          IOUtils.closeQuietly(allFiles);
         } catch (Throwable e) {
           logger.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           state = 0; // failure

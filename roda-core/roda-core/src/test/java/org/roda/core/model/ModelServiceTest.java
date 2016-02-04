@@ -60,6 +60,7 @@ import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageTestUtils;
@@ -164,9 +165,10 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, representation1.getId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ORIGINAL, representation1.isOriginal());
 
-    Iterable<File> allRep1Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    ClosableIterable<File> allRep1Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
     List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().map(f -> f.getId())
       .collect(Collectors.toList());
+    allRep1Files.close();
 
     assertThat(allRep1FileIds,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_1_FILE_1_ID, CorporaConstants.REPRESENTATION_1_FILE_2_ID));
@@ -176,9 +178,10 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, representation2.getId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ORIGINAL, representation2.isOriginal());
 
-    Iterable<File> allRep2Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_2_ID);
+    ClosableIterable<File> allRep2Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_2_ID);
     List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().map(f -> f.getId())
       .collect(Collectors.toList());
+    allRep2Files.close();
 
     assertThat(allRep2FileIds,
       containsInAnyOrder(CorporaConstants.REPRESENTATION_2_FILE_1_ID, CorporaConstants.REPRESENTATION_2_FILE_2_ID));
@@ -254,10 +257,11 @@ public class ModelServiceTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS));
 
-    Iterable<File> allFiles = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    ClosableIterable<File> allFiles = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
 
     List<File> reusableList = new ArrayList<>();
     Iterables.addAll(reusableList, allFiles);
+    allFiles.close();
 
     assertTrue(reusableList.contains(new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID,
       new ArrayList<>(), false)));

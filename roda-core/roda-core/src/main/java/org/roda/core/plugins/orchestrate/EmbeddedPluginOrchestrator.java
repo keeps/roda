@@ -17,6 +17,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -254,7 +255,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
         for (Representation rep : aip.getRepresentations()) {
-          Iterable<File> files = model.listFilesDirectlyUnder(aip.getId(), rep.getId());
+          ClosableIterable<File> files = model.listAllFiles(aip.getId(), rep.getId());
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {
@@ -263,8 +264,12 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
               block = new ArrayList<File>();
             }
 
-            block.add(fileIter.next());
+            File file = fileIter.next();
+            if (!file.isDirectory()) {
+              block.add(file);
+            }
           }
+          IOUtils.closeQuietly(files);
         }
       }
 
@@ -315,13 +320,13 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
     // TODO Auto-generated method stub
-    
+
   }
 
 }
