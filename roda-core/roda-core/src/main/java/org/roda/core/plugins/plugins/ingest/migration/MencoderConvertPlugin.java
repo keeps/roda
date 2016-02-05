@@ -98,7 +98,7 @@ public class MencoderConvertPlugin extends CommandConvertPlugin {
     mimetypeToExtension = MencoderConvertPluginUtils.getMimetypeToExtension();
     applicableTo = MencoderConvertPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "mencoderconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 

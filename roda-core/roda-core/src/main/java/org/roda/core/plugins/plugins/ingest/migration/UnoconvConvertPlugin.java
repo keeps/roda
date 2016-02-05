@@ -94,7 +94,7 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
     mimetypeToExtension = UnoconvConvertPluginUtils.getMimetypeToExtension();
     applicableTo = UnoconvConvertPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 

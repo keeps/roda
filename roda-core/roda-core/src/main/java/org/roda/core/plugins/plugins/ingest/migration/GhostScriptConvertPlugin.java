@@ -106,7 +106,7 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
     mimetypeToExtension = GhostScriptConvertPluginUtils.getMimetypeToExtension();
     applicableTo = GhostScriptConvertPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 

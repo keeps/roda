@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -69,9 +70,7 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    outputFormat = "pdf";
-    applicableTo.add("pdf");
-    convertableTo.add(outputFormat);
+    fillFileFormatStructures();
   }
 
   @Override
@@ -100,7 +99,12 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
 
   @Override
   public void fillFileFormatStructures() {
-    return;
+    outputFormat = "pdf";
+
+    applicableTo.add("pdf");
+    convertableTo.add("pdf");
+    mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
+    pronomToExtension = PdfToPdfaPluginUtils.getPronomToExtension();
   }
 
 }

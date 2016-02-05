@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -72,27 +71,44 @@ public class SoxConvertPluginUtils {
     return version.trim();
   }
 
+  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    map.put("fmt/134", new ArrayList<String>(Arrays.asList("mp3")));
-    map.put("fmt/199", new ArrayList<String>(Arrays.asList("mp4")));
-    map.put("fmt/203", new ArrayList<String>(Arrays.asList("ogg")));
-    map.put("fmt/414", new ArrayList<String>(Arrays.asList("aif", "aiff")));
-    map.put("x-fmt/139", new ArrayList<String>(Arrays.asList("au")));
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert",
+      "inputFormatPronoms");
+
+    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+      // TODO add missing pronoms
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+
+      if (mimeExtensions == null)
+        System.out.println("MIME: " + pronom);
+      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static Map<String, List<String>> getMimetypeToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    map.put("audio/mpeg", new ArrayList<String>(Arrays.asList("mp3")));
-    map.put("application/mp4", new ArrayList<String>(Arrays.asList("mp4")));
-    map.put("audio/ogg", new ArrayList<String>(Arrays.asList("ogg")));
-    map.put("audio/x-wav", new ArrayList<String>(Arrays.asList("wav")));
-    map.put("audio/basic", new ArrayList<String>(Arrays.asList("au")));
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert",
+      "inputFormatMimetypes");
+
+    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
+      // TODO add missing mimetypes
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
+
+      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static List<String> getInputExtensions() {
-    return Arrays.asList("mp3", "aac", "ogg", "opus", "mp4", "wav", "aif", "aiff", "au");
+    // TODO add missing extensions
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert",
+      "inputFormatExtensions");
+    return Arrays.asList(inputFormatExtensions.split(" "));
   }
 }

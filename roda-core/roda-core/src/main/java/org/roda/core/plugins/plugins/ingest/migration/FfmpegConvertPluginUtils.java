@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -66,35 +65,42 @@ public class FfmpegConvertPluginUtils {
     return version.trim();
   }
 
+  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    // TODO add missing pronoms
-    map.put("fmt/573", new ArrayList<String>(Arrays.asList("webm")));
-    map.put("fmt/203", new ArrayList<String>(Arrays.asList("ogg")));
-    map.put("fmt/596", new ArrayList<String>(Arrays.asList("mp4", "m4a")));
-    map.put("fmt/199", new ArrayList<String>(Arrays.asList("mp4", "m4a")));
-    map.put("fmt/3", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("fmt/4", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("fmt/5", new ArrayList<String>(Arrays.asList("avi")));
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+      "inputFormatPronoms");
+
+    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+      // TODO add missing pronoms
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+
+      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static Map<String, List<String>> getMimetypeToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    // TODO add missing mimetypes
-    map.put("video/webm", new ArrayList<String>(Arrays.asList("webm")));
-    map.put("audio/ogg", new ArrayList<String>(Arrays.asList("ogg")));
-    map.put("video/mp4", new ArrayList<String>(Arrays.asList("mp4", "m4v", "m4a", "f4v", "f4a")));
-    map.put("application/mp4", new ArrayList<String>(Arrays.asList("mp4", "m4v", "m4a", "f4v", "f4a")));
-    map.put("audio/x-wav", new ArrayList<String>(Arrays.asList("wav")));
-    map.put("image/gif", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("video/x-msvideo", new ArrayList<String>(Arrays.asList("avi")));
-    map.put("video/x-msvideo", new ArrayList<String>(Arrays.asList("avi")));
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+      "inputFormatMimetypes");
+
+    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
+      // TODO add missing mimetypes
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
+
+      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static List<String> getInputExtensions() {
     // TODO add missing extensions
-    return Arrays.asList("webm", "ogg", "opus", "mp4", "wav", "gif", "avi", "3g2");
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+      "inputFormatExtensions");
+    return Arrays.asList(inputFormatExtensions.split(" "));
   }
 }

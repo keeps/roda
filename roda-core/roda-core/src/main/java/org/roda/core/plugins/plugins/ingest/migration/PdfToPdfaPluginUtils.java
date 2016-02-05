@@ -15,8 +15,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
+import org.roda.core.RodaCoreFactory;
 import org.verapdf.core.ValidationException;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.metadata.fixer.impl.MetadataFixerImpl;
@@ -53,11 +59,36 @@ public class PdfToPdfaPluginUtils {
   }
 
   private static Path executePdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
-    // final pdfa output
+
+    // pdfa - file to save the GS output
+    // fixed - file to save the fixed representation
+    Path pdfa = Files.createTempFile("pdfa", ".pdf");
     Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
 
+    // GhostScript transformation command
+    String[] gsArgs = new String[10];
+    gsArgs[0] = "gs";
+    gsArgs[1] = "-dPDFA";
+    gsArgs[2] = "-dBATCH";
+    gsArgs[3] = "-dNOPAUSE";
+    gsArgs[4] = "-dUseCIEColor";
+    gsArgs[5] = "-sProcessColorModel=DeviceCMYK";
+    gsArgs[6] = "-sDEVICE=pdfwrite";
+    gsArgs[7] = "-sPDFACompatibilityPolicy=1";
+    gsArgs[8] = "-sOutputFile=" + pdfa.toString();
+    gsArgs[9] = p.toString();
+
+    Ghostscript gs = Ghostscript.getInstance();
+
+    try {
+      gs.initialize(gsArgs);
+      gs.exit();
+    } catch (GhostscriptException e) {
+      throw new GhostscriptException("Exception when using GhostScript: ", e);
+    }
+
     // metadata fixer transformation
-    InputStream is = new FileInputStream(p.toString());
+    InputStream is = new FileInputStream(pdfa.toString());
 
     try (ModelParser loader = new ModelParser(is)) {
 
@@ -80,6 +111,25 @@ public class PdfToPdfaPluginUtils {
     }
 
     return fixed;
+  }
+
+  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+
+  public static Map<String, List<String>> getPronomToExtension() {
+    Map<String, List<String>> map = new HashMap<>();
+    String inputFormatPronoms = RodaCoreFactory
+      .getRodaConfigurationAsString("tools", "pdftopdfa", "inputFormatPronoms");
+
+    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+      // TODO add missing pronoms
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+
+      if (mimeExtensions == null)
+        System.out.println("MIME: " + pronom);
+      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
+    return map;
   }
 
 }

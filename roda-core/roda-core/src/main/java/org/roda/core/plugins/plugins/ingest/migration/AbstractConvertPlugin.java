@@ -7,8 +7,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -256,8 +258,6 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       }
 
       try {
-
-        // TODO change to execute on the AIP with the new representation
         Plugin<AIP> psp = new PremisSkeletonPlugin();
         Plugin<AIP> sfp = new SiegfriedPlugin();
         Plugin<AIP> ttp = new TikaFullTextPlugin();
@@ -273,7 +273,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         pluginOrchestrator.runPluginOnAIPs(sfp, Arrays.asList(aip.getId()));
         pluginOrchestrator.runPluginOnAIPs(ttp, Arrays.asList(aip.getId()));
 
-        index.reindexAIP(aip);
+        model.notifyAIPUpdated(aip.getId());
 
       } catch (Exception e) {
         logger.debug("Error re-indexing new representation " + newRepresentationID);
@@ -288,6 +288,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     throws PluginException {
 
     int state = 1;
+    Set<String> aipSet = new HashSet<String>();
 
     for (File file : list) {
       try {
@@ -345,6 +346,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId(), false);
               model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload, false);
 
+              aipSet.add(file.getAipId());
+
             } else {
               logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                 + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
@@ -352,10 +355,34 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             }
           }
         }
+
       } catch (Throwable e) {
         logger.error("Error processing file " + file.getId() + ": " + e.getMessage(), e);
         state = 0;
       }
+    }
+
+    try {
+      Plugin<AIP> psp = new PremisSkeletonPlugin();
+      Plugin<AIP> sfp = new SiegfriedPlugin();
+      Plugin<AIP> ttp = new TikaFullTextPlugin();
+
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("createsPluginEvent", "false");
+      psp.setParameterValues(params);
+      sfp.setParameterValues(params);
+      ttp.setParameterValues(params);
+
+      PluginOrchestrator pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+      pluginOrchestrator.runPluginOnAIPs(psp, new ArrayList<String>(aipSet));
+      pluginOrchestrator.runPluginOnAIPs(sfp, new ArrayList<String>(aipSet));
+      pluginOrchestrator.runPluginOnAIPs(ttp, new ArrayList<String>(aipSet));
+
+      for (String aipId : aipSet) {
+        model.notifyAIPUpdated(aipId);
+      }
+    } catch (Throwable e) {
+      logger.debug("Error re-indexing AIPs after conversion.");
     }
 
     return null;

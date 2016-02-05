@@ -99,7 +99,7 @@ public class FfmpegConvertPlugin extends CommandConvertPlugin {
     mimetypeToExtension = FfmpegConvertPluginUtils.getMimetypeToExtension();
     applicableTo = FfmpegConvertPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 }

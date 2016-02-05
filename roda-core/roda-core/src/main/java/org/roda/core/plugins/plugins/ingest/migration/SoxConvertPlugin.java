@@ -98,7 +98,7 @@ public class SoxConvertPlugin extends CommandConvertPlugin {
     mimetypeToExtension = SoxConvertPluginUtils.getMimetypeToExtension();
     applicableTo = SoxConvertPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 

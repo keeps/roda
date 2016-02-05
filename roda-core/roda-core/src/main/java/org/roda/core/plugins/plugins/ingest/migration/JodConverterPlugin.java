@@ -106,7 +106,7 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
     mimetypeToExtension = JodConverterPluginUtils.getMimetypeToExtension();
     applicableTo = JodConverterPluginUtils.getInputExtensions();
 
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "jodconverter", "outputFormats");
     convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
   }
 

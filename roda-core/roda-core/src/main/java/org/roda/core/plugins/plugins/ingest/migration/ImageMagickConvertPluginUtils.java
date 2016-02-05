@@ -6,7 +6,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -70,50 +69,38 @@ public class ImageMagickConvertPluginUtils {
 
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    // TODO add missing pronoms
-    map.put("fmt/11", new ArrayList<String>(Arrays.asList("png")));
-    map.put("fmt/12", new ArrayList<String>(Arrays.asList("png")));
-    map.put("fmt/13", new ArrayList<String>(Arrays.asList("png")));
-    map.put("fmt/3", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("fmt/4", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("fmt/152", new ArrayList<String>(Arrays.asList("tiff", "tif", "dng")));
-    map.put("fmt/155", new ArrayList<String>(Arrays.asList("tiff", "tif")));
-    map.put("fmt/353", new ArrayList<String>(Arrays.asList("tiff", "tif")));
-    map.put("fmt/154", new ArrayList<String>(Arrays.asList("tiff", "tif")));
-    map.put("fmt/153", new ArrayList<String>(Arrays.asList("tiff", "tif")));
-    map.put("fmt/156", new ArrayList<String>(Arrays.asList("tiff", "tif", "tfx")));
-    map.put("x-fmt/399", new ArrayList<String>(Arrays.asList("tif")));
-    map.put("x-fmt/388", new ArrayList<String>(Arrays.asList("tif")));
-    map.put("x-fmt/387", new ArrayList<String>(Arrays.asList("tif")));
-    map.put("fmt/41", new ArrayList<String>(Arrays.asList("jpeg", "jpg", "jpe")));
-    map.put("fmt/42", new ArrayList<String>(Arrays.asList("jpeg", "jpg", "jpe")));
-    map.put("x-fmt/398", new ArrayList<String>(Arrays.asList("jpg")));
-    map.put("x-fmt/390", new ArrayList<String>(Arrays.asList("jpg")));
-    map.put("x-fmt/391", new ArrayList<String>(Arrays.asList("jpg")));
-    map.put("fmt/645", new ArrayList<String>(Arrays.asList("jpg")));
-    map.put("fmt/43", new ArrayList<String>(Arrays.asList("jpeg", "jpg", "jpe")));
-    map.put("fmt/44", new ArrayList<String>(Arrays.asList("jpeg", "jpg", "jpe")));
-    map.put("fmt/112", new ArrayList<String>(Arrays.asList("spf", "jpg")));
-    map.put("fmt/91", new ArrayList<String>(Arrays.asList("svg")));
-    map.put("fmt/92", new ArrayList<String>(Arrays.asList("svg")));
-    map.put("fmt/413", new ArrayList<String>(Arrays.asList("svg")));
-    map.put("x-fmt/109", new ArrayList<String>(Arrays.asList("svgz")));
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert",
+      "inputFormatPronoms");
+
+    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+      // TODO add missing pronoms
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+
+      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static Map<String, List<String>> getMimetypeToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    // TODO add missing mimetypes
-    map.put("image/png", new ArrayList<String>(Arrays.asList("png")));
-    map.put("image/gif", new ArrayList<String>(Arrays.asList("gif")));
-    map.put("image/tiff", new ArrayList<String>(Arrays.asList("tiff", "tif", "dng")));
-    map.put("image/jpeg", new ArrayList<String>(Arrays.asList("jpg", "jpeg", "jpe", "spf")));
-    map.put("image/svg+xml", new ArrayList<String>(Arrays.asList("svg", "svgz")));
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert",
+      "inputFormatMimetypes");
+
+    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
+      // TODO add missing mimetypes
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
+
+      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
     return map;
   }
 
   public static List<String> getInputExtensions() {
     // TODO add missing extensions
-    return Arrays.asList("png", "gif", "tiff", "tif", "jpg", "jpeg", "svg");
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert",
+      "inputFormatExtensions");
+    return Arrays.asList(inputFormatExtensions.split(" "));
   }
 }

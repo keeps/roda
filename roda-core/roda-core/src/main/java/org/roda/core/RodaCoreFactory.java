@@ -250,6 +250,7 @@ public class RodaCoreFactory {
         configurationFiles = new ArrayList<String>();
         propertiesCache = new HashMap<String, Map<String, String>>();
         addConfiguration("roda-core.properties");
+        addConfiguration("roda-core-formats.properties");
 
         // instantiate storage and model service
         instantiateStorageAndModel();
@@ -1035,7 +1036,7 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "");
+      params.put("inputFormat", "jpg");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
