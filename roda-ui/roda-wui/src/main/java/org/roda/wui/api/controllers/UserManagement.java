@@ -7,9 +7,16 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.net.URLEncoder;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.mail.internet.InternetAddress;
+
+import org.apache.velocity.VelocityContext;
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -20,6 +27,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -30,6 +38,7 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.common.RodaCoreService;
+import org.roda.wui.common.server.VelocityMail;
 
 public class UserManagement extends RodaCoreService {
 
@@ -192,16 +201,16 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void register(User user, String password) throws EmailAlreadyExistsException,
-    UserAlreadyExistsException, IllegalOperationException, GenericException, NotFoundException {
+  public static void registerUser(User user, String password)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     Date start = new Date();
 
     // delegate
-    UserManagementHelper.addUser(user, password);
+    UserManagementHelper.registerUser(user, password);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "register", null, duration, "user", user);
+    registerAction(user, "UserManagement", "registerUser", null, duration, "user", user);
   }
 
   public static void addUser(RodaUser user, User newUser, String password)
@@ -219,12 +228,12 @@ public class UserManagement extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "addUser", null, duration, "user", newUser);
   }
-  
+
   public static void modifyMyUser(RodaUser user, User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException,
     IllegalOperationException {
     Date start = new Date();
-    
+
     if (!user.getId().equals(modifiedUser.getId())) {
       throw new IllegalOperationException("Trying to modify user information for another user");
     }
@@ -310,5 +319,112 @@ public class UserManagement extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
+  }
+
+  public static void sendEmailVerification(String servletPath, String username)
+    throws GenericException, NotFoundException {
+    Date start = new Date();
+
+    User user = UserManagementHelper.retrieveUser(username);
+
+    if (user == null)
+      throw new NotFoundException("User " + username + " doesn't exist.");
+
+    if (user.isActive() || user.getEmailConfirmationToken() == null)
+      throw new GenericException("User " + username + " is already active or email confirmation token doesn't exist.");
+
+    sendEmailVerification(servletPath, user);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "resendEmailVerification", null, duration, "user", user);
+  }
+
+  public static void confirmUserEmail(String username, String emailConfirmationToken)
+    throws InvalidTokenException, LdapUtilityException, NotFoundException {
+    Date start = new Date();
+
+    User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
+    
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "confirmUserEmail", null, duration, "user", user);
+  }
+
+  public static void requestPasswordReset(String servletPath, String usernameOrEmail)
+    throws GenericException, NotFoundException, IllegalOperationException, LdapUtilityException {
+    Date start = new Date();
+
+    String username = null;
+    String email = null;
+
+    if (usernameOrEmail.matches(
+      "^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$")) {
+      email = usernameOrEmail;
+    } else {
+      username = usernameOrEmail;
+    }
+
+    User user = UserManagementHelper.requestPasswordReset(username, email);
+    sendRecoverLoginEmail(servletPath, user);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "requestPasswordReset", null, duration, "user", user);
+  }
+
+  public static void resetUserPassword(String username, String password, String resetPasswordToken)
+    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException {
+    Date start = new Date();
+
+    User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "resetUserPassword", null, duration, "user", user);
+  }
+
+  private static void sendEmailVerification(String servletPath, User user) throws GenericException {
+    try {
+      String token = user.getEmailConfirmationToken();
+      String username = user.getName();
+      String email = user.getEmail();
+      String verificationURL = servletPath + "/#verifyemail";
+      String verificationCompleteURL = verificationURL + "/" + URLEncoder.encode(username, "UTF-8") + "/" + token;
+
+      Map<String, String> contextMap = new HashMap<String, String>();
+      contextMap.put("username", username);
+      contextMap.put("token", token);
+      contextMap.put("verificationURL", verificationURL);
+      contextMap.put("verificationCompleteURL", verificationCompleteURL);
+
+      VelocityMail vmail = VelocityMail.getDefaultInstance();
+      InternetAddress address = new InternetAddress(email);
+      vmail.send("emailverification", address, new VelocityContext(contextMap));
+    } catch (Exception e) {
+      throw new GenericException("Problem sending email");
+    }
+  }
+
+  private static void sendRecoverLoginEmail(String servletPath, User user) throws GenericException {
+    try {
+      String token = user.getResetPasswordToken();
+      String username = user.getName();
+      String email = user.getEmail();
+      String recoverLoginURL = servletPath + "/#resetpassword";
+      String recoverLoginCompleteURL = recoverLoginURL + "/" + URLEncoder.encode(username, "UTF-8") + "/" + token;
+
+      Map<String, String> contextMap = new HashMap<String, String>();
+      contextMap.put("username", username);
+      contextMap.put("token", token);
+      contextMap.put("recoverLoginURL", recoverLoginURL);
+      contextMap.put("recoverLoginCompleteURL", recoverLoginCompleteURL);
+
+      VelocityMail vmail = VelocityMail.getDefaultInstance();
+      InternetAddress address = new InternetAddress(email);
+      vmail.send("recoverlogin", address, new VelocityContext(contextMap));
+    } catch (Exception e) {
+      throw new GenericException("Problem sending email");
+    }
   }
 }

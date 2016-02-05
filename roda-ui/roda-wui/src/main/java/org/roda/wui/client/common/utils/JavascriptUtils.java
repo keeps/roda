@@ -153,8 +153,7 @@ public class JavascriptUtils {
             // Something has gone wrong!
             data.context.addClass('error');
             $wnd.console.log("data"+data+" error thrown: "+data.errorThrown);
-        }
-
+        },
     });
 
 
@@ -181,6 +180,11 @@ public class JavascriptUtils {
     }
 
 });
+  }-*/;
+  
+  public static native int isUploadRunning() /*-{
+    var activeUploads = $wnd.jQuery('#upload').fileupload('active');
+    return activeUploads;
   }-*/;
   
   public static native void updateURLWithoutReloading(String newUrl) /*-{

@@ -187,4 +187,6 @@ public interface BrowserService extends RemoteService {
    * Get Google reCAPTCHA account id
    */
   String getGoogleReCAPTCHAAccount();
+
+  boolean isRegisterActive();
 }

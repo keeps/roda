@@ -20,6 +20,11 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  *         'UserManagementConstants.properties'.
  */
 public interface UserManagementConstants extends Constants, ConstantsWithLookup {
+  
+  // Create/Edit User/Group
+  public String dataTabTitle();
+
+  public String permissionsTabTitle();
 
   // Control Panel
   public String list();
@@ -51,8 +56,10 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editGroup();
 
   public String removeGroup();
+  
+  public String actions();
 
-  // Select user or group
+  // Select User/Group   
   public String selectNoUser();
 
   public String selectNoGroup();
@@ -63,20 +70,27 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
 
   public String selectNoUserOrGroup();
 
-  // Create/Edit User/Group
-  public String dataTabTitle();
-
-  public String permissionsTabTitle();
-
-  // * Create User
+  // Create User
   public String createUserTitle();
 
   public String createUserCancel();
 
   public String createUserCreate();
+  
+  // Edit User
+  public String editUserTitle();
 
-  // ** Create User Data
+  public String editUserCancel();
+  
+  public String editUserRemove();
+  
+  public String editUserActivate();
+  
+  public String editUserDeactivate();
 
+  public String editUserApply();
+
+  // User Data Panel
   public String username();
 
   public String password();
@@ -126,36 +140,19 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String allGroups();
 
   public String memberGroups();
-
-  // * Edit User
-  public String editUserTitle();
-
-  public String editUserCancel();
   
-  public String editUserRemove();
+  public String userGroups();
   
-  public String editUserActivate();
-  
-  public String editUserDeactivate();
+  public String userPermissions();
 
-  public String editUserApply();
-
-  public String editUserData();
-
-  public String editUserPermissions();
-
-  // * Create Group
+  // Create Group
   public String createGroupTitle();
 
   public String createGroupCreate();
 
   public String createGroupCancel();
 
-  public String groupName();
-
-  public String groupFullname();
-
-  // * Edit Group
+  // Edit Group
   public String editGroupTitle();
 
   public String editGroupApply();
@@ -163,8 +160,30 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editGroupRemove();
 
   public String editGroupCancel();
+  
+  // Group data panel
+  public String groupName();
 
-  // * Roles Description
+  public String groupFullname();
+  
+  public String groupDataNote();
+  
+  public String groupGroups();
+  
+  public String groupPermissions();
+  
+  // Preferences
+  public String preferencesUserDataTitle();
+
+  public String preferencesSubmit();
+  
+  public String preferencesCancel();
+
+  public String preferencesEmailAlreadyExists();
+
+  public String preferencesSubmitSuccess();
+
+  // Roles Description
   public String role_01();
 
   public String role_02();
@@ -204,7 +223,7 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
 
   public String actionReportLogTabTitle();
 
-  // User log
+  // User Log
   public String actionReportLogDateTime();
 
   public String actionReportLogAction();
@@ -238,11 +257,23 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
 
   public String registerEmailAlreadyExists();
 
-  public String registerSuccess();
-
   public String registerWrongCaptcha();
+  
+  public String registerFailure();
+  
+  public String registerSendEmailVerificationFailure();
+  
+  public String registerSuccessDialogTitle();
+  
+  public String registerSuccessDialogMessage();
+  
+  public String registerSuccessDialogMessageActive();
+  
+  public String registerSuccessDialogButton();
 
-  // Verify email
+  // Verify Email
+  public String verifyEmailTitle();
+  
   public String verifyEmailUsername();
 
   public String verifyEmailToken();
@@ -252,10 +283,12 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String verifyEmailResend();
 
   public String verifyEmailChange();
+  
+  public String verifyEmailSubmit();
+  
+  public String verifyEmailCancel();
 
   public String verifyEmailNoSuchUser();
-
-  public String verifyEmailSuccess();
 
   public String verifyEmailWrongToken();
 
@@ -265,36 +298,47 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
 
   public String verifyEmailChangePrompt();
 
-  public String verifyEmailChangeSuccess();
-
   public String verifyEmailChangeFailure();
 
   public String verifyEmailAlreadyExists();
-
-  // Preferences
-  public String preferencesUserDataTitle();
-
-  public String preferencesSubmit();
-
-  public String preferencesEmailAlreadyExists();
-
-  public String preferencesSubmitSuccess();
+  
+  public String verifyEmailChangeSuccess();
+  
+  public String verifyEmailFailure();
+  
+  public String verifyEmailSuccessDialogTitle();
+  
+  public String verifyEmailSuccessDialogMessage();
+  
+  public String verifyEmailSuccessDialogButton();
 
   // Recover Login
+  public String recoverLoginTitle();
+  
   public String recoverLoginUsernameOrEmail();
 
   public String recoverLoginCaptchaTitle();
 
   public String recoverLoginSubmit();
-
-  public String recoverLoginSuccess();
+  
+  public String recoverLoginCancel();
 
   public String recoverLoginCaptchaFailed();
 
   public String recoverLoginNoSuchUser();
+  
+  public String recoverLoginFailure();
+  
+  public String recoverLoginSuccessDialogTitle();
+  
+  public String recoverLoginSuccessDialogMessage();
+  
+  public String recoverLoginSuccessDialogButton();
 
-  // Reset password
-  public String resetPassordUsername();
+  // Reset Password
+  public String resetPasswordTitle();
+  
+  public String resetPasswordUsername();
 
   public String resetPasswordToken();
 
@@ -303,15 +347,22 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String resetPasswordRepeatPassword();
 
   public String resetPasswordSubmit();
+  
+  public String resetPasswordCancel();
 
   public String resetPasswordInvalidToken();
 
   public String resetPasswordNoSuchUser();
+  
+  public String resetPasswordFailure();
 
-  public String resetPasswordSuccess();
+  public String resetPasswordSuccessDialogTitle();
+  
+  public String resetPasswordSuccessDialogMessage();
+  
+  public String resetPasswordSuccessDialogButton();
 
   // Select User Window
-
   public String selectUserWindowTitle();
 
   public String selectUserWindowSelect();
@@ -319,7 +370,6 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String selectUserWindowCancel();
 
   // Select Group Window
-
   public String selectGroupWindowTitle();
 
   public String selectGroupWindowSelect();

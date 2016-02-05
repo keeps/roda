@@ -193,7 +193,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @DefaultStringValue("Login")
   public String loginLogin();
 
-  @DefaultStringValue("Register")
+  @DefaultStringValue("Sign up")
   public String loginRegister();
 
   @DefaultStringValue("Recover")

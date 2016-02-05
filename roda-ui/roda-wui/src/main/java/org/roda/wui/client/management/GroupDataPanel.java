@@ -24,6 +24,8 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
@@ -73,6 +75,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
   private boolean editmode;
 
   private boolean changed = false;
+  private boolean checked = false;
 
   /**
    * Create a new group data panel
@@ -113,6 +116,14 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
         GroupDataPanel.this.onChange();
       }
     };
+    
+    KeyUpHandler keyUpHandler = new KeyUpHandler() {
+      
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        onChange();
+      }
+    };
 
     groupname.addKeyPressHandler(new KeyPressHandler() {
 
@@ -132,8 +143,10 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
       }
     });
     groupname.addChangeHandler(changeHandler);
+    groupname.addKeyUpHandler(keyUpHandler);
     fullname.addChangeHandler(changeHandler);
-
+    fullname.addKeyUpHandler(keyUpHandler);
+    
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
       @Override
@@ -265,6 +278,8 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     } else {
       fullname.removeStyleName("isWrong");
     }
+    
+    checked = true;
 
     return valid;
   }
@@ -324,6 +339,9 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
   protected void onChange() {
     changed = true;
+    if (checked) {
+      isValid();
+    }
     ValueChangeEvent.fire(this, getValue());
   }
 

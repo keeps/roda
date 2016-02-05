@@ -13,7 +13,6 @@ import org.roda.wui.client.management.recaptcha.RecaptchaException;
 public class RecaptchaUtils {
   public static void recaptchaVerify(String secret, String captcha) throws RecaptchaException {
     try {
-
       String urlParameters = "secret=" + secret + "&response=" + captcha;
       String url = "https://www.google.com/recaptcha/api/siteverify?" + urlParameters;
       String USER_AGENT = "Mozilla/5.0";

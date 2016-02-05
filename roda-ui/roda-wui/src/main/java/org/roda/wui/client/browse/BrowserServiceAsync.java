@@ -117,4 +117,6 @@ public interface BrowserServiceAsync {
   void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
   void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
+  
+  void isRegisterActive(AsyncCallback<Boolean> callback);
 }

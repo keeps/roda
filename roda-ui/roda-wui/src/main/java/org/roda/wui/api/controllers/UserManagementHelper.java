@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -90,8 +91,12 @@ public class UserManagementHelper {
     }
   }
 
-  public static void addUser(User user, String password)
- throws GenericException, EmailAlreadyExistsException,
+  public static void registerUser(User user, String password)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+    RodaCoreFactory.getModelService().registerUser(user, password, true, true);
+  }
+
+  public static void addUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     RodaCoreFactory.getModelService().addUser(user, password, true, true);
   }
@@ -115,5 +120,20 @@ public class UserManagementHelper {
 
   public static void removeGroup(String groupname) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().removeGroup(groupname, true, true);
+  }
+  
+  public static User confirmUserEmail(String username, String email, String emailConfirmationToken)
+    throws InvalidTokenException, LdapUtilityException, NotFoundException {
+    return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
+  }
+
+  public static User requestPasswordReset(String username, String email)
+    throws IllegalOperationException, NotFoundException, LdapUtilityException {
+    return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
+  }
+  
+  public static User resetUserPassword(String username, String password, String resetPasswordToken)
+    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException {
+    return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }
 }

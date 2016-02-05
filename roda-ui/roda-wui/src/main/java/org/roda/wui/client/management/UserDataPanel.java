@@ -28,7 +28,11 @@ import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
+import com.google.gwt.event.logical.shared.SelectionEvent;
+import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -44,6 +48,7 @@ import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
@@ -134,6 +139,7 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
   private boolean editmode;
 
   private boolean changed = false;
+  private boolean checked = false;
 
   /**
    * Create a new user data panel
@@ -234,6 +240,22 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
         UserDataPanel.this.onChange();
       }
     };
+    
+    SelectionHandler<Suggestion> selectionHandler = new SelectionHandler<Suggestion>() {
+      
+      @Override
+      public void onSelection(SelectionEvent<Suggestion> event) {
+        onChange();
+      }
+    };
+    
+    KeyUpHandler keyUpHandler = new KeyUpHandler() {
+      
+      @Override
+      public void onKeyUp(KeyUpEvent event) {
+        onChange();
+      }
+    };
 
     username.addKeyPressHandler(new KeyPressHandler() {
 
@@ -253,11 +275,14 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       }
     });
     username.addChangeHandler(changeHandler);
+    username.addKeyUpHandler(keyUpHandler);
     password.addValueChangeHandler(valueChangedHandler);
     fullname.addChangeHandler(changeHandler);
+    fullname.addKeyUpHandler(keyUpHandler);
     businessCategory.addChangeHandler(changeHandler);
     idType.addChangeHandler(changeHandler);
     idNumber.addChangeHandler(changeHandler);
+    idNumber.addKeyUpHandler(keyUpHandler);
     idDate.addValueChangeHandler(new ValueChangeHandler<Date>() {
 
       @Override
@@ -266,17 +291,23 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       }
     });
     idLocality.addChangeHandler(changeHandler);
+    idLocality.addKeyUpHandler(keyUpHandler);
     nationality.addValueChangeHandler(valueChangedHandler);
+    nationality.addSelectionHandler(selectionHandler);
+    nationality.addKeyUpHandler(keyUpHandler);
     nif.addChangeHandler(changeHandler);
 
     email.addChangeHandler(changeHandler);
+    email.addKeyUpHandler(keyUpHandler);
     postalAddress.addChangeHandler(changeHandler);
     postalCode.addChangeHandler(changeHandler);
     locality.addChangeHandler(changeHandler);
     country.addValueChangeHandler(valueChangedHandler);
+    country.addSelectionHandler(selectionHandler);
+    country.addKeyUpHandler(keyUpHandler);
     phoneNumber.addChangeHandler(changeHandler);
     fax.addChangeHandler(changeHandler);
-
+    
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
       @Override
@@ -498,12 +529,12 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       idLocality.removeStyleName("isWrong");
     }
 
-    // if (!nationalityList.contains(nationality.getText())) {
-    // valid = false;
-    // nationality.addStyleName("isWrong");
-    // } else {
-    // nationality.removeStyleName("isWrong");
-    // }
+    if (nationality.getText().length() == 0) {
+      valid = false;
+      nationality.addStyleName("isWrong");
+    } else {
+      nationality.removeStyleName("isWrong");
+    }
 
     if (!email.getText()
       .matches("^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[_A-Za-z0-9-]+)")) {
@@ -513,12 +544,14 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       email.removeStyleName("isWrong");
     }
 
-    // if (!countryList.contains(country.getText())) {
-    // valid = false;
-    // country.addStyleName("isWrong");
-    // } else {
-    // country.removeStyleName("isWrong");
-    // }
+    if (country.getText().length() == 0) {
+      valid = false;
+      country.addStyleName("isWrong");
+    } else {
+      country.removeStyleName("isWrong");
+    }
+    
+    checked = true;
 
     return valid;
   }
@@ -588,6 +621,9 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
 
   protected void onChange() {
     changed = true;
+    if (checked) {
+      isValid();
+    }
     ValueChangeEvent.fire(this, getValue());
   }
 

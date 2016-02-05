@@ -62,7 +62,6 @@ public class Menu extends Composite {
   private static LanguageSwitcherPanelConstants languagesConstants = (LanguageSwitcherPanelConstants) GWT
     .create(LanguageSwitcherPanelConstants.class);
 
-
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   interface MyUiBinder extends UiBinder<Widget, Menu> {
@@ -98,7 +97,7 @@ public class Menu extends Composite {
   private final MenuBar languagesMenu;
 
   private final MenuBar settingsMenu;
-  
+
   private String selectedLanguage;
 
   /**
@@ -108,7 +107,10 @@ public class Menu extends Composite {
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    about = new MenuItem(constants.title_about(), createCommand(Welcome.RESOLVER.getHistoryPath()));
+    // about = new MenuItem(constants.title_about(),
+    // createCommand(Welcome.RESOLVER.getHistoryPath()));
+    about = customMenuItem("fa fa-home", constants.title_about(), "menu-item-label", null,
+      createCommand(Welcome.RESOLVER.getHistoryPath()));
 
     dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
       createCommand(Browse.RESOLVER.getHistoryPath()));
@@ -231,14 +233,13 @@ public class Menu extends Composite {
     if (user.isGuest()) {
       rightMenu
         .addItem(customMenuItem("fa fa-user", constants.loginLogin(), "menu-item-label", null, createLoginCommand()));
-      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label", null,
+      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label menu-register", null,
         createCommand(Register.RESOLVER.getHistoryPath())));
     } else {
       rightMenu.addItem(customMenuItem("fa fa-cog", constants.title_settings(), "menu-item-label", settingsMenu, null));
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
     }
-    rightMenu
-      .addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));
+    rightMenu.addItem(customMenuItem("fa fa-globe", selectedLanguage, "menu-item-label", languagesMenu, null));
   }
 
   private MenuItem customMenuItem(String icon, String label, String styleNames, MenuBar subMenu,
@@ -302,7 +303,7 @@ public class Menu extends Composite {
 
   private void setLanguageMenu() {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-    
+
     // TODO externalize supported languages
     Map<String, String> supportedLanguages = new HashMap<String, String>();
     supportedLanguages.put("en", languagesConstants.lang_en());

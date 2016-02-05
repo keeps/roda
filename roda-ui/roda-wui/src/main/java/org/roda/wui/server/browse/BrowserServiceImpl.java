@@ -72,6 +72,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   private static String GANALYTICS_ACCOUNT_CODE = null;
   private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
+  private static String GANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
+  private static String GRECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
+
+  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
+
   /**
    * Create a new BrowserService Implementation instance
    *
@@ -83,7 +88,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public String getGoogleAnalyticsAccount() {
     if (GANALYTICS_ACCOUNT_CODE == null) {
-      GANALYTICS_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString("ui.google.analytics.code", "");
+      GANALYTICS_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GANALYTICS_CODE_PROPERTY, "");
       LOGGER.debug("Google Analytics Account Code: " + GANALYTICS_ACCOUNT_CODE);
     }
     return GANALYTICS_ACCOUNT_CODE;
@@ -92,7 +97,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public String getGoogleReCAPTCHAAccount() {
     if (GRECAPTCHA_ACCOUNT_CODE == null) {
-      GRECAPTCHA_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString("ui.google.recaptcha.code", "");
+      GRECAPTCHA_ACCOUNT_CODE = RodaCoreFactory.getRodaConfiguration().getString(GRECAPTCHA_CODE_PROPERTY, "");
       LOGGER.debug("Google ReCAPTCHA Account Code: " + GRECAPTCHA_ACCOUNT_CODE);
     }
     return GRECAPTCHA_ACCOUNT_CODE;
@@ -387,5 +392,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.retrieveIndexedPreservationEvent(user, indexedPreservationEventId);
+  }
+
+  @Override
+  public boolean isRegisterActive() {
+    return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
   }
 }

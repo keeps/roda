@@ -12,18 +12,26 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.data.adapter.ContentAdapter;
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.wui.common.client.PrintReportException;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -31,7 +39,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @author Luis Faria
  *
  */
-@SuppressWarnings("deprecation")
 public interface UserManagementServiceAsync {
 
   public void getMemberCount(Filter filter, AsyncCallback<Long> callback);
@@ -39,11 +46,45 @@ public interface UserManagementServiceAsync {
   void findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<RODAMember>> callback);
 
+  /**
+   * Get a group
+   *
+   * @param groupname
+   *          the group name
+   * @return the group
+   * @throws RODAException
+   */
   void getGroup(String groupname, AsyncCallback<Group> callback);
 
   void listAllGroups(AsyncCallback<List<Group>> callback);
 
+  /**
+   * Get a user
+   *
+   * @param username
+   *          the user name
+   * @return the user
+   *
+   * @throws RODAException
+   */
   void getUser(String username, AsyncCallback<User> callback);
+
+  /**
+   * Register a new user
+   *
+   * @param user
+   *          The user to register
+   * @param password
+   *          user password
+   * @param captcha
+   *          the captcha challenge
+   * @return true if passed the challenge, false otherwise
+   * @throws GenericException
+   * @throws UserAlreadyExistsException
+   * @throws EmailAlreadyExistsException
+   * @throws RecaptchaException
+   */
+  public void registerUser(User user, String password, String captcha, AsyncCallback<Void> callback);
 
   /**
    * Create a new user
@@ -52,7 +93,11 @@ public interface UserManagementServiceAsync {
    *          the user
    * @param password
    *          the user password
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws EmailAlreadyExistsException
+   * @throws UserAlreadyExistsException
+   * @throws GenericException
    */
   public void addUser(User user, String password, AsyncCallback<Void> callback);
 
@@ -63,8 +108,10 @@ public interface UserManagementServiceAsync {
    *          the modified users
    * @param password
    *          the new user password, or null to stay the same
-   * @throws RODAException
-   *
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws AlreadyExistsException
+   * @throws GenericException
    */
   public void modifyUser(User user, String password, AsyncCallback<Void> callback);
 
@@ -75,7 +122,11 @@ public interface UserManagementServiceAsync {
    *          the modified user
    * @param password
    *          the user password if modified, or null if it remains the same
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws AlreadyExistsException
+   * @throws GenericException
+   * @throws IllegalOperationException
    */
   public void editMyUser(User user, String password, AsyncCallback<Void> callback);
 
@@ -85,7 +136,8 @@ public interface UserManagementServiceAsync {
    * @param username
    *          the user name
    * @return true if user was removed, false if it was only deactivated
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
    */
   public void removeUser(String username, AsyncCallback<Void> callback);
 
@@ -94,7 +146,9 @@ public interface UserManagementServiceAsync {
    *
    * @param group
    *          the new group
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
+   * @throws AlreadyExistsException
    */
   public void addGroup(Group group, AsyncCallback<Void> callback);
 
@@ -103,7 +157,9 @@ public interface UserManagementServiceAsync {
    *
    * @param group
    *          the modified group
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
+   * @throws NotFoundException
    */
   public void modifyGroup(Group group, AsyncCallback<Void> callback);
 
@@ -112,7 +168,8 @@ public interface UserManagementServiceAsync {
    *
    * @param groupname
    *          the group name
-   * @throws RODAException
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
    */
   public void removeGroup(String groupname, AsyncCallback<Void> callback);
 
@@ -131,18 +188,14 @@ public interface UserManagementServiceAsync {
   void retrieveLogEntry(String logEntryId, AsyncCallback<LogEntry> callback);
 
   /**
-   * Register a new user
+   * Resend the email challenge to a user email
    *
-   * @param user
-   *          The user to register
-   * @param password
-   *          user password
-   * @param captcha
-   *          the captcha chalenge
-   * @return true if passed the chalenge, false otherwise
-   * @throws RODAException
+   * @param username
+   *          the name of the user
+   * @throws GenericException
+   * @throws NotFoundException
    */
-  public void register(User user, String password, String captcha, AsyncCallback<Void> callback);
+  public void sendEmailVerification(String username, AsyncCallback<Void> callback);
 
   /**
    * Verify a user email. If verified user will become active
@@ -151,22 +204,11 @@ public interface UserManagementServiceAsync {
    *          the name of the user
    * @param token
    *          the token used in email verification
-   * @return true if email verified, false otherwise
-   * @throws RODAException
-   *
+   * @throws InvalidTokenException
+   * @throws LdapUtilityException
+   * @throws NotFoundException
    */
-  public void verifyemail(String username, String token, AsyncCallback<Boolean> callback);
-
-  /**
-   * Resend the email chalenge to a user email
-   *
-   * @param username
-   *          the name of the user
-   * @return true if email resent, false otherwise
-   * @throws RODAException
-   *
-   */
-  public void resendEmailVerification(String username, AsyncCallback<Boolean> callback);
+  public void confirmUserEmail(String username, String emailConfirmationToken, AsyncCallback<Void> callback);
 
   /**
    * Change the email of a user that is still not active due to a email
@@ -189,35 +231,30 @@ public interface UserManagementServiceAsync {
    * @param usernameOrEmail
    *          the user name or email
    * @param captcha
-   *          the capcha chalenge answer
-   * @return true if the user passed the chalenge, false otherwise
-   * @throws RODAException
+   *          the captcha challenge answer
+   * @throws GenericException
+   * @throws NotFoundException
+   * @throws IllegalOperationException
+   * @throws LdapUtilityException
+   * @throws RecaptchaException
    */
-  public void requestPassordReset(String usernameOrEmail, String captcha, AsyncCallback<Boolean> callback);
+  public void requestPasswordReset(String usernameOrEmail, String captcha, AsyncCallback<Void> callback);
 
   /**
    * Reset a user password
    *
    * @param username
    *          the user name
+   * @param password
+   *          the new password
    * @param resetPasswordToken
    *          the password token that was sent by email on
    *          requestPasswordReset(String, String)
-   * @param newPassword
-   *          the new password
-   * @throws RODAException
-   *
+   * @throws InvalidTokenException
+   * @throws IllegalOperationException
+   * @throws LdapUtilityException
+   * @throws NotFoundException
    */
-  public void resetPassword(String username, String resetPasswordToken, String newPassword,
+  public void resetUserPassword(String username, String password, String resetPasswordToken, 
     AsyncCallback<Void> callback);
-
-  /**
-   * Set user log report info
-   *
-   * @param adapter
-   * @param localeString
-   * @throws PrintReportException
-   */
-  public void setUserLogReportInfo(ContentAdapter adapter, String localeString, AsyncCallback<Void> callback);
-
 }

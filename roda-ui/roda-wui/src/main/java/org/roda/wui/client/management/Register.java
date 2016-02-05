@@ -14,8 +14,14 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.exceptions.EmailAlreadyExistsException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.main.Login;
+import org.roda.wui.client.management.recaptcha.RecaptchaException;
 import org.roda.wui.client.management.recaptcha.RecaptchaWidget;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
@@ -34,7 +40,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.UserManagementConstants;
-import config.i18n.client.UserManagementMessages;
 
 /**
  * @author Luis Faria
@@ -57,8 +62,24 @@ public class Register extends Composite {
     }
 
     @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      callback.onSuccess(true);
+    public void isCurrentUserPermitted(final AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().getAuthenticatedUser(new AsyncCallback<RodaUser>() {
+
+        @Override
+        public void onSuccess(RodaUser user) {
+          if (user != null && user.isGuest()) {
+            callback.onSuccess(true);
+          } else {
+            Tools.newHistory(Welcome.RESOLVER);
+            callback.onSuccess(null);
+          }
+        }
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+      });
     }
 
     public List<String> getHistoryPath() {
@@ -75,13 +96,12 @@ public class Register extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private final User user;
+  private User user;
 
   private boolean recaptchaActive = true;
 
   private RecaptchaWidget recaptchaWidget;
 
-  private static UserManagementMessages messages = (UserManagementMessages) GWT.create(UserManagementMessages.class);
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
@@ -135,20 +155,77 @@ public class Register extends Composite {
         recaptchaResponse = recaptchaWidget.getResponse();
       }
 
-      final User user = userDataPanel.getUser();
+      user = userDataPanel.getUser();
+      user.setActive(false);
+
       final String password = userDataPanel.getPassword();
       final String recaptcha = recaptchaResponse;
 
-      UserManagementService.Util.getInstance().register(user, password, recaptcha, new AsyncCallback<Void>() {
+      BrowserService.Util.getInstance().isRegisterActive(new AsyncCallback<Boolean>() {
+
+        @Override
+        public void onSuccess(Boolean result) {
+          final boolean registerActive = result;
+          user.setActive(result);
+
+          UserManagementService.Util.getInstance().registerUser(user, password, recaptcha, new AsyncCallback<Void>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              errorMessage(caught);
+            }
+
+            @Override
+            public void onSuccess(Void result) {
+              if (registerActive) {
+                Dialogs.showInformationDialog(constants.registerSuccessDialogTitle(),
+                  constants.registerSuccessDialogMessageActive(), constants.registerSuccessDialogButton(),
+                  new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Tools.newHistory(Login.RESOLVER);
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    Tools.newHistory(Login.RESOLVER);
+                  }
+                });
+              } else {
+                UserManagementService.Util.getInstance().sendEmailVerification(user.getId(), new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Dialogs.showInformationDialog(constants.registerSuccessDialogTitle(),
+                      constants.registerSuccessDialogMessage(), constants.registerSuccessDialogButton(),
+                      new AsyncCallback<Void>() {
+
+                      @Override
+                      public void onSuccess(Void result) {
+                        Tools.newHistory(Login.RESOLVER);
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Tools.newHistory(Login.RESOLVER);
+                      }
+                    });
+                  }
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    sendEmailVerificationFailure(caught);
+                  }
+                });
+              }
+            }
+          });
+        }
 
         @Override
         public void onFailure(Throwable caught) {
           errorMessage(caught);
-        }
-
-        @Override
-        public void onSuccess(Void result) {
-          
         }
       });
     }
@@ -160,14 +237,23 @@ public class Register extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(Welcome.RESOLVER);
+    Tools.newHistory(Login.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {
+    recaptchaWidget.reset();
     if (caught instanceof EmailAlreadyExistsException) {
       Toast.showError(constants.registerEmailAlreadyExists());
+    } else if (caught instanceof UserAlreadyExistsException) {
+      Toast.showError(constants.registerUserExists());
+    } else if (caught instanceof RecaptchaException) {
+      Toast.showError(constants.registerWrongCaptcha());
     } else {
-      Toast.showError(messages.editUserFailure(Register.this.user.getName(), caught.getMessage()));
+      Toast.showError(constants.registerFailure());
     }
+  }
+
+  private void sendEmailVerificationFailure(Throwable caught) {
+    Toast.showError(constants.registerSendEmailVerificationFailure());
   }
 }

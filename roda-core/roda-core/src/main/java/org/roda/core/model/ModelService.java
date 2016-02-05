@@ -33,6 +33,7 @@ import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.GroupAlreadyExistsException;
 import org.roda.core.data.exceptions.IllegalOperationException;
+import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
@@ -1089,6 +1090,28 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  public void registerUser(User user, String password, boolean useModel, boolean notify)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
+    boolean success = true;
+    try {
+      if (useModel) {
+        UserUtility.getLdapUtility().registerUser(user, password);
+      }
+    } catch (LdapUtilityException e) {
+      success = false;
+      throw new GenericException("Error registering user to LDAP", e);
+    } catch (UserAlreadyExistsException e) {
+      success = false;
+      throw new UserAlreadyExistsException("User already exists", e);
+    } catch (EmailAlreadyExistsException e) {
+      success = false;
+      throw new EmailAlreadyExistsException("Email already exists", e);
+    }
+    if (success && notify) {
+      notifyUserCreated(user);
+    }
+  }
+
   public void addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     addUser(user, null, useModel, notify);
@@ -1138,7 +1161,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error updating user to LDAP", e);
+      throw new GenericException("Error modifying user to LDAP", e);
     } catch (EmailAlreadyExistsException e) {
       success = false;
       throw new AlreadyExistsException("User already exists", e);
@@ -1163,7 +1186,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error deleting user from LDAP", e);
+      throw new GenericException("Error removing user from LDAP", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1200,7 +1223,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error updating group to LDAP", e);
+      throw new GenericException("Error modifying group to LDAP", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("Group doesn't exist", e);
@@ -1222,7 +1245,7 @@ public class ModelService extends ModelObservable {
       }
     } catch (LdapUtilityException e) {
       success = false;
-      throw new GenericException("Error updating group to LDAP", e);
+      throw new GenericException("Error removing group from LDAP", e);
     } catch (IllegalOperationException e) {
       success = false;
       throw new AuthorizationDeniedException("Illegal operation", e);
@@ -1231,6 +1254,85 @@ public class ModelService extends ModelObservable {
       notifyGroupDeleted(id);
     }
   }
+
+  public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,
+    boolean notify) throws LdapUtilityException, NotFoundException, InvalidTokenException {
+    User user = null;
+    boolean success = true;
+    try {
+      if (useModel) {
+        user = UserUtility.getLdapUtility().confirmUserEmail(username, email, emailConfirmationToken);
+      }
+      success = true;
+    } catch (LdapUtilityException e) {
+      success = false;
+      throw new LdapUtilityException("Error on password reset", e);
+    } catch (NotFoundException e) {
+      success = false;
+      throw new NotFoundException("User doesn't exist", e);
+    } catch (InvalidTokenException e) {
+      success = false;
+      throw new InvalidTokenException("Token exception", e);
+    }
+    if (success && user != null && notify) {
+      notifyUserUpdated(user);
+    }
+    return user;
+  }
+
+  public User requestPasswordReset(String username, String email, boolean useModel, boolean notify)
+    throws IllegalOperationException, NotFoundException, LdapUtilityException {
+    User user = null;
+    boolean success = true;
+    try {
+      if (useModel) {
+        user = UserUtility.getLdapUtility().requestPasswordReset(username, email);
+      }
+      success = true;
+    } catch (LdapUtilityException e) {
+      success = false;
+      throw new LdapUtilityException("Error requesting password reset", e);
+    } catch (NotFoundException e) {
+      success = false;
+      throw new NotFoundException("User doesn't exist", e);
+    } catch (IllegalOperationException e) {
+      success = false;
+      throw new IllegalOperationException("Illegal operation", e);
+    }
+    if (success && user != null && notify) {
+      notifyUserUpdated(user);
+    }
+    return user;
+  }
+
+  public User resetUserPassword(String username, String password, String resetPasswordToken, boolean useModel,
+    boolean notify) throws LdapUtilityException, NotFoundException, InvalidTokenException, IllegalOperationException {
+    User user = null;
+    boolean success = true;
+    try {
+      if (useModel) {
+        user = UserUtility.getLdapUtility().resetUserPassword(username, password, resetPasswordToken);
+      }
+      success = true;
+    } catch (LdapUtilityException e) {
+      success = false;
+      throw new LdapUtilityException("Error on password reset", e);
+    } catch (NotFoundException e) {
+      success = false;
+      throw new NotFoundException("User doesn't exist", e);
+    } catch (InvalidTokenException e) {
+      success = false;
+      throw new InvalidTokenException("Token exception", e);
+    } catch (IllegalOperationException e) {
+      success = false;
+      throw new IllegalOperationException("Illegal operation", e);
+    }
+    if (success && user != null && notify) {
+      notifyUserUpdated(user);
+    }
+    return user;
+  }
+  
 
   public Binary retrieveOtherMetadataBinary(OtherMetadata om)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {

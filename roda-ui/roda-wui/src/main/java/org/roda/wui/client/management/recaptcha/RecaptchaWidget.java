@@ -41,10 +41,10 @@ public class RecaptchaWidget extends Composite {
   }
 
   public void reset() {
-    Recaptcha.reset(RECAPTCHA_DIV_ID);
+    Recaptcha.reset();
   }
 
   public String getResponse() {
-    return Recaptcha.getResponse(RECAPTCHA_DIV_ID);
+    return Recaptcha.getResponse();
   }
 }

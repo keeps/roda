@@ -16,6 +16,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -28,6 +29,7 @@ import com.google.gwt.event.dom.client.DragOverEvent;
 import com.google.gwt.event.dom.client.DragOverHandler;
 import com.google.gwt.event.dom.client.DropEvent;
 import com.google.gwt.event.dom.client.DropHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -91,7 +93,8 @@ public class IngestTransferUpload extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private ClientLogger logger = new ClientLogger(getClass().getName());
+  @SuppressWarnings("unused")
+  private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
@@ -116,8 +119,12 @@ public class IngestTransferUpload extends Composite {
 
   private TransferredResource resource;
 
+  @SuppressWarnings("unused")
+  private HandlerRegistration handlerRegistration;
+
   private IngestTransferUpload() {
     initWidget(uiBinder.createAndBindUi(this));
+
   }
 
   private String getUploadUrl() {
@@ -136,7 +143,25 @@ public class IngestTransferUpload extends Composite {
     return ret;
   }
 
-  protected void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+  protected void onLoad() {
+//    if (handlerRegistration != null) {
+//      handlerRegistration.removeHandler();
+//      handlerRegistration = null;
+//    }
+//
+//    logger.debug("ADD HANDLER");
+//    handlerRegistration = History.addValueChangeHandler(new ValueChangeHandler<String>() {
+//
+//      @Override
+//      public void onValueChange(ValueChangeEvent<String> event) {
+//        logger.debug("BACK " + JavascriptUtils.isUploadRunning());
+//        History.newItem(Tools.createHistoryToken(IngestTransferUpload.RESOLVER.getHistoryPath()), false);
+////        verifyActiveUploads();
+//      }
+//    });
+  }
+
+  protected void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       // Upload to root
       resource = null;
@@ -160,6 +185,7 @@ public class IngestTransferUpload extends Composite {
               callback.onSuccess(IngestTransferUpload.this);
               updateUploadForm();
             }
+
           });
       } else {
         Tools.newHistory(IngestTransfer.RESOLVER);
@@ -219,4 +245,38 @@ public class IngestTransferUpload extends Composite {
     }
   }
 
+  // void verifyActiveUploads() {
+  // int uploads = JavascriptUtils.isUploadRunning();
+  // if (uploads > 0) {
+  // historyBack();
+  // } else {
+  // Dialogs.showConfirmDialog("1", "2", "3", "4", new AsyncCallback<Boolean>()
+  // {
+  //
+  // @Override
+  // public void onFailure(Throwable caught) {
+  // // TODO Auto-generated method stub
+  //
+  // }
+  //
+  // @Override
+  // public void onSuccess(Boolean result) {
+  // if (result) {
+  // historyBack();
+  // }
+  // }
+  // });
+  // }
+  // }
+  //
+  // void historyBack() {
+  // handlerRegistration.removeHandler();
+  // handlerRegistration = null;
+  // if (resource != null) {
+  // Tools.newHistory(IngestTransfer.RESOLVER,
+  // IngestTransfer.getPathFromTransferredResourceId(resource.getId()));
+  // } else {
+  // Tools.newHistory(IngestTransfer.RESOLVER);
+  // }
+  // }
 }

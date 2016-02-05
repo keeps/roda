@@ -83,7 +83,7 @@ public class Tools {
     return tokens;
   }
 
-  private static String createHistoryToken(List<String> tokens) {
+  public static String createHistoryToken(List<String> tokens) {
     StringBuilder builder = new StringBuilder();
     boolean first = true;
     for (String token : tokens) {

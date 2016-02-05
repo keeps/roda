@@ -6,8 +6,7 @@
 	xmlns:u="urn:import:org.roda.wui.client.management">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
-
+	
 	<ui:style>
 		.postalAddress {
 		min-height: 84px;
@@ -87,14 +86,18 @@
 		</g:FlowPanel>
 		<g:FlowPanel ui:field="groupSelectPanel" addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="col_12">
-				<g:Label styleName="h4">Groups</g:Label>
+				<g:Label styleName="h4">
+					<ui:text from="{constants.userGroups}" />
+				</g:Label>
 				<u:GroupSelect ui:field="groupSelect" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 		<g:FlowPanel ui:field="permissionsSelectPanel"
 			addStyleNames="row full_width no_padding {style.section}">
 			<g:FlowPanel addStyleNames="col_12">
-				<g:Label styleName="h4">Permissions</g:Label>
+				<g:Label styleName="h4">
+					<ui:text from="{constants.userPermissions}" />
+				</g:Label>
 				<u:PermissionsPanel ui:field="permissionsPanel" />
 			</g:FlowPanel>
 		</g:FlowPanel>

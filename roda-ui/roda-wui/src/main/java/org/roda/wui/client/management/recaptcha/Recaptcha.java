@@ -10,11 +10,11 @@ public class Recaptcha {
     });
   }-*/;
 
-  public static native void reset(String div) /*-{
-    $wnd.grecaptcha.reset(div);
+  public static native void reset() /*-{
+    $wnd.grecaptcha.reset();
   }-*/;
 
-  public static native String getResponse(String div) /*-{
+  public static native String getResponse() /*-{
     return $wnd.grecaptcha.getResponse();
   }-*/;
 }

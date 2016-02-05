@@ -42,6 +42,8 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ErrorEvent;
+import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -719,6 +721,14 @@ public class ViewRepresentation extends Composite {
 
   private void imagePreview(IndexedFile file) {
     Image image = new Image(RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()));
+    image.addErrorHandler(new ErrorHandler() {
+      
+      @Override
+      public void onError(ErrorEvent event) {
+        filePreview.clear();
+        errorPreview();
+      }
+    });
     filePreview.add(image);
     image.setStyleName("viewRepresentationImageFilePreview");
   }

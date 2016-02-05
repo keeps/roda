@@ -6,29 +6,26 @@
 	xmlns:u="urn:import:org.roda.wui.client.management">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
-
-	<ui:style>
-
-	</ui:style>
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Create user</g:Label>
+				<g:Label styleName="h1">
+					<ui:text from="{constants.createUserTitle}" />
+				</g:Label>
 				<u:UserDataPanel ui:field="userDataPanel" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from="{constants.actions}" />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						<ui:text from='{constants.editUserApply}' />
+						<ui:text from='{constants.createUserCreate}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						<ui:text from='{constants.editUserCancel}' />
+						<ui:text from='{constants.createUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

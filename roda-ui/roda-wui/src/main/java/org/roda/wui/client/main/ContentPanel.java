@@ -18,6 +18,9 @@ import java.util.Set;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.management.Preferences;
+import org.roda.wui.client.management.RecoverLogin;
+import org.roda.wui.client.management.ResetPassword;
+import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.search.BasicSearch;
 import org.roda.wui.client.welcome.Welcome;
@@ -26,9 +29,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.client.Management;
-import org.roda.wui.management.user.client.RecoverLoginRequest;
-import org.roda.wui.management.user.client.ResetPassword;
-import org.roda.wui.management.user.client.VerifyEmail;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
@@ -93,12 +93,12 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(Management.RESOLVER);
     // User Management
     resolvers.add(Preferences.RESOLVER);
-    resolvers.add(RecoverLoginRequest.getInstance());
     resolvers.add(Register.RESOLVER);
-    resolvers.add(ResetPassword.getInstance());
-    resolvers.add(VerifyEmail.getInstance());
+    resolvers.add(RecoverLogin.RESOLVER);
+    resolvers.add(ResetPassword.RESOLVER);
+    resolvers.add(VerifyEmail.RESOLVER);
   }
-
+  
   /**
    * Update the content panel with the new history
    * 

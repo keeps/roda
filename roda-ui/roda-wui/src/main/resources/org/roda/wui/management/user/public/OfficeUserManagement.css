@@ -772,3 +772,7 @@
 .wui-data-panel .password {
 	margin-bottom: 5px;
 }
+
+#recaptcha_div {
+	margin-top: 20px;
+}

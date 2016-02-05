@@ -1120,6 +1120,12 @@
             this._initProgressObject(this);
             this._initEventHandlers();
         },
+        
+        // This method is exposed to the widget API and allows to query
+        // the number of active uploads:
+        active: function () {
+            return this._active;
+        },
 
         // This method is exposed to the widget API and allows to query
         // the widget upload progress.

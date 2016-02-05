@@ -16,6 +16,8 @@ import java.util.List;
 import org.roda.core.data.exceptions.AuthenticationDeniedException;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.management.RecoverLogin;
+import org.roda.wui.client.management.Register;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -23,6 +25,7 @@ import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -103,6 +106,12 @@ public class Login extends Composite {
   Button login;
 
   @UiField
+  Label recover;
+
+  @UiField
+  Label register;
+
+  @UiField
   Label error;
 
   private String service = null;
@@ -116,6 +125,22 @@ public class Login extends Composite {
         if (event.isAttached()) {
           username.setFocus(true);
         }
+      }
+    });
+
+    register.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Tools.newHistory(Register.RESOLVER);
+      }
+    });
+
+    recover.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        Tools.newHistory(RecoverLogin.RESOLVER);
       }
     });
   }
@@ -154,6 +179,7 @@ public class Login extends Composite {
     String passwordText = password.getText();
     error.setText("");
 
+    // TODO strings
     if (usernameText.trim().length() == 0 || passwordText.trim().length() == 0) {
       error.setText("Please fill the username and password");
     } else {
@@ -176,7 +202,6 @@ public class Login extends Composite {
           } else {
             Tools.newHistory(Welcome.RESOLVER);
           }
-
         }
       });
     }

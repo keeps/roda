@@ -1140,7 +1140,7 @@ public class LdapUtility {
     throws UserAlreadyExistsException, EmailAlreadyExistsException, LdapUtilityException {
 
     // A new registered user, is always inactive.
-    user.setActive(false);
+    // user.setActive(false);
 
     // Generate an email verification token with 1 day expiration date.
     UUID uuidToken = UUID.randomUUID();

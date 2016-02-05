@@ -229,6 +229,7 @@
 .wui-login-dialog .cancel {
 	margin-right: 10px;
 }
+
 /* @end */
 
 /* @group Menus */
@@ -342,6 +343,10 @@
 
 .menu-item .fa {
 	font-size: 1.5rem;
+}
+
+.menu-register {
+	display: none;
 }
 
 .menu-item-language-selected .fa {
@@ -2376,6 +2381,7 @@
 .loginPanel {
 	margin: 40px auto;
 	max-width: 400px;
+	min-width: 300px;
 	background-color: #eee;
 	padding: 40px;
 }
@@ -2384,13 +2390,83 @@
 	margin-top: 0px;
 }
 
+.login-buttons {
+	height: 50px;
+}
+
 .login-button {
 	margin-top: 20px;
-	width: 100px;
+	width: 120px;
+	float: left;
+}
+
+.login-link {
+	display: inline;
+	float: right;
+	color: #089de3;
+	margin-top: 25px;
+	margin-left: 15px;
+	font-size: 1.2rem;
+}
+
+.login-link:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
 }
 
 .login-error {
 	color: #F53E3E;
+	width: 100%;
+	font-size: 1.2rem;
+}
+
+/**********************************************
+				RECOVER
+************************************************/
+.recoverPanel {
+	margin: 40px auto;
+	max-width: 400px;
+	min-width: 300px;
+	background-color: #eee;
+	padding: 40px;
+}
+
+.recoverPanel h1 {
+	margin-top: 0px;
+}
+
+.recover-buttons {
+	height: 50px;
+}
+
+.recover-button {
+	margin-top: 20px;
+	width: 120px;
+	float: left;
+}
+
+.recover-link {
 	display: inline;
-	margin-left: 10px;
+	float: right;
+	color: #089de3;
+	margin-top: 25px;
+	margin-left: 15px;
+	font-size: 1.2rem;
+}
+
+.recover-link:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.recover-error {
+	color: #F53E3E;
+	width: 100%;
+	font-size: 1.2rem;
+}
+
+.recoverPanel .isWrong {
+	background-color: #d97570;
 }
