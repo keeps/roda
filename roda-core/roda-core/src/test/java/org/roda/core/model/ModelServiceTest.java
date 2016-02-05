@@ -336,8 +336,6 @@ public class ModelServiceTest {
   @Test
   public void testListAIPs() throws RODAException {
 
-    logger.info("Initial state: " + Iterables.toString(model.listAIPs()));
-
     // generate AIP ID
     final String aip1Id = UUID.randomUUID().toString();
     final String aip2Id = UUID.randomUUID().toString();
@@ -353,11 +351,6 @@ public class ModelServiceTest {
     Iterable<AIP> listAIPs = model.listAIPs();
     List<AIP> reusableList = new ArrayList<>();
     Iterables.addAll(reusableList, listAIPs);
-
-    logger.info("AIP1: " + aip1);
-    logger.info("AIP2: " + aip2);
-    logger.info("AIP3: " + aip3);
-    logger.info("List: " + reusableList);
 
     assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 
