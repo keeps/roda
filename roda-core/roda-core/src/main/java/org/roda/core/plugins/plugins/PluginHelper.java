@@ -186,7 +186,7 @@ public final class PluginHelper {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
       targets, outcome, detailNote, detailExtension, agentID, agentRole);
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, fileID, premisEvent);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, id, premisEvent);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);
     pm.setRepresentationId(representationID);

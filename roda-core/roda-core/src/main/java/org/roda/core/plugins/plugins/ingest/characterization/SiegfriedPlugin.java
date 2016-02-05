@@ -58,16 +58,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   private Map<String, String> parameters;
   private boolean createsPluginEvent = true;
 
-  private ContentPayload agent;
-
   @Override
   public void init() throws PluginException {
-    try {
-      agent = PremisUtils.createPremisAgentBinary(getClass().getName() + "@" + getVersion(),
-        "characterization-siegfried", RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    } catch (GenericException e) {
-      throw new PluginException("Error initializing agent", e);
-    }
   }
 
   @Override
@@ -118,8 +110,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     PluginState state;
 
     try {
-      model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, getName() + "/" + getVersion(),
-        agent);
+      PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }

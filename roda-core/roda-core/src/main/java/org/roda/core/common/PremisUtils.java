@@ -34,21 +34,22 @@ import javax.xml.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.xmlbeans.XmlException;
-import org.apache.xmlbeans.XmlObject;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.metadata.MetadataHelperUtility;
 import org.roda.core.metadata.PremisMetadataException;
+import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
@@ -57,18 +58,21 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.util.DateParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
 import lc.xmlns.premisV2.AgentComplexType;
+import lc.xmlns.premisV2.AgentDocument;
 import lc.xmlns.premisV2.AgentIdentifierComplexType;
 import lc.xmlns.premisV2.ContentLocationComplexType;
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
 import lc.xmlns.premisV2.EventComplexType;
+import lc.xmlns.premisV2.EventDocument;
+import lc.xmlns.premisV2.EventIdentifierComplexType;
 import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
 import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
-import lc.xmlns.premisV2.ExtensionComplexType;
 import lc.xmlns.premisV2.FixityComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
 import lc.xmlns.premisV2.FormatDesignationComplexType;
@@ -76,6 +80,7 @@ import lc.xmlns.premisV2.FormatRegistryComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.ObjectComplexType;
+import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
@@ -304,10 +309,12 @@ public class PremisUtils {
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<String> sources, List<String> targets, String outcome, String detailNote, String detailExtension,
     String agentID, String agentType) throws GenericException {
-
-    EventComplexType ect = EventComplexType.Factory.newInstance();
-    ect.addNewEventIdentifier().setEventIdentifierValue(eventID);
-    ect.setEventDateTime(date);
+    EventDocument event = EventDocument.Factory.newInstance();
+    EventComplexType ect = event.addNewEvent();
+    EventIdentifierComplexType eict = ect.addNewEventIdentifier();
+    eict.setEventIdentifierValue(eventID);
+    eict.setEventIdentifierType("local");
+    ect.setEventDateTime(DateParser.getIsoDate(date));
     ect.setEventType(type);
     ect.setEventDetail(details);
     if (sources != null) {
@@ -329,47 +336,57 @@ public class PremisUtils {
     outcomeInformation.setEventOutcome(outcome);
     EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();
     eodct.setEventOutcomeDetailNote(detailNote);
-    ExtensionComplexType extension = eodct.addNewEventOutcomeDetailExtension();
-    extension.set(XmlObject.Factory.newValue(detailExtension));
+
+    // TODO handle...
+    /*
+     * if(detailExtension!=null){ ExtensionComplexType extension =
+     * eodct.addNewEventOutcomeDetailExtension();
+     * extension.set(XmlObject.Factory.newValue("<p>"+detailExtension+"</p>"));
+     * }
+     */
     try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(ect, true));
+      return new StringContentPayload(MetadataHelperUtility.saveToString(event, true));
     } catch (MetadataException e) {
-      throw new GenericException("Error creating Premis Event",e);
+      throw new GenericException("Error creating Premis Event", e);
     }
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, String type) throws GenericException {
-    AgentComplexType act = AgentComplexType.Factory.newInstance();
+    AgentDocument agent = AgentDocument.Factory.newInstance();
+    
+    AgentComplexType act = agent.addNewAgent();
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
-    agentIdentifier.setAgentIdentifierType("");
+    agentIdentifier.setAgentIdentifierType("local");
     agentIdentifier.setAgentIdentifierValue(id);
     act.addAgentName(name);
     act.setAgentType(type);
     try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(act, true));
+      return new StringContentPayload(MetadataHelperUtility.saveToString(agent, true));
     } catch (MetadataException e) {
       throw new GenericException("Error creating PREMIS agent binary", e);
     }
   }
 
   public static ContentPayload createBaseRepresentation(String representationId) throws GenericException {
-    Representation representation = (Representation) ObjectComplexType.Factory.newInstance();
-    representation.addNewObjectIdentifier().setObjectIdentifierValue(representationId);
+    Representation representation = Representation.Factory.newInstance();
+    ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
+    oict.setObjectIdentifierType("local");
+    oict.setObjectIdentifierValue(representationId);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
-    
-    
+
     try {
       return new StringContentPayload(MetadataHelperUtility.saveToString(representation, true));
     } catch (MetadataException e) {
-       throw new GenericException("Error creating base representation",e);
+      throw new GenericException("Error creating base representation", e);
     }
   }
 
-  public static ContentPayload createBaseFile(Binary originalFile) throws NoSuchAlgorithmException, IOException, GenericException {
+  public static ContentPayload createBaseFile(Binary originalFile)
+    throws NoSuchAlgorithmException, IOException, GenericException {
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
     file.addNewObjectIdentifier().setObjectIdentifierValue(originalFile.getStoragePath().getName());
-    ObjectCharacteristicsComplexType occt =  file.addNewObjectCharacteristics();
+    ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     occt.setCompositionLevel(BigInteger.valueOf(0));
     FixityComplexType fixityMD5 = occt.addNewFixity();
     Fixity md5 = calculateFixity(originalFile, "MD5", "");
@@ -377,7 +394,7 @@ public class PremisUtils {
     fixityMD5.setMessageDigestAlgorithm(md5.getMessageDigestAlgorithm());
     fixityMD5.setMessageDigestOriginator(md5.getMessageDigestOriginator());
     occt.setSize(originalFile.getSizeInBytes());
-    //occt.addNewObjectCharacteristicsExtension().set("");
+    // occt.addNewObjectCharacteristicsExtension().set("");
     file.addNewOriginalName().setStringValue(originalFile.getStoragePath().getName());
     StorageComplexType sct = file.addNewStorage();
     ContentLocationComplexType clct = sct.addNewContentLocation();
@@ -386,7 +403,7 @@ public class PremisUtils {
     try {
       return new StringContentPayload(MetadataHelperUtility.saveToString(file, true));
     } catch (MetadataException e) {
-      throw new GenericException("Error creating base file",e);
+      throw new GenericException("Error creating base file", e);
     }
   }
 
@@ -464,5 +481,16 @@ public class PremisUtils {
 
     }
     return doc;
+  }
+
+  public static void createPremisAgentBinary(Plugin<?> plugin, String preservationAgentTypeCharacterizationPlugin,
+    ModelService model) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    //TODO optimize agent creation
+    String id = plugin.getClass().getName() + "@" + plugin.getVersion();
+    ContentPayload agent;
+    agent = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
+      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, id, agent);
+
   }
 }

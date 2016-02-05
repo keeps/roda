@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -42,6 +43,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -149,7 +151,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
       representationId, representationPremis);
-    Iterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
+    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
     for (File file : allFiles) {
       try {
         StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
@@ -162,6 +164,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           + " from AIP " + aip.getId());
       }
     }
+    IOUtils.closeQuietly(allFiles);
   }
 
   @Override
