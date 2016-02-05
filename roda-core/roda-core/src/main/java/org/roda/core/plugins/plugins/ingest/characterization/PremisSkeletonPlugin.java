@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +26,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -38,11 +36,9 @@ import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
@@ -153,16 +149,9 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       representationId, representationPremis);
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
     for (File file : allFiles) {
-      try {
-        StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
-        Binary currentFileBinary = storage.getBinary(storagePath);
-        ContentPayload filePreservation = PremisUtils.createBaseFile(currentFileBinary);
-        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
-          file.getId(), filePreservation);
-      } catch (NoSuchAlgorithmException nsae) {
-        LOGGER.error("Error creating premis object for file " + file.getId() + " of representation " + representationId
-          + " from AIP " + aip.getId());
-      }
+      ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
+      model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
+        file.getId(), filePreservation);
     }
     IOUtils.closeQuietly(allFiles);
   }

@@ -40,6 +40,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
@@ -353,7 +354,7 @@ public class PremisUtils {
 
   public static ContentPayload createPremisAgentBinary(String id, String name, String type) throws GenericException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
-    
+
     AgentComplexType act = agent.addNewAgent();
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
     agentIdentifier.setAgentIdentifierType("local");
@@ -381,25 +382,38 @@ public class PremisUtils {
     }
   }
 
-  public static ContentPayload createBaseFile(Binary originalFile)
-    throws NoSuchAlgorithmException, IOException, GenericException {
+  public static ContentPayload createBaseFile(File originalFile, ModelService model)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
-    file.addNewObjectIdentifier().setObjectIdentifierValue(originalFile.getStoragePath().getName());
+    ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
+    oict.setObjectIdentifierValue(originalFile.getId());
+    oict.setObjectIdentifierType("local");
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     occt.setCompositionLevel(BigInteger.valueOf(0));
-    FixityComplexType fixityMD5 = occt.addNewFixity();
-    Fixity md5 = calculateFixity(originalFile, "MD5", "");
-    fixityMD5.setMessageDigest(md5.getMessageDigest());
-    fixityMD5.setMessageDigestAlgorithm(md5.getMessageDigestAlgorithm());
-    fixityMD5.setMessageDigestOriginator(md5.getMessageDigestOriginator());
-    occt.setSize(originalFile.getSizeInBytes());
+    FormatComplexType fct = occt.addNewFormat();
+    FormatDesignationComplexType fdct = fct.addNewFormatDesignation();
+    fdct.setFormatName("");
+    fdct.setFormatVersion("");
+    Binary binary = model.getStorage().getBinary(ModelUtils.getRepresentationFileStoragePath(originalFile));
+    try {
+      Fixity md5 = calculateFixity(binary, "MD5", "");
+      FixityComplexType fixityMD5 = occt.addNewFixity();
+      fixityMD5.setMessageDigest(md5.getMessageDigest());
+      fixityMD5.setMessageDigestAlgorithm(md5.getMessageDigestAlgorithm());
+      fixityMD5.setMessageDigestOriginator(md5.getMessageDigestOriginator());
+    } catch (IOException | NoSuchAlgorithmException e) {
+      LOGGER.warn("Could not calculate fixity for file " + originalFile);
+    }
+
+    occt.setSize(binary.getSizeInBytes());
     // occt.addNewObjectCharacteristicsExtension().set("");
-    file.addNewOriginalName().setStringValue(originalFile.getStoragePath().getName());
+    file.addNewOriginalName().setStringValue(originalFile.getId());
     StorageComplexType sct = file.addNewStorage();
     ContentLocationComplexType clct = sct.addNewContentLocation();
     clct.setContentLocationType("");
     clct.setContentLocationValue("");
+
     try {
       return new StringContentPayload(MetadataHelperUtility.saveToString(file, true));
     } catch (MetadataException e) {
@@ -413,7 +427,7 @@ public class PremisUtils {
   }
 
   public static lc.xmlns.premisV2.File binaryToFile(InputStream binaryInputStream) throws XmlException, IOException {
-    return (lc.xmlns.premisV2.File) ObjectComplexType.Factory.parse(binaryInputStream);
+    return lc.xmlns.premisV2.File.Factory.parse(binaryInputStream);
   }
 
   public static EventComplexType binaryToEvent(InputStream binaryInputStream) throws XmlException, IOException {
@@ -422,7 +436,7 @@ public class PremisUtils {
 
   public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
     throws XmlException, IOException {
-    return (Representation) ObjectComplexType.Factory.parse(binaryInputStream);
+    return Representation.Factory.parse(binaryInputStream);
   }
 
   public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws XmlException, IOException {
@@ -484,8 +498,9 @@ public class PremisUtils {
   }
 
   public static void createPremisAgentBinary(Plugin<?> plugin, String preservationAgentTypeCharacterizationPlugin,
-    ModelService model) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    //TODO optimize agent creation
+    ModelService model)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    // TODO optimize agent creation
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agent;
     agent = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
