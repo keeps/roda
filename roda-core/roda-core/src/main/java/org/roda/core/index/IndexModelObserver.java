@@ -146,7 +146,7 @@ public class IndexModelObserver implements ModelObserver {
       premisFile = PremisUtils.getPremisFile(model.getStorage(), file.getAipId(), file.getRepresentationId(),
         file.getId());
     } catch (NotFoundException e) {
-      LOGGER.warn("On indexing representations, did not find PREMIS for file: " + file);
+      LOGGER.trace("On indexing representations, did not find PREMIS for file: " + file);
     } catch (RODAException | IOException e) {
       LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
     }
@@ -164,7 +164,7 @@ public class IndexModelObserver implements ModelObserver {
       | IOException | SAXException e) {
       LOGGER.warn("Error getting fulltext for file: " + file, e);
     } catch (NotFoundException e) {
-      LOGGER.debug("Fulltext not found for file: " + file);
+      LOGGER.trace("Fulltext not found for file: " + file);
     }
 
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile, fulltext);

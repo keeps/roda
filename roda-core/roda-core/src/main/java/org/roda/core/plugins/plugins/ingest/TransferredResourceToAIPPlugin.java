@@ -143,11 +143,11 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
                 String fileId = file.getFileName().toString();
                 List<String> directoryPath = new ArrayList<>();
-                for (int i = 0; i < relativePath.getNameCount() - 1; i++) {
+                for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
                   directoryPath.add(relativePath.getName(i).toString());
                 }
 
-                ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
+                ContentPayload payload = new FSPathContentPayload(file);
                 boolean notifyFileCreated = false;
                 model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
               } catch (RODAException e) {
