@@ -96,8 +96,7 @@ public class ShowJobReport extends Composite {
   private final JobReport jobReport;
   // private final Map<String, PluginInfo> pluginsInfo;
 
-  @UiField
-  Label id;
+
   @UiField
   Anchor job;
   @UiField
@@ -121,7 +120,6 @@ public class ShowJobReport extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    id.setText(jobReport.getId());
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     objectId.setText(jobReport.getObjectId());

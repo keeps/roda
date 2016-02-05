@@ -122,7 +122,7 @@ public class ShowJob extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final Job job;
+  private Job job;
   private final Map<String, PluginInfo> pluginsInfo;
 
   @UiField
@@ -163,9 +163,11 @@ public class ShowJob extends Composite {
     creator.setText(job.getUsername());
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
-    updateStatus(job);
+    updateStatus();
 
-    jobReports.autoUpdate(PERIOD_MILLIS);
+    if (isJobRunning()) {
+      jobReports.autoUpdate(PERIOD_MILLIS);
+    }
 
     jobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -196,7 +198,12 @@ public class ShowJob extends Composite {
 
   }
 
-  private void updateStatus(final Job job) {
+  private boolean isJobRunning() {
+    return job != null && !JOB_STATE.COMPLETED.equals(job.getState())
+      && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState());
+  }
+
+  private void updateStatus() {
     JOB_STATE state = job.getState();
     if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
       // TODO different message for failure?
@@ -209,13 +216,16 @@ public class ShowJob extends Composite {
       status.setText(state.toString());
     }
 
-    scheduleUpdateStatus(job);
+    scheduleUpdateStatus();
   }
 
-  private void scheduleUpdateStatus(final Job job) {
+  private Timer autoUpdateTimer = null;
+
+  private void scheduleUpdateStatus() {
     JOB_STATE state = job.getState();
-    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-      Timer scheduler = new Timer() {
+    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)
+      && autoUpdateTimer == null) {
+      autoUpdateTimer = new Timer() {
 
         @Override
         public void run() {
@@ -228,15 +238,31 @@ public class ShowJob extends Composite {
 
             @Override
             public void onSuccess(Job updatedJob) {
-              updateStatus(updatedJob);
-              scheduleUpdateStatus(updatedJob);
+              ShowJob.this.job = updatedJob;
+              updateStatus();
+              scheduleUpdateStatus();
             }
           });
         }
-
       };
-      scheduler.schedule(PERIOD_MILLIS);
+      autoUpdateTimer.schedule(PERIOD_MILLIS);
     }
+  }
+
+  @Override
+  protected void onDetach() {
+    if (autoUpdateTimer != null) {
+      autoUpdateTimer.cancel();
+    }
+    super.onDetach();
+  }
+
+  @Override
+  protected void onLoad() {
+    if (autoUpdateTimer != null && !autoUpdateTimer.isRunning() && isJobRunning()) {
+      autoUpdateTimer.scheduleRepeating(PERIOD_MILLIS);
+    }
+    super.onLoad();
   }
 
   private void createBooleanLayout(PluginParameter parameter) {

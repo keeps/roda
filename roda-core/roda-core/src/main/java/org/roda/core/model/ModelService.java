@@ -64,6 +64,7 @@ import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.v2.premis.PremisAgentHelper;
 import org.roda.core.metadata.v2.premis.PremisEventHelper;
 import org.roda.core.metadata.v2.premis.PremisFileObjectHelper;
@@ -1744,6 +1745,20 @@ public class ModelService extends ModelObservable {
     // TODO
 
     notifyFileUpdated(file);
+  }
+
+  public JobReport retrieveJobReport(String jobId, String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    StoragePath jobReportPath = ModelUtils.getJobReportPath(ModelUtils.getJobReportId(jobId, aipId));
+    Binary binary = storage.getBinary(jobReportPath);
+    JobReport ret;
+    try {
+      ret = ModelUtils.getObjectFromJson(binary.getContent().createInputStream(), JobReport.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading job report", e);
+    }
+    return ret;
   }
 
   public void createJobReport(JobReport jobReport) throws GenericException {

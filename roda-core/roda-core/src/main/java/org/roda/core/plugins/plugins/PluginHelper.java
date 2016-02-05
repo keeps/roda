@@ -18,10 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -29,7 +25,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -108,7 +103,8 @@ public final class PluginHelper {
     return pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
-  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters, PluginParameter pluginParameter) {
+  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters,
+    PluginParameter pluginParameter) {
     return verifyIfStepShouldBePerformed(pluginParameters, pluginParameter);
   }
 
@@ -140,15 +136,15 @@ public final class PluginHelper {
     return ret;
   }
 
-  public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters) throws NotFoundException,
-    GenericException {
+  public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters)
+    throws NotFoundException, GenericException {
     return index.retrieve(Job.class, getJobId(pluginParameters));
   }
 
   public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
     PluginState pluginState, String jobId) {
     JobReport jobReport = new JobReport();
-    jobReport.setId(UUID.randomUUID().toString());
+    jobReport.setId(ModelUtils.getJobReportId(jobId, reportItem.getItemId()));
     jobReport.setJobId(jobId);
     jobReport.setAipId(reportItem.getItemId());
     jobReport.setObjectId(reportItem.getOtherId());
@@ -173,36 +169,24 @@ public final class PluginHelper {
     PluginState pluginState, String jobId, String aipId) {
 
     try {
-      Filter filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_AIP_ID, aipId));
-      Sorter sorter = null;
-      Sublist sublist = new Sublist();
-      IndexResult<JobReport> find = index.find(JobReport.class, filter, sorter, sublist);
-      if (!find.getResults().isEmpty()) {
+      JobReport jobReport = model.retrieveJobReport(jobId, aipId);
 
-        JobReport jobReport = find.getResults().get(0);
+      jobReport.setLastPluginRan(plugin.getClass().getName());
+      jobReport.setLastPluginRanState(pluginState);
+      jobReport.getReport().addItem(reportItem);
+      jobReport.setDateUpdated(new Date());
 
-        jobReport.setLastPluginRan(plugin.getClass().getName());
-        jobReport.setLastPluginRanState(pluginState);
-        jobReport.getReport().addItem(reportItem);
-        jobReport.setDateUpdated(new Date());
-
-        model.updateJobReport(jobReport);
-      } else {
-        LOGGER.error("Cannot find Job Report using filter {}", filter);
-      }
-    } catch (GenericException | RequestNotValidException e) {
+      model.updateJobReport(jobReport);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
 
   }
 
   public static EventPreservationObject createPluginEvent(String aipID, String representationID, String fileID,
-    ModelService model, String eventType, String eventDetails, String agentRole, String agentID,
-    List<String> objectIDs, PluginState outcome, String detailNote, String detailExtension)
-    throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
-    AuthorizationDeniedException {
+    ModelService model, String eventType, String eventDetails, String agentRole, String agentID, List<String> objectIDs,
+    PluginState outcome, String detailNote, String detailExtension) throws PremisMetadataException, IOException,
+      RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     EventPreservationObject epo = new EventPreservationObject();
     epo.setDatetime(new Date());
     epo.setEventType(eventType);
@@ -339,7 +323,7 @@ public final class PluginHelper {
 
   public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
     AgentPreservationObject agent, String eventType, String eventDetails, String agentRole, String detailExtension)
-    throws PluginException {
+      throws PluginException {
 
     try {
       boolean success = (state == PluginState.SUCCESS);
@@ -385,8 +369,9 @@ public final class PluginHelper {
   // logic)
   public static void createPluginEventAndAgent(String aipID, String representationID, ModelService model, String type,
     String details, String agentRole, String agentID, List<String> objectIDs, String outcome, String detailNote,
-    String detailExtension, String agentName, String agentType) throws PremisMetadataException, IOException,
-    RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+    String detailExtension, String agentName, String agentType)
+      throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
+      AlreadyExistsException, AuthorizationDeniedException {
 
     String name = UUID.randomUUID().toString();
 

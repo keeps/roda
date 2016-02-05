@@ -505,6 +505,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT);
   }
 
+  public static String getJobReportId(String jobId, String aipId) {
+    return jobId + "-" + aipId;
+  }
+
   public static StoragePath getJobReportPath(String jobReportId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT, jobReportId);
   }

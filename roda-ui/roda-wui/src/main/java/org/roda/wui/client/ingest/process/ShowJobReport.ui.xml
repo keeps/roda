@@ -18,10 +18,6 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Information package processing report</g:Label>
 				<g:Label addStyleNames="label">
-					id
-				</g:Label>
-				<g:Label ui:field="id" />
-				<g:Label addStyleNames="label">
 					Job
 				</g:Label>
 				<!-- <g:Label ui:field="job" /> -->
