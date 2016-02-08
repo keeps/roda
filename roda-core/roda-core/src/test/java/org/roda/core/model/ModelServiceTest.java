@@ -248,7 +248,7 @@ public class ModelServiceTest {
 
     Binary f0_premis_bin = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.F0_PREMIS_XML);
-    lc.xmlns.premisV2.File f0_premis_file = PremisUtils.binaryToFile(f0_premis_bin.getContent().createInputStream());
+    lc.xmlns.premisV2.File f0_premis_file = PremisUtils.binaryToFile(f0_premis_bin.getContent(), true);
 
     ObjectCharacteristicsComplexType f0_characteristics = f0_premis_file.getObjectCharacteristicsList().get(0);
     assertEquals(0, f0_characteristics.getCompositionLevel().intValue());
@@ -259,7 +259,7 @@ public class ModelServiceTest {
 
     Binary event_premis_bin = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
-    EventComplexType event_premis = PremisUtils.binaryToEvent(event_premis_bin.getContent().createInputStream());
+    EventComplexType event_premis = PremisUtils.binaryToEvent(event_premis_bin.getContent(), true);
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType());
     assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationList().get(0).getEventOutcome());
   }

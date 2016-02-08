@@ -7,8 +7,6 @@
  */
 package org.roda.core.common;
 
-import static org.junit.Assert.fail;
-
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.IOException;
@@ -88,6 +86,7 @@ import lc.xmlns.premisV2.FormatRegistryComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.ObjectComplexType;
+import lc.xmlns.premisV2.ObjectDocument;
 import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
@@ -241,7 +240,8 @@ public class PremisUtils {
 
   }
 
-  public static Binary updateFile(Binary preservationFile, IndexedFile file) throws XmlException, IOException {
+  public static Binary updateFile(Binary preservationFile, IndexedFile file)
+    throws XmlException, IOException, GenericException {
 
     FileFormat fileFormat = file.getFileFormat();
     lc.xmlns.premisV2.File f = binaryToFile(preservationFile.getContent().createInputStream());
@@ -433,17 +433,36 @@ public class PremisUtils {
     return null;
   }
 
-  public static lc.xmlns.premisV2.File binaryToFile(InputStream binaryInputStream) throws XmlException, IOException {
-    return lc.xmlns.premisV2.File.Factory.parse(binaryInputStream);
+  public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
+    throws XmlException, IOException, GenericException {
+    ObjectDocument objectDocument = ObjectDocument.Factory.parse(binaryInputStream);
+
+    ObjectComplexType object = objectDocument.getObject();
+    if (object instanceof Representation) {
+      return (Representation) object;
+    } else {
+      throw new GenericException("Trying to load a representation but was a " + object.getClass().getSimpleName());
+    }
+  }
+
+  public static lc.xmlns.premisV2.File binaryToFile(InputStream binaryInputStream)
+    throws XmlException, IOException, GenericException {
+    ObjectDocument objectDocument = ObjectDocument.Factory.parse(binaryInputStream);
+
+    ObjectComplexType object = objectDocument.getObject();
+    if (object instanceof lc.xmlns.premisV2.File) {
+      return (lc.xmlns.premisV2.File) object;
+    } else {
+      throw new GenericException("Trying to load a file but was a " + object.getClass().getSimpleName());
+    }
   }
 
   public static EventComplexType binaryToEvent(InputStream binaryInputStream) throws XmlException, IOException {
-    return EventComplexType.Factory.parse(binaryInputStream);
+    return EventDocument.Factory.parse(binaryInputStream).getEvent();
   }
 
-  public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
-    throws XmlException, IOException {
-    return Representation.Factory.parse(binaryInputStream);
+  public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws XmlException, IOException {
+    return AgentDocument.Factory.parse(binaryInputStream).getAgent();
   }
 
   public static lc.xmlns.premisV2.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
@@ -457,18 +476,7 @@ public class PremisUtils {
       validationOptions.setErrorListener(validationErrors);
 
       if (validate && !representation.validate(validationOptions)) {
-        ValidationReport report = new ValidationReport();
-        report.setValid(false);
-        List<ValidationIssue> issues = new ArrayList<>();
-        for (XmlValidationError error : validationErrors) {
-          ValidationIssue issue = new ValidationIssue();
-          issue.setMessage(error.getMessage());
-          issue.setColumnNumber(error.getColumn());
-          issue.setLineNumber(error.getLine());
-          issues.add(issue);
-        }
-        report.setIssues(issues);
-        throw new ValidationException(report);
+        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
@@ -477,11 +485,83 @@ public class PremisUtils {
     return representation;
   }
 
-  public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws XmlException, IOException {
-    return AgentComplexType.Factory.parse(binaryInputStream);
+  public static lc.xmlns.premisV2.File binaryToFile(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    lc.xmlns.premisV2.File file;
+    try {
+      file = binaryToFile(payload.createInputStream());
+
+      List<XmlValidationError> validationErrors = new ArrayList<>();
+      XmlOptions validationOptions = new XmlOptions();
+      validationOptions.setErrorListener(validationErrors);
+
+      if (validate && !file.validate(validationOptions)) {
+        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+      }
+    } catch (XmlException | IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+
+    return file;
   }
 
-  public static SolrInputDocument updateSolrDocument(SolrInputDocument doc, Binary premisBinary) {
+  public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    EventComplexType event;
+    try {
+      event = binaryToEvent(payload.createInputStream());
+
+      List<XmlValidationError> validationErrors = new ArrayList<>();
+      XmlOptions validationOptions = new XmlOptions();
+      validationOptions.setErrorListener(validationErrors);
+
+      if (validate && !event.validate(validationOptions)) {
+        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+      }
+    } catch (XmlException | IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+
+    return event;
+  }
+
+  public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    AgentComplexType agent;
+    try {
+      agent = binaryToAgent(payload.createInputStream());
+
+      List<XmlValidationError> validationErrors = new ArrayList<>();
+      XmlOptions validationOptions = new XmlOptions();
+      validationOptions.setErrorListener(validationErrors);
+
+      if (validate && !agent.validate(validationOptions)) {
+        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+      }
+    } catch (XmlException | IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+
+    return agent;
+  }
+
+  private static ValidationReport xmlValidationErrorsToValidationReport(List<XmlValidationError> validationErrors) {
+    ValidationReport report = new ValidationReport();
+    report.setValid(false);
+    List<ValidationIssue> issues = new ArrayList<>();
+    for (XmlValidationError error : validationErrors) {
+      ValidationIssue issue = new ValidationIssue();
+      issue.setMessage(error.getMessage());
+      issue.setColumnNumber(error.getColumn());
+      issue.setLineNumber(error.getLine());
+      issues.add(issue);
+    }
+    report.setIssues(issues);
+    return report;
+  }
+
+  public static SolrInputDocument updateSolrDocument(SolrInputDocument doc, Binary premisBinary)
+    throws GenericException {
     try {
       lc.xmlns.premisV2.File premisFile = binaryToFile(premisBinary.getContent().createInputStream());
       if (premisFile.getOriginalName() != null) {

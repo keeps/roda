@@ -406,7 +406,8 @@ public final class ModelUtils {
       fileId + ".file.premis.xml");
   }
 
-  public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(ContentPayload payload) {
+  public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(ContentPayload payload)
+    throws GenericException {
     lc.xmlns.premisV2.Representation representation = null;
     InputStream binaryInputStream = null;
     try {
@@ -446,7 +447,7 @@ public final class ModelUtils {
     return event;
   }
 
-  public static lc.xmlns.premisV2.File getPreservationFileObject(ContentPayload payload) {
+  public static lc.xmlns.premisV2.File getPreservationFileObject(ContentPayload payload) throws GenericException {
     lc.xmlns.premisV2.File file = null;
     InputStream binaryInputStream = null;
     try {
@@ -726,12 +727,15 @@ public final class ModelUtils {
     return objects;
   }
 
-  public static PreservationMetadataType getPreservationType(ContentPayload payload) {
+  public static PreservationMetadataType getPreservationType(ContentPayload payload) throws GenericException {
     PreservationMetadataType type;
     EventComplexType event = ModelUtils.getPreservationEvent(payload);
     if (event != null) {
       type = PreservationMetadataType.EVENT;
     } else {
+      // TODO review this method, loading a object can then infer the type by
+      // the class name
+
       lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(payload);
       if (file != null) {
         type = PreservationMetadataType.OBJECT_FILE;

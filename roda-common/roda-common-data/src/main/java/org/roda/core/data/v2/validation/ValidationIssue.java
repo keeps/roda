@@ -45,4 +45,10 @@ public class ValidationIssue implements Serializable {
     this.columnNumber = columnNumber;
   }
 
+  @Override
+  public String toString() {
+    return "ValidationIssue [message=" + message + ", lineNumber=" + lineNumber + ", columnNumber=" + columnNumber
+      + "]";
+  }
+
 }

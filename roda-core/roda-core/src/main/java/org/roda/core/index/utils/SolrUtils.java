@@ -750,8 +750,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -1361,8 +1361,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file, Binary premisFile,
-    String fulltext) {
+  public static SolrInputDocument fileToSolrDocument(File file, Binary premisFile, String fulltext) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
@@ -1383,7 +1382,11 @@ public class SolrUtils {
     if (premisFile != null) {
       // TODO get entry point from PREMIS or remove it
       // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-      doc = PremisUtils.updateSolrDocument(doc,premisFile);
+      try {
+        doc = PremisUtils.updateSolrDocument(doc, premisFile);
+      } catch (GenericException e) {
+        LOGGER.warn("Could not index file PREMIS information", e);
+      }
     }
 
     if (fulltext != null) {
