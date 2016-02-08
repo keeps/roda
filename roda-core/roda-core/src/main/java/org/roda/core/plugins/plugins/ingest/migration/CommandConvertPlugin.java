@@ -10,13 +10,8 @@ import java.util.Map;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 
 public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
@@ -27,12 +22,6 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
     super();
     commandArguments = "";
   }
-
-  @Override
-  public abstract void init() throws PluginException;
-
-  @Override
-  public abstract void shutdown();
 
   @Override
   public abstract String getName();
@@ -71,9 +60,5 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
   @Override
   public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
     IOException, CommandException;
-
-  @Override
-  public abstract Report beforeExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
 
 }

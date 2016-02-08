@@ -115,16 +115,16 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           }
 
           state = PluginState.SUCCESS;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException | XmlException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);
@@ -142,7 +142,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, XmlException {
+    NotFoundException, AuthorizationDeniedException, XmlException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
@@ -153,7 +153,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
       model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
         file.getId(), filePreservation);
-      ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file,aip.getId(),representationId,model);
+      // ContentPayload updatedRepresentation =
+      // PremisUtils.linkFileToRepresentation(file,aip.getId(),representationId,model);
     }
     IOUtils.closeQuietly(allFiles);
   }

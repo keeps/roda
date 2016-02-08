@@ -86,6 +86,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.log.LogEntry;
@@ -1009,7 +1010,8 @@ public class RodaCoreFactory {
       params.put("inputFormat", "pdf");
       params.put("outputFormat", "pdf");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1025,7 +1027,25 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runImageMagickConvertRepresentationPlugin(String maxKbytes, String inputFormat,
+    String outputFormat) {
+    try {
+
+      Plugin<?> plugin = new ImageMagickConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", "");
+      params.put("outputFormat", outputFormat);
+      params.put("commandArguments", "");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1055,7 +1075,8 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1071,7 +1092,8 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1085,7 +1107,8 @@ public class RodaCoreFactory {
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1100,7 +1123,8 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1115,7 +1139,8 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1130,7 +1155,23 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runUnoconvConvertRepresentationPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+    try {
+      Plugin<?> plugin = new UnoconvConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", "");
+      params.put("outputFormat", outputFormat);
+      params.put("commandArguments", "");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1141,12 +1182,37 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new GeneralCommandConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "");
+      params.put("inputFormat", inputFormat);
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList("AIP_1"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+        Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
     } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runReindexingPlugins() {
+    try {
+      Plugin<AIP> psp = new PremisSkeletonPlugin();
+      Plugin<AIP> sfp = new SiegfriedPlugin();
+      Plugin<AIP> ttp = new TikaFullTextPlugin();
+
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("createsPluginEvent", "false");
+      psp.setParameterValues(params);
+      sfp.setParameterValues(params);
+      ttp.setParameterValues(params);
+
+      getPluginOrchestrator().runPluginOnAIPs(psp, Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
+      getPluginOrchestrator().runPluginOnAIPs(sfp, Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
+      getPluginOrchestrator().runPluginOnAIPs(ttp, Arrays.asList("bcbe6b71-ba70-4558-b9ed-251948f5ddb3"));
+
+      model.notifyAIPUpdated("bcbe6b71-ba70-4558-b9ed-251948f5ddb3");
+
+    } catch (InvalidParameterException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
   }
@@ -1408,6 +1474,8 @@ public class RodaCoreFactory {
       runPDFtoPDFAPlugin(args.get(1));
     } else if ("imagemagickconvert".equals(args.get(0))) {
       runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("imagemagickrepresentationconvert".equals(args.get(0))) {
+      runImageMagickConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("imagemagickfileconvert".equals(args.get(0))) {
       runImageMagickConvertFilePlugin(args.get(1), args.get(2), args.get(3));
     } else if ("soxconvert".equals(args.get(0))) {
@@ -1422,8 +1490,12 @@ public class RodaCoreFactory {
       runMencoderConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("unoconvconvert".equals(args.get(0))) {
       runUnoconvConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("unoconvrepresentationconvert".equals(args.get(0))) {
+      runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("generalcommandconvert".equals(args.get(0))) {
       runGeneralCommandConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("reindexer".equals(args.get(0))) {
+      runReindexingPlugins();
     } else if ("jhove".equals(args.get(0))) {
       runJhovePlugin();
     } else if ("fits".equals(args.get(0))) {

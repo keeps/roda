@@ -20,27 +20,12 @@ import java.util.Map;
 import org.ghost4j.GhostscriptException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.index.IndexService;
-import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.verapdf.core.VeraPDFException;
 
 public class PdfToPdfaPlugin extends AbstractConvertPlugin {
-
-  @Override
-  public void init() throws PluginException {
-    // do nothing
-  }
-
-  @Override
-  public void shutdown() {
-    // do nothing
-  }
 
   @Override
   public String getName() {
@@ -90,11 +75,6 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
     }
 
     return pluginResult;
-  }
-
-  @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
   }
 
   @Override

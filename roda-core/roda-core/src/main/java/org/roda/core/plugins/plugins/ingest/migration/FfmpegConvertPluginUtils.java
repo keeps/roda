@@ -61,6 +61,7 @@ public class FfmpegConvertPluginUtils {
     version = version.replace("Copyright", "?");
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('?'));
+      version = version.replace(" ", "_");
     }
     return version.trim();
   }

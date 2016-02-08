@@ -68,6 +68,7 @@ public class MencoderConvertPluginUtils {
     }
 
     version = version.replaceAll("(MEncoder\\s+[0-9.-]+).*", "$1");
+    version = version.replace(" ", "_");
     return version.trim();
   }
 

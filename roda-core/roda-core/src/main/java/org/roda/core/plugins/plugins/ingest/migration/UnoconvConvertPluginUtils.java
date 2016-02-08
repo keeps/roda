@@ -64,6 +64,7 @@ public class UnoconvConvertPluginUtils {
     }
 
     version = version.replaceAll("(LibreOffice\\s[0-9.]+).*", "$1");
+    version = version.replace(" ", "_");
     return version.trim();
   }
 

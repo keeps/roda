@@ -62,6 +62,7 @@ public class ImageMagickConvertPluginUtils {
     }
 
     version = version.replaceAll("Version:\\s+([a-zA-Z]+\\s+[a-zA-Z0-9.-]+).*", "$1");
+    version = version.replace(" ", "_");
     return version.trim();
   }
 
