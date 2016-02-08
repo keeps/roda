@@ -244,7 +244,7 @@ public class FedoraStorageService implements StorageService {
       return FedoraConversionUtils.fedoraObjectToDirectory(fedoraRepository.getRepositoryUrl(), object);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Error getting directory " + storagePath, e);
-    } catch (BadRequestException e) {
+    } catch (BadRequestException  e) {
       throw new RequestNotValidException("Error getting directory " + storagePath, e);
     } catch (org.fcrepo.client.NotFoundException e) {
       throw new NotFoundException("Error getting directory " + storagePath, e);

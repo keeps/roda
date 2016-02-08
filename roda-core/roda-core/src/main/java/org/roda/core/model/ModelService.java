@@ -941,46 +941,6 @@ public class ModelService extends ModelObservable {
 
   }
 
-  // FIXME turn this into ClosableIterable
-  // TODO to improve...
-  public Iterable<PreservationMetadata> getAipPreservationObjects(String aipId)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Iterable<PreservationMetadata> it = null;
-    final List<PreservationMetadata> rpos = new ArrayList<PreservationMetadata>();
-
-    final Iterator<Resource> resourceIterator = storage
-      .listResourcesUnderDirectory(ModelUtils.getRepresentationsPath(aipId)).iterator();
-    while (resourceIterator.hasNext()) {
-      Resource resource = resourceIterator.next();
-      Iterator<Resource> preservationIterator = storage.listResourcesUnderDirectory(
-        ModelUtils.getAIPRepresentationPreservationPath(aipId, resource.getStoragePath().getName())).iterator();
-      while (preservationIterator.hasNext()) {
-        Resource preservationObject = preservationIterator.next();
-
-        Binary preservationBinary = storage.getBinary(preservationObject.getStoragePath());
-        lc.xmlns.premisV2.Representation r = ModelUtils
-          .getPreservationRepresentationObject(preservationBinary.getContent());
-        if (r != null) {
-          PreservationMetadata pm = new PreservationMetadata();
-          pm.setAipId(aipId);
-          pm.setRepresentationId(resource.getStoragePath().getName());
-          pm.setId(null);
-          pm.setType(PreservationMetadataType.OBJECT_REPRESENTATION);
-          rpos.add(pm);
-        }
-
-      }
-    }
-    it = new Iterable<PreservationMetadata>() {
-      @Override
-      public Iterator<PreservationMetadata> iterator() {
-        return rpos.iterator();
-      }
-    };
-
-    return it;
-  }
-
   private ValidationReport isAIPvalid(ModelService model, Directory directory,
     boolean failIfNoDescriptiveMetadataSchema)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
@@ -1159,6 +1119,13 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(aipId, representationId, preservationID,
       PreservationMetadataType.EVENT);
+    return storage.getBinary(storagePath);
+  }
+
+  public Binary retrieveAgentPreservationObject(String preservationID)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(null, null, preservationID,
+      PreservationMetadataType.AGENT);
     return storage.getBinary(storagePath);
   }
 
