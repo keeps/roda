@@ -475,6 +475,13 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
+  
+  
+  /************************************************
+   *               PREMIS
+   ************************************************/
+  
+  public static final Object PREMIS_LOCAL_IDENTIFIER_TYPE = "local";
 
   /* Preservation events fields */
   public static final String PRESERVATION_EVENT_ID = "id";
@@ -566,6 +573,7 @@ public final class RodaConstants {
    */
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
   public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
+  
   
   
 

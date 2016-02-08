@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <prem:object xsi:type="prem:representation" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
-    <prem:objectIdentifierType>RODAObjectPID</prem:objectIdentifierType>
+    <prem:objectIdentifierType>local</prem:objectIdentifierType>
     <prem:objectIdentifierValue>representation_1</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
@@ -12,7 +12,7 @@
     <prem:relationshipType>structural</prem:relationshipType>
     <prem:relationshipSubType>has root</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
-      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
       <prem:relatedObjectIdentifierValue>F0</prem:relatedObjectIdentifierValue>
       <prem:relatedObjectSequence>0</prem:relatedObjectSequence>
     </prem:relatedObjectIdentification>
@@ -21,7 +21,7 @@
     <prem:relationshipType>structural</prem:relationshipType>
     <prem:relationshipSubType>has part</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
-      <prem:relatedObjectIdentifierType>RODAObjectDatastreamID</prem:relatedObjectIdentifierType>
+      <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
       <prem:relatedObjectIdentifierValue>F1</prem:relatedObjectIdentifierValue>
       <prem:relatedObjectSequence>1</prem:relatedObjectSequence>
     </prem:relatedObjectIdentification>

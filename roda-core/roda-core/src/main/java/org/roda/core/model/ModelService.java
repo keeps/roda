@@ -1159,9 +1159,8 @@ public class ModelService extends ModelObservable {
     return storage.getBinary(filePath);
   }
 
-  public Binary retrieveEventPreservationObject(String aipId, String representationId, String fileId,
-    String preservationID)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public Binary retrieveEventPreservationObject(String aipId, String representationId, String preservationID)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(aipId, representationId, preservationID,
       PreservationMetadataType.EVENT);
     return storage.getBinary(storagePath);
@@ -1555,7 +1554,7 @@ public class ModelService extends ModelObservable {
     if (agents != null) {
       for (PreservationLinkingAgent pla : agents) {
         ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
-        pla.getTitle() + "/" + pla.getVersion(), pla.getType());
+          pla.getTitle() + "/" + pla.getVersion(), pla.getType());
         createPreservationMetadata(PreservationMetadataType.AGENT, null, null, pla.getIdentifierValue(), b);
       }
     }

@@ -7,6 +7,8 @@
  */
 package org.roda.core.common;
 
+import static org.junit.Assert.fail;
+
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
 import java.io.IOException;
@@ -34,6 +36,8 @@ import javax.xml.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
+import org.apache.xmlbeans.XmlValidationError;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -45,6 +49,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.metadata.MetadataHelperUtility;
 import org.roda.core.metadata.PremisMetadataException;
@@ -437,6 +444,37 @@ public class PremisUtils {
   public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
     throws XmlException, IOException {
     return Representation.Factory.parse(binaryInputStream);
+  }
+
+  public static lc.xmlns.premisV2.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
+    throws ValidationException, GenericException {
+    Representation representation;
+    try {
+      representation = binaryToRepresentation(payload.createInputStream());
+
+      List<XmlValidationError> validationErrors = new ArrayList<>();
+      XmlOptions validationOptions = new XmlOptions();
+      validationOptions.setErrorListener(validationErrors);
+
+      if (validate && !representation.validate(validationOptions)) {
+        ValidationReport report = new ValidationReport();
+        report.setValid(false);
+        List<ValidationIssue> issues = new ArrayList<>();
+        for (XmlValidationError error : validationErrors) {
+          ValidationIssue issue = new ValidationIssue();
+          issue.setMessage(error.getMessage());
+          issue.setColumnNumber(error.getColumn());
+          issue.setLineNumber(error.getLine());
+          issues.add(issue);
+        }
+        report.setIssues(issues);
+        throw new ValidationException(report);
+      }
+    } catch (XmlException | IOException e) {
+      throw new GenericException("Error loading representation premis file", e);
+    }
+
+    return representation;
   }
 
   public static AgentComplexType binaryToAgent(InputStream binaryInputStream) throws XmlException, IOException {

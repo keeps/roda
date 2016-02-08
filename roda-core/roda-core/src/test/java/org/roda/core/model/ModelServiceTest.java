@@ -29,9 +29,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import org.apache.commons.io.IOUtils;
+import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlOptions;
+import org.apache.xmlbeans.XmlValidationError;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -41,6 +42,8 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -65,6 +68,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
+
+import jersey.repackaged.com.google.common.collect.Lists;
+import lc.xmlns.premisV2.EventComplexType;
+import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
+import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 
 /**
  * Unit tests for ModelService
@@ -115,7 +123,7 @@ public class ModelServiceTest {
   }
 
   @Test
-  public void testCreateAIP() throws RODAException, ParseException, IOException {
+  public void testCreateAIP() throws RODAException, ParseException, IOException, XmlException {
 
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
@@ -227,26 +235,33 @@ public class ModelServiceTest {
       IOUtils.toByteArray(binary_2_2.getContent().createInputStream()).length);
 
     // test preservation metadata
-    /*
-     * RepresentationFilePreservationObject rfpo =
-     * model.retrieveRepresentationFileObject(aipId,
-     * CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.F0_PREMIS_XML);
-     * assertEquals(rfpo.getCompositionLevel(), 0);
-     * assertEquals(rfpo.getFormatDesignationName(), CorporaConstants.TEXT_XML);
-     * 
-     * EventPreservationObject epo =
-     * model.retrieveEventPreservationObject(aipId,
-     * CorporaConstants.REPRESENTATION_1_ID, null,
-     * CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
-     * assertEquals(epo.getEventType(), CorporaConstants.INGESTION);
-     * assertEquals(epo.getOutcome(), CorporaConstants.SUCCESS);
-     * 
-     * RepresentationPreservationObject rpo =
-     * model.retrieveRepresentationPreservationObject(aipId,
-     * CorporaConstants.REPRESENTATION_1_ID);
-     * assertEquals(rpo.getPreservationLevel(),
-     * CorporaConstants.PRESERVATION_LEVEL_FULL);
-     */
+
+    Binary preservationObject = model.retrieveRepresentationPreservationObject(aipId,
+      CorporaConstants.REPRESENTATION_1_ID);
+    lc.xmlns.premisV2.Representation rpo = PremisUtils.binaryToRepresentation(preservationObject.getContent(), true);
+
+    List<ObjectIdentifierComplexType> objectIdentifierList = rpo.getObjectIdentifierList();
+    assertEquals(RodaConstants.PREMIS_LOCAL_IDENTIFIER_TYPE, objectIdentifierList.get(0).getObjectIdentifierType());
+    assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierList().get(0).getObjectIdentifierValue());
+    assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
+      rpo.getPreservationLevelList().get(0).getPreservationLevelValue());
+
+    Binary f0_premis_bin = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+      CorporaConstants.F0_PREMIS_XML);
+    lc.xmlns.premisV2.File f0_premis_file = PremisUtils.binaryToFile(f0_premis_bin.getContent().createInputStream());
+
+    ObjectCharacteristicsComplexType f0_characteristics = f0_premis_file.getObjectCharacteristicsList().get(0);
+    assertEquals(0, f0_characteristics.getCompositionLevel().intValue());
+    assertEquals(0, f0_characteristics.getCompositionLevel().intValue());
+
+    assertEquals(f0_characteristics.getFormatList().get(0).getFormatDesignation().getFormatName(),
+      CorporaConstants.TEXT_XML);
+
+    Binary event_premis_bin = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+      CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
+    EventComplexType event_premis = PremisUtils.binaryToEvent(event_premis_bin.getContent().createInputStream());
+    assertEquals(CorporaConstants.INGESTION, event_premis.getEventType());
+    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationList().get(0).getEventOutcome());
   }
 
   @Test
@@ -265,14 +280,14 @@ public class ModelServiceTest {
     Iterables.addAll(reusableList, allFiles);
     allFiles.close();
 
-    assertTrue(reusableList.contains(new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID,
-      new ArrayList<>(), false)));
-    assertTrue(reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(),
-      true)));
-    assertTrue(reusableList.contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays
-      .asList("folder"), true)));
-    assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays
-      .asList("folder", "subfolder"), false)));
+    assertTrue(reusableList.contains(
+      new File("2012-roda-promo-en.pdf", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), false)));
+    assertTrue(
+      reusableList.contains(new File("folder", aipId, CorporaConstants.REPRESENTATION_1_ID, new ArrayList<>(), true)));
+    assertTrue(reusableList
+      .contains(new File("subfolder", aipId, CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), true)));
+    assertTrue(reusableList.contains(new File("RODA 2 logo.svg", aipId, CorporaConstants.REPRESENTATION_1_ID,
+      Arrays.asList("folder", "subfolder"), false)));
 
     assertTrue(reusableList.contains(new File("RODA 2 logo-circle-black.svg", aipId,
       CorporaConstants.REPRESENTATION_1_ID, Arrays.asList("folder"), false)));
@@ -414,8 +429,8 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
     final String newDescriptiveMetadataId = UUID.randomUUID().toString();
-    final Binary binary = corporaService.getBinary(DefaultStoragePath
-      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService
+      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
       binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -426,10 +441,10 @@ public class ModelServiceTest {
     assertEquals(newDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary newDescriptiveMetadataBinary = storage.getBinary(ModelUtils
-      .getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), newDescriptiveMetadataBinary.getContent()
-      .createInputStream()));
+    Binary newDescriptiveMetadataBinary = storage
+      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(newDescriptiveMetadata));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      newDescriptiveMetadataBinary.getContent().createInputStream()));
 
   }
 
@@ -440,8 +455,8 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    final Binary binary = corporaService.getBinary(DefaultStoragePath
-      .parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
+    final Binary binary = corporaService
+      .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
@@ -452,10 +467,10 @@ public class ModelServiceTest {
     assertEquals(updatedDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary updatedDescriptiveMetadataBinary = storage.getBinary(ModelUtils
-      .getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), updatedDescriptiveMetadataBinary
-      .getContent().createInputStream()));
+    Binary updatedDescriptiveMetadataBinary = storage
+      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      updatedDescriptiveMetadataBinary.getContent().createInputStream()));
 
   }
 
@@ -586,8 +601,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      createdFileBinary.getContent().createInputStream()));
   }
 
   @Test
@@ -613,8 +628,8 @@ public class ModelServiceTest {
 
     // check content
     Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
-    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(), createdFileBinary.getContent()
-      .createInputStream()));
+    assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
+      createdFileBinary.getContent().createInputStream()));
   }
 
   @Test
@@ -636,7 +651,6 @@ public class ModelServiceTest {
       // do nothing
     }
   }
-
 
   /*
    * @Test public void testRetrieveEventPreservationObject() throws
@@ -701,7 +715,7 @@ public class ModelServiceTest {
    * assertEquals(apo.getAgentType(), CorporaConstants.SOFTWARE_INGEST_TASK);
    * assertEquals(apo.getAgentName(), CorporaConstants.INGEST_CREATE_AIP); }
    */
-  
+
   @Test
   public void createLogEntry() throws RODAException {
     // setup

@@ -280,7 +280,8 @@ public class PluginManager {
           p.init();
           internalPluginChache.put(plugin.getName(), p);
           addPluginToPluginTypeMapping(p);
-        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | PluginException
+          | RuntimeException e) {
           LOGGER.error("Unable to instantiate plugin '{}'", plugin.getCanonicalName());
         }
       }
