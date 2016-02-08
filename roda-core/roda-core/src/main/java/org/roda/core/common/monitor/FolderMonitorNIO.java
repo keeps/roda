@@ -32,7 +32,7 @@ public class FolderMonitorNIO {
   private static final Logger LOGGER = LoggerFactory.getLogger(FolderMonitorNIO.class);
 
   private final List<FolderObserver> observers;
-  private Path basePath;
+  private final Path basePath;
   private Thread threadWatch;
   private Date indexDate;
   private SolrClient index;
@@ -58,6 +58,10 @@ public class FolderMonitorNIO {
   public void stopWatch() {
     threadWatch.interrupt();
     watchDir.stop();
+  }
+
+  public Path getBasePath() {
+    return basePath;
   }
 
   public void addFolderObserver(FolderObserver observer) {
