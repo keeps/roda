@@ -48,6 +48,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
@@ -65,7 +66,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
@@ -76,6 +76,7 @@ import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public final class ModelUtils {
+
   private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
   /**
@@ -238,31 +239,6 @@ public final class ModelUtils {
     return ids;
   }
 
-  // /**
-  // * Returns a list of ids from the children of a certain resources, starting
-  // * with the prefix defined
-  // *
-  // * @param storage
-  // * the storage service containing the parent resource
-  // * @param path
-  // * the storage paths for the parent resources
-  // * @param prefix
-  // * the prefix of the children
-  // * @throws StorageServiceException
-  // */
-  // public static List<String> getIds(StorageService storage, List<StoragePath>
-  // paths, String prefix)
-  // throws StorageServiceException {
-  // List<String> ids = new ArrayList<String>();
-  // for (StoragePath path : paths) {
-  // if (path.getName().startsWith(prefix)) {
-  // ids.add(path.getName());
-  // }
-  // }
-  // return ids;
-  //
-  // }
-
   public static StoragePath getAIPcontainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
   }
@@ -309,8 +285,8 @@ public final class ModelUtils {
       representationId);
   }
 
-  public static StoragePath getRepresentationFileStoragePath(String aipId, String representationId,
-    List<String> directoryPath, String fileId) throws RequestNotValidException {
+  public static StoragePath getFileStoragePath(String aipId, String representationId, List<String> directoryPath,
+    String fileId) throws RequestNotValidException {
     List<String> path = new ArrayList<>();
     path.add(RodaConstants.STORAGE_CONTAINER_AIP);
     path.add(aipId);
@@ -324,8 +300,8 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
-  public static StoragePath getRepresentationFileStoragePath(File f) throws RequestNotValidException {
-    return getRepresentationFileStoragePath(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId());
+  public static StoragePath getFileStoragePath(File f) throws RequestNotValidException {
+    return getFileStoragePath(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId());
   }
 
   public static String getAIPidFromStoragePath(StoragePath path) {
@@ -353,30 +329,81 @@ public final class ModelUtils {
 
   public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
     throws RequestNotValidException {
-    return getPreservationMetadataStoragePath(pm.getAipId(), pm.getRepresentationId(), pm.getId(), pm.getType());
+    return getPreservationMetadataStoragePath(pm.getId(), pm.getType(), pm.getAipId(), pm.getRepresentationId(),
+      pm.getFileDirectoryPath(), pm.getFileId());
   }
 
-  public static StoragePath getPreservationMetadataStoragePath(String aipId, String representationId, String id,
-    PreservationMetadataType type) throws RequestNotValidException {
+  public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type)
+    throws RequestNotValidException {
+    return getPreservationMetadataStoragePath(id, type, null, null, null, null);
+  }
+
+  public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId)
+    throws RequestNotValidException {
+    return getPreservationMetadataStoragePath(id, type, aipId, null, null, null);
+  }
+
+  public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
+    String representationId) throws RequestNotValidException {
+    return getPreservationMetadataStoragePath(id, type, aipId, representationId, null, null);
+  }
+
+  public static String generatePreservationMetadataId(PreservationMetadataType type, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId) {
+    StringBuilder idBuilder = new StringBuilder();
+    idBuilder.append(type.toString());
+    if (aipId != null) {
+      idBuilder.append("-");
+      idBuilder.append(aipId);
+    }
+    if (representationId != null) {
+      idBuilder.append("-");
+      idBuilder.append(representationId);
+    }
+    if (fileDirectoryPath != null) {
+      for (String dir : fileDirectoryPath) {
+        idBuilder.append("-");
+        idBuilder.append(dir);
+      }
+    }
+    if (fileId != null) {
+      idBuilder.append("-");
+      idBuilder.append(fileId);
+    }
+    return idBuilder.toString();
+  }
+
+  public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     // TODO review this method
     StoragePath path = null;
     if (type != null) {
       if (type.equals(PreservationMetadataType.AGENT)) {
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-          RodaConstants.STORAGE_DIRECTORY_AGENTS, id + ".agent.premis.xml");
+          RodaConstants.STORAGE_DIRECTORY_AGENTS, id + RodaConstants.PREMIS_AGENT_SUFFIX);
       } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
           RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-          id + ".representation.premis.xml");
+          id + RodaConstants.PREMIS_REPRESENTATION_SUFFIX);
       } else if (type.equals(PreservationMetadataType.EVENT)) {
         // TODO HANDLE AIP and REPRESENTATION EVENTS
         path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
           RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-          id + ".event.premis.xml");
+          id + RodaConstants.PREMIS_EVENT_SUFFIX);
       } else if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
-        path = DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipId,
-          RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationId,
-          id + ".file.premis.xml");
+
+        List<String> p = new ArrayList<>();
+        p.add(RodaConstants.STORAGE_CONTAINER_AIP);
+        p.add(aipId);
+        p.add(RodaConstants.STORAGE_DIRECTORY_METADATA);
+        p.add(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+        p.add(representationId);
+        if (fileDirectoryPath != null) {
+          p.addAll(fileDirectoryPath);
+        }
+        p.add(fileId + RodaConstants.PREMIS_FILE_SUFFIX);
+
+        path = DefaultStoragePath.parse(p);
       }
     }
     return path;
@@ -400,12 +427,6 @@ public final class ModelUtils {
 
   }
 
-  public static StoragePath getPreservationFilePath(String aipId, String representationId, String fileId)
-    throws RequestNotValidException {
-    return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId),
-      fileId + ".file.premis.xml");
-  }
-
   public static lc.xmlns.premisV2.Representation getPreservationRepresentationObject(ContentPayload payload)
     throws GenericException {
     lc.xmlns.premisV2.Representation representation = null;
@@ -425,66 +446,6 @@ public final class ModelUtils {
       }
     }
     return representation;
-  }
-
-  public static EventComplexType getPreservationEvent(ContentPayload payload) {
-    EventComplexType event = null;
-    InputStream binaryInputStream = null;
-    try {
-      binaryInputStream = payload.createInputStream();
-      event = PremisUtils.binaryToEvent(binaryInputStream);
-    } catch (IOException | ClassCastException | XmlException e) {
-      event = null;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return event;
-  }
-
-  public static lc.xmlns.premisV2.File getPreservationFileObject(ContentPayload payload) throws GenericException {
-    lc.xmlns.premisV2.File file = null;
-    InputStream binaryInputStream = null;
-    try {
-      binaryInputStream = payload.createInputStream();
-      file = PremisUtils.binaryToFile(binaryInputStream);
-    } catch (IOException | ClassCastException | XmlException e) {
-      file = null;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return file;
-  }
-
-  public static AgentComplexType getPreservationAgentObject(ContentPayload payload) {
-    AgentComplexType agent = null;
-    InputStream binaryInputStream = null;
-    try {
-      binaryInputStream = payload.createInputStream();
-      agent = PremisUtils.binaryToAgent(binaryInputStream);
-    } catch (IOException | ClassCastException | XmlException e) {
-      agent = null;
-    } finally {
-      if (binaryInputStream != null) {
-        try {
-          binaryInputStream.close();
-        } catch (IOException e1) {
-          LOGGER.warn("Cannot close file inputstream", e1);
-        }
-      }
-    }
-    return agent;
   }
 
   public static StoragePath getLogPath(String logFile) throws RequestNotValidException {
@@ -668,13 +629,14 @@ public final class ModelUtils {
   }
 
   public static List<IndexedPreservationAgent> extractAgentsFromPreservationBinary(ContentPayload payload,
-    PreservationMetadataType type) {
+    PreservationMetadataType type, boolean validatePremis) throws ValidationException, GenericException {
+
     List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
     if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
       // TODO check if files has agents
       LOGGER.error("Not implemented!");
     } else if (type.equals(PreservationMetadataType.EVENT)) {
-      EventComplexType event = getPreservationEvent(payload);
+      EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
@@ -698,12 +660,13 @@ public final class ModelUtils {
   }
 
   public static <T> List<IndexedPreservationObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
-    Class<T> c) {
+    Class<T> c) throws ValidationException, GenericException {
+    boolean validatePremis = false;
     List<IndexedPreservationObject> objects = new ArrayList<IndexedPreservationObject>();
     if (c.equals(File.class)) {
       LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
-      EventComplexType event = getPreservationEvent(payload);
+      EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
       List<LinkingObjectIdentifierComplexType> identifiers = event.getLinkingObjectIdentifierList();
       if (identifiers != null) {
         for (LinkingObjectIdentifierComplexType loict : identifiers) {
@@ -743,11 +706,22 @@ public final class ModelUtils {
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId);
   }
 
-  public static StoragePath getToolMetadataPath(String aipID, String representationId, String fileName, String type)
-    throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
-      RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER, type, representationId,
-      fileName);
+  public static StoragePath getToolMetadataPath(String aipID, String representationId, List<String> directoryPath,
+    String fileName, String fileSuffix, String type) throws RequestNotValidException {
+
+    List<String> path = new ArrayList<>();
+    path.add(RodaConstants.STORAGE_CONTAINER_AIP);
+    path.add(aipID);
+    path.add(RodaConstants.STORAGE_DIRECTORY_METADATA);
+    path.add(RodaConstants.STORAGE_DIRECTORY_OTHER);
+    path.add(type);
+    path.add(representationId);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
+    }
+    path.add(fileName + fileSuffix);
+
+    return DefaultStoragePath.parse(path);
 
   }
 
@@ -799,7 +773,7 @@ public final class ModelUtils {
   // agent path -> /Preservation/Agents/[agentID].agent.premis.xml
   public static StoragePath getPreservationAgentPath(String agentID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
-      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID + ".agent.premis.xml");
+      RodaConstants.STORAGE_DIRECTORY_AGENTS, agentID + RodaConstants.PREMIS_AGENT_SUFFIX);
   }
 
   // aip metadata path -> /AIP/[aipId]/Metadata/Preservation
@@ -820,7 +794,7 @@ public final class ModelUtils {
     throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_PRESERVATION, representationID,
-      representationID + ".representation.premis.xml");
+      representationID + RodaConstants.PREMIS_REPRESENTATION_SUFFIX);
   }
 
   public static StoragePath getPath(StoragePath parent, String children) throws RequestNotValidException {

@@ -48,7 +48,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,15 +116,13 @@ public class JpylyzerPlugin implements Plugin<AIP> {
               // TODO check if file is JPEG2000
               try {
                 LOGGER.debug("Processing file: " + file);
-                StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+                StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(storagePath);
 
-                Path ffProbeResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
-
-                Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
-                model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "jpylyzer",
-                  resource);
-                ffProbeResults.toFile().delete();
+                String ffProbeResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
+                ContentPayload payload = new StringContentPayload(ffProbeResults);
+                model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                  "jpylyzer", payload);
               } catch (RODAException | IOException sse) {
                 LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
               }

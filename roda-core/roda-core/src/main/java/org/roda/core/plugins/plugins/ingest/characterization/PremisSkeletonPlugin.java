@@ -34,6 +34,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
@@ -115,16 +116,16 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           }
 
           state = PluginState.SUCCESS;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException | XmlException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
-            RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
+            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);
@@ -142,7 +143,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, XmlException {
+      NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
+
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
@@ -150,11 +152,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       representationId, representationPremis);
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
     for (File file : allFiles) {
-      ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
-      model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
-        file.getId(), filePreservation);
-      // ContentPayload updatedRepresentation =
-      // PremisUtils.linkFileToRepresentation(file,aip.getId(),representationId,model);
+      if (!file.isDirectory()) {
+        ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
+        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
+          file.getPath(), file.getId(), filePreservation);
+        ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file, aip.getId(), representationId,
+          RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL, RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, model);
+        // TODO save updated representation
+      }
     }
     IOUtils.closeQuietly(allFiles);
   }

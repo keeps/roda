@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -138,18 +139,14 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
             @Override
             public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+              String fileId = file.getFileName().toString();
+              List<String> directoryPath = extractDirectoryPath(transferredResourcePath, file);
               try {
-                Path relativePath = transferredResourcePath.relativize(file);
-
-                String fileId = file.getFileName().toString();
-                List<String> directoryPath = new ArrayList<>();
-                for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
-                  directoryPath.add(relativePath.getName(i).toString());
-                }
-
                 ContentPayload payload = new FSPathContentPayload(file);
                 boolean notifyFileCreated = false;
-                model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
+                File createdFile = model.createFile(aip.getId(), representationId, directoryPath, fileId, payload,
+                  notifyFileCreated);
+                LOGGER.info("Created file: " + createdFile);
               } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }
@@ -199,6 +196,15 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
     }
     return report;
+  }
+
+  private List<String> extractDirectoryPath(Path transferredResourcePath, Path file) {
+    List<String> directoryPath = new ArrayList<>();
+    Path relativePath = transferredResourcePath.relativize(file);
+    for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
+      directoryPath.add(relativePath.getName(i).toString());
+    }
+    return directoryPath;
   }
 
   @Override

@@ -475,13 +475,16 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
-  
-  
+
   /************************************************
-   *               PREMIS
+   * PREMIS
    ************************************************/
-  
-  public static final Object PREMIS_LOCAL_IDENTIFIER_TYPE = "local";
+
+  public static final String PREMIS_IDENTIFIER_TYPE_LOCAL = "local";
+  public static final String PREMIS_FILE_SUFFIX = ".file.premis.xml";
+  public static final String PREMIS_EVENT_SUFFIX = ".event.premis.xml";
+  public static final String PREMIS_REPRESENTATION_SUFFIX = ".representation.premis.xml";
+  public static final String PREMIS_AGENT_SUFFIX = ".agent.premis.xml";
 
   /* Preservation events fields */
   public static final String PRESERVATION_EVENT_ID = "id";
@@ -509,12 +512,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
   public static final String PRESERVATION_TYPE_EVENT = "type";
-  
-  
-  
-  
-  
-  
+
   /*
    * accession adding emulation information appraisal capture compression
    * creation data carrier migration deaccession decompression decryption
@@ -555,7 +553,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK = "executing program task";
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
-  
+
   public static final String PRESERVATION_AGENT_TYPE_INGEST_TASK = "software:ingest_task";
   public static final String PRESERVATION_AGENT_TYPE_MIGRATOR = "software:migrator";
   public static final String PRESERVATION_AGENT_TYPE_DIGITALIZATION = "software:digitalization";
@@ -565,7 +563,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN = "software:plugin:verapdf_check";
   public static final String PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN = "software:plugin:conversion";
   public static final String PRESERVATION_AGENT_TYPE_UNKNOWN_PREFIX = "unknown:";
-  
+
   public static final String PRESERVATION_LEVEL_FULL = "full";
 
   /**
@@ -573,8 +571,8 @@ public final class RodaConstants {
    */
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
   public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
-  
-  
-  
+
+  public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
+  public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
 
 }

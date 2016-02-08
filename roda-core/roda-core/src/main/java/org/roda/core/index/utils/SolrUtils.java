@@ -304,7 +304,7 @@ public class SolrUtils {
       }
     }
 
-    LOGGER.debug("Converting filter {} to query {}", filter, ret);
+    LOGGER.trace("Converting filter {} to query {}", filter, ret);
     return ret.toString();
   }
 
@@ -436,7 +436,7 @@ public class SolrUtils {
     if (value != null) {
       if (valueClass.equals(Date.class)) {
         String date = DateUtil.getThreadLocalDateFormat().format(Date.class.cast(value));
-        LOGGER.debug("Appending date value \"" + date + "\" to range");
+        LOGGER.trace("Appending date value \"" + date + "\" to range");
         ret.append(date);
       } else if (valueClass.equals(Long.class)) {
         ret.append(Long.class.cast(value));
@@ -482,7 +482,7 @@ public class SolrUtils {
       }
       if (filterQuery.length() > 0) {
         query.addFilterQuery(filterQuery.toString());
-        LOGGER.debug("Query after defining facets: " + query.toString());
+        LOGGER.trace("Query after defining facets: " + query.toString());
       }
     }
   }
@@ -657,7 +657,7 @@ public class SolrUtils {
       ret = (Date) object;
     } else if (object instanceof String) {
       try {
-        LOGGER.debug("Parsing date (" + object + ") from string");
+        LOGGER.trace("Parsing date (" + object + ") from string");
         ret = RodaUtils.parseDate((String) object);
       } catch (ParseException e) {
         LOGGER.error("Could not convert Solr object to date", e);
@@ -1126,14 +1126,13 @@ public class SolrUtils {
    */
   public static QueryResponse executeSolrQuery(SolrClient index, String collection, String solrQueryString)
     throws SolrServerException, IOException {
-    LOGGER.debug("query string: " + solrQueryString);
+    LOGGER.trace("query string: " + solrQueryString);
     SolrQuery query = new SolrQuery();
     for (String string : solrQueryString.split("&")) {
       String[] split = string.split("=");
-      LOGGER.debug(split[0] + " > " + split[1]);
       query.add(split[0], split[1]);
     }
-    LOGGER.debug("executeSolrQuery: " + query);
+    LOGGER.trace("executeSolrQuery: " + query);
     return index.query(collection, query);
   }
 
@@ -1372,7 +1371,7 @@ public class SolrUtils {
 
     // extra-fields
     try {
-      StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(file);
+      StoragePath filePath = ModelUtils.getFileStoragePath(file);
       doc.addField(RodaConstants.FILE_STORAGEPATH, filePath.asString());
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
@@ -1398,8 +1397,6 @@ public class SolrUtils {
   }
 
   public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
-    LOGGER.debug(doc.toString());
-
     IndexedFile file = null;
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));

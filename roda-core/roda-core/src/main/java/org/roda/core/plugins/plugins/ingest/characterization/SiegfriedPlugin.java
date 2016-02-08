@@ -38,6 +38,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -48,6 +49,7 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -111,8 +113,10 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     PluginState state;
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
+        model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }
 
@@ -137,19 +141,16 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           for (int i = 0; i < files.length(); i++) {
             JSONObject fileObject = files.getJSONObject(i);
 
+            // XXX directories are not supported
+            List<String> directoryPath = new ArrayList<>();
             String fileName = fileObject.getString("filename");
             fileName = fileName.substring(fileName.lastIndexOf(File.separatorChar) + 1);
             long fileSize = fileObject.getLong("filesize");
 
-            Path p = Files.createTempFile("temp", ".temp");
-            Files.write(p, fileObject.toString().getBytes());
-            Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
-              + ", FILE: " + fileName + ")");
+            ContentPayload payload = new StringContentPayload(fileObject.toString());
 
-            model.createOtherMetadata(aip.getId(), representation.getId(), fileName + ".json", "Siegfried", resource);
-
-            p.toFile().delete();
+            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileName, ".json",
+              "Siegfried", payload);
 
             JSONArray matches = (JSONArray) fileObject.get("matches");
             if (matches.length() > 0) {
@@ -183,9 +184,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           model.updateFileFormats(updatedFiles);
 
           PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS,
-           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
-            "The files of the representation were successfully identified.",
-            siegfriedOutput,agent);
+            RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
+            "The files of the representation were successfully identified.", siegfriedOutput, agent);
 
           FSUtils.deletePath(data);
 

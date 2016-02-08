@@ -48,7 +48,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,14 +114,14 @@ public class FFProbePlugin implements Plugin<AIP> {
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is a video
-              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
-              Path ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());
-              Binary resource = (Binary) FSUtils.convertPathToResource(ffProbeResults.getParent(), ffProbeResults);
+              String ffProbeResults = FFProbePluginUtils.runFFProbe(file, binary, getParameterValues());
+              ContentPayload payload = new StringContentPayload(ffProbeResults);
               // TODO support file path
-              model.createOtherMetadata(aip.getId(), representation.getId(), file + ".xml", "FFProbe", resource);
-              ffProbeResults.toFile().delete();
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                "FFProbe", payload);
             }
           }
           IOUtils.closeQuietly(allFiles);

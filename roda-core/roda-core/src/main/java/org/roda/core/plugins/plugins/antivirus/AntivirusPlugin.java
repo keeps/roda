@@ -34,6 +34,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
@@ -123,10 +124,11 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
-    
+
     Report report = PluginHelper.createPluginReport(this);
     Path sourcePath = null;
     boolean deleteSourcePath = false;
@@ -184,7 +186,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
       try {
         LOGGER.info("Creating event");
-        createEvent(virusCheckResult, exception, state, aip, model,agent);
+        createEvent(virusCheckResult, exception, state, aip, model, agent);
         report.addItem(reportItem);
 
         LOGGER.info("Updating job report");
@@ -208,12 +210,13 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
-          RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK, "All the files from the SIP were verified against an antivirus.",
-          Arrays.asList(representation.getId()), null, success ? "success" : "failure", success ? "" : "Error",
-            success ? virusCheckResult.getReport() : exception.getMessage(), agent);
+          RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
+          "All the files from the SIP were verified against an antivirus.", Arrays.asList(representation.getId()), null,
+          success ? "success" : "failure", success ? "" : "Error",
+          success ? virusCheckResult.getReport() : exception.getMessage(), agent);
       }
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException | ValidationException e) {
       throw new PluginException("Error while creating the event", e);
     }
 

@@ -30,7 +30,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
@@ -91,12 +93,12 @@ public class ExifToolPlugin implements Plugin<AIP> {
         try {
           /*
            * OLD VERSION... FILE BY FILE Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representation.getId()); for
-           * (String fileID : representation.getFileIds()) { LOGGER.debug(
+           * model.retrieveRepresentation(aip.getId(), representation.getId());
+           * for (String fileID : representation.getFileIds()) { LOGGER.debug(
            * "Processing file " + fileID + " from " + representation.getId() +
            * " of AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representation.getId(), fileID); Binary
-           * binary = storage.getBinary(file.getStoragePath());
+           * model.retrieveFile(aip.getId(), representation.getId(), fileID);
+           * Binary binary = storage.getBinary(file.getStoragePath());
            * 
            * Path exifToolResults = ExifToolUtils.runExifTool(file, binary,
            * getParameterValues()); Binary resource = (Binary)
@@ -119,10 +121,17 @@ public class ExifToolPlugin implements Plugin<AIP> {
 
           try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
             for (Path path : directoryStream) {
-              Binary resource = (Binary) FSUtils.convertPathToResource(path.getParent(), path);
-              LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
-                + ", FILE: " + path.toFile().getName() + ")");
-              model.createOtherMetadata(aip.getId(), representation.getId(), path.toFile().getName(), "ExifTool", resource);
+              ContentPayload payload = new FSPathContentPayload(path);
+              List<String> fileDirectoryPath = new ArrayList<>();
+
+              Path relativePath = metadata.relativize(path);
+              for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
+                fileDirectoryPath.add(relativePath.getName(i).toString());
+              }
+
+              String fileId = path.getFileName().toString();
+              model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
+                "ExifTool", payload);
             }
           }
           FSUtils.deletePath(data);

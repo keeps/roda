@@ -39,6 +39,7 @@ import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
@@ -184,11 +185,11 @@ public final class PluginHelper {
     ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
     String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent)
       throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException {
+      AuthorizationDeniedException, ValidationException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
       targets, outcome, detailNote, detailExtension, Arrays.asList(agent));
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, id, premisEvent);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, premisEvent);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);
     pm.setRepresentationId(representationID);
@@ -312,10 +313,10 @@ public final class PluginHelper {
   }
 
   public static PreservationMetadata createPluginAgent(ModelService model, String agentId, String agentName,
-    String agentType)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    String agentType) throws GenericException, NotFoundException, RequestNotValidException,
+      AuthorizationDeniedException, ValidationException {
     ContentPayload premisAgent = PremisUtils.createPremisAgentBinary(agentId, agentName, agentType);
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, agentId, premisAgent);
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, agentId, premisAgent);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(null);
     pm.setRepresentationId(null);

@@ -72,6 +72,7 @@ public class CorporaConstants {
   public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";
   public static final String STRANGE_DESC_METADATA_FILE = "strange.xml";
 
+  @Deprecated
   public static final String F0_PREMIS_XML = "F0";
   public static final String TEXT_XML = "text/xml";
   public static final String REPRESENTATION_1_PREMIS_EVENT_ID = "roda_398";

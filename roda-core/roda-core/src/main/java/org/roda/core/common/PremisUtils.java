@@ -53,13 +53,11 @@ import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.metadata.MetadataException;
 import org.roda.core.metadata.MetadataHelperUtility;
-import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
@@ -134,13 +132,6 @@ public class PremisUtils {
 
     org.roda.core.metadata.MetadataHelperUtility.saveToFile(f, temp.toFile());
     return (Binary) FSUtils.convertPathToResource(temp.getParent(), temp);
-  }
-
-  public static Binary getPremisFile(StorageService storage, String aipID, String representationID, String fileID)
-    throws IOException, PremisMetadataException, GenericException, RequestNotValidException, NotFoundException,
-    AuthorizationDeniedException {
-    Binary binary = storage.getBinary(ModelUtils.getPreservationFilePath(aipID, representationID, fileID));
-    return binary;
   }
 
   public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
@@ -380,9 +371,8 @@ public class PremisUtils {
         loict.setLinkingObjectIdentifierType("target");
       }
     }
-    
-    
-    if(agents!=null){
+
+    if (agents != null) {
       for (IndexedPreservationAgent agent : agents) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
         agentIdentifier.setLinkingAgentIdentifierType("local");
@@ -456,7 +446,7 @@ public class PremisUtils {
     FormatDesignationComplexType fdct = fct.addNewFormatDesignation();
     fdct.setFormatName("");
     fdct.setFormatVersion("");
-    Binary binary = model.getStorage().getBinary(ModelUtils.getRepresentationFileStoragePath(originalFile));
+    Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
     try {
       Fixity md5 = calculateFixity(binary, "MD5", "");
       FixityComplexType fixityMD5 = occt.addNewFixity();
@@ -485,11 +475,11 @@ public class PremisUtils {
 
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<Fixity>();
-    lc.xmlns.premisV2.File f = binaryToFile(premisFile.getContent().createInputStream()); 
-    if(f.getObjectCharacteristicsList()!=null && f.getObjectCharacteristicsList().size()>0){
+    lc.xmlns.premisV2.File f = binaryToFile(premisFile.getContent().createInputStream());
+    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
       ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
-      if(occt.getFixityList()!=null && occt.getFixityList().size()>0){
-        for(FixityComplexType fct : occt.getFixityList()){
+      if (occt.getFixityList() != null && occt.getFixityList().size() > 0) {
+        for (FixityComplexType fct : occt.getFixityList()) {
           Fixity fix = new Fixity();
           fix.setMessageDigest(fct.getMessageDigest());
           fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm());
@@ -683,14 +673,14 @@ public class PremisUtils {
     return doc;
   }
 
-  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin, String preservationAgentTypeCharacterizationPlugin,
-    ModelService model)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin,
+    String preservationAgentTypeCharacterizationPlugin, ModelService model) throws GenericException, NotFoundException,
+      RequestNotValidException, AuthorizationDeniedException, ValidationException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, id, agentPayload);
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload);
     IndexedPreservationAgent agent = new IndexedPreservationAgent();
     agent.setId(id);
     agent.setIdentifierType("local");
@@ -699,15 +689,19 @@ public class PremisUtils {
     return agent;
   }
 
-  public static ContentPayload linkFileToRepresentation(File file, String aipId, String representationId, ModelService model) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException, IOException {
-    Binary preservationRepresentation = model.getStorage().getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
+  public static ContentPayload linkFileToRepresentation(File file, String aipId, String representationId,
+    String relationshipType, String relationshipSubType, ModelService model) throws GenericException,
+      RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException, IOException {
+    Binary preservationRepresentation = model.getStorage()
+      .getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
     Representation r = binaryToRepresentation(preservationRepresentation.getContent().createInputStream());
     RelationshipComplexType relationship = r.addNewRelationship();
-    relationship.setRelationshipType("XXXX");
+    relationship.setRelationshipType(relationshipType);
+    relationship.setRelationshipSubType(relationshipSubType);
     RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
-    roict.setRelatedObjectIdentifierType("local");
-    roict.setRelatedObjectIdentifierValue(file.getId()+".file.premis.xml");
-    
+    roict.setRelatedObjectIdentifierType(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL);
+    roict.setRelatedObjectIdentifierValue(file.getId() + RodaConstants.PREMIS_FILE_SUFFIX);
+
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     document.setObject(r);
     try {

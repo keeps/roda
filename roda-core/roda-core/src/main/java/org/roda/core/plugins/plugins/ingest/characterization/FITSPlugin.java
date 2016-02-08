@@ -32,7 +32,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
@@ -90,12 +92,12 @@ public class FITSPlugin implements Plugin<AIP> {
         try {
           /*
            * Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representation.getId()); for
-           * (String fileID : representation.getFileIds()) { LOGGER.debug(
+           * model.retrieveRepresentation(aip.getId(), representation.getId());
+           * for (String fileID : representation.getFileIds()) { LOGGER.debug(
            * "Processing file " + fileID + " of representation " +
            * representation.getId() + " from AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representation.getId(), fileID); Binary
-           * binary = storage.getBinary(file.getStoragePath());
+           * model.retrieveFile(aip.getId(), representation.getId(), fileID);
+           * Binary binary = storage.getBinary(file.getStoragePath());
            * 
            * Path fitsResult = FITSUtils.runFits(file, binary,
            * getParameterValues()); Binary resource = (Binary)
@@ -115,12 +117,13 @@ public class FITSPlugin implements Plugin<AIP> {
 
           ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
+            // TODO the following path is not expecting folders
             Path p = output.resolve(file.getId() + ".fits.xml");
-            Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+            ContentPayload payload = new FSPathContentPayload(p);
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + file.getId() + ")");
-            model.
-            createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "FITS", resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
+              payload);
           }
           IOUtils.closeQuietly(allFiles);
           FSUtils.deletePath(data);

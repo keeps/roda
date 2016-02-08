@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -106,7 +107,8 @@ public class FixityPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN,
         model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
 
@@ -120,11 +122,9 @@ public class FixityPlugin implements Plugin<AIP> {
           List<String> okFileIDS = new ArrayList<String>();
           List<String> koFileIDS = new ArrayList<String>();
           for (File currentFile : allFiles) {
-            StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(currentFile);
+            StoragePath storagePath = ModelUtils.getFileStoragePath(currentFile);
             Binary currentFileBinary = storage.getBinary(storagePath);
-
-            Binary premisFile = PremisUtils.getPremisFile(model.getStorage(), aip.getId(), r.getId(),
-              currentFile.getId());
+            Binary premisFile = model.retrievePreservationFile(currentFile);
             List<Fixity> fixities = PremisUtils.extractFixities(premisFile);
 
             if (fixities != null) {

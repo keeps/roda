@@ -32,6 +32,7 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.PremisMetadataException;
@@ -77,8 +78,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     pronomToExtension = new HashMap<>();
     mimetypeToExtension = new HashMap<>();
 
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   public void init() throws PluginException {
@@ -147,7 +148,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
       logger.error("Error running adding Conversion plugin: " + e.getMessage(), e);
     }
 
@@ -210,7 +212,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                 }
 
-                StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(fileStoragePath);
 
                 // FIXME file that doesn't get deleted afterwards
@@ -253,7 +255,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           // add unchanged files to the new representation
           if (alteredFiles.size() > 0) {
             for (File f : unchangedFiles) {
-              StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(f);
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
               Binary binary = storage.getBinary(fileStoragePath);
               Path uriPath = Paths.get(binary.getContent().getURI());
               ContentPayload payload = new FSPathContentPayload(uriPath);
@@ -323,8 +325,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
               && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                  .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+                || (applicableTo.contains(fileFormat)))
+              && ifile.getSize() < (maxKbytes * 1024)) {
 
               if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
                 fileFormat = pronomToExtension.get(filePronom).get(0);
@@ -335,7 +338,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
               }
 
-              StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(fileStoragePath);
 
               // FIXME file that doesn't get deleted afterwards
@@ -376,7 +379,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         // add unchanged files to the new representation
         if (alteredFiles.size() > 0) {
           for (File f : unchangedFiles) {
-            StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(f);
+            StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
+
             Binary binary = storage.getBinary(fileStoragePath);
             Path uriPath = Paths.get(binary.getContent().getURI());
             ContentPayload payload = new FSPathContentPayload(uriPath);
@@ -400,9 +404,13 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     }
 
     try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
+        model);
       model.notifyAIPUpdated(aipId);
-    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-      e.printStackTrace();
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
+      logger.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
+
     }
 
     return null;
@@ -430,8 +438,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
             && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))
+            && ifile.getSize() < (maxKbytes * 1024)) {
 
             if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
               && !applicableTo.contains(fileFormat)) {
@@ -443,7 +452,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               fileFormat = pronomToExtension.get(filePronom).get(0);
             }
 
-            StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+            StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
             Binary binary = storage.getBinary(fileStoragePath);
 
             // FIXME file that doesn't get deleted afterwards
@@ -460,8 +469,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils
-                .getPreservationPath(file.getAipId(), newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
+                newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -511,11 +520,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return null;
   }
 
-  public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException;
+  public abstract Path executePlugin(Binary binary, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException;
 
-  public void createEvent(List<String> alteredFiles, AIP aip, String newRepresentationID, ModelService model,
-    int state, IndexedPreservationAgent agent) throws PluginException {
+  public void createEvent(List<String> alteredFiles, AIP aip, String newRepresentationID, ModelService model, int state,
+    IndexedPreservationAgent agent) throws PluginException {
 
     // building the detail extension for the plugin event
     String outcome = "success";
@@ -546,7 +555,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
         Arrays.asList(newRepresentationID), null, outcome, stringBuilder.toString(), null, agent);
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException e) {
+      | AuthorizationDeniedException | ValidationException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }

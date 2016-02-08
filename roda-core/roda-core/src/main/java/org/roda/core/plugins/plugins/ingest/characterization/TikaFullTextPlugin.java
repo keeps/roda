@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,13 +29,13 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -48,7 +47,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -118,8 +117,9 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
     try {
       PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Error running adding TikaFullText plugin: " + e.getMessage(), e);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
+      LOGGER.error("Error create PREMIS agent for Apache Tika", e);
     }
 
     for (AIP aip : list) {
@@ -135,16 +135,14 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
           for (File file : allFiles) {
 
             if (!file.isDirectory()) {
-              LOGGER.debug("Processing file: " + file);
-              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+              LOGGER.trace("Processing file: " + file);
+              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
-              // FIXME file that doesn't get deleted afterwards
-              Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
-
-              Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-              model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + OUTPUT_EXT, APP_NAME,
-                resource);
+              String tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
+              ContentPayload payload = new StringContentPayload(tikaResult);
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), OUTPUT_EXT,
+                APP_NAME, payload);
               try {
                 IndexedFile f = index.retrieve(IndexedFile.class,
                   SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
@@ -162,8 +160,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
                 if (properties.containsKey(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION)) {
                   f.setDateCreatedByApplication(properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
                 }
-                LOGGER.info("Tika creating app name: " + f.getCreatingApplicationName() + " version: "
-                  + f.getCreatingApplicationVersion() + " date: " + f.getDateCreatedByApplication());
+
                 updatedFiles.add(f);
               } catch (ParserConfigurationException pce) {
 

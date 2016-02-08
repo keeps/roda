@@ -7,9 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
@@ -34,21 +34,18 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
 public class TikaFullTextPluginUtils {
-  public static Path extractMetadata(InputStream is) throws IOException, SAXException, TikaException {
+  public static String extractMetadata(InputStream is) throws IOException, SAXException, TikaException {
     Parser parser = new AutoDetectParser();
     Metadata metadata = new Metadata();
     ContentHandler handler = new ToXMLContentHandler();
     // FIXME does "is" gets closed???
     parser.parse(is, handler, metadata, new ParseContext());
-    String content = handler.toString();
-    Path p = Files.createTempFile("tika", ".xml");
-    Files.write(p, content.getBytes());
-    return p;
+    return handler.toString();
   }
 
-  public static Map<String, String> extractPropertiesFromResult(Path tikaResult)
+  public static Map<String, String> extractPropertiesFromResult(String tikaResult)
     throws ParserConfigurationException, IOException, SAXException {
-    return extractPropertiesFromResult(Files.newInputStream(tikaResult));
+    return extractPropertiesFromResult(new ByteArrayInputStream(tikaResult.getBytes()));
   }
 
   public static Map<String, String> extractPropertiesFromResult(InputStream tikaResultStream)
@@ -79,7 +76,7 @@ public class TikaFullTextPluginUtils {
       if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Application-Version")) {
         properties.put(RodaConstants.FILE_CREATING_APPLICATION_VERSION, e.getAttribute("content"));
       }
-      
+
       if (e.getAttribute("name") != null && e.getAttribute("name").equalsIgnoreCase("Creation-Date")) {
         properties.put(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, e.getAttribute("content"));
       }

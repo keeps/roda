@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.metadata.PremisMetadataException;
@@ -50,6 +51,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.xml.sax.SAXException;
@@ -76,8 +78,8 @@ public class AbstractConvertPluginUtils {
 
   public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
     String aipId, String representationId) throws IOException, PremisMetadataException, RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
-    SAXException, TikaException {
+      GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
+      SAXException, TikaException, ValidationException {
 
     runPremisSkeleton(index, model, storage, aipId, representationId);
     runSiegfried(index, model, storage, aipId, representationId);
@@ -86,8 +88,8 @@ public class AbstractConvertPluginUtils {
 
   private static void runPremisSkeleton(IndexService index, ModelService model, StorageService storage, String aipId,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
-    TikaException {
+      NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
+      TikaException, ValidationException {
 
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aipId, representationId,
@@ -103,8 +105,8 @@ public class AbstractConvertPluginUtils {
 
   private static void runSiegfried(IndexService index, ModelService model, StorageService storage, String aipId,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
-    TikaException {
+      NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
+      TikaException, ValidationException {
 
     IndexedPreservationAgent agent = PremisUtils.createPremisAgentBinary(new SiegfriedPlugin(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
@@ -121,17 +123,15 @@ public class AbstractConvertPluginUtils {
     for (int i = 0; i < files.length(); i++) {
       JSONObject fileObject = files.getJSONObject(i);
 
-      String fileName = fileObject.getString("filename");
-      fileName = fileName.substring(fileName.lastIndexOf(java.io.File.separatorChar) + 1);
+      // TODO set file directory path
+      List<String> fileDirectoryPath = new ArrayList<>();
+      String fileId = fileObject.getString("filename");
+      fileId = fileId.substring(fileId.lastIndexOf(java.io.File.separatorChar) + 1);
       long fileSize = fileObject.getLong("filesize");
 
-      Path p = Files.createTempFile("temp", ".temp");
-      Files.write(p, fileObject.toString().getBytes());
-      Binary resource = (Binary) FSUtils.convertPathToResource(p.getParent(), p);
+      ContentPayload payload = new StringContentPayload(fileObject.toString());
 
-      model.createOtherMetadata(aipId, representationId, fileName + ".json", "Siegfried", resource);
-
-      p.toFile().delete();
+      model.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, ".json", "Siegfried", payload);
 
       JSONArray matches = (JSONArray) fileObject.get("matches");
       if (matches.length() > 0) {
@@ -143,10 +143,10 @@ public class AbstractConvertPluginUtils {
             String mime = match.getString("mime");
             String version = match.getString("version");
             String extension = "";
-            if (fileName.contains(".")) {
-              extension = fileName.substring(fileName.lastIndexOf('.'));
+            if (fileId.contains(".")) {
+              extension = fileId.substring(fileId.lastIndexOf('.'));
             }
-            IndexedFile f = index.retrieve(IndexedFile.class, SolrUtils.getId(aipId, representationId, fileName));
+            IndexedFile f = index.retrieve(IndexedFile.class, SolrUtils.getId(aipId, representationId, fileId));
             FileFormat ff = new FileFormat();
             ff.setFormatDesignationName(format);
             ff.setFormatDesignationVersion(version);
@@ -155,7 +155,7 @@ public class AbstractConvertPluginUtils {
             ff.setExtension(extension);
             f.setFileFormat(ff);
             f.setSize(fileSize);
-            f.setOriginalName(fileName);
+            f.setOriginalName(fileId);
             updatedFiles.add(f);
           }
         }
@@ -176,23 +176,23 @@ public class AbstractConvertPluginUtils {
   }
 
   private static void runTIKA(IndexService index, ModelService model, StorageService storage, String aipId,
-    String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
-    TikaException {
+    String representationId)
+      throws IOException, PremisMetadataException, RequestNotValidException, GenericException, NotFoundException,
+      AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException, TikaException {
 
     ClosableIterable<File> allFiles = model.listAllFiles(aipId, representationId);
     List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
     for (File file : allFiles) {
 
       if (!file.isDirectory()) {
-        StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+        StoragePath storagePath = ModelUtils.getFileStoragePath(file);
         Binary binary = storage.getBinary(storagePath);
 
-        // FIXME file that doesn't get deleted afterwards
-        Path tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
+        String tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
 
-        Binary resource = (Binary) FSUtils.convertPathToResource(tikaResult.getParent(), tikaResult);
-        model.createOtherMetadata(aipId, representationId, file.getId() + ".html", "ApacheTika", resource);
+        ContentPayload payload = new StringContentPayload(tikaResult);
+        model.createOtherMetadata(aipId, representationId, file.getPath(), file.getId(), ".html", "ApacheTika",
+          payload);
         try {
           IndexedFile f = index.retrieve(IndexedFile.class, SolrUtils.getId(aipId, representationId, file.getId()));
 

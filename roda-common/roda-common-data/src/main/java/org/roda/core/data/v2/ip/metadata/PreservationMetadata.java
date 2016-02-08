@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -22,18 +23,36 @@ public class PreservationMetadata implements Serializable {
   @JsonIgnore
   private String aipId;
   private String representationId;
+  private List<String> fileDirectoryPath;
+  private String fileId;
   private PreservationMetadataType type;
 
   public PreservationMetadata() {
     super();
   }
 
-  public PreservationMetadata(String id, String aipId, String representationId, PreservationMetadataType type) {
+  public PreservationMetadata(String id, PreservationMetadataType type, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
     super();
     this.id = id;
+    this.type = type;
+
     this.aipId = aipId;
     this.representationId = representationId;
-    this.type = type;
+    this.fileDirectoryPath = fileDirectoryPath;
+    this.fileId = fileId;
+  }
+
+  public PreservationMetadata(String id, PreservationMetadataType type) {
+    this(id, type, null, null, null, null);
+  }
+
+  public PreservationMetadata(String id, PreservationMetadataType type, String aipId) {
+    this(id, type, aipId, null, null, null);
+  }
+
+  public PreservationMetadata(String id, PreservationMetadataType type, String aipId, String representationId) {
+    this(id, type, aipId, representationId, null, null);
   }
 
   /**
@@ -41,6 +60,18 @@ public class PreservationMetadata implements Serializable {
    */
   public String getId() {
     return id;
+  }
+
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public PreservationMetadataType getType() {
+    return type;
+  }
+
+  public void setType(PreservationMetadataType type) {
+    this.type = type;
   }
 
   /**
@@ -62,16 +93,20 @@ public class PreservationMetadata implements Serializable {
     this.representationId = representationId;
   }
 
-  public PreservationMetadataType getType() {
-    return type;
+  public List<String> getFileDirectoryPath() {
+    return fileDirectoryPath;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public void setFileDirectoryPath(List<String> fileDirectoryPath) {
+    this.fileDirectoryPath = fileDirectoryPath;
   }
 
-  public void setType(PreservationMetadataType type) {
-    this.type = type;
+  public String getFileId() {
+    return fileId;
+  }
+
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
   }
 
   @Override
@@ -79,6 +114,8 @@ public class PreservationMetadata implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((fileDirectoryPath == null) ? 0 : fileDirectoryPath.hashCode());
+    result = prime * result + ((fileId == null) ? 0 : fileId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -99,6 +136,16 @@ public class PreservationMetadata implements Serializable {
         return false;
     } else if (!aipId.equals(other.aipId))
       return false;
+    if (fileDirectoryPath == null) {
+      if (other.fileDirectoryPath != null)
+        return false;
+    } else if (!fileDirectoryPath.equals(other.fileDirectoryPath))
+      return false;
+    if (fileId == null) {
+      if (other.fileId != null)
+        return false;
+    } else if (!fileId.equals(other.fileId))
+      return false;
     if (id == null) {
       if (other.id != null)
         return false;
@@ -116,8 +163,8 @@ public class PreservationMetadata implements Serializable {
 
   @Override
   public String toString() {
-    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationID=" + representationId + ", type="
-      + type + "]";
+    return "PreservationMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId
+      + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", type=" + type + "]";
   }
 
 }

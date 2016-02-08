@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -120,12 +121,13 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     throws PluginException {
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
+        model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
       logger.error("Error running VeraPDF plugin: " + e.getMessage(), e);
     }
 
-    
     for (AIP aip : list) {
       logger.debug("Processing AIP " + aip.getId());
 
@@ -150,7 +152,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
               if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))
                 && ifile.getSize() < (maxKbytes * 1024)) {
 
-                StoragePath fileStoragePath = ModelUtils.getRepresentationFileStoragePath(file);
+                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(fileStoragePath);
 
                 // FIXME file that doesn't get deleted afterwards
@@ -176,7 +178,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         }
 
         logger.debug("Creating veraPDF event for the representation " + representation.getId());
-        createEvent(resourceList, aip, representation.getId(), model, state,agent);
+        createEvent(resourceList, aip, representation.getId(), model, state, agent);
       }
     }
 
@@ -235,8 +237,10 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         + " finished with a status: " + outcome + ".");
 
       // FIXME revise PREMIS generation
-      PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,  RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,  "All the files from the AIP were submitted to a veraPDF validation.", 
-        Arrays.asList(representationId), null, outcome, noteStringBuilder.toString(), null, agent);
+      PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,
+        RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
+        "All the files from the AIP were submitted to a veraPDF validation.", Arrays.asList(representationId), null,
+        outcome, noteStringBuilder.toString(), null, agent);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);
     }

@@ -193,7 +193,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_1_ID, file_1_1.getId());
 
-    final Binary binary_1_1 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_1_1));
+    final Binary binary_1_1 = storage.getBinary(ModelUtils.getFileStoragePath(file_1_1));
     assertTrue(binary_1_1.getSizeInBytes() > 0);
     assertEquals(binary_1_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_1.getContent().createInputStream()).length);
@@ -204,7 +204,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, file_1_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_1_FILE_2_ID, file_1_2.getId());
 
-    final Binary binary_1_2 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_1_2));
+    final Binary binary_1_2 = storage.getBinary(ModelUtils.getFileStoragePath(file_1_2));
     assertTrue(binary_1_2.getSizeInBytes() > 0);
     assertEquals(binary_1_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_1_2.getContent().createInputStream()).length);
@@ -215,7 +215,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_1.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_1_ID, file_2_1.getId());
 
-    final Binary binary_2_1 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_2_1));
+    final Binary binary_2_1 = storage.getBinary(ModelUtils.getFileStoragePath(file_2_1));
     assertTrue(binary_2_1.getSizeInBytes() > 0);
     assertEquals(binary_2_1.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_1.getContent().createInputStream()).length);
@@ -226,7 +226,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, file_2_2.getRepresentationId());
     assertEquals(CorporaConstants.REPRESENTATION_2_FILE_2_ID, file_2_2.getId());
 
-    final Binary binary_2_2 = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(file_2_2));
+    final Binary binary_2_2 = storage.getBinary(ModelUtils.getFileStoragePath(file_2_2));
     assertTrue(binary_2_2.getSizeInBytes() > 0);
     assertEquals(binary_2_2.getSizeInBytes().intValue(),
       IOUtils.toByteArray(binary_2_2.getContent().createInputStream()).length);
@@ -238,13 +238,13 @@ public class ModelServiceTest {
     lc.xmlns.premisV2.Representation rpo = PremisUtils.binaryToRepresentation(preservationObject.getContent(), true);
 
     List<ObjectIdentifierComplexType> objectIdentifierList = rpo.getObjectIdentifierList();
-    assertEquals(RodaConstants.PREMIS_LOCAL_IDENTIFIER_TYPE, objectIdentifierList.get(0).getObjectIdentifierType());
+    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierList.get(0).getObjectIdentifierType());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierList().get(0).getObjectIdentifierValue());
     assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
       rpo.getPreservationLevelList().get(0).getPreservationLevelValue());
 
-    Binary f0_premis_bin = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.F0_PREMIS_XML);
+    Binary f0_premis_bin = model.retrievePreservationFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
     lc.xmlns.premisV2.File f0_premis_file = PremisUtils.binaryToFile(f0_premis_bin.getContent(), true);
 
     ObjectCharacteristicsComplexType f0_characteristics = f0_premis_file.getObjectCharacteristicsList().get(0);
@@ -254,7 +254,7 @@ public class ModelServiceTest {
     assertEquals(f0_characteristics.getFormatList().get(0).getFormatDesignation().getFormatName(),
       CorporaConstants.TEXT_XML);
 
-    Binary event_premis_bin = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+    Binary event_premis_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event_premis = PremisUtils.binaryToEvent(event_premis_bin.getContent(), true);
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType());
@@ -597,7 +597,7 @@ public class ModelServiceTest {
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -624,7 +624,7 @@ public class ModelServiceTest {
     assertEquals(createdFile, retrievedFile);
 
     // check content
-    Binary createdFileBinary = storage.getBinary(ModelUtils.getRepresentationFileStoragePath(createdFile));
+    Binary createdFileBinary = storage.getBinary(ModelUtils.getFileStoragePath(createdFile));
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       createdFileBinary.getContent().createInputStream()));
   }
@@ -656,7 +656,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Binary event_bin = model.retrieveEventPreservationObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
+    Binary event_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event = PremisUtils.binaryToEvent(event_bin.getContent(), true);
 
@@ -672,8 +672,8 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Binary file_bin = model.retrieveRepresentationFileObject(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.F0_PREMIS_XML);
+    Binary file_bin = model.retrievePreservationFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
+      CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
     lc.xmlns.premisV2.File file = PremisUtils.binaryToFile(file_bin.getContent(), true);
 
     ObjectCharacteristicsComplexType file_characteristics = file.getObjectCharacteristicsArray(0);
@@ -709,7 +709,7 @@ public class ModelServiceTest {
     storage.copy(corporaService, preservationContainerPath,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 
-    Binary agent_bin = model.retrieveAgentPreservationObject(CorporaConstants.AGENT_RODA_8);
+    Binary agent_bin = model.retrievePreservationAgent(CorporaConstants.AGENT_RODA_8);
     AgentComplexType agent = PremisUtils.binaryToAgent(agent_bin.getContent(), true);
 
     assertEquals(CorporaConstants.AGENT_RODA_8, agent.getAgentIdentifierArray(0).getAgentIdentifierValue());

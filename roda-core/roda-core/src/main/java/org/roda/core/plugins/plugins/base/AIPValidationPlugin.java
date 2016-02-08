@@ -31,6 +31,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -113,8 +114,9 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
+      | ValidationException e) {
+      LOGGER.error("Error creating antivirus PREMIS agent", e);
     }
 
     boolean validateDescriptiveMetadata = Boolean.parseBoolean(parameters.getOrDefault(

@@ -335,8 +335,9 @@ public class Browser extends RodaCoreService {
   }
 
   public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
-    String fileId, InputStream is, FormDataContentDisposition fileDetail)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+      ValidationException {
 
     Date startDate = new Date();
 
@@ -345,8 +346,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is,
-      fileDetail, true);
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileDirectoryPath,
+      fileId, is, fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -356,8 +357,9 @@ public class Browser extends RodaCoreService {
   }
 
   public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
-    String fileId, InputStream is, FormDataContentDisposition fileDetail)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
+      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+      ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -365,8 +367,8 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileId, is,
-      fileDetail, false);
+    BrowserHelper.createOrUpdateAipRepresentationPreservationMetadataFile(aipId, representationId, fileDirectoryPath,
+      fileId, is, fileDetail, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

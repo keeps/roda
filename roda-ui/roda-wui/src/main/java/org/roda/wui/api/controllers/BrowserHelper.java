@@ -276,7 +276,7 @@ public class BrowserHelper {
     StorageService storage = RodaCoreFactory.getStorageService();
 
     if (!file.isDirectory()) {
-      StoragePath filePath = ModelUtils.getRepresentationFileStoragePath(file);
+      StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
       ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
       zipEntries.add(info);
@@ -425,7 +425,7 @@ public class BrowserHelper {
 
     } catch (IOException e) {
       throw new GenericException("Error getting AIP preservation metadata", e);
-    } 
+    }
 
   }
 
@@ -551,8 +551,9 @@ public class BrowserHelper {
   }
 
   public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
-    String fileId, InputStream is, FormDataContentDisposition fileDetail, boolean create)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail,
+    boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
+      ValidationException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
@@ -560,8 +561,8 @@ public class BrowserHelper {
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(file);
       if (create) {
-        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId, fileId,
-          payload);
+        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
+          fileDirectoryPath, fileId, payload);
       } else {
         model.updatePreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId, fileId,
           payload);
@@ -706,7 +707,7 @@ public class BrowserHelper {
 
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary representationFileBinary = storage
-      .getBinary(ModelUtils.getRepresentationFileStoragePath(aipId, representationId, directoryPath, fileId));
+      .getBinary(ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId));
     filename = representationFileBinary.getStoragePath().getName();
     mediaType = MediaType.WILDCARD;
     stream = new StreamingOutput() {

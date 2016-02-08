@@ -33,7 +33,9 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,12 +94,13 @@ public class JHOVEPlugin implements Plugin<AIP> {
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               LOGGER.debug("Processing file: " + file);
-              StoragePath storagePath = ModelUtils.getRepresentationFileStoragePath(file);
+              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 
               Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
-              Binary resource = (Binary) FSUtils.convertPathToResource(jhoveResults.getParent(), jhoveResults);
-              model.createOtherMetadata(aip.getId(), representation.getId(), file.getId() + ".xml", "JHOVE", resource);
+              ContentPayload payload = new FSPathContentPayload(jhoveResults);
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                "JHOVE", payload);
               jhoveResults.toFile().delete();
             }
           }

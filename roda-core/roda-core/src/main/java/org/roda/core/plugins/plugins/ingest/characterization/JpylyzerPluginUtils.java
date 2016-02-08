@@ -29,18 +29,13 @@ import org.slf4j.LoggerFactory;
 public class JpylyzerPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(JpylyzerPluginUtils.class);
 
-  public static Path inspect(File f) throws PluginException {
+  public static String inspect(File f) throws PluginException {
     try {
       List<String> command = getCommand();
       command.add(f.getAbsolutePath());
-      String jpylyzerOutput = CommandUtility.execute(command);
-      Path p = Files.createTempFile("jpylyzer", ".xml");
-      Files.write(p, jpylyzerOutput.getBytes());
-      return p;
+      return CommandUtility.execute(command);
     } catch (CommandException e) {
       throw new PluginException("Error while executing jpylyzer command");
-    } catch (IOException e) {
-      throw new PluginException("Error while parsing jpylyzer output");
     }
   }
 
@@ -62,8 +57,8 @@ public class JpylyzerPluginUtils {
     return command;
   }
 
-  public static Path runJpylyzer(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
-    throws IOException, PluginException {
+  public static String runJpylyzer(org.roda.core.data.v2.ip.File file, Binary binary,
+    Map<String, String> parameterValues) throws IOException, PluginException {
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
     IOUtils.copy(binary.getContent().createInputStream(), fos);

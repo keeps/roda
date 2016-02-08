@@ -45,7 +45,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
@@ -116,10 +118,14 @@ public class MediaInfoPlugin implements Plugin<AIP> {
 
           Map<String, Path> mediaInfoParsed = parseMediaInfoOutput(mediaInfoOutput);
           for (Map.Entry<String, Path> entry : mediaInfoParsed.entrySet()) {
-            Binary resource = (Binary) FSUtils.convertPathToResource(entry.getValue().getParent(), entry.getValue());
+            // XXX directories are not supported
+            List<String> directoryPath = new ArrayList<>();
+            String fileId = entry.getKey();
+            ContentPayload payload = new FSPathContentPayload(entry.getValue());
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + entry.getValue().toFile().getName() + ")");
-            model.createOtherMetadata(aip.getId(), representation.getId(), entry.getKey() + ".xml", "MediaInfo", resource);
+            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml", "MediaInfo",
+              payload);
           }
           FSUtils.deletePath(data);
         } catch (RODAException | IOException | CommandException | XPathExpressionException

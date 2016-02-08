@@ -17,7 +17,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -141,11 +140,10 @@ public class IndexModelObserver implements ModelObserver {
   private void indexFile(File file, boolean commit, boolean recursive) {
     Binary premisFile = null;
     try {
-      premisFile = PremisUtils.getPremisFile(model.getStorage(), file.getAipId(), file.getRepresentationId(),
-        file.getId());
+      premisFile = model.retrievePreservationFile(file);
     } catch (NotFoundException e) {
       LOGGER.trace("On indexing representations, did not find PREMIS for file: " + file);
-    } catch (RODAException | IOException e) {
+    } catch (RODAException e) {
       LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
     }
 
@@ -153,7 +151,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
 
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getId() + TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
+        file.getPath(), file.getId(), TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
 
       Map<String, String> properties = TikaFullTextPluginUtils
         .extractPropertiesFromResult(fulltextBinary.getContent().createInputStream());

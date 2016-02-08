@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -16,21 +17,30 @@ public class OtherMetadata implements Serializable {
   private static final long serialVersionUID = 7643339238489130326L;
 
   private String id;
+  private String type;
   @JsonIgnore
   private String aipId;
   private String representationId;
-  private String type;
+  private List<String> fileDirectoryPath;
+  private String fileId;
+  private String fileSuffix;
 
   public OtherMetadata() {
     super();
   }
 
-  public OtherMetadata(String id, String aipId, String representationId, String type) {
+  public OtherMetadata(String id, String type, String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, String fileSuffix) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.representationId = representationId;
     this.type = type;
+    this.fileSuffix = fileSuffix;
+  }
+
+  public OtherMetadata(String id, String type, String aipId, String representationId) {
+    this(id, type, aipId, representationId, null, null, null);
   }
 
   public String getId() {
@@ -65,11 +75,38 @@ public class OtherMetadata implements Serializable {
     this.type = type;
   }
 
+  public String getFileId() {
+    return fileId;
+  }
+
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
+  }
+
+  public String getFileSuffix() {
+    return fileSuffix;
+  }
+
+  public void setFileSuffix(String fileSuffix) {
+    this.fileSuffix = fileSuffix;
+  }
+
+  public List<String> getFileDirectoryPath() {
+    return fileDirectoryPath;
+  }
+
+  public void setFileDirectoryPath(List<String> fileDirectoryPath) {
+    this.fileDirectoryPath = fileDirectoryPath;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((fileDirectoryPath == null) ? 0 : fileDirectoryPath.hashCode());
+    result = prime * result + ((fileId == null) ? 0 : fileId.hashCode());
+    result = prime * result + ((fileSuffix == null) ? 0 : fileSuffix.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
@@ -89,6 +126,21 @@ public class OtherMetadata implements Serializable {
       if (other.aipId != null)
         return false;
     } else if (!aipId.equals(other.aipId))
+      return false;
+    if (fileDirectoryPath == null) {
+      if (other.fileDirectoryPath != null)
+        return false;
+    } else if (!fileDirectoryPath.equals(other.fileDirectoryPath))
+      return false;
+    if (fileId == null) {
+      if (other.fileId != null)
+        return false;
+    } else if (!fileId.equals(other.fileId))
+      return false;
+    if (fileSuffix == null) {
+      if (other.fileSuffix != null)
+        return false;
+    } else if (!fileSuffix.equals(other.fileSuffix))
       return false;
     if (id == null) {
       if (other.id != null)
@@ -110,8 +162,8 @@ public class OtherMetadata implements Serializable {
 
   @Override
   public String toString() {
-    return "OtherMetadata [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", type=" + type
-      + "]";
+    return "OtherMetadata [id=" + id + ", type=" + type + ", aipId=" + aipId + ", representationId=" + representationId
+      + ", fileDirectoryPath=" + fileDirectoryPath + ", fileId=" + fileId + ", fileSuffix=" + fileSuffix + "]";
   }
 
 }

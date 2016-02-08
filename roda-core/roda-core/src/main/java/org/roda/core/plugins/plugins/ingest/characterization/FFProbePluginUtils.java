@@ -29,18 +29,13 @@ import org.slf4j.LoggerFactory;
 public class FFProbePluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(FFProbePluginUtils.class);
 
-  public static Path inspect(File f) throws PluginException {
+  public static String inspect(File f) throws PluginException {
     try {
       List<String> command = getCommand();
       command.add(f.getAbsolutePath());
-      String ffProbeOutput = CommandUtility.execute(command);
-      Path p = Files.createTempFile("ffprobe", ".xml");
-      Files.write(p, ffProbeOutput.getBytes());
-      return p;
+      return CommandUtility.execute(command);
     } catch (CommandException e) {
       throw new PluginException("Error while executing FFProbe command");
-    } catch (IOException e) {
-      throw new PluginException("Error while parsing FFProbe output");
     }
   }
 
@@ -65,8 +60,11 @@ public class FFProbePluginUtils {
     return command;
   }
 
-  public static Path runFFProbe(org.roda.core.data.v2.ip.File file, Binary binary, Map<String, String> parameterValues)
-    throws IOException, PluginException {
+  public static String runFFProbe(org.roda.core.data.v2.ip.File file, Binary binary,
+    Map<String, String> parameterValues) throws IOException, PluginException {
+    // TODO f is not deleted in runtime
+    // TODO use storage method to get direct access to file
+
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
     IOUtils.copy(binary.getContent().createInputStream(), fos);
