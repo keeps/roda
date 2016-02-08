@@ -387,7 +387,7 @@ public class PremisUtils {
         agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
         agentIdentifier.setRole(agent.getRole());
         agentIdentifier.setTitle(agent.getTitle());
-        agentIdentifier.setType(agent.getType());
+        agentIdentifier.setType("simple");
       }
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
@@ -427,13 +427,12 @@ public class PremisUtils {
 
   public static ContentPayload createBaseRepresentation(String representationId) throws GenericException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
-    
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType("local");
     oict.setObjectIdentifierValue(representationId);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
-    document.set(representation);
+    document.setObject(representation);
     try {
       return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
     } catch (MetadataException e) {
@@ -443,6 +442,7 @@ public class PremisUtils {
 
   public static ContentPayload createBaseFile(File originalFile, ModelService model)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ObjectDocument document = ObjectDocument.Factory.newInstance();
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
@@ -473,8 +473,9 @@ public class PremisUtils {
     clct.setContentLocationType("");
     clct.setContentLocationValue("");
 
+    document.setObject(file);
     try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(file, true));
+      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
     } catch (MetadataException e) {
       throw new GenericException("Error creating base file", e);
     }
