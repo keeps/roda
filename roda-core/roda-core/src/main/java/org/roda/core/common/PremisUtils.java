@@ -90,6 +90,8 @@ import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.ObjectComplexType;
 import lc.xmlns.premisV2.ObjectDocument;
 import lc.xmlns.premisV2.ObjectIdentifierComplexType;
+import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
+import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
@@ -481,9 +483,22 @@ public class PremisUtils {
     }
   }
 
-  public static List<Fixity> extractFixities(Binary premisFile) {
-    // TODO Auto-generated method stub
-    return null;
+  public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
+    List<Fixity> fixities = new ArrayList<Fixity>();
+    lc.xmlns.premisV2.File f = binaryToFile(premisFile.getContent().createInputStream()); 
+    if(f.getObjectCharacteristicsList()!=null && f.getObjectCharacteristicsList().size()>0){
+      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
+      if(occt.getFixityList()!=null && occt.getFixityList().size()>0){
+        for(FixityComplexType fct : occt.getFixityList()){
+          Fixity fix = new Fixity();
+          fix.setMessageDigest(fct.getMessageDigest());
+          fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm());
+          fix.setMessageDigestOriginator(fct.getMessageDigestOriginator());
+          fixities.add(fix);
+        }
+      }
+    }
+    return fixities;
   }
 
   public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
@@ -618,7 +633,7 @@ public class PremisUtils {
     try {
       lc.xmlns.premisV2.File premisFile = binaryToFile(premisBinary.getContent().createInputStream());
       if (premisFile.getOriginalName() != null) {
-        doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName());
+        doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName().getStringValue());
 
         // TODO extension
       }
@@ -682,5 +697,23 @@ public class PremisUtils {
     agent.setIdentifierValue(id);
     agent.setTitle(plugin.getName());
     return agent;
+  }
+
+  public static ContentPayload linkFileToRepresentation(File file, String aipId, String representationId, ModelService model) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException, IOException {
+    Binary preservationRepresentation = model.getStorage().getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
+    Representation r = binaryToRepresentation(preservationRepresentation.getContent().createInputStream());
+    RelationshipComplexType relationship = r.addNewRelationship();
+    relationship.setRelationshipType("XXXX");
+    RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
+    roict.setRelatedObjectIdentifierType("local");
+    roict.setRelatedObjectIdentifierValue(file.getId()+".file.premis.xml");
+    
+    ObjectDocument document = ObjectDocument.Factory.newInstance();
+    document.setObject(r);
+    try {
+      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
+    } catch (MetadataException e) {
+      throw new GenericException("Error creating base representation", e);
+    }
   }
 }

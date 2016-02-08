@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -175,7 +176,7 @@ public class FixityPlugin implements Plugin<AIP> {
             }
           }
           IOUtils.closeQuietly(allFiles);
-        } catch (IOException | RODAException e) {
+        } catch (IOException | RODAException | XmlException e) {
           LOGGER.error("Error processing Representation " + r.getId() + " - " + e.getMessage(), e);
           try {
             PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,

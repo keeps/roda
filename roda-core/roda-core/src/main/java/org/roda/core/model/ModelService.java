@@ -1040,40 +1040,6 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  private PreservationMetadata convertResourceToPreservationMetadata(Resource resource) throws GenericException {
-    if (resource instanceof DefaultBinary) {
-      String id = resource.getStoragePath().getName();
-      String aipId = ModelUtils.getAIPidFromStoragePath(resource.getStoragePath());
-      String representationId = ModelUtils.getRepresentationIdFromStoragePath(resource.getStoragePath());
-      PreservationMetadataType type = ModelUtils.getPreservationType(((DefaultBinary) resource).getContent());
-
-      return new PreservationMetadata(id, aipId, representationId, type);
-    } else {
-      throw new GenericException(
-        "Error while trying to convert something that it isn't a Binary into a preservation metadata binary");
-    }
-  }
-
-  @Deprecated
-  private Representation convertResourceToRepresentation(Resource resource)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    if (resource instanceof DefaultDirectory) {
-      StoragePath directoryPath = resource.getStoragePath();
-
-      String id = directoryPath.getName();
-      String aipId = ModelUtils.getAIPidFromStoragePath(directoryPath);
-
-      // TODO infer original
-      boolean original = true;
-
-      return new Representation(id, aipId, original);
-
-    } else {
-      throw new GenericException(
-        "Error while trying to convert something that it isn't a Directory into a representation");
-    }
-  }
-
   private File convertResourceToRepresentationFile(Resource resource)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     File ret;
@@ -1154,56 +1120,6 @@ public class ModelService extends ModelObservable {
     if (notify) {
       notifyLogEntryCreated(logEntry);
     }
-  }
-
-  // TODO verify
-  public ClosableIterable<PreservationMetadata> listPreservationMetadataBinaries(String aipId, String representationID)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    ClosableIterable<PreservationMetadata> aipsIterable;
-
-    final ClosableIterable<Resource> resourcesIterable = storage
-      .listResourcesUnderContainer(ModelUtils.getAIPRepresentationPreservationPath(aipId, representationID));
-    Iterator<Resource> resourcesIterator = resourcesIterable.iterator();
-
-    aipsIterable = new ClosableIterable<PreservationMetadata>() {
-
-      @Override
-      public Iterator<PreservationMetadata> iterator() {
-        return new Iterator<PreservationMetadata>() {
-
-          @Override
-          public boolean hasNext() {
-            if (resourcesIterator == null) {
-              return false;
-            }
-            return resourcesIterator.hasNext();
-          }
-
-          @Override
-          public PreservationMetadata next() {
-            try {
-              Resource next = resourcesIterator.next();
-              return convertResourceToPreservationMetadata(next);
-            } catch (NoSuchElementException | GenericException e) {
-              LOGGER.error("Error while listing preservation metadata binaries", e);
-              return null;
-            }
-          }
-
-          @Override
-          public void remove() {
-            throw new UnsupportedOperationException();
-          }
-        };
-      }
-
-      @Override
-      public void close() throws IOException {
-        resourcesIterable.close();
-      }
-    };
-
-    return aipsIterable;
   }
 
   public void addLogEntry(LogEntry logEntry, Path logDirectory)

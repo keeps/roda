@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -117,7 +118,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
             new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-        } catch (RODAException e) {
+        } catch (RODAException | XmlException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
@@ -141,7 +142,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException {
+      NotFoundException, AuthorizationDeniedException, XmlException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
@@ -152,6 +153,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
       model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
         file.getId(), filePreservation);
+      ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file,aip.getId(),representationId,model);
     }
     IOUtils.closeQuietly(allFiles);
   }

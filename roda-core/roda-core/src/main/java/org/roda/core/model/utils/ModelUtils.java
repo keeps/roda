@@ -727,38 +727,6 @@ public final class ModelUtils {
     return objects;
   }
 
-  public static PreservationMetadataType getPreservationType(ContentPayload payload) throws GenericException {
-    PreservationMetadataType type;
-    EventComplexType event = ModelUtils.getPreservationEvent(payload);
-    if (event != null) {
-      type = PreservationMetadataType.EVENT;
-    } else {
-      // TODO review this method, loading a object can then infer the type by
-      // the class name
-
-      lc.xmlns.premisV2.File file = ModelUtils.getPreservationFileObject(payload);
-      if (file != null) {
-        type = PreservationMetadataType.OBJECT_FILE;
-      } else {
-        AgentComplexType agent = ModelUtils.getPreservationAgentObject(payload);
-        if (agent != null) {
-          type = PreservationMetadataType.AGENT;
-        } else {
-          lc.xmlns.premisV2.Representation representation = ModelUtils.getPreservationRepresentationObject(payload);
-          if (representation != null) {
-            type = PreservationMetadataType.OBJECT_REPRESENTATION;
-          } else {
-            // TODO send log
-            // TODO support remaining types
-            type = null;
-          }
-        }
-      }
-    }
-    return type;
-
-  }
-
   public static StoragePath getOtherMetadataDirectory(String aipID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER);
