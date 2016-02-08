@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -108,9 +109,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
-
+    IndexedPreservationAgent agent = null;
     try {
-      PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }
@@ -182,9 +183,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           model.updateFileFormats(updatedFiles);
 
           PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS,
-            getName() + "/" + getVersion(), RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
+           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
             "The files of the representation were successfully identified.",
-            RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, siegfriedOutput);
+            siegfriedOutput,agent);
 
           FSUtils.deletePath(data);
 

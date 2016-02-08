@@ -13,11 +13,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -81,6 +87,14 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+
+    IndexedPreservationAgent agent = null;
+    try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error creating auto-accept agent: " + e.getMessage(), e);
+    }
+
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
@@ -104,7 +118,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, outcomeDetail));
       }
 
-      createEvent(outcomeDetail, state, aip, model);
+      createEvent(outcomeDetail, state, aip, model, agent);
       report.addItem(reportItem);
 
       PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
@@ -114,8 +128,8 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     return report;
   }
 
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
-    throws PluginException {
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model,
+    IndexedPreservationAgent agent) throws PluginException {
 
     try {
       boolean success = (state == PluginState.SUCCESS);
@@ -123,35 +137,12 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
-          RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID", Arrays.asList(representation.getId()),
-          null, success ? "success" : "failure", success ? "" : "Error", outcomeDetail);
+          Arrays.asList(representation.getId()), null, success ? "success" : "failure", success ? "" : "Error",
+          outcomeDetail, agent);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
-
-    // TODO agent
-    /*
-     * DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
-     * EventPreservationObject epo = new EventPreservationObject();
-     * epo.setDatetime(new Date()); epo.setEventType(EventPreservationObject.
-     * PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK); epo.setEventDetail(
-     * "All the files from the SIP were verified against an antivirus.");
-     * epo.setAgentRole(EventPreservationObject.
-     * PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK); String name =
-     * UUID.randomUUID().toString(); epo.setId(name); epo.setAgentID("AGENT ID"
-     * ); epo.setObjectIDs(aip.getRepresentationIds().toArray(new
-     * String[aip.getRepresentationIds().size()]));
-     * epo.setOutcome(virusCheckResult.isClean()?"success":"error");
-     * epo.setOutcomeDetailNote("Report");
-     * epo.setOutcomeDetailExtension(virusCheckResult.getReport()); byte[]
-     * serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
-     * Path file = Files.createTempFile("preservation", ".xml"); Files.copy(new
-     * ByteArrayInputStream(serializedPremisEvent), file,
-     * StandardCopyOption.REPLACE_EXISTING); Binary resource = (Binary)
-     * FSUtils.convertPathToResource(file.getParent(), file);
-     * model.createPreservationMetadata(aip.getId(), name, resource);
-     */
   }
 
   @Override

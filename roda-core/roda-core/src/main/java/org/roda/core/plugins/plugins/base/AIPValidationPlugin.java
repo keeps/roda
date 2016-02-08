@@ -13,12 +13,18 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.PremisUtils;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -104,6 +110,12 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    IndexedPreservationAgent agent = null;
+    try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
+    }
 
     boolean validateDescriptiveMetadata = Boolean.parseBoolean(parameters.getOrDefault(
       PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getId(), PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getDefaultValue()));
@@ -140,16 +152,16 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
   // TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
   // TODO AGENT ID...
-  private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid)
-    throws PluginException {
+  private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid,
+    IndexedPreservationAgent agent) throws PluginException {
     try {
       boolean success = descriptiveValid && preservationValid;
 
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK, "AGENT ID", Arrays.asList(representation.getId()),
-          null, success ? "success" : "failure", "Report", "");
+          Arrays.asList(representation.getId()), null, success ? "success" : "failure", success ? "success" : "Error",
+          "", agent);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

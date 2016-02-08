@@ -20,12 +20,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Stack;
 
-import lc.xmlns.premisV2.EventComplexType;
-import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
-import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
-import lc.xmlns.premisV2.ExtensionComplexType;
-import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.LdapUtilityException;
@@ -49,9 +43,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.Metadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -76,6 +70,8 @@ import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import lc.xmlns.premisV2.EventComplexType;
 
 /**
  * Class that "relates" Model & Storage
@@ -1550,9 +1546,9 @@ public class ModelService extends ModelObservable {
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, payload, false, true);
-    List<PreservationLinkingAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type);
+    List<IndexedPreservationAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type);
     if (agents != null) {
-      for (PreservationLinkingAgent pla : agents) {
+      for (IndexedPreservationAgent pla : agents) {
         ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
           pla.getTitle() + "/" + pla.getVersion(), pla.getType());
         createPreservationMetadata(PreservationMetadataType.AGENT, null, null, pla.getIdentifierValue(), b);

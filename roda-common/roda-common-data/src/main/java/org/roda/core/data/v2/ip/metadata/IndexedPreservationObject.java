@@ -1,21 +1,29 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
+import java.util.Date;
 
-public class PreservationLinkingObject implements Serializable {
-  public enum LINKING_OBJECT_TYPE {
-    SOURCE, OUTCOME
-  }
-  
-  private static final long serialVersionUID = -3796945190331813821L;
+public class IndexedPreservationObject implements Serializable {
+  private static final long serialVersionUID = 7864328669898523851L;
+  private String id;
   private String role;
   private String title;
   private String type;
   private String identifierType;
   private String identifierValue;
-  private LINKING_OBJECT_TYPE objectType;
-  
-  public PreservationLinkingObject() {
+  private String version;
+  public String getId() {
+    return id;
+  }
+  public void setId(String id) {
+    this.id = id;
   }
   public String getRole() {
     return role;
@@ -35,12 +43,6 @@ public class PreservationLinkingObject implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
-  public LINKING_OBJECT_TYPE getObjectType() {
-    return objectType;
-  }
-  public void setObjectType(LINKING_OBJECT_TYPE objectType) {
-    this.objectType = objectType;
-  }
   public String getIdentifierType() {
     return identifierType;
   }
@@ -52,5 +54,11 @@ public class PreservationLinkingObject implements Serializable {
   }
   public void setIdentifierValue(String identifierValue) {
     this.identifierValue = identifierValue;
+  }
+  public String getVersion() {
+    return version;
+  }
+  public void setVersion(String version) {
+    this.version = version;
   }
 }

@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -180,12 +181,13 @@ public final class PluginHelper {
   }
 
   public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
-    ModelService model, String eventType, String eventDetails, String agentRole, String agentID, List<String> sources,
-    List<String> targets, String outcome, String detailNote, String detailExtension) throws PremisMetadataException,
-      IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
+    String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent)
+      throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
+      AuthorizationDeniedException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
-      targets, outcome, detailNote, detailExtension, agentID, agentRole);
+      targets, outcome, detailNote, detailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, aipID, representationID, id, premisEvent);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);
@@ -282,8 +284,9 @@ public final class PluginHelper {
     }
   }
 
-  public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state, String agentID,
-    String eventType, String eventDetails, String agentRole, String detailExtension) throws PluginException {
+  public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
+    String eventType, String eventDetails, String detailExtension, IndexedPreservationAgent agent)
+      throws PluginException {
     String outcome = "";
     switch (state) {
       case SUCCESS:
@@ -300,8 +303,8 @@ public final class PluginHelper {
     try {
       boolean success = (state == PluginState.SUCCESS);
       for (Representation representation : aip.getRepresentations()) {
-        createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails, agentRole, agentID,
-          Arrays.asList(representation.getId()), null, outcome, success ? "" : "Error", detailExtension);
+        createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
+          Arrays.asList(representation.getId()), null, outcome, success ? "" : "Error", detailExtension, agent);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

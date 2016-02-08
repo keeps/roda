@@ -46,6 +46,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
@@ -85,6 +86,7 @@ import lc.xmlns.premisV2.FormatDesignationComplexType;
 import lc.xmlns.premisV2.FormatRegistryComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
+import lc.xmlns.premisV2.ObjectComplexType;
 import lc.xmlns.premisV2.ObjectComplexType;
 import lc.xmlns.premisV2.ObjectDocument;
 import lc.xmlns.premisV2.ObjectIdentifierComplexType;
@@ -246,60 +248,37 @@ public class PremisUtils {
     FileFormat fileFormat = file.getFileFormat();
     lc.xmlns.premisV2.File f = binaryToFile(preservationFile.getContent().createInputStream());
     if (fileFormat != null) {
-      ObjectCharacteristicsComplexType occt = null;
-      FormatComplexType fct = null;
-      FormatDesignationComplexType fdct = null;
-      FormatRegistryComplexType registry = null;
-      CreatingApplicationComplexType cact = null;
-      if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
-        occt = f.getObjectCharacteristicsList().get(0);
-      } else {
-        occt = f.addNewObjectCharacteristics();
-      }
-      if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
-        fct = occt.getFormatList().get(0);
-      } else {
-        fct = occt.addNewFormat();
-      }
-      if (fct.getFormatDesignation() != null) {
-        fdct = fct.getFormatDesignation();
-      } else {
-        fdct = fct.addNewFormatDesignation();
-      }
+
       if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
+        FormatDesignationComplexType fdct = getFormatDesignation(f);
         fdct.setFormatName(fileFormat.getFormatDesignationName());
       }
       if (!StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
+        FormatDesignationComplexType fdct = getFormatDesignation(f);
         fdct.setFormatVersion(fileFormat.getFormatDesignationVersion());
       }
       if (!StringUtils.isBlank(fileFormat.getMimeType())) {
+        FormatDesignationComplexType fdct = getFormatDesignation(f);
         fdct.setFormatName(fileFormat.getFormatDesignationName());
       }
 
-      if (fct.getFormatRegistry() != null) {
-        registry = fct.getFormatRegistry();
-      } else {
-        registry = fct.addNewFormatRegistry();
+      if (!StringUtils.isBlank(fileFormat.getPronom())) {
+        FormatRegistryComplexType frct = getFormatRegistry(f, RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+        frct.setFormatRegistryKey(fileFormat.getPronom());
       }
 
-      if (!StringUtils.isBlank(fileFormat.getPronom())) {
-        registry.setFormatRegistryKey(RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-        registry.setFormatRegistryKey(fileFormat.getPronom());
-      }
-      if (occt.getCreatingApplicationList() != null && occt.getCreatingApplicationList().size() > 0) {
-        cact = occt.getCreatingApplicationList().get(0);
-      } else {
-        cact = occt.addNewCreatingApplication();
-      }
       if (!StringUtils.isBlank(file.getCreatingApplicationName())) {
+        CreatingApplicationComplexType cact = getCreatingApplication(f);
         cact.setCreatingApplicationName(file.getCreatingApplicationName());
       }
 
       if (!StringUtils.isBlank(file.getCreatingApplicationVersion())) {
+        CreatingApplicationComplexType cact = getCreatingApplication(f);
         cact.setCreatingApplicationVersion(file.getCreatingApplicationVersion());
       }
 
       if (!StringUtils.isBlank(file.getDateCreatedByApplication())) {
+        CreatingApplicationComplexType cact = getCreatingApplication(f);
         cact.setDateCreatedByApplication(file.getDateCreatedByApplication());
       }
     }
@@ -314,9 +293,68 @@ public class PremisUtils {
     return null;
   }
 
+  private static CreatingApplicationComplexType getCreatingApplication(lc.xmlns.premisV2.File f) {
+    ObjectCharacteristicsComplexType occt;
+    CreatingApplicationComplexType cact;
+    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+      occt = f.getObjectCharacteristicsList().get(0);
+    } else {
+      occt = f.addNewObjectCharacteristics();
+    }
+    if (occt.getCreatingApplicationList() != null && occt.getCreatingApplicationList().size() > 0) {
+      cact = occt.getCreatingApplicationArray(0);
+    } else {
+      cact = occt.addNewCreatingApplication();
+    }
+    return cact;
+  }
+
+  private static FormatRegistryComplexType getFormatRegistry(lc.xmlns.premisV2.File f, String registryName) {
+    ObjectCharacteristicsComplexType occt;
+    FormatComplexType fct;
+    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+      occt = f.getObjectCharacteristicsList().get(0);
+    } else {
+      occt = f.addNewObjectCharacteristics();
+    }
+    if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
+      fct = occt.getFormatList().get(0);
+    } else {
+      fct = occt.addNewFormat();
+    }
+    FormatRegistryComplexType frct = fct.getFormatRegistry();
+    if (frct == null) {
+      frct = fct.addNewFormatRegistry();
+      frct.setFormatRegistryName(registryName);
+    }
+    return frct;
+  }
+
+  private static FormatDesignationComplexType getFormatDesignation(lc.xmlns.premisV2.File f) {
+    ObjectCharacteristicsComplexType occt;
+    FormatComplexType fct;
+    FormatDesignationComplexType fdct;
+    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+      occt = f.getObjectCharacteristicsList().get(0);
+    } else {
+      occt = f.addNewObjectCharacteristics();
+    }
+    if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
+      fct = occt.getFormatList().get(0);
+    } else {
+      fct = occt.addNewFormat();
+    }
+    if (fct.getFormatDesignation() != null) {
+      fdct = fct.getFormatDesignation();
+    } else {
+      fdct = fct.addNewFormatDesignation();
+    }
+    return fdct;
+  }
+
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<String> sources, List<String> targets, String outcome, String detailNote, String detailExtension,
-    String agentID, String agentType) throws GenericException {
+    List<IndexedPreservationAgent> agent) throws GenericException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
@@ -615,15 +653,19 @@ public class PremisUtils {
     return doc;
   }
 
-  public static void createPremisAgentBinary(Plugin<?> plugin, String preservationAgentTypeCharacterizationPlugin,
+  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin, String preservationAgentTypeCharacterizationPlugin,
     ModelService model)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    // TODO optimize agent creation
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
-    ContentPayload agent;
-    agent = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
+    ContentPayload agentPayload;
+    agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, id, agent);
-
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, null, null, id, agentPayload);
+    IndexedPreservationAgent agent = new IndexedPreservationAgent();
+    agent.setId(id);
+    agent.setIdentifierType("local");
+    agent.setIdentifierValue(id);
+    agent.setTitle(plugin.getName());
+    return agent;
   }
 }

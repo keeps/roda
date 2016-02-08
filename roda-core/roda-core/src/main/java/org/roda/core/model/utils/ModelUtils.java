@@ -40,8 +40,8 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationLinkingAgent;
-import org.roda.core.data.v2.ip.metadata.PreservationLinkingObject;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationObject;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -667,9 +667,9 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static List<PreservationLinkingAgent> extractAgentsFromPreservationBinary(ContentPayload payload,
+  public static List<IndexedPreservationAgent> extractAgentsFromPreservationBinary(ContentPayload payload,
     PreservationMetadataType type) {
-    List<PreservationLinkingAgent> agents = new ArrayList<PreservationLinkingAgent>();
+    List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
     if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
       // TODO check if files has agents
       LOGGER.error("Not implemented!");
@@ -678,7 +678,7 @@ public final class ModelUtils {
       List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
       if (identifiers != null) {
         for (LinkingAgentIdentifierComplexType laict : identifiers) {
-          PreservationLinkingAgent agent = new PreservationLinkingAgent();
+          IndexedPreservationAgent agent = new IndexedPreservationAgent();
           agent.setTitle(laict.getTitle());
           agent.setIdentifierType(laict.getLinkingAgentIdentifierType());
           agent.setIdentifierValue(laict.getLinkingAgentIdentifierValue());
@@ -697,9 +697,9 @@ public final class ModelUtils {
     return agents;
   }
 
-  public static <T> List<PreservationLinkingObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
+  public static <T> List<IndexedPreservationObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
     Class<T> c) {
-    List<PreservationLinkingObject> objects = new ArrayList<PreservationLinkingObject>();
+    List<IndexedPreservationObject> objects = new ArrayList<IndexedPreservationObject>();
     if (c.equals(File.class)) {
       LOGGER.error("Not implemented!");
     } else if (c.equals(EventComplexType.class)) {
@@ -707,7 +707,7 @@ public final class ModelUtils {
       List<LinkingObjectIdentifierComplexType> identifiers = event.getLinkingObjectIdentifierList();
       if (identifiers != null) {
         for (LinkingObjectIdentifierComplexType loict : identifiers) {
-          PreservationLinkingObject object = new PreservationLinkingObject();
+          IndexedPreservationObject object = new IndexedPreservationObject();
 
           object.setTitle(loict.getTitle());
           object.setIdentifierType(loict.getLinkingObjectIdentifierType());

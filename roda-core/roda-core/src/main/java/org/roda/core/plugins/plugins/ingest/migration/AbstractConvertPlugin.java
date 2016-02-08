@@ -15,6 +15,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -26,6 +27,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -151,6 +153,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    IndexedPreservationAgent agent = null;
+    try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      logger.error("Error running adding Conversion plugin: " + e.getMessage(), e);
+    }
 
     for (AIP aip : list) {
       logger.debug("Processing AIP " + aip.getId());
@@ -254,7 +262,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         }
 
         logger.debug("Creating convert plugin event for the representation " + representation.getId());
-        createEvent(alteredFiles, aip, representation.getId(), newRepresentationID, model, state);
+        createEvent(alteredFiles, aip, representation.getId(), newRepresentationID, model, state,agent);
       }
 
       try {
@@ -287,6 +295,14 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
     throws PluginException {
 
+    
+    IndexedPreservationAgent agent = null;
+    try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      logger.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
+    }
+    
     int state = 1;
     Set<String> aipSet = new HashSet<String>();
 
@@ -392,7 +408,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<String> alteredFiles, AIP aip, String representationID, String newRepresentionID,
-    ModelService model, int state) throws PluginException {
+    ModelService model, int state, IndexedPreservationAgent agent) throws PluginException {
 
     // building the detail extension for the plugin event
     String outcome = "success";
@@ -420,13 +436,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginAgent(model, getClass().getName() + "@" + getVersion(), getClass().getName(),
-        RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN);
-      PluginHelper.createPluginEvent(aip.getId(), representationID, null, model,
-        RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
-        RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, getClass().getName() + "@" + getVersion(),
-        Arrays.asList(representationID), null, outcome, stringBuilder.toString(), null);
-
+      PluginHelper.createPluginEvent(aip.getId(), representationID, null, model,  RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation", 
+        Arrays.asList(representationID), null, outcome, stringBuilder.toString(), null, agent);
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException e) {
       throw new PluginException(e.getMessage(), e);

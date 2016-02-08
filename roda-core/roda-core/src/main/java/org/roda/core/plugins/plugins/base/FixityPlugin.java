@@ -17,14 +17,18 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -96,6 +100,15 @@ public class FixityPlugin implements Plugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+
+    IndexedPreservationAgent agent = null;
+    try {
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN,
+        model);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
+    }
+
     for (AIP aip : list) {
 
       for (Representation r : aip.getRepresentations()) {
@@ -146,20 +159,18 @@ public class FixityPlugin implements Plugin<AIP> {
                 sb.append("<li>" + s + "</li>");
               }
               sb.append("</ul>");
+
               PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository",
-                RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
-                Arrays.asList(r.getId()), null, "failure", "Reason", sb.toString());
+                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
+                null, "failure", "Reason", sb.toString(), agent);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {
               LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
               PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository",
-                RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
-                Arrays.asList(r.getId()), null, "success", okFileIDS.size() + " files checked successfully",
-                okFileIDS.toString());
+                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
+                null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), agent);
               notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);
             }
           }
@@ -169,9 +180,8 @@ public class FixityPlugin implements Plugin<AIP> {
           try {
             PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
               RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-              "Checksums recorded in PREMIS were compared with the files in the repository",
-              RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK, getName() + "/" + getVersion(),
-              Arrays.asList(r.getId()), null, "partial success", "Reason", "<p>" + e.getMessage() + "</p>");
+              "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
+              null, "partial success", "Reason", "<p>" + e.getMessage() + "</p>", agent);
             notifyUserOfFixityCheckUndetermined(r.getId(), pm, e.getMessage());
           } catch (RODAException | IOException e1) {
             LOGGER.error("Error creating premis event for representation " + r.getId() + " of AIP " + aip.getId());
