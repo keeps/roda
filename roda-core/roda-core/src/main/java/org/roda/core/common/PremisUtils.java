@@ -84,9 +84,9 @@ import lc.xmlns.premisV2.FixityComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
 import lc.xmlns.premisV2.FormatDesignationComplexType;
 import lc.xmlns.premisV2.FormatRegistryComplexType;
+import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
-import lc.xmlns.premisV2.ObjectComplexType;
 import lc.xmlns.premisV2.ObjectComplexType;
 import lc.xmlns.premisV2.ObjectDocument;
 import lc.xmlns.premisV2.ObjectIdentifierComplexType;
@@ -354,7 +354,7 @@ public class PremisUtils {
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<String> sources, List<String> targets, String outcome, String detailNote, String detailExtension,
-    List<IndexedPreservationAgent> agent) throws GenericException {
+    List<IndexedPreservationAgent> agents) throws GenericException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
@@ -376,6 +376,18 @@ public class PremisUtils {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(target);
         loict.setLinkingObjectIdentifierType("target");
+      }
+    }
+    
+    
+    if(agents!=null){
+      for (IndexedPreservationAgent agent : agents) {
+        LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
+        agentIdentifier.setLinkingAgentIdentifierType("local");
+        agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
+        agentIdentifier.setRole(agent.getRole());
+        agentIdentifier.setTitle(agent.getTitle());
+        agentIdentifier.setType(agent.getType());
       }
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
@@ -414,14 +426,16 @@ public class PremisUtils {
   }
 
   public static ContentPayload createBaseRepresentation(String representationId) throws GenericException {
+    ObjectDocument document = ObjectDocument.Factory.newInstance();
+    
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType("local");
     oict.setObjectIdentifierValue(representationId);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
-
+    document.set(representation);
     try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(representation, true));
+      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
     } catch (MetadataException e) {
       throw new GenericException("Error creating base representation", e);
     }
