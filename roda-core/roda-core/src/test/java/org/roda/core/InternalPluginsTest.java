@@ -65,6 +65,7 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lc.xmlns.premisV2.FormatComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.Representation;
 
@@ -290,7 +291,30 @@ public class InternalPluginsTest {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
     assertReports(reports);
 
-    // TODO test if Siegfried as correctly executed
+    aip = model.retrieveAIP(aip.getId());
+
+    // 12 files with siegfried output
+    Assert.assertEquals(12, aip.getMetadata().getOtherMetadata().size());
+
+    Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      SiegfriedPlugin.OTHER_METADATA_TYPE);
+
+    Assert.assertNotNull(om);
+
+    Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+
+    lc.xmlns.premisV2.File fpo = PremisUtils.binaryToFile(fpo_bin.getContent(), true);
+
+    FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
+    Assert.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName());
+    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, format.getFormatRegistry().getFormatRegistryName());
+    Assert.assertEquals("x-fmt/111", format.getFormatRegistry().getFormatRegistryKey());
+
+    // TODO check format MIME type
+
+    // TODO test if PREMIS event was created
 
   }
 

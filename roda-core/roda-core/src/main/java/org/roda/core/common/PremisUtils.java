@@ -362,7 +362,6 @@ public class PremisUtils {
     if (sources != null) {
       for (String source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        LOGGER.error("SETTING IDENTIFIER: "+source);
         loict.setLinkingObjectIdentifierValue(source);
         loict.setLinkingObjectIdentifierType("source");
       }

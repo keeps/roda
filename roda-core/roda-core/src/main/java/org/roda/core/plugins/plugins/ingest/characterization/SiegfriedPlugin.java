@@ -54,6 +54,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin implements Plugin<AIP> {
+  public static final String OTHER_METADATA_TYPE = "Siegfried";
+  public static final String FILE_SUFFIX = ".json";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
 
   private Map<String, String> parameters;
@@ -114,7 +117,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
         model);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
+        model);
     } catch (RODAException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }
@@ -148,8 +152,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
             ContentPayload payload = new StringContentPayload(fileObject.toString());
 
-            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileName, ".json",
-              "Siegfried", payload);
+            model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileName, FILE_SUFFIX,
+              OTHER_METADATA_TYPE, payload);
 
             JSONArray matches = (JSONArray) fileObject.get("matches");
             if (matches.length() > 0) {
