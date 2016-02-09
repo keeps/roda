@@ -201,7 +201,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
   private List<String> extractDirectoryPath(Path transferredResourcePath, Path file) {
     List<String> directoryPath = new ArrayList<>();
     Path relativePath = transferredResourcePath.relativize(file);
-    for (int i = 0; i < relativePath.getNameCount() - 2; i++) {
+    for (int i = 0; i < relativePath.getNameCount() - 1; i++) {
       directoryPath.add(relativePath.getName(i).toString());
     }
     return directoryPath;

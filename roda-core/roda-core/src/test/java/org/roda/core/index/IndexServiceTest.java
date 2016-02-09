@@ -85,7 +85,13 @@ public class IndexServiceTest {
 
     basePath = Files.createTempDirectory("indexTests");
     System.setProperty("roda.home", basePath.toString());
-    RodaCoreFactory.instantiateTest();
+
+    boolean deploySolr = true;
+    boolean deployLdap = true;
+    boolean deployFolderMonitor = false;
+    boolean deployOrchestrator = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();

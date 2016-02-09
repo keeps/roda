@@ -12,6 +12,8 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -26,19 +28,26 @@ public class FileVisitorChecker implements FileVisitor<Path> {
   private IndexService index;
   private Path basePath;
   private boolean ok;
+  private final List<Path> pathsNotFound;
 
   public FileVisitorChecker(Path basePath, IndexService index) {
     this.index = index;
     this.ok = true;
     this.basePath = basePath;
+    this.pathsNotFound = new ArrayList<>();
   }
 
   @Override
   public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-    if (basePath.relativize(dir).getNameCount() > 1) {
+    Path relativePath = basePath.relativize(dir);
+    if (relativePath.getNameCount() > 1) {
       try {
-        index.retrieve(TransferredResource.class, basePath.relativize(dir).toString());
-      } catch (NotFoundException | GenericException e) {
+        index.retrieve(TransferredResource.class, relativePath.toString());
+      } catch (NotFoundException e) {
+        LOGGER.error("Could not find: " + relativePath);
+        this.ok = false;
+        this.pathsNotFound.add(relativePath);
+      } catch (GenericException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }
@@ -53,10 +62,15 @@ public class FileVisitorChecker implements FileVisitor<Path> {
 
   @Override
   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-    if (basePath.relativize(file).getNameCount() > 1) {
+    Path relativePath = basePath.relativize(file);
+    if (relativePath.getNameCount() > 1) {
       try {
-        index.retrieve(TransferredResource.class, basePath.relativize(file).toString());
-      } catch (NotFoundException | GenericException e) {
+        index.retrieve(TransferredResource.class, relativePath.toString());
+      } catch (NotFoundException e) {
+        LOGGER.error("Could not find: " + relativePath);
+        this.ok = false;
+        this.pathsNotFound.add(relativePath);
+      } catch (GenericException e) {
         LOGGER.error("Error", e);
         this.ok = false;
       }
@@ -71,6 +85,10 @@ public class FileVisitorChecker implements FileVisitor<Path> {
 
   public boolean isOk() {
     return ok;
+  }
+
+  public List<Path> getPathsNotFound() {
+    return pathsNotFound;
   }
 
 }

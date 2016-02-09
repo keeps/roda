@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 
 public class InternalPluginsTest {
 
+  private static final int AUTO_COMMIT_TIMEOUT = 3000;
   private static Path basePath;
   private static Path logPath;
   private static ModelService model;
@@ -67,7 +68,12 @@ public class InternalPluginsTest {
 
     basePath = Files.createTempDirectory("indexTests");
     System.setProperty("roda.home", basePath.toString());
-    RodaCoreFactory.instantiateTest();
+
+    boolean deploySolr = true;
+    boolean deployLdap = false;
+    boolean deployFolderMonitor = true;
+    boolean deployOrchestrator = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -135,8 +141,8 @@ public class InternalPluginsTest {
     // TODO check if 4 times is the expected
     Mockito.verify(observer, Mockito.times(4));
 
-    logger.info("Waiting 3s for soft-commit");
-    Thread.sleep(3000);
+    logger.info("Waiting for soft-commit");
+    Thread.sleep(AUTO_COMMIT_TIMEOUT);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class, "test");
     Assert.assertNotNull(transferredResource);
@@ -158,6 +164,6 @@ public class InternalPluginsTest {
 
     logger.info("All files: " + reusableAllFiles);
 
-    Assert.assertEquals(12, reusableAllFiles.size());
+    Assert.assertEquals(15, reusableAllFiles.size());
   }
 }

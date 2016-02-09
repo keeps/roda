@@ -165,8 +165,11 @@ public class RodaCoreFactory {
   private static IndexService index;
   private static SolrClient solr;
   private static boolean FEATURE_OVERRIDE_INDEX_CONFIGS = true;
-  private static boolean TEST_DONT_DEPLOY_SOLR = false;
-  private static boolean TEST_DONT_DEPLOY_LDAP = false;
+
+  private static boolean TEST_DEPLOY_SOLR = true;
+  private static boolean TEST_DEPLOY_LDAP = true;
+  private static boolean TEST_DEPLOY_FOLDER_MONITOR = true;
+  private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
 
   // Core related constants
   private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
@@ -223,9 +226,12 @@ public class RodaCoreFactory {
     instantiate(NodeType.WORKER);
   }
 
-  public static void instantiateTest(boolean dontInstantiateSolr, boolean dontInstantiateLdap) {
-    TEST_DONT_DEPLOY_SOLR = dontInstantiateSolr;
-    TEST_DONT_DEPLOY_LDAP = dontInstantiateLdap;
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployFolderMonitor,
+    boolean deployOrchestrator) {
+    TEST_DEPLOY_SOLR = deploySolr;
+    TEST_DEPLOY_LDAP = deployLdap;
+    TEST_DEPLOY_FOLDER_MONITOR = deployFolderMonitor;
+    TEST_DEPLOY_ORCHESTRATOR = deployOrchestrator;
     instantiated = false;
     instantiate(NodeType.TEST);
   }
@@ -358,7 +364,7 @@ public class RodaCoreFactory {
 
       // instantiate index related object
       index = new IndexService(solr, model);
-    } else if (nodeType == NodeType.TEST && !TEST_DONT_DEPLOY_SOLR) {
+    } else if (nodeType == NodeType.TEST && TEST_DEPLOY_SOLR) {
       try {
         URL solrConfigURL = RodaCoreFactory.class
           .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/solr.xml");
@@ -474,18 +480,21 @@ public class RodaCoreFactory {
         getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
         getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
     } else if (nodeType == NodeType.TEST) {
-      if (!TEST_DONT_DEPLOY_LDAP) {
+      if (TEST_DEPLOY_LDAP) {
         startApacheDS();
       }
 
-      try {
-        startTransferredResourcesFolderMonitor();
-      } catch (Exception e) {
-        LOGGER.error("Error starting Transferred Resources Monitor: " + e.getMessage(), e);
+      if (TEST_DEPLOY_FOLDER_MONITOR) {
+        try {
+          startTransferredResourcesFolderMonitor();
+        } catch (Exception e) {
+          LOGGER.error("Error starting Transferred Resources Monitor: " + e.getMessage(), e);
+        }
       }
-      
-      // Starting orchestrator 
-      pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+
+      if (TEST_DEPLOY_ORCHESTRATOR) {
+        pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+      }
     } else {
       LOGGER.error("Unknown node type \"" + nodeType + "\"");
     }
@@ -589,20 +598,30 @@ public class RodaCoreFactory {
 
   public static void shutdown() throws IOException {
     if (instantiated) {
-      solr.close();
 
-      if (nodeType == NodeType.MASTER || nodeType == NodeType.TEST) {
+      if (nodeType == NodeType.MASTER) {
+        solr.close();
         stopApacheDS();
-      }
-
-      if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER) {
         pluginManager.shutdown();
+        transferredResourcesFolderMonitor.stopWatch();
+        pluginOrchestrator.shutdown();
+      } else if (nodeType == NodeType.WORKER) {
+        pluginManager.shutdown();
+      } else if (nodeType == NodeType.TEST) {
+        if (TEST_DEPLOY_SOLR) {
+          solr.close();
+        }
+        if (TEST_DEPLOY_LDAP) {
+          stopApacheDS();
+        }
+        if (TEST_DEPLOY_FOLDER_MONITOR) {
+          transferredResourcesFolderMonitor.stopWatch();
+        }
+        if (TEST_DEPLOY_ORCHESTRATOR) {
+          pluginOrchestrator.shutdown();
+        }
       }
 
-      if (nodeType == NodeType.MASTER || nodeType == NodeType.TEST) {
-        pluginOrchestrator.shutdown();
-        transferredResourcesFolderMonitor.stopWatch();
-      }
     }
   }
 
@@ -714,6 +733,14 @@ public class RodaCoreFactory {
 
   public static IndexService getIndexService() {
     return index;
+  }
+
+  public static SolrClient getSolr() {
+    return solr;
+  }
+
+  public static void setSolr(SolrClient solr) {
+    RodaCoreFactory.solr = solr;
   }
 
   public static PluginManager getPluginManager() {

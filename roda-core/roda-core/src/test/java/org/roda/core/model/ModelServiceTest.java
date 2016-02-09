@@ -108,7 +108,13 @@ public class ModelServiceTest {
   public void init() throws IOException, GenericException {
     basePath = Files.createTempDirectory("modelTests");
     System.setProperty("roda.home", basePath.toString());
-    RodaCoreFactory.instantiateTest(true, true);
+
+    boolean deploySolr = false;
+    boolean deployLdap = false;
+    boolean deployFolderMonitor = false;
+    boolean deployOrchestrator = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+
     logPath = RodaCoreFactory.getLogPath();
     storage = RodaCoreFactory.getStorageService();
     model = RodaCoreFactory.getModelService();
