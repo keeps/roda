@@ -222,7 +222,7 @@ public class InternalPluginsTest {
   private boolean getReportOutcome(Report report) {
     for (Attribute attribute : report.getItems().get(0).getAttributes()) {
       if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME)) {
-        return attribute.getValue().equals(RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS);
+        return attribute.getValue().equalsIgnoreCase(RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS);
       }
     }
     return false;
