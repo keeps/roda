@@ -53,7 +53,8 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   private TextColumn<IndexedPreservationEvent> eventAgentColumn;
   private TextColumn<IndexedPreservationEvent> eventTypeColumn;
   private TextColumn<IndexedPreservationEvent> eventDetailColumn;
-  private TextColumn<IndexedPreservationEvent> eventObjectColumn;
+  private TextColumn<IndexedPreservationEvent> eventSourceObjectColumn;
+  private TextColumn<IndexedPreservationEvent> eventOutcomeObjectColumn;
   private TextColumn<IndexedPreservationEvent> eventOutcomeColumn;
 
   public PreservationEventList() {
@@ -105,21 +106,17 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       public String getValue(IndexedPreservationEvent event) {
         String ret = null;
         if (event != null) {
-          //TODO IMPROVE...
           if(event.getLinkingAgentIds()!=null){
-            ret = "";
-            for(String agentID : event.getLinkingAgentIds()){
-              ret+=agentID;
-              ret+=" ";
-            }
-            ret = ret.trim();
+            ret = event.getLinkingAgentIds().size()+ " agents";
+          } else {
+            ret = "none";
           }
         }
         return ret;
       }
     };
 
-    eventObjectColumn = new TextColumn<IndexedPreservationEvent>() {
+    eventSourceObjectColumn = new TextColumn<IndexedPreservationEvent>() {
 
       @Override
       public String getValue(IndexedPreservationEvent event) {
@@ -128,12 +125,9 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
         //TODO handle outcome objects
         if (event != null) {
           if(event.getSourcesObjectIds()!=null){
-            ret = "";
-            for(String sourceID : event.getSourcesObjectIds()){
-              ret+=sourceID;
-              ret+=" ";
-            }
-            ret = ret.trim();
+            ret = event.getSourcesObjectIds().size()+ " objects";
+          } else {
+            ret = "none";
           }
           
         }
@@ -143,6 +137,26 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     };
 
+    eventOutcomeObjectColumn = new TextColumn<IndexedPreservationEvent>() {
+
+      @Override
+      public String getValue(IndexedPreservationEvent event) {
+        String ret = null;
+        // TODO define link
+        if (event != null) {
+          if(event.getOutcomeObjectIds()!=null){
+            ret = event.getOutcomeObjectIds().size()+ " objects";
+          } else {
+            ret = "none";
+          }
+          
+        }
+
+        return ret;
+      }
+
+    };
+    
     eventDateTimeColumn.setSortable(true);
     eventTypeColumn.setSortable(true);
     eventDetailColumn.setSortable(true);
@@ -154,7 +168,8 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     display.addColumn(eventAgentColumn, messages.preservationEventListHeaderAgent());
     display.addColumn(eventTypeColumn, messages.preservationEventListHeaderType());
     display.addColumn(eventDetailColumn, messages.preservationEventListHeaderDetail());
-    display.addColumn(eventObjectColumn, messages.preservationEventListHeaderObject());
+    display.addColumn(eventSourceObjectColumn, messages.preservationEventListHeaderSourceObject());
+    display.addColumn(eventOutcomeObjectColumn, messages.preservationEventListHeaderOutcomeObject());
     display.addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome());
 
     // display.setColumnWidth(eventDetailColumn, "100%");
@@ -169,7 +184,8 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     eventAgentColumn.setCellStyleNames("nowrap");
     // eventTypeColumn.setCellStyleNames("nowrap");
     eventOutcomeColumn.setCellStyleNames("nowrap");
-    eventObjectColumn.setCellStyleNames("nowrap");
+    eventSourceObjectColumn.setCellStyleNames("nowrap");
+    eventOutcomeObjectColumn.setCellStyleNames("nowrap");
     eventAgentColumn.setCellStyleNames("nowrap");
 
   }

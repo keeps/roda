@@ -400,8 +400,11 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Detail")
   String preservationEventListHeaderDetail();
 
-  @DefaultMessage("Objects")
-  String preservationEventListHeaderObject();
+  @DefaultMessage("Source objects")
+  String preservationEventListHeaderSourceObject();
+  
+  @DefaultMessage("Outcome objects")
+  String preservationEventListHeaderOutcomeObject();
 
   @DefaultMessage("Outcome")
   String preservationEventListHeaderOutcome();

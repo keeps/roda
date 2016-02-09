@@ -92,7 +92,7 @@ import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
 public class PremisUtils {
-  private static final String SEPARATOR = "_";
+  private static final String SEPARATOR = "/";
   private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
