@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.filter.Filter;
@@ -45,6 +46,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -53,6 +55,9 @@ import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -60,8 +65,14 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
+import lc.xmlns.premisV2.Representation;
+
 public class InternalPluginsTest {
 
+  private static final String CORPORA_TEST1 = "test1";
+  private static final String CORPORA_TEST1_TXT = "test1.txt";
+  private static final int GENERATED_FILE_SIZE = 100;
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
   private static Path logPath;
@@ -122,21 +133,22 @@ public class InternalPluginsTest {
     // FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
 
     f.createFolder(null, "test");
-    f.createFolder("test", "test1");
+    f.createFolder("test", CORPORA_TEST1);
     f.createFolder("test", "test2");
     f.createFolder("test", "test3");
 
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(RandomStringUtils.random(100).getBytes());
-    f.createFile("test", "test1.txt", inputStream);
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(
+      RandomStringUtils.random(GENERATED_FILE_SIZE).getBytes());
+    f.createFile("test", CORPORA_TEST1_TXT, inputStream);
     f.createFile("test", "test2.txt", inputStream);
     f.createFile("test", "test3.txt", inputStream);
-    f.createFile("test/test1", "test1.txt", inputStream);
+    f.createFile("test/test1", CORPORA_TEST1_TXT, inputStream);
     f.createFile("test/test1", "test2.txt", inputStream);
     f.createFile("test/test1", "test3.txt", inputStream);
-    f.createFile("test/test2", "test1.txt", inputStream);
+    f.createFile("test/test2", CORPORA_TEST1_TXT, inputStream);
     f.createFile("test/test2", "test2.txt", inputStream);
     f.createFile("test/test2", "test3.txt", inputStream);
-    f.createFile("test/test3", "test1.txt", inputStream);
+    f.createFile("test/test3", CORPORA_TEST1_TXT, inputStream);
     f.createFile("test/test3", "test2.txt", inputStream);
     f.createFile("test/test3", "test3.txt", inputStream);
 
@@ -148,6 +160,32 @@ public class InternalPluginsTest {
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class, "test");
     return transferredResource;
+  }
+
+  private void assertReports(List<Report> reports) {
+    for (Report report : reports) {
+      boolean outcome = getReportOutcome(report);
+      String outcomeDetails = getReportOutcomeDetails(report);
+      Assert.assertTrue(outcomeDetails, outcome);
+    }
+  }
+
+  private String getReportOutcomeDetails(Report report) {
+    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
+      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS)) {
+        return attribute.getValue();
+      }
+    }
+    return "";
+  }
+
+  private boolean getReportOutcome(Report report) {
+    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
+      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME)) {
+        return attribute.getValue().equalsIgnoreCase(RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS);
+      }
+    }
+    return false;
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
@@ -163,7 +201,9 @@ public class InternalPluginsTest {
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, Arrays.asList(transferredResource));
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+      Arrays.asList(transferredResource));
+    assertReports(reports);
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -199,32 +239,82 @@ public class InternalPluginsTest {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
     assertReports(reports);
 
+    aip = model.retrieveAIP(aip.getId());
+
+    // 12 files and one representation
+    Assert.assertEquals(13, aip.getMetadata().getPreservationMetadata().size());
+
+    Binary rpo_bin = model.retrieveRepresentationPreservationObject(aip.getId(),
+      aip.getRepresentations().get(0).getId());
+    Representation rpo = PremisUtils.binaryToRepresentation(rpo_bin.getContent(), true);
+
+    // Relates to 12 files
+    Assert.assertEquals(12, rpo.getRelationshipList().size());
+
+    Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+
+    lc.xmlns.premisV2.File fpo = PremisUtils.binaryToFile(fpo_bin.getContent(), true);
+
+    ObjectCharacteristicsComplexType fileCharacteristics = fpo.getObjectCharacteristicsArray(0);
+
+    // check a fixity was generated
+    Assert.assertTrue("No fixity checks", fileCharacteristics.getFixityList().size() > 0);
+
+    // check file size
+    long size = fileCharacteristics.getSize();
+    Assert.assertEquals(GENERATED_FILE_SIZE, size);
+
+    // check file original name
+    String originalName = fpo.getOriginalName().getStringValue();
+    Assert.assertEquals(CORPORA_TEST1_TXT, originalName);
+
   }
 
-  private void assertReports(List<Report> reports) {
-    for (Report report : reports) {
-      logger.info("Report: " + report);
-      boolean outcome = getReportOutcome(report);
-      String outcomeDetails = getReportOutcomeDetails(report);
-      Assert.assertTrue(outcomeDetails, outcome);
-    }
+  @Test
+  public void testSiegfried() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+    AIP aip = ingestCorpora();
+
+    Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    premisSkeletonPlugin.setParameterValues(parameters);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, Arrays.asList(aip.getId()));
+
+    Plugin<AIP> plugin = new SiegfriedPlugin();
+    Map<String, String> parameters2 = new HashMap<>();
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    plugin.setParameterValues(parameters2);
+
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
+    assertReports(reports);
+
+    // TODO test if Siegfried as correctly executed
+
   }
 
-  private String getReportOutcomeDetails(Report report) {
-    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
-      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS)) {
-        return attribute.getValue();
-      }
-    }
-    return "";
+  @Test
+  public void testApacheTika() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+    AIP aip = ingestCorpora();
+
+    Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    premisSkeletonPlugin.setParameterValues(parameters);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, Arrays.asList(aip.getId()));
+
+    Plugin<AIP> plugin = new TikaFullTextPlugin();
+    Map<String, String> parameters2 = new HashMap<>();
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    plugin.setParameterValues(parameters2);
+
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
+    assertReports(reports);
+
+    // TODO test if Siegfried as correctly executed
+
   }
 
-  private boolean getReportOutcome(Report report) {
-    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
-      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME)) {
-        return attribute.getValue().equalsIgnoreCase(RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS);
-      }
-    }
-    return false;
-  }
 }

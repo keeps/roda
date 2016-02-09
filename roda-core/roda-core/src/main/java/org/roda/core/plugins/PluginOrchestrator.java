@@ -25,13 +25,14 @@ public interface PluginOrchestrator {
 
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
 
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin);
+  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin);
 
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin);
+  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin);
 
-  public void runPluginOnAllFiles(Plugin<File> plugin);
+  public List<Report> runPluginOnAllFiles(Plugin<File> plugin);
 
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths);
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
+    List<TransferredResource> paths);
 
   public <T extends Serializable> void runPlugin(Plugin<T> plugin);
 

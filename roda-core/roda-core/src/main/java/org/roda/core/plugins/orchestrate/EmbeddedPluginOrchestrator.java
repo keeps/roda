@@ -178,7 +178,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
       ClosableIterable<AIP> aips = model.listAIPs();
@@ -209,10 +209,13 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       LOGGER.error("Error running plugin on all AIPs", e);
     }
 
+    // TODO return reports
+    return null;
+
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
       ClosableIterable<AIP> aips = model.listAIPs();
@@ -245,10 +248,13 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all representations", e);
     }
+
+    // TODO return all reports
+    return null;
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
+  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
       ClosableIterable<AIP> aips = model.listAIPs();
@@ -290,10 +296,14 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all files", e);
     }
+
+    // TODO return all reports
+    return null;
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> resources) {
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
+    List<TransferredResource> resources) {
     try {
       plugin.beforeExecute(index, model, storage);
 
@@ -317,6 +327,9 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on transferred resources", e);
     }
+
+    // TODO return all reports
+    return null;
 
   }
 

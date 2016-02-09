@@ -146,7 +146,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
                 boolean notifyFileCreated = false;
                 File createdFile = model.createFile(aip.getId(), representationId, directoryPath, fileId, payload,
                   notifyFileCreated);
-                LOGGER.info("Created file: " + createdFile);
+                LOGGER.debug("Created " + createdFile);
               } catch (RODAException e) {
                 // TODO log or mark nothing to do
               }

@@ -125,7 +125,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
-    List<Report> ret = null;
     try {
       int multiplier = 0;
       LOGGER.info("Executing beforeExecute");
@@ -159,25 +158,31 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
-      ret = new ArrayList<>();
-      for (Object o : reports) {
-        if (o instanceof Report) {
-          ret.add((Report) o);
-        } else {
-          LOGGER.warn("Got a response that was not a report: " + o.getClass().getName());
-        }
-      }
+      return mapToReports(reports);
 
     } catch (Exception e) {
       // FIXME catch proper exception
       LOGGER.error("Error executing job", e);
     }
     LOGGER.info("End of method");
+    return null;
+  }
+
+  private List<Report> mapToReports(Iterable<Object> reports) {
+    List<Report> ret;
+    ret = new ArrayList<>();
+    for (Object o : reports) {
+      if (o instanceof Report) {
+        ret.add((Report) o);
+      } else {
+        LOGGER.warn("Got a response that was not a report: " + o.getClass().getName());
+      }
+    }
     return ret;
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       int multiplier = 0;
       LOGGER.info("Executing beforeExecute");
@@ -207,20 +212,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       plugin.afterExecute(index, model, storage);
+
+      return mapToReports(reports);
 
     } catch (Exception e) {
       // FIXME catch proper exception
       e.printStackTrace();
     }
     LOGGER.info("End of method");
-
+    return null;
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
@@ -252,19 +259,20 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       plugin.afterExecute(index, model, storage);
 
+      return mapToReports(reports);
     } catch (Exception e) {
       // FIXME catch proper exception
       e.printStackTrace();
     }
-
+    return null;
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
+  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
@@ -308,14 +316,17 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       plugin.afterExecute(index, model, storage);
+
+      return mapToReports(reports);
 
     } catch (Exception e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
+    return null;
 
   }
 
@@ -347,7 +358,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> resources) {
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
+    List<TransferredResource> resources) {
     try {
       int multiplier = 0;
       LOGGER.info("Executing beforeExecute");
@@ -373,16 +385,18 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       plugin.afterExecute(index, model, storage);
+
+      return mapToReports(reports);
 
     } catch (Exception e) {
       // FIXME catch proper exception
       e.printStackTrace();
     }
     LOGGER.info("End of method");
-
+    return null;
   }
 
   @Override

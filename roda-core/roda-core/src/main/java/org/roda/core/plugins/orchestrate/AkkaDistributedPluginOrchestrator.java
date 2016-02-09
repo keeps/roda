@@ -145,18 +145,18 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
-
+  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
+    return null;
   }
 
   @Override
-  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
-
+  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+    return null;
   }
 
   @Override
-  public void runPluginOnAllFiles(Plugin<File> plugin) {
-
+  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
+    return null;
   }
 
   @Override
@@ -170,8 +170,9 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<TransferredResource> paths) {
-
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
+    List<TransferredResource> paths) {
+    return null;
   }
 
   @Override

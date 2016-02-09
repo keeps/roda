@@ -1332,7 +1332,6 @@ public class ModelService extends ModelObservable {
     }
     return user;
   }
-  
 
   public Binary retrieveOtherMetadataBinary(OtherMetadata om)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -1386,9 +1385,9 @@ public class ModelService extends ModelObservable {
       fileSuffix, type);
     boolean asReference = false;
     boolean createIfNotExists = true;
-    try{
+    try {
       storage.createBinary(binaryPath, payload, asReference);
-    }catch(AlreadyExistsException e){
+    } catch (AlreadyExistsException e) {
       storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
     }
     // TODO create a better id
@@ -1473,7 +1472,7 @@ public class ModelService extends ModelObservable {
       // update PREMIS
       try {
         Binary b = retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-        
+
         b = PremisUtils.updateFile(b, file);
 
         StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(file.getId(),
@@ -1485,7 +1484,7 @@ public class ModelService extends ModelObservable {
         | AuthorizationDeniedException | XmlException e) {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
-        LOGGER.warn(e.getMessage(),e);
+        LOGGER.warn(e.getMessage(), e);
       }
     }
     // TODO is any notify needed?
@@ -1525,17 +1524,20 @@ public class ModelService extends ModelObservable {
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     boolean asReference = false;
     storage.createBinary(binaryPath, payload, asReference);
-    boolean validatePremis = true;
-    List<IndexedPreservationAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type,
-      validatePremis);
-    if (agents != null) {
+
+    // TODO why is this method needed? A PREMIS agent must be created on its
+    // own.
+    if (PreservationMetadataType.EVENT.equals(type)) {
+      boolean validatePremis = true;
+      List<IndexedPreservationAgent> agents = ModelUtils.extractAgentsFromPreservationEventBinary(payload,
+        validatePremis);
       for (IndexedPreservationAgent pla : agents) {
-        try{
+        try {
           ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
             pla.getTitle() + "/" + pla.getVersion(), pla.getType());
           createPreservationMetadata(PreservationMetadataType.AGENT, pla.getIdentifierValue(), b);
-        }catch(AlreadyExistsException alreadyExists){
-          LOGGER.warn("Agent already exists: "+pla.getIdentifierValue());
+        } catch (AlreadyExistsException alreadyExists) {
+          LOGGER.warn("Agent already exists: " + pla.getIdentifierValue());
         }
       }
     }

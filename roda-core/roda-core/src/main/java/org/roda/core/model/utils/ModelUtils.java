@@ -628,34 +628,24 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static List<IndexedPreservationAgent> extractAgentsFromPreservationBinary(ContentPayload payload,
-    PreservationMetadataType type, boolean validatePremis) throws ValidationException, GenericException {
+  public static List<IndexedPreservationAgent> extractAgentsFromPreservationEventBinary(ContentPayload payload,
+    boolean validatePremis) throws ValidationException, GenericException {
 
     List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
-    if (type.equals(PreservationMetadataType.OBJECT_FILE)) {
-      // TODO check if files has agents
-      LOGGER.error("Not implemented!");
-    } else if (type.equals(PreservationMetadataType.EVENT)) {
-      EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
-      List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
-      if (identifiers != null) {
-        for (LinkingAgentIdentifierComplexType laict : identifiers) {
-          IndexedPreservationAgent agent = new IndexedPreservationAgent();
-          agent.setTitle(laict.getTitle());
-          agent.setIdentifierType(laict.getLinkingAgentIdentifierType());
-          agent.setIdentifierValue(laict.getLinkingAgentIdentifierValue());
-          agent.setRole(laict.getRole());
-          agent.setType(laict.getType());
-          agents.add(agent);
-        }
+    EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
+    List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
+    if (identifiers != null) {
+      for (LinkingAgentIdentifierComplexType laict : identifiers) {
+        IndexedPreservationAgent agent = new IndexedPreservationAgent();
+        agent.setTitle(laict.getTitle());
+        agent.setIdentifierType(laict.getLinkingAgentIdentifierType());
+        agent.setIdentifierValue(laict.getLinkingAgentIdentifierValue());
+        agent.setRole(laict.getRole());
+        agent.setType(laict.getType());
+        agents.add(agent);
       }
-    } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
-      // TODO
-      LOGGER.error("Not implemented!");
-    } else {
-      // TODO
-      LOGGER.error("Not implemented!");
     }
+
     return agents;
   }
 
