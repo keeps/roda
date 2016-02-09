@@ -19,8 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.compress.utils.IOUtils;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.AfterClass;
@@ -78,7 +76,7 @@ public class InternalPluginsTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.debug("Running index tests under storage {}", basePath);
+    logger.info("Running internal plugins tests under storage {}", basePath);
   }
 
   @AfterClass
@@ -100,61 +98,39 @@ public class InternalPluginsTest {
     FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
 
     FolderObserver observer = Mockito.mock(FolderObserver.class);
+    f.addFolderObserver(observer);
 
-    // f.addFolderObserver(observer);
-    f.addFolderObserver(new FolderObserver() {
-
-      @Override
-      public void transferredResourceModified(TransferredResource resource) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void transferredResourceDeleted(TransferredResource resource) {
-        // TODO Auto-generated method stub
-
-      }
-
-      @Override
-      public void transferredResourceAdded(TransferredResource resource) {
-        logger.info("Added: " + resource);
-      }
-
-      @Override
-      public void pathDeleted(Path deleted) {
-        // TODO Auto-generated method stub
-
-      }
-    });
+    while (!f.isFullyInitialized()) {
+      logger.info("Waiting for folder monitor to initialize...");
+      Thread.sleep(1000);
+    }
 
     Assert.assertTrue(f.isFullyInitialized());
 
-    Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-      .resolve(CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS).resolve(RodaConstants.STORAGE_DIRECTORY_DATA)
-      .resolve(CorporaConstants.REPRESENTATION_1_ID);
-
-    FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
-
-    // f.createFolder(null, "test");
-    // f.createFolder("test", "test1");
-    // f.createFolder("test", "test2");
-    // f.createFolder("test", "test3");
+    // Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
+    // .resolve(CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS).resolve(RodaConstants.STORAGE_DIRECTORY_DATA)
+    // .resolve(CorporaConstants.REPRESENTATION_1_ID);
     //
-    // ByteArrayInputStream inputStream = new
-    // ByteArrayInputStream(RandomStringUtils.random(100).getBytes());
-    // f.createFile("test", "test1.txt", inputStream);
-    // f.createFile("test", "test2.txt", inputStream);
-    // f.createFile("test", "test3.txt", inputStream);
-    // f.createFile("test/test1", "test1.txt", inputStream);
-    // f.createFile("test/test1", "test2.txt", inputStream);
-    // f.createFile("test/test1", "test3.txt", inputStream);
-    // f.createFile("test/test2", "test1.txt", inputStream);
-    // f.createFile("test/test2", "test2.txt", inputStream);
-    // f.createFile("test/test2", "test3.txt", inputStream);
-    // f.createFile("test/test3", "test1.txt", inputStream);
-    // f.createFile("test/test3", "test2.txt", inputStream);
-    // f.createFile("test/test3", "test3.txt", inputStream);
+    // FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
+
+    f.createFolder(null, "test");
+    f.createFolder("test", "test1");
+    f.createFolder("test", "test2");
+    f.createFolder("test", "test3");
+
+    ByteArrayInputStream inputStream = new ByteArrayInputStream(RandomStringUtils.random(100).getBytes());
+    f.createFile("test", "test1.txt", inputStream);
+    f.createFile("test", "test2.txt", inputStream);
+    f.createFile("test", "test3.txt", inputStream);
+    f.createFile("test/test1", "test1.txt", inputStream);
+    f.createFile("test/test1", "test2.txt", inputStream);
+    f.createFile("test/test1", "test3.txt", inputStream);
+    f.createFile("test/test2", "test1.txt", inputStream);
+    f.createFile("test/test2", "test2.txt", inputStream);
+    f.createFile("test/test2", "test3.txt", inputStream);
+    f.createFile("test/test3", "test1.txt", inputStream);
+    f.createFile("test/test3", "test2.txt", inputStream);
+    f.createFile("test/test3", "test3.txt", inputStream);
 
     // TODO check if 4 times is the expected
     Mockito.verify(observer, Mockito.times(4));

@@ -8,7 +8,7 @@
 	</appender>
 
 	<logger name="org.roda" additivity="false">
-		<level value="INFO" />
+		<level value="DEBUG" />
 		<appender-ref ref="STDOUT" />
 	</logger>
 
