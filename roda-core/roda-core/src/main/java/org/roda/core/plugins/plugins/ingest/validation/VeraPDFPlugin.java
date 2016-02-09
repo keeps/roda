@@ -23,11 +23,8 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -37,7 +34,6 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -123,8 +119,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
         model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       logger.error("Error running VeraPDF plugin: " + e.getMessage(), e);
     }
 

@@ -107,8 +107,7 @@ public class FixityPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN,
         model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
 

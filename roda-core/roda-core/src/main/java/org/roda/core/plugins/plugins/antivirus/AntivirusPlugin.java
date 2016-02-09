@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -124,8 +125,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
 
@@ -216,7 +216,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
           success ? virusCheckResult.getReport() : exception.getMessage(), agent);
       }
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException | ValidationException e) {
+      | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);
     }
 

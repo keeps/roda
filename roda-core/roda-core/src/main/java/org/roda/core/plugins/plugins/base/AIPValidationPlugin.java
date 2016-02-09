@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -115,7 +116,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+      | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating antivirus PREMIS agent", e);
     }
 

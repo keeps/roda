@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -143,8 +144,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
   private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
     String representationId) throws IOException, PremisMetadataException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, XmlException, ValidationException {
-
+      NotFoundException, AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
     ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);

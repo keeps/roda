@@ -553,7 +553,7 @@ public class BrowserHelper {
   public static void createOrUpdateAipRepresentationPreservationMetadataFile(String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail,
     boolean create) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
-      ValidationException {
+      ValidationException, AlreadyExistsException {
     Path file = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();

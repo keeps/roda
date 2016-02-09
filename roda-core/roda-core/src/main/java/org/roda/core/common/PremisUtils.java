@@ -38,6 +38,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -675,7 +676,7 @@ public class PremisUtils {
 
   public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin,
     String preservationAgentTypeCharacterizationPlugin, ModelService model) throws GenericException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, ValidationException {
+      RequestNotValidException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),

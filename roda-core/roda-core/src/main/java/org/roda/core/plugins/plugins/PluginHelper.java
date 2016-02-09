@@ -20,6 +20,7 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -185,7 +186,7 @@ public final class PluginHelper {
     ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
     String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent)
       throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException {
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
       targets, outcome, detailNote, detailExtension, Arrays.asList(agent));
@@ -314,7 +315,7 @@ public final class PluginHelper {
 
   public static PreservationMetadata createPluginAgent(ModelService model, String agentId, String agentName,
     String agentType) throws GenericException, NotFoundException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException {
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     ContentPayload premisAgent = PremisUtils.createPremisAgentBinary(agentId, agentName, agentType);
     model.createPreservationMetadata(PreservationMetadataType.AGENT, agentId, premisAgent);
     PreservationMetadata pm = new PreservationMetadata();

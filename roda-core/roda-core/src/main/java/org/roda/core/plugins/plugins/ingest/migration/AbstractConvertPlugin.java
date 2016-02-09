@@ -17,10 +17,12 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -148,8 +150,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       logger.error("Error running adding Conversion plugin: " + e.getMessage(), e);
     }
 
@@ -407,8 +408,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
         model);
       model.notifyAIPUpdated(aipId);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       logger.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
 
     }
@@ -555,7 +555,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
         Arrays.asList(newRepresentationID), null, outcome, stringBuilder.toString(), null, agent);
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException | ValidationException e) {
+      | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }

@@ -117,8 +117,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
     try {
       PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException e) {
+    } catch (RODAException e) {
       LOGGER.error("Error create PREMIS agent for Apache Tika", e);
     }
 

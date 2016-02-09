@@ -337,7 +337,7 @@ public class Browser extends RodaCoreService {
   public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-      ValidationException {
+      ValidationException, AlreadyExistsException {
 
     Date startDate = new Date();
 
@@ -359,7 +359,7 @@ public class Browser extends RodaCoreService {
   public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-      ValidationException {
+      ValidationException, AlreadyExistsException {
     Date startDate = new Date();
 
     // check user permissions

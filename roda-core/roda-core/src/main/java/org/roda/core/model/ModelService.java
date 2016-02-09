@@ -1386,27 +1386,27 @@ public class ModelService extends ModelObservable {
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-      ValidationException {
+      ValidationException, AlreadyExistsException {
     String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
     return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
     String representationId, ContentPayload payload) throws GenericException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, ValidationException {
+      RequestNotValidException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPreservationMetadata(type, id, aipId, representationId, null, null, payload);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id,
     ContentPayload payload) throws GenericException, NotFoundException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException {
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPreservationMetadata(type, id, null, null, null, null, payload);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-      ValidationException {
+      ValidationException, AlreadyExistsException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
     pm.setAipId(aipId);
@@ -1415,7 +1415,8 @@ public class ModelService extends ModelObservable {
     pm.setFileId(fileId);
     pm.setType(type);
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
-    storage.updateBinaryContent(binaryPath, payload, false, true);
+    boolean asReference = false;
+    storage.createBinary(binaryPath, payload, asReference);
     boolean validatePremis = true;
     List<IndexedPreservationAgent> agents = ModelUtils.extractAgentsFromPreservationBinary(payload, type,
       validatePremis);
