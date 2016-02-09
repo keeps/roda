@@ -94,8 +94,9 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  *
  */
 public class BrowserHelper {
-  private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 2;
+  private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
+  
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
@@ -122,7 +123,7 @@ public class BrowserHelper {
     }
 
     // set representations
-    // getting the last 2 representations
+    // getting the last [BUNDLE_MAX_REPRESENTATION_COUNT] representations
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_ORIGINAL, true));
     IndexResult<Representation> findRepresentations = findRepresentations(aipId, sorter,
       new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
