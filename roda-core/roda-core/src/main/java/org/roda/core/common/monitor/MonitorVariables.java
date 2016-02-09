@@ -72,6 +72,17 @@ public class MonitorVariables {
     return instance;
   }
 
+  public static synchronized void destroy() {
+    if (instance != null) {
+      try {
+        instance.getWatcher().close();
+      } catch (IOException e) {
+        LOGGER.warn("Error while closing watcher", e);
+      }
+      instance = null;
+    }
+  }
+
   public WatchService getWatcher() {
     return watcher;
   }
@@ -95,4 +106,5 @@ public class MonitorVariables {
       }
     });
   }
+
 }

@@ -168,7 +168,20 @@ public final class PluginHelper {
     PluginState pluginState, String jobId, String aipId) {
 
     try {
-      JobReport jobReport = model.retrieveJobReport(jobId, aipId);
+      JobReport jobReport;
+
+      try {
+        jobReport = model.retrieveJobReport(jobId, aipId);
+      } catch (NotFoundException e) {
+        jobReport = new JobReport();
+        jobReport.setId(ModelUtils.getJobReportId(jobId, reportItem.getItemId()));
+        jobReport.setJobId(jobId);
+        jobReport.setAipId(reportItem.getItemId());
+        jobReport.setObjectId(reportItem.getOtherId());
+        jobReport.setDateCreated(new Date());
+        Report report = new Report();
+        jobReport.setReport(report);
+      }
 
       jobReport.setLastPluginRan(plugin.getClass().getName());
       jobReport.setLastPluginRanState(pluginState);
@@ -176,7 +189,7 @@ public final class PluginHelper {
       jobReport.setDateUpdated(new Date());
 
       model.updateJobReport(jobReport);
-    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
 

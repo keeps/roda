@@ -7,6 +7,9 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
+import java.io.Serializable;
+
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -36,15 +39,18 @@ public class AkkaWorkerActor extends UntypedActor {
       PluginMessage message = (PluginMessage) msg;
       // TODO should be init be done here as well as it is already being done in
       // the plugin manager???
-      Plugin plugin = message.getPlugin();
+      Plugin<?> plugin = message.getPlugin();
       plugin.init();
+      Report report;
       try {
-        plugin.execute(index, model, storage, message.getList());
+        report = plugin.execute(index, model, storage, message.getList());
       } catch (Exception e) {
         logger.error("Error executing action!", e);
+        // TODO set a error report
+        report = null;
       }
       plugin.shutdown();
-      getSender().tell("Done!", getSelf());
+      getSender().tell(report, getSelf());
     }
   }
 

@@ -15,6 +15,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Report;
 
 import akka.actor.ActorRef;
 
@@ -22,7 +23,7 @@ public interface PluginOrchestrator {
 
   public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
 
   public void runPluginOnAllAIPs(Plugin<AIP> plugin);
 

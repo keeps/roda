@@ -16,6 +16,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -139,8 +140,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
-
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+    return null;
   }
 
   @Override

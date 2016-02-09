@@ -23,6 +23,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -123,7 +124,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+    List<Report> ret = null;
     try {
       int multiplier = 0;
       LOGGER.info("Executing beforeExecute");
@@ -153,15 +155,25 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       plugin.afterExecute(index, model, storage);
 
+      ret = new ArrayList<>();
+      for (Object o : reports) {
+        if (o instanceof Report) {
+          ret.add((Report) o);
+        } else {
+          LOGGER.warn("Got a response that was not a report: " + o.getClass().getName());
+        }
+      }
+
     } catch (Exception e) {
       // FIXME catch proper exception
-      e.printStackTrace();
+      LOGGER.error("Error executing job", e);
     }
     LOGGER.info("End of method");
+    return ret;
   }
 
   @Override

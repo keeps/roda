@@ -88,11 +88,9 @@ public class WatchDir implements Runnable {
 
   public void stop() {
     this.running = false;
-    try {
-      MonitorVariables.getInstance().getWatcher().close();
-    } catch (IOException e) {
-      LOGGER.error("Error stopping WatchDir", e);
-    }
+    
+    MonitorVariables.destroy();
+    
     if (threadReindex != null) {
       threadReindex.interrupt();
     }
