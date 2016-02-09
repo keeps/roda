@@ -440,6 +440,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
 
   public static final String FILE_ID = "id";
+  public static final String FILE_PATH = "path";
   public static final String FILE_AIPID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
@@ -574,5 +575,6 @@ public final class RodaConstants {
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
+  
 
 }

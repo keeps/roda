@@ -147,17 +147,17 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       NotFoundException, AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
     LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
 
-    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId,
-      representationId, representationPremis);
+    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(aip.getId(),representationId);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION,representationId, aip.getId(), representationId,
+    representationPremis);
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
     for (File file : allFiles) {
       if (!file.isDirectory()) {
         ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
           file.getPath(), file.getId(), filePreservation);
-        ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file, aip.getId(), representationId,
-          RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL, RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, model);
+        ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file, aip.getId(), representationId,RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL, RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, model);
+        model.updatePreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aip.getId(), representationId, representationId, updatedRepresentation);
         // TODO save updated representation
       }
     }

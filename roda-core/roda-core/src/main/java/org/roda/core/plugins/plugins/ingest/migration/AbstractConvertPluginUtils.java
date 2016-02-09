@@ -91,7 +91,7 @@ public class AbstractConvertPluginUtils {
       NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
       TikaException, ValidationException {
 
-    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(representationId);
+    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(aipId, representationId);
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, aipId, representationId,
       representationId, representationPremis);
     ClosableIterable<File> allFiles = model.listAllFiles(aipId, representationId);

@@ -95,6 +95,7 @@ import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
 public class PremisUtils {
+  private static final String SEPARATOR ="_";
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
@@ -238,7 +239,7 @@ public class PremisUtils {
 
   public static Binary updateFile(Binary preservationFile, IndexedFile file)
     throws XmlException, IOException, GenericException {
-
+    ObjectDocument document = ObjectDocument.Factory.newInstance();
     FileFormat fileFormat = file.getFileFormat();
     lc.xmlns.premisV2.File f = binaryToFile(preservationFile.getContent().createInputStream());
     if (fileFormat != null) {
@@ -277,9 +278,10 @@ public class PremisUtils {
       }
     }
 
+    document.setObject(f);
     try {
       Path eventPath = Files.createTempFile("file", ".premis.xml");
-      MetadataHelperUtility.saveToFile(f, eventPath.toFile());
+      MetadataHelperUtility.saveToFile(document, eventPath.toFile());
       return (Binary) FSUtils.convertPathToResource(eventPath.getParent(), eventPath);
     } catch (IOException | MetadataException | GenericException | RequestNotValidException | NotFoundException e) {
 
@@ -360,6 +362,7 @@ public class PremisUtils {
     if (sources != null) {
       for (String source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
+        LOGGER.error("SETTING IDENTIFIER: "+source);
         loict.setLinkingObjectIdentifierValue(source);
         loict.setLinkingObjectIdentifierType("source");
       }
@@ -418,12 +421,13 @@ public class PremisUtils {
     }
   }
 
-  public static ContentPayload createBaseRepresentation(String representationId) throws GenericException {
+  public static ContentPayload createBaseRepresentation(String aipID, String representationId) throws GenericException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType("local");
-    oict.setObjectIdentifierValue(representationId);
+    String identifier = createPremisRepresentationIdentifier(aipID, representationId);
+    oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
     document.setObject(representation);
     try {
@@ -439,7 +443,8 @@ public class PremisUtils {
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
-    oict.setObjectIdentifierValue(originalFile.getId());
+    String identifier = createPremisFileIdentifier(originalFile);
+    oict.setObjectIdentifierValue(identifier);
     oict.setObjectIdentifierType("local");
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     occt.setCompositionLevel(BigInteger.valueOf(0));
@@ -682,6 +687,13 @@ public class PremisUtils {
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload);
+    IndexedPreservationAgent agent = getPreservationAgent(plugin,preservationAgentTypeCharacterizationPlugin,model);
+    return agent;
+  }
+  
+  public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin,
+    String preservationAgentTypeCharacterizationPlugin, ModelService model) {
+    String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     IndexedPreservationAgent agent = new IndexedPreservationAgent();
     agent.setId(id);
     agent.setIdentifierType("local");
@@ -701,7 +713,7 @@ public class PremisUtils {
     relationship.setRelationshipSubType(relationshipSubType);
     RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
     roict.setRelatedObjectIdentifierType(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL);
-    roict.setRelatedObjectIdentifierValue(file.getId() + RodaConstants.PREMIS_FILE_SUFFIX);
+    roict.setRelatedObjectIdentifierValue(createPremisFileIdentifier(file));
 
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     document.setObject(r);
@@ -710,5 +722,20 @@ public class PremisUtils {
     } catch (MetadataException e) {
       throw new GenericException("Error creating base representation", e);
     }
+  }
+  
+  
+  public static String createPremisRepresentationIdentifier(String aipId, String representationId) {
+    return aipId+SEPARATOR+representationId;
+  }
+  public static String createPremisFileIdentifier(File f) {
+    String identifier = createPremisRepresentationIdentifier(f.getAipId(), f.getRepresentationId());
+    if(f.getPath()!=null && f.getPath().size()>0){
+      identifier+=SEPARATOR;
+      identifier+=StringUtils.join(f.getPath(),SEPARATOR);
+    }
+    identifier+=SEPARATOR;
+    identifier+=f.getId();
+    return identifier;
   }
 }

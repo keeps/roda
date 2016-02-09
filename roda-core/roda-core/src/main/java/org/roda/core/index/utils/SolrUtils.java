@@ -1364,6 +1364,7 @@ public class SolrUtils {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
     doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+    doc.addField(RodaConstants.FILE_PATH,file.getPath());
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
@@ -1401,6 +1402,7 @@ public class SolrUtils {
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
+    List<String> path = objectToListString(doc.get(RodaConstants.FILE_PATH));
     // boolean entryPoint =
     // objectToBoolean(doc.get(RodaConstants.FILE_ISENTRYPOINT));
 
@@ -1409,7 +1411,7 @@ public class SolrUtils {
     long size = objectToLong(doc.get(RodaConstants.FILE_SIZE)) != null ? objectToLong(doc.get(RodaConstants.FILE_SIZE))
       : 0;
     boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
-    String path = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
+    String storagePath = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
     // format
     String formatDesignationName = objectToString(doc.get(RodaConstants.FILE_FILEFORMAT));
@@ -1426,11 +1428,13 @@ public class SolrUtils {
     String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
     String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
 
+    
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
     // FIXME remove entrypoint from IndexedFile...
-    file = new IndexedFile(fileId, aipId, representationId, path, false, fileFormat, originalName, size, isDirectory,
-      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText);
+   
+    file = new IndexedFile(fileId,path, aipId, representationId, false, fileFormat, originalName, size, isDirectory,
+      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText,storagePath);
     return file;
   }
 

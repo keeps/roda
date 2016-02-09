@@ -125,6 +125,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+    } catch(AlreadyExistsException e){
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
@@ -211,7 +213,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
-          "All the files from the SIP were verified against an antivirus.", Arrays.asList(representation.getId()), null,
+          "All the files from the SIP were verified against an antivirus.", Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null,
           success ? "success" : "failure", success ? "" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage(), agent);
       }

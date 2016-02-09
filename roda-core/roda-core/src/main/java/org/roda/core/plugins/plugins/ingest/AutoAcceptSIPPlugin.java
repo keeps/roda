@@ -15,6 +15,7 @@ import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -92,6 +93,8 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
       LOGGER.error("Error creating auto-accept agent: " + e.getMessage(), e);
     }
@@ -138,7 +141,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
-          Arrays.asList(representation.getId()), null, success ? "success" : "failure", success ? "" : "Error",
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, success ? "success" : "failure", success ? "" : "Error",
           outcomeDetail, agent);
       }
     } catch (IOException | RODAException e) {

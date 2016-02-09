@@ -150,6 +150,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
     } catch (RODAException e) {
       logger.error("Error running adding Conversion plugin: " + e.getMessage(), e);
     }
@@ -408,9 +410,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
         model);
       model.notifyAIPUpdated(aipId);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
+        model);
     } catch (RODAException e) {
-      logger.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
-
+      logger.error("Error running creating agent for AbstractConvertPlugin", e);
     }
 
     return null;
@@ -553,7 +557,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     try {
       PluginHelper.createPluginEvent(aip.getId(), newRepresentationID, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
-        Arrays.asList(newRepresentationID), null, outcome, stringBuilder.toString(), null, agent);
+        Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), newRepresentationID)), null,
+        outcome, stringBuilder.toString(), null, agent);
     } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

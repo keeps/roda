@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -107,6 +108,8 @@ public class FixityPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN,
         model);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN, model);
     } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
@@ -162,7 +165,7 @@ public class FixityPlugin implements Plugin<AIP> {
 
               PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
+                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),r.getId())),
                 null, "failure", "Reason", sb.toString(), agent);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {

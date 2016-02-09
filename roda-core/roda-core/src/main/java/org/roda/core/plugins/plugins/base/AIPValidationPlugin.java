@@ -115,8 +115,9 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException
-      | ValidationException | AlreadyExistsException e) {
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+    } catch (RODAException e) {
       LOGGER.error("Error creating antivirus PREMIS agent", e);
     }
 
@@ -163,7 +164,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          Arrays.asList(representation.getId()), null, success ? "success" : "failure", success ? "success" : "Error",
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, success ? "success" : "failure", success ? "success" : "Error",
           "", agent);
       }
     } catch (IOException | RODAException e) {

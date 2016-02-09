@@ -446,6 +446,7 @@ public class ViewRepresentation extends Composite {
       }));
 
     if (simpleFile != null) {
+      //TODO review with new path
       for (String folder : simpleFile.getPath()) {
         if (!(folder.equals(aipId) || folder.equals(representationId) || folder.equals(simpleFile.getId())
           || folder.isEmpty())) {

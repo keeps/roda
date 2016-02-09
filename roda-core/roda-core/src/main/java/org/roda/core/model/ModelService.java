@@ -1284,7 +1284,11 @@ public class ModelService extends ModelObservable {
       fileSuffix, type);
     boolean asReference = false;
     boolean createIfNotExists = true;
-    storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
+    try{
+      storage.createBinary(binaryPath, payload, asReference);
+    }catch(AlreadyExistsException e){
+      storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
+    }
     // TODO create a better id
     StringBuilder idBuilder = new StringBuilder();
     idBuilder.append(type).append("_");
@@ -1367,6 +1371,7 @@ public class ModelService extends ModelObservable {
       // update PREMIS
       try {
         Binary b = retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+        
         b = PremisUtils.updateFile(b, file);
 
         StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(file.getId(),
@@ -1378,6 +1383,7 @@ public class ModelService extends ModelObservable {
         | AuthorizationDeniedException | XmlException e) {
         LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
           file.getRepresentationId(), file.getId());
+        LOGGER.warn(e.getMessage(),e);
       }
     }
     // TODO is any notify needed?
@@ -1422,9 +1428,13 @@ public class ModelService extends ModelObservable {
       validatePremis);
     if (agents != null) {
       for (IndexedPreservationAgent pla : agents) {
-        ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
-          pla.getTitle() + "/" + pla.getVersion(), pla.getType());
-        createPreservationMetadata(PreservationMetadataType.AGENT, pla.getIdentifierValue(), b);
+        try{
+          ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
+            pla.getTitle() + "/" + pla.getVersion(), pla.getType());
+          createPreservationMetadata(PreservationMetadataType.AGENT, pla.getIdentifierValue(), b);
+        }catch(AlreadyExistsException alreadyExists){
+          LOGGER.warn("Agent already exists: "+pla.getIdentifierValue());
+        }
       }
     }
 

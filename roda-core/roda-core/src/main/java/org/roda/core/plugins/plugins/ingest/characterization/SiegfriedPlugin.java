@@ -113,6 +113,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
         model);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
     } catch (RODAException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }

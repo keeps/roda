@@ -23,6 +23,7 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -118,6 +119,9 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
+        model);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
         model);
     } catch (RODAException e) {
       logger.error("Error running VeraPDF plugin: " + e.getMessage(), e);
@@ -234,8 +238,9 @@ public class VeraPDFPlugin implements Plugin<AIP> {
       // FIXME revise PREMIS generation
       PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-        "All the files from the AIP were submitted to a veraPDF validation.", Arrays.asList(representationId), null,
-        outcome, noteStringBuilder.toString(), null, agent);
+        "All the files from the AIP were submitted to a veraPDF validation.",
+        Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representationId)), null, outcome,
+        noteStringBuilder.toString(), null, agent);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);
     }

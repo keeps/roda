@@ -8,7 +8,6 @@
 package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
-import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -18,6 +17,7 @@ public class IndexedFile implements Serializable {
   private static final long serialVersionUID = 3303019735787641534L;
 
   private String id = null;
+  private List<String> path = null;
   private String aipId = null;
   private String representationId = null;
 
@@ -37,17 +37,18 @@ public class IndexedFile implements Serializable {
     super();
   }
 
-  public IndexedFile(String id, String aipId, String representationId, String storagePath, boolean entryPoint,
+  public IndexedFile(String id, List<String> path, String aipId, String representationId, boolean entryPoint,
     FileFormat fileFormat, String originalName, long size, boolean isDirectory, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext) {
-    super();
+    String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext,
+    String storagePath) {
     this.id = id;
+    this.path = path;
     this.aipId = aipId;
     this.representationId = representationId;
     this.entryPoint = entryPoint;
     this.fileFormat = fileFormat;
-    this.size = size;
     this.originalName = originalName;
+    this.size = size;
     this.isDirectory = isDirectory;
     this.creatingApplicationName = creatingApplicationName;
     this.creatingApplicationVersion = creatingApplicationVersion;
@@ -55,6 +56,14 @@ public class IndexedFile implements Serializable {
     this.hash = hash;
     this.fulltext = fulltext;
     this.storagePath = storagePath;
+  }
+
+  public List<String> getPath() {
+    return path;
+  }
+
+  public void setPath(List<String> path) {
+    this.path = path;
   }
 
   public String getFulltext() {
@@ -176,11 +185,6 @@ public class IndexedFile implements Serializable {
     this.fileFormat = fileFormat;
   }
 
-  /* TODO get correct path */
-  public List<String> getPath() {
-    return Arrays.asList(aipId, representationId, id);
-  }
-
   public String getStoragePath() {
     return storagePath;
   }
@@ -204,6 +208,7 @@ public class IndexedFile implements Serializable {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (isDirectory ? 1231 : 1237);
     result = prime * result + ((originalName == null) ? 0 : originalName.hashCode());
+    result = prime * result + ((path == null) ? 0 : path.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
@@ -268,6 +273,11 @@ public class IndexedFile implements Serializable {
         return false;
     } else if (!originalName.equals(other.originalName))
       return false;
+    if (path == null) {
+      if (other.path != null)
+        return false;
+    } else if (!path.equals(other.path))
+      return false;
     if (representationId == null) {
       if (other.representationId != null)
         return false;
@@ -285,11 +295,13 @@ public class IndexedFile implements Serializable {
 
   @Override
   public String toString() {
-    return "IndexedFile [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", entryPoint="
-      + entryPoint + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
-      + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
+    return "IndexedFile [id=" + id + ", path=" + path + ", aipId=" + aipId + ", representationId=" + representationId
+      + ", entryPoint=" + entryPoint + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size="
+      + size + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
       + dateCreatedByApplication + ", hash=" + hash + ", fulltext=" + fulltext + ", storagePath=" + storagePath + "]";
   }
+
+ 
 
 }

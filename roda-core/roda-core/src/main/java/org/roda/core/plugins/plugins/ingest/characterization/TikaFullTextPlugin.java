@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.tika.exception.TikaException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -117,6 +118,8 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
     try {
       PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
+    } catch (AlreadyExistsException e) {
+      //TODO verify agent creation (event)
     } catch (RODAException e) {
       LOGGER.error("Error create PREMIS agent for Apache Tika", e);
     }

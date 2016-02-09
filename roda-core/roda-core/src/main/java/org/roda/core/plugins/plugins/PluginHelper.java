@@ -319,24 +319,11 @@ public final class PluginHelper {
       boolean success = (state == PluginState.SUCCESS);
       for (Representation representation : aip.getRepresentations()) {
         createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
-          Arrays.asList(representation.getId()), null, outcome, success ? "" : "Error", detailExtension, agent);
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, outcome, success ? "" : "Error", detailExtension, agent);
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }
 
-  public static PreservationMetadata createPluginAgent(ModelService model, String agentId, String agentName,
-    String agentType) throws GenericException, NotFoundException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    ContentPayload premisAgent = PremisUtils.createPremisAgentBinary(agentId, agentName, agentType);
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, agentId, premisAgent);
-    PreservationMetadata pm = new PreservationMetadata();
-    pm.setAipId(null);
-    pm.setRepresentationId(null);
-    pm.setId(agentId);
-    pm.setType(PreservationMetadataType.AGENT);
-    return pm;
-
-  }
 }
