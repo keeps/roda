@@ -19,10 +19,13 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
@@ -44,16 +47,10 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.data.v2.validation.ValidationIssue;
-import org.roda.core.data.v2.validation.ValidationReport;
-import org.roda.core.metadata.MetadataException;
-import org.roda.core.metadata.MetadataHelperUtility;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -95,7 +92,8 @@ import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
 public class PremisUtils {
-  private static final String SEPARATOR ="_";
+  private static final String SEPARATOR = "_";
+  private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
@@ -106,34 +104,6 @@ public class PremisUtils {
       originator);
     dsInputStream.close();
     return fixity;
-  }
-
-  public static Binary addFormatToPremis(Binary preservationFile, FileFormat format)
-    throws IOException, XmlException, MetadataException, RequestNotValidException, NotFoundException, GenericException {
-    lc.xmlns.premisV2.File f = lc.xmlns.premisV2.File.Factory.parse(preservationFile.getContent().createInputStream());
-    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
-      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
-      if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
-        FormatComplexType fct = occt.getFormatList().get(0);
-        if (fct.getFormatDesignation() != null) {
-          fct.getFormatDesignation().setFormatName(format.getMimeType());
-        } else {
-          fct.addNewFormatDesignation().setFormatName(format.getMimeType());
-        }
-      } else {
-        FormatComplexType fct = occt.addNewFormat();
-        fct.addNewFormatDesignation().setFormatName(format.getMimeType());
-      }
-    } else {
-      ObjectCharacteristicsComplexType occt = f.addNewObjectCharacteristics();
-      FormatComplexType fct = occt.addNewFormat();
-      fct.addNewFormatDesignation().setFormatName(format.getMimeType());
-    }
-
-    Path temp = Files.createTempFile("file", ".premis.xml");
-
-    org.roda.core.metadata.MetadataHelperUtility.saveToFile(f, temp.toFile());
-    return (Binary) FSUtils.convertPathToResource(temp.getParent(), temp);
   }
 
   public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
@@ -237,56 +207,47 @@ public class PremisUtils {
 
   }
 
-  public static Binary updateFile(Binary preservationFile, IndexedFile file)
-    throws XmlException, IOException, GenericException {
-    ObjectDocument document = ObjectDocument.Factory.newInstance();
-    FileFormat fileFormat = file.getFileFormat();
-    lc.xmlns.premisV2.File f = binaryToFile(preservationFile.getContent().createInputStream());
-    if (fileFormat != null) {
+  public static void updateFileFormat(lc.xmlns.premisV2.File file, String formatDesignationName,
+    String formatDesignationVersion, String pronom, String mimeType) {
 
-      if (!StringUtils.isBlank(fileFormat.getFormatDesignationName())) {
-        FormatDesignationComplexType fdct = getFormatDesignation(f);
-        fdct.setFormatName(fileFormat.getFormatDesignationName());
-      }
-      if (!StringUtils.isBlank(fileFormat.getFormatDesignationVersion())) {
-        FormatDesignationComplexType fdct = getFormatDesignation(f);
-        fdct.setFormatVersion(fileFormat.getFormatDesignationVersion());
-      }
-      if (!StringUtils.isBlank(fileFormat.getMimeType())) {
-        FormatDesignationComplexType fdct = getFormatDesignation(f);
-        fdct.setFormatName(fileFormat.getFormatDesignationName());
-      }
-
-      if (!StringUtils.isBlank(fileFormat.getPronom())) {
-        FormatRegistryComplexType frct = getFormatRegistry(f, RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-        frct.setFormatRegistryKey(fileFormat.getPronom());
-      }
-
-      if (!StringUtils.isBlank(file.getCreatingApplicationName())) {
-        CreatingApplicationComplexType cact = getCreatingApplication(f);
-        cact.setCreatingApplicationName(file.getCreatingApplicationName());
-      }
-
-      if (!StringUtils.isBlank(file.getCreatingApplicationVersion())) {
-        CreatingApplicationComplexType cact = getCreatingApplication(f);
-        cact.setCreatingApplicationVersion(file.getCreatingApplicationVersion());
-      }
-
-      if (!StringUtils.isBlank(file.getDateCreatedByApplication())) {
-        CreatingApplicationComplexType cact = getCreatingApplication(f);
-        cact.setDateCreatedByApplication(file.getDateCreatedByApplication());
-      }
+    if (!StringUtils.isBlank(formatDesignationName)) {
+      FormatDesignationComplexType fdct = getFormatDesignation(file);
+      fdct.setFormatName(formatDesignationName);
     }
 
-    document.setObject(f);
-    try {
-      Path eventPath = Files.createTempFile("file", ".premis.xml");
-      MetadataHelperUtility.saveToFile(document, eventPath.toFile());
-      return (Binary) FSUtils.convertPathToResource(eventPath.getParent(), eventPath);
-    } catch (IOException | MetadataException | GenericException | RequestNotValidException | NotFoundException e) {
-
+    if (!StringUtils.isBlank(formatDesignationVersion)) {
+      FormatDesignationComplexType fdct = getFormatDesignation(file);
+      fdct.setFormatVersion(formatDesignationVersion);
     }
-    return null;
+
+    if (!StringUtils.isBlank(pronom)) {
+      FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+      frct.setFormatRegistryKey(pronom);
+    }
+    if (!StringUtils.isBlank(mimeType)) {
+      // TODO add mime type
+      // FormatDesignationComplexType fdct = getFormatDesignation(file);
+      // fdct.setFormatName(fileFormat.getFormatDesignationName());
+    }
+
+  }
+
+  public static void updateCreatingApplication(lc.xmlns.premisV2.File file, String creatingApplicationName,
+    String creatingApplicationVersion, String dateCreatedByApplication) {
+    if (!StringUtils.isBlank(creatingApplicationName)) {
+      CreatingApplicationComplexType cact = getCreatingApplication(file);
+      cact.setCreatingApplicationName(creatingApplicationName);
+    }
+
+    if (!StringUtils.isBlank(creatingApplicationVersion)) {
+      CreatingApplicationComplexType cact = getCreatingApplication(file);
+      cact.setCreatingApplicationVersion(creatingApplicationVersion);
+    }
+
+    if (!StringUtils.isBlank(dateCreatedByApplication)) {
+      CreatingApplicationComplexType cact = getCreatingApplication(file);
+      cact.setDateCreatedByApplication(dateCreatedByApplication);
+    }
   }
 
   private static CreatingApplicationComplexType getCreatingApplication(lc.xmlns.premisV2.File f) {
@@ -350,7 +311,7 @@ public class PremisUtils {
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<String> sources, List<String> targets, String outcome, String detailNote, String detailExtension,
-    List<IndexedPreservationAgent> agents) throws GenericException {
+    List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
@@ -397,14 +358,12 @@ public class PremisUtils {
      * extension.set(XmlObject.Factory.newValue("<p>"+detailExtension+"</p>"));
      * }
      */
-    try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(event, true));
-    } catch (MetadataException e) {
-      throw new GenericException("Error creating Premis Event", e);
-    }
+    return new StringContentPayload(MetadataUtils.saveToString(event, true));
+
   }
 
-  public static ContentPayload createPremisAgentBinary(String id, String name, String type) throws GenericException {
+  public static ContentPayload createPremisAgentBinary(String id, String name, String type)
+    throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
     AgentComplexType act = agent.addNewAgent();
@@ -413,14 +372,13 @@ public class PremisUtils {
     agentIdentifier.setAgentIdentifierValue(id);
     act.addAgentName(name);
     act.setAgentType(type);
-    try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(agent, true));
-    } catch (MetadataException e) {
-      throw new GenericException("Error creating PREMIS agent binary", e);
-    }
+
+    return new StringContentPayload(MetadataUtils.saveToString(agent, true));
+
   }
 
-  public static ContentPayload createBaseRepresentation(String aipID, String representationId) throws GenericException {
+  public static ContentPayload createBaseRepresentation(String aipID, String representationId)
+    throws GenericException, ValidationException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
@@ -429,15 +387,12 @@ public class PremisUtils {
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
     document.setObject(representation);
-    try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
-    } catch (MetadataException e) {
-      throw new GenericException("Error creating base representation", e);
-    }
+
+    return new StringContentPayload(MetadataUtils.saveToString(document, true));
   }
 
-  public static ContentPayload createBaseFile(File originalFile, ModelService model)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static ContentPayload createBaseFile(File originalFile, ModelService model) throws GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, ValidationException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
@@ -452,14 +407,23 @@ public class PremisUtils {
     fdct.setFormatName("");
     fdct.setFormatVersion("");
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
-    try {
-      Fixity md5 = calculateFixity(binary, "MD5", "");
-      FixityComplexType fixityMD5 = occt.addNewFixity();
-      fixityMD5.setMessageDigest(md5.getMessageDigest());
-      fixityMD5.setMessageDigestAlgorithm(md5.getMessageDigestAlgorithm());
-      fixityMD5.setMessageDigestOriginator(md5.getMessageDigestOriginator());
-    } catch (IOException | NoSuchAlgorithmException e) {
-      LOGGER.warn("Could not calculate fixity for file " + originalFile);
+
+    if (binary.getContentDigest() != null && !binary.getContentDigest().isEmpty()) {
+      // TODO use binary content digest information
+    } else {
+      // if binary does not contain digest, create a new one
+      try {
+        for (String algorithm : MANDATORY_CHECKSUM_ALGORITHMS) {
+          // TODO set better originator
+          Fixity fixity = calculateFixity(binary, algorithm, "RODA");
+          FixityComplexType premis_fixity = occt.addNewFixity();
+          premis_fixity.setMessageDigest(fixity.getMessageDigest());
+          premis_fixity.setMessageDigestAlgorithm(fixity.getMessageDigestAlgorithm());
+          premis_fixity.setMessageDigestOriginator(fixity.getMessageDigestOriginator());
+        }
+      } catch (IOException | NoSuchAlgorithmException e) {
+        LOGGER.warn("Could not calculate fixity for file " + originalFile);
+      }
     }
 
     occt.setSize(binary.getSizeInBytes());
@@ -471,11 +435,8 @@ public class PremisUtils {
     clct.setContentLocationValue("");
 
     document.setObject(file);
-    try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
-    } catch (MetadataException e) {
-      throw new GenericException("Error creating base file", e);
-    }
+
+    return new StringContentPayload(MetadataUtils.saveToString(document, true));
   }
 
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
@@ -539,7 +500,7 @@ public class PremisUtils {
       validationOptions.setErrorListener(validationErrors);
 
       if (validate && !representation.validate(validationOptions)) {
-        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationErrors));
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
@@ -551,21 +512,31 @@ public class PremisUtils {
   public static lc.xmlns.premisV2.File binaryToFile(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     lc.xmlns.premisV2.File file;
+    List<XmlValidationError> validationErrors = new ArrayList<>();
     try {
       file = binaryToFile(payload.createInputStream());
 
-      List<XmlValidationError> validationErrors = new ArrayList<>();
       XmlOptions validationOptions = new XmlOptions();
       validationOptions.setErrorListener(validationErrors);
 
       if (validate && !file.validate(validationOptions)) {
-        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationErrors));
       }
-    } catch (XmlException | IOException e) {
+    } catch (XmlException e) {
+      ValidationException exception = new ValidationException(e);
+      exception.setReport(MetadataUtils.xmlValidationErrorsToValidationReport(validationErrors));
+      throw exception;
+    } catch (IOException e) {
       throw new GenericException("Error loading representation premis file", e);
     }
 
     return file;
+  }
+
+  public static ContentPayload fileToBinary(lc.xmlns.premisV2.File file) throws GenericException, ValidationException {
+    ObjectDocument d = ObjectDocument.Factory.newInstance();
+    d.setObject(file);
+    return new StringContentPayload(MetadataUtils.saveToString(d, true));
   }
 
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
@@ -579,7 +550,7 @@ public class PremisUtils {
       validationOptions.setErrorListener(validationErrors);
 
       if (validate && !event.validate(validationOptions)) {
-        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationErrors));
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
@@ -599,28 +570,13 @@ public class PremisUtils {
       validationOptions.setErrorListener(validationErrors);
 
       if (validate && !agent.validate(validationOptions)) {
-        throw new ValidationException(xmlValidationErrorsToValidationReport(validationErrors));
+        throw new ValidationException(MetadataUtils.xmlValidationErrorsToValidationReport(validationErrors));
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
     }
 
     return agent;
-  }
-
-  private static ValidationReport xmlValidationErrorsToValidationReport(List<XmlValidationError> validationErrors) {
-    ValidationReport report = new ValidationReport();
-    report.setValid(false);
-    List<ValidationIssue> issues = new ArrayList<>();
-    for (XmlValidationError error : validationErrors) {
-      ValidationIssue issue = new ValidationIssue();
-      issue.setMessage(error.getMessage());
-      issue.setColumnNumber(error.getColumn());
-      issue.setLineNumber(error.getLine());
-      issues.add(issue);
-    }
-    report.setIssues(issues);
-    return report;
   }
 
   public static SolrInputDocument updateSolrDocument(SolrInputDocument doc, Binary premisBinary)
@@ -686,10 +642,10 @@ public class PremisUtils {
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload);
-    IndexedPreservationAgent agent = getPreservationAgent(plugin,preservationAgentTypeCharacterizationPlugin,model);
+    IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
     return agent;
   }
-  
+
   public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin,
     String preservationAgentTypeCharacterizationPlugin, ModelService model) {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
@@ -702,8 +658,9 @@ public class PremisUtils {
   }
 
   public static ContentPayload linkFileToRepresentation(File file, String aipId, String representationId,
-    String relationshipType, String relationshipSubType, ModelService model) throws GenericException,
-      RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException, IOException {
+    String relationshipType, String relationshipSubType, ModelService model)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException,
+      IOException, ValidationException {
     Binary preservationRepresentation = model.getStorage()
       .getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
     Representation r = binaryToRepresentation(preservationRepresentation.getContent().createInputStream());
@@ -716,25 +673,23 @@ public class PremisUtils {
 
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     document.setObject(r);
-    try {
-      return new StringContentPayload(MetadataHelperUtility.saveToString(document, true));
-    } catch (MetadataException e) {
-      throw new GenericException("Error creating base representation", e);
-    }
+    return new StringContentPayload(MetadataUtils.saveToString(document, true));
+
   }
-  
-  
+
   public static String createPremisRepresentationIdentifier(String aipId, String representationId) {
-    return aipId+SEPARATOR+representationId;
+    return aipId + SEPARATOR + representationId;
   }
+
   public static String createPremisFileIdentifier(File f) {
     String identifier = createPremisRepresentationIdentifier(f.getAipId(), f.getRepresentationId());
-    if(f.getPath()!=null && f.getPath().size()>0){
-      identifier+=SEPARATOR;
-      identifier+=StringUtils.join(f.getPath(),SEPARATOR);
+    if (f.getPath() != null && f.getPath().size() > 0) {
+      identifier += SEPARATOR;
+      identifier += StringUtils.join(f.getPath(), SEPARATOR);
     }
-    identifier+=SEPARATOR;
-    identifier+=f.getId();
+    identifier += SEPARATOR;
+    identifier += f.getId();
     return identifier;
   }
+
 }

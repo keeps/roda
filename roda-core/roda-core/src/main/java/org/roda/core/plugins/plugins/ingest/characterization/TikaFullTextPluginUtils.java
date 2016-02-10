@@ -85,13 +85,4 @@ public class TikaFullTextPluginUtils {
     return properties;
   }
 
-  public static String extractApplicationNameFromResult(Path tikaResult) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public static String extractApplicationVersionFromResult(Path tikaResult) {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

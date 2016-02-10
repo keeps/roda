@@ -44,7 +44,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.Metadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -79,6 +78,7 @@ import org.slf4j.LoggerFactory;
  * 1) how to undo things created/changed upon exceptions??? if using fedora
  * perhaps with transactions
  * 
+ * @author Luis Faria <lfaria@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ModelService extends ModelObservable {
@@ -1010,7 +1010,10 @@ public class ModelService extends ModelObservable {
 
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(fileId, PreservationMetadataType.OBJECT_FILE,
+
+    String id = ModelUtils.generatePreservationMetadataId(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
+      fileDirectoryPath, fileId);
+    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, PreservationMetadataType.OBJECT_FILE,
       aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
   }
@@ -1353,33 +1356,39 @@ public class ModelService extends ModelObservable {
   public OtherMetadata createOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId, String fileSuffix, String type, ContentPayload payload)
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    OtherMetadata otherMetadataBinary = null;
-    try {
-      StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipId, representationId, type);
-      storage.getDirectory(otherMetadataPath);
-    } catch (NotFoundException e) {
-      LOGGER.debug("Tool directory doesn't exist... Creating...");
-      try {
-        StoragePath otherMetadataPath = ModelUtils.getOtherMetadataDirectory(aipId);
-        storage.createDirectory(otherMetadataPath);
-      } catch (AlreadyExistsException e1) {
-        // nothing to do
-      }
-
-      try {
-        StoragePath otherMetadataPath = ModelUtils.getToolMetadataDirectory(aipId, type);
-        storage.createDirectory(otherMetadataPath);
-      } catch (AlreadyExistsException e1) {
-        // nothing to do
-      }
-      try {
-        StoragePath otherMetadataPath = ModelUtils.getToolRepresentationMetadataDirectory(aipId, representationId,
-          type);
-        storage.createDirectory(otherMetadataPath);
-      } catch (AlreadyExistsException e1) {
-        // nothing to do
-      }
-    }
+    OtherMetadata om = null;
+    // try {
+    // StoragePath otherMetadataPath =
+    // ModelUtils.getToolRepresentationMetadataDirectory(aipId,
+    // representationId, type);
+    // storage.getDirectory(otherMetadataPath);
+    // } catch (NotFoundException e) {
+    // LOGGER.debug("Tool directory doesn't exist... Creating...");
+    // try {
+    // StoragePath otherMetadataPath =
+    // ModelUtils.getOtherMetadataDirectory(aipId);
+    // storage.createDirectory(otherMetadataPath);
+    // } catch (AlreadyExistsException e1) {
+    // // nothing to do
+    // }
+    //
+    // try {
+    // StoragePath otherMetadataPath =
+    // ModelUtils.getToolMetadataDirectory(aipId, type);
+    // storage.createDirectory(otherMetadataPath);
+    // } catch (AlreadyExistsException e1) {
+    // // nothing to do
+    // }
+    // try {
+    // StoragePath otherMetadataPath =
+    // ModelUtils.getToolRepresentationMetadataDirectory(aipId,
+    // representationId,
+    // type);
+    // storage.createDirectory(otherMetadataPath);
+    // } catch (AlreadyExistsException e1) {
+    // // nothing to do
+    // }
+    // }
 
     StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
@@ -1390,24 +1399,19 @@ public class ModelService extends ModelObservable {
     } catch (AlreadyExistsException e) {
       storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
     }
-    // TODO create a better id
-    StringBuilder idBuilder = new StringBuilder();
-    idBuilder.append(type).append("_");
-    idBuilder.append(aipId).append("_");
-    idBuilder.append(representationId).append("_");
-    if (fileDirectoryPath != null) {
-      for (String dirItem : fileDirectoryPath) {
-        idBuilder.append(dirItem).append("_");
-      }
-    }
 
-    idBuilder.append(fileId);
+    String id = ModelUtils.generateOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
 
-    otherMetadataBinary = new OtherMetadata(idBuilder.toString(), type, aipId, representationId, fileDirectoryPath,
-      fileId, fileSuffix);
-    notifyOtherMetadataCreated(otherMetadataBinary);
+    om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
-    return otherMetadataBinary;
+    // update AIP metadata
+    AIP aip = getAIPMetadata(aipId);
+    aip.getMetadata().getOtherMetadata().add(om);
+    updateAIPMetadata(aip);
+
+    notifyOtherMetadataCreated(om);
+
+    return om;
   }
 
   public void createJob(Job job) throws GenericException {
@@ -1464,32 +1468,6 @@ public class ModelService extends ModelObservable {
     notifyJobReportUpdated(jobReport);
   }
 
-  public void updateFileFormats(List<IndexedFile> updatedFiles) {
-    // TODO this method should go to PremisUtils
-    // TODO update to preservation metadata should go through model
-
-    for (IndexedFile file : updatedFiles) {
-      // update PREMIS
-      try {
-        Binary b = retrievePreservationFile(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
-
-        b = PremisUtils.updateFile(b, file);
-
-        StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(file.getId(),
-          PreservationMetadataType.OBJECT_FILE, file.getAipId(), file.getRepresentationId(), file.getPath(),
-          file.getId());
-
-        storage.updateBinaryContent(filePath, b.getContent(), false, true);
-      } catch (IOException | GenericException | RequestNotValidException | NotFoundException
-        | AuthorizationDeniedException | XmlException e) {
-        LOGGER.warn("Error updating file format in storage for file {}/{}/{} ", file.getAipId(),
-          file.getRepresentationId(), file.getId());
-        LOGGER.warn(e.getMessage(), e);
-      }
-    }
-    // TODO is any notify needed?
-  }
-
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
@@ -1525,23 +1503,6 @@ public class ModelService extends ModelObservable {
     boolean asReference = false;
     storage.createBinary(binaryPath, payload, asReference);
 
-    // TODO why is this method needed? A PREMIS agent must be created on its
-    // own.
-    if (PreservationMetadataType.EVENT.equals(type)) {
-      boolean validatePremis = true;
-      List<IndexedPreservationAgent> agents = ModelUtils.extractAgentsFromPreservationEventBinary(payload,
-        validatePremis);
-      for (IndexedPreservationAgent pla : agents) {
-        try {
-          ContentPayload b = PremisUtils.createPremisAgentBinary(pla.getIdentifierValue(),
-            pla.getTitle() + "/" + pla.getVersion(), pla.getType());
-          createPreservationMetadata(PreservationMetadataType.AGENT, pla.getIdentifierValue(), b);
-        } catch (AlreadyExistsException alreadyExists) {
-          LOGGER.warn("Agent already exists: " + pla.getIdentifierValue());
-        }
-      }
-    }
-
     if (aipId != null) {
       // Update AIP metadata
       AIP aip = getAIPMetadata(aipId);
@@ -1553,15 +1514,17 @@ public class ModelService extends ModelObservable {
     return pm;
   }
 
-  // TODO remove PREMIS type and file Id
-  public void updatePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
-    String id, ContentPayload payload)
+  public void updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
+    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
-    pm.setAipId(aipId);
     pm.setId(id);
-    pm.setRepresentationId(representationId);
     pm.setType(type);
+    pm.setAipId(aipId);
+    pm.setRepresentationId(representationId);
+    pm.setFileDirectoryPath(fileDirectoryPath);
+    pm.setFileId(fileId);
+
     StoragePath binaryPath = ModelUtils.getPreservationMetadataStoragePath(pm);
     storage.updateBinaryContent(binaryPath, payload, false, true);
 
@@ -1579,7 +1542,6 @@ public class ModelService extends ModelObservable {
     notifyPreservationMetadataUpdated(pm);
   }
 
-  // TODO remove PREMIS type and file Id
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
     String id) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();

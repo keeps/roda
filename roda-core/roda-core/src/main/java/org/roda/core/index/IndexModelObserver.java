@@ -151,7 +151,7 @@ public class IndexModelObserver implements ModelObserver {
     try {
 
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.OUTPUT_EXT, TikaFullTextPlugin.APP_NAME);
+        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
 
       Map<String, String> properties = TikaFullTextPluginUtils
         .extractPropertiesFromResult(fulltextBinary.getContent().createInputStream());

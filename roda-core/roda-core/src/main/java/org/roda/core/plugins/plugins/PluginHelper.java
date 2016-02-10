@@ -42,7 +42,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -198,7 +197,7 @@ public final class PluginHelper {
   public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
     ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
     String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent)
-      throws PremisMetadataException, IOException, RequestNotValidException, NotFoundException, GenericException,
+      throws IOException, RequestNotValidException, NotFoundException, GenericException,
       AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,

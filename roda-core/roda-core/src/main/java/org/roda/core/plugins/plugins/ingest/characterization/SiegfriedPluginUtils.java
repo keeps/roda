@@ -26,8 +26,8 @@ public class SiegfriedPluginUtils {
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
     String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "binary");
-    command = new ArrayList<String>(Arrays.asList(siegfriedPath.toString(), "-json=true", "-z=false", "-nr=true",
-      sourceDirectory.toFile().getAbsolutePath()));
+    command = new ArrayList<String>(
+      Arrays.asList(siegfriedPath.toString(), "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
 

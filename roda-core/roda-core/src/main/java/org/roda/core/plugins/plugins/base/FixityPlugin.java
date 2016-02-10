@@ -60,7 +60,7 @@ public class FixityPlugin implements Plugin<AIP> {
     try {
       agent = PremisUtils.createPremisAgentBinary(getName() + "/" + getVersion(), "fixityCheck",
         RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
-    } catch (GenericException e) {
+    } catch (GenericException | ValidationException e) {
       throw new PluginException("Error initializing agent", e);
     }
   }
@@ -165,8 +165,9 @@ public class FixityPlugin implements Plugin<AIP> {
 
               PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),r.getId())),
-                null, "failure", "Reason", sb.toString(), agent);
+                "Checksums recorded in PREMIS were compared with the files in the repository",
+                Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), r.getId())), null,
+                "failure", "Reason", sb.toString(), agent);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {
               LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());

@@ -96,7 +96,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class BrowserHelper {
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
-  
+
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
@@ -565,8 +565,9 @@ public class BrowserHelper {
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
           fileDirectoryPath, fileId, payload);
       } else {
-        model.updatePreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId, fileId,
-          payload);
+        PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
+        String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+        model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);

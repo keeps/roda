@@ -37,7 +37,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
-import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -217,7 +216,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
           success ? "success" : "failure", success ? "" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage(), agent);
       }
-    } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
+    } catch (IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);
     }

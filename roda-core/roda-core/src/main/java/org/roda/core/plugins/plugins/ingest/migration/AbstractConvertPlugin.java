@@ -37,7 +37,6 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
-import org.roda.core.metadata.PremisMetadataException;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -559,7 +558,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
         Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), newRepresentationID)), null,
         outcome, stringBuilder.toString(), null, agent);
-    } catch (PremisMetadataException | IOException | RequestNotValidException | NotFoundException | GenericException
+    } catch (IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
     }

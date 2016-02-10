@@ -18,6 +18,7 @@ public class OtherMetadata implements Serializable {
 
   private String id;
   private String type;
+
   @JsonIgnore
   private String aipId;
   private String representationId;
@@ -33,9 +34,12 @@ public class OtherMetadata implements Serializable {
     String fileId, String fileSuffix) {
     super();
     this.id = id;
+    this.type = type;
+
     this.aipId = aipId;
     this.representationId = representationId;
-    this.type = type;
+    this.fileDirectoryPath = fileDirectoryPath;
+    this.fileId = fileId;
     this.fileSuffix = fileSuffix;
   }
 

@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,6 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -65,6 +65,7 @@ import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import lc.xmlns.premisV2.CreatingApplicationComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.Representation;
@@ -113,6 +114,10 @@ public class InternalPluginsTest {
     FSUtils.deletePath(basePath);
   }
 
+  private ByteArrayInputStream generateContentData() {
+    return new ByteArrayInputStream(RandomStringUtils.randomAscii(GENERATED_FILE_SIZE).getBytes());
+  }
+
   private TransferredResource createCorpora()
     throws InterruptedException, IOException, FileAlreadyExistsException, NotFoundException, GenericException {
     FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
@@ -138,20 +143,18 @@ public class InternalPluginsTest {
     f.createFolder("test", "test2");
     f.createFolder("test", "test3");
 
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(
-      RandomStringUtils.random(GENERATED_FILE_SIZE).getBytes());
-    f.createFile("test", CORPORA_TEST1_TXT, inputStream);
-    f.createFile("test", "test2.txt", inputStream);
-    f.createFile("test", "test3.txt", inputStream);
-    f.createFile("test/test1", CORPORA_TEST1_TXT, inputStream);
-    f.createFile("test/test1", "test2.txt", inputStream);
-    f.createFile("test/test1", "test3.txt", inputStream);
-    f.createFile("test/test2", CORPORA_TEST1_TXT, inputStream);
-    f.createFile("test/test2", "test2.txt", inputStream);
-    f.createFile("test/test2", "test3.txt", inputStream);
-    f.createFile("test/test3", CORPORA_TEST1_TXT, inputStream);
-    f.createFile("test/test3", "test2.txt", inputStream);
-    f.createFile("test/test3", "test3.txt", inputStream);
+    f.createFile("test", CORPORA_TEST1_TXT, generateContentData());
+    f.createFile("test", "test2.txt", generateContentData());
+    f.createFile("test", "test3.txt", generateContentData());
+    f.createFile("test/test1", CORPORA_TEST1_TXT, generateContentData());
+    f.createFile("test/test1", "test2.txt", generateContentData());
+    f.createFile("test/test1", "test3.txt", generateContentData());
+    f.createFile("test/test2", CORPORA_TEST1_TXT, generateContentData());
+    f.createFile("test/test2", "test2.txt", generateContentData());
+    f.createFile("test/test2", "test3.txt", generateContentData());
+    f.createFile("test/test3", CORPORA_TEST1_TXT, generateContentData());
+    f.createFile("test/test3", "test2.txt", generateContentData());
+    f.createFile("test/test3", "test3.txt", generateContentData());
 
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
@@ -264,7 +267,7 @@ public class InternalPluginsTest {
 
     // check file size
     long size = fileCharacteristics.getSize();
-    Assert.assertEquals(GENERATED_FILE_SIZE, size);
+    Assert.assertTrue("File size is zero", size > 0);
 
     // check file original name
     String originalName = fpo.getOriginalName().getStringValue();
@@ -293,7 +296,7 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // 12 files with siegfried output
+    // 12 files with Siegfried output
     Assert.assertEquals(12, aip.getMetadata().getOtherMetadata().size());
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
@@ -337,7 +340,30 @@ public class InternalPluginsTest {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
     assertReports(reports);
 
-    // TODO test if Siegfried as correctly executed
+    aip = model.retrieveAIP(aip.getId());
+
+    // 12 files with Apache Tika output
+    Assert.assertEquals(12, aip.getMetadata().getOtherMetadata().size());
+
+    Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX,
+      TikaFullTextPlugin.OTHER_METADATA_TYPE);
+
+    Assert.assertNotNull(om);
+
+    Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+
+    lc.xmlns.premisV2.File fpo = PremisUtils.binaryToFile(fpo_bin.getContent(), true);
+
+    ObjectCharacteristicsComplexType characteristics = fpo.getObjectCharacteristicsArray(0);
+
+    Assert.assertEquals(1, characteristics.getCreatingApplicationList().size());
+
+    CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
+    Assert.assertEquals("X", creatingApplication.getCreatingApplicationName());
+    Assert.assertEquals("X", creatingApplication.getCreatingApplicationVersion());
+    Assert.assertEquals(new Date(), creatingApplication.getDateCreatedByApplication());
 
   }
 

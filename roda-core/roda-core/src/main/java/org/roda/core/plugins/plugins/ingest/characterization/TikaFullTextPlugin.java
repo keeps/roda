@@ -19,26 +19,21 @@ import org.apache.tika.exception.TikaException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -55,9 +50,9 @@ import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
 
-  public static final String OUTPUT_EXT = ".html";
+  public static final String FILE_SUFFIX = ".html";
 
-  public static final String APP_NAME = "ApacheTika";
+  public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
@@ -119,7 +114,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
     try {
       PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
     } catch (AlreadyExistsException e) {
-      //TODO verify agent creation (event)
+      // TODO verify agent creation (event)
     } catch (RODAException e) {
       LOGGER.error("Error create PREMIS agent for Apache Tika", e);
     }
@@ -143,34 +138,37 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
               String tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
               ContentPayload payload = new StringContentPayload(tikaResult);
-              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), OUTPUT_EXT,
-                APP_NAME, payload);
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), FILE_SUFFIX,
+                OTHER_METADATA_TYPE, payload);
+
+              // update PREMIS
               try {
-                IndexedFile f = index.retrieve(IndexedFile.class,
-                  SolrUtils.getId(aip.getId(), representation.getId(), file.getId()));
-
                 Map<String, String> properties = TikaFullTextPluginUtils.extractPropertiesFromResult(tikaResult);
-                if (properties.containsKey(RodaConstants.FILE_FULLTEXT)) {
-                  f.setFulltext(properties.get(RodaConstants.FILE_FULLTEXT));
-                }
-                if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_NAME)) {
-                  f.setCreatingApplicationName(properties.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
-                }
-                if (properties.containsKey(RodaConstants.FILE_CREATING_APPLICATION_VERSION)) {
-                  f.setCreatingApplicationVersion(properties.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
-                }
-                if (properties.containsKey(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION)) {
-                  f.setDateCreatedByApplication(properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
-                }
+                String fulltext = properties.get(RodaConstants.FILE_FULLTEXT);
+                String creatingApplicationName = properties.get(RodaConstants.FILE_CREATING_APPLICATION_NAME);
+                String creatingApplicationVersion = properties.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION);
+                String dateCreatedByApplication = properties.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION);
 
-                updatedFiles.add(f);
+                Binary premis_bin = model.retrievePreservationFile(file);
+
+                lc.xmlns.premisV2.File premis_file = PremisUtils.binaryToFile(premis_bin.getContent(), false);
+                PremisUtils.updateCreatingApplication(premis_file, creatingApplicationName, creatingApplicationVersion,
+                  dateCreatedByApplication);
+
+                PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
+                String id = ModelUtils.generatePreservationMetadataId(type, aip.getId(), representation.getId(),
+                  file.getPath(), file.getId());
+
+                ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
+                model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(),
+                  file.getId(), premis_file_payload);
+
               } catch (ParserConfigurationException pce) {
 
               }
             }
           }
           IOUtils.closeQuietly(allFiles);
-          model.updateFileFormats(updatedFiles);
         }
 
         state = PluginState.SUCCESS;

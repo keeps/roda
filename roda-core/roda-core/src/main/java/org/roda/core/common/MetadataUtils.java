@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.metadata;
+package org.roda.core.common;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -13,22 +13,30 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.apache.xmlbeans.XmlError;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
+import org.apache.xmlbeans.XmlValidationError;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.validation.ValidationIssue;
+import org.roda.core.data.v2.validation.ValidationReport;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.drew.metadata.MetadataException;
 
 /**
  * This is an utility class for metadata helpers.
  * 
- * @author Rui Castro
+ * @author Luis Faria <lfaria@keep.pt>
  */
-public class MetadataHelperUtility {
-  private static final Logger logger = LoggerFactory.getLogger(MetadataHelperUtility.class);
+public class MetadataUtils {
+  private static final Logger logger = LoggerFactory.getLogger(MetadataUtils.class);
 
   /**
    * Saves the current XML object to a byte array.
@@ -36,12 +44,14 @@ public class MetadataHelperUtility {
    * @param xmlObject
    * 
    * @return a <code>byte[]</code> with the contents of the XML file.
+   * @throws ValidationException
+   * @throws GenericException
    * 
    * @throws MetadataException
    *           if the XML object is not valid or if something goes wrong with
    *           the serialisation.
    */
-  public static byte[] saveToByteArray(XmlObject xmlObject) throws MetadataException {
+  public static byte[] saveToByteArray(XmlObject xmlObject) throws GenericException, ValidationException {
     return saveToByteArray(xmlObject, true);
   }
 
@@ -52,12 +62,12 @@ public class MetadataHelperUtility {
    * @param writeXMLDeclaration
    * 
    * @return a <code>byte[]</code> with the contents of the XML file.
+   * @throws ValidationException
+   * @throws GenericException
    * 
-   * @throws MetadataException
-   *           if the XML object is not valid or if something goes wrong with
-   *           the serialisation.
    */
-  public static byte[] saveToByteArray(XmlObject xmlObject, boolean writeXMLDeclaration) throws MetadataException {
+  public static byte[] saveToByteArray(XmlObject xmlObject, boolean writeXMLDeclaration)
+    throws GenericException, ValidationException {
 
     // Save the xml object to a byte array
     ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
@@ -66,8 +76,9 @@ public class MetadataHelperUtility {
 
     return byteArrayStream.toByteArray();
   }
-  
-  public static String saveToString(XmlObject xmlObject, boolean writeXMLDeclaration) throws MetadataException {
+
+  public static String saveToString(XmlObject xmlObject, boolean writeXMLDeclaration)
+    throws GenericException, ValidationException {
 
     ByteArrayOutputStream byteArrayStream = new ByteArrayOutputStream();
     saveToOutputStream(xmlObject, byteArrayStream, writeXMLDeclaration);
@@ -92,13 +103,14 @@ public class MetadataHelperUtility {
    * @throws IOException
    *           if {@link FileOutputStream} associated with the {@link File}
    *           couldn't be closed.
+   * @throws ValidationException
+   * @throws GenericException
    */
-  public static void saveToFile(XmlObject xmlObject, File file)
-    throws MetadataException, FileNotFoundException, IOException {
-
-    FileOutputStream fileOutputStream = new FileOutputStream(file);
-    saveToOutputStream(xmlObject, fileOutputStream, true);
-    fileOutputStream.close();
+  public static void saveToFile(XmlObject xmlObject, Path path)
+    throws IOException, GenericException, ValidationException {
+    OutputStream outputStream = Files.newOutputStream(path);
+    saveToOutputStream(xmlObject, outputStream, true);
+    outputStream.close();
   }
 
   /**
@@ -110,18 +122,17 @@ public class MetadataHelperUtility {
    *          the {@link OutputStream}.
    * @param writeXMLDeclaration
    * 
-   * @throws MetadataException
-   *           if the XML object is not valid or if something goes wrong with
-   *           the serialisation.
+   * @throws GenericException
+   * @throws ValidationException
    */
   public static void saveToOutputStream(XmlObject xmlObject, OutputStream outputStream, boolean writeXMLDeclaration)
-    throws MetadataException {
+    throws GenericException, ValidationException {
 
     logger.trace("Serializing XML Object " + xmlObject.toString());
 
     // Create an XmlOptions instance and set the error listener.
     XmlOptions validateOptions = new XmlOptions();
-    List<XmlError> errorList = new ArrayList<XmlError>();
+    List<XmlValidationError> errorList = new ArrayList<XmlValidationError>();
     validateOptions.setErrorListener(errorList);
 
     // Validate the XML.
@@ -141,19 +152,27 @@ public class MetadataHelperUtility {
 
       } catch (IOException e) {
         logger.debug("Error serializing XML object - " + e.getMessage(), e);
-        throw new PremisMetadataException("Error serializing XML object - " + e.getMessage(), e);
+        throw new GenericException("Error serializing XML object", e);
       }
 
     } else {
-
-      // If the XML isn't valid, loop through the listener's contents,
-      // printing contained messages.
-      for (XmlError xmlError : errorList) {
-        logger.error("XmlError: " + xmlError);
-      }
-
-      throw new MetadataException("XML document is not valid: " + errorList);
+      throw new ValidationException(xmlValidationErrorsToValidationReport(errorList));
     }
+  }
+
+  public static ValidationReport xmlValidationErrorsToValidationReport(List<XmlValidationError> validationErrors) {
+    ValidationReport report = new ValidationReport();
+    report.setValid(false);
+    List<ValidationIssue> issues = new ArrayList<>();
+    for (XmlValidationError error : validationErrors) {
+      ValidationIssue issue = new ValidationIssue();
+      issue.setMessage(error.getMessage());
+      issue.setColumnNumber(error.getColumn());
+      issue.setLineNumber(error.getLine());
+      issues.add(issue);
+    }
+    report.setIssues(issues);
+    return report;
   }
 
 }

@@ -40,7 +40,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationObject;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -67,7 +66,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import lc.xmlns.premisV2.EventComplexType;
-import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
 
 /**
@@ -373,6 +371,31 @@ public final class ModelUtils {
     return idBuilder.toString();
   }
 
+  public static String generateOtherMetadataId(String type, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
+    StringBuilder idBuilder = new StringBuilder();
+    idBuilder.append(type);
+    if (aipId != null) {
+      idBuilder.append("-");
+      idBuilder.append(aipId);
+    }
+    if (representationId != null) {
+      idBuilder.append("-");
+      idBuilder.append(representationId);
+    }
+    if (fileDirectoryPath != null) {
+      for (String dir : fileDirectoryPath) {
+        idBuilder.append("-");
+        idBuilder.append(dir);
+      }
+    }
+    if (fileId != null) {
+      idBuilder.append("-");
+      idBuilder.append(fileId);
+    }
+    return idBuilder.toString();
+  }
+
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     // TODO review this method
@@ -626,27 +649,6 @@ public final class ModelUtils {
       LOGGER.error("Error transforming json string to job reports", e);
     }
     return ret;
-  }
-
-  public static List<IndexedPreservationAgent> extractAgentsFromPreservationEventBinary(ContentPayload payload,
-    boolean validatePremis) throws ValidationException, GenericException {
-
-    List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
-    EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
-    List<LinkingAgentIdentifierComplexType> identifiers = event.getLinkingAgentIdentifierList();
-    if (identifiers != null) {
-      for (LinkingAgentIdentifierComplexType laict : identifiers) {
-        IndexedPreservationAgent agent = new IndexedPreservationAgent();
-        agent.setTitle(laict.getTitle());
-        agent.setIdentifierType(laict.getLinkingAgentIdentifierType());
-        agent.setIdentifierValue(laict.getLinkingAgentIdentifierValue());
-        agent.setRole(laict.getRole());
-        agent.setType(laict.getType());
-        agents.add(agent);
-      }
-    }
-
-    return agents;
   }
 
   public static <T> List<IndexedPreservationObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
