@@ -25,6 +25,7 @@ public class CorporaConstants {
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
   public static final String SOURCE_AIP_ID_REAL = "REAL";
   public static final String SOURCE_AIP_REP_WITH_SUBFOLDERS = "AIP_REP_WITH_SUBFOLDERS";
+  public static final String SOURCE_AIP_CONVERTER = "AIP_CONVERTER";
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 
@@ -81,6 +82,7 @@ public class CorporaConstants {
   public static final String SUCCESS = "success";
   public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
   public static final String PRESERVATION_LEVEL_FULL = "full";
+  public static final String REPRESENTATION_CONVERTER_ID = "5e9a84de-2d81-47ce-afa6-5abee2dd9bdf";
 
   public static final String AGENT_RODA_8 = "roda_8";
   public static final String METS_XML = "METS.xml";

@@ -14,35 +14,23 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.ClosableIterable;
-import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,7 +100,8 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
         try {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("createPremisForRepresentation  " + representation.getId());
-            createPremisForRepresentation(model, storage, temp, aip, representation.getId());
+            LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, temp, aip, representation.getId());
           }
 
           state = PluginState.SUCCESS;
@@ -139,31 +128,6 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
       LOGGER.error("Error executing FastCharacterizationAction: " + ioe.getMessage(), ioe);
     }
     return report;
-  }
-
-  private void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
-    String representationId) throws IOException, RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
-    LOGGER.debug("Processing representation " + representationId + " from AIP " + aip.getId());
-
-    ContentPayload representationPremis = PremisUtils.createBaseRepresentation(aip.getId(), representationId);
-    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, representationId, aip.getId(),
-      representationId, representationPremis);
-    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representationId);
-    for (File file : allFiles) {
-      if (!file.isDirectory()) {
-        ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
-        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
-          file.getPath(), file.getId(), filePreservation);
-        ContentPayload updatedRepresentation = PremisUtils.linkFileToRepresentation(file, aip.getId(), representationId,
-          RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL, RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, model);
-        String id = representationId;
-        PreservationMetadataType type = PreservationMetadataType.OBJECT_REPRESENTATION;
-        model.updatePreservationMetadata(id, type, aip.getId(), representationId, null, null, updatedRepresentation);
-        // TODO save updated representation
-      }
-    }
-    IOUtils.closeQuietly(allFiles);
   }
 
   @Override

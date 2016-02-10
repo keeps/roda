@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.tika.exception.TikaException;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -13,6 +14,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -21,9 +23,13 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPluginUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPluginUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
+import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 public class AbstractConvertPluginUtils {
@@ -47,14 +53,18 @@ public class AbstractConvertPluginUtils {
   }
 
   public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
-    String aipId, String representationId)
-      throws IOException, RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-      PluginException, AlreadyExistsException, SAXException, TikaException, ValidationException {
+    String aipId, String representationId) throws IOException, RequestNotValidException,
+      GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
+      SAXException, TikaException, ValidationException, XmlException, InvalidParameterException {
 
-    // runPremisSkeleton(index, model, storage, aipId, representationId);
-    // runSiegfried(index, model, storage, aipId, representationId);
-    // runTIKA(index, model, storage, aipId, representationId);
-    // TODO review this
+    AIP aip = model.retrieveAIP(aipId);
+    Representation representation = model.retrieveRepresentation(aipId, representationId);
+
+    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, null, aip, representationId);
+    // 
+    
+    SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, null, false);
+    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
   }
 
 }
