@@ -15,7 +15,7 @@
 			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
-	
+
 	<appender name="CORE_FILEOUT_NO_THREAD" class="ch.qos.logback.core.FileAppender">
 		<file>${roda.home}/log/roda-core.log</file>
 		<encoder>
@@ -25,6 +25,13 @@
 
 	<!-- FIXME delete after tests - START -->
 	<logger name="org.roda.core.plugins.plugins.antivirus.AntivirusPlugin"
+		additivity="false">
+		<level value="DEBUG" />
+		<appender-ref ref="CORE_FILEOUT" />
+	</logger>
+
+	<logger
+		name="org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin"
 		additivity="false">
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
@@ -60,7 +67,7 @@
 		<level value="DEBUG" />
 		<appender-ref ref="CORE_FILEOUT" />
 	</logger>
-	
+
 	<logger name="org.apache.solr" additivity="false">
 		<level value="WARN" />
 		<appender-ref ref="CORE_FILEOUT_NO_THREAD" />

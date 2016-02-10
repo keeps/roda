@@ -36,6 +36,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
+import scala.noinline;
+
 public class TikaFullTextPlugin implements Plugin<AIP> {
 
   public static final String FILE_SUFFIX = ".html";
@@ -100,7 +102,9 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
     PluginState state;
 
     try {
-      PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model);
+      boolean notifyAgent = true;
+      PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model,
+        notifyAgent);
     } catch (AlreadyExistsException e) {
       // TODO verify agent creation (event)
     } catch (RODAException e) {
@@ -115,19 +119,20 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
       try {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
-          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
+          boolean inotify = false;
+          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
         }
+        model.notifyAIPUpdated(aip.getId());
 
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-
       } catch (RODAException | SAXException | TikaException | IOException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;
-        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString())).addAttribute(
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Error running Tika " + aip.getId() + ": "
-            + e.getMessage()));
+        reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()))
+          .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS,
+            "Error running Tika " + aip.getId() + ": " + e.getMessage()));
       }
 
       report.addItem(reportItem);

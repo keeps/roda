@@ -114,7 +114,9 @@ public class AIPValidationPlugin implements Plugin<AIP> {
     throws PluginException {
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+      boolean notifyAgent = true;
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model,
+        notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
@@ -157,15 +159,19 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   // TODO EVENT MUST BE "AIP EVENT" INSTEAD OF "REPRESENTATION EVENT"
   // TODO AGENT ID...
   private void createEvent(AIP aip, ModelService model, boolean descriptiveValid, boolean preservationValid,
-    IndexedPreservationAgent agent) throws PluginException {
+    IndexedPreservationAgent agent, boolean notify) throws PluginException {
     try {
       boolean success = descriptiveValid && preservationValid;
 
       for (Representation representation : aip.getRepresentations()) {
+        boolean inotify = false;
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, success ? "success" : "failure", success ? "success" : "Error",
-          "", agent);
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
+          success ? "success" : "failure", success ? "success" : "Error", "", agent, inotify);
+      }
+      if (notify) {
+        model.notifyAIPUpdated(aip.getId());
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

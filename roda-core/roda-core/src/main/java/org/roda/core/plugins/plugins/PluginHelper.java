@@ -196,13 +196,13 @@ public final class PluginHelper {
 
   public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
     ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
-    String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent)
-      throws IOException, RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent, boolean notify)
+      throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
       targets, outcome, detailNote, detailExtension, Arrays.asList(agent));
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, premisEvent);
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);
     pm.setRepresentationId(representationID);
@@ -299,7 +299,7 @@ public final class PluginHelper {
   }
 
   public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
-    String eventType, String eventDetails, String detailExtension, IndexedPreservationAgent agent)
+    String eventType, String eventDetails, String detailExtension, IndexedPreservationAgent agent, boolean notify)
       throws PluginException {
     String outcome = "";
     switch (state) {
@@ -317,8 +317,13 @@ public final class PluginHelper {
     try {
       boolean success = (state == PluginState.SUCCESS);
       for (Representation representation : aip.getRepresentations()) {
+        boolean inotify = false;
         createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, outcome, success ? "" : "Error", detailExtension, agent);
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
+          outcome, success ? "" : "Error", detailExtension, agent, inotify);
+      }
+      if (notify) {
+        model.notifyAIPUpdated(aip.getId());
       }
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);

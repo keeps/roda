@@ -21,9 +21,7 @@ import java.util.Optional;
 import java.util.Stack;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.LdapUtilityException;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -40,7 +38,6 @@ import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -1354,41 +1351,9 @@ public class ModelService extends ModelObservable {
   }
 
   public OtherMetadata createOtherMetadata(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId, String fileSuffix, String type, ContentPayload payload)
+    String fileId, String fileSuffix, String type, ContentPayload payload, boolean notify)
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     OtherMetadata om = null;
-    // try {
-    // StoragePath otherMetadataPath =
-    // ModelUtils.getToolRepresentationMetadataDirectory(aipId,
-    // representationId, type);
-    // storage.getDirectory(otherMetadataPath);
-    // } catch (NotFoundException e) {
-    // LOGGER.debug("Tool directory doesn't exist... Creating...");
-    // try {
-    // StoragePath otherMetadataPath =
-    // ModelUtils.getOtherMetadataDirectory(aipId);
-    // storage.createDirectory(otherMetadataPath);
-    // } catch (AlreadyExistsException e1) {
-    // // nothing to do
-    // }
-    //
-    // try {
-    // StoragePath otherMetadataPath =
-    // ModelUtils.getToolMetadataDirectory(aipId, type);
-    // storage.createDirectory(otherMetadataPath);
-    // } catch (AlreadyExistsException e1) {
-    // // nothing to do
-    // }
-    // try {
-    // StoragePath otherMetadataPath =
-    // ModelUtils.getToolRepresentationMetadataDirectory(aipId,
-    // representationId,
-    // type);
-    // storage.createDirectory(otherMetadataPath);
-    // } catch (AlreadyExistsException e1) {
-    // // nothing to do
-    // }
-    // }
 
     StoragePath binaryPath = ModelUtils.getToolMetadataPath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
@@ -1409,7 +1374,9 @@ public class ModelService extends ModelObservable {
     aip.getMetadata().getOtherMetadata().add(om);
     updateAIPMetadata(aip);
 
-    notifyOtherMetadataCreated(om);
+    if (notify) {
+      notifyOtherMetadataCreated(om);
+    }
 
     return om;
   }
@@ -1469,27 +1436,27 @@ public class ModelService extends ModelObservable {
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
+    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
     String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
-    return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload);
+    return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
-    String representationId, ContentPayload payload) throws GenericException, NotFoundException,
+    String representationId, ContentPayload payload, boolean notify) throws GenericException, NotFoundException,
       RequestNotValidException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPreservationMetadata(type, id, aipId, representationId, null, null, payload);
+    return createPreservationMetadata(type, id, aipId, representationId, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id,
-    ContentPayload payload) throws GenericException, NotFoundException, RequestNotValidException,
+    ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
       AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPreservationMetadata(type, id, null, null, null, null, payload);
+    return createPreservationMetadata(type, id, null, null, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
+    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
     PreservationMetadata pm = new PreservationMetadata();
@@ -1510,12 +1477,14 @@ public class ModelService extends ModelObservable {
       updateAIPMetadata(aip);
     }
 
-    notifyPreservationMetadataCreated(pm);
+    if (notify) {
+      notifyPreservationMetadataCreated(pm);
+    }
     return pm;
   }
 
   public void updatePreservationMetadata(String id, PreservationMetadataType type, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload)
+    String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
@@ -1537,13 +1506,17 @@ public class ModelService extends ModelObservable {
     } else {
       preservationMetadata.add(pm);
     }
-    updateAIP(aip);
 
-    notifyPreservationMetadataUpdated(pm);
+    updateAIPMetadata(aip);
+
+    if (notify) {
+      notifyPreservationMetadataUpdated(pm);
+    }
   }
 
   public void deletePreservationMetadata(PreservationMetadataType type, String aipId, String representationId,
-    String id) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    String id, boolean notify)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipId);
     pm.setId(id);
@@ -1563,7 +1536,9 @@ public class ModelService extends ModelObservable {
       }
     }
 
-    notifyPreservationMetadataDeleted(pm);
+    if (notify) {
+      notifyPreservationMetadataDeleted(pm);
+    }
   }
 
 }

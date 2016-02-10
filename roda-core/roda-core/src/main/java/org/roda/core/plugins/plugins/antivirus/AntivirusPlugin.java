@@ -121,7 +121,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
     throws PluginException {
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+      boolean notifyAgent = true;
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model,
+        notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
@@ -170,7 +172,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
       try {
         LOGGER.info("Creating event");
-        createEvent(virusCheckResult, exception, state, aip, model, agent);
+        boolean notify = true;
+        createEvent(virusCheckResult, exception, state, aip, model, agent, notify);
         report.addItem(reportItem);
 
         LOGGER.info("Updating job report");
@@ -187,18 +190,22 @@ public class AntivirusPlugin implements Plugin<AIP> {
   }
 
   private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
-    ModelService model, IndexedPreservationAgent agent) throws PluginException {
+    ModelService model, IndexedPreservationAgent agent, boolean notify) throws PluginException {
 
     try {
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
 
       for (Representation representation : aip.getRepresentations()) {
+        boolean inotify = false;
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
           "All the files from the SIP were verified against an antivirus.",
           Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
           success ? "success" : "failure", success ? "" : "Error",
-          success ? virusCheckResult.getReport() : exception.getMessage(), agent);
+          success ? virusCheckResult.getReport() : exception.getMessage(), agent, inotify);
+      }
+      if (notify) {
+        model.notifyAIPUpdated(aip.getId());
       }
     } catch (IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {

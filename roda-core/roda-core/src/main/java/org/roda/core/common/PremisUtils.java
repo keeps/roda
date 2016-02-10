@@ -377,18 +377,17 @@ public class PremisUtils {
 
   }
 
-  public static ContentPayload createBaseRepresentation(String aipID, String representationId)
+  public static Representation createBaseRepresentation(String aipID, String representationId)
     throws GenericException, ValidationException {
-    ObjectDocument document = ObjectDocument.Factory.newInstance();
+
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType("local");
     String identifier = createPremisRepresentationIdentifier(aipID, representationId);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
-    document.setObject(representation);
 
-    return new StringContentPayload(MetadataUtils.saveToString(document, true));
+    return representation;
   }
 
   public static ContentPayload createBaseFile(File originalFile, ModelService model) throws GenericException,
@@ -539,6 +538,13 @@ public class PremisUtils {
     return new StringContentPayload(MetadataUtils.saveToString(d, true));
   }
 
+  public static ContentPayload representationToBinary(Representation representation)
+    throws GenericException, ValidationException {
+    ObjectDocument d = ObjectDocument.Factory.newInstance();
+    d.setObject(representation);
+    return new StringContentPayload(MetadataUtils.saveToString(d, true));
+  }
+
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     EventComplexType event;
@@ -635,13 +641,14 @@ public class PremisUtils {
   }
 
   public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin,
-    String preservationAgentTypeCharacterizationPlugin, ModelService model) throws GenericException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    String preservationAgentTypeCharacterizationPlugin, ModelService model, boolean notify)
+      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload);
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
     return agent;
   }
@@ -657,24 +664,16 @@ public class PremisUtils {
     return agent;
   }
 
-  public static ContentPayload linkFileToRepresentation(File file, String aipId, String representationId,
-    String relationshipType, String relationshipSubType, ModelService model)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, XmlException,
-      IOException, ValidationException {
-    Binary preservationRepresentation = model.getStorage()
-      .getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
-    Representation r = binaryToRepresentation(preservationRepresentation.getContent().createInputStream());
+  public static void linkFileToRepresentation(File file, String relationshipType, String relationshipSubType,
+    Representation r) throws GenericException, RequestNotValidException, NotFoundException,
+      AuthorizationDeniedException, XmlException, IOException, ValidationException {
+
     RelationshipComplexType relationship = r.addNewRelationship();
     relationship.setRelationshipType(relationshipType);
     relationship.setRelationshipSubType(relationshipSubType);
     RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
     roict.setRelatedObjectIdentifierType(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL);
     roict.setRelatedObjectIdentifierValue(createPremisFileIdentifier(file));
-
-    ObjectDocument document = ObjectDocument.Factory.newInstance();
-    document.setObject(r);
-    return new StringContentPayload(MetadataUtils.saveToString(document, true));
-
   }
 
   public static String createPremisRepresentationIdentifier(String aipId, String representationId) {

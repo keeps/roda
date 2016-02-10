@@ -32,8 +32,12 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -107,6 +111,7 @@ public class FFProbePlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
+      boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
@@ -121,7 +126,7 @@ public class FFProbePlugin implements Plugin<AIP> {
               ContentPayload payload = new StringContentPayload(ffProbeResults);
               // TODO support file path
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                "FFProbe", payload);
+                "FFProbe", payload, inotify);
             }
           }
           IOUtils.closeQuietly(allFiles);
@@ -130,7 +135,11 @@ public class FFProbePlugin implements Plugin<AIP> {
         }
 
       }
-
+      try {
+        model.notifyAIPUpdated(aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error notifying of AIP update", e);
+      }
     }
     return null;
   }

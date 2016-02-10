@@ -96,10 +96,14 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
 
         try {
           for (Representation representation : aip.getRepresentations()) {
+
             LOGGER.debug("createPremisForRepresentation  " + representation.getId());
             LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
-            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representation.getId());
+            boolean inotify = false;
+            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representation.getId(),
+              inotify);
           }
+          model.notifyAIPUpdated(aip.getId());
 
           state = PluginState.SUCCESS;
           reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),

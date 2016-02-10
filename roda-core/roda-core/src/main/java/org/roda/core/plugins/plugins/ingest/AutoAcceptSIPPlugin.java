@@ -92,7 +92,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
 
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+      boolean notifyAgent = true;
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model,
+        notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
@@ -139,11 +141,13 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       boolean success = (state == PluginState.SUCCESS);
 
       for (Representation representation : aip.getRepresentations()) {
+        boolean notify = false;
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null, success ? "success" : "failure", success ? "" : "Error",
-          outcomeDetail, agent);
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
+          success ? "success" : "failure", success ? "" : "Error", outcomeDetail, agent, notify);
       }
+      model.notifyAIPUpdated(aip.getId());
     } catch (IOException | RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }

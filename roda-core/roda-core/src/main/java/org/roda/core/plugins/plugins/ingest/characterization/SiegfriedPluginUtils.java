@@ -85,7 +85,7 @@ public class SiegfriedPluginUtils {
   }
 
   public static void runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, IndexedPreservationAgent agent, boolean createsPluginEvent)
+    AIP aip, Representation representation, IndexedPreservationAgent agent, boolean createsPluginEvent, boolean notify)
       throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException, PluginException {
 
@@ -96,6 +96,7 @@ public class SiegfriedPluginUtils {
     String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
     IOUtils.closeQuietly(directAccess);
 
+    boolean inotify = false;
     final JSONObject obj = new JSONObject(siegfriedOutput);
     JSONArray files = (JSONArray) obj.get("files");
 
@@ -114,7 +115,7 @@ public class SiegfriedPluginUtils {
       ContentPayload payload = new StringContentPayload(fileObject.toString());
 
       model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-        SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload);
+        SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, inotify);
 
       // Update PREMIS files
       JSONArray matches = (JSONArray) fileObject.get("matches");
@@ -140,7 +141,7 @@ public class SiegfriedPluginUtils {
 
               ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
               model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-                premis_file_payload);
+                premis_file_payload, inotify);
 
             } catch (NotFoundException e) {
               LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
@@ -155,7 +156,7 @@ public class SiegfriedPluginUtils {
     if (createsPluginEvent) {
       PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
-        "The files of the representation were successfully identified.", siegfriedOutput, agent);
+        "The files of the representation were successfully identified.", siegfriedOutput, agent, notify);
     }
 
   }

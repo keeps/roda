@@ -561,13 +561,14 @@ public class BrowserHelper {
       file = Files.createTempFile("preservation", ".tmp");
       Files.copy(is, file, StandardCopyOption.REPLACE_EXISTING);
       ContentPayload payload = new FSPathContentPayload(file);
+      boolean notify = true;
       if (create) {
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
-          fileDirectoryPath, fileId, payload);
+          fileDirectoryPath, fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
         String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
-        model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload);
+        model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP representation preservation metadata file", e);
@@ -585,8 +586,9 @@ public class BrowserHelper {
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(String aipId, String representationId,
     String fileId, String preservationId)
       throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    boolean notify = true;
     RodaCoreFactory.getModelService().deletePreservationMetadata(PreservationMetadataType.OBJECT_FILE, aipId,
-      representationId, preservationId);
+      representationId, preservationId, notify);
   }
 
   public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,

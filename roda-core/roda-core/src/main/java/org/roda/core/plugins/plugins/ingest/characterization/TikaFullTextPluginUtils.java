@@ -10,9 +10,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,7 +33,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -108,11 +105,13 @@ public class TikaFullTextPluginUtils {
   }
 
   public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation) throws NotFoundException, GenericException, RequestNotValidException,
-      AuthorizationDeniedException, IOException, SAXException, TikaException, ValidationException {
+    AIP aip, Representation representation, boolean notify)
+      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException, IOException,
+      SAXException, TikaException, ValidationException {
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
-    List<IndexedFile> updatedFiles = new ArrayList<IndexedFile>();
+
+    boolean inotify = false;
     for (File file : allFiles) {
 
       if (!file.isDirectory()) {
@@ -122,7 +121,7 @@ public class TikaFullTextPluginUtils {
         String tikaResult = TikaFullTextPluginUtils.extractMetadata(binary.getContent().createInputStream());
         ContentPayload payload = new StringContentPayload(tikaResult);
         model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-          TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload);
+          TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, inotify);
 
         // update PREMIS
         try {
@@ -143,8 +142,9 @@ public class TikaFullTextPluginUtils {
             file.getPath(), file.getId());
 
           ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
+
           model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(), file.getId(),
-            premis_file_payload);
+            premis_file_payload, inotify);
 
         } catch (ParserConfigurationException pce) {
 
@@ -152,5 +152,8 @@ public class TikaFullTextPluginUtils {
       }
     }
     IOUtils.closeQuietly(allFiles);
+    if (notify) {
+      model.notifyAIPUpdated(aip.getId());
+    }
   }
 }

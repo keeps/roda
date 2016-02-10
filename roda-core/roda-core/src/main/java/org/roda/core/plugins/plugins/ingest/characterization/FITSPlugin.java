@@ -16,8 +16,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -88,6 +92,7 @@ public class FITSPlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
+      boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
         ClosableIterable<File> allFiles = null;
@@ -107,9 +112,9 @@ public class FITSPlugin implements Plugin<AIP> {
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + file.getId() + ")");
             model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
-              payload);
+              payload, inotify);
           }
-          
+
           FSUtils.deletePath(output);
         } catch (RODAException | IOException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
@@ -118,7 +123,11 @@ public class FITSPlugin implements Plugin<AIP> {
           IOUtils.closeQuietly(allFiles);
         }
       }
-
+      try {
+        model.notifyAIPUpdated(aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error notifying of AIP update", e);
+      }
     }
 
     return null;

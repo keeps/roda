@@ -148,7 +148,10 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
     IndexedPreservationAgent agent = null;
     try {
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
+      // Agent is detached from AIP
+      boolean notify = true;
+      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model,
+        notify);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
     } catch (RODAException e) {
@@ -279,14 +282,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         }
 
         logger.debug("Creating convert plugin event for the representation " + representation.getId());
-        createEvent(alteredFiles, newFiles, aip, newRepresentationID, model, state, agent);
+        boolean notifyEvent = false;
+        createEvent(alteredFiles, newFiles, aip, newRepresentationID, model, state, agent, notifyEvent);
 
       }
 
       try {
 
         for (String repId : newRepresentations) {
-          AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aip.getId(), repId);
+          boolean inotify = false;
+          AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aip.getId(), repId, inotify);
         }
 
         model.notifyAIPUpdated(aip.getId());
@@ -401,10 +406,14 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           }
         }
 
-        AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aipId, newRepresentationID);
+        boolean notifyReindex = false;
+        AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aipId, newRepresentationID,
+          notifyReindex);
 
         logger.debug("Creating convert plugin event for the representation " + representation.getId());
-        createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent);
+        boolean notifyEvent = false;
+        createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent,
+          notifyEvent);
 
       } catch (Throwable e) {
         logger.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
@@ -529,7 +538,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     CommandException;
 
   public void createEvent(List<File> alteredFiles, List<File> newFiles, AIP aip, String newRepresentationID,
-    ModelService model, int state, IndexedPreservationAgent agent) throws PluginException {
+    ModelService model, int state, IndexedPreservationAgent agent, boolean notify) throws PluginException {
 
     List<String> premisSourceFilesIdentifiers = new ArrayList<String>();
     List<String> premisTargetFilesIdentifiers = new ArrayList<String>();
@@ -568,7 +577,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     try {
       PluginHelper.createPluginEvent(aip.getId(), newRepresentationID, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION, "Some files were converted on a new representation",
-        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), null, agent);
+        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), null, agent,
+        notify);
     } catch (IOException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

@@ -87,6 +87,7 @@ public class JHOVEPlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
+      boolean inotify = false;
       try {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
@@ -100,7 +101,7 @@ public class JHOVEPlugin implements Plugin<AIP> {
               Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
               ContentPayload payload = new FSPathContentPayload(jhoveResults);
               model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                "JHOVE", payload);
+                "JHOVE", payload, inotify);
               jhoveResults.toFile().delete();
             }
           }
@@ -110,6 +111,12 @@ public class JHOVEPlugin implements Plugin<AIP> {
         LOGGER.error("Error processing AIP: " + aip.getId(), e);
       } catch (Exception e) {
         LOGGER.error("Error processing AIP: " + aip.getId(), e);
+      }
+
+      try {
+        model.notifyAIPUpdated(aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error notifying of AIP update", e);
       }
     }
     return null;

@@ -17,8 +17,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -87,6 +91,7 @@ public class DroidPlugin implements Plugin<AIP> {
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
+      boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
         DirectResourceAccess directAccess = null;
@@ -110,15 +115,21 @@ public class DroidPlugin implements Plugin<AIP> {
             ContentPayload payload = new StringContentPayload(xmlOutput);
 
             model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml", "DROID",
-              payload);
+              payload, inotify);
           }
-        } catch (RODAException  e) {
+        } catch (RODAException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);
         }
       }
-
+      
+      try {
+        model.notifyAIPUpdated(aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error notifying of AIP update", e);
+      }
+      
     }
     return null;
   }

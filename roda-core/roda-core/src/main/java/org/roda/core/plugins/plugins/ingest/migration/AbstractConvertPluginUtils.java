@@ -15,6 +15,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -52,17 +53,24 @@ public class AbstractConvertPluginUtils {
   }
 
   public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
-    String aipId, String representationId) throws IOException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
-      TikaException, ValidationException, XmlException, InvalidParameterException {
+    String aipId, String representationId, boolean notify) throws IOException, RequestNotValidException,
+      GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
+      SAXException, TikaException, ValidationException, XmlException, InvalidParameterException {
 
     AIP aip = model.retrieveAIP(aipId);
     Representation representation = model.retrieveRepresentation(aipId, representationId);
+    boolean createPluginEvent = false;
+    boolean inotify = false;
+    // TODO set agent
+    IndexedPreservationAgent agent = null;
+    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representationId, inotify);
+    SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, agent,
+      createPluginEvent, inotify);
+    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
 
-    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representationId);
-
-    SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, null, false);
-    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
+    if (notify) {
+      model.notifyAIPUpdated(aipId);
+    }
   }
 
 }

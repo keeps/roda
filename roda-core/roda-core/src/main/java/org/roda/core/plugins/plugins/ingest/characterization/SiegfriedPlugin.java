@@ -99,8 +99,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     PluginState state;
     IndexedPreservationAgent agent = null;
     try {
+      boolean notifyAgent = true;
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
-        model);
+        model, notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
         model);
@@ -116,12 +117,12 @@ public class SiegfriedPlugin implements Plugin<AIP> {
       try {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-
+          boolean inotify = false;
           SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, agent,
-            createsPluginEvent);
-
+            createsPluginEvent, inotify);
         }
-
+        model.notifyAIPUpdated(aip.getId());
+        
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 

@@ -17,8 +17,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -88,7 +92,7 @@ public class ExifToolPlugin implements Plugin<AIP> {
     throws PluginException {
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
-
+      boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
 
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
@@ -114,7 +118,7 @@ public class ExifToolPlugin implements Plugin<AIP> {
 
               String fileId = path.getFileName().toString();
               model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml",
-                "ExifTool", payload);
+                "ExifTool", payload, inotify);
             }
           }
           FSUtils.deletePath(metadata);
@@ -123,6 +127,12 @@ public class ExifToolPlugin implements Plugin<AIP> {
         } finally {
           IOUtils.closeQuietly(directAccess);
         }
+      }
+
+      try {
+        model.notifyAIPUpdated(aip.getId());
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Error notifying of AIP update", e);
       }
     }
     return null;

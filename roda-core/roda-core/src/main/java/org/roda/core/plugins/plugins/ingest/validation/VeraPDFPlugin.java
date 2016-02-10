@@ -118,8 +118,9 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     throws PluginException {
     IndexedPreservationAgent agent = null;
     try {
+      boolean notifyAgent = true;
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
-        model);
+        model, notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
         model);
@@ -236,11 +237,12 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         + " finished with a status: " + outcome + ".");
 
       // FIXME revise PREMIS generation
+      boolean notify = false;
       PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
         "All the files from the AIP were submitted to a veraPDF validation.",
         Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representationId)), null, outcome,
-        noteStringBuilder.toString(), null, agent);
+        noteStringBuilder.toString(), null, agent, notify);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);
     }
