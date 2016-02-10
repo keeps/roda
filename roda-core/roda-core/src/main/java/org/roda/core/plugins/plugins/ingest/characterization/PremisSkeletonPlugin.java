@@ -8,8 +8,6 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +90,6 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
     PluginState state;
 
     try {
-      Path temp = Files.createTempDirectory("temp");
       for (AIP aip : list) {
         LOGGER.debug("Processing AIP " + aip.getId());
         ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Creating base PREMIS", aip.getId(), null);
@@ -101,7 +98,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
           for (Representation representation : aip.getRepresentations()) {
             LOGGER.debug("createPremisForRepresentation  " + representation.getId());
             LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
-            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, temp, aip, representation.getId());
+            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representation.getId());
           }
 
           state = PluginState.SUCCESS;

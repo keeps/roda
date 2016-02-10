@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -30,6 +31,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -87,13 +89,12 @@ public class DroidPlugin implements Plugin<AIP> {
       LOGGER.debug("Processing AIP " + aip.getId());
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+        DirectResourceAccess directAccess = null;
         try {
-
-          Path data = Files.createTempDirectory("data");
-          StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          tempStorage.copy(storage, representationPath, representationPath);
-          String droidOutput = DroidPluginUtils.runDROIDOnPath(data.resolve(representationPath.asString()));
+          directAccess = storage.getDirectAccess(representationPath);
+
+          String droidOutput = DroidPluginUtils.runDROIDOnPath(directAccess.getPath());
           LOGGER.debug("DROID OUTPUT: " + droidOutput);
 
           for (String outputLine : droidOutput.split("\n")) {
@@ -111,9 +112,10 @@ public class DroidPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId, ".xml", "DROID",
               payload);
           }
-          FSUtils.deletePath(data);
-        } catch (RODAException | IOException e) {
+        } catch (RODAException  e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(directAccess);
         }
       }
 

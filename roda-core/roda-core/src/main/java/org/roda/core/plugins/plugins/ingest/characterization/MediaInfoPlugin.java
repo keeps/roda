@@ -31,6 +31,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -46,6 +47,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -109,12 +111,12 @@ public class MediaInfoPlugin implements Plugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+        DirectResourceAccess directAccess = null;
         try {
-          Path data = Files.createTempDirectory("data");
-          StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          tempStorage.copy(storage, representationPath, representationPath);
-          String mediaInfoOutput = MediaInfoPluginUtils.runMediaInfoOnPath(data.resolve(representationPath.asString()));
+          directAccess = storage.getDirectAccess(representationPath);
+
+          String mediaInfoOutput = MediaInfoPluginUtils.runMediaInfoOnPath(directAccess.getPath());
 
           Map<String, Path> mediaInfoParsed = parseMediaInfoOutput(mediaInfoOutput);
           for (Map.Entry<String, Path> entry : mediaInfoParsed.entrySet()) {
@@ -127,11 +129,12 @@ public class MediaInfoPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml", "MediaInfo",
               payload);
           }
-          FSUtils.deletePath(data);
         } catch (RODAException | IOException | CommandException | XPathExpressionException
           | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
           | TransformerException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+        } finally {
+          IOUtils.closeQuietly(directAccess);
         }
       }
 

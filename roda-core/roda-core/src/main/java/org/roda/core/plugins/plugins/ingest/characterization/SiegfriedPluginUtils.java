@@ -7,14 +7,13 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.roda.core.RodaCoreFactory;
@@ -39,10 +38,9 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.slf4j.Logger;
@@ -88,16 +86,15 @@ public class SiegfriedPluginUtils {
 
   public static void runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
     AIP aip, Representation representation, IndexedPreservationAgent agent, boolean createsPluginEvent)
-      throws IOException, GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+      throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException, PluginException {
 
-    // TODO run directly in storage
-    Path data = Files.createTempDirectory("data");
-    StorageService tempStorage = new FileStorageService(data);
     StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-    tempStorage.copy(storage, representationPath, representationPath);
-    Path representationFsPath = data.resolve(representationPath.asString());
+    DirectResourceAccess directAccess = storage.getDirectAccess(representationPath);
+
+    Path representationFsPath = directAccess.getPath();
     String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
+    IOUtils.closeQuietly(directAccess);
 
     final JSONObject obj = new JSONObject(siegfriedOutput);
     JSONArray files = (JSONArray) obj.get("files");
@@ -161,7 +158,6 @@ public class SiegfriedPluginUtils {
         "The files of the representation were successfully identified.", siegfriedOutput, agent);
     }
 
-    FSUtils.deletePath(data);
   }
 
 }

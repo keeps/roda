@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +125,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-      } catch (PluginException | IOException | NotFoundException | GenericException | RequestNotValidException
+      } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 

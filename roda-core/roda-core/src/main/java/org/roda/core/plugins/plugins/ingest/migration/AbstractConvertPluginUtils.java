@@ -29,7 +29,6 @@ import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPluginUtil
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.StorageService;
-import org.slf4j.Logger;
 import org.xml.sax.SAXException;
 
 public class AbstractConvertPluginUtils {
@@ -53,16 +52,15 @@ public class AbstractConvertPluginUtils {
   }
 
   public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
-    String aipId, String representationId) throws IOException, RequestNotValidException,
-      GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
-      SAXException, TikaException, ValidationException, XmlException, InvalidParameterException {
+    String aipId, String representationId) throws IOException, RequestNotValidException, GenericException,
+      NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
+      TikaException, ValidationException, XmlException, InvalidParameterException {
 
     AIP aip = model.retrieveAIP(aipId);
     Representation representation = model.retrieveRepresentation(aipId, representationId);
 
-    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, null, aip, representationId);
-    // 
-    
+    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representationId);
+
     SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, null, false);
     TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
   }

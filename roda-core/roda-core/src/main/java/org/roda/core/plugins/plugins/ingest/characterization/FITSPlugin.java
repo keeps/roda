@@ -33,6 +33,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -89,33 +90,16 @@ public class FITSPlugin implements Plugin<AIP> {
       LOGGER.debug("Processing AIP " + aip.getId());
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+        ClosableIterable<File> allFiles = null;
+        DirectResourceAccess directAccess = null;
         try {
-          /*
-           * Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representation.getId());
-           * for (String fileID : representation.getFileIds()) { LOGGER.debug(
-           * "Processing file " + fileID + " of representation " +
-           * representation.getId() + " from AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representation.getId(), fileID);
-           * Binary binary = storage.getBinary(file.getStoragePath());
-           * 
-           * Path fitsResult = FITSUtils.runFits(file, binary,
-           * getParameterValues()); Binary resource = (Binary)
-           * FSUtils.convertPathToResource(fitsResult.getParent(), fitsResult);
-           * model.createOtherMetadata(aip.getId(), representation.getId(),
-           * file.getStoragePath().getName() + ".xml", "FITS", resource);
-           * FSUtils.deletePath(fitsResult);
-           * 
-           * }
-           */
-          Path data = Files.createTempDirectory("data");
-          Path output = Files.createTempDirectory("output");
-          StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          tempStorage.copy(storage, representationPath, representationPath);
-          FITSPluginUtils.runFITSOnPath(data.resolve(representationPath.asString()), output);
+          directAccess = storage.getDirectAccess(representationPath);
+          Path output = Files.createTempDirectory("output");
 
-          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          FITSPluginUtils.runFITSOnPath(directAccess.getPath(), output);
+
+          allFiles = model.listAllFiles(aip.getId(), representation.getId());
           for (File file : allFiles) {
             // TODO the following path is not expecting folders
             Path p = output.resolve(file.getId() + ".fits.xml");
@@ -125,11 +109,13 @@ public class FITSPlugin implements Plugin<AIP> {
             model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
               payload);
           }
-          IOUtils.closeQuietly(allFiles);
-          FSUtils.deletePath(data);
+          
           FSUtils.deletePath(output);
         } catch (RODAException | IOException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(directAccess);
+          IOUtils.closeQuietly(allFiles);
         }
       }
 

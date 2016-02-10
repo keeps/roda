@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -31,6 +32,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -90,33 +92,14 @@ public class ExifToolPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
 
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+
+        DirectResourceAccess directAccess = null;
         try {
-          /*
-           * OLD VERSION... FILE BY FILE Representation representation =
-           * model.retrieveRepresentation(aip.getId(), representation.getId());
-           * for (String fileID : representation.getFileIds()) { LOGGER.debug(
-           * "Processing file " + fileID + " from " + representation.getId() +
-           * " of AIP " + aip.getId()); File file =
-           * model.retrieveFile(aip.getId(), representation.getId(), fileID);
-           * Binary binary = storage.getBinary(file.getStoragePath());
-           * 
-           * Path exifToolResults = ExifToolUtils.runExifTool(file, binary,
-           * getParameterValues()); Binary resource = (Binary)
-           * FSUtils.convertPathToResource(exifToolResults.getParent(),
-           * exifToolResults); model.createOtherMetadata(aip.getId(),
-           * representation.getId(), file.getStoragePath().getName() + ".xml",
-           * "ExifTool", resource); exifToolResults.toFile().delete(); }
-           */
-          // NEW VERSION
-          // TODO: if storage is filesystem, no need to copy all files to a
-          // "temp" FileStorageService
-          Path data = Files.createTempDirectory("data");
-          StorageService tempStorage = new FileStorageService(data);
           StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          tempStorage.copy(storage, representationPath, representationPath);
+          directAccess = storage.getDirectAccess(representationPath);
+
           Path metadata = Files.createTempDirectory("metadata");
-          String exifOutput = ExifToolPluginUtils.runExifToolOnPath(data.resolve(representationPath.asString()),
-            metadata);
+          String exifOutput = ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
           LOGGER.debug("ExifOutput: " + exifOutput);
 
           try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
@@ -134,10 +117,11 @@ public class ExifToolPlugin implements Plugin<AIP> {
                 "ExifTool", payload);
             }
           }
-          FSUtils.deletePath(data);
           FSUtils.deletePath(metadata);
         } catch (RODAException | IOException | CommandException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+        } finally {
+          IOUtils.closeQuietly(directAccess);
         }
       }
     }

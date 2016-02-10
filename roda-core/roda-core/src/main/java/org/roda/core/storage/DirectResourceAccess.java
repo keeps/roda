@@ -1,7 +1,6 @@
 package org.roda.core.storage;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.nio.file.Path;
 
 import org.roda.core.data.exceptions.AuthorizationDeniedException;

@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
-import java.nio.file.Path;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -23,7 +22,7 @@ import org.roda.core.storage.StorageService;
 
 public class PremisSkeletonPluginUtils {
 
-  public static void createPremisForRepresentation(ModelService model, StorageService storage, Path temp, AIP aip,
+  public static void createPremisForRepresentation(ModelService model, StorageService storage, AIP aip,
     String representationId) throws IOException, RequestNotValidException, GenericException, NotFoundException,
       AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
 
