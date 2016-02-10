@@ -1,7 +1,7 @@
 language: java
 jdk:
   - oraclejdk8
-sudo: false
+sudo: required
 before_script:
   - curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
   - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
