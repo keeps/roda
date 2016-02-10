@@ -1256,7 +1256,7 @@ public class ModelService extends ModelObservable {
   }
 
   public User confirmUserEmail(String username, String email, String emailConfirmationToken, boolean useModel,
-    boolean notify) throws LdapUtilityException, NotFoundException, InvalidTokenException {
+    boolean notify) throws NotFoundException, InvalidTokenException, GenericException {
     User user = null;
     boolean success = true;
     try {
@@ -1266,7 +1266,7 @@ public class ModelService extends ModelObservable {
       success = true;
     } catch (LdapUtilityException e) {
       success = false;
-      throw new LdapUtilityException("Error on password reset", e);
+      throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);
@@ -1281,7 +1281,7 @@ public class ModelService extends ModelObservable {
   }
 
   public User requestPasswordReset(String username, String email, boolean useModel, boolean notify)
-    throws IllegalOperationException, NotFoundException, LdapUtilityException {
+    throws IllegalOperationException, NotFoundException, GenericException {
     User user = null;
     boolean success = true;
     try {
@@ -1291,7 +1291,7 @@ public class ModelService extends ModelObservable {
       success = true;
     } catch (LdapUtilityException e) {
       success = false;
-      throw new LdapUtilityException("Error requesting password reset", e);
+      throw new GenericException("Error requesting password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);
@@ -1306,7 +1306,7 @@ public class ModelService extends ModelObservable {
   }
 
   public User resetUserPassword(String username, String password, String resetPasswordToken, boolean useModel,
-    boolean notify) throws LdapUtilityException, NotFoundException, InvalidTokenException, IllegalOperationException {
+    boolean notify) throws NotFoundException, InvalidTokenException, IllegalOperationException, GenericException {
     User user = null;
     boolean success = true;
     try {
@@ -1316,7 +1316,7 @@ public class ModelService extends ModelObservable {
       success = true;
     } catch (LdapUtilityException e) {
       success = false;
-      throw new LdapUtilityException("Error on password reset", e);
+      throw new GenericException("Error on password reset", e);
     } catch (NotFoundException e) {
       success = false;
       throw new NotFoundException("User doesn't exist", e);

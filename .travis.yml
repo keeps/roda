@@ -2,3 +2,8 @@ language: java
 jdk:
   - oraclejdk8
 sudo: false
+before_script:
+  - curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
+  - echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
+  - sudo apt-get update -qq
+  - sudo apt-get install siegfried -y

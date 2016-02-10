@@ -12,7 +12,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -185,7 +184,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void confirmUserEmail(String username, String emailConfirmationToken)
-    throws InvalidTokenException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, NotFoundException, GenericException {
     UserManagement.confirmUserEmail(username, emailConfirmationToken);
   }
 
@@ -207,10 +206,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     // }
     return successful;
   }
-  
+
   @Override
   public void requestPasswordReset(String usernameOrEmail, String captcha)
-    throws GenericException, NotFoundException, IllegalOperationException, LdapUtilityException, RecaptchaException {
+    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException {
     if (captcha != null) {
       RecaptchaUtils
         .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
@@ -221,7 +220,7 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
 
   @Override
   public void resetUserPassword(String username, String password, String resetPasswordToken)
-    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     UserManagement.resetUserPassword(username, password, resetPasswordToken);
   }
 

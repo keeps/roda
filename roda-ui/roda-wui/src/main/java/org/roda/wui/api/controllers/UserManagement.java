@@ -16,7 +16,6 @@ import java.util.Map;
 import javax.mail.internet.InternetAddress;
 
 import org.apache.velocity.VelocityContext;
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -341,18 +340,18 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static void confirmUserEmail(String username, String emailConfirmationToken)
-    throws InvalidTokenException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, NotFoundException, GenericException {
     Date start = new Date();
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
-    
+
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "confirmUserEmail", null, duration, "user", user);
   }
 
   public static void requestPasswordReset(String servletPath, String usernameOrEmail)
-    throws GenericException, NotFoundException, IllegalOperationException, LdapUtilityException {
+    throws GenericException, NotFoundException, IllegalOperationException {
     Date start = new Date();
 
     String username = null;
@@ -374,7 +373,7 @@ public class UserManagement extends RodaCoreService {
   }
 
   public static void resetUserPassword(String username, String password, String resetPasswordToken)
-    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     Date start = new Date();
 
     User user = UserManagementHelper.resetUserPassword(username, password, resetPasswordToken);

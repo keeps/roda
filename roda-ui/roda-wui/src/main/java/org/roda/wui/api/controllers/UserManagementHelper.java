@@ -121,19 +121,19 @@ public class UserManagementHelper {
   public static void removeGroup(String groupname) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().removeGroup(groupname, true, true);
   }
-  
+
   public static User confirmUserEmail(String username, String email, String emailConfirmationToken)
-    throws InvalidTokenException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
   public static User requestPasswordReset(String username, String email)
-    throws IllegalOperationException, NotFoundException, LdapUtilityException {
+    throws IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
   }
-  
+
   public static User resetUserPassword(String username, String password, String resetPasswordToken)
-    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException {
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }
 }

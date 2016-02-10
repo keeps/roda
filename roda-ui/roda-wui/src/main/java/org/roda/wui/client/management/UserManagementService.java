@@ -12,7 +12,6 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
-import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -238,11 +237,11 @@ public interface UserManagementService extends RemoteService {
    * @param token
    *          the token used in email verification
    * @throws InvalidTokenException
-   * @throws LdapUtilityException
    * @throws NotFoundException
+   * @throws GenericException
    */
   public void confirmUserEmail(String username, String emailConfirmationToken)
-    throws InvalidTokenException, LdapUtilityException, NotFoundException;
+    throws InvalidTokenException, NotFoundException, GenericException;
 
   /**
    * Change the email of a user that is still not active due to a email
@@ -273,7 +272,7 @@ public interface UserManagementService extends RemoteService {
    * @throws RecaptchaException
    */
   public void requestPasswordReset(String usernameOrEmail, String captcha)
-    throws GenericException, NotFoundException, IllegalOperationException, LdapUtilityException, RecaptchaException;
+    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException;
 
   /**
    * Reset a user password
@@ -287,9 +286,9 @@ public interface UserManagementService extends RemoteService {
    *          requestPasswordReset(String, String)
    * @throws InvalidTokenException
    * @throws IllegalOperationException
-   * @throws LdapUtilityException
    * @throws NotFoundException
+   * @throws GenericException
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken)
-    throws InvalidTokenException, IllegalOperationException, LdapUtilityException, NotFoundException;
+    throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException;
 }
