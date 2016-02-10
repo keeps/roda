@@ -27,6 +27,7 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
@@ -384,6 +385,28 @@ public class FileStorageService implements StorageService {
       throw new GenericException(
         "There isn't a Container or Directory or Binary representated by " + storagePath.asString());
     }
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
+
+    DirectResourceAccess ret = new DirectResourceAccess() {
+
+      @Override
+      public Path getPath() {
+        Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
+        // TODO disable write access to resource
+        // for UNIX programs using user with read-only permissions
+        // for Java programs using SecurityManager and Policy
+        return resourcePath;
+      }
+
+      @Override
+      public void close() throws IOException {
+        // nothing to do
+      }
+    };
+    return ret;
   }
 
 }

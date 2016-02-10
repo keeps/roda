@@ -333,4 +333,6 @@ public interface StorageService {
     throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
     AuthorizationDeniedException;
 
+  public DirectResourceAccess getDirectAccess(StoragePath storagePath);
+
 }

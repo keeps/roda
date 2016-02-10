@@ -52,6 +52,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
@@ -237,6 +238,24 @@ public class InternalPluginsTest {
     // All folders and files
     Assert.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
   }
+  
+  @Test
+  public void testVirusCheck() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+    AIP aip = ingestCorpora();
+
+    Plugin<AIP> plugin = new AntivirusPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    plugin.setParameterValues(parameters);
+
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
+    assertReports(reports);
+
+    aip = model.retrieveAIP(aip.getId());
+
+    // TODO check if PREMIS event was created
+
+  }
 
   @Test
   public void testPremisSkeleton() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
@@ -374,7 +393,10 @@ public class InternalPluginsTest {
     Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
       DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
 
+    // TODO test fulltext
+    
     // TODO test if PREMIS event was created
+    
   }
 
 }

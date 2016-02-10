@@ -7,6 +7,10 @@
  */
 package org.roda.core.storage.fedora;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -24,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
@@ -31,6 +36,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
@@ -38,6 +44,7 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -244,7 +251,7 @@ public class FedoraStorageService implements StorageService {
       return FedoraConversionUtils.fedoraObjectToDirectory(fedoraRepository.getRepositoryUrl(), object);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Error getting directory " + storagePath, e);
-    } catch (BadRequestException  e) {
+    } catch (BadRequestException e) {
       throw new RequestNotValidException("Error getting directory " + storagePath, e);
     } catch (org.fcrepo.client.NotFoundException e) {
       throw new NotFoundException("Error getting directory " + storagePath, e);
@@ -548,6 +555,48 @@ public class FedoraStorageService implements StorageService {
       }
 
     }
+  }
+
+  @Override
+  public DirectResourceAccess getDirectAccess(final StoragePath storagePath) {
+    DirectResourceAccess ret = new DirectResourceAccess() {
+      Path temp = null;
+
+      @Override
+      public Path getPath()
+        throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
+        Class<? extends Entity> entity = getEntity(storagePath);
+        Path path;
+        try {
+          temp = Files.createTempDirectory("temp");
+          if (entity.equals(Container.class) || entity.equals(Directory.class)) {
+            StorageService tempStorage = new FileStorageService(temp);
+            tempStorage.copy(FedoraStorageService.this, storagePath, storagePath);
+            path = temp;
+          } else {
+            path = temp.resolve(entity.getName());
+            Binary binary = getBinary(storagePath);
+            ContentPayload payload = binary.getContent();
+            InputStream inputStream = payload.createInputStream();
+            Files.copy(inputStream, path);
+            inputStream.close();
+          }
+        } catch (IOException | AlreadyExistsException e) {
+          throw new GenericException(e);
+        }
+        return path;
+      }
+
+      @Override
+      public void close() throws IOException {
+        if (temp != null) {
+          Files.delete(temp);
+          temp = null;
+        }
+      }
+
+    };
+    return ret;
   }
 
 }

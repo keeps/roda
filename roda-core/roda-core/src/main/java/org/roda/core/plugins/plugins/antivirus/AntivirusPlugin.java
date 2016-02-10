@@ -8,13 +8,12 @@
 package org.roda.core.plugins.plugins.antivirus;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -42,9 +41,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -124,15 +122,14 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
-    } catch(AlreadyExistsException e){
+    } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
     } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }
 
     Report report = PluginHelper.createPluginReport(this);
-    Path sourcePath = null;
-    boolean deleteSourcePath = false;
+
     PluginState state;
 
     for (AIP aip : list) {
@@ -140,21 +137,13 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
+      DirectResourceAccess directAccess = null;
       try {
         LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
         StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
 
-        if (storage instanceof FileStorageService) {
-          sourcePath = ((FileStorageService) storage).resolve(aipPath);
-          deleteSourcePath = false;
-        } else {
-          sourcePath = Files.createTempDirectory("temp");
-          StorageService tempStorage = new FileStorageService(sourcePath);
-          tempStorage.copy(storage, aipPath, aipPath);
-          deleteSourcePath = true;
-        }
-
-        virusCheckResult = getAntiVirus().checkForVirus(sourcePath);
+        directAccess = storage.getDirectAccess(aipPath);
+        virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
         state = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
@@ -163,8 +152,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
 
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
-      } catch (RuntimeException | IOException | RequestNotValidException | AlreadyExistsException | GenericException
-        | NotFoundException | AuthorizationDeniedException e) {
+      } catch (RuntimeException | RequestNotValidException | GenericException | NotFoundException
+        | AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
@@ -176,13 +165,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
         LOGGER.error("Error processing AIP " + aip.getId(), e);
         throw new PluginException(e);
       } finally {
-        try {
-          if (deleteSourcePath && sourcePath != null) {
-            FSUtils.deletePath(sourcePath);
-          }
-        } catch (GenericException | NotFoundException e) {
-          LOGGER.error("Error removing temp storage", e);
-        }
+        IOUtils.closeQuietly(directAccess);
       }
 
       try {
@@ -212,7 +195,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
-          "All the files from the SIP were verified against an antivirus.", Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(),representation.getId())), null,
+          "All the files from the SIP were verified against an antivirus.",
+          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
           success ? "success" : "failure", success ? "" : "Error",
           success ? virusCheckResult.getReport() : exception.getMessage(), agent);
       }
