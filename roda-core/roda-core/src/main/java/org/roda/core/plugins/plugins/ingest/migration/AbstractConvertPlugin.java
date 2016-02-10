@@ -49,6 +49,7 @@ import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.CommandException;
@@ -78,8 +79,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     pronomToExtension = new HashMap<>();
     mimetypeToExtension = new HashMap<>();
 
-    hasPartialSuccessOnOutcome = Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
+      "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   public void init() throws PluginException {
@@ -215,11 +216,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 }
 
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-                Binary binary = storage.getBinary(fileStoragePath);
+                DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
                 // FIXME file that doesn't get deleted afterwards
                 logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-                Path pluginResult = executePlugin(binary, fileFormat);
+                Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
 
                 if (pluginResult != null) {
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -243,6 +244,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                     notify);
                   alteredFiles.add(file);
                   newFiles.add(f);
+                  IOUtils.closeQuietly(directAccess);
 
                 } else {
                   logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
@@ -330,9 +332,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
               && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-                || (applicableTo.contains(fileFormat)))
-              && ifile.getSize() < (maxKbytes * 1024)) {
+                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+                  .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
               if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
                 fileFormat = pronomToExtension.get(filePronom).get(0);
@@ -344,11 +345,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               }
 
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-              Binary binary = storage.getBinary(fileStoragePath);
+              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
               // FIXME file that doesn't get deleted afterwards
               logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-              Path pluginResult = executePlugin(binary, fileFormat);
+              Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
 
               if (pluginResult != null) {
                 ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -370,6 +371,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 File f = model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload, notify);
                 alteredFiles.add(file);
                 newFiles.add(f);
+                IOUtils.closeQuietly(directAccess);
 
               } else {
                 logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
@@ -442,9 +444,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
             && ((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-              || (applicableTo.contains(fileFormat)))
-            && ifile.getSize() < (maxKbytes * 1024)) {
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
             if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
               && !applicableTo.contains(fileFormat)) {
@@ -457,11 +458,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             }
 
             StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-            Binary binary = storage.getBinary(fileStoragePath);
+            DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
             // FIXME file that doesn't get deleted afterwards
             logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-            Path pluginResult = executePlugin(binary, fileFormat);
+            Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
 
             if (pluginResult != null) {
               ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -473,8 +474,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
-                newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils
+                .getPreservationPath(file.getAipId(), newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -524,8 +525,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return new Report();
   }
 
-  public abstract Path executePlugin(Binary binary, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException;
+  public abstract Path executePlugin(Path path, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException;
 
   public void createEvent(List<File> alteredFiles, List<File> newFiles, AIP aip, String newRepresentationID,
     ModelService model, int state, IndexedPreservationAgent agent) throws PluginException {

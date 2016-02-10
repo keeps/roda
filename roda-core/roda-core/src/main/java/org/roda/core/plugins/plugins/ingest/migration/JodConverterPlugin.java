@@ -2,9 +2,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +13,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 
 public class JodConverterPlugin extends AbstractConvertPlugin {
@@ -65,19 +62,10 @@ public class JodConverterPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
     CommandException {
-    Path uriPath = Paths.get(binary.getContent().getURI());
-    Path pluginResult;
 
-    if (Files.exists(uriPath)) {
-      pluginResult = JodConverterPluginUtils.runJodConverter(uriPath, fileFormat, outputFormat);
-    } else {
-      pluginResult = JodConverterPluginUtils.runJodConverter(binary.getContent().createInputStream(), fileFormat,
-        outputFormat);
-    }
-
-    return pluginResult;
+    return JodConverterPluginUtils.runJodConverter(uriPath, fileFormat, outputFormat);
   }
 
   @Override

@@ -2,9 +2,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -13,7 +11,6 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 
 public class ImageMagickConvertPlugin extends CommandConvertPlugin {
@@ -56,20 +53,10 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
     fillFileFormatStructures();
   }
 
-  public Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException, IOException,
+  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
     CommandException {
-    Path uriPath = Paths.get(binary.getContent().getURI());
-    Path pluginResult;
 
-    if (Files.exists(uriPath)) {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, fileFormat, outputFormat,
-        commandArguments);
-    } else {
-      pluginResult = ImageMagickConvertPluginUtils.runImageMagickConvert(binary.getContent().createInputStream(),
-        fileFormat, outputFormat, commandArguments);
-    }
-
-    return pluginResult;
+    return ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, fileFormat, outputFormat, commandArguments);
   }
 
   @Override

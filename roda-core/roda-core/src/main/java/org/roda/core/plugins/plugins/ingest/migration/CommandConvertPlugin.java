@@ -11,7 +11,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.storage.Binary;
 import org.roda.core.util.CommandException;
 
 public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
@@ -58,7 +57,7 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public abstract Path executePlugin(Binary binary, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException;
+  public abstract Path executePlugin(Path path, String fileFormat) throws UnsupportedOperationException, IOException,
+    CommandException;
 
 }
