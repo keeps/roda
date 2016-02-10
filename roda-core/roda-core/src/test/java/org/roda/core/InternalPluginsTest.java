@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +63,8 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.util.DateParser;
+import org.w3c.util.InvalidDateException;
 
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
@@ -72,6 +73,9 @@ import lc.xmlns.premisV2.Representation;
 
 public class InternalPluginsTest {
 
+  private static final int CORPORA_FILES_COUNT = 13;
+  private static final int CORPORA_FOLDERS_COUNT = 3;
+  private static final String CORPORA_PDF = "test.docx";
   private static final String CORPORA_TEST1 = "test1";
   private static final String CORPORA_TEST1_TXT = "test1.txt";
   private static final int GENERATED_FILE_SIZE = 100;
@@ -156,6 +160,8 @@ public class InternalPluginsTest {
     f.createFile("test/test3", "test2.txt", generateContentData());
     f.createFile("test/test3", "test3.txt", generateContentData());
 
+    f.createFile("test", CORPORA_PDF, getClass().getResourceAsStream("/corpora/Media/" + CORPORA_PDF));
+
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
 
@@ -228,7 +234,8 @@ public class InternalPluginsTest {
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, allFiles);
 
-    Assert.assertEquals(15, reusableAllFiles.size());
+    // All folders and files
+    Assert.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
   }
 
   @Test
@@ -245,15 +252,15 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // 12 files and one representation
-    Assert.assertEquals(13, aip.getMetadata().getPreservationMetadata().size());
+    // Files plus one representation
+    Assert.assertEquals(CORPORA_FILES_COUNT + 1, aip.getMetadata().getPreservationMetadata().size());
 
     Binary rpo_bin = model.retrieveRepresentationPreservationObject(aip.getId(),
       aip.getRepresentations().get(0).getId());
     Representation rpo = PremisUtils.binaryToRepresentation(rpo_bin.getContent(), true);
 
-    // Relates to 12 files
-    Assert.assertEquals(12, rpo.getRelationshipList().size());
+    // Relates to files
+    Assert.assertEquals(CORPORA_FILES_COUNT, rpo.getRelationshipList().size());
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
@@ -296,8 +303,8 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // 12 files with Siegfried output
-    Assert.assertEquals(12, aip.getMetadata().getOtherMetadata().size());
+    // Files with Siegfried output
+    Assert.assertEquals(CORPORA_FILES_COUNT, aip.getMetadata().getOtherMetadata().size());
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
@@ -322,7 +329,8 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testApacheTika() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testApacheTika()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, InvalidDateException {
     AIP aip = ingestCorpora();
 
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
@@ -342,8 +350,8 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // 12 files with Apache Tika output
-    Assert.assertEquals(12, aip.getMetadata().getOtherMetadata().size());
+    // Files with Apache Tika output
+    Assert.assertEquals(CORPORA_FILES_COUNT, aip.getMetadata().getOtherMetadata().size());
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX,
@@ -352,7 +360,7 @@ public class InternalPluginsTest {
     Assert.assertNotNull(om);
 
     Binary fpo_bin = model.retrievePreservationFile(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT);
+      new ArrayList<>(), CORPORA_PDF);
 
     lc.xmlns.premisV2.File fpo = PremisUtils.binaryToFile(fpo_bin.getContent(), true);
 
@@ -361,10 +369,12 @@ public class InternalPluginsTest {
     Assert.assertEquals(1, characteristics.getCreatingApplicationList().size());
 
     CreatingApplicationComplexType creatingApplication = characteristics.getCreatingApplicationArray(0);
-    Assert.assertEquals("X", creatingApplication.getCreatingApplicationName());
-    Assert.assertEquals("X", creatingApplication.getCreatingApplicationVersion());
-    Assert.assertEquals(new Date(), creatingApplication.getDateCreatedByApplication());
+    Assert.assertEquals("Microsoft Office Word", creatingApplication.getCreatingApplicationName());
+    Assert.assertEquals("15.0000", creatingApplication.getCreatingApplicationVersion());
+    Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
+      DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
 
+    // TODO test if PREMIS event was created
   }
 
 }
