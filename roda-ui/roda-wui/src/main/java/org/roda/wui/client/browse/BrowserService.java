@@ -22,6 +22,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -192,5 +193,11 @@ public interface BrowserService extends RemoteService {
   String getGoogleReCAPTCHAAccount();
 
   boolean isRegisterActive();
+
+  IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

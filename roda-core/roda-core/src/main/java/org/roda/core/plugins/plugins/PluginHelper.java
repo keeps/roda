@@ -320,7 +320,7 @@ public final class PluginHelper {
         boolean inotify = false;
         createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
           Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
-          outcome, success ? "" : "Error", detailExtension, agent, inotify);
+          outcome, success ? "Success" : "Error", detailExtension, agent, inotify);
       }
       if (notify) {
         model.notifyAIPUpdated(aip.getId());

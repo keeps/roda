@@ -33,6 +33,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -40,6 +41,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.RodaCoreService;
 
@@ -59,6 +61,7 @@ public class Browser extends RodaCoreService {
   private static final String TRANSFERRED_RESOURCE_ID_PARAM = "transferredResourceId";
 
   private static final String INDEX_PRESERVATION_EVENT_ID = "indexedPreservationEventId";
+  private static final String INDEX_PRESERVATION_AGENT_ID = "indexedPreservationAgentId";
 
   private static final String PARENT_PARAM = "parent";
   private static final String FOLDERNAME_PARAM = "folderName";
@@ -696,8 +699,8 @@ public class Browser extends RodaCoreService {
     return resource;
   }
 
-  public static String createTransferredResourcesFolder(RodaUser user, String parent, String folderName)
-    throws AuthorizationDeniedException, GenericException {
+  public static String createTransferredResourcesFolder(RodaUser user, String parent, String folderName,
+    boolean forceCommit) throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
@@ -706,7 +709,7 @@ public class Browser extends RodaCoreService {
 
     // delegate
     try {
-      String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName);
+      String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName, forceCommit);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();
@@ -721,7 +724,7 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  public static void removeTransferredResources(RodaUser user, List<String> ids)
+  public static void removeTransferredResources(RodaUser user, List<String> ids, boolean forceCommit)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
@@ -731,15 +734,15 @@ public class Browser extends RodaCoreService {
     UserUtility.checkTransferredResourceAccess(user, ids);
 
     // delegate
-    BrowserHelper.removeTransferredResources(ids);
+    BrowserHelper.removeTransferredResources(ids, forceCommit);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, PATH_PARAM, ids);
   }
 
-  public static void createTransferredResourceFile(RodaUser user, String path, String fileName, InputStream inputStream)
-    throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
+  public static void createTransferredResourceFile(RodaUser user, String path, String fileName, InputStream inputStream,
+    boolean forceCommit) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
     Date startDate = new Date();
 
     // check user permissions
@@ -749,7 +752,7 @@ public class Browser extends RodaCoreService {
 
     // delegate
     try {
-      BrowserHelper.createTransferredResourceFile(path, fileName, inputStream);
+      BrowserHelper.createTransferredResourceFile(path, fileName, inputStream, forceCommit);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();
@@ -780,11 +783,11 @@ public class Browser extends RodaCoreService {
   }
 
   public static void createTransferredResource(RodaUser user, String parentId, String fileName, InputStream inputStream,
-    String name) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
+    String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
     if (name == null) {
-      Browser.createTransferredResourceFile(user, parentId, fileName, inputStream);
+      Browser.createTransferredResourceFile(user, parentId, fileName, inputStream, forceCommit);
     } else {
-      Browser.createTransferredResourcesFolder(user, parentId, name);
+      Browser.createTransferredResourcesFolder(user, parentId, name, forceCommit);
     }
   }
 
@@ -907,5 +910,48 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "getTransferredResource", null, duration, "resourceId", resourceId);
 
     return response;
+  }
+
+  public static IndexedPreservationAgent retrieveIndexedPreservationAgent(RodaUser user,
+    String indexedPreservationAgentId) throws NotFoundException, GenericException, AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    IndexedPreservationAgent resource = BrowserHelper.retrieveIndexedPreservationAgent(indexedPreservationAgentId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveIndexedPreservationAgent", null, duration,
+      INDEX_PRESERVATION_AGENT_ID, indexedPreservationAgentId);
+
+    return resource;
+  }
+
+  public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaUser user, String eventId) throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    PreservationEventViewBundle resource = BrowserHelper.retrievePreservationEventViewBundle(eventId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrievePreservationEventViewBundle", null, duration,
+      INDEX_PRESERVATION_EVENT_ID, eventId);
+
+    return resource;
   }
 }

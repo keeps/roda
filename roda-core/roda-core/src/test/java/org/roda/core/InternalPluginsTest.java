@@ -92,6 +92,7 @@ public class InternalPluginsTest {
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
   private static Path logPath;
+  
   private static ModelService model;
   private static IndexService index;
 
@@ -492,8 +493,7 @@ public class InternalPluginsTest {
       SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_PDF)));
 
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
-    Assert.assertEquals(1, files.getTotalCount());
-    // TODO test if PREMIS event was created
+    Assert.assertEquals(1, files.getTotalCount());    
 
   }
 

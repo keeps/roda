@@ -147,8 +147,8 @@ public class ShowPreservationEvent extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrieveIndexedPreservationEvent(eventId,
-      new AsyncCallback<IndexedPreservationEvent>() {
+    BrowserService.Util.getInstance().retrievePreservationEventViewBundle(eventId,
+      new AsyncCallback<PreservationEventViewBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -161,8 +161,8 @@ public class ShowPreservationEvent extends Composite {
         }
 
         @Override
-        public void onSuccess(IndexedPreservationEvent event) {
-          ShowPreservationEvent.this.event = event;
+        public void onSuccess(PreservationEventViewBundle eventBundle) {
+          ShowPreservationEvent.this.event = eventBundle.getEvent();
           viewAction();
         }
       });
@@ -179,25 +179,29 @@ public class ShowPreservationEvent extends Composite {
     eventDetailLabel.setText(event.getEventDetail());
 
     // AGENTS
-    // TODO... update with new structure (list of agents instead of single agent...)
-    
+    // TODO... update with new structure (list of agents instead of single
+    // agent...)
+
     /*
-    eventAgentIdLabel.setText(event.getAgentIdentifierValue());
-    
-    eventAgentRoleLabel.setVisible(StringUtils.isNotBlank(event.getAgentRole()));
-    eventAgentRoleValue.setVisible(StringUtils.isNotBlank(event.getAgentRole()));
-    eventAgentRoleValue.setText(event.getAgentRole());
-    */
+     * eventAgentIdLabel.setText(event.getAgentIdentifierValue());
+     * 
+     * eventAgentRoleLabel.setVisible(StringUtils.isNotBlank(event.getAgentRole(
+     * )));
+     * eventAgentRoleValue.setVisible(StringUtils.isNotBlank(event.getAgentRole(
+     * ))); eventAgentRoleValue.setText(event.getAgentRole());
+     */
 
     // OBJECTS
     // TODO set links
-    // TODO... update with new structure (list of objects instead of single agent...)
+    // TODO... update with new structure (list of objects instead of single
+    // agent...)
     /*
-    eventObjectIdValue.setText(event.getObjectIdentifierValue());
-    eventObjectRoleLabel.setVisible(StringUtils.isNotBlank(event.getObjectRole()));
-    eventObjectRoleValue.setVisible(StringUtils.isNotBlank(event.getObjectRole()));
-    eventObjectRoleValue.setText(event.getObjectRole());
-    */
+     * eventObjectIdValue.setText(event.getObjectIdentifierValue());
+     * eventObjectRoleLabel.setVisible(StringUtils.isNotBlank(event.
+     * getObjectRole()));
+     * eventObjectRoleValue.setVisible(StringUtils.isNotBlank(event.
+     * getObjectRole())); eventObjectRoleValue.setText(event.getObjectRole());
+     */
     // OUTCOME
     eventOutcomeLabel.setText(event.getEventOutcome());
 

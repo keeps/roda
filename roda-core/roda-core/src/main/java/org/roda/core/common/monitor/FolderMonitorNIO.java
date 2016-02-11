@@ -20,6 +20,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
+import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -45,6 +47,10 @@ public class FolderMonitorNIO {
     this.index = index;
 
     startWatch();
+  }
+  
+  public void commit() throws SolrServerException, IOException{
+    index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
   }
 
   private void startWatch() throws Exception {
@@ -97,13 +103,13 @@ public class FolderMonitorNIO {
 
   }
 
-  public void removeSync(List<String> ids) throws NotFoundException, GenericException {
+  public void removeSync(List<String> ids, boolean forceCommit) throws NotFoundException, GenericException {
     for (String s : ids) {
       Path relative = Paths.get(s);
       Path fullPath = basePath.resolve(relative);
       if (Files.exists(fullPath)) {
         for (FolderObserver observer : observers) {
-          observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath));
+          observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath), forceCommit);
         }
         FSUtils.deletePath(fullPath);
       } else {

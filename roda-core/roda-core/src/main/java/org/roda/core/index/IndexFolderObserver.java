@@ -63,11 +63,14 @@ public class IndexFolderObserver implements FolderObserver {
   }
 
   @Override
-  public void transferredResourceDeleted(TransferredResource resource) {
+  public void transferredResourceDeleted(TransferredResource resource, boolean forceCommit) {
     LOGGER.debug("DELETE: " + resource.toString());
     try {
       index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, resource.getId());
       index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + resource.getId() + "\"");
+      if(forceCommit){
+        index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
+      }
     } catch (SolrServerException | IOException e) {
       LOGGER.error("ERROR DELETING RESOURCE " + resource.getId() + " : " + e.getMessage(), e);
     }

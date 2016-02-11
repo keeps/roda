@@ -16,10 +16,12 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -122,5 +124,10 @@ public interface BrowserServiceAsync {
   void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
 
   void isRegisterActive(AsyncCallback<Boolean> callback);
+
+  void retrieveIndexedPreservationAgent(String indexedPreservationAgentId,
+    AsyncCallback<IndexedPreservationAgent> callback);
+
+  void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
 }

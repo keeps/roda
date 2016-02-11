@@ -73,7 +73,7 @@ public class TransferredResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.createTransferredResource(user, parentId, fileDetail.getFileName(), inputStream, name);
+    Browser.createTransferredResource(user, parentId, fileDetail.getFileName(), inputStream, name, true);
 
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
@@ -86,7 +86,7 @@ public class TransferredResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
     // TODO support remove multiple resources in one go
-    Browser.removeTransferredResources(user, Arrays.asList(path));
+    Browser.removeTransferredResources(user, Arrays.asList(path), true);
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }

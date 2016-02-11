@@ -30,6 +30,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -58,6 +59,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -78,6 +80,7 @@ import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
+import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
@@ -767,28 +770,37 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
   }
 
-  public static String createTransferredResourcesFolder(String parent, String folderName) throws GenericException {
+  public static String createTransferredResourcesFolder(String parent, String folderName, boolean forceCommit)
+    throws GenericException {
     try {
-      return RodaCoreFactory.getFolderMonitor().createFolder(parent, folderName);
-    } catch (IOException e) {
+      String id = RodaCoreFactory.getFolderMonitor().createFolder(parent, folderName);
+      if (forceCommit) {
+        RodaCoreFactory.getFolderMonitor().commit();
+      }
+      return id;
+    } catch (IOException | SolrServerException e) {
       LOGGER.error("Error creating transferred resource folder", e);
       throw new GenericException("Error creating transferred resource folder: " + e.getMessage());
     }
   }
 
-  public static void removeTransferredResources(List<String> ids) throws GenericException, NotFoundException {
-    RodaCoreFactory.getFolderMonitor().removeSync(ids);
+  public static void removeTransferredResources(List<String> ids, boolean forceCommit)
+    throws GenericException, NotFoundException {
+    RodaCoreFactory.getFolderMonitor().removeSync(ids, forceCommit);
   }
 
-  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream)
-    throws GenericException, AlreadyExistsException {
+  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream,
+    boolean forceCommit) throws GenericException, AlreadyExistsException {
     try {
       LOGGER.debug("createTransferredResourceFile(path=" + path + ",name=" + fileName + ")");
       RodaCoreFactory.getFolderMonitor().createFile(path, fileName, inputStream);
+      if (forceCommit) {
+        RodaCoreFactory.getFolderMonitor().commit();
+      }
     } catch (FileAlreadyExistsException e) {
       throw new AlreadyExistsException("Error creating transferred resource file", e);
-    } catch (IOException e) {
-      LOGGER.error("Error removing transferred resource", e);
+    } catch (IOException | SolrServerException e) {
+      LOGGER.error("Error creating transferred resource", e);
       throw new GenericException("Error creating transferred resource file: " + e.getMessage());
     }
 
@@ -902,4 +914,29 @@ public class BrowserHelper {
     return new StreamResponse(transferredResource.getName(), MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
   }
 
+  public static IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
+    throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class, indexedPreservationAgentId);
+  }
+
+  public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
+    throws NotFoundException, GenericException {
+    PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
+    IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
+    eventBundle.setEvent(ipe);
+    if (ipe.getLinkingAgentIds() != null && ipe.getLinkingAgentIds().size() > 0) {
+      List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
+      for (String agentID : ipe.getLinkingAgentIds()) {
+        try {
+          IndexedPreservationAgent agent = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class,
+            agentID);
+          agents.add(agent);
+        } catch (NotFoundException | GenericException e) {
+          LOGGER.error("Error getting agent " + agentID + ": " + e.getMessage());
+        }
+      }
+      eventBundle.setAgents(agents);
+    }
+    return eventBundle;
+  }
 }

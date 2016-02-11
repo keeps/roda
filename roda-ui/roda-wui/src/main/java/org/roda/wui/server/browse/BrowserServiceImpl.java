@@ -28,6 +28,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
@@ -44,6 +45,7 @@ import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -253,14 +255,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.createTransferredResourcesFolder(user, parent, folderName);
+    return Browser.createTransferredResourcesFolder(user, parent, folderName, false);
   }
 
   @Override
   public void removeTransferredResources(List<String> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Browser.removeTransferredResources(user, ids);
+    Browser.removeTransferredResources(user, ids, false);
   }
 
   @Override
@@ -405,5 +407,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public boolean isRegisterActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
+  }
+
+  @Override
+  public IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveIndexedPreservationAgent(user, indexedPreservationAgentId);
+  }
+
+  @Override
+  public PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrievePreservationEventViewBundle(user, eventId);
   }
 }

@@ -125,7 +125,7 @@ public class NotifierThread implements Runnable {
   protected void notifyTransferredResourceDeleted(TransferredResource resource) {
     LOGGER.debug("DELETED: " + resource.getFullPath());
     for (FolderObserver observer : observers) {
-      observer.transferredResourceDeleted(resource);
+      observer.transferredResourceDeleted(resource,false);
     }
   }
 
