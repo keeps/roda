@@ -225,8 +225,14 @@ public class ShowPreservationEvent extends Composite {
     if (event.getSourcesObjectIds().size() > 0) {
       for (String sourceObjectId : event.getSourcesObjectIds()) {
         FlowPanel layout = new FlowPanel();
-        
-        
+
+        Label idLabel = new Label("Identifier");
+        idLabel.addStyleName("label");
+        // TODO set anchor
+        Label idValue = new Label(sourceObjectId);
+        layout.add(idLabel);
+        layout.add(idValue);
+
         sourceObjectsPanel.add(layout);
       }
     } else {
@@ -236,7 +242,16 @@ public class ShowPreservationEvent extends Composite {
     // Outcome objects
     if (event.getSourcesObjectIds().size() > 0) {
       for (String outcomeObjectId : event.getOutcomeObjectIds()) {
-        // TODO add
+        FlowPanel layout = new FlowPanel();
+
+        Label idLabel = new Label("Identifier");
+        idLabel.addStyleName("label");
+        // TODO set anchor
+        Label idValue = new Label(outcomeObjectId);
+        layout.add(idLabel);
+        layout.add(idValue);
+
+        sourceObjectsPanel.add(layout);
       }
     } else {
       // TODO hide

@@ -658,8 +658,10 @@ public class PremisUtils {
       ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
+    
+    // TODO set agent extension
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
-      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, "", "");
+      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, "", plugin.getDescription());
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
     return agent;

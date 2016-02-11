@@ -398,6 +398,7 @@ public class InternalPluginsTest {
     
     Assert.assertEquals("text/plain", indFile.getFileFormat().getMimeType());
     Assert.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
+    Assert.assertEquals("Plain Text File", indFile.getFileFormat().getFormatDesignationName());
     
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
