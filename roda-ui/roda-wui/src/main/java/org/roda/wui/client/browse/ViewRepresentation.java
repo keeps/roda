@@ -143,8 +143,6 @@ public class ViewRepresentation extends Composite {
                 }
                 final String fileId = historyTokens.get(historyTokens.size() - 1);
 
-                GWT.log("File path: " + fileDirectoryPath + " id: " + fileId);
-
                 BrowserService.Util.getInstance().retrieveFile(aipId, representationId, fileDirectoryPath, fileId,
                   new AsyncCallback<IndexedFile>() {
 
@@ -308,11 +306,10 @@ public class ViewRepresentation extends Composite {
     this.fileId = fileId;
     this.file = file;
 
-    GWT.log("View file: " + file);
+    String parentUuid = getParentUuid(file);
     if (file != null && file.isDirectory()) {
       defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_ID, file.getUuid()));
-    } else if (file != null && !file.isDirectory()) {
-      String parentUuid = getParentUuid(file);
+    } else if (file != null && !file.isDirectory() && parentUuid != null) {
       defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_ID, parentUuid));
     } else {
       defaultFilter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_ID));
@@ -323,7 +320,7 @@ public class ViewRepresentation extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
+    breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
 
     searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationSearchPlaceHolder());
@@ -367,7 +364,9 @@ public class ViewRepresentation extends Composite {
             && (ViewRepresentation.this.file == null || results.get(0).equals(ViewRepresentation.this.file))) {
             singleFileMode = true;
             filesList.nextItemSelection();
-          } else if (results.size() > 1 && !results.get(0).isDirectory() && Window.getClientWidth() > WINDOW_WIDTH) {
+          } else if (results.size() > 1 && !results.get(0).isDirectory()
+            && (ViewRepresentation.this.file == null || ViewRepresentation.this.file.isDirectory())
+            && Window.getClientWidth() > WINDOW_WIDTH) {
             filesList.nextItemSelection();
           }
 
@@ -412,19 +411,13 @@ public class ViewRepresentation extends Composite {
     });
   }
 
-  private String getParentUuid(IndexedFile file) {
-    String parentUUID = null;
-    List<String> path = file.getPath();
-    if (path != null && !path.isEmpty()) {
-      String parentFileId = path.get(path.size() - 1);
-      List<String> parentFileDirectoryPath = new ArrayList<>();
-      if (path.size() > 1) {
-        parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
-      }
-      parentUUID = IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath,
-        parentFileId);
-    }
-    return parentUUID;
+  private void clean() {
+    cleanURL();
+    file = null;
+    hideRightPanel();
+    breadcrumb.updatePath(getBreadcrumbs());
+    firstLoad = true;
+    filesList.refresh();
   }
 
   private void changeURL() {
@@ -445,62 +438,76 @@ public class ViewRepresentation extends Composite {
     }
   }
 
-  // TODO check if can be removed
   private void cleanURL() {
     String url = Window.Location.createUrlBuilder().buildString();
     url = url.substring(0, url.lastIndexOf("/"));
     JavascriptUtils.updateURLWithoutReloading(url);
   }
 
-  private List<BreadcrumbItem> getBreadcrumbs(final BrowseItemBundle itemBundle, IndexedFile simpleFile) {
-    List<BreadcrumbItem> ret = new ArrayList<>();
+  private List<BreadcrumbItem> getBreadcrumbs() {
+    List<BreadcrumbItem> fullBreadcrumb = new ArrayList<>();
+    List<BreadcrumbItem> fileBreadcrumb = new ArrayList<>();
+
     IndexedAIP aip = itemBundle.getAip();
     List<Representation> representations = itemBundle.getRepresentations();
     Representation rep = selectRepresentation(representations, representationId);
 
     // AIP breadcrumb
-    ret
+    fullBreadcrumb
       .add(
         new BreadcrumbItem(
           getBreadcrumbLabel((aip.getTitle() != null) ? aip.getTitle() : aip.getId(),
             RodaConstants.VIEW_REPRESENTATION_DESCRIPTION_LEVEL),
           Tools.concat(Browse.RESOLVER.getHistoryPath(), aipId)));
 
-    // Representation breadcrumb
-    ret.add(new BreadcrumbItem(
-      getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION), new Command() {
-
-        @Override
-        public void execute() {
-          if (file != null) {
-            file = null;
-            firstLoad = true;
-          }
-
-          Tools.newHistory(ViewRepresentation.RESOLVER, aipId, representationId);
-        }
-      }));
-
-    if (simpleFile != null) {
+    if (file != null) {
+      List<String> filePath = file.getPath();
       List<String> pathBuilder = new ArrayList<>();
       pathBuilder.add(aipId);
       pathBuilder.add(representationId);
-      for (String folder : simpleFile.getPath()) {
+      for (String folder : filePath) {
         pathBuilder.add(folder);
         List<String> path = new ArrayList<>(pathBuilder);
-        ret.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
-          Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
+        if (filePath.indexOf(folder) != (filePath.size() - 1)) {
+          fileBreadcrumb.add(new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER),
+            Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), path)));
+        } else {
+          fileBreadcrumb.add(
+            new BreadcrumbItem(getBreadcrumbLabel(folder, RodaConstants.VIEW_REPRESENTATION_FOLDER), new Command() {
+
+              @Override
+              public void execute() {
+                clean();
+              }
+            }));
+        }
       }
 
-      String fileLabel = simpleFile.getOriginalName() != null ? simpleFile.getOriginalName() : simpleFile.getId();
+      String fileLabel = file.getOriginalName() != null ? file.getOriginalName() : file.getId();
 
-      ret.add(new BreadcrumbItem(
-        simpleFile.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
+      fileBreadcrumb.add(new BreadcrumbItem(
+        file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
           : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, simpleFile.getId())));
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, file.getId())));
     }
 
-    return ret;
+    // Representation breadcrumb
+    fullBreadcrumb.add(fileBreadcrumb.size() > 1
+      ? new BreadcrumbItem(
+        getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId))
+      : new BreadcrumbItem(
+        getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION), new Command() {
+
+          @Override
+          public void execute() {
+            clean();
+          }
+        }));
+
+    fullBreadcrumb.addAll(fileBreadcrumb);
+
+    return fullBreadcrumb;
   }
 
   private Representation selectRepresentation(List<Representation> representations, String representationId) {
@@ -582,7 +589,7 @@ public class ViewRepresentation extends Composite {
   }
 
   private void panelsControl() {
-    if (file == null) {
+    if (file == null || file.isDirectory()) {
       showFilesPanel();
       if (Window.getClientWidth() < WINDOW_WIDTH) {
         hideFilePreview();
@@ -630,9 +637,9 @@ public class ViewRepresentation extends Composite {
 
     file = (filesList.getSelectionModel().getSelectedObject() != null)
       ? filesList.getSelectionModel().getSelectedObject() : file;
+    breadcrumb.updatePath(getBreadcrumbs());
 
     if (file != null && !file.isDirectory()) {
-      breadcrumb.updatePath(getBreadcrumbs(itemBundle, file));
       downloadFileButton.setVisible(true);
       infoFileButton.setVisible(true);
 
@@ -928,5 +935,22 @@ public class ViewRepresentation extends Composite {
       valueLabel.addStyleName("infoFileEntryValue");
       entry.addStyleName("infoFileEntry");
     }
+  }
+
+  private String getParentUuid(IndexedFile file) {
+    String parentUUID = null;
+    if (file != null) {
+      List<String> path = file.getPath();
+      if (path != null && !path.isEmpty()) {
+        String parentFileId = path.get(path.size() - 1);
+        List<String> parentFileDirectoryPath = new ArrayList<>();
+        if (path.size() > 1) {
+          parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
+        }
+        parentUUID = IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath,
+          parentFileId);
+      }
+    }
+    return parentUUID;
   }
 }
