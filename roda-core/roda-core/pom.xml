@@ -184,10 +184,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.roda-project</groupId>
-			<artifactId>roda-common-metadata</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.roda-project</groupId>
 			<artifactId>roda-common-utils</artifactId>
 		</dependency>
 		<dependency>
