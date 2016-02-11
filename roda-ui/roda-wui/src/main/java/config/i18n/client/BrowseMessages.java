@@ -428,9 +428,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Identifier")
   String preservationEventId();
 
-  @DefaultMessage("Path")
-  String preservationEventPath();
-
   @DefaultMessage("Date")
   String preservationEventDatetime();
 
@@ -469,5 +466,8 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Outcome detail extension")
   String preservationEventOutcomeDetailExtension();
+
+  @DefaultMessage("{0} ({1})")
+  String preservationEventAgentIdValue(String identifierValue, String identifierType);
 
 }

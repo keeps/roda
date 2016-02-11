@@ -32,14 +32,6 @@
 					</g:Label>
 					<g:Label ui:field="eventIdValue" />
 					<g:Label styleName="label">
-						<ui:text from='{messages.preservationEventPath}' />
-					</g:Label>
-					<g:Label ui:field="eventPathValue" />
-					<g:Label styleName="label">
-						<ui:text from='{messages.preservationEventDatetime}' />
-					</g:Label>
-					<g:Label ui:field="eventDatetimeLabel" />
-					<g:Label styleName="label">
 						<ui:text from='{messages.preservationEventType}' />
 					</g:Label>
 					<g:Label ui:field="eventTypeLabel" />
@@ -47,20 +39,17 @@
 						<ui:text from='{messages.preservationEventDetail}' />
 					</g:Label>
 					<g:Label ui:field="eventDetailLabel" />
-
+					
+					<g:Label styleName="label">
+						<ui:text from='{messages.preservationEventDatetime}' />
+					</g:Label>
+					<g:Label ui:field="eventDatetimeLabel" />
+					
 					<!-- AGENTS -->
 					<g:Label styleName="h4">
 						<ui:text from='{messages.preservationEventAgentsHeader}' />
 					</g:Label>
-					<g:Label styleName="label">
-						<ui:text from='{messages.preservationEventAgentId}' />
-					</g:Label>
-					<g:Label ui:field="eventAgentIdLabel" />
-					
-					<g:Label ui:field="eventAgentRoleLabel" styleName="label">
-						<ui:text from='{messages.preservationEventAgentRole}' />
-					</g:Label>
-					<g:Label ui:field="eventAgentRoleValue" />
+					<g:FlowPanel ui:field="agentsPanel"/>
 
 					<!-- LINKING OBJECTS -->
 					<g:Label styleName="h4">

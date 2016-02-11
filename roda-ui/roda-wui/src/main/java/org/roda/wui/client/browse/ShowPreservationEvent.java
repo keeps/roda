@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
@@ -31,6 +32,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -95,9 +97,6 @@ public class ShowPreservationEvent extends Composite {
   Label eventIdValue;
 
   @UiField
-  Label eventPathValue;
-
-  @UiField
   Label eventDatetimeLabel;
 
   @UiField
@@ -107,10 +106,7 @@ public class ShowPreservationEvent extends Composite {
   Label eventDetailLabel;
 
   @UiField
-  Label eventAgentIdLabel;
-
-  @UiField
-  Label eventAgentRoleLabel, eventAgentRoleValue;
+  FlowPanel agentsPanel;
 
   @UiField
   Label eventObjectIdValue;
@@ -131,7 +127,7 @@ public class ShowPreservationEvent extends Composite {
   private String aipId;
   private String eventId;
 
-  private IndexedPreservationEvent event;
+  private PreservationEventViewBundle bundle;
 
   /**
    * Create a new panel to edit a user
@@ -162,34 +158,47 @@ public class ShowPreservationEvent extends Composite {
 
         @Override
         public void onSuccess(PreservationEventViewBundle eventBundle) {
-          ShowPreservationEvent.this.event = eventBundle.getEvent();
+          ShowPreservationEvent.this.bundle = eventBundle;
           viewAction();
         }
       });
   }
 
   public void viewAction() {
-    eventIdValue.setText(event.getId());
-    // TODO have a better way to get the PREMIS file path
-    eventPathValue.setText(event.getAipId() + "/" + event.getRepresentationId() + "/" + event.getFileId());
+    IndexedPreservationEvent event = bundle.getEvent();
 
-    eventDatetimeLabel
-      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(event.getEventDateTime()));
+    eventIdValue.setText(event.getId());
+
     eventTypeLabel.setText(event.getEventType());
     eventDetailLabel.setText(event.getEventDetail());
+    eventDatetimeLabel
+      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(event.getEventDateTime()));
 
     // AGENTS
-    // TODO... update with new structure (list of agents instead of single
-    // agent...)
+    List<IndexedPreservationAgent> agents = bundle.getAgents();
+    for (IndexedPreservationAgent agent : agents) {
+      FlowPanel layout = new FlowPanel();
 
-    /*
-     * eventAgentIdLabel.setText(event.getAgentIdentifierValue());
-     * 
-     * eventAgentRoleLabel.setVisible(StringUtils.isNotBlank(event.getAgentRole(
-     * )));
-     * eventAgentRoleValue.setVisible(StringUtils.isNotBlank(event.getAgentRole(
-     * ))); eventAgentRoleValue.setText(event.getAgentRole());
-     */
+      Label idLabel = new Label(messages.preservationEventAgentId());
+      idLabel.addStyleName("label");
+      Label idValue = new Label(
+        messages.preservationEventAgentIdValue(agent.getIdentifierValue(), agent.getIdentifierType()));
+
+      layout.add(idLabel);
+      layout.add(idValue);
+
+      agentsPanel.add(layout);
+
+      // <g:Label styleName="label">
+      // <ui:text from='{messages.preservationEventAgentId}' />
+      // </g:Label>
+      // <g:Label ui:field="eventAgentIdLabel" />
+      //
+      // <g:Label ui:field="eventAgentRoleLabel" styleName="label">
+      // <ui:text from='{messages.preservationEventAgentRole}' />
+      // </g:Label>
+      // <g:Label ui:field="eventAgentRoleValue" />
+    }
 
     // OBJECTS
     // TODO set links
