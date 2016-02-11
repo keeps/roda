@@ -573,6 +573,8 @@ public final class RodaConstants {
    */
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
   public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
+  public static final String PRESERVATION_REGISTRY_MIME = "mime";
+
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";

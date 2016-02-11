@@ -225,9 +225,8 @@ public class PremisUtils {
       frct.setFormatRegistryKey(pronom);
     }
     if (!StringUtils.isBlank(mimeType)) {
-      // TODO add mime type
-      // FormatDesignationComplexType fdct = getFormatDesignation(file);
-      // fdct.setFormatName(fileFormat.getFormatDesignationName());
+      FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_MIME);
+      frct.setFormatRegistryKey(mimeType);
     }
 
   }
@@ -266,21 +265,30 @@ public class PremisUtils {
     return cact;
   }
 
-  private static FormatRegistryComplexType getFormatRegistry(lc.xmlns.premisV2.File f, String registryName) {
+  public static FormatRegistryComplexType getFormatRegistry(lc.xmlns.premisV2.File f, String registryName) {
     ObjectCharacteristicsComplexType occt;
-    FormatComplexType fct;
+    FormatRegistryComplexType frct = null;
     if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
       occt = f.getObjectCharacteristicsList().get(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
     if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
-      fct = occt.getFormatList().get(0);
+      for (FormatComplexType fct : occt.getFormatList()) {
+        if (fct.getFormatRegistry() != null) {
+          if (fct.getFormatRegistry().getFormatRegistryName().equalsIgnoreCase(registryName)) {
+            frct = fct.getFormatRegistry();
+            break;
+          }
+        }
+      }
+      if (frct == null) {
+        FormatComplexType fct = occt.addNewFormat();
+        frct = fct.addNewFormatRegistry();
+        frct.setFormatRegistryName(registryName);
+      }
     } else {
-      fct = occt.addNewFormat();
-    }
-    FormatRegistryComplexType frct = fct.getFormatRegistry();
-    if (frct == null) {
+      FormatComplexType fct = occt.addNewFormat();
       frct = fct.addNewFormatRegistry();
       frct.setFormatRegistryName(registryName);
     }
@@ -618,11 +626,15 @@ public class PremisUtils {
           if (fct.getFormatDesignation() != null) {
             doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName());
             doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
-            doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, fct.getFormatDesignation().getFormatName());
           }
           if (fct.getFormatRegistry() != null && fct.getFormatRegistry().getFormatRegistryName()
             .equalsIgnoreCase(RodaConstants.PRESERVATION_REGISTRY_PRONOM)) {
             doc.addField(RodaConstants.FILE_PRONOM, fct.getFormatRegistry().getFormatRegistryKey());
+          }
+          FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
+            RodaConstants.PRESERVATION_REGISTRY_MIME);
+          if (mimeRegistry != null) {
+            doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey());
           }
           // TODO extension
         }

@@ -50,6 +50,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
@@ -70,6 +71,7 @@ import org.w3c.util.InvalidDateException;
 
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
+import lc.xmlns.premisV2.FormatRegistryComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.Representation;
 
@@ -339,10 +341,24 @@ public class InternalPluginsTest {
 
     FormatComplexType format = fpo.getObjectCharacteristicsArray(0).getFormatArray(0);
     Assert.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName());
-    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, format.getFormatRegistry().getFormatRegistryName());
-    Assert.assertEquals("x-fmt/111", format.getFormatRegistry().getFormatRegistryKey());
+    FormatRegistryComplexType pronomRegistry = PremisUtils.getFormatRegistry(fpo,
+      RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, pronomRegistry.getFormatRegistryName());
+    Assert.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey());
 
-    // TODO check format MIME type
+    FormatRegistryComplexType mimeRegistry = PremisUtils.getFormatRegistry(fpo,
+      RodaConstants.PRESERVATION_REGISTRY_MIME);
+    Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey());
+
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_FORMAT_MIMETYPE, "text/plain"));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_PATH, CORPORA_TEST1));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
+      SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_TEST1_TXT)));
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
+    Assert.assertEquals(1, files.getTotalCount());
 
     // TODO test if PREMIS event was created
 
@@ -394,8 +410,14 @@ public class InternalPluginsTest {
     Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
       DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
 
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test")), null, new Sublist(0, 10));
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
+      SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_PDF)));
+
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());
     // TODO test if PREMIS event was created
 
