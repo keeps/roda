@@ -378,13 +378,11 @@ public class IndexModelObserver implements ModelObserver {
 
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
-        LOGGER.debug("INDEXING EVENT");
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
         index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
       } else if (type.equals(PreservationMetadataType.AGENT)) {
-        LOGGER.debug("INDEXING AGENT");
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
-        index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
+        index.commit(RodaConstants.INDEX_PRESERVATION_AGENTS);
       }
 
       // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
