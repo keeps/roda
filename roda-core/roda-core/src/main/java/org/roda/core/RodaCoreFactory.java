@@ -198,6 +198,9 @@ public class RodaCoreFactory {
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
   private static DescriptionLevelManager descriptionLevelManager = null;
 
+  // Test objects
+  private static String aipId = "d6129d30-6282-452d-836b-62b08ca52597";
+
   /** Private empty constructor */
   private RodaCoreFactory() {
 
@@ -1049,8 +1052,7 @@ public class RodaCoreFactory {
       params.put("inputFormat", "pdf");
       params.put("outputFormat", "pdf");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1066,8 +1068,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1114,8 +1115,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1131,8 +1131,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1146,8 +1145,7 @@ public class RodaCoreFactory {
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1162,8 +1160,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1178,8 +1175,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1194,8 +1190,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1225,8 +1220,7 @@ public class RodaCoreFactory {
       params.put("outputFormat", "tiff");
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
       plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-        Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1253,7 +1247,6 @@ public class RodaCoreFactory {
       Plugin<AIP> psp = new PremisSkeletonPlugin();
       Plugin<AIP> sfp = new SiegfriedPlugin();
       Plugin<AIP> ttp = new TikaFullTextPlugin();
-      String aipId = "9ca04d1c-d0ab-4705-a7b1-943698a4fbac";
 
       Map<String, String> params = new HashMap<String, String>();
       params.put("createsPluginEvent", "false");

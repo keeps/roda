@@ -10,11 +10,17 @@ before_script:
   - sudo apt-get install siegfried -y
   # Install Clam Anti Virus
   - sudo apt-get install clamav -y
+  # Install FFmpeg
   - sudo add-apt-repository -y ppa:mc3man/trusty-media
   - sudo apt-get update 
-  - sudo apt-get install -y ffmpeg
-  - sudo apt-get install -y imagemagick
-  - sudo apt-get install -y sox
-  - sudo apt-get install -y unoconv
-  - sudo apt-get install -y ghostscript
-  - sudo apt-get install -y mencoder
+  - sudo apt-get install ffmpeg -y
+  # Install ImageMagick
+  - sudo apt-get install imagemagick -y
+  # Install SoX
+  - sudo apt-get install sox -y
+  # Install Unoconv
+  - sudo apt-get install unoconv -y
+  # Install GhostScript
+  - sudo apt-get install ghostscript -y
+  # Install Mencoder
+  - sudo apt-get install mencoder -y

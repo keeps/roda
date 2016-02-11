@@ -210,10 +210,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 && ifile.getSize() < (maxKbytes * 1024)) {
 
                 if (applicableTo.size() > 0) {
-                  if (filePronom != null && !filePronom.isEmpty() && !pronomToExtension.containsKey(filePronom)) {
+                  System.err.println("TESTE: " + fileMimetype + " - " + filePronom + " - " + fileFormat);
+                  if (filePronom != null && !filePronom.isEmpty()
+                    && !pronomToExtension.get(filePronom).contains(fileFormat)) {
                     fileFormat = pronomToExtension.get(filePronom).get(0);
                   } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                    && !mimetypeToExtension.containsKey(fileMimetype)) {
+                    && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
                     fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                   }
                 }
@@ -341,10 +343,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
               if (applicableTo.size() > 0) {
-                if (filePronom != null && !filePronom.isEmpty() && !pronomToExtension.containsKey(filePronom)) {
+                if (filePronom != null && !filePronom.isEmpty()
+                  && !pronomToExtension.get(filePronom).contains(fileFormat)) {
                   fileFormat = pronomToExtension.get(filePronom).get(0);
                 } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                  && !mimetypeToExtension.containsKey(fileMimetype)) {
+                  && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
                   fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                 }
               }
@@ -451,18 +454,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-            && ((filePronom != null && pronomToExtension.containsKey(filePronom))
+            && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
               || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
                 .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
-            if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
-              && !applicableTo.contains(fileFormat)) {
-              fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
-            }
-
-            if (filePronom != null && pronomToExtension.containsKey(filePronom)
-              && !mimetypeToExtension.containsKey(fileMimetype) && !applicableTo.contains(fileFormat)) {
-              fileFormat = pronomToExtension.get(filePronom).get(0);
+            if (applicableTo.size() > 0) {
+              if (filePronom != null && !filePronom.isEmpty()
+                && !pronomToExtension.get(filePronom).contains(fileFormat)) {
+                fileFormat = pronomToExtension.get(filePronom).get(0);
+              } else if (fileMimetype != null && !fileMimetype.isEmpty()
+                && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
+                fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+              }
             }
 
             StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
