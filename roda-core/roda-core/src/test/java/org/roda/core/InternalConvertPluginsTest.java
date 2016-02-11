@@ -39,6 +39,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -155,8 +156,8 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(1, transferredResources.size());
     RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, transferredResources);
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
-      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -179,8 +180,8 @@ public class InternalConvertPluginsTest {
 
   @Ignore
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testImageMagickPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -221,8 +222,7 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("image/tiff", fileMimetype);
     }
@@ -271,8 +271,7 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("audio/ogg", fileMimetype);
     }
@@ -321,8 +320,7 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("image/gif", fileMimetype);
     }
@@ -371,8 +369,7 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("application/pdf", fileMimetype);
     }
@@ -421,16 +418,15 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("video/x-msvideo", fileMimetype);
     }
   }
 
   @Test
-  public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGhostScriptPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -472,8 +468,7 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(changedCounter, changedFiles.size());
 
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertEquals("application/pdf", fileMimetype);
     }
@@ -481,8 +476,8 @@ public class InternalConvertPluginsTest {
 
   @Ignore
   @Test
-  public void testJodConverterPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testJodConverterPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -518,12 +513,13 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$")).count());
   }
 
   @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testPdfToPdfaPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -562,8 +558,7 @@ public class InternalConvertPluginsTest {
     List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
       .collect(Collectors.toList());
     for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class,
-        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String filePronom = ifile.getFileFormat().getPronom();
       Assert.assertEquals("fmt/354", filePronom);
     }
@@ -572,9 +567,9 @@ public class InternalConvertPluginsTest {
 
   @Ignore
   @Test
-  public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    InvalidParameterException, InterruptedException, IOException {
+  public void testMultipleRepresentations()
+    throws FileAlreadyExistsException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException {
 
     AIP aip = ingestCorpora();
 
@@ -605,8 +600,8 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(3, aip.getRepresentations().size());
 
-    Assert.assertEquals(0, aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId))
-      .count());
+    Assert.assertEquals(0,
+      aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId)).count());
 
     ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(2).getId());
     List<File> newReusableAllFiles = new ArrayList<>();
@@ -620,22 +615,20 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(
-          1,
-          newReusableAllFiles.stream()
-            .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream()
+          .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$")).count());
 
   }
 
   @Ignore
   @Test
-  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGeneralCommandPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -671,8 +664,8 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$")).count());
   }
 
 }

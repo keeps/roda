@@ -42,6 +42,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -92,7 +93,7 @@ public class InternalPluginsTest {
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
   private static Path logPath;
-  
+
   private static ModelService model;
   private static IndexService index;
 
@@ -392,12 +393,9 @@ public class InternalPluginsTest {
 
     Filter filterFile = new Filter();
     filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_FORMAT_MIMETYPE, "text/plain"));
-    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
-    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_PATH, CORPORA_TEST1));
-    filterFile
-      .add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
-    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
-      SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_TEST1_TXT)));
+    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_UUID, IdUtils.getFileId(aip.getId(),
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT)));
+
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filterFile, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());
 
@@ -487,13 +485,11 @@ public class InternalPluginsTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
-      SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_PDF)));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID,
+      IdUtils.getFileId(aip.getId(), aip.getRepresentations().get(0).getId(), new ArrayList<>(), CORPORA_PDF)));
 
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
-    Assert.assertEquals(1, files.getTotalCount());    
+    Assert.assertEquals(1, files.getTotalCount());
 
   }
 

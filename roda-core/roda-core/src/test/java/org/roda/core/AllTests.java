@@ -19,7 +19,8 @@ import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
-  FedoraStorageServiceTest.class, SolrUtilsTest.class, MonitorIndexTest.class, InternalPluginsTest.class})
+  FedoraStorageServiceTest.class, SolrUtilsTest.class, MonitorIndexTest.class, InternalPluginsTest.class,
+  InternalConvertPluginsTest.class})
 public class AllTests {
 
 }
