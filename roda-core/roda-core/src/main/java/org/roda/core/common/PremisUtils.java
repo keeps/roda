@@ -368,8 +368,8 @@ public class PremisUtils {
 
   }
 
-  public static ContentPayload createPremisAgentBinary(String id, String name, String type, String extension, String note)
-    throws GenericException, ValidationException {
+  public static ContentPayload createPremisAgentBinary(String id, String name, String type, String extension,
+    String note) throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
     AgentComplexType act = agent.addNewAgent();
@@ -625,9 +625,11 @@ public class PremisUtils {
             doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName());
             doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
           }
-          if (fct.getFormatRegistry() != null && fct.getFormatRegistry().getFormatRegistryName()
-            .equalsIgnoreCase(RodaConstants.PRESERVATION_REGISTRY_PRONOM)) {
-            doc.addField(RodaConstants.FILE_PRONOM, fct.getFormatRegistry().getFormatRegistryKey());
+
+          FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,
+            RodaConstants.PRESERVATION_REGISTRY_PRONOM);
+          if (pronomRegistry != null) {
+            doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey());
           }
           FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_MIME);
@@ -657,7 +659,7 @@ public class PremisUtils {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
-      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,"","");
+      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, "", "");
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
     return agent;

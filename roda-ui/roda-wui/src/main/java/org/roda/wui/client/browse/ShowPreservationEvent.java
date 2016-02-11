@@ -109,10 +109,10 @@ public class ShowPreservationEvent extends Composite {
   FlowPanel agentsPanel;
 
   @UiField
-  Label eventObjectIdValue;
+  FlowPanel sourceObjectsPanel;
 
   @UiField
-  Label eventObjectRoleLabel, eventObjectRoleValue;
+  FlowPanel outcomeObjectsPanel;
 
   @UiField
   Label eventOutcomeLabel;
@@ -176,31 +176,72 @@ public class ShowPreservationEvent extends Composite {
 
     // AGENTS
     List<IndexedPreservationAgent> agents = bundle.getAgents();
+    // TODO missing agent role
     for (IndexedPreservationAgent agent : agents) {
       FlowPanel layout = new FlowPanel();
 
       Label idLabel = new Label(messages.preservationEventAgentId());
       idLabel.addStyleName("label");
-      Label idValue = new Label(
-        messages.preservationEventAgentIdValue(agent.getIdentifierValue(), agent.getIdentifierType()));
-
+      Label idValue = new Label(agent.getId());
       layout.add(idLabel);
       layout.add(idValue);
 
-      agentsPanel.add(layout);
+      if (StringUtils.isNotBlank(agent.getName())) {
+        Label nameLabel = new Label("Name");
+        idLabel.addStyleName("label");
+        Label nameValue = new Label(agent.getName());
+        layout.add(nameLabel);
+        layout.add(nameValue);
+      }
 
-      // <g:Label styleName="label">
-      // <ui:text from='{messages.preservationEventAgentId}' />
-      // </g:Label>
-      // <g:Label ui:field="eventAgentIdLabel" />
-      //
-      // <g:Label ui:field="eventAgentRoleLabel" styleName="label">
-      // <ui:text from='{messages.preservationEventAgentRole}' />
-      // </g:Label>
-      // <g:Label ui:field="eventAgentRoleValue" />
+      if (StringUtils.isNotBlank(agent.getType())) {
+        Label typeLabel = new Label("Type");
+        typeLabel.addStyleName("label");
+        Label typeValue = new Label(agent.getType());
+        layout.add(typeLabel);
+        layout.add(typeValue);
+      }
+
+      if (StringUtils.isNotBlank(agent.getNote())) {
+        Label noteLabel = new Label("Note");
+        noteLabel.addStyleName("label");
+        Label noteValue = new Label(agent.getNote());
+        layout.add(noteLabel);
+        layout.add(noteValue);
+      }
+
+      if (StringUtils.isNotBlank(agent.getExtension())) {
+        Label extensionLabel = new Label("Extension");
+        extensionLabel.addStyleName("label");
+        Label extensionValue = new Label(agent.getExtension());
+        layout.add(extensionLabel);
+        layout.add(extensionValue);
+      }
+
+      agentsPanel.add(layout);
     }
 
-    // OBJECTS
+    // Source objects
+    if (event.getSourcesObjectIds().size() > 0) {
+      for (String sourceObjectId : event.getSourcesObjectIds()) {
+        FlowPanel layout = new FlowPanel();
+        
+        
+        sourceObjectsPanel.add(layout);
+      }
+    } else {
+      // TODO hide
+    }
+
+    // Outcome objects
+    if (event.getSourcesObjectIds().size() > 0) {
+      for (String outcomeObjectId : event.getOutcomeObjectIds()) {
+        // TODO add
+      }
+    } else {
+      // TODO hide
+    }
+
     // TODO set links
     // TODO... update with new structure (list of objects instead of single
     // agent...)

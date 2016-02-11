@@ -51,19 +51,17 @@
 					</g:Label>
 					<g:FlowPanel ui:field="agentsPanel"/>
 
-					<!-- LINKING OBJECTS -->
+					<!-- LINKING SOURCE OBJECTS -->
 					<g:Label styleName="h4">
 						<ui:text from='{messages.preservationEventObjectsHeader}' />
 					</g:Label>
-					<g:Label styleName="label">
-						<ui:text from='{messages.preservationEventObjectId}' />
-					</g:Label>
-					<g:Label ui:field="eventObjectIdValue" />
-					<g:Label ui:field="eventObjectRoleLabel" styleName="label">
-						<ui:text from='{messages.preservationEventObjectRole}' />
-					</g:Label>
-					<g:Label ui:field="eventObjectRoleValue" />
+					<g:FlowPanel ui:field="sourceObjectsPanel"/>
 					
+					<!-- LINKING OUTCOME OBJECTS -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventObjectsHeader}' />
+					</g:Label>
+					<g:FlowPanel ui:field="outcomeObjectsPanel"/>
 
 					<!-- OUTCOME -->
 					<g:Label styleName="h4">
