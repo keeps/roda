@@ -23,11 +23,11 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
+import org.roda_project.commons_ip.model.IPFile;
+import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.model.SIPDescriptiveMetadata;
-import org.roda_project.commons_ip.model.SIPRepresentation;
-import org.roda_project.commons_ip.utils.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +48,7 @@ public class EARKSIPToAIPPluginUtils {
 
     if (sip.getRepresentations() != null && sip.getRepresentations().size() > 0) {
 
-      for (SIPRepresentation sr : sip.getRepresentations()) {
+      for (IPRepresentation sr : sip.getRepresentations()) {
         boolean original = true;
         model.createRepresentation(aip.getId(), sr.getObjectID(), original, false);
 
@@ -56,11 +56,10 @@ public class EARKSIPToAIPPluginUtils {
         PluginHelper.createDirectories(model, aip.getId(), sr.getObjectID());
 
         if (sr.getData() != null && sr.getData().size() > 0) {
-          for (Pair<Path, List<String>> entry : sr.getData()) {
-            Path filePath = entry.getFirst();
-            List<String> directoryPath = entry.getSecond();
-            String fileId = filePath.getFileName().toString();
-            ContentPayload payload = new FSPathContentPayload(filePath);
+          for (IPFile file : sr.getData()) {
+            List<String> directoryPath = file.getRelativeFolders();
+            String fileId = file.getFileName();
+            ContentPayload payload = new FSPathContentPayload(file.getPath());
             model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload, true);
           }
         }
@@ -68,9 +67,9 @@ public class EARKSIPToAIPPluginUtils {
     }
 
     if (sip.getDescriptiveMetadata() != null && sip.getDescriptiveMetadata().size() > 0) {
-      for (SIPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
+      for (IPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
         String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
-        ContentPayload payload = new FSPathContentPayload(dm.getMetadata());
+        ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
         String type = (dm.getMetadataType() != null) ? dm.getMetadataType().toString() : "";
 
         model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type, false);

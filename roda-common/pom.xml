@@ -12,6 +12,5 @@
 	<modules>
 		<module>roda-common-utils</module>
 		<module>roda-common-data</module>
-		<module>roda-common-metadata</module>
 	</modules>
 </project>

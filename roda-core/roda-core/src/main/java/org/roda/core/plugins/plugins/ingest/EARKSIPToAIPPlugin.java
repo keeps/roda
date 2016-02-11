@@ -30,7 +30,7 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.parse.impl.eark.EARKParser;
+import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,8 +94,7 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
       try {
         LOGGER.debug("Converting " + earkSIPPath + " to AIP");
-        EARKParser migrator = new EARKParser();
-        SIP sip = migrator.parse(earkSIPPath);
+        SIP sip = EARKSIP.parse(earkSIPPath);
 
         String parentId = PluginHelper.getParentId(sip.getParentID(), jobDefinedParentId, jobDefinedForceParentId);
 

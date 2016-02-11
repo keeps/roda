@@ -141,7 +141,6 @@
 			</activation>
 			<modules>
 				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
@@ -152,7 +151,6 @@
 			<id>wui-with-cas</id>
 			<modules>
 				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
@@ -163,7 +161,6 @@
 			<id>wui</id>
 			<modules>
 				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
@@ -173,7 +170,6 @@
 			<id>common</id>
 			<modules>
 				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-metadata</module>
 				<module>roda-common/roda-common-utils</module>
 				<module>roda-core/roda-core</module>
 			</modules>
@@ -692,11 +688,6 @@
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
-				<artifactId>roda-common-metadata</artifactId>
-				<version>2.0.0-SNAPSHOT</version>
-			</dependency>
-			<dependency>
-				<groupId>org.roda-project</groupId>
 				<artifactId>roda-common-utils</artifactId>
 				<version>2.0.0-SNAPSHOT</version>
 			</dependency>
@@ -1029,11 +1020,11 @@
 				<artifactId>reflections</artifactId>
 				<version>0.9.10</version>
 			</dependency>
-			<!-- LOCAL INSTALL -->
+			<!-- RODA Commons IP -->
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>commons-ip</artifactId>
-				<version>1.0.0-alpha1</version>
+				<version>1.0.0-alpha6</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
