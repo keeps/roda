@@ -391,13 +391,14 @@ public class InternalPluginsTest {
       RodaConstants.PRESERVATION_REGISTRY_MIME);
     Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey());
 
-    Filter filterFile = new Filter();
-    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_FORMAT_MIMETYPE, "text/plain"));
-    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_UUID, IdUtils.getFileId(aip.getId(),
-      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT)));
-
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filterFile, null, new Sublist(0, 10));
-    Assert.assertEquals(1, files.getTotalCount());
+    
+    
+    IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
+    
+    Assert.assertEquals("text/plain", indFile.getFileFormat().getMimeType());
+    Assert.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
+    
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
