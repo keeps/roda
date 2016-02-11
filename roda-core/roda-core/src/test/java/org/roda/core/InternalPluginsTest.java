@@ -45,6 +45,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
@@ -238,7 +239,7 @@ public class InternalPluginsTest {
     // All folders and files
     Assert.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
   }
-  
+
   @Test
   public void testVirusCheck() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
@@ -393,10 +394,11 @@ public class InternalPluginsTest {
     Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
       DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
 
-    // TODO test fulltext
-    
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test")), null, new Sublist(0, 10));
+    Assert.assertEquals(1, files.getTotalCount());
     // TODO test if PREMIS event was created
-    
+
   }
 
 }
