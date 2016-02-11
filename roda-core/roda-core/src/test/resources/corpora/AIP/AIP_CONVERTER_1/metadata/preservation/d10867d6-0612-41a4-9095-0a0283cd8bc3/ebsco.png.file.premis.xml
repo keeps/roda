@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>local</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>05c3599c-5fc6-4424-af13-b3b37f6e85da/d10867d6-0612-41a4-9095-0a0283cd8bc3/ebsco.png</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-256</prem:messageDigestAlgorithm>
+      <prem:messageDigest>68E2395E73D6E2E3D03845689E23C4436B60B79747CDB6683C6EDF214B76AE11</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>51087</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>Portable Network Graphics</prem:formatName>
+        <prem:formatVersion>1.0</prem:formatVersion>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>pronom</prem:formatRegistryName>
+        <prem:formatRegistryKey>fmt/11</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>mime</prem:formatRegistryName>
+        <prem:formatRegistryKey>image/png</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+  </prem:objectCharacteristics>
+  <prem:originalName>ebsco.png</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType/>
+      <prem:contentLocationValue/>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

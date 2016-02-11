@@ -200,7 +200,7 @@ public class RodaCoreFactory {
   private static DescriptionLevelManager descriptionLevelManager = null;
 
   // Test objects
-  private static String aipId = "d6129d30-6282-452d-836b-62b08ca52597";
+  private static String aipId = "05c3599c-5fc6-4424-af13-b3b37f6e85da";
 
   /** Private empty constructor */
   private RodaCoreFactory() {

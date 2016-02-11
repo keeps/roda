@@ -82,7 +82,7 @@ public class CorporaConstants {
   public static final String SUCCESS = "success";
   public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
   public static final String PRESERVATION_LEVEL_FULL = "full";
-  public static final String REPRESENTATION_CONVERTER_ID = "c554e859-5ddf-402d-a5d0-c17857166b67";
+  public static final String REPRESENTATION_CONVERTER_ID = "d10867d6-0612-41a4-9095-0a0283cd8bc3";
 
   public static final String AGENT_RODA_8 = "roda_8";
   public static final String METS_XML = "METS.xml";

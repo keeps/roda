@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>local</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>05c3599c-5fc6-4424-af13-b3b37f6e85da/d10867d6-0612-41a4-9095-0a0283cd8bc3/new_folder/koharfid.ppt</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-256</prem:messageDigestAlgorithm>
+      <prem:messageDigest>26760788346BA9AD35317F82C351F0CFCB23998B5C21D123EE86F941585C232F</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>396288</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>Microsoft Powerpoint Presentation</prem:formatName>
+        <prem:formatVersion>97-2003</prem:formatVersion>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>pronom</prem:formatRegistryName>
+        <prem:formatRegistryKey>fmt/126</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>mime</prem:formatRegistryName>
+        <prem:formatRegistryKey>application/vnd.ms-powerpoint</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:creatingApplication>
+      <prem:dateCreatedByApplication>1601-01-01T00:00:00Z</prem:dateCreatedByApplication>
+    </prem:creatingApplication>
+  </prem:objectCharacteristics>
+  <prem:originalName>koharfid.ppt</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType/>
+      <prem:contentLocationValue/>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>
