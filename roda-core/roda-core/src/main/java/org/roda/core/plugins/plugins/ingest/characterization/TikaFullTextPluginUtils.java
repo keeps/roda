@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -138,8 +139,8 @@ public class TikaFullTextPluginUtils {
             dateCreatedByApplication);
 
           PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-          String id = ModelUtils.generatePreservationMetadataId(type, aip.getId(), representation.getId(),
-            file.getPath(), file.getId());
+          String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
+            file.getId());
 
           ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
 

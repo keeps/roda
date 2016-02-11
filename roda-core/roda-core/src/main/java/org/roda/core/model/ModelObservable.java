@@ -104,9 +104,10 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyFileDeleted(String aipId, String representationId, String fileId) {
+  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) {
     for (ModelObserver observer : observers) {
-      observer.fileDeleted(aipId, representationId, fileId);
+      observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId);
     }
   }
 

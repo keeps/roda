@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -136,7 +137,7 @@ public class SiegfriedPluginUtils {
               PremisUtils.updateFileFormat(premis_file, format, version, pronom, mime);
 
               PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-              String id = ModelUtils.generatePreservationMetadataId(type, aip.getId(), representation.getId(),
+              String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(),
                 fileDirectoryPath, fileId);
 
               ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);

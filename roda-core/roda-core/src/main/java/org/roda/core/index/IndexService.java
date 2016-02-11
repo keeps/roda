@@ -100,9 +100,9 @@ public class IndexService {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
   }
 
-  public <T extends Serializable> T retrieve(Class<T> returnClass, String... ids)
+  public <T extends Serializable> T retrieve(Class<T> returnClass, String id)
     throws NotFoundException, GenericException {
-    return SolrUtils.retrieve(index, returnClass, ids);
+    return SolrUtils.retrieve(index, returnClass, id);
   }
 
   public void reindexAIPs()

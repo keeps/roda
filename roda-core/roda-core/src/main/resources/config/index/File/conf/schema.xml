@@ -106,9 +106,9 @@
    -->     
   
   
-   <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="path" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="uuid" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="path" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="parentId" type="string" indexed="true" stored="false" required="false" multiValued="false" /> 
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 

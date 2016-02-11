@@ -35,6 +35,7 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
@@ -188,8 +189,8 @@ public class ModelService extends ModelObservable {
     try {
       json = IOUtils.toString(binary.getContent().createInputStream());
       aip = ModelUtils.getObjectFromJson(json, AIP.class);
-    } catch (IOException e) {
-      throw new GenericException("Could not parse AIP metadata", e);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Could not parse AIP metadata of " + aipId + " at " + metadataStoragePath, e);
     }
 
     // Setting information that does not come in JSON
@@ -931,7 +932,7 @@ public class ModelService extends ModelObservable {
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
     storage.deleteResource(filePath);
     if (notify) {
-      notifyFileDeleted(aipId, representationId, fileId);
+      notifyFileDeleted(aipId, representationId, directoryPath, fileId);
     }
 
   }
@@ -1008,7 +1009,7 @@ public class ModelService extends ModelObservable {
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    String id = ModelUtils.generatePreservationMetadataId(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
+    String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
       fileDirectoryPath, fileId);
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, PreservationMetadataType.OBJECT_FILE,
       aipId, representationId, fileDirectoryPath, fileId);
@@ -1365,7 +1366,7 @@ public class ModelService extends ModelObservable {
       storage.updateBinaryContent(binaryPath, payload, asReference, createIfNotExists);
     }
 
-    String id = ModelUtils.generateOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+    String id = IdUtils.getOtherMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
 
     om = new OtherMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, fileSuffix);
 
@@ -1439,7 +1440,7 @@ public class ModelService extends ModelObservable {
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
-    String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+    String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
     return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 

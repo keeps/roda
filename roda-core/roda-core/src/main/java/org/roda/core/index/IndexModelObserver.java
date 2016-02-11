@@ -8,6 +8,7 @@
 package org.roda.core.index;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -23,6 +24,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -283,7 +285,7 @@ public class IndexModelObserver implements ModelObserver {
   public void representationDeleted(String aipId, String representationId) {
     // XXX check if forcing auto commit is necessary
     boolean forceCommit = true;
-    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.getId(aipId, representationId),
+    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, IdUtils.getRepresentationId(aipId, representationId),
       "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
   }
 
@@ -296,14 +298,14 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void fileUpdated(File file) {
-    fileDeleted(file.getAipId(), file.getRepresentationId(), file.getId());
+    fileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
     fileCreated(file);
 
   }
 
   @Override
-  public void fileDeleted(String aipId, String representationId, String fileId) {
-    String id = SolrUtils.getId(aipId, representationId, fileId);
+  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
+    String id = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     // XXX check if forcing auto commit is necessary
     boolean forceCommit = true;
     deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")", forceCommit);

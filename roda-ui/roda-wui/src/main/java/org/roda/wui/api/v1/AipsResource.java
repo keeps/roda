@@ -218,7 +218,7 @@ public class AipsResource {
   }
 
   @GET
-  @Path("/{aip_id}/data/{representation_id}/{file_id}")
+  @Path("/{aip_id}/data/{representation_id}/file/{file_uuid}")
   @Produces({"application/json", "application/octetstream"})
   @ApiOperation(value = "Get representation file", notes = "Get representation file", response = File.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
@@ -227,7 +227,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdFileIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUuid,
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
@@ -235,8 +235,8 @@ public class AipsResource {
     // delegate action to controller
     List<String> directoryPath = new ArrayList<>();
     // TODO get directory path from request
-    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId,
-      directoryPath, fileId, acceptFormat);
+    StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, aipId, representationId, fileUuid,
+      acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentationFile);
   }
@@ -250,7 +250,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdFileIdPut(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @ApiParam(value = "The path to the file in the shared file system where the file should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -266,7 +266,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdFileIdPost(
     @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The requested ID of the new file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
     // TODO
@@ -282,7 +282,7 @@ public class AipsResource {
   public Response aipsAipIdDataRepresentationIdFileIdDelete(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId)
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -466,7 +466,7 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId)
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -486,7 +486,7 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPost(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
@@ -512,7 +512,7 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdPut(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @FormDataParam("file") InputStream inputStream, @FormDataParam("file") FormDataContentDisposition fileDetail)
       throws RODAException {
     // get user
@@ -535,7 +535,7 @@ public class AipsResource {
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_ID) String fileId,
+    @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "json, xml, html", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user

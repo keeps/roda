@@ -82,6 +82,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -127,23 +128,10 @@ import org.slf4j.LoggerFactory;
  */
 public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
-  private static final String ID_SEPARATOR = ".";
 
   /** Private empty constructor */
   private SolrUtils() {
 
-  }
-
-  public static String getId(String... ids) {
-    StringBuilder ret = new StringBuilder();
-    for (String id : ids) {
-      if (ret.length() > 0) {
-        ret.append(ID_SEPARATOR);
-      }
-      ret.append(id);
-    }
-
-    return ret.toString();
   }
 
   public static <T extends Serializable> IndexResult<T> queryResponseToIndexResult(QueryResponse response,
@@ -749,8 +737,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(JobReport.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -768,12 +756,11 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String... ids)
+  public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
     throws NotFoundException, GenericException {
     T ret;
-    String id = SolrUtils.getId(ids);
     try {
-      SolrDocument doc = index.getById(getIndexName(classToRetrieve), SolrUtils.getId(ids));
+      SolrDocument doc = index.getById(getIndexName(classToRetrieve), id);
       if (doc != null) {
         ret = solrDocumentTo(classToRetrieve, doc);
       } else {
@@ -981,7 +968,7 @@ public class SolrUtils {
 
   public static SolrInputDocument representationToSolrDocument(Representation rep) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SRO_UUID, getId(rep.getAipId(), rep.getId()));
+    doc.addField(RodaConstants.SRO_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.SRO_ID, rep.getId());
     doc.addField(RodaConstants.SRO_AIP_ID, rep.getAipId());
     doc.addField(RodaConstants.SRO_ORIGINAL, rep.isOriginal());
@@ -1363,9 +1350,19 @@ public class SolrUtils {
 
   public static SolrInputDocument fileToSolrDocument(File file, Binary premisFile, String fulltext) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.FILE_UUID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
-    doc.addField(RodaConstants.FILE_ID, getId(file.getAipId(), file.getRepresentationId(), file.getId()));
-    doc.addField(RodaConstants.FILE_PATH, file.getPath());
+    doc.addField(RodaConstants.FILE_UUID, IdUtils.getFileId(file));
+    List<String> path = file.getPath();
+    doc.addField(RodaConstants.FILE_PATH, path);
+    if (path != null && !path.isEmpty()) {
+      String parentFileId = path.get(path.size() - 1);
+      List<String> parentFileDirectoryPath = new ArrayList<>();
+      if (path.size() > 1) {
+        parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
+      }
+
+      doc.addField(RodaConstants.FILE_PARENT_ID,
+        IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath, parentFileId));
+    }
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
     doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
@@ -1400,6 +1397,7 @@ public class SolrUtils {
 
   public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
     IndexedFile file = null;
+    String uuid = objectToString(doc.get(RodaConstants.FILE_UUID));
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
     String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
@@ -1431,10 +1429,10 @@ public class SolrUtils {
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
-    // FIXME remove entrypoint from IndexedFile...
 
-    file = new IndexedFile(fileId, path, aipId, representationId, false, fileFormat, originalName, size, isDirectory,
-      creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText, storagePath);
+    file = new IndexedFile(uuid, aipId, representationId, path, fileId, false, fileFormat, originalName, size,
+      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText,
+      storagePath);
     return file;
   }
 

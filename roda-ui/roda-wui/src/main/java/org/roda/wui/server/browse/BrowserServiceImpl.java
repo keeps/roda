@@ -126,10 +126,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return I18nUtility.translate(result, IndexedAIP.class, localeString);
   }
 
-  public IndexResult<IndexedFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  @Override
+  public IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.getFiles(user, filter, sorter, sublist, facets, localeString);
+    return Browser.findFiles(user, filter, sorter, sublist, facets);
+  }
+
+  @Override
+  public IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveFile(user, aipId, representationId, fileDirectoryPath, fileId);
   }
 
   public Long countDescriptiveMetadata(Filter filter)

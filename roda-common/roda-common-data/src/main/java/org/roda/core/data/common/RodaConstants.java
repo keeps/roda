@@ -89,6 +89,7 @@ public final class RodaConstants {
   public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
   // sub-resources strings
   public static final String API_DATA = "data";
+  public static final Object API_FILE = "file";
   public static final String API_DESCRIPTIVE_METADATA = "descriptive_metadata";
   public static final String API_PRESERVATION_METADATA = "preservation_metadata";
   // "http query string" related strings
@@ -109,7 +110,7 @@ public final class RodaConstants {
   // "http path param" related strings
   public static final String API_PATH_PARAM_AIP_ID = "aip_id";
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
-  public static final String API_PATH_PARAM_FILE_ID = "file_id";
+  public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
@@ -439,8 +440,9 @@ public final class RodaConstants {
   public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
   public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
 
-  public static final String FILE_ID = "id";
+  public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";
+  public static final String FILE_PARENT_ID = "parentId";
   public static final String FILE_AIPID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
@@ -450,7 +452,6 @@ public final class RodaConstants {
   public static final String FILE_ISENTRYPOINT = "isEntryPoint";
   public static final String FILE_FILEFORMAT = "fileFormat";
   public static final String FILE_STORAGEPATH = "storagePath";
-  public static final String FILE_UUID = "uuid";
   public static final String FILE_ORIGINALNAME = "originalName";
   public static final String FILE_SIZE = "size";
   public static final String FILE_ISDIRECTORY = "isDirectory";
@@ -578,6 +579,5 @@ public final class RodaConstants {
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
-  
 
 }

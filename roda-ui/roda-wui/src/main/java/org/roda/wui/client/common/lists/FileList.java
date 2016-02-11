@@ -140,8 +140,7 @@ public class FileList extends AsyncTableCell<IndexedFile> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      BrowserService.Util.getInstance().getRepresentationFiles(filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+      BrowserService.Util.getInstance().findFiles(filter, sorter, sublist, getFacets(), callback);
     }
   }
 

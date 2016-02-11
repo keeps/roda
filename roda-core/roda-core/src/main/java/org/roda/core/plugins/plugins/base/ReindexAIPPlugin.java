@@ -23,6 +23,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +90,9 @@ public class ReindexAIPPlugin implements Plugin<AIP> {
       index.reindexAIP(aip);
     }
 
-    return null;
+    Report report = PluginHelper.createPluginReport(this);
+
+    return report;
   }
 
   @Override
@@ -108,7 +111,7 @@ public class ReindexAIPPlugin implements Plugin<AIP> {
       LOGGER.debug("Skipping clear indexes");
     }
 
-    return null;
+    return new Report();
   }
 
   @Override
@@ -123,7 +126,7 @@ public class ReindexAIPPlugin implements Plugin<AIP> {
       throw new PluginException("Error optimizing index", e);
     }
 
-    return null;
+    return new Report();
   }
 
   @Override

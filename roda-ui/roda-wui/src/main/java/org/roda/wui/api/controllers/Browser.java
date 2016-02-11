@@ -329,7 +329,7 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPreservationMetadataFile", aipId, duration,
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
-      RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
+      RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
     return aipRepresentationPreservationMetadataFile;
   }
@@ -394,7 +394,7 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "aipsAipIdPreservationMetadataRepresentationIdFileIdDelete", aipId,
       duration, RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID,
-      representationId, RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
+      representationId, RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
 
   }
 
@@ -587,11 +587,11 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", aip.getId(), duration,
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
-      RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
+      RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
   }
 
   public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
-    List<String> directoryPath, String fileId, String acceptFormat)
+    String fileUuid, String acceptFormat)
       throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -603,13 +603,14 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
-    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId,
-      directoryPath, fileId, acceptFormat);
+    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId, fileUuid,
+      acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_ID, fileId);
+      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID,
+      fileUuid);
 
     return aipRepresentationFile;
   }
@@ -791,8 +792,8 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.isTransferFullyInitialized();
   }
 
-  public static IndexResult<IndexedFile> getFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString) throws GenericException, RequestNotValidException {
+  public static IndexResult<IndexedFile> findFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException, RequestNotValidException {
     Date startDate = new Date();
 
     // TODO
@@ -808,6 +809,27 @@ public class Browser extends RodaCoreService {
       RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
     return files;
+  }
+
+  public static IndexedFile retrieveFile(RodaUser user, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId)
+      throws GenericException, RequestNotValidException, NotFoundException {
+    Date startDate = new Date();
+
+    // TODO
+    // check user permissions
+    // UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    IndexedFile file = BrowserHelper.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveFile", null, duration, RodaConstants.FILE_AIPID, aipId,
+      RodaConstants.FILE_REPRESENTATIONID, representationId, RodaConstants.FILE_PATH, fileDirectoryPath,
+      RodaConstants.FILE_FILEID, fileId);
+
+    return file;
   }
 
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)

@@ -7,6 +7,8 @@
  */
 package org.roda.core.model;
 
+import java.util.List;
+
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -43,7 +45,7 @@ public interface ModelObserver {
 
   public void fileUpdated(File file);
 
-  public void fileDeleted(String aipId, String representationId, String fileId);
+  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId);
 
   public void logEntryCreated(LogEntry entry);
 

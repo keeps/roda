@@ -16,12 +16,13 @@ public class IndexedFile implements Serializable {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
-  private String id = null;
-  private List<String> path = null;
+  private String uuid = null;
+
   private String aipId = null;
   private String representationId = null;
+  private List<String> path = null;
+  private String id = null;
 
-  private boolean entryPoint = false;
   private FileFormat fileFormat = null;
   private String originalName = null;
   private long size = 0;
@@ -37,15 +38,17 @@ public class IndexedFile implements Serializable {
     super();
   }
 
-  public IndexedFile(String id, List<String> path, String aipId, String representationId, boolean entryPoint,
-    FileFormat fileFormat, String originalName, long size, boolean isDirectory, String creatingApplicationName,
-    String creatingApplicationVersion, String dateCreatedByApplication, List<String> hash, String fulltext,
-    String storagePath) {
-    this.id = id;
-    this.path = path;
+  public IndexedFile(String uuid, String aipId, String representationId, List<String> path, String id,
+    boolean entryPoint, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
+    String creatingApplicationName, String creatingApplicationVersion, String dateCreatedByApplication,
+    List<String> hash, String fulltext, String storagePath) {
+    this.uuid = uuid;
+
     this.aipId = aipId;
     this.representationId = representationId;
-    this.entryPoint = entryPoint;
+    this.path = path;
+    this.id = id;
+
     this.fileFormat = fileFormat;
     this.originalName = originalName;
     this.size = size;
@@ -58,6 +61,30 @@ public class IndexedFile implements Serializable {
     this.storagePath = storagePath;
   }
 
+  public String getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
+  }
+
+  public String getAipId() {
+    return aipId;
+  }
+
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
+  }
+
+  public String getRepresentationId() {
+    return representationId;
+  }
+
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
+  }
+
   public List<String> getPath() {
     return path;
   }
@@ -66,12 +93,44 @@ public class IndexedFile implements Serializable {
     this.path = path;
   }
 
-  public String getFulltext() {
-    return fulltext;
+  public String getId() {
+    return id;
   }
 
-  public void setFulltext(String fulltext) {
-    this.fulltext = fulltext;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public FileFormat getFileFormat() {
+    return fileFormat;
+  }
+
+  public void setFileFormat(FileFormat fileFormat) {
+    this.fileFormat = fileFormat;
+  }
+
+  public String getOriginalName() {
+    return originalName;
+  }
+
+  public void setOriginalName(String originalName) {
+    this.originalName = originalName;
+  }
+
+  public long getSize() {
+    return size;
+  }
+
+  public void setSize(long size) {
+    this.size = size;
+  }
+
+  public boolean isDirectory() {
+    return isDirectory;
+  }
+
+  public void setDirectory(boolean isDirectory) {
+    this.isDirectory = isDirectory;
   }
 
   public String getCreatingApplicationName() {
@@ -106,83 +165,12 @@ public class IndexedFile implements Serializable {
     this.hash = hash;
   }
 
-  public boolean isDirectory() {
-    return isDirectory;
+  public String getFulltext() {
+    return fulltext;
   }
 
-  public void setDirectory(boolean isDirectory) {
-    this.isDirectory = isDirectory;
-  }
-
-  public String getOriginalName() {
-    return originalName;
-  }
-
-  public void setOriginalName(String originalName) {
-    this.originalName = originalName;
-  }
-
-  public long getSize() {
-    return size;
-  }
-
-  public void setSize(long size) {
-    this.size = size;
-  }
-
-  /**
-   * @return the id
-   */
-  public String getId() {
-    return id;
-  }
-
-  /**
-   * @return the aipId
-   */
-  public String getAipId() {
-    return aipId;
-  }
-
-  /**
-   * @return the representationId
-   */
-  public String getRepresentationId() {
-    return representationId;
-  }
-
-  /**
-   * @return the entryPoint
-   */
-  public boolean isEntryPoint() {
-    return entryPoint;
-  }
-
-  /**
-   * @return the fileFormat
-   */
-  public FileFormat getFileFormat() {
-    return fileFormat;
-  }
-
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public void setAipId(String aipId) {
-    this.aipId = aipId;
-  }
-
-  public void setRepresentationId(String representationId) {
-    this.representationId = representationId;
-  }
-
-  public void setEntryPoint(boolean entryPoint) {
-    this.entryPoint = entryPoint;
-  }
-
-  public void setFileFormat(FileFormat fileFormat) {
-    this.fileFormat = fileFormat;
+  public void setFulltext(String fulltext) {
+    this.fulltext = fulltext;
   }
 
   public String getStoragePath() {
@@ -201,7 +189,6 @@ public class IndexedFile implements Serializable {
     result = prime * result + ((creatingApplicationName == null) ? 0 : creatingApplicationName.hashCode());
     result = prime * result + ((creatingApplicationVersion == null) ? 0 : creatingApplicationVersion.hashCode());
     result = prime * result + ((dateCreatedByApplication == null) ? 0 : dateCreatedByApplication.hashCode());
-    result = prime * result + (entryPoint ? 1231 : 1237);
     result = prime * result + ((fileFormat == null) ? 0 : fileFormat.hashCode());
     result = prime * result + ((fulltext == null) ? 0 : fulltext.hashCode());
     result = prime * result + ((hash == null) ? 0 : hash.hashCode());
@@ -212,6 +199,7 @@ public class IndexedFile implements Serializable {
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
+    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
 
@@ -243,8 +231,6 @@ public class IndexedFile implements Serializable {
       if (other.dateCreatedByApplication != null)
         return false;
     } else if (!dateCreatedByApplication.equals(other.dateCreatedByApplication))
-      return false;
-    if (entryPoint != other.entryPoint)
       return false;
     if (fileFormat == null) {
       if (other.fileFormat != null)
@@ -290,18 +276,21 @@ public class IndexedFile implements Serializable {
         return false;
     } else if (!storagePath.equals(other.storagePath))
       return false;
+    if (uuid == null) {
+      if (other.uuid != null)
+        return false;
+    } else if (!uuid.equals(other.uuid))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "IndexedFile [id=" + id + ", path=" + path + ", aipId=" + aipId + ", representationId=" + representationId
-      + ", entryPoint=" + entryPoint + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size="
-      + size + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
+    return "IndexedFile [uuid=" + uuid + ", aipId=" + aipId + ", representationId=" + representationId + ", path="
+      + path + ", id=" + id + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
+      + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
       + dateCreatedByApplication + ", hash=" + hash + ", fulltext=" + fulltext + ", storagePath=" + storagePath + "]";
   }
-
- 
 
 }

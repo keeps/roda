@@ -26,6 +26,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -143,8 +144,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
             logger.debug("Processing file: " + file);
 
             if (!file.isDirectory()) {
-              IndexedFile ifile = index.retrieve(IndexedFile.class,
-                SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());

@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -346,56 +347,6 @@ public final class ModelUtils {
     return getPreservationMetadataStoragePath(id, type, aipId, representationId, null, null);
   }
 
-  public static String generatePreservationMetadataId(PreservationMetadataType type, String aipId,
-    String representationId, List<String> fileDirectoryPath, String fileId) {
-    StringBuilder idBuilder = new StringBuilder();
-    idBuilder.append(type.toString());
-    if (aipId != null) {
-      idBuilder.append("-");
-      idBuilder.append(aipId);
-    }
-    if (representationId != null) {
-      idBuilder.append("-");
-      idBuilder.append(representationId);
-    }
-    if (fileDirectoryPath != null) {
-      for (String dir : fileDirectoryPath) {
-        idBuilder.append("-");
-        idBuilder.append(dir);
-      }
-    }
-    if (fileId != null) {
-      idBuilder.append("-");
-      idBuilder.append(fileId);
-    }
-    return idBuilder.toString();
-  }
-
-  public static String generateOtherMetadataId(String type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
-    StringBuilder idBuilder = new StringBuilder();
-    idBuilder.append(type);
-    if (aipId != null) {
-      idBuilder.append("-");
-      idBuilder.append(aipId);
-    }
-    if (representationId != null) {
-      idBuilder.append("-");
-      idBuilder.append(representationId);
-    }
-    if (fileDirectoryPath != null) {
-      for (String dir : fileDirectoryPath) {
-        idBuilder.append("-");
-        idBuilder.append(dir);
-      }
-    }
-    if (fileId != null) {
-      idBuilder.append("-");
-      idBuilder.append(fileId);
-    }
-    return idBuilder.toString();
-  }
-
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     // TODO review this method
@@ -605,7 +556,7 @@ public final class ModelUtils {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
       ret = mapper.readValue(json, objectClass);
-    } catch (IOException e) {
+    } catch (IOException  e) {
       throw new GenericException("Error while parsing JSON", e);
     }
     return ret;

@@ -83,8 +83,11 @@ public interface BrowserServiceAsync {
 
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
 
-  void getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
+  void findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     AsyncCallback<IndexResult<IndexedFile>> callback);
+
+  void retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+    AsyncCallback<IndexedFile> callback);
 
   void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
     AsyncCallback<IndexResult<Job>> callback);
@@ -117,6 +120,7 @@ public interface BrowserServiceAsync {
   void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
   void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
-  
+
   void isRegisterActive(AsyncCallback<Boolean> callback);
+
 }

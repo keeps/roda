@@ -145,8 +145,11 @@ public interface BrowserService extends RemoteService {
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  IndexResult<IndexedFile> getRepresentationFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+  IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
   IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -182,11 +185,12 @@ public interface BrowserService extends RemoteService {
    * Get Google Analytics account id
    */
   String getGoogleAnalyticsAccount();
-  
+
   /**
    * Get Google reCAPTCHA account id
    */
   String getGoogleReCAPTCHAAccount();
 
   boolean isRegisterActive();
+
 }

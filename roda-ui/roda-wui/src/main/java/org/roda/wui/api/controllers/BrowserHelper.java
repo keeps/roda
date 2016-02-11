@@ -49,6 +49,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -567,7 +568,7 @@ public class BrowserHelper {
           fileDirectoryPath, fileId, payload, notify);
       } else {
         PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-        String id = ModelUtils.generatePreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+        String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
         model.updatePreservationMetadata(id, type, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
       }
     } catch (IOException e) {
@@ -701,17 +702,19 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteFile(aipId, representationId, directoryPath, fileId, true);
   }
 
-  public static StreamResponse getAipRepresentationFile(String aipId, String representationId,
-    List<String> directoryPath, String fileId, String acceptFormat)
+  public static StreamResponse getAipRepresentationFile(String aipId, String representationId, String fileUuid,
+    String acceptFormat)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     final String filename;
     final String mediaType;
     final StreamingOutput stream;
 
+    IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
+
     StorageService storage = RodaCoreFactory.getStorageService();
     Binary representationFileBinary = storage
-      .getBinary(ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId));
+      .getBinary(ModelUtils.getFileStoragePath(aipId, representationId, indexedFile.getPath(), indexedFile.getId()));
     filename = representationFileBinary.getStoragePath().getName();
     mediaType = MediaType.WILDCARD;
     stream = new StreamingOutput() {
@@ -841,6 +844,12 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, sorter, sublist, facets);
   }
 
+  public static IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+      IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
+  }
+
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String[] types = RodaCoreFactory.getRodaConfiguration().getString("ui.browser.metadata.descriptive.types")
@@ -892,4 +901,5 @@ public class BrowserHelper {
 
     return new StreamResponse(transferredResource.getName(), MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
   }
+
 }

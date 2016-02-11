@@ -47,6 +47,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -149,7 +150,7 @@ public class IndexServiceTest {
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
-    Representation rep1 = index.retrieve(Representation.class, aipId, rep1Id);
+    Representation rep1 = index.retrieve(Representation.class, IdUtils.getRepresentationId(aipId, rep1Id));
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();

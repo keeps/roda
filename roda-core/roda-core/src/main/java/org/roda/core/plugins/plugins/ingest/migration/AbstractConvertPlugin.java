@@ -23,6 +23,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -35,7 +36,6 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -79,8 +79,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     pronomToExtension = new HashMap<>();
     mimetypeToExtension = new HashMap<>();
 
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   public void init() throws PluginException {
@@ -197,8 +197,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
             if (!file.isDirectory()) {
 
-              IndexedFile ifile = index.retrieve(IndexedFile.class,
-                SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
@@ -331,16 +330,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
           if (!file.isDirectory()) {
 
-            IndexedFile ifile = index.retrieve(IndexedFile.class,
-              SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
             String fileMimetype = ifile.getFileFormat().getMimeType();
             String filePronom = ifile.getFileFormat().getPronom();
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
               && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                  .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+                || (applicableTo.contains(fileFormat)))
+              && ifile.getSize() < (maxKbytes * 1024)) {
 
               if (applicableTo.size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty()
@@ -447,16 +446,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
         if (!file.isDirectory()) {
 
-          IndexedFile ifile = index.retrieve(IndexedFile.class,
-            SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String filePronom = ifile.getFileFormat().getPronom();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
             && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))
+            && ifile.getSize() < (maxKbytes * 1024)) {
 
             if (applicableTo.size() > 0) {
               if (filePronom != null && !filePronom.isEmpty()
@@ -485,8 +484,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils
-                .getPreservationPath(file.getAipId(), newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
+                newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -536,8 +535,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return new Report();
   }
 
-  public abstract Path executePlugin(Path path, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException;
+  public abstract Path executePlugin(Path path, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<File> alteredFiles, List<File> newFiles, AIP aip, String newRepresentationID,
     ModelService model, int state, IndexedPreservationAgent agent, boolean notify) throws PluginException {
