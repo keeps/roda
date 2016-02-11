@@ -114,6 +114,7 @@
    <field name="eventType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventOutcome" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventOutcomeDetailExtension" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />   
+   <field name="eventOutcomeDetailNote" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />   
    <field name="linkingAgentIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="linkingOutcomeObjectIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="linkingSourceObjectIdentifier" type="string" indexed="true" stored="true" required="false" multiValued="true" />

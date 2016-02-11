@@ -86,7 +86,13 @@
 						<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/text()" />
 					</field>
 				</xsl:if>
+				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
+					<field name="eventOutcomeDetailNote">
+						<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" />
+					</field>
+				</xsl:if>
 			</xsl:if>
+			
 		</xsl:if>
 		<xsl:if test="prem:eventIdentifier">
 			<xsl:if test="prem:eventIdentifier/prem:eventIdentifierValue">
