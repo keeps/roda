@@ -204,18 +204,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
               if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || inputFormat.isEmpty())
-                && ((filePronom != null && pronomToExtension.containsKey(filePronom))
+                && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
                   || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
                   || applicableTo.contains(fileFormat) || applicableTo.size() == 0)
                 && ifile.getSize() < (maxKbytes * 1024)) {
 
-                if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
-                  fileFormat = pronomToExtension.get(filePronom).get(0);
-                }
-
-                if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
-                  && !pronomToExtension.containsKey(filePronom)) {
-                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                if (applicableTo.size() > 0) {
+                  if (filePronom != null && !filePronom.isEmpty() && !pronomToExtension.containsKey(filePronom)) {
+                    fileFormat = pronomToExtension.get(filePronom).get(0);
+                  } else if (fileMimetype != null && !fileMimetype.isEmpty()
+                    && !mimetypeToExtension.containsKey(fileMimetype)) {
+                    fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                  }
                 }
 
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
@@ -336,17 +336,17 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-              && ((filePronom != null && pronomToExtension.containsKey(filePronom))
+              && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
                 || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
                   .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
 
-              if (filePronom != null && pronomToExtension.containsKey(filePronom)) {
-                fileFormat = pronomToExtension.get(filePronom).get(0);
-              }
-
-              if (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)
-                && !pronomToExtension.containsKey(filePronom)) {
-                fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+              if (applicableTo.size() > 0) {
+                if (filePronom != null && !filePronom.isEmpty() && !pronomToExtension.containsKey(filePronom)) {
+                  fileFormat = pronomToExtension.get(filePronom).get(0);
+                } else if (fileMimetype != null && !fileMimetype.isEmpty()
+                  && !mimetypeToExtension.containsKey(fileMimetype)) {
+                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                }
               }
 
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
@@ -404,17 +404,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           if (!representation.isOriginal()) {
             model.deleteRepresentation(aipId, representation.getId());
           }
+
+          boolean notifyReindex = false;
+          AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aipId, newRepresentationID,
+            notifyReindex);
+
+          logger.debug("Creating convert plugin event for the representation " + representation.getId());
+          boolean notifyEvent = false;
+          createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent,
+            notifyEvent);
         }
-
-        boolean notifyReindex = false;
-        AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aipId, newRepresentationID,
-          notifyReindex);
-
-        logger.debug("Creating convert plugin event for the representation " + representation.getId());
-        boolean notifyEvent = false;
-        createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent,
-          notifyEvent);
-
       } catch (Throwable e) {
         logger.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         state = 0;

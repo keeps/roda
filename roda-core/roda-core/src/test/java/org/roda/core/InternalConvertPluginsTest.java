@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
@@ -42,14 +43,17 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
+import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.FfmpegConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.JodConverterPlugin;
@@ -135,8 +139,8 @@ public class InternalConvertPluginsTest {
     }
     if (corporaNumber == MULTIPLE_CORPORA) {
       corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
-        .resolve(CorporaConstants.SOURCE_AIP_CONVERTER_2).resolve(RodaConstants.STORAGE_DIRECTORY_DATA)
-        .resolve(CorporaConstants.REPRESENTATION_CONVERTER_ID_2);
+        .resolve(CorporaConstants.SOURCE_AIP_CONVERTER_3).resolve(RodaConstants.STORAGE_DIRECTORY_DATA)
+        .resolve(CorporaConstants.REPRESENTATION_CONVERTER_ID_3);
     }
     if (corporaNumber == SUBFOLDER_CORPORA) {
       corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)
@@ -229,8 +233,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("image/tiff", fileMimetype);
+    }
   }
 
   @Ignore
@@ -270,8 +283,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]ogg$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]ogg$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("audio/ogg", fileMimetype);
+    }
   }
 
   @Ignore
@@ -311,8 +333,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]gif$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]gif$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("image/gif", fileMimetype);
+    }
   }
 
   @Ignore
@@ -352,8 +383,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("application/pdf", fileMimetype);
+    }
   }
 
   @Ignore
@@ -393,8 +433,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]avi$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]avi$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("video/x-msvideo", fileMimetype);
+    }
   }
 
   @Ignore
@@ -436,8 +485,17 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
+      .collect(Collectors.toList());
+
+    Assert.assertEquals(changedCounter, changedFiles.size());
+
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertEquals("application/pdf", fileMimetype);
+    }
   }
 
   @Ignore
@@ -521,10 +579,18 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .count());
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
+      .collect(Collectors.toList());
+    for (File file : changedFiles) {
+      IndexedFile ifile = index.retrieve(IndexedFile.class,
+        SolrUtils.getId(file.getAipId(), file.getRepresentationId(), file.getId()));
+      String filePronom = ifile.getFileFormat().getPronom();
+      Assert.assertEquals("fmt/354", filePronom);
+    }
+
   }
 
+  @Ignore
   @Test
   public void testSubFolderConversion() throws FileAlreadyExistsException, RequestNotValidException, NotFoundException,
     GenericException, AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException,
@@ -558,6 +624,110 @@ public class InternalConvertPluginsTest {
 
     for (File f : reusableAllFiles) {
       if (f.getId().matches(".*[.](jpg|png)$")) {
+        changedCounter++;
+        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());
+      }
+    }
+
+    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
+      .count());
+  }
+
+  @Test
+  public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    InvalidParameterException, InterruptedException, IOException {
+
+    AIP aip = ingestCorpora(MULTIPLE_CORPORA);
+
+    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
+    List<File> reusableAllFiles = new ArrayList<>();
+    Iterables.addAll(reusableAllFiles, allFiles);
+
+    Plugin<?> plugin = new ImageMagickConvertPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put("maxKbytes", "20000");
+    parameters.put("outputFormat", "tiff");
+    plugin.setParameterValues(parameters);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
+    aip = model.retrieveAIP(aip.getId());
+    Assert.assertEquals(2, aip.getRepresentations().size());
+    String deletableRepresentationId = aip.getRepresentations().get(1).getId();
+
+    Plugin<?> plugin2 = new SoxConvertPlugin();
+    Map<String, String> parameters2 = new HashMap<>();
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters2.put("maxKbytes", "20000");
+    parameters2.put("outputFormat", "ogg");
+    plugin2.setParameterValues(parameters2);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin2);
+    aip = model.retrieveAIP(aip.getId());
+    Assert.assertEquals(3, aip.getRepresentations().size());
+
+    Assert.assertEquals(0, aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId))
+      .count());
+
+    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(2).getId());
+    List<File> newReusableAllFiles = new ArrayList<>();
+    Iterables.addAll(newReusableAllFiles, newAllFiles);
+
+    Assert.assertEquals(numberOfFilesSubFolder, newReusableAllFiles.size());
+
+    int changedCounter = 0;
+
+    for (File f : reusableAllFiles) {
+      if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
+        changedCounter++;
+        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+        Assert.assertEquals(
+          1,
+          newReusableAllFiles.stream()
+            .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
+      }
+    }
+
+    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$"))
+      .count());
+
+  }
+
+  @Ignore
+  @Test
+  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
+    IOException {
+    AIP aip = ingestCorpora(SIMPLE_CORPORA);
+
+    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
+    List<File> reusableAllFiles = new ArrayList<>();
+    Iterables.addAll(reusableAllFiles, allFiles);
+
+    Plugin<?> plugin = new GeneralCommandConvertPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put("maxKbytes", "20000");
+    parameters.put("inputFormat", "png");
+    parameters.put("outputFormat", "tiff");
+    parameters.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
+    plugin.setParameterValues(parameters);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
+    aip = model.retrieveAIP(aip.getId());
+    Assert.assertEquals(2, aip.getRepresentations().size());
+
+    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(1).getId());
+    List<File> newReusableAllFiles = new ArrayList<>();
+    Iterables.addAll(newReusableAllFiles, newAllFiles);
+
+    Assert.assertEquals(numberOfFilesSimple, newReusableAllFiles.size());
+
+    int changedCounter = 0;
+
+    for (File f : reusableAllFiles) {
+      if (f.getId().matches(".*[.](png)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".tiff")).count());

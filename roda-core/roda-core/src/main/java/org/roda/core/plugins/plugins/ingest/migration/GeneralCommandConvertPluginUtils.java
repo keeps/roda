@@ -1,9 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -13,22 +10,6 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class GeneralCommandConvertPluginUtils {
-
-  public static Path runGeneralCommandConvert(InputStream is, String inputFormat, String outputFormat,
-    String commandArguments) throws IOException, CommandException {
-
-    // write the inputstream data on a new file (absolute path needed)
-    Path input = Files.createTempFile("copy", "." + inputFormat);
-    byte[] buffer = new byte[is.available()];
-    is.read(buffer);
-    OutputStream os = new FileOutputStream(input.toFile());
-    os.write(buffer);
-    os.close();
-    is.close();
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeGeneralCommand(input, output, commandArguments);
-  }
 
   public static Path runGeneralCommandConvert(Path input, String inputFormat, String outputFormat,
     String commandArguments) throws IOException, CommandException {

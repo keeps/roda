@@ -85,7 +85,7 @@ public class CorporaConstants {
   public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
   public static final String PRESERVATION_LEVEL_FULL = "full";
   public static final String REPRESENTATION_CONVERTER_ID = "5e9a84de-2d81-47ce-afa6-5abee2dd9bdf";
-  public static final String REPRESENTATION_CONVERTER_ID_2 = "5e9a84de-2d81-47ce-afa6-5abee2dd9bdf";
+  public static final String REPRESENTATION_CONVERTER_ID_2 = "5df8d24e-9bfb-4850-a458-84235373759f";
   public static final String REPRESENTATION_CONVERTER_ID_3 = "846e7be6-4ce9-40e0-ab62-8f84e50db5a4";
 
   public static final String AGENT_RODA_8 = "roda_8";

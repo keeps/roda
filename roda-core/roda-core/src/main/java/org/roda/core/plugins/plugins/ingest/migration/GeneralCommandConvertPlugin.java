@@ -3,28 +3,20 @@ package org.roda.core.plugins.plugins.ingest.migration;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 
-public class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
-
-  public String commandArguments;
+public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
 
   @Override
   public String getName() {
-    return "name";
+    return "General conversion";
   }
 
   @Override
   public String getDescription() {
-    return "description";
+    return "Generates a new format file using a generic command line.";
   }
 
   @Override
@@ -38,37 +30,13 @@ public class GeneralCommandConvertPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    List<PluginParameter> params = new ArrayList<PluginParameter>();
-
-    PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
-      "", true, true, "Output format");
-
-    PluginParameter commandArgs = new PluginParameter("command", "Command arguments", PluginParameterType.STRING, "",
-      true, true, "Command to execute");
-
-    params.add(outputParam);
-    params.add(commandArgs);
-    return params;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-
-    // add command arguments
-    if (parameters.containsKey("commandArguments")) {
-      commandArguments = parameters.get("commandArguments").trim();
+  public Path executePlugin(Path uriPath, String fileFormat) {
+    try {
+      return GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, fileFormat, outputFormat,
+        commandArguments);
+    } catch (IOException | CommandException e) {
+      return null;
     }
-  }
-
-  @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
-
-    return GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, fileFormat, outputFormat,
-      commandArguments);
-
   }
 
   @Override

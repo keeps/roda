@@ -1,10 +1,7 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ConnectException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,22 +19,6 @@ import com.artofsolving.jodconverter.openoffice.connection.SocketOpenOfficeConne
 import com.artofsolving.jodconverter.openoffice.converter.OpenOfficeDocumentConverter;
 
 public class JodConverterPluginUtils {
-
-  public static Path runJodConverter(InputStream is, String inputFormat, String outputFormat) throws IOException,
-    CommandException {
-
-    // write the inputstream data on a new file (absolute path needed)
-    Path input = Files.createTempFile("copy", "." + inputFormat);
-    byte[] buffer = new byte[is.available()];
-    is.read(buffer);
-    OutputStream os = new FileOutputStream(input.toFile());
-    os.write(buffer);
-    os.close();
-    is.close();
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeJodConverter(input, output, inputFormat, outputFormat);
-  }
 
   public static Path runJodConverter(Path input, String inputFormat, String outputFormat) throws IOException,
     CommandException {

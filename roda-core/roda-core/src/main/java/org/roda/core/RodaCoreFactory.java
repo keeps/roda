@@ -1221,12 +1221,28 @@ public class RodaCoreFactory {
       Plugin<?> plugin = new GeneralCommandConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", inputFormat);
-      params.put("outputFormat", outputFormat);
+      params.put("inputFormat", "png");
+      params.put("outputFormat", "tiff");
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
       plugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
         Arrays.asList("9ca04d1c-d0ab-4705-a7b1-943698a4fbac"));
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runGeneralCommandConvertRepresentationPlugin(String maxKbytes, String inputFormat,
+    String outputFormat) {
+    try {
+      Plugin<?> plugin = new GeneralCommandConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", "png");
+      params.put("outputFormat", "tiff");
+      params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
     } catch (InvalidParameterException ipe) {
       LOGGER.error(ipe.getMessage(), ipe);
     }
@@ -1534,6 +1550,8 @@ public class RodaCoreFactory {
       runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("generalcommandconvert".equals(args.get(0))) {
       runGeneralCommandConvertPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("generalcommandrepresentationconvert".equals(args.get(0))) {
+      runGeneralCommandConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("reindexer".equals(args.get(0))) {
       runReindexingPlugins();
     } else if ("jhove".equals(args.get(0))) {

@@ -38,28 +38,11 @@ import org.verapdf.pdfa.validators.Validators;
 
 public class PdfToPdfaPluginUtils {
 
-  public static Path runPdfToPdfa(InputStream pdfInputStream) throws IOException, VeraPDFException,
-    GhostscriptException {
-
-    // write pdf inputstream data on a new file (absolute path needed when
-    // running GS)
-    Path p = Files.createTempFile("pdf_copy", ".pdf");
-    byte[] buffer = new byte[pdfInputStream.available()];
-    pdfInputStream.read(buffer);
-    OutputStream os = new FileOutputStream(p.toFile());
-    os.write(buffer);
-    os.close();
-    pdfInputStream.close();
-
-    return executePdfToPdfa(p);
-  }
-
   public static Path runPdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
     return executePdfToPdfa(p);
   }
 
   private static Path executePdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
-
     // pdfa - file to save the GS output
     // fixed - file to save the fixed representation
     Path pdfa = Files.createTempFile("pdfa", ".pdf");
