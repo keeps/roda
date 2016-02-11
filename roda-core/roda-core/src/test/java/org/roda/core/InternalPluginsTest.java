@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
+import org.apache.xmlbeans.XmlException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -47,6 +48,9 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -70,8 +74,10 @@ import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
 
 import lc.xmlns.premisV2.CreatingApplicationComplexType;
+import lc.xmlns.premisV2.EventComplexType;
 import lc.xmlns.premisV2.FormatComplexType;
 import lc.xmlns.premisV2.FormatRegistryComplexType;
+import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
 import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
 import lc.xmlns.premisV2.Representation;
 
@@ -256,8 +262,41 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // TODO check if PREMIS event was created
+    String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
+    boolean found = false;
+    List<PreservationMetadata> preservationMetadataList = aip.getMetadata().getPreservationMetadata();
+    for (PreservationMetadata pm : preservationMetadataList) {
+      if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+        try {
+          EventComplexType event = PremisUtils
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+              .getContent().createInputStream());
+          if (event.getLinkingAgentIdentifierList() != null && event.getLinkingAgentIdentifierList().size() > 0) {
+            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()) {
+              if (laict.getLinkingAgentIdentifierValue() != null
+                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                found = true;
+                break;
+              }
+            }
+            if (found) {
+              break;
+            }
+          }
+        } catch (XmlException | IOException e) {
 
+        }
+      }
+    }
+    Assert.assertTrue(found);
+
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
+      RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK));
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
+    IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
+      new Sublist(0, 10));
+    Assert.assertEquals(1, events.getTotalCount());
   }
 
   @Test
@@ -350,17 +389,52 @@ public class InternalPluginsTest {
       RodaConstants.PRESERVATION_REGISTRY_MIME);
     Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey());
 
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_FORMAT_MIMETYPE, "text/plain"));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_PATH, CORPORA_TEST1));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
+    Filter filterFile = new Filter();
+    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_FORMAT_MIMETYPE, "text/plain"));
+    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aip.getId()));
+    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_PATH, CORPORA_TEST1));
+    filterFile
+      .add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, aip.getRepresentations().get(0).getId()));
+    filterFile.add(new SimpleFilterParameter(RodaConstants.FILE_ID,
       SolrUtils.getId(aip.getId(), aip.getRepresentations().get(0).getId(), CORPORA_TEST1_TXT)));
-    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
+    IndexResult<IndexedFile> files = index.find(IndexedFile.class, filterFile, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());
 
-    // TODO test if PREMIS event was created
+    String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
+    boolean found = false;
+    List<PreservationMetadata> preservationMetadataList = aip.getMetadata().getPreservationMetadata();
+    for (PreservationMetadata pm : preservationMetadataList) {
+      if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+        try {
+          EventComplexType event = PremisUtils
+            .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+              .getContent().createInputStream());
+          if (event.getLinkingAgentIdentifierList() != null && event.getLinkingAgentIdentifierList().size() > 0) {
+            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()) {
+              if (laict.getLinkingAgentIdentifierValue() != null
+                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                found = true;
+                break;
+              }
+            }
+            if (found) {
+              break;
+            }
+          }
+        } catch (XmlException | IOException e) {
+
+        }
+      }
+    }
+    Assert.assertTrue(found);
+
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
+      RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION));
+    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
+    IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
+      new Sublist(0, 10));
+    Assert.assertEquals(1, events.getTotalCount());
 
   }
 
