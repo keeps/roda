@@ -106,12 +106,10 @@
    -->   
    
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />   
-   <field name="role" type="string" indexed="true" stored="true" required="false" multiValued="false" />   
-   <field name="title" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="name" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="identifierType" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="identifierValue" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="version" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="extension" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="note" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

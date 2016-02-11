@@ -1161,21 +1161,16 @@ public class SolrUtils {
 
   private static IndexedPreservationAgent solrDocumentToIndexedPreservationAgent(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_ID));
-    final String role = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLE));
-    final String title = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TITLE));
+    final String name = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NAME));
     final String type = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TYPE));
-    final String identifierType = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_IDENTIFIER_TYPE));
-    final String identifierValue = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_IDENTIFIER_VALUE));
-    final String version = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION));
-
+    final String extension = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_EXTENSION));
+    final String note = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE));
     IndexedPreservationAgent ipa = new IndexedPreservationAgent();
     ipa.setId(id);
-    ipa.setIdentifierType(identifierType);
-    ipa.setIdentifierValue(identifierValue);
-    ipa.setRole(role);
-    ipa.setTitle(title);
+    ipa.setName(name);
     ipa.setType(type);
-    ipa.setVersion(version);
+    ipa.setExtension(extension);
+    ipa.setNote(note);
     return ipa;
   }
 

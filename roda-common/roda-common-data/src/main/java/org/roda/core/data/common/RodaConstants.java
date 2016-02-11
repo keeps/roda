@@ -505,12 +505,10 @@ public final class RodaConstants {
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
-  public static final String PRESERVATION_AGENT_ROLE = "role";
-  public static final String PRESERVATION_AGENT_TITLE = "title";
+  public static final String PRESERVATION_AGENT_NAME = "name";
   public static final String PRESERVATION_AGENT_TYPE = "type";
-  public static final String PRESERVATION_AGENT_IDENTIFIER_TYPE = "identifierType";
-  public static final String PRESERVATION_AGENT_IDENTIFIER_VALUE = "identifierValue";
-  public static final String PRESERVATION_AGENT_VERSION = "version";
+  public static final Object PRESERVATION_AGENT_EXTENSION = "extension";
+  public static final Object PRESERVATION_AGENT_NOTE = "note";
 
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
@@ -579,5 +577,6 @@ public final class RodaConstants {
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
+  
 
 }

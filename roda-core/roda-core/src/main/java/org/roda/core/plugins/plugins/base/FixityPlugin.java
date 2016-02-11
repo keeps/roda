@@ -56,13 +56,7 @@ public class FixityPlugin implements Plugin<AIP> {
   private Map<String, String> parameters;
 
   @Override
-  public void init() throws PluginException {
-    try {
-      agent = PremisUtils.createPremisAgentBinary(getName() + "/" + getVersion(), "fixityCheck",
-        RodaConstants.PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN);
-    } catch (GenericException | ValidationException e) {
-      throw new PluginException("Error initializing agent", e);
-    }
+  public void init() {
   }
 
   @Override

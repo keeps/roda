@@ -349,8 +349,6 @@ public class PremisUtils {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
         agentIdentifier.setLinkingAgentIdentifierType("local");
         agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
-        agentIdentifier.setRole(agent.getRole());
-        agentIdentifier.setTitle(agent.getTitle());
         agentIdentifier.setType("simple");
       }
     }
@@ -370,7 +368,7 @@ public class PremisUtils {
 
   }
 
-  public static ContentPayload createPremisAgentBinary(String id, String name, String type)
+  public static ContentPayload createPremisAgentBinary(String id, String name, String type, String extension, String note)
     throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
@@ -659,7 +657,7 @@ public class PremisUtils {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
-      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN);
+      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,"","");
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
     return agent;
@@ -670,9 +668,7 @@ public class PremisUtils {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     IndexedPreservationAgent agent = new IndexedPreservationAgent();
     agent.setId(id);
-    agent.setIdentifierType("local");
-    agent.setIdentifierValue(id);
-    agent.setTitle(plugin.getName());
+    agent.setName(plugin.getName());
     return agent;
   }
 

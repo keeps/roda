@@ -13,29 +13,26 @@ import java.util.Date;
 public class IndexedPreservationAgent implements Serializable {
   private static final long serialVersionUID = 7864328669898523851L;
   private String id;
-  private String role;
-  private String title;
+  private String name;
   private String type;
-  private String identifierType;
-  private String identifierValue;
-  private String version;
+  private String note;
+  private String extension;
+  
+  
+  public IndexedPreservationAgent() {
+    super();
+  }
   public String getId() {
     return id;
   }
   public void setId(String id) {
     this.id = id;
   }
-  public String getRole() {
-    return role;
+  public String getName() {
+    return name;
   }
-  public void setRole(String role) {
-    this.role = role;
-  }
-  public String getTitle() {
-    return title;
-  }
-  public void setTitle(String title) {
-    this.title = title;
+  public void setName(String name) {
+    this.name = name;
   }
   public String getType() {
     return type;
@@ -43,22 +40,23 @@ public class IndexedPreservationAgent implements Serializable {
   public void setType(String type) {
     this.type = type;
   }
-  public String getIdentifierType() {
-    return identifierType;
+  public String getNote() {
+    return note;
   }
-  public void setIdentifierType(String identifierType) {
-    this.identifierType = identifierType;
+  public void setNote(String note) {
+    this.note = note;
   }
-  public String getIdentifierValue() {
-    return identifierValue;
+  public String getExtension() {
+    return extension;
   }
-  public void setIdentifierValue(String identifierValue) {
-    this.identifierValue = identifierValue;
+  public void setExtension(String extension) {
+    this.extension = extension;
   }
-  public String getVersion() {
-    return version;
+  @Override
+  public String toString() {
+    return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
+      + ", extension=" + extension + "]";
   }
-  public void setVersion(String version) {
-    this.version = version;
-  }
+  
+  
 }

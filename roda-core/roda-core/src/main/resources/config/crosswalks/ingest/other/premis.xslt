@@ -23,7 +23,7 @@
 			</field>
 		</xsl:if>
 		<xsl:if test="prem:agentName">
-			<field name="title">
+			<field name="name">
 				<xsl:value-of select="prem:agentName/text()" />
 			</field>
 		</xsl:if>
@@ -32,7 +32,16 @@
 				<xsl:value-of select="prem:agentType/text()" />
 			</field>
 		</xsl:if>
-
+		<xsl:if test="prem:agentExtension">
+			<field name="extension">
+				<xsl:value-of select="prem:agentExtension/text()" />
+			</field>
+		</xsl:if>
+	<xsl:if test="prem:agentNote">
+			<field name="note">
+				<xsl:value-of select="prem:agentExtension/text()" />
+			</field>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="prem:object">
 		<xsl:if
