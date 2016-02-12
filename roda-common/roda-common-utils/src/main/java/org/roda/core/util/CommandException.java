@@ -40,6 +40,8 @@ public class CommandException extends Exception {
    */
   public CommandException(String message, int exitCode, String output) {
     super(message);
+    this.exitCode = exitCode;
+    this.output = output;
   }
 
   /**

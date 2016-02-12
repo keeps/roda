@@ -10,14 +10,12 @@ package org.roda.core.plugins.plugins.ingest.migration;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 import org.verapdf.core.VeraPDFException;
@@ -45,22 +43,11 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<PluginParameter>();
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    fillFileFormatStructures();
-  }
-
-  @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     try {
-      return PdfToPdfaPluginUtils.runPdfToPdfa(uriPath);
+      return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath);
     } catch (VeraPDFException | GhostscriptException e) {
       return null;
     }
@@ -68,13 +55,25 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    outputFormat = "pdf";
+  public List<String> getApplicableTo() {
+    return Arrays.asList("pdf");
+  }
 
-    applicableTo.add("pdf");
-    convertableTo.add("pdf");
-    mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
-    pronomToExtension = PdfToPdfaPluginUtils.getPronomToExtension();
+  @Override
+  public List<String> getConvertableTo() {
+    return Arrays.asList("pdf");
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    Map<String, List<String>> map = new HashMap<String, List<String>>();
+    map.put("application/pdf", Arrays.asList("pdf"));
+    return map;
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return PdfToPdfaPluginUtils.getPronomToExtension();
   }
 
 }

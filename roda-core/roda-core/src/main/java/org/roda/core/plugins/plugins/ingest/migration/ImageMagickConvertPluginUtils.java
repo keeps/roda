@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,17 +13,11 @@ import org.roda.core.util.CommandUtility;
 
 public class ImageMagickConvertPluginUtils {
 
-  public static Path runImageMagickConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
-    throws IOException, CommandException, UnsupportedOperationException {
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeImageMagick(input, output, inputFormat, outputFormat, commandArguments);
-  }
-
-  private static Path executeImageMagick(Path input, Path output, String inputFormat, String outputFormat,
-    String commandArguments) throws CommandException {
+  public static String executeImageMagick(Path input, Path output, String outputFormat, String commandArguments)
+    throws CommandException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
-    command = command.replace("{input_file}", inputFormat + ":" + input.toString());
+    command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
     command = command.replace("{arguments}", commandArguments);
 
@@ -32,8 +25,7 @@ public class ImageMagickConvertPluginUtils {
     List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
-    CommandUtility.execute(commandList);
-    return output;
+    return CommandUtility.execute(commandList);
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {

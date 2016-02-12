@@ -9,9 +9,9 @@ import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
+import org.slf4j.LoggerFactory;
 
 public class AvconvConvertPlugin extends CommandConvertPlugin {
 
@@ -37,7 +37,7 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
     try {
       return AvconvConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      logger.debug("Error getting Avconv version");
+      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting Avconv version");
       return new String();
     }
   }
@@ -47,14 +47,6 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
     return new AvconvConvertPlugin();
   }
 
-  @Override
-  public List<PluginParameter> getParameters() {
-
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
-    return super.getParameters();
-  }
-
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -62,25 +54,33 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
     if (parameters.containsKey("outputArguments")) {
       outputArguments = parameters.get("outputArguments");
     }
-
-    fillFileFormatStructures();
   }
 
   @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
-    return AvconvConvertPluginUtils.runAvconvVideoConvert(uriPath, fileFormat, outputFormat, commandArguments,
-      outputArguments);
+    return AvconvConvertPluginUtils.executeAvconv(inputPath, outputPath, commandArguments, outputArguments);
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    pronomToExtension = AvconvConvertPluginUtils.getPronomToExtension();
-    mimetypeToExtension = AvconvConvertPluginUtils.getMimetypeToExtension();
-    applicableTo = AvconvConvertPluginUtils.getInputExtensions();
+  public List<String> getApplicableTo() {
+    return AvconvConvertPluginUtils.getInputExtensions();
+  }
 
+  @Override
+  public List<String> getConvertableTo() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    return Arrays.asList(outputFormats.split("\\s+"));
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    return AvconvConvertPluginUtils.getPronomToExtension();
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return AvconvConvertPluginUtils.getMimetypeToExtension();
   }
 }

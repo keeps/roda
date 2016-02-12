@@ -9,10 +9,9 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
+import org.slf4j.LoggerFactory;
 
 public class GhostScriptConvertPlugin extends CommandConvertPlugin {
 
@@ -31,7 +30,7 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
     try {
       return GhostScriptConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      logger.debug("Error getting GhostScript version");
+      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting GhostScript version");
       return new String();
     }
   }
@@ -42,37 +41,35 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
-
-    return super.getParameters();
-  }
-
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    fillFileFormatStructures();
-  }
-
-  @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     try {
-      return GhostScriptConvertPluginUtils.runGhostScriptConvert(uriPath, fileFormat, outputFormat, commandArguments);
+      return GhostScriptConvertPluginUtils.executeGS(inputPath, outputPath, commandArguments);
     } catch (GhostscriptException e) {
       return null;
     }
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    pronomToExtension = GhostScriptConvertPluginUtils.getPronomToExtension();
-    mimetypeToExtension = GhostScriptConvertPluginUtils.getMimetypeToExtension();
-    applicableTo = GhostScriptConvertPluginUtils.getInputExtensions();
+  public List<String> getApplicableTo() {
+    return GhostScriptConvertPluginUtils.getInputExtensions();
+  }
 
+  @Override
+  public List<String> getConvertableTo() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    return Arrays.asList(outputFormats.split("\\s+"));
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    return GhostScriptConvertPluginUtils.getPronomToExtension();
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return GhostScriptConvertPluginUtils.getMimetypeToExtension();
   }
 
 }

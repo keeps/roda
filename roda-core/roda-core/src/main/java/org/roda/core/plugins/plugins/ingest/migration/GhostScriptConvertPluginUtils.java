@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -16,14 +15,7 @@ import org.roda.core.util.CommandUtility;
 
 public class GhostScriptConvertPluginUtils {
 
-  public static Path runGhostScriptConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
-    throws IOException, CommandException, GhostscriptException {
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeGS(input, output, commandArguments);
-  }
-
-  private static Path executeGS(Path input, Path output, String commandArguments) throws GhostscriptException,
+  public static String executeGS(Path input, Path output, String commandArguments) throws GhostscriptException,
     IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "commandLine");
@@ -47,7 +39,7 @@ public class GhostScriptConvertPluginUtils {
       throw new GhostscriptException("Exception when using GhostScript: ", e);
     }
 
-    return output;
+    return "";
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {

@@ -3,6 +3,10 @@ package org.roda.core.plugins.plugins.ingest.migration;
 import java.io.IOException;
 import java.io.Serializable;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
@@ -30,18 +34,32 @@ public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Path executePlugin(Path uriPath, String fileFormat) {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) {
     try {
-      return GeneralCommandConvertPluginUtils.runGeneralCommandConvert(uriPath, fileFormat, outputFormat,
-        commandArguments);
+      return GeneralCommandConvertPluginUtils.executeGeneralCommand(inputPath, outputPath, commandArguments);
     } catch (IOException | CommandException e) {
       return null;
     }
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    return;
+  public List<String> getApplicableTo() {
+    return new ArrayList<String>();
+  }
+
+  @Override
+  public List<String> getConvertableTo() {
+    return new ArrayList<String>();
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    return new HashMap<String, List<String>>();
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return new HashMap<String, List<String>>();
   }
 
 }

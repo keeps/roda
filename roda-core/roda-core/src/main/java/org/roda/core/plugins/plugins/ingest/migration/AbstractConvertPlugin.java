@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -40,12 +41,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
@@ -59,6 +55,8 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
+  private String inputFormat;
+  private String outputFormat;
 
   public void init() throws PluginException {
     // do nothing
@@ -68,9 +66,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     // do nothing
   }
 
-  public boolean isHasPartialSuccessOnOutcome() {
-    return Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  public boolean hasPartialSuccessOnOutcome() {
+    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins",
+      "hasPartialSuccessOnOutcome"));
   }
 
   public abstract List<String> getApplicableTo();
@@ -89,9 +87,21 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public abstract Plugin<Serializable> cloneMe();
 
-  public abstract String getInputFormat();
+  public String getInputFormat() {
+    return this.inputFormat;
+  }
 
-  public abstract String getOutputFormat();
+  public String getOutputFormat() {
+    return this.outputFormat;
+  }
+
+  public void setInputFormat(String format) {
+    this.inputFormat = format;
+  }
+
+  public void setOutputFormat(String format) {
+    this.outputFormat = format;
+  }
 
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
@@ -105,7 +115,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     List<PluginParameter> params = new ArrayList<PluginParameter>();
 
     PluginParameter outputParam = new PluginParameter("outputParams", "Output parameters", PluginParameterType.STRING,
-      "", convertableTo, true, true, "Lists the possible output formats");
+      "", getConvertableTo(), true, true, "Lists the possible output formats");
 
     params.add(outputParam);
     return params;
@@ -113,27 +123,21 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public Map<String, String> getParameterValues() {
     Map<String, String> parametersMap = new HashMap<String, String>();
-    parametersMap.put("inputFormat", inputFormat);
-    parametersMap.put("outputFormat", outputFormat);
-    parametersMap.put("maxKbytes", Long.toString(maxKbytes));
-    parametersMap.put("hasPartialSuccessOnOutcome", Boolean.toString(hasPartialSuccessOnOutcome));
+    parametersMap.put("inputFormat", getInputFormat());
+    parametersMap.put("outputFormat", getOutputFormat());
+    parametersMap.put("hasPartialSuccessOnOutcome", Boolean.toString(hasPartialSuccessOnOutcome()));
     return parametersMap;
   }
 
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // indicates the maximum kbytes the files that will be processed must have
-    if (parameters.containsKey("maxKbytes")) {
-      maxKbytes = Long.parseLong(parameters.get("maxKbytes"));
-    }
-
     // input image format
     if (parameters.containsKey("inputFormat")) {
-      inputFormat = parameters.get("inputFormat");
+      setOutputFormat(parameters.get("inputFormat"));
     }
 
     // output image format
     if (parameters.containsKey("outputFormat")) {
-      outputFormat = parameters.get("outputFormat");
+      setOutputFormat(parameters.get("outputFormat"));
     }
   }
 
@@ -149,7 +153,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
     } catch (RODAException e) {
-      logger.error("Error running adding Conversion plugin: " + e.getMessage(), e);
+      LOGGER.error("Error running adding Conversion plugin: " + e.getMessage(), e);
     }
 
     if (list.size() > 0) {
@@ -168,7 +172,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     IndexedPreservationAgent agent) throws PluginException {
 
     for (AIP aip : list) {
-      logger.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP " + aip.getId());
       List<String> newRepresentations = new ArrayList<String>();
       String newRepresentationID = null;
       boolean notify = true;
@@ -182,12 +186,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         int state = 1;
 
         try {
-          logger.debug("Processing representation: " + representation);
+          LOGGER.debug("Processing representation: " + representation);
 
           ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
 
           for (File file : allFiles) {
-            logger.debug("Processing file: " + file);
+            LOGGER.debug("Processing file: " + file);
 
             if (!file.isDirectory()) {
 
@@ -197,18 +201,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
               if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || inputFormat.isEmpty())
-                && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-                  || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-                  || applicableTo.contains(fileFormat) || applicableTo.size() == 0)
-                && ifile.getSize() < (maxKbytes * 1024)) {
+                && (getApplicableTo().size() == 0
+                  || (filePronom != null && getPronomToExtension().containsKey(filePronom))
+                  || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+                  || getApplicableTo().contains(fileFormat) || getApplicableTo().size() == 0)) {
 
-                if (applicableTo.size() > 0) {
+                if (getApplicableTo().size() > 0) {
                   if (filePronom != null && !filePronom.isEmpty()
-                    && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-                    fileFormat = pronomToExtension.get(filePronom).get(0);
+                    && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
+                    fileFormat = getPronomToExtension().get(filePronom).get(0);
                   } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                    && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-                    fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                    && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
+                    fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
                   }
                 }
 
@@ -216,16 +220,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
                 // FIXME file that doesn't get deleted afterwards
-                logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-                Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
+                LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+                Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+                String result;
+                try {
+                  result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
-                if (pluginResult != null) {
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
                   StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
 
                   // create a new representation if it does not exist
                   if (!newRepresentations.contains(newRepresentationID)) {
-                    logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
+                    LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + aip.getId());
                     boolean original = false;
                     newRepresentations.add(newRepresentationID);
                     model.createRepresentation(aip.getId(), newRepresentationID, original, notify);
@@ -243,11 +249,14 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
 
-                } else {
-                  logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
+                } catch (CommandException e) {
+                  e.getOutput();
+                  e.getExitCode();
+                  LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                     + " of representation " + representation.getId() + " from AIP " + aip.getId());
                   state = 2;
                 }
+
               } else {
                 unchangedFiles.add(file);
               }
@@ -270,12 +279,13 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             }
           }
 
-        } catch (Throwable e) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+        } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
+          | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           state = 0;
         }
 
-        logger.debug("Creating convert plugin event for the representation " + representation.getId());
+        LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, newFiles, aip, newRepresentationID, model, state, agent, notifyEvent);
 
@@ -290,7 +300,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
         model.notifyAIPUpdated(aip.getId());
       } catch (Exception e) {
-        logger.debug("Error re-indexing new representation " + newRepresentationID);
+        LOGGER.debug("Error re-indexing new representation " + newRepresentationID);
       }
 
     }
@@ -314,12 +324,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       boolean notify = true;
 
       try {
-        logger.debug("Processing representation: " + representation);
+        LOGGER.debug("Processing representation: " + representation);
 
         ClosableIterable<File> allFiles = model.listAllFiles(aipId, representation.getId());
 
         for (File file : allFiles) {
-          logger.debug("Processing file: " + file);
+          LOGGER.debug("Processing file: " + file);
 
           if (!file.isDirectory()) {
 
@@ -329,18 +339,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-              && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-                || (applicableTo.contains(fileFormat)))
-              && ifile.getSize() < (maxKbytes * 1024)) {
+              && (getApplicableTo().size() == 0
+                || (filePronom != null && getPronomToExtension().containsKey(filePronom))
+                || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
+                  .contains(fileFormat)))) {
 
-              if (applicableTo.size() > 0) {
+              if (getApplicableTo().size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty()
-                  && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-                  fileFormat = pronomToExtension.get(filePronom).get(0);
+                  && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
+                  fileFormat = getPronomToExtension().get(filePronom).get(0);
                 } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                  && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                  && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
+                  fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
                 }
               }
 
@@ -348,15 +358,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
               // FIXME file that doesn't get deleted afterwards
-              logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-              Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
+              LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+              try {
+                Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+                String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
-              if (pluginResult != null) {
                 ContentPayload payload = new FSPathContentPayload(pluginResult);
                 StoragePath storagePath = ModelUtils.getRepresentationPath(aipId, representation.getId());
 
                 if (!newRepresentations.contains(newRepresentationID)) {
-                  logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
+                  LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
                   boolean original = false;
                   newRepresentations.add(newRepresentationID);
                   model.createRepresentation(aipId, newRepresentationID, original, notify);
@@ -373,9 +384,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 newFiles.add(f);
                 IOUtils.closeQuietly(directAccess);
 
-              } else {
-                logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
-                  + " of representation " + representation.getId() + " from AIP " + aipId);
+              } catch (CommandException e) {
+                e.getOutput();
+                e.getExitCode();
+                LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
+                  + " of representation " + representation.getId() + " from AIP " + representation.getAipId());
                 state = 2;
               }
             } else {
@@ -404,13 +417,13 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aipId, newRepresentationID,
             notifyReindex);
 
-          logger.debug("Creating convert plugin event for the representation " + representation.getId());
+          LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
           boolean notifyEvent = false;
           createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent,
             notifyEvent);
         }
       } catch (Throwable e) {
-        logger.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
+        LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         state = 0;
       }
     }
@@ -418,7 +431,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     try {
       model.notifyAIPUpdated(aipId);
     } catch (RODAException e) {
-      logger.error("Error running creating agent for AbstractConvertPlugin", e);
+      LOGGER.error("Error running creating agent for AbstractConvertPlugin", e);
     }
 
     return new Report();
@@ -433,7 +446,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
     for (File file : list) {
       try {
-        logger.debug("Processing file " + file.getId());
+        LOGGER.debug("Processing file " + file.getId());
 
         String newRepresentationID = UUID.randomUUID().toString();
 
@@ -445,18 +458,17 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-            && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-              || (applicableTo.contains(fileFormat)))
-            && ifile.getSize() < (maxKbytes * 1024)) {
+            && (getApplicableTo().size() == 0 || (filePronom != null && getPronomToExtension().containsKey(filePronom))
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
+                .contains(fileFormat)))) {
 
-            if (applicableTo.size() > 0) {
+            if (getApplicableTo().size() > 0) {
               if (filePronom != null && !filePronom.isEmpty()
-                && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-                fileFormat = pronomToExtension.get(filePronom).get(0);
+                && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
+                fileFormat = getPronomToExtension().get(filePronom).get(0);
               } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-                fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
+                fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
               }
             }
 
@@ -464,21 +476,22 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
             // FIXME file that doesn't get deleted afterwards
-            logger.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-            Path pluginResult = executePlugin(directAccess.getPath(), fileFormat);
+            LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
+            try {
+              Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+              String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
-            if (pluginResult != null) {
               ContentPayload payload = new FSPathContentPayload(pluginResult);
               StoragePath storagePath = ModelUtils.getRepresentationPath(file.getAipId(), file.getRepresentationId());
 
               // create a new representation if it does not exist
-              logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());
+              LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());
               boolean original = false;
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
-                newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils
+                .getPreservationPath(file.getAipId(), newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -488,8 +501,10 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
               aipSet.add(file.getAipId());
 
-            } else {
-              logger.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
+            } catch (CommandException e) {
+              e.getOutput();
+              e.getExitCode();
+              LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                 + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
               state = 2;
             }
@@ -497,32 +512,15 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         }
 
       } catch (Throwable e) {
-        logger.error("Error processing file " + file.getId() + ": " + e.getMessage(), e);
+        LOGGER.error("Error processing file " + file.getId() + ": " + e.getMessage(), e);
         state = 0;
       }
     }
 
     try {
-      Plugin<AIP> psp = new PremisSkeletonPlugin();
-      Plugin<AIP> sfp = new SiegfriedPlugin();
-      Plugin<AIP> ttp = new TikaFullTextPlugin();
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("createsPluginEvent", "false");
-      psp.setParameterValues(params);
-      sfp.setParameterValues(params);
-      ttp.setParameterValues(params);
-
-      PluginOrchestrator pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-      pluginOrchestrator.runPluginOnAIPs(psp, new ArrayList<String>(aipSet));
-      pluginOrchestrator.runPluginOnAIPs(sfp, new ArrayList<String>(aipSet));
-      pluginOrchestrator.runPluginOnAIPs(ttp, new ArrayList<String>(aipSet));
-
-      for (String aipId : aipSet) {
-        model.notifyAIPUpdated(aipId);
-      }
+      AbstractConvertPluginUtils.reIndexPlugins(model, aipSet);
     } catch (Throwable e) {
-      logger.debug("Error re-indexing AIPs after conversion.");
+      LOGGER.debug("Error re-indexing AIPs after conversion.");
     }
 
     return new Report();
@@ -558,12 +556,12 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     }
 
     // Conversion plugin did not run correctly
-    if (state == 0 || (state == 2 && hasPartialSuccessOnOutcome == false)) {
+    if (state == 0 || (state == 2 && hasPartialSuccessOnOutcome() == false)) {
       outcome = "failure";
       stringBuilder.setLength(0);
     }
     // some files were not converted
-    if (state == 2 && hasPartialSuccessOnOutcome == true) {
+    if (state == 2 && hasPartialSuccessOnOutcome() == true) {
       outcome = "partial success";
     }
 
@@ -586,7 +584,5 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
   }
-
-  public abstract void fillFileFormatStructures();
 
 }

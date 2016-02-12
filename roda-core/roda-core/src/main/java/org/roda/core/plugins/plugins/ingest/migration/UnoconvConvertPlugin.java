@@ -8,8 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 
@@ -36,33 +34,32 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
-    return super.getParameters();
-  }
-
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    fillFileFormatStructures();
+    return UnoconvConvertPluginUtils.executeUnoconvConvert(inputPath, outputPath, super.getOutputFormat(),
+      commandArguments);
   }
 
   @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
-
-    return UnoconvConvertPluginUtils.runUnoconvConvert(uriPath, fileFormat, outputFormat, commandArguments);
+  public List<String> getApplicableTo() {
+    return UnoconvConvertPluginUtils.getInputExtensions();
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    pronomToExtension = UnoconvConvertPluginUtils.getPronomToExtension();
-    mimetypeToExtension = UnoconvConvertPluginUtils.getMimetypeToExtension();
-    applicableTo = UnoconvConvertPluginUtils.getInputExtensions();
-
+  public List<String> getConvertableTo() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    return Arrays.asList(outputFormats.split("\\s+"));
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    return UnoconvConvertPluginUtils.getPronomToExtension();
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return UnoconvConvertPluginUtils.getMimetypeToExtension();
   }
 
 }

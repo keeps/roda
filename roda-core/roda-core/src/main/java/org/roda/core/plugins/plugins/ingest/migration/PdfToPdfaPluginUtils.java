@@ -38,15 +38,10 @@ import org.verapdf.pdfa.validators.Validators;
 
 public class PdfToPdfaPluginUtils {
 
-  public static Path runPdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
-    return executePdfToPdfa(p);
-  }
-
-  private static Path executePdfToPdfa(Path p) throws IOException, VeraPDFException, GhostscriptException {
+  public static String executePdfToPdfa(Path p, Path fixed) throws IOException, VeraPDFException, GhostscriptException {
     // pdfa - file to save the GS output
     // fixed - file to save the fixed representation
     Path pdfa = Files.createTempFile("pdfa", ".pdf");
-    Path fixed = Files.createTempFile("pdfa_fixed", ".pdf");
 
     // GhostScript transformation command
     String[] gsArgs = new String[10];
@@ -93,7 +88,7 @@ public class PdfToPdfaPluginUtils {
       throw new VeraPDFException("Exception when fixing metadata: ", e);
     }
 
-    return fixed;
+    return "";
   }
 
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/

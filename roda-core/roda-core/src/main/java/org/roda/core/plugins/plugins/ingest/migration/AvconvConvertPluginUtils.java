@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,14 +13,7 @@ import org.roda.core.util.CommandUtility;
 
 public class AvconvConvertPluginUtils {
 
-  public static Path runAvconvVideoConvert(Path input, String inputFormat, String outputFormat,
-    String commandArguments, String outputArguments) throws IOException, CommandException {
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeAvconv(input, output, commandArguments, outputArguments);
-  }
-
-  private static Path executeAvconv(Path input, Path output, String commandArguments, String outputArguments)
+  public static String executeAvconv(Path input, Path output, String commandArguments, String outputArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "commandLine");
@@ -34,8 +26,7 @@ public class AvconvConvertPluginUtils {
     List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
-    CommandUtility.execute(commandList);
-    return output;
+    return CommandUtility.execute(commandList);
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {

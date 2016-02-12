@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,15 +13,8 @@ import org.roda.core.util.CommandUtility;
 
 public class UnoconvConvertPluginUtils {
 
-  public static Path runUnoconvConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
-    throws IOException, CommandException {
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeUnoconvConvert(input, output, inputFormat, outputFormat, commandArguments);
-  }
-
-  private static Path executeUnoconvConvert(Path input, Path output, String inputFormat, String outputFormat,
-    String commandArguments) throws CommandException, IOException, UnsupportedOperationException {
+  public static String executeUnoconvConvert(Path input, Path output, String outputFormat, String commandArguments)
+    throws CommandException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
@@ -34,8 +26,7 @@ public class UnoconvConvertPluginUtils {
     List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
-    CommandUtility.execute(commandList);
-    return output;
+    return CommandUtility.execute(commandList);
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {

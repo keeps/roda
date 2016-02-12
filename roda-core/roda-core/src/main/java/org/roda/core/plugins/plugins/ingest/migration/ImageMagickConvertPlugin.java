@@ -8,10 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
+import org.slf4j.LoggerFactory;
 
 public class ImageMagickConvertPlugin extends CommandConvertPlugin {
 
@@ -30,7 +29,7 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
     try {
       return ImageMagickConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      logger.debug("Error getting ImageMagick version");
+      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting ImageMagick version");
       return new String();
     }
   }
@@ -40,33 +39,32 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
     return new ImageMagickConvertPlugin();
   }
 
-  @Override
-  public List<PluginParameter> getParameters() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
-    return super.getParameters();
-  }
-
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    super.setParameterValues(parameters);
-    fillFileFormatStructures();
-  }
-
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
-
-    return ImageMagickConvertPluginUtils.runImageMagickConvert(uriPath, fileFormat, outputFormat, commandArguments);
+    return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
+      commandArguments);
   }
 
   @Override
-  public void fillFileFormatStructures() {
-    pronomToExtension = ImageMagickConvertPluginUtils.getPronomToExtension();
-    mimetypeToExtension = ImageMagickConvertPluginUtils.getMimetypeToExtension();
-    applicableTo = ImageMagickConvertPluginUtils.getInputExtensions();
+  public List<String> getApplicableTo() {
+    return ImageMagickConvertPluginUtils.getInputExtensions();
+  }
 
+  @Override
+  public List<String> getConvertableTo() {
     String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
-    convertableTo.addAll(Arrays.asList(outputFormats.split("\\s+")));
+    return Arrays.asList(outputFormats.split("\\s+"));
+  }
+
+  @Override
+  public Map<String, List<String>> getPronomToExtension() {
+    return ImageMagickConvertPluginUtils.getPronomToExtension();
+  }
+
+  @Override
+  public Map<String, List<String>> getMimetypeToExtension() {
+    return ImageMagickConvertPluginUtils.getMimetypeToExtension();
   }
 
 }
