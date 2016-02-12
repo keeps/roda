@@ -183,7 +183,7 @@ public class BasicSearch extends Composite {
     searchInputBox.getElement().setPropertyString("placeholder", messages.searchPlaceHolder());
     searchAdvancedPanel.setVisible(false);
 
-    this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+    searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
@@ -191,7 +191,7 @@ public class BasicSearch extends Composite {
       }
     });
 
-    this.searchInputButton.addClickHandler(new ClickHandler() {
+    searchInputButton.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -199,7 +199,7 @@ public class BasicSearch extends Composite {
       }
     });
 
-    this.searchAdvancedDisclosureButton.addClickHandler(new ClickHandler() {
+    searchAdvancedDisclosureButton.addClickHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {

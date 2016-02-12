@@ -122,9 +122,10 @@ public class IngestTransferUpload extends Composite {
   @SuppressWarnings("unused")
   private HandlerRegistration handlerRegistration;
 
+  protected boolean verified = false;
+
   private IngestTransferUpload() {
     initWidget(uiBinder.createAndBindUi(this));
-
   }
 
   private String getUploadUrl() {
@@ -143,22 +144,24 @@ public class IngestTransferUpload extends Composite {
     return ret;
   }
 
-  protected void onLoad() {
-//    if (handlerRegistration != null) {
-//      handlerRegistration.removeHandler();
-//      handlerRegistration = null;
-//    }
-//
-//    logger.debug("ADD HANDLER");
-//    handlerRegistration = History.addValueChangeHandler(new ValueChangeHandler<String>() {
-//
-//      @Override
-//      public void onValueChange(ValueChangeEvent<String> event) {
-//        logger.debug("BACK " + JavascriptUtils.isUploadRunning());
-//        History.newItem(Tools.createHistoryToken(IngestTransferUpload.RESOLVER.getHistoryPath()), false);
-////        verifyActiveUploads();
-//      }
-//    });
+  protected void onAttach() {
+    verified = false;
+
+    // handlerRegistration = History.addValueChangeHandler(new
+    // ValueChangeHandler<String>() {
+    //
+    // @Override
+    // public void onValueChange(ValueChangeEvent<String> event) {
+    // if (!verified) {
+    // logger.debug("BACK " + JavascriptUtils.isUploadRunning());
+    // History.newItem(Tools.createHistoryToken(IngestTransferUpload.RESOLVER.getHistoryPath()),
+    // false);
+    // // verifyActiveUploads();
+    // }
+    // }
+    // });
+
+    super.onAttach();
   }
 
   protected void resolve(final List<String> historyTokens, final AsyncCallback<Widget> callback) {
@@ -238,11 +241,7 @@ public class IngestTransferUpload extends Composite {
 
   @UiHandler("done")
   void buttonDoneHandler(ClickEvent e) {
-    if (resource != null) {
-      Tools.newHistory(IngestTransfer.RESOLVER, IngestTransfer.getPathFromTransferredResourceId(resource.getId()));
-    } else {
-      Tools.newHistory(IngestTransfer.RESOLVER);
-    }
+    historyBack();
   }
 
   // void verifyActiveUploads() {
@@ -262,21 +261,19 @@ public class IngestTransferUpload extends Composite {
   // @Override
   // public void onSuccess(Boolean result) {
   // if (result) {
+  // verified = true;
   // historyBack();
   // }
   // }
   // });
   // }
   // }
-  //
-  // void historyBack() {
-  // handlerRegistration.removeHandler();
-  // handlerRegistration = null;
-  // if (resource != null) {
-  // Tools.newHistory(IngestTransfer.RESOLVER,
-  // IngestTransfer.getPathFromTransferredResourceId(resource.getId()));
-  // } else {
-  // Tools.newHistory(IngestTransfer.RESOLVER);
-  // }
-  // }
+
+  void historyBack() {
+    if (resource != null) {
+      Tools.newHistory(IngestTransfer.RESOLVER, IngestTransfer.getPathFromTransferredResourceId(resource.getId()));
+    } else {
+      Tools.newHistory(IngestTransfer.RESOLVER);
+    }
+  }
 }

@@ -852,7 +852,7 @@ public class ViewRepresentation extends Composite {
     List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
     String basicQuery = searchInputBox.getText();
-    if (!"".equals(basicQuery)) {
+    if (!basicQuery.isEmpty()) {
       parameters.add(new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, basicQuery));
     }
 

@@ -1692,141 +1692,9 @@
 	display: none;
 }
 
-/************************************************/
-/*********   INGEST                 *************/
-/************************************************/
-.wui-ingest-transfer .wui-breadcrumbPanel {
-	position: relative;
-}
-
-/*----------------------------
-    The file upload form
------------------------------*/
-#upload {
-	width: 100%;
-	margin: 20px auto;
-}
-
-.dragover #drop {
-	border: 5px solid #ddd;
-}
-
-#drop {
-	padding: 40px 50px;
-	text-align: center;
-	text-transform: uppercase;
-	font-size: 16px;
-	font-weight: bold;
-	color: #7f858a;
-	border: 5px dashed #e6e7e9;
-	border-radius: 10px;
-}
-
-#drop h4 {
-	font-size: 2.4rem;
-    line-height: 1.35;
-    letter-spacing: -.08rem;
-	color: #999;
-	text-transform: none;
-	margin-top: 0px;
-	margin-bottom: 1rem;
-    font-weight: 400;
-}
-
-#drop a {
-	background-color: #089de3;
-	padding: 10px 20px;
-	color: #fff;
-	font-size: 1.2rem;
-	border-radius: 2px;
-	cursor: pointer;
-	display: block;
-	margin: 10px auto 0;
-	max-width: 100px;
-	line-height: 1;
-}
-
-#drop a:hover {
-	background-color: #3998d0;
-}
-
-#drop input {
-	display: none;
-}
-
-#upload-list {
-	list-style: none;
-}
-
-#upload-list li {
-	height: 52px;
-	position: relative;
-}
-
-#upload-list li input {
-	display: none;
-}
-
-#upload-list li p {
-	width: 100%;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	font-size: 1.3rem;
-	font-weight: 500;
-	position: absolute;
-	top: 10px;
-	left: 60px;
-}
-
-#upload-list li i {
-	font-weight: normal;
-	font-style: normal;
-	color: #7f7f7f;
-	display: block;
-	font-size: 1.1rem;
-}
-
-#upload-list li canvas {
-	top: 15px;
-	left: 20px;
-	position: absolute;
-}
-
-#upload-list li span {
-	width: 15px;
-	height: 12px;
-	background: url('images/icons.png') no-repeat;
-	position: absolute;
-	top: 20px;
-	right: 20px;
-	cursor: pointer;
-}
-
-#upload-list li.working span {
-	height: 16px;
-	background-position: 0 -12px;
-}
-
-#upload-list li.error p {
-	color: #D20707;
-}
-
-/************************************************/
-/*********   SEARCH                 *************/
-/************************************************/
-.search {
-	
-}
-
-.search .searchLabel {
-	margin-bottom: 5px;
-}
-
-.search .searchInput {
-	display: flex;
-}
-
+/**********************************************
+				DEFAULT SEARCH + ADV SEARCH
+************************************************/
 .searchPanel {
 	margin-right: 80px;
 	height: 40px;
@@ -1843,7 +1711,7 @@
 	margin-right: -80px;
 }
 
-.search .searchBox {
+.searchBox {
 	box-sizing: border-box;
 	width: 100%;
 	height: 4rem;
@@ -1854,13 +1722,13 @@
 	background-color: #eee;
 }
 
-.search .searchBox::-webkit-input-placeholder,
-.search .searchBox:placeholder-shown {
+.searchBox::-webkit-input-placeholder,
+.searchBox:placeholder-shown {
 	color: rgba(0,0,0, 0.5);
 }
 
-.search .searchButton,
-.search .searchAdvancedDisclosureButton {
+.searchButton,
+.searchAdvancedDisclosureButton {
 	cursor: pointer;
 	cursor: hand;
 	position: relative;
@@ -1871,51 +1739,51 @@
     background-color: #089de3;
 }
 
-.search .searchAdvancedDisclosureButton {
+.searchAdvancedDisclosureButton {
 	background-color: #eee;
 	color: rgba(0,0,0, 0.5);
 }
 
-.search .searchButton:hover {
+.searchButton:hover {
 	background-color: #3998d0;
 }
 
-.search .searchButton-html {
+.searchButton-html {
 	font-size: 15px;
 }
 
-.search .searchAdvancedDisclosureButton .fa-angle-up {
+.searchAdvancedDisclosureButton .fa-angle-up {
 	display: none;
 }
 
-.search .searchAdvancedDisclosureButton.open .fa-angle-up {
+.searchAdvancedDisclosureButton.open .fa-angle-up {
 	display: block;
 }
 
-.search .searchAdvancedDisclosureButton.open .fa-angle-down {
+.searchAdvancedDisclosureButton.open .fa-angle-down {
 	display: none;
 }
 
-.search .searchButton .fa-stack-2x {
+.searchButton .fa-stack-2x {
 	color: #089de3;
 	display: none;
 }
 
-.search .searchButton .fa-stack-1x {
+.searchButton .fa-stack-1x {
 	color: white;
 }
 
-.search .searchResults {
+.searchResults {
 	margin-top: 20px;
 	clear: both;
 }
 
-.search .searchApplyFilters {
+.searchApplyFilters {
 	margin: 10px 0;
 	width: 100%;
 }
 
-.search .searchAdvancedSearch {
+.searchAdvancedSearch {
 	margin: 10px 0;
 	width: 100%;
 }
@@ -1966,6 +1834,21 @@
 }
 
 /**********************************************
+				SEARCH
+************************************************/
+.search {
+	
+}
+
+.search .searchLabel {
+	margin-bottom: 5px;
+}
+
+.search .searchInput {
+	display: flex;
+}
+
+/**********************************************
 				COMMON
 ************************************************/
 .gwt-DialogBox {
@@ -2006,6 +1889,102 @@
 	margin-top: 0;
 } 
 
+
+/**********************************************
+				LOGIN
+************************************************/
+.loginPanel {
+	margin: 40px auto;
+	max-width: 400px;
+	min-width: 300px;
+	background-color: #eee;
+	padding: 40px;
+}
+
+.loginPanel h1 {
+	margin-top: 0px;
+}
+
+.login-buttons {
+	height: 50px;
+}
+
+.login-button {
+	margin-top: 20px;
+	width: 120px;
+	float: left;
+}
+
+.login-link {
+	display: inline;
+	float: right;
+	color: #089de3;
+	margin-top: 25px;
+	margin-left: 15px;
+	font-size: 1.2rem;
+}
+
+.login-link:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.login-error {
+	color: #F53E3E;
+	width: 100%;
+	font-size: 1.2rem;
+}
+
+/**********************************************
+				RECOVER
+************************************************/
+.recoverPanel {
+	margin: 40px auto;
+	max-width: 400px;
+	min-width: 300px;
+	background-color: #eee;
+	padding: 40px;
+}
+
+.recoverPanel h1 {
+	margin-top: 0px;
+}
+
+.recover-buttons {
+	height: 50px;
+}
+
+.recover-button {
+	margin-top: 20px;
+	width: 120px;
+	float: left;
+}
+
+.recover-link {
+	display: inline;
+	float: right;
+	color: #089de3;
+	margin-top: 25px;
+	margin-left: 15px;
+	font-size: 1.2rem;
+}
+
+.recover-link:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.recover-error {
+	color: #F53E3E;
+	width: 100%;
+	font-size: 1.2rem;
+}
+
+.recoverPanel .isWrong {
+	background-color: #d97570;
+}
 
 /**********************************************
 				VIEW REPRESENTATION
@@ -2237,6 +2216,7 @@
 	float: left;
 	width: 40px;
 	margin-right: -55px;
+	background-color: transparent;
 }
 
 .viewRepresentation .searchButton-html {
@@ -2286,6 +2266,129 @@
 }
 
 /**********************************************
+				INGEST
+************************************************/
+.wui-ingest-transfer .wui-breadcrumbPanel {
+	position: relative;
+}
+
+.wui-ingest-transfer .searchPanel {
+	margin-right: 40px;
+	margin-bottom: 20px;
+	margin-top: 10px;
+}
+
+#upload {
+	width: 100%;
+	margin: 20px auto;
+}
+
+.dragover #drop {
+	border: 5px solid #ddd;
+}
+
+#drop {
+	padding: 40px 50px;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	font-weight: bold;
+	color: #7f858a;
+	border: 5px dashed #e6e7e9;
+	border-radius: 10px;
+}
+
+#drop h4 {
+	font-size: 2.4rem;
+    line-height: 1.35;
+    letter-spacing: -.08rem;
+	color: #999;
+	text-transform: none;
+	margin-top: 0px;
+	margin-bottom: 1rem;
+    font-weight: 400;
+}
+
+#drop a {
+	background-color: #089de3;
+	padding: 10px 20px;
+	color: #fff;
+	font-size: 1.2rem;
+	border-radius: 2px;
+	cursor: pointer;
+	display: block;
+	margin: 10px auto 0;
+	max-width: 100px;
+	line-height: 1;
+}
+
+#drop a:hover {
+	background-color: #3998d0;
+}
+
+#drop input {
+	display: none;
+}
+
+#upload-list {
+	list-style: none;
+}
+
+#upload-list li {
+	height: 52px;
+	position: relative;
+}
+
+#upload-list li input {
+	display: none;
+}
+
+#upload-list li p {
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 1.3rem;
+	font-weight: 500;
+	position: absolute;
+	top: 10px;
+	left: 60px;
+}
+
+#upload-list li i {
+	font-weight: normal;
+	font-style: normal;
+	color: #7f7f7f;
+	display: block;
+	font-size: 1.1rem;
+}
+
+#upload-list li canvas {
+	top: 15px;
+	left: 20px;
+	position: absolute;
+}
+
+#upload-list li span {
+	width: 15px;
+	height: 12px;
+	background: url('images/icons.png') no-repeat;
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	cursor: pointer;
+}
+
+#upload-list li.working span {
+	height: 16px;
+	background-position: 0 -12px;
+}
+
+#upload-list li.error p {
+	color: #D20707;
+}
+
+/**********************************************
 				INGEST PROCESS NEW
 ************************************************/
 .wui-transferredResourceList {
@@ -2320,7 +2423,9 @@
 	margin-bottom: 10px;
 }
 
-/****** INGEST PROCESS VIEW ***************/
+/**********************************************
+				INGEST PROCESS VIEW
+************************************************/
 .job-report-object-input i, .job-report-object-output i {
 	font-size: 1.4rem;
 	margin-right: 5px;
@@ -2331,7 +2436,7 @@
 }
 
 /**********************************************
-				Show Job
+				SHOW JOB
 ************************************************/
 .job-report-object-output {
 	
@@ -2349,9 +2454,8 @@
 }
 
 /**********************************************
-				Show Job Report
+				SHOW JOB REPORT
 ************************************************/
-
 .report-item-title {
 	background-color: #089de3;
 	padding: 5px 10px;
@@ -2385,100 +2489,4 @@
 
 .preservationEvents .preservationMetadata .content {
 	display: none;
-}
-
-/**********************************************
-				LOGIN
-************************************************/
-.loginPanel {
-	margin: 40px auto;
-	max-width: 400px;
-	min-width: 300px;
-	background-color: #eee;
-	padding: 40px;
-}
-
-.loginPanel h1 {
-	margin-top: 0px;
-}
-
-.login-buttons {
-	height: 50px;
-}
-
-.login-button {
-	margin-top: 20px;
-	width: 120px;
-	float: left;
-}
-
-.login-link {
-	display: inline;
-	float: right;
-	color: #089de3;
-	margin-top: 25px;
-	margin-left: 15px;
-	font-size: 1.2rem;
-}
-
-.login-link:hover {
-	text-decoration: underline;
-	cursor: hand;
-	cursor: pointer;
-}
-
-.login-error {
-	color: #F53E3E;
-	width: 100%;
-	font-size: 1.2rem;
-}
-
-/**********************************************
-				RECOVER
-************************************************/
-.recoverPanel {
-	margin: 40px auto;
-	max-width: 400px;
-	min-width: 300px;
-	background-color: #eee;
-	padding: 40px;
-}
-
-.recoverPanel h1 {
-	margin-top: 0px;
-}
-
-.recover-buttons {
-	height: 50px;
-}
-
-.recover-button {
-	margin-top: 20px;
-	width: 120px;
-	float: left;
-}
-
-.recover-link {
-	display: inline;
-	float: right;
-	color: #089de3;
-	margin-top: 25px;
-	margin-left: 15px;
-	font-size: 1.2rem;
-}
-
-.recover-link:hover {
-	text-decoration: underline;
-	cursor: hand;
-	cursor: pointer;
-}
-
-.recover-error {
-	color: #F53E3E;
-	width: 100%;
-	font-size: 1.2rem;
-}
-
-.recoverPanel .isWrong {
-	background-color: #d97570;
 }

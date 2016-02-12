@@ -131,17 +131,19 @@
    <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
    
    <defaultSearchField>search</defaultSearchField>
-   <copyField source="fulltext" dest="search"/>
+   <copyField source="path" dest="search"/>
+   <copyField source="fileId" dest="search"/>
    <copyField source="formatMimetype" dest="search"/>
-   <copyField source="originalName" dest="search"/>
-   <copyField source="extension" dest="search"/>
+   <copyField source="formatVersion" dest="search"/>
    <copyField source="formatPronom" dest="search"/>
    <copyField source="fileFormat" dest="search"/>
+   <copyField source="originalName" dest="search"/>
+   <copyField source="extension" dest="search"/>
+   <copyField source="fulltext" dest="search"/>
    <copyField source="creatingApplicationName" dest="search"/>
    <copyField source="creatingApplicationVersion" dest="search"/>
    <copyField source="dateCreatedByApplication" dest="search"/>
    <copyField source="hash" dest="search"/>
-   
    
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

@@ -17,8 +17,10 @@ import java.util.List;
 import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -39,9 +41,13 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -56,6 +62,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -136,6 +143,12 @@ public class IngestTransfer extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
+  @UiField
+  TextBox searchInputBox;
+
+  @UiField
+  AccessibleFocusPanel searchInputButton;
+
   @UiField(provided = true)
   TransferredResourceList transferredResourceList;
 
@@ -169,12 +182,33 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    // TODO externalise strings
+    searchInputBox.getElement().setPropertyString("placeholder", "Search transferred resources");
+
+    searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<String> event) {
+        doSearch();
+      }
+    });
+
+    searchInputButton.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        doSearch();
+      }
+
+    });
+
     transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
         if (r != null && !r.isFile()) {
+          searchInputBox.setText("");
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
         } else if (r != null && r.isFile()) {
 
@@ -481,4 +515,21 @@ public class IngestTransfer extends Composite {
     return selected;
   }
 
+  private void doSearch() {
+    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
+
+    String basicQuery = searchInputBox.getText();
+    if (!basicQuery.isEmpty()) {
+      parameters.add(new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_NAME, basicQuery));
+    }
+
+    Filter filter = new Filter(DEFAULT_FILTER);
+    if (resource != null) {
+      filter = new Filter(
+        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getRelativePath()));
+    }
+    filter.add(parameters);
+
+    transferredResourceList.setFilter(filter);
+  }
 }

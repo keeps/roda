@@ -3,7 +3,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:lists="urn:import:org.roda.wui.client.common.lists"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:m="urn:import:org.roda.wui.client.main">
+	xmlns:d="urn:import:com.google.gwt.user.datepicker.client" xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+	xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
 
@@ -48,6 +49,21 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
+				<g:FlowPanel styleName="searchPanel">
+					<g:FlowPanel styleName="searchPanelLeft">
+						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+					</g:FlowPanel>
+					<g:FlowPanel styleName="searchPanelRight">
+						<wcag:AccessibleFocusPanel styleName="searchButton"
+							ui:field="searchInputButton">
+							<g:HTML addStyleNames="searchButton-html">
+								<span class="fa-stack fa-lg">
+									<i class="fa fa-search fa-stack-1x"></i>
+								</span>
+							</g:HTML>
+						</wcag:AccessibleFocusPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
 				<lists:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 			</g:FlowPanel>
