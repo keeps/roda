@@ -238,16 +238,6 @@ public final class RodaConstants {
   public static final String STORAGE_META_PERMISSION_REMOVE_GROUPS = "permission.remove.groups";
 
   /*
-   * SIP FIELDS
-   */
-  public static final String SIP_NAME = "name";
-  public static final String SIP_SUBMISSION_DATE = "submissionDate";
-  public static final String SIP_STATE_CURRENT = "state";
-  public static final String SIP_PERCENTAGE = "percentage";
-  public static final String SIP_PRODUCER = "producer";
-  public static final String SIP_CREATED_AIP = "createdAIPs";
-
-  /*
    * AIP FIELDS
    */
   public static final String AIP_ID = "id";
@@ -294,7 +284,7 @@ public final class RodaConstants {
   public static final String AIP_LABEL = "label";
   public static final String AIP__ALL = "_all";
 
-  /**
+  /*
    * Descriptive Metadata fields
    */
   public static final String DESCRIPTIVE_METADATA_ID = "id";
@@ -478,10 +468,9 @@ public final class RodaConstants {
   public static final String VIEW_REPRESENTATION_FOLDER = "folder";
   public static final String VIEW_REPRESENTATION_FILE = "file";
 
-  /************************************************
+  /*
    * PREMIS
-   ************************************************/
-
+   */
   public static final String PREMIS_IDENTIFIER_TYPE_LOCAL = "local";
   public static final String PREMIS_FILE_SUFFIX = ".file.premis.xml";
   public static final String PREMIS_EVENT_SUFFIX = ".event.premis.xml";
@@ -573,7 +562,6 @@ public final class RodaConstants {
   public static final String PRESERVATION_LEVEL_BITLEVEL = "bitlevel";
   public static final String PRESERVATION_REGISTRY_PRONOM = "pronom";
   public static final String PRESERVATION_REGISTRY_MIME = "mime";
-
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";

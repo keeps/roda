@@ -198,6 +198,7 @@ public class RodaCoreFactory {
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
   private static DescriptionLevelManager descriptionLevelManager = null;
 
+  // 20160211 hsilva: this constant should be deleted
   // Test objects
   private static String aipId = "05c3599c-5fc6-4424-af13-b3b37f6e85da";
 
