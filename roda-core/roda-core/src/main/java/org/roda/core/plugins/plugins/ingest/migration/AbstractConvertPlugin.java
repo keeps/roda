@@ -58,30 +58,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
-  public Logger logger;
-  public String inputFormat;
-  public String outputFormat;
-  public long maxKbytes;
-  public boolean hasPartialSuccessOnOutcome;
-  public List<String> applicableTo;
-  public List<String> convertableTo;
-  public Map<String, List<String>> pronomToExtension;
-  public Map<String, List<String>> mimetypeToExtension;
-
-  protected AbstractConvertPlugin() {
-    logger = LoggerFactory.getLogger(getClass());
-    inputFormat = "";
-    outputFormat = "";
-    maxKbytes = 20000; // default value: 20000 kb
-
-    applicableTo = new ArrayList<>();
-    convertableTo = new ArrayList<>();
-    pronomToExtension = new HashMap<>();
-    mimetypeToExtension = new HashMap<>();
-
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
-  }
+  private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
 
   public void init() throws PluginException {
     // do nothing
@@ -91,6 +68,19 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     // do nothing
   }
 
+  public boolean isHasPartialSuccessOnOutcome() {
+    return Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  }
+
+  public abstract List<String> getApplicableTo();
+
+  public abstract List<String> getConvertableTo();
+
+  public abstract Map<String, List<String>> getPronomToExtension();
+
+  public abstract Map<String, List<String>> getMimetypeToExtension();
+
   public abstract String getName();
 
   public abstract String getDescription();
@@ -98,6 +88,10 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   public abstract String getVersion();
 
   public abstract Plugin<Serializable> cloneMe();
+
+  public abstract String getInputFormat();
+
+  public abstract String getOutputFormat();
 
   public PluginType getType() {
     return PluginType.AIP_TO_AIP;
@@ -336,8 +330,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
             if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
               && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                  .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+                || (applicableTo.contains(fileFormat)))
+              && ifile.getSize() < (maxKbytes * 1024)) {
 
               if (applicableTo.size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty()
@@ -451,8 +446,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
           if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
             && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))
+            && ifile.getSize() < (maxKbytes * 1024)) {
 
             if (applicableTo.size() > 0) {
               if (filePronom != null && !filePronom.isEmpty()
@@ -481,8 +477,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
                 storagePath);
 
-              StoragePath storagePreservationPath = ModelUtils
-                .getPreservationPath(file.getAipId(), newRepresentationID);
+              StoragePath storagePreservationPath = ModelUtils.getPreservationPath(file.getAipId(),
+                newRepresentationID);
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
@@ -532,8 +528,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return new Report();
   }
 
-  public abstract Path executePlugin(Path path, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException;
+  public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException;
 
   public void createEvent(List<File> alteredFiles, List<File> newFiles, AIP aip, String newRepresentationID,
     ModelService model, int state, IndexedPreservationAgent agent, boolean notify) throws PluginException {

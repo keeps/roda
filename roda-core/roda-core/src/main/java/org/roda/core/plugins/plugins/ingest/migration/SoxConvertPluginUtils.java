@@ -14,15 +14,8 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxConvertPluginUtils {
 
-  public static Path runSoxSoundConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
-    throws IOException, CommandException {
-
-    Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeSox(input, output, commandArguments);
-  }
-
-  private static Path executeSox(Path input, Path output, String commandArguments) throws CommandException,
-    IOException, UnsupportedOperationException {
+  public static String executeSox(Path input, Path output, String commandArguments)
+    throws CommandException, IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
@@ -38,8 +31,7 @@ public class SoxConvertPluginUtils {
     List<String> commandList = Arrays.asList(command.split("\\s+"));
 
     // running the command
-    CommandUtility.execute(commandList);
-    return output;
+    return CommandUtility.execute(commandList);
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
@@ -53,7 +45,9 @@ public class SoxConvertPluginUtils {
     return version.trim();
   }
 
-  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+  /***************************
+   * FILLING FILE FORMAT STRUCTURES
+   ***************************/
 
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();

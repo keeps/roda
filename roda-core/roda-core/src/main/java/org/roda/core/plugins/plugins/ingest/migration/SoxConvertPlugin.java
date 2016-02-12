@@ -2,6 +2,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
@@ -54,10 +55,12 @@ public class SoxConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Path executePlugin(Path uriPath, String fileFormat) throws UnsupportedOperationException, IOException,
-    CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException {
 
-    return SoxConvertPluginUtils.runSoxSoundConvert(uriPath, fileFormat, outputFormat, commandArguments);
+    String output = SoxConvertPluginUtils.executeSox(inputPath, outputPath, commandArguments);
+
+    return output;
   }
 
   @Override
