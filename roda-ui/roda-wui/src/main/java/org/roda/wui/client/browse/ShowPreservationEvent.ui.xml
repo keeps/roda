@@ -39,47 +39,50 @@
 						<ui:text from='{messages.preservationEventDetail}' />
 					</g:Label>
 					<g:Label ui:field="eventDetailLabel" />
-					
+
 					<g:Label styleName="label">
 						<ui:text from='{messages.preservationEventDatetime}' />
 					</g:Label>
 					<g:Label ui:field="eventDatetimeLabel" />
 					
-					<!-- AGENTS -->
-					<g:Label styleName="h4">
-						<ui:text from='{messages.preservationEventAgentsHeader}' />
-					</g:Label>
-					<g:FlowPanel ui:field="agentsPanel"/>
-
-					<!-- LINKING SOURCE OBJECTS -->
-					<g:Label styleName="h4">
-						<ui:text from='{messages.preservationEventObjectsHeader}' />
-					</g:Label>
-					<g:FlowPanel ui:field="sourceObjectsPanel"/>
-					
-					<!-- LINKING OUTCOME OBJECTS -->
-					<g:Label styleName="h4">
-						<ui:text from='{messages.preservationEventObjectsHeader}' />
-					</g:Label>
-					<g:FlowPanel ui:field="outcomeObjectsPanel"/>
-
-					<!-- OUTCOME -->
-					<g:Label styleName="h4">
-						<ui:text from='{messages.preservationEventOutcomeInformationHeader}' />
-					</g:Label>
 					<g:Label styleName="label">
 						<ui:text from='{messages.preservationEventOutcome}' />
 					</g:Label>
 					<g:Label ui:field="eventOutcomeLabel" />
+
+					<!-- AGENTS -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventAgentsHeader}' />
+					</g:Label>
+					<g:FlowPanel ui:field="agentsPanel" />
+
+					<!-- LINKING SOURCE OBJECTS -->
+					<g:Label styleName="h4" ui:field="sourceObjectsHeader">
+						<ui:text from='{messages.preservationEventSourceObjectsHeader}' />
+					</g:Label>
+					<g:FlowPanel ui:field="sourceObjectsPanel" />
+
+					<!-- LINKING OUTCOME OBJECTS -->
+					<g:Label styleName="h4" ui:field="outcomeObjectsHeader">
+						<ui:text from='{messages.preservationEventOutcomeObjectsHeader}' />
+					</g:Label>
+					<g:FlowPanel ui:field="outcomeObjectsPanel" />
+
+					<!-- OUTCOME DETAIL -->
+					<g:Label styleName="h4">
+						<ui:text from='{messages.preservationEventOutcomeDetailHeader}' />
+					</g:Label>
+					
 					<g:Label ui:field="eventOutcomeDetailNoteLabel" styleName="label">
 						<ui:text from='{messages.preservationEventOutcomeDetailNote}' />
 					</g:Label>
-					<g:Label ui:field="eventOutcomeDetailNoteValue" />
+					<g:Label ui:field="eventOutcomeDetailNoteValue" styleName="code-pre" />
 					<g:Label ui:field="eventOutcomeDetailExtensionLabel"
 						styleName="label">
 						<ui:text from='{messages.preservationEventOutcomeDetailExtension}' />
 					</g:Label>
-					<g:Label ui:field="eventOutcomeDetailExtensionValue" />
+					<g:Label ui:field="eventOutcomeDetailExtensionValue"
+						styleName="code-pre" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

@@ -217,29 +217,6 @@ public class AntivirusPlugin implements Plugin<AIP> {
       | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);
     }
-
-    // TODO agent
-    /*
-     * DateFormat format = new SimpleDateFormat("yyyy-MM-dd_hh:mm:ss.SSS");
-     * EventPreservationObject epo = new EventPreservationObject();
-     * epo.setDatetime(new Date()); epo.setEventType(EventPreservationObject.
-     * PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK); epo.setEventDetail(
-     * "All the files from the SIP were verified against an antivirus.");
-     * epo.setAgentRole(EventPreservationObject.
-     * PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK); String name =
-     * UUID.randomUUID().toString(); epo.setId(name); epo.setAgentID("AGENT ID"
-     * ); epo.setObjectIDs(aip.getRepresentationIds().toArray(new
-     * String[aip.getRepresentationIds().size()]));
-     * epo.setOutcome(virusCheckResult.isClean()?"success":"error");
-     * epo.setOutcomeDetailNote("Report");
-     * epo.setOutcomeDetailExtension(virusCheckResult.getReport()); byte[]
-     * serializedPremisEvent = new PremisEventHelper(epo).saveToByteArray();
-     * Path file = Files.createTempFile("preservation", ".xml"); Files.copy(new
-     * ByteArrayInputStream(serializedPremisEvent), file,
-     * StandardCopyOption.REPLACE_EXISTING); Binary resource = (Binary)
-     * FSUtils.convertPathToResource(file.getParent(), file);
-     * model.createPreservationMetadata(aip.getId(), name, resource);
-     */
   }
 
   @Override

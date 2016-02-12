@@ -109,8 +109,12 @@ public class ShowPreservationEvent extends Composite {
   FlowPanel agentsPanel;
 
   @UiField
+  Label sourceObjectsHeader;
+  @UiField
   FlowPanel sourceObjectsPanel;
 
+  @UiField
+  Label outcomeObjectsHeader;
   @UiField
   FlowPanel outcomeObjectsPanel;
 
@@ -177,8 +181,10 @@ public class ShowPreservationEvent extends Composite {
     // AGENTS
     List<IndexedPreservationAgent> agents = bundle.getAgents();
     // TODO missing agent role
+
     for (IndexedPreservationAgent agent : agents) {
       FlowPanel layout = new FlowPanel();
+      layout.addStyleName("list-panel");
 
       Label idLabel = new Label(messages.preservationEventAgentId());
       idLabel.addStyleName("label");
@@ -188,7 +194,7 @@ public class ShowPreservationEvent extends Composite {
 
       if (StringUtils.isNotBlank(agent.getName())) {
         Label nameLabel = new Label("Name");
-        idLabel.addStyleName("label");
+        nameLabel.addStyleName("label");
         Label nameValue = new Label(agent.getName());
         layout.add(nameLabel);
         layout.add(nameValue);
@@ -225,6 +231,7 @@ public class ShowPreservationEvent extends Composite {
     if (event.getSourcesObjectIds().size() > 0) {
       for (String sourceObjectId : event.getSourcesObjectIds()) {
         FlowPanel layout = new FlowPanel();
+        layout.addStyleName("list-panel");
 
         Label idLabel = new Label("Identifier");
         idLabel.addStyleName("label");
@@ -236,13 +243,23 @@ public class ShowPreservationEvent extends Composite {
         sourceObjectsPanel.add(layout);
       }
     } else {
-      // TODO hide
+      sourceObjectsHeader.setVisible(false);
+      sourceObjectsPanel.setVisible(false);
     }
 
     // Outcome objects
-    if (event.getSourcesObjectIds().size() > 0) {
+    if (event.getOutcomeObjectIds().size() > 0) {
       for (String outcomeObjectId : event.getOutcomeObjectIds()) {
+        
         FlowPanel layout = new FlowPanel();
+        layout.addStyleName("list-panel");
+        
+        String[] split = outcomeObjectId.split("/");
+        String aipId = split.length > 0 ? split[0] : null;
+        String repId = split.length > 1 ? split[1] : null;
+        String fileId = split.length > 2 ? split[2] : null;
+
+        
 
         Label idLabel = new Label("Identifier");
         idLabel.addStyleName("label");
@@ -251,33 +268,30 @@ public class ShowPreservationEvent extends Composite {
         layout.add(idLabel);
         layout.add(idValue);
 
-        sourceObjectsPanel.add(layout);
+        outcomeObjectsPanel.add(layout);
       }
     } else {
-      // TODO hide
+      outcomeObjectsHeader.setVisible(false);
+      outcomeObjectsPanel.setVisible(false);
     }
 
-    // TODO set links
-    // TODO... update with new structure (list of objects instead of single
-    // agent...)
-    /*
-     * eventObjectIdValue.setText(event.getObjectIdentifierValue());
-     * eventObjectRoleLabel.setVisible(StringUtils.isNotBlank(event.
-     * getObjectRole()));
-     * eventObjectRoleValue.setVisible(StringUtils.isNotBlank(event.
-     * getObjectRole())); eventObjectRoleValue.setText(event.getObjectRole());
-     */
     // OUTCOME
     eventOutcomeLabel.setText(event.getEventOutcome());
 
-    // TODO add event outcome detail note when available
-    eventOutcomeDetailNoteLabel.setVisible(false);
-    eventOutcomeDetailNoteValue.setVisible(false);
-    // eventOutcomeDetailNoteValue.setText(event.getEventOutcomeDetailNote());
+    if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {
+      eventOutcomeDetailNoteValue.setText(event.getEventOutcomeDetailNote());
+    } else {
+      eventOutcomeDetailNoteLabel.setVisible(false);
+      eventOutcomeDetailNoteValue.setVisible(false);
+    }
 
-    eventOutcomeDetailExtensionLabel.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
-    eventOutcomeDetailExtensionValue.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
-    eventOutcomeDetailExtensionValue.setText(event.getEventOutcomeDetailExtension());
+    if (StringUtils.isNotBlank(event.getEventOutcomeDetailExtension())) {
+      eventOutcomeDetailExtensionValue.setText(event.getEventOutcomeDetailExtension());
+    } else {
+      eventOutcomeDetailExtensionLabel.setVisible(false);
+      eventOutcomeDetailExtensionValue.setVisible(false);
+    }
+
   }
 
   @UiHandler("backButton")

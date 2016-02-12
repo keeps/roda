@@ -37,6 +37,7 @@ import javax.xml.validation.Validator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.xmlbeans.XmlException;
+import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
 import org.roda.core.RodaCoreFactory;
@@ -376,8 +377,25 @@ public class PremisUtils {
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
     agentIdentifier.setAgentIdentifierType("local");
     agentIdentifier.setAgentIdentifierValue(id);
-    act.addAgentName(name);
+
     act.setAgentType(type);
+
+    if (StringUtils.isNotBlank(name)) {
+      act.addAgentName(name);
+    }
+
+    if (StringUtils.isNotBlank(note)) {
+      act.addAgentNote(note);
+    }
+    if (StringUtils.isNotBlank(extension)) {
+      try {
+        act.addNewAgentExtension().set(XmlObject.Factory.parse(extension));
+      } catch (XmlException e) {
+        // e.getError()
+        // TODO convert XmlException to a Valiation Exception in MetadataUtils
+        throw new ValidationException(e.getMessage());
+      }
+    }
 
     return new StringContentPayload(MetadataUtils.saveToString(agent, true));
 
@@ -658,7 +676,7 @@ public class PremisUtils {
       ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
-    
+
     // TODO set agent extension
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
       RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, "", plugin.getDescription());

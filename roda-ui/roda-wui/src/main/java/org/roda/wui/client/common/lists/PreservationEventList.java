@@ -51,11 +51,11 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedPreservationEvent, Date> eventDateTimeColumn;
-  private TextColumn<IndexedPreservationEvent> eventAgentColumn;
+  // private TextColumn<IndexedPreservationEvent> eventAgentColumn;
   private TextColumn<IndexedPreservationEvent> eventTypeColumn;
   private TextColumn<IndexedPreservationEvent> eventDetailColumn;
-  private TextColumn<IndexedPreservationEvent> eventSourceObjectColumn;
-  private TextColumn<IndexedPreservationEvent> eventOutcomeObjectColumn;
+  // private TextColumn<IndexedPreservationEvent> eventSourceObjectColumn;
+  // private TextColumn<IndexedPreservationEvent> eventOutcomeObjectColumn;
   private TextColumn<IndexedPreservationEvent> eventOutcomeColumn;
 
   public PreservationEventList() {
@@ -101,76 +101,79 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       }
     };
 
-    eventAgentColumn = new TextColumn<IndexedPreservationEvent>() {
+    // eventAgentColumn = new TextColumn<IndexedPreservationEvent>() {
+    //
+    // @Override
+    // public String getValue(IndexedPreservationEvent event) {
+    // String ret = null;
+    // if (event != null) {
+    // if(event.getLinkingAgentIds()!=null){
+    // ret = event.getLinkingAgentIds().size()+ " agents";
+    // } else {
+    // ret = "none";
+    // }
+    // }
+    // return ret;
+    // }
+    // };
+    //
+    // eventSourceObjectColumn = new TextColumn<IndexedPreservationEvent>() {
+    //
+    // @Override
+    // public String getValue(IndexedPreservationEvent event) {
+    // String ret = null;
+    // // TODO define link
+    // //TODO handle outcome objects
+    // if (event != null) {
+    // if(event.getSourcesObjectIds()!=null){
+    // ret = event.getSourcesObjectIds().size()+ " objects";
+    // } else {
+    // ret = "none";
+    // }
+    //
+    // }
+    //
+    // return ret;
+    // }
+    //
+    // };
+    //
+    // eventOutcomeObjectColumn = new TextColumn<IndexedPreservationEvent>() {
+    //
+    // @Override
+    // public String getValue(IndexedPreservationEvent event) {
+    // String ret = null;
+    // // TODO define link
+    // if (event != null) {
+    // if(event.getOutcomeObjectIds()!=null){
+    // ret = event.getOutcomeObjectIds().size()+ " objects";
+    // } else {
+    // ret = "none";
+    // }
+    //
+    // }
+    //
+    // return ret;
+    // }
+    //
+    // };
 
-      @Override
-      public String getValue(IndexedPreservationEvent event) {
-        String ret = null;
-        if (event != null) {
-          if(event.getLinkingAgentIds()!=null){
-            ret = event.getLinkingAgentIds().size()+ " agents";
-          } else {
-            ret = "none";
-          }
-        }
-        return ret;
-      }
-    };
-
-    eventSourceObjectColumn = new TextColumn<IndexedPreservationEvent>() {
-
-      @Override
-      public String getValue(IndexedPreservationEvent event) {
-        String ret = null;
-        // TODO define link
-        //TODO handle outcome objects
-        if (event != null) {
-          if(event.getSourcesObjectIds()!=null){
-            ret = event.getSourcesObjectIds().size()+ " objects";
-          } else {
-            ret = "none";
-          }
-          
-        }
-
-        return ret;
-      }
-
-    };
-
-    eventOutcomeObjectColumn = new TextColumn<IndexedPreservationEvent>() {
-
-      @Override
-      public String getValue(IndexedPreservationEvent event) {
-        String ret = null;
-        // TODO define link
-        if (event != null) {
-          if(event.getOutcomeObjectIds()!=null){
-            ret = event.getOutcomeObjectIds().size()+ " objects";
-          } else {
-            ret = "none";
-          }
-          
-        }
-
-        return ret;
-      }
-
-    };
-    
     eventDateTimeColumn.setSortable(true);
     eventTypeColumn.setSortable(true);
     eventDetailColumn.setSortable(true);
     eventOutcomeColumn.setSortable(true);
-    eventAgentColumn.setSortable(true);
+    // eventAgentColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(eventDateTimeColumn, messages.preservationEventListHeaderDate());
-    display.addColumn(eventAgentColumn, messages.preservationEventListHeaderAgent());
+    // display.addColumn(eventAgentColumn,
+    // messages.preservationEventListHeaderAgent());
     display.addColumn(eventTypeColumn, messages.preservationEventListHeaderType());
     display.addColumn(eventDetailColumn, messages.preservationEventListHeaderDetail());
-    display.addColumn(eventSourceObjectColumn, messages.preservationEventListHeaderSourceObject());
-    display.addColumn(eventOutcomeObjectColumn, messages.preservationEventListHeaderOutcomeObject());
+    // display.addColumn(eventSourceObjectColumn,
+    // messages.preservationEventListHeaderSourceObject());
+    // display.addColumn(eventOutcomeObjectColumn,
+    // messages.preservationEventListHeaderOutcomeObject());
     display.addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome());
 
     // display.setColumnWidth(eventDetailColumn, "100%");
@@ -182,12 +185,12 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
     display.getColumnSortList().push(new ColumnSortInfo(eventDateTimeColumn, false));
 
     eventDateTimeColumn.setCellStyleNames("nowrap");
-    eventAgentColumn.setCellStyleNames("nowrap");
+    // eventAgentColumn.setCellStyleNames("nowrap");
     // eventTypeColumn.setCellStyleNames("nowrap");
     eventOutcomeColumn.setCellStyleNames("nowrap");
-    eventSourceObjectColumn.setCellStyleNames("nowrap");
-    eventOutcomeObjectColumn.setCellStyleNames("nowrap");
-    eventAgentColumn.setCellStyleNames("nowrap");
+    // eventSourceObjectColumn.setCellStyleNames("nowrap");
+    // eventOutcomeObjectColumn.setCellStyleNames("nowrap");
+    // eventAgentColumn.setCellStyleNames("nowrap");
 
   }
 
@@ -199,8 +202,10 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     Map<Column<IndexedPreservationEvent, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, String>();
     columnSortingKeyMap.put(eventDateTimeColumn, RodaConstants.PRESERVATION_EVENT_DATETIME);
-    //TODO an event can now have multiple agents... sort by agent id should maybe be removed...
-    columnSortingKeyMap.put(eventAgentColumn, RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER);
+    // TODO an event can now have multiple agents... sort by agent id should
+    // maybe be removed...
+    // columnSortingKeyMap.put(eventAgentColumn,
+    // RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER);
     columnSortingKeyMap.put(eventTypeColumn, RodaConstants.PRESERVATION_EVENT_TYPE);
     columnSortingKeyMap.put(eventDetailColumn, RodaConstants.PRESERVATION_EVENT_DETAIL);
     columnSortingKeyMap.put(eventOutcomeColumn, RodaConstants.PRESERVATION_EVENT_OUTCOME);

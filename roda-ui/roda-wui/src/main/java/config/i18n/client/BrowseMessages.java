@@ -430,6 +430,10 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Date")
   String preservationEventDatetime();
+  
+  @DefaultMessage("Outcome")
+  String preservationEventOutcome();
+
 
   @DefaultMessage("Type")
   String preservationEventType();
@@ -446,8 +450,11 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Role")
   String preservationEventAgentRole();
 
-  @DefaultMessage("Objects")
-  String preservationEventObjectsHeader();
+  @DefaultMessage("Source objects")
+  String preservationEventSourceObjectsHeader();
+  
+  @DefaultMessage("Outcome objects")
+  String preservationEventOutcomeObjectsHeader();
 
   @DefaultMessage("Identifier")
   String preservationEventObjectId();
@@ -455,16 +462,14 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Role")
   String preservationEventObjectRole();
 
-  @DefaultMessage("Outcome information")
-  String preservationEventOutcomeInformationHeader();
-
-  @DefaultMessage("Outcome")
-  String preservationEventOutcome();
-
-  @DefaultMessage("Outcome detail note")
+  @DefaultMessage("Outcome detail")
+  String preservationEventOutcomeDetailHeader();
+  
+  
+  @DefaultMessage("Note")
   String preservationEventOutcomeDetailNote();
 
-  @DefaultMessage("Outcome detail extension")
+  @DefaultMessage("Extension")
   String preservationEventOutcomeDetailExtension();
 
 

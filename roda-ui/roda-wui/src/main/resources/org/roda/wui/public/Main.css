@@ -1995,6 +1995,18 @@
 	float: right;
 }
 
+.list-panel {
+ 	border-left: 5px solid #089de3;
+    margin-top: 15px;
+    padding: 5px 10px;
+    box-shadow: 2px 2px 5px 1px #ddd;
+}
+
+.list-panel:first-of-type {
+	margin-top: 0;
+} 
+
+
 /**********************************************
 				VIEW REPRESENTATION
 ************************************************/
