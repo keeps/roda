@@ -73,7 +73,6 @@ public class InternalConvertPluginsTest {
   private static ModelService model;
   private static IndexService index;
   private static int numberOfFiles = 18;
-  private static String maxKbytes = "20000";
   private static Path corporaPath;
   private static StorageService corporaService;
 
@@ -186,7 +185,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new ImageMagickConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "tiff");
     plugin.setParameterValues(parameters);
 
@@ -235,7 +233,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new SoxConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
@@ -284,7 +281,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new AvconvConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "gif");
     parameters.put("outputArguments", "-pix_fmt rgb24");
     plugin.setParameterValues(parameters);
@@ -334,7 +330,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new UnoconvConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
@@ -383,7 +378,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new GhostScriptConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "pdf");
     parameters.put("commandArguments", "-sDEVICE=pdfwrite");
     plugin.setParameterValues(parameters);
@@ -434,7 +428,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new PdfToPdfaPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
@@ -485,7 +478,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new ImageMagickConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("outputFormat", "tiff");
     plugin.setParameterValues(parameters);
 
@@ -544,7 +536,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin = new GeneralCommandConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
     parameters.put("inputFormat", "png");
     parameters.put("outputFormat", "tiff");
     parameters.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");

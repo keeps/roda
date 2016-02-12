@@ -45,7 +45,7 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
     IOException, CommandException {
 
     try {
-      return GhostScriptConvertPluginUtils.executeGS(inputPath, outputPath, commandArguments);
+      return GhostScriptConvertPluginUtils.executeGS(inputPath, outputPath, super.getCommandArguments());
     } catch (GhostscriptException e) {
       return null;
     }

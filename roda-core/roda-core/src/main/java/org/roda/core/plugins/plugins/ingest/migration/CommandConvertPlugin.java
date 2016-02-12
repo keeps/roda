@@ -10,11 +10,19 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 
 public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
 
-  public String commandArguments;
+  private String commandArguments;
 
-  public CommandConvertPlugin() {
+  protected CommandConvertPlugin() {
     super();
     commandArguments = "";
+  }
+
+  public String getCommandArguments() {
+    return commandArguments;
+  }
+
+  public void setCommandArguments(String args) {
+    commandArguments = args;
   }
 
   @Override
@@ -35,7 +43,7 @@ public abstract class CommandConvertPlugin extends AbstractConvertPlugin {
 
     // add command arguments
     if (parameters.containsKey("commandArguments")) {
-      commandArguments = parameters.get("commandArguments").trim();
+      setCommandArguments(parameters.get("commandArguments").trim());
     }
   }
 

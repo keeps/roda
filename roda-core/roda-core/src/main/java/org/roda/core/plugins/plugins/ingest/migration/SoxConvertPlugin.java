@@ -43,7 +43,7 @@ public class SoxConvertPlugin extends CommandConvertPlugin {
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
     IOException, CommandException {
 
-    String output = SoxConvertPluginUtils.executeSox(inputPath, outputPath, commandArguments);
+    String output = SoxConvertPluginUtils.executeSox(inputPath, outputPath, super.getCommandArguments());
     return output;
   }
 

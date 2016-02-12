@@ -43,7 +43,7 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
     IOException, CommandException {
 
     return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
-      commandArguments);
+      super.getCommandArguments());
   }
 
   @Override

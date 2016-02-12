@@ -22,6 +22,14 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
     outputArguments = "";
   }
 
+  public String getOutputArguments() {
+    return outputArguments;
+  }
+
+  public void setOutputArguments(String args) {
+    outputArguments = args;
+  }
+
   @Override
   public String getName() {
     return "Video conversion";
@@ -52,7 +60,7 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
 
     // avconv output command arguments
     if (parameters.containsKey("outputArguments")) {
-      outputArguments = parameters.get("outputArguments");
+      setOutputArguments(parameters.get("outputArguments"));
     }
   }
 
@@ -60,7 +68,8 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
     IOException, CommandException {
 
-    return AvconvConvertPluginUtils.executeAvconv(inputPath, outputPath, commandArguments, outputArguments);
+    return AvconvConvertPluginUtils.executeAvconv(inputPath, outputPath, super.getCommandArguments(),
+      getOutputArguments());
   }
 
   @Override

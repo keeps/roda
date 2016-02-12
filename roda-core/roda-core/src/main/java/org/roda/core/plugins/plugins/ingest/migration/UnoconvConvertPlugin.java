@@ -38,7 +38,7 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
     IOException, CommandException {
 
     return UnoconvConvertPluginUtils.executeUnoconvConvert(inputPath, outputPath, super.getOutputFormat(),
-      commandArguments);
+      super.getCommandArguments());
   }
 
   @Override

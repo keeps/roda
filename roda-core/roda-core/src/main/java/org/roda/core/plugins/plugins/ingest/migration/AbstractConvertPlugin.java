@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.tika.exception.TikaException;
+import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
@@ -31,10 +34,13 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.jobs.Attribute;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -51,12 +57,18 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
   private String inputFormat;
   private String outputFormat;
+
+  protected AbstractConvertPlugin() {
+    inputFormat = "";
+    outputFormat = "";
+  }
 
   public void init() throws PluginException {
     // do nothing
@@ -132,7 +144,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     // input image format
     if (parameters.containsKey("inputFormat")) {
-      setOutputFormat(parameters.get("inputFormat"));
+      setInputFormat(parameters.get("inputFormat"));
     }
 
     // output image format
@@ -171,6 +183,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
   private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list,
     IndexedPreservationAgent agent) throws PluginException {
 
+    Report report = PluginHelper.createPluginReport(this);
+    PluginState pluginState;
+
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP " + aip.getId());
       List<String> newRepresentations = new ArrayList<String>();
@@ -182,6 +197,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         List<File> newFiles = new ArrayList<File>();
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
+        ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", representation.getId(),
+          null);
 
         int state = 1;
 
@@ -199,20 +216,23 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               String fileMimetype = ifile.getFileFormat().getMimeType();
               String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+              List<String> applicableTo = getApplicableTo();
+              Map<String, List<String>> pronomToExtension = getPronomToExtension();
+              Map<String, List<String>> mimetypeToExtension = getMimetypeToExtension();
 
-              if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || inputFormat.isEmpty())
-                && (getApplicableTo().size() == 0
-                  || (filePronom != null && getPronomToExtension().containsKey(filePronom))
-                  || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
-                  || getApplicableTo().contains(fileFormat) || getApplicableTo().size() == 0)) {
+              if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat()
+                .isEmpty()))
+                && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
+                  || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+                    .contains(fileFormat)))) {
 
-                if (getApplicableTo().size() > 0) {
+                if (applicableTo.size() > 0) {
                   if (filePronom != null && !filePronom.isEmpty()
-                    && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
-                    fileFormat = getPronomToExtension().get(filePronom).get(0);
+                    && !pronomToExtension.get(filePronom).contains(fileFormat)) {
+                    fileFormat = pronomToExtension.get(filePronom).get(0);
                   } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                    && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
-                    fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
+                    && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
+                    fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                   }
                 }
 
@@ -221,10 +241,9 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
                 // FIXME file that doesn't get deleted afterwards
                 LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
-                Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
-                String result;
                 try {
-                  result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
+                  Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
+                  String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
                   StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
@@ -249,9 +268,20 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
 
+                  pluginState = PluginState.SUCCESS;
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+
                 } catch (CommandException e) {
                   e.getOutput();
                   e.getExitCode();
+
+                  pluginState = PluginState.FAILURE;
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
                   LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                     + " of representation " + representation.getId() + " from AIP " + aip.getId());
                   state = 2;
@@ -288,11 +318,10 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, newFiles, aip, newRepresentationID, model, state, agent, notifyEvent);
-
+        report.addItem(reportItem);
       }
 
       try {
-
         for (String repId : newRepresentations) {
           boolean inotify = false;
           AbstractConvertPluginUtils.reIndexingRepresentation(index, model, storage, aip.getId(), repId, inotify);
@@ -313,6 +342,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
+    Report report = PluginHelper.createPluginReport(this);
+    PluginState pluginState;
 
     for (Representation representation : list) {
       List<File> unchangedFiles = new ArrayList<File>();
@@ -322,6 +353,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       aipId = representation.getAipId();
       int state = 1;
       boolean notify = true;
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", representation.getId(), null);
 
       try {
         LOGGER.debug("Processing representation: " + representation);
@@ -337,20 +369,23 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
             String fileMimetype = ifile.getFileFormat().getMimeType();
             String filePronom = ifile.getFileFormat().getPronom();
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+            List<String> applicableTo = getApplicableTo();
+            Map<String, List<String>> pronomToExtension = getPronomToExtension();
+            Map<String, List<String>> mimetypeToExtension = getMimetypeToExtension();
 
-            if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-              && (getApplicableTo().size() == 0
-                || (filePronom != null && getPronomToExtension().containsKey(filePronom))
-                || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
+            if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat()
+              .isEmpty()))
+              && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
+                || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
                   .contains(fileFormat)))) {
 
-              if (getApplicableTo().size() > 0) {
+              if (applicableTo.size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty()
-                  && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
-                  fileFormat = getPronomToExtension().get(filePronom).get(0);
+                  && !pronomToExtension.get(filePronom).contains(fileFormat)) {
+                  fileFormat = pronomToExtension.get(filePronom).get(0);
                 } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                  && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
-                  fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
+                  && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
+                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
                 }
               }
 
@@ -384,9 +419,20 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 newFiles.add(f);
                 IOUtils.closeQuietly(directAccess);
 
+                pluginState = PluginState.SUCCESS;
+                reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                  RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                  RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+
               } catch (CommandException e) {
                 e.getOutput();
                 e.getExitCode();
+
+                pluginState = PluginState.FAILURE;
+                reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                  RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                  RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
                 LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                   + " of representation " + representation.getId() + " from AIP " + representation.getAipId());
                 state = 2;
@@ -421,8 +467,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           boolean notifyEvent = false;
           createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId), newRepresentationID, model, state, agent,
             notifyEvent);
+          report.addItem(reportItem);
         }
-      } catch (Throwable e) {
+      } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
+        | AuthorizationDeniedException | IOException | AlreadyExistsException | ValidationException
+        | InvalidParameterException | SAXException | TikaException | XmlException e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         state = 0;
       }
@@ -434,7 +483,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       LOGGER.error("Error running creating agent for AbstractConvertPlugin", e);
     }
 
-    return new Report();
+    return report;
   }
 
   private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list,
@@ -443,12 +492,16 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     int state = 1;
     Set<String> aipSet = new HashSet<String>();
     boolean notify = true;
+    Report report = PluginHelper.createPluginReport(this);
+    PluginState pluginState;
 
     for (File file : list) {
       try {
         LOGGER.debug("Processing file " + file.getId());
 
         String newRepresentationID = UUID.randomUUID().toString();
+        ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", file.getId(), null);
+        String newFileId = null;
 
         if (!file.isDirectory()) {
 
@@ -456,19 +509,23 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String filePronom = ifile.getFileFormat().getPronom();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+          List<String> applicableTo = getApplicableTo();
+          Map<String, List<String>> pronomToExtension = getPronomToExtension();
+          Map<String, List<String>> mimetypeToExtension = getMimetypeToExtension();
 
-          if (((!inputFormat.isEmpty() && fileFormat.equalsIgnoreCase(inputFormat)) || (inputFormat.isEmpty()))
-            && (getApplicableTo().size() == 0 || (filePronom != null && getPronomToExtension().containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
+          if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat()
+            .isEmpty()))
+            && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
+              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
                 .contains(fileFormat)))) {
 
-            if (getApplicableTo().size() > 0) {
+            if (applicableTo.size() > 0) {
               if (filePronom != null && !filePronom.isEmpty()
-                && !getPronomToExtension().get(filePronom).contains(fileFormat)) {
-                fileFormat = getPronomToExtension().get(filePronom).get(0);
+                && !pronomToExtension.get(filePronom).contains(fileFormat)) {
+                fileFormat = pronomToExtension.get(filePronom).get(0);
               } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
-                fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
+                && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
+                fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
               }
             }
 
@@ -495,15 +552,26 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               model.getStorage().createDirectory(storagePreservationPath);
 
               // update file on new representation
-              String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
+              newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
               model.deleteFile(file.getAipId(), newRepresentationID, file.getPath(), file.getId(), notify);
               model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload, notify);
 
               aipSet.add(file.getAipId());
 
+              pluginState = PluginState.SUCCESS;
+              reportItem = PluginHelper.setPluginReportItemInfo(reportItem, file.getId(), new Attribute(
+                RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+
             } catch (CommandException e) {
               e.getOutput();
               e.getExitCode();
+
+              pluginState = PluginState.FAILURE;
+              reportItem = PluginHelper.setPluginReportItemInfo(reportItem, file.getId(), new Attribute(
+                RodaConstants.REPORT_ATTR_OUTCOME, pluginState.toString()), new Attribute(
+                RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+
               LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                 + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
               state = 2;
@@ -511,8 +579,19 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           }
         }
 
-      } catch (Throwable e) {
-        LOGGER.error("Error processing file " + file.getId() + ": " + e.getMessage(), e);
+        boolean notifyEvent = false;
+        ArrayList<File> newFiles = new ArrayList<File>();
+        if (newFileId != null) {
+          newFiles.add(model.retrieveFile(file.getAipId(), file.getRepresentationId(), file.getPath(), newFileId));
+        }
+
+        createEvent(Arrays.asList(file), newFiles, model.retrieveAIP(file.getAipId()), newRepresentationID, model,
+          state, agent, notifyEvent);
+        report.addItem(reportItem);
+
+      } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
+        | AuthorizationDeniedException | ValidationException | IOException | AlreadyExistsException e) {
+        LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
         state = 0;
       }
     }

@@ -36,7 +36,7 @@ public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
   @Override
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat) {
     try {
-      return GeneralCommandConvertPluginUtils.executeGeneralCommand(inputPath, outputPath, commandArguments);
+      return GeneralCommandConvertPluginUtils.executeGeneralCommand(inputPath, outputPath, super.getCommandArguments());
     } catch (IOException | CommandException e) {
       return null;
     }
