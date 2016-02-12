@@ -196,12 +196,12 @@ public final class PluginHelper {
 
   public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
     ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
-    String outcome, String detailNote, String detailExtension, IndexedPreservationAgent agent, boolean notify)
-      throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+    String outcome, String outcomeDetailNote, String outcomeDetailExtension, IndexedPreservationAgent agent,
+    boolean notify) throws IOException, RequestNotValidException, NotFoundException, GenericException,
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
-      targets, outcome, detailNote, detailExtension, Arrays.asList(agent));
+      targets, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);

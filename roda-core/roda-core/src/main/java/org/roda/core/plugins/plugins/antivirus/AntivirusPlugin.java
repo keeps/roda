@@ -25,7 +25,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -193,17 +192,24 @@ public class AntivirusPlugin implements Plugin<AIP> {
     ModelService model, IndexedPreservationAgent agent, boolean notify) throws PluginException {
 
     try {
+      boolean inotify = false;
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
+      String representationId = null;
+      String fileId = null;
 
-      for (Representation representation : aip.getRepresentations()) {
-        boolean inotify = false;
-        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
-          RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK,
-          "All the files from the SIP were verified against an antivirus.",
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
-          success ? "success" : "failure", success ? "" : "Error",
-          success ? virusCheckResult.getReport() : exception.getMessage(), agent, inotify);
-      }
+      // TODO review below information and externalise strings
+      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK;
+      String eventDetails = "All the files from the SIP were verified against an antivirus.";
+      List<String> sourceObjects = Arrays.asList(aip.getId());
+      List<String> outcomeObjects = null;
+      String outcome = success ? "success" : "failure";
+      String outcomeDetailNote = success ? virusCheckResult.getReport()
+        : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
+      String outcomeDetailExtension = null;
+
+      PluginHelper.createPluginEvent(aip.getId(), representationId, fileId, model, eventType, eventDetails,
+        sourceObjects, outcomeObjects, outcome, outcomeDetailNote, outcomeDetailExtension, agent, inotify);
+
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }
