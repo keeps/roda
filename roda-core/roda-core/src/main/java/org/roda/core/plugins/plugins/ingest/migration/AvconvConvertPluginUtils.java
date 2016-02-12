@@ -12,22 +12,23 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
-public class FfmpegConvertPluginUtils {
+public class AvconvConvertPluginUtils {
 
-  public static Path runFfmpegVideoConvert(Path input, String inputFormat, String outputFormat, String commandArguments)
-    throws IOException, CommandException {
+  public static Path runAvconvVideoConvert(Path input, String inputFormat, String outputFormat,
+    String commandArguments, String outputArguments) throws IOException, CommandException {
 
     Path output = Files.createTempFile("result", "." + outputFormat);
-    return executeFfmpeg(input, output, commandArguments);
+    return executeAvconv(input, output, commandArguments, outputArguments);
   }
 
-  private static Path executeFfmpeg(Path input, Path output, String commandArguments) throws CommandException,
-    IOException, UnsupportedOperationException {
+  private static Path executeAvconv(Path input, Path output, String commandArguments, String outputArguments)
+    throws CommandException, IOException, UnsupportedOperationException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{arguments}", commandArguments);
+    command = command.replace("{output_arguments}", outputArguments);
 
     // filling a list of the command line arguments
     List<String> commandList = Arrays.asList(command.split("\\s+"));
@@ -38,7 +39,7 @@ public class FfmpegConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("ffmpeg", "-version");
+    String version = CommandUtility.execute("avconv", "-version");
     version = version.replace("Copyright", "?");
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('?'));
@@ -51,7 +52,7 @@ public class FfmpegConvertPluginUtils {
 
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert",
       "inputFormatPronoms");
 
     for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
@@ -66,7 +67,7 @@ public class FfmpegConvertPluginUtils {
 
   public static Map<String, List<String>> getMimetypeToExtension() {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert",
       "inputFormatMimetypes");
 
     for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
@@ -81,7 +82,7 @@ public class FfmpegConvertPluginUtils {
 
   public static List<String> getInputExtensions() {
     // TODO add missing extensions
-    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "ffmpegconvert",
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert",
       "inputFormatExtensions");
     return Arrays.asList(inputFormatExtensions.split(" "));
   }

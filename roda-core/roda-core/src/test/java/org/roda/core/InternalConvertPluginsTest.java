@@ -52,12 +52,10 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.FfmpegConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.JodConverterPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.MencoderConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
@@ -223,7 +221,7 @@ public class InternalConvertPluginsTest {
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
-      System.err.println("TESTE: " + ifile.getFileFormat().getPronom());
+      Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("image/tiff", fileMimetype);
     }
   }
@@ -273,24 +271,25 @@ public class InternalConvertPluginsTest {
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("audio/ogg", fileMimetype);
     }
   }
 
-  @Ignore
   @Test
-  public void testFfmpegPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
 
     ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, allFiles);
 
-    Plugin<?> plugin = new FfmpegConvertPlugin();
+    Plugin<?> plugin = new AvconvConvertPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     parameters.put("maxKbytes", "20000");
-    parameters.put("outputFormat", "gif");
+    parameters.put("outputFormat", "avi");
+    // parameters.put("outputArguments", "-pix_fmt rgb24");
     plugin.setParameterValues(parameters);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
@@ -310,11 +309,11 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](3g2|avi)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".gif")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".avi")).count());
       }
     }
 
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]gif$"))
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]avi$"))
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
@@ -322,6 +321,7 @@ public class InternalConvertPluginsTest {
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
+      Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("image/gif", fileMimetype);
     }
   }
@@ -377,54 +377,6 @@ public class InternalConvertPluginsTest {
 
   @Ignore
   @Test
-  public void testMencoderPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
-    AIP aip = ingestCorpora();
-
-    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
-
-    Plugin<?> plugin = new MencoderConvertPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
-    parameters.put("outputFormat", "avi");
-    plugin.setParameterValues(parameters);
-
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(1).getId());
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
-
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](avi|mpg)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".avi")).count());
-      }
-    }
-
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]avi$"))
-      .collect(Collectors.toList());
-
-    Assert.assertEquals(changedCounter, changedFiles.size());
-
-    for (File file : changedFiles) {
-      IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-      String fileMimetype = ifile.getFileFormat().getMimeType();
-      Assert.assertEquals("video/x-msvideo", fileMimetype);
-    }
-  }
-
-  @Test
   public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
     AIP aip = ingestCorpora();
@@ -471,54 +423,12 @@ public class InternalConvertPluginsTest {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       String pronom = ifile.getFileFormat().getPronom();
-      System.err.println("TESTE: " + fileMimetype + " - " + pronom);
+      Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("application/pdf", fileMimetype);
     }
   }
 
   @Ignore
-  @Test
-  public void testJodConverterPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
-    AIP aip = ingestCorpora();
-
-    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
-    List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
-
-    Plugin<?> plugin = new JodConverterPlugin();
-    Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("maxKbytes", "20000");
-    parameters.put("outputFormat", "pdf");
-    plugin.setParameterValues(parameters);
-
-    // XXX needs soffice running
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
-
-    aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(2, aip.getRepresentations().size());
-
-    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(1).getId());
-    List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
-
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
-
-    for (File f : reusableAllFiles) {
-      if (f.getId().matches(".*[.](pdf|txt|doc|xls|ppt|html|odt|ods|odp|xml)$")) {
-        changedCounter++;
-        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
-      }
-    }
-
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .count());
-  }
-
   @Test
   public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
@@ -561,6 +471,7 @@ public class InternalConvertPluginsTest {
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String filePronom = ifile.getFileFormat().getPronom();
+      Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("fmt/354", filePronom);
     }
 

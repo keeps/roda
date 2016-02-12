@@ -124,12 +124,10 @@ import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.FfmpegConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.JodConverterPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.MencoderConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
@@ -1122,54 +1120,9 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runFfmpegConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
-    try {
-
-      Plugin<?> plugin = new FfmpegConvertPlugin();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runJodConverterPlugin(String maxKbytes, String inputFormat, String outputFormat) {
-    try {
-      Plugin<?> plugin = new JodConverterPlugin();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
   private static void runGhostScriptConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new GhostScriptConvertPlugin();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runMencoderConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
-    try {
-      Plugin<?> plugin = new MencoderConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
@@ -1200,6 +1153,21 @@ public class RodaCoreFactory {
   private static void runUnoconvConvertRepresentationPlugin(String maxKbytes, String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new UnoconvConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("maxKbytes", maxKbytes);
+      params.put("inputFormat", "");
+      params.put("outputFormat", outputFormat);
+      params.put("commandArguments", "");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runAvconvConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+    try {
+      Plugin<?> plugin = new AvconvConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
@@ -1543,18 +1511,14 @@ public class RodaCoreFactory {
       runImageMagickConvertFilePlugin(args.get(1), args.get(2), args.get(3));
     } else if ("soxconvert".equals(args.get(0))) {
       runSoxConvertPlugin(args.get(1), args.get(2), args.get(3));
-    } else if ("ffmpegconvert".equals(args.get(0))) {
-      runFfmpegConvertPlugin(args.get(1), args.get(2), args.get(3));
-    } else if ("jodconverter".equals(args.get(0))) {
-      runJodConverterPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("ghostscriptconvert".equals(args.get(0))) {
       runGhostScriptConvertPlugin(args.get(1), args.get(2), args.get(3));
-    } else if ("mencoderconvert".equals(args.get(0))) {
-      runMencoderConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("unoconvconvert".equals(args.get(0))) {
       runUnoconvConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("unoconvrepresentationconvert".equals(args.get(0))) {
       runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
+    } else if ("avconvconvert".equals(args.get(0))) {
+      runAvconvConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("generalcommandconvert".equals(args.get(0))) {
       runGeneralCommandConvertPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("generalcommandrepresentationconvert".equals(args.get(0))) {
