@@ -23,7 +23,6 @@ import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.common.monitor.FolderMonitorNIO;
@@ -175,7 +174,6 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(numberOfFiles, reusableAllFiles.size());
   }
 
-  @Ignore
   @Test
   public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
@@ -226,7 +224,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
@@ -288,8 +285,8 @@ public class InternalConvertPluginsTest {
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     parameters.put("maxKbytes", "20000");
-    parameters.put("outputFormat", "avi");
-    // parameters.put("outputArguments", "-pix_fmt rgb24");
+    parameters.put("outputFormat", "gif");
+    parameters.put("outputArguments", "-pix_fmt rgb24");
     plugin.setParameterValues(parameters);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
@@ -309,11 +306,11 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](3g2|avi)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".avi")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".gif")).count());
       }
     }
 
-    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]avi$"))
+    List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]gif$"))
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
@@ -326,7 +323,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
@@ -375,7 +371,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
@@ -428,7 +423,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora();
@@ -477,7 +471,6 @@ public class InternalConvertPluginsTest {
 
   }
 
-  @Ignore
   @Test
   public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
@@ -539,7 +532,6 @@ public class InternalConvertPluginsTest {
 
   }
 
-  @Ignore
   @Test
   public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
