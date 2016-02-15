@@ -7,12 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.tika.exception.TikaException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -34,7 +32,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 public class TikaFullTextPlugin implements Plugin<AIP> {
 
@@ -128,7 +125,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-      } catch (RODAException | SAXException | TikaException | IOException e) {
+      } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
         state = PluginState.FAILURE;

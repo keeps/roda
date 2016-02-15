@@ -69,15 +69,11 @@ public interface ModelObserver {
 
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary);
 
-  public void jobCreated(Job job);
-
-  public void jobUpdated(Job job);
+  public void jobCreatedOrUpdated(Job job);
 
   public void jobDeleted(String jobId);
 
-  public void jobReportCreated(JobReport jobReport);
-
-  public void jobReportUpdated(JobReport jobReport);
+  public void jobReportCreatedOrUpdated(JobReport jobReport);
 
   public void jobReportDeleted(String jobReportId);
 

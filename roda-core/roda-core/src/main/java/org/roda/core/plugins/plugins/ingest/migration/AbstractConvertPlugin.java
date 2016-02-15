@@ -19,6 +19,7 @@ import org.apache.tika.exception.TikaException;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -49,7 +50,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -203,17 +203,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
           null);
 
         try {
-
           if (!representation.isOriginal()) {
             newRepresentationID = representation.getId();
             newRepresentations.add(representation.getId());
-            StoragePath representationPreservationPath = ModelUtils.getAIPRepresentationPreservationPath(aip.getId(),
-              representation.getId());
+            StoragePath representationPreservationPath = ModelUtils
+              .getRepresentationPreservationMetadataStoragePath(aip.getId(), representation.getId());
             storage.deleteResource(representationPreservationPath);
           }
 
           LOGGER.debug("Processing representation: " + representation);
-          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+
+          boolean recursive = true;
+          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
           for (File file : allFiles) {
             LOGGER.debug("Processing file: " + file);
@@ -255,7 +256,6 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                   String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
-                  StoragePath storagePath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
 
                   // create a new representation if it does not exist
                   if (!newRepresentations.contains(newRepresentationID) && representation.isOriginal()) {
@@ -287,6 +287,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
                   reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
                     new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()),
+
                     new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
                   LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
@@ -363,17 +364,18 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", representation.getId(), null);
 
       try {
-
         if (!representation.isOriginal()) {
           newRepresentationID = representation.getId();
           newRepresentations.add(representation.getId());
-          StoragePath representationPreservationPath = ModelUtils.getAIPRepresentationPreservationPath(aipId,
-            representation.getId());
+          StoragePath representationPreservationPath = ModelUtils
+            .getRepresentationPreservationMetadataStoragePath(aipId, representation.getId());
           storage.deleteResource(representationPreservationPath);
         }
 
         LOGGER.debug("Processing representation: " + representation);
-        ClosableIterable<File> allFiles = model.listAllFiles(aipId, representation.getId());
+        boolean recursive = true;
+        CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
+          recursive);
 
         for (File file : allFiles) {
           LOGGER.debug("Processing file: " + file);
@@ -415,7 +417,6 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
                 String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
                 ContentPayload payload = new FSPathContentPayload(pluginResult);
-                StoragePath storagePath = ModelUtils.getRepresentationPath(aipId, representation.getId());
 
                 if (!newRepresentations.contains(newRepresentationID)) {
                   LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
@@ -437,6 +438,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
                 reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
                   new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()),
+
                   new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
 
               } catch (CommandException e) {
@@ -559,7 +561,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
               String result = executePlugin(directAccess.getPath(), pluginResult, fileFormat);
 
               ContentPayload payload = new FSPathContentPayload(pluginResult);
-              StoragePath storagePath = ModelUtils.getRepresentationPath(file.getAipId(), file.getRepresentationId());
+              StoragePath storagePath = ModelUtils.getRepresentationStoragePath(file.getAipId(),
+                file.getRepresentationId());
 
               // create a new representation if it does not exist
               LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + file.getAipId());

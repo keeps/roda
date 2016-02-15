@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -37,7 +38,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.PluginOrchestrator;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +181,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
 
       List<AIP> block = new ArrayList<AIP>();
@@ -218,7 +218,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
 
       List<Representation> block = new ArrayList<Representation>();
@@ -257,14 +257,15 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
 
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
         for (Representation rep : aip.getRepresentations()) {
-          ClosableIterable<File> files = model.listAllFiles(aip.getId(), rep.getId());
+          boolean recursive = true;
+          CloseableIterable<File> files = model.listFilesUnder(aip.getId(), rep.getId(), recursive);
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {

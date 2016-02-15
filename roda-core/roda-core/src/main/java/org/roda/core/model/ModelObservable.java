@@ -177,15 +177,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyJobCreated(Job job) {
+  protected void notifyJobCreatedOrUpdated(Job job) {
     for (ModelObserver observer : observers) {
-      observer.jobCreated(job);
-    }
-  }
-
-  protected void notifyJobUpdated(Job job) {
-    for (ModelObserver observer : observers) {
-      observer.jobUpdated(job);
+      observer.jobCreatedOrUpdated(job);
     }
   }
 
@@ -195,15 +189,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyJobReportCreated(JobReport jobReport) {
+  protected void notifyJobReportCreatedOrUpdated(JobReport jobReport) {
     for (ModelObserver observer : observers) {
-      observer.jobReportCreated(jobReport);
-    }
-  }
-
-  protected void notifyJobReportUpdated(JobReport jobReport) {
-    for (ModelObserver observer : observers) {
-      observer.jobReportUpdated(jobReport);
+      observer.jobReportCreatedOrUpdated(jobReport);
     }
   }
 

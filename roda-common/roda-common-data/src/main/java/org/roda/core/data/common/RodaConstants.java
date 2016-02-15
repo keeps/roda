@@ -198,6 +198,8 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_METADATA = "metadata";
   public static final String STORAGE_DIRECTORY_DESCRIPTIVE = "descriptive";
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
+  public static final String STORAGE_DIRECTORY_REPRESENTATIONS = "representations";
+  public static final String STORAGE_DIRECTORY_SUBMISSION = "submission";
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";

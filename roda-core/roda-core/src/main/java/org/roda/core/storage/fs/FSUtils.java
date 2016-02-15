@@ -7,7 +7,6 @@
  */
 package org.roda.core.storage.fs;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
@@ -15,6 +14,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -29,15 +29,16 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.mutable.MutableLong;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
@@ -241,13 +242,13 @@ public final class FSUtils {
    * @throws NotFoundException
    * @throws GenericException
    */
-  public static ClosableIterable<Resource> listPath(final Path basePath, final Path path)
+  public static CloseableIterable<Resource> listPath(final Path basePath, final Path path)
     throws NotFoundException, GenericException {
-    ClosableIterable<Resource> resourceIterable;
+    CloseableIterable<Resource> resourceIterable;
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(path);
       final Iterator<Path> pathIterator = directoryStream.iterator();
-      resourceIterable = new ClosableIterable<Resource>() {
+      resourceIterable = new CloseableIterable<Resource>() {
 
         @Override
         public Iterator<Resource> iterator() {
@@ -292,8 +293,9 @@ public final class FSUtils {
 
   public static Long countPath(Path basePath, Path directoryPath) throws NotFoundException, GenericException {
     Long count = 0L;
+    DirectoryStream<Path> directoryStream = null;
     try {
-      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(directoryPath);
+      directoryStream = Files.newDirectoryStream(directoryPath);
 
       final Iterator<Path> pathIterator = directoryStream.iterator();
       while (pathIterator.hasNext()) {
@@ -301,15 +303,95 @@ public final class FSUtils {
         pathIterator.next();
       }
 
-      directoryStream.close();
-
     } catch (NoSuchFileException e) {
       throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + directoryPath);
     } catch (IOException e) {
       throw new GenericException("Could not list contents of entity at: " + directoryPath, e);
+    } finally {
+      IOUtils.closeQuietly(directoryStream);
     }
 
     return count;
+  }
+
+  public static Long recursivelyCountPath(Path basePath, Path directoryPath)
+    throws NotFoundException, GenericException {
+    Long count = 0L;
+    Stream<Path> walk = null;
+    try {
+      walk = Files.walk(directoryPath);
+
+      final Iterator<Path> pathIterator = walk.iterator();
+      while (pathIterator.hasNext()) {
+        count++;
+        pathIterator.next();
+      }
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + directoryPath);
+    } catch (IOException e) {
+      throw new GenericException("Could not list contents of entity at: " + directoryPath, e);
+    } finally {
+      if (walk != null) {
+        walk.close();
+      }
+    }
+
+    return count;
+  }
+
+  public static CloseableIterable<Resource> recursivelyListPath(final Path basePath, final Path path)
+    throws NotFoundException, GenericException {
+    CloseableIterable<Resource> resourceIterable;
+    try {
+      final Stream<Path> walk = Files.walk(path, FileVisitOption.FOLLOW_LINKS);
+      final Iterator<Path> pathIterator = walk.iterator();
+
+      // skip root
+      if (pathIterator.hasNext()) {
+        pathIterator.next();
+      }
+
+      resourceIterable = new CloseableIterable<Resource>() {
+
+        @Override
+        public Iterator<Resource> iterator() {
+          return new Iterator<Resource>() {
+
+            @Override
+            public boolean hasNext() {
+              return pathIterator.hasNext();
+            }
+
+            @Override
+            public Resource next() {
+              Path next = pathIterator.next();
+              Resource ret;
+              try {
+                ret = convertPathToResource(basePath, next);
+              } catch (GenericException | NotFoundException | RequestNotValidException e) {
+                LOGGER.error("Error while list path " + basePath + " while parsing resource " + next, e);
+                ret = null;
+              }
+
+              return ret;
+            }
+
+          };
+        }
+
+        @Override
+        public void close() throws IOException {
+          walk.close();
+        }
+      };
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not list contents of entity because it doesn't exist: " + path, e);
+    } catch (IOException e) {
+      throw new GenericException("Could not list contents of entity at: " + path, e);
+    }
+
+    return resourceIterable;
   }
 
   /**
@@ -319,12 +401,12 @@ public final class FSUtils {
    *          base path
    * @throws GenericException
    */
-  public static ClosableIterable<Container> listContainers(final Path basePath) throws GenericException {
-    ClosableIterable<Container> containerIterable;
+  public static CloseableIterable<Container> listContainers(final Path basePath) throws GenericException {
+    CloseableIterable<Container> containerIterable;
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(basePath);
       final Iterator<Path> pathIterator = directoryStream.iterator();
-      containerIterable = new ClosableIterable<Container>() {
+      containerIterable = new CloseableIterable<Container>() {
 
         @Override
         public Iterator<Container> iterator() {
@@ -392,20 +474,7 @@ public final class FSUtils {
 
     // construct
     if (Files.isDirectory(path)) {
-      try {
-        MutableLong size = new MutableLong();
-        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            size.add(attrs.size());
-            return FileVisitResult.CONTINUE;
-          }
-        });
-
-        resource = new DefaultDirectory(storagePath);
-      } catch (IOException e) {
-        throw new GenericException("Could not get file size", e);
-      }
+      resource = new DefaultDirectory(storagePath);
     } else {
       ContentPayload content = new FSPathContentPayload(path);
       long sizeInBytes;
@@ -538,6 +607,5 @@ public final class FSUtils {
 
     return file;
   }
-  
 
 }

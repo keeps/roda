@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class ExifToolPluginUtils {
     }
     return command;
   }
-  
+
   private static List<String> getBatchCommand(Path sourceDirectory, Path exifToolOutputDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
     Path exifToolHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "exiftool", "home"));
@@ -71,11 +72,13 @@ public class ExifToolPluginUtils {
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
-      command = new ArrayList<String>(
-        Arrays.asList(EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool.exe", "-X", "-w", exifToolOutputDirectory.toFile().getAbsolutePath()+"/%f.%e.xml",sourceDirectory.toFile().getAbsolutePath()));
+      command = new ArrayList<String>(Arrays.asList(
+        EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool.exe", "-X", "-w",
+        exifToolOutputDirectory.toFile().getAbsolutePath() + "/%f.%e.xml", sourceDirectory.toFile().getAbsolutePath()));
     } else {
-      command = new ArrayList<String>(
-        Arrays.asList(EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool", "-X", "-w", exifToolOutputDirectory.toFile().getAbsolutePath()+"/%f.%e.xml",sourceDirectory.toFile().getAbsolutePath()));
+      command = new ArrayList<String>(Arrays.asList(EXIFTOOL_DIRECTORY.getAbsolutePath() + File.separator + "exiftool",
+        "-X", "-w", exifToolOutputDirectory.toFile().getAbsolutePath() + "/%f.%e.xml",
+        sourceDirectory.toFile().getAbsolutePath()));
     }
     return command;
   }
@@ -84,13 +87,15 @@ public class ExifToolPluginUtils {
     throws IOException, PluginException {
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
-    IOUtils.copy(binary.getContent().createInputStream(), fos);
+    InputStream inputStream = binary.getContent().createInputStream();
+    IOUtils.copy(inputStream, fos);
+    IOUtils.closeQuietly(inputStream);
     fos.close();
     return inspect(f);
   }
 
   public static String runExifToolOnPath(Path sourceDirectory, Path exifToolOutputDirectory) throws CommandException {
-    List<String> command = getBatchCommand(sourceDirectory,exifToolOutputDirectory);
+    List<String> command = getBatchCommand(sourceDirectory, exifToolOutputDirectory);
     String exifToolOutput = CommandUtility.execute(command);
     return exifToolOutput;
   }

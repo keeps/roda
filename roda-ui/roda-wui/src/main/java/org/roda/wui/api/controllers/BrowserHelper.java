@@ -34,6 +34,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -68,9 +69,9 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -153,7 +154,7 @@ public class BrowserHelper {
   private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService().retrieveAIP(aipId)
-      .getMetadata().getDescriptiveMetadata();
+      .getDescriptiveMetadata();
 
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
 
@@ -263,7 +264,9 @@ public class BrowserHelper {
       ModelService model = RodaCoreFactory.getModelService();
 
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      ClosableIterable<org.roda.core.data.v2.ip.File> allFiles = model.listAllFiles(aipId, representationId);
+      boolean recursive = true;
+      CloseableIterable<org.roda.core.data.v2.ip.File> allFiles = model.listFilesUnder(aipId, representationId,
+        recursive);
       for (org.roda.core.data.v2.ip.File file : allFiles) {
         addToZip(zipEntries, file);
       }
@@ -284,7 +287,7 @@ public class BrowserHelper {
     if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent().createInputStream());
+      ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent());
       zipEntries.add(info);
     } else {
       // TODO add directory zip entry
@@ -301,32 +304,29 @@ public class BrowserHelper {
   protected static StreamResponse listAipDescriptiveMetadata(String aipId, String start, String limit)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     List<DescriptiveMetadata> metadata = null;
-    try {
-      ModelService model = RodaCoreFactory.getModelService();
-      StorageService storage = RodaCoreFactory.getStorageService();
-      metadata = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
-      Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-      int startInt = pagingParams.getFirst();
-      int limitInt = pagingParams.getSecond();
-      int counter = 0;
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      for (DescriptiveMetadata dm : metadata) {
-        if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
-          StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, dm.getId());
-          Binary binary = storage.getBinary(storagePath);
-          ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent().createInputStream());
-          zipEntries.add(info);
-        } else {
-          break;
-        }
-        counter++;
+
+    ModelService model = RodaCoreFactory.getModelService();
+    StorageService storage = RodaCoreFactory.getStorageService();
+    metadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    int startInt = pagingParams.getFirst();
+    int limitInt = pagingParams.getSecond();
+    int counter = 0;
+    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    for (DescriptiveMetadata dm : metadata) {
+      if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
+        StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, dm.getId());
+        Binary binary = storage.getBinary(storagePath);
+        ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent());
+        zipEntries.add(info);
+      } else {
+        break;
       }
-
-      return createZipStreamResponse(zipEntries, aipId);
-
-    } catch (IOException e) {
-      throw new GenericException("Error listing AIP descriptive metadata", e);
+      counter++;
     }
+
+    return createZipStreamResponse(zipEntries, aipId);
+
   }
 
   protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -399,7 +399,7 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     List<Representation> representations = null;
-
+    CloseableIterable<PreservationMetadata> preservationFiles = null;
     try {
       ModelService model = RodaCoreFactory.getModelService();
       StorageService storage = RodaCoreFactory.getStorageService();
@@ -409,15 +409,15 @@ public class BrowserHelper {
       int limitInt = pagingParams.getSecond();
       int counter = 0;
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      List<PreservationMetadata> preservationFiles = model.retrieveAIP(aipId).getMetadata().getPreservationMetadata();
+      boolean includeRepresentations = true;
+      preservationFiles = model.listPreservationMetadata(aipId, includeRepresentations);
       for (PreservationMetadata preservationFile : preservationFiles) {
         if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
           StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
           Binary binary = storage.getBinary(storagePath);
           if (preservationFile.getRepresentationId() != null) {
             ZipEntryInfo info = new ZipEntryInfo(
-              preservationFile.getRepresentationId() + File.separator + storagePath.getName(),
-              binary.getContent().createInputStream());
+              preservationFile.getRepresentationId() + File.separator + storagePath.getName(), binary.getContent());
             zipEntries.add(info);
           }
         } else {
@@ -429,8 +429,8 @@ public class BrowserHelper {
 
       return createZipStreamResponse(zipEntries, aipId);
 
-    } catch (IOException e) {
-      throw new GenericException("Error getting AIP preservation metadata", e);
+    } finally {
+      IOUtils.closeQuietly(preservationFiles);
     }
 
   }
@@ -451,11 +451,6 @@ public class BrowserHelper {
 
   }
 
-  // FIXME 100 lines of method
-  // FIXME 100 lines of method
-  // FIXME 100 lines of method
-  // FIXME 100 lines of method
-  // FIXME 100 lines of method
   public static StreamResponse getAipRepresentationPreservationMetadata(String aipId, String representationId,
     String startAgent, String limitAgent, String startEvent, String limitEvent, String startFile, String limitFile,
     String acceptFormat, String language)
@@ -466,7 +461,7 @@ public class BrowserHelper {
     StreamResponse response = null;
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<PreservationMetadata> preservationFiles;
+      CloseableIterable<PreservationMetadata> preservationFiles = null;
       try {
         Pair<Integer, Integer> pagingParamsAgent = ApiUtils.processPagingParams(startAgent, limitAgent);
         int counterAgent = 0;
@@ -475,7 +470,8 @@ public class BrowserHelper {
         Pair<Integer, Integer> pagingParamsFile = ApiUtils.processPagingParams(startFile, limitFile);
         int counterFile = 0;
         List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-        preservationFiles = model.retrieveAIP(aipId).getMetadata().getPreservationMetadata();
+        preservationFiles = model.listPreservationMetadata(aipId, representationId);
+
         for (PreservationMetadata preservationFile : preservationFiles) {
           boolean add = false;
 
@@ -502,33 +498,16 @@ public class BrowserHelper {
           if (add) {
             StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
             Binary binary = storage.getBinary(storagePath);
-            ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent().createInputStream());
+            ZipEntryInfo info = new ZipEntryInfo(storagePath.getName(), binary.getContent());
             zipEntries.add(info);
           }
         }
+
         response = createZipStreamResponse(zipEntries, aipId + "_" + representationId);
 
-      } catch (IOException e) {
-        throw new GenericException("Error getting representation preservation metadata", e);
+      } finally {
+        IOUtils.closeQuietly(preservationFiles);
       }
-    } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML.equals(acceptFormat)) {
-
-      String filename = aipId + "_" + representationId + ".html";
-
-      String html = HTMLUtils.getRepresentationPreservationMetadataHtml(
-        ModelUtils.getAIPRepresentationPreservationPath(aipId, representationId), storage,
-        ServerTools.parseLocale(language), ApiUtils.processPagingParams(startAgent, limitAgent),
-        ApiUtils.processPagingParams(startEvent, limitEvent), ApiUtils.processPagingParams(startFile, limitFile));
-
-      StreamingOutput stream = new StreamingOutput() {
-        @Override
-        public void write(OutputStream os) throws IOException, WebApplicationException {
-          PrintStream printStream = new PrintStream(os);
-          printStream.print(html);
-          printStream.close();
-        }
-      };
-      response = new StreamResponse(filename, MediaType.TEXT_HTML, stream);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
@@ -540,10 +519,7 @@ public class BrowserHelper {
   public static StreamResponse getAipRepresentationPreservationMetadataFile(String aipId, String representationId,
     String fileId) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
 
-    StorageService storage = RodaCoreFactory.getStorageService();
-    Binary binary;
-
-    binary = storage.getBinary(ModelUtils.getPreservationRepresentationPath(aipId, representationId));
+    Binary binary = RodaCoreFactory.getModelService().retrievePreservationRepresentation(aipId, representationId);
 
     String filename = binary.getStoragePath().getName();
     StreamingOutput stream = new StreamingOutput() {
@@ -600,12 +576,12 @@ public class BrowserHelper {
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
-    StoragePath aipPath = ModelUtils.getAIPpath(aipId);
+    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
     // TODO update setting AIP parent
     // Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
 
     if (StringUtils.isBlank(parentId)) {
-      StoragePath parentPath = ModelUtils.getAIPpath(parentId);
+      StoragePath parentPath = ModelUtils.getAIPStoragePath(parentId);
       storage.getDirectory(parentPath);
 
       // metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
@@ -676,7 +652,9 @@ public class BrowserHelper {
       stream = new StreamingOutput() {
         @Override
         public void write(OutputStream os) throws IOException, WebApplicationException {
-          IOUtils.copy(zipEntries.get(0).getInputStream(), os);
+          InputStream inputStream = zipEntries.get(0).getPayload().createInputStream();
+          IOUtils.copy(inputStream, os);
+          IOUtils.closeQuietly(inputStream);
         }
       };
       filename = zipEntries.get(0).getName();
@@ -829,7 +807,7 @@ public class BrowserHelper {
         IndexResult<IndexedAIP> collections = index.find(IndexedAIP.class, allButRepresentationsFilter, null,
           new Sublist(i, 100));
         for (IndexedAIP aip : collections.getResults()) {
-          array.add(ModelUtils.aipToJSON(aip));
+          array.add(JsonUtils.aipToJSON(aip));
         }
       }
       root.set("dos", array);

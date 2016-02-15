@@ -16,6 +16,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.io.IOUtils;
 
 /**
  * Tools to handle Zips
@@ -38,12 +39,14 @@ public class ZipTools {
     for (ZipEntryInfo file : files) {
       ZipEntry entry = new ZipEntry(file.getName());
       zos.putNextEntry(entry);
-      sendToZip(file.getInputStream(), zos);
+      InputStream inputStream = file.getPayload().createInputStream();
+      sendToZip(inputStream, zos);
+      IOUtils.closeQuietly(inputStream);
       zos.closeEntry();
     }
 
-    zos.close();
-    out.close();
+    IOUtils.closeQuietly(zos);
+    IOUtils.closeQuietly(out);
   }
 
   

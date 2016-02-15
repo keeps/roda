@@ -10,7 +10,9 @@ package org.roda.core.storage;
 import java.io.IOException;
 import java.util.Iterator;
 
-public class EmptyClosableIterable<T> implements ClosableIterable<T> {
+import org.roda.core.common.iterables.CloseableIterable;
+
+public class EmptyClosableIterable<T> implements CloseableIterable<T> {
 
   @Override
   public void close() throws IOException {

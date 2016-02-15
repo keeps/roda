@@ -16,11 +16,11 @@ import org.fcrepo.client.FedoraObject;
 import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 
@@ -31,7 +31,7 @@ import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
  * @author Sébastien Leroux <sleroux@keep.pt>
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class IterableContainer implements ClosableIterable<Container> {
+public class IterableContainer implements CloseableIterable<Container> {
   private Iterator<FedoraResource> fedoraResources;
 
   public IterableContainer(FedoraRepository repository)

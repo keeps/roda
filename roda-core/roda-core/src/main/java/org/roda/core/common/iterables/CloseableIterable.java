@@ -5,9 +5,9 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.storage;
+package org.roda.core.common.iterables;
 
 import java.io.Closeable;
 
-public interface ClosableIterable<T> extends Closeable, Iterable<T> {
+public interface CloseableIterable<T> extends Closeable, Iterable<T> {
 }

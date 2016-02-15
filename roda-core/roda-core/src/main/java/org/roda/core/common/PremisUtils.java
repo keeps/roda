@@ -34,6 +34,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.xmlbeans.XmlException;
@@ -127,6 +128,8 @@ public class PremisUtils {
     } catch (SAXException e) {
       premisV2 = false;
     }
+    IOUtils.closeQuietly(inputStream);
+    IOUtils.closeQuietly(schemaStream);
     return premisV2;
   }
 
@@ -146,9 +149,10 @@ public class PremisUtils {
     InputStream transformerStream = null;
     InputStream bais = null;
 
+    Reader reader = null;
     try {
+      reader = new InputStreamReader(binary.getContent().createInputStream());
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      Reader reader = new InputStreamReader(binary.getContent().createInputStream());
       transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/migration/v2Tov3.xslt");
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
@@ -163,20 +167,9 @@ public class PremisUtils {
     } catch (TransformerException e) {
       throw e;
     } finally {
-      if (transformerStream != null) {
-        try {
-          transformerStream.close();
-        } catch (IOException e) {
-
-        }
-      }
-      if (bais != null) {
-        try {
-          bais.close();
-        } catch (IOException e) {
-
-        }
-      }
+      IOUtils.closeQuietly(transformerStream);
+      IOUtils.closeQuietly(bais);
+      IOUtils.closeQuietly(reader);
     }
   }
 
@@ -465,7 +458,8 @@ public class PremisUtils {
   
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<Fixity>();
-    lc.xmlns.premisV2.File f = binaryToFile(premisFile.getContent().createInputStream());
+    InputStream inputStream = premisFile.getContent().createInputStream();
+    lc.xmlns.premisV2.File f = binaryToFile(inputStream);
     if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
       ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
       if (occt.getFixityList() != null && occt.getFixityList().size() > 0) {
@@ -478,6 +472,7 @@ public class PremisUtils {
         }
       }
     }
+    IOUtils.closeQuietly(inputStream);
     return fixities;
   }
 
@@ -516,8 +511,10 @@ public class PremisUtils {
   public static lc.xmlns.premisV2.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     Representation representation;
+    InputStream inputStream = null;
     try {
-      representation = binaryToRepresentation(payload.createInputStream());
+      inputStream = payload.createInputStream();
+      representation = binaryToRepresentation(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
       XmlOptions validationOptions = new XmlOptions();
@@ -528,6 +525,8 @@ public class PremisUtils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
 
     return representation;
@@ -537,8 +536,10 @@ public class PremisUtils {
     throws ValidationException, GenericException {
     lc.xmlns.premisV2.File file;
     List<XmlValidationError> validationErrors = new ArrayList<>();
+    InputStream inputStream = null;
     try {
-      file = binaryToFile(payload.createInputStream());
+      inputStream = payload.createInputStream();
+      file = binaryToFile(inputStream);
 
       XmlOptions validationOptions = new XmlOptions();
       validationOptions.setErrorListener(validationErrors);
@@ -552,6 +553,8 @@ public class PremisUtils {
       throw exception;
     } catch (IOException e) {
       throw new GenericException("Error loading representation premis file", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
 
     return file;
@@ -573,8 +576,10 @@ public class PremisUtils {
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     EventComplexType event;
+    InputStream inputStream = null;
     try {
-      event = binaryToEvent(payload.createInputStream());
+      inputStream = payload.createInputStream();
+      event = binaryToEvent(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
       XmlOptions validationOptions = new XmlOptions();
@@ -585,6 +590,8 @@ public class PremisUtils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
 
     return event;
@@ -593,8 +600,10 @@ public class PremisUtils {
   public static AgentComplexType binaryToAgent(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     AgentComplexType agent;
+    InputStream inputStream = null;
     try {
-      agent = binaryToAgent(payload.createInputStream());
+      inputStream = payload.createInputStream();
+      agent = binaryToAgent(inputStream);
 
       List<XmlValidationError> validationErrors = new ArrayList<>();
       XmlOptions validationOptions = new XmlOptions();
@@ -605,6 +614,8 @@ public class PremisUtils {
       }
     } catch (XmlException | IOException e) {
       throw new GenericException("Error loading representation premis file", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
 
     return agent;
@@ -612,8 +623,11 @@ public class PremisUtils {
 
   public static SolrInputDocument updateSolrDocument(SolrInputDocument doc, Binary premisBinary)
     throws GenericException {
+
+    InputStream inputStream = null;
     try {
-      lc.xmlns.premisV2.File premisFile = binaryToFile(premisBinary.getContent().createInputStream());
+      inputStream = premisBinary.getContent().createInputStream();
+      lc.xmlns.premisV2.File premisFile = binaryToFile(inputStream);
       if (premisFile.getOriginalName() != null) {
         doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName().getStringValue());
 
@@ -666,7 +680,9 @@ public class PremisUtils {
       }
 
     } catch (XmlException | IOException e) {
-
+      LOGGER.error("Error updating Solr document", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
     return doc;
   }

@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -35,14 +36,11 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,16 +99,18 @@ public class FITSPlugin implements Plugin<AIP> {
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
-        ClosableIterable<File> allFiles = null;
+        CloseableIterable<File> allFiles = null;
         DirectResourceAccess directAccess = null;
         try {
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          directAccess = storage.getDirectAccess(representationPath);
+          StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+            representation.getId());
+          directAccess = storage.getDirectAccess(representationDataPath);
           Path output = Files.createTempDirectory("output");
 
           FITSPluginUtils.runFITSOnPath(directAccess.getPath(), output);
 
-          allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          boolean recursive = true;
+          allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
           for (File file : allFiles) {
             // TODO the following path is not expecting folders
             Path p = output.resolve(file.getId() + ".fits.xml");

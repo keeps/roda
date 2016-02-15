@@ -20,7 +20,6 @@ public class PreservationMetadata implements Serializable {
   }
 
   private String id;
-  @JsonIgnore
   private String aipId;
   private String representationId;
   private List<String> fileDirectoryPath;

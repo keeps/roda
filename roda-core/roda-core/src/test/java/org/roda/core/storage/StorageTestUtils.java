@@ -71,7 +71,7 @@ public class StorageTestUtils {
 
     Iterable<Resource> sourceResourceList = null;
     if (Container.class.isAssignableFrom(sourceEntity) && Container.class.isAssignableFrom(targetEntity)) {
-      sourceResourceList = sourceStorage.listResourcesUnderContainer(sourceEntityStoragePath);
+      sourceResourceList = sourceStorage.listResourcesUnderContainer(sourceEntityStoragePath, false);
 
     } else if (Directory.class.isAssignableFrom(sourceEntity) && Directory.class.isAssignableFrom(targetEntity)) {
 
@@ -80,7 +80,7 @@ public class StorageTestUtils {
 
       assertEquals(sourceDirectory.isDirectory(), targetDirectory.isDirectory());
 
-      sourceResourceList = sourceStorage.listResourcesUnderDirectory(sourceEntityStoragePath);
+      sourceResourceList = sourceStorage.listResourcesUnderDirectory(sourceEntityStoragePath, false);
 
     } else if (Binary.class.isAssignableFrom(sourceEntity) && Binary.class.isAssignableFrom(targetEntity)) {
 

@@ -8,6 +8,7 @@
 package org.roda.core.storage.fedora.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,6 +16,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.FedoraContent;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
@@ -63,10 +65,14 @@ public final class FedoraConversionUtils {
    */
   public static FedoraContent contentPayloadToFedoraContent(ContentPayload payload, String mimetype)
     throws GenericException {
+    InputStream inputStream = null;
     try {
-      return new FedoraContent().setContent(payload.createInputStream()).setContentType(mimetype);
+      inputStream = payload.createInputStream();
+      return new FedoraContent().setContent(inputStream).setContentType(mimetype);
     } catch (IOException e) {
       throw new GenericException("Error while converting content payload into fedora content", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
   }
 

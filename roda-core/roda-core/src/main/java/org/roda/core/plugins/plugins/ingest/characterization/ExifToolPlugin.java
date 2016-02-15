@@ -105,8 +105,9 @@ public class ExifToolPlugin implements Plugin<AIP> {
 
         DirectResourceAccess directAccess = null;
         try {
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          directAccess = storage.getDirectAccess(representationPath);
+          StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+            representation.getId());
+          directAccess = storage.getDirectAccess(representationDataPath);
 
           Path metadata = Files.createTempDirectory("metadata");
           String exifOutput = ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);

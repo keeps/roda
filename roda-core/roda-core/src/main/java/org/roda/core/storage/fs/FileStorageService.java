@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -20,7 +21,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
@@ -69,7 +69,7 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Container> listContainers() throws GenericException {
+  public CloseableIterable<Container> listContainers() throws GenericException {
     return FSUtils.listContainers(basePath);
   }
 
@@ -125,34 +125,39 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException {
     Path path = FSUtils.getEntityPath(basePath, storagePath);
-    return FSUtils.listPath(basePath, path);
+    if (recursive) {
+      return FSUtils.recursivelyListPath(basePath, path);
+    } else {
+      return FSUtils.listPath(basePath, path);
+    }
   }
 
   @Override
-  public Long countResourcesUnderContainer(StoragePath storagePath) throws NotFoundException, GenericException {
+  public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
+    throws NotFoundException, GenericException {
     Path path = FSUtils.getEntityPath(basePath, storagePath);
-    return FSUtils.countPath(basePath, path);
+    if (recursive) {
+      return FSUtils.recursivelyCountPath(basePath, path);
+    } else {
+      return FSUtils.countPath(basePath, path);
+    }
   }
 
   @Override
   public Directory createDirectory(StoragePath storagePath) throws AlreadyExistsException, GenericException {
     Path dirPath = FSUtils.getEntityPath(basePath, storagePath);
     Path directory = null;
+
+    if (Files.exists(dirPath)) {
+      throw new AlreadyExistsException("Could not create directory at " + dirPath);
+    }
+
     try {
       directory = Files.createDirectories(dirPath);
       return new DefaultDirectory(storagePath);
-    } catch (FileAlreadyExistsException e) {
-      // cleanup
-      try {
-        FSUtils.deletePath(directory);
-      } catch (NotFoundException | GenericException e1) {
-        LOGGER.warn("Error while cleaning up", e1);
-      }
-
-      throw new AlreadyExistsException("Could not create directory at " + dirPath, e);
     } catch (IOException e) {
       // cleanup
       try {
@@ -206,16 +211,25 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
-    return FSUtils.listPath(basePath, directoryPath);
+    if (recursive) {
+      return FSUtils.recursivelyListPath(basePath, directoryPath);
+    } else {
+      return FSUtils.listPath(basePath, directoryPath);
+    }
   }
 
   @Override
-  public Long countResourcesUnderDirectory(StoragePath storagePath) throws NotFoundException, GenericException {
+  public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
+    throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
-    return FSUtils.countPath(basePath, directoryPath);
+    if (recursive) {
+      return FSUtils.recursivelyCountPath(basePath, directoryPath);
+    } else {
+      return FSUtils.countPath(basePath, directoryPath);
+    }
   }
 
   @Override

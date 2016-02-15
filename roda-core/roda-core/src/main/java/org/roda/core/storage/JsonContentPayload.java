@@ -15,6 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
+import org.apache.commons.io.IOUtils;
+
 public class JsonContentPayload implements ContentPayload {
   private String content;
   private Path contentPath;
@@ -30,7 +32,9 @@ public class JsonContentPayload implements ContentPayload {
 
   @Override
   public void writeToPath(Path path) throws IOException {
-    Files.copy(createInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
+    InputStream inputStream = createInputStream();
+    Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING);
+    IOUtils.closeQuietly(inputStream);
   }
 
   @Override

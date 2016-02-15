@@ -19,7 +19,6 @@ public class OtherMetadata implements Serializable {
   private String id;
   private String type;
 
-  @JsonIgnore
   private String aipId;
   private String representationId;
   private List<String> fileDirectoryPath;

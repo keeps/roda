@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -30,7 +31,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginOrchestrator;
 import org.roda.core.plugins.orchestrate.akka.AkkaJobWorkerActor;
 import org.roda.core.plugins.orchestrate.akka.AkkaWorkerActor;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -187,7 +187,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       int multiplier = 0;
       LOGGER.info("Executing beforeExecute");
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -231,7 +231,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -276,7 +276,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
-      ClosableIterable<AIP> aips = model.listAIPs();
+      CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -284,7 +284,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       while (aipIter.hasNext()) {
         AIP aip = aipIter.next();
         for (Representation representation : aip.getRepresentations()) {
-          ClosableIterable<File> files = model.listAllFiles(aip.getId(), representation.getId());
+          boolean recursive = true;
+          CloseableIterable<File> files = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
           Iterator<File> fileIter = files.iterator();
 
           while (fileIter.hasNext()) {

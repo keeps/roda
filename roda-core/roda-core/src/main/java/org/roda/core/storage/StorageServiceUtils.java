@@ -9,6 +9,8 @@ package org.roda.core.storage;
 
 import java.util.Iterator;
 
+import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -89,17 +91,21 @@ public final class StorageServiceUtils {
       AuthorizationDeniedException {
     if (Container.class.isAssignableFrom(rootEntity)) {
       toService.createContainer(toStoragePath);
-      Iterator<Resource> childResourcesIterator = fromService.listResourcesUnderContainer(fromStoragePath).iterator();
-      iterateAndCopyOrMoveResourcesRecursivelly(fromService, fromStoragePath, toService, toStoragePath,
-        childResourcesIterator, copy);
+      boolean recursive = false;
+      CloseableIterable<Resource> childResourcesIterator = fromService.listResourcesUnderContainer(fromStoragePath,
+        recursive);
+      iterateAndCopyOrMoveResources(fromService, fromStoragePath, toService, toStoragePath, childResourcesIterator,
+        copy);
       if (!copy) {
         fromService.deleteContainer(fromStoragePath);
       }
     } else if (Directory.class.isAssignableFrom(rootEntity)) {
       toService.createDirectory(toStoragePath);
-      Iterator<Resource> childResourcesIterator = fromService.listResourcesUnderDirectory(fromStoragePath).iterator();
-      iterateAndCopyOrMoveResourcesRecursivelly(fromService, fromStoragePath, toService, toStoragePath,
-        childResourcesIterator, copy);
+      boolean recursive = false;
+      CloseableIterable<Resource> childResourcesIterator = fromService.listResourcesUnderDirectory(fromStoragePath,
+        recursive);
+      iterateAndCopyOrMoveResources(fromService, fromStoragePath, toService, toStoragePath, childResourcesIterator,
+        copy);
       if (!copy) {
         fromService.deleteResource(fromStoragePath);
       }
@@ -114,12 +120,14 @@ public final class StorageServiceUtils {
     }
   }
 
-  private static void iterateAndCopyOrMoveResourcesRecursivelly(StorageService fromService, StoragePath fromStoragePath,
-    StorageService toService, StoragePath toStoragePath, Iterator<Resource> childResourcesIterator, boolean copy)
-      throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
+  private static void iterateAndCopyOrMoveResources(StorageService fromService, StoragePath fromStoragePath,
+    StorageService toService, StoragePath toStoragePath, CloseableIterable<Resource> childResourcesIterable,
+    boolean copy) throws RequestNotValidException, AlreadyExistsException, GenericException, NotFoundException,
       AuthorizationDeniedException {
-    while (childResourcesIterator.hasNext()) {
-      Resource child = childResourcesIterator.next();
+
+    Iterator<Resource> iterator = childResourcesIterable.iterator();
+    while (iterator.hasNext()) {
+      Resource child = iterator.next();
       if (copy) {
         toService.copy(fromService, child.getStoragePath(),
           extractToStoragePathChild(fromStoragePath, child.getStoragePath(), toStoragePath));
@@ -128,6 +136,7 @@ public final class StorageServiceUtils {
           extractToStoragePathChild(fromStoragePath, child.getStoragePath(), toStoragePath));
       }
     }
+    IOUtils.closeQuietly(childResourcesIterable);
   }
 
   private static StoragePath extractToStoragePathChild(StoragePath fromStoragePath, StoragePath fromStoragePathChild,

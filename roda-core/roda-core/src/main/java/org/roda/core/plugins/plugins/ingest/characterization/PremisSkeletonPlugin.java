@@ -105,7 +105,7 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
             LOGGER.debug("createPremisForRepresentation  " + representation.getId());
             LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
             boolean inotify = false;
-            PremisSkeletonPluginUtils.runPremisSkeletonOnRepresentation(model, storage, aip, representation.getId(),
+            PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representation.getId(),
               inotify);
           }
           model.notifyAIPUpdated(aip.getId());

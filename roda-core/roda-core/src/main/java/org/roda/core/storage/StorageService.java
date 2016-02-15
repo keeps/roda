@@ -7,6 +7,7 @@
  */
 package org.roda.core.storage;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -44,7 +45,7 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public ClosableIterable<Container> listContainers()
+  public CloseableIterable<Container> listContainers()
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   /**
@@ -90,7 +91,7 @@ public interface StorageService {
     throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
-   * List all resources directly under this container.
+   * List all resources under this container.
    * 
    * @param storagePath
    *          storage path that identifies the container.
@@ -100,11 +101,11 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
-   * Count all resources directly under this container.
+   * Count all resources under this container.
    * 
    * @param storagePath
    *          storage path that identifies the container.
@@ -114,8 +115,9 @@ public interface StorageService {
    * @throws NotFoundException
    * @throws RequestNotValidException
    */
-  public Long countResourcesUnderContainer(StoragePath storagePath)
+  public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+  
 
   /**
    * Creates a new directory with the specified name.
@@ -162,7 +164,7 @@ public interface StorageService {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
-   * List all resources, container or binaries, directly under this directory.
+   * List all resources, container or binaries, under this directory.
    * 
    * @param storagePath
    *          storage path that identifies the directory
@@ -172,11 +174,11 @@ public interface StorageService {
    * @throws RequestNotValidException
    * @throws AuthorizationDeniedException
    */
-  public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**
-   * Count all resources, container or binaries, directly under this directory.
+   * Count all resources, container or binaries, under this directory.
    * 
    * @param storagePath
    *          storage path that identifies the directory
@@ -186,7 +188,7 @@ public interface StorageService {
    * @throws AuthorizationDeniedException
    * @throws RequestNotValidException
    */
-  public Long countResourcesUnderDirectory(StoragePath storagePath)
+  public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   /**

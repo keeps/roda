@@ -76,7 +76,7 @@ public class JobsHelper {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
-    RodaCoreFactory.getModelService().createJob(updatedJob);
+    RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
 
     // FIXME should we verify if the job was created with success???
     // FIXME correctly handle future returned by Patterns.ask

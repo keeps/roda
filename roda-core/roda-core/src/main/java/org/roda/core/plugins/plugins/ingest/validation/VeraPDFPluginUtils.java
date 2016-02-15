@@ -16,6 +16,8 @@ import java.nio.file.Path;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.IOUtils;
+import org.roda.core.storage.ContentPayload;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.features.pb.PBFeatureParser;
 import org.verapdf.features.tools.FeaturesCollection;
@@ -30,7 +32,7 @@ import org.verapdf.report.MachineReadableReport;
 
 public class VeraPDFPluginUtils {
 
-  public static Path runVeraPDF(InputStream isPDF, String filename, String profile, boolean hasFeatures)
+  public static Path runVeraPDF(ContentPayload payload, String filename, String profile, boolean hasFeatures)
     throws IOException, JAXBException, IllegalArgumentException, VeraPDFException {
     Path p = null;
 
@@ -38,6 +40,7 @@ public class VeraPDFPluginUtils {
     boolean reportPassedChecks = false;
     long startTime = System.currentTimeMillis();
 
+    InputStream isPDF = payload.createInputStream();
     ModelParser loader = new ModelParser(isPDF);
 
     // validation code
@@ -58,10 +61,11 @@ public class VeraPDFPluginUtils {
     MachineReadableReport mrr = MachineReadableReport.fromValues(filename, validationProfile, result,
       reportPassedChecks, null, featuresCollection, System.currentTimeMillis() - startTime);
     MachineReadableReport.toXml(mrr, os, Boolean.TRUE);
-    os.close();
-    loader.close();
 
-    isPDF.close();
+    IOUtils.closeQuietly(os);
+    IOUtils.closeQuietly(loader);
+    IOUtils.closeQuietly(isPDF);
+
     return p;
   }
 

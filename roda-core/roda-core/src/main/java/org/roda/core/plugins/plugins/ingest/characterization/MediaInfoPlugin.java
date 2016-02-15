@@ -123,8 +123,9 @@ public class MediaInfoPlugin implements Plugin<AIP> {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         DirectResourceAccess directAccess = null;
         try {
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          directAccess = storage.getDirectAccess(representationPath);
+          StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+            representation.getId());
+          directAccess = storage.getDirectAccess(representationDataPath);
 
           String mediaInfoOutput = MediaInfoPluginUtils.runMediaInfoOnPath(directAccess.getPath());
 

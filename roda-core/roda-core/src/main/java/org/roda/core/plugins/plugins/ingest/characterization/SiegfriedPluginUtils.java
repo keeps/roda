@@ -90,8 +90,9 @@ public class SiegfriedPluginUtils {
       throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException, PluginException {
 
-    StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-    DirectResourceAccess directAccess = storage.getDirectAccess(representationPath);
+    StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+      representation.getId());
+    DirectResourceAccess directAccess = storage.getDirectAccess(representationDataPath);
 
     Path representationFsPath = directAccess.getPath();
     String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);

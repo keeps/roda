@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.xmlbeans.XmlException;
@@ -29,6 +30,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.adapter.filter.Filter;
@@ -55,7 +57,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.Plugin;
@@ -65,7 +66,6 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugi
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -242,7 +242,7 @@ public class InternalPluginsTest {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 
-    ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(0).getId());
+    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, allFiles);
 
@@ -266,7 +266,8 @@ public class InternalPluginsTest {
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
-    List<PreservationMetadata> preservationMetadataList = aip.getMetadata().getPreservationMetadata();
+    CloseableIterable<PreservationMetadata> preservationMetadataList = model.listPreservationMetadata(aip.getId(),
+      true);
     for (PreservationMetadata pm : preservationMetadataList) {
       if (pm.getType().equals(PreservationMetadataType.EVENT)) {
         try {
@@ -290,6 +291,7 @@ public class InternalPluginsTest {
         }
       }
     }
+    IOUtils.closeQuietly(preservationMetadataList);
     Assert.assertTrue(found);
 
     Filter filter = new Filter();
@@ -315,11 +317,13 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // Files plus one representation
-    Assert.assertEquals(CORPORA_FILES_COUNT + 1, aip.getMetadata().getPreservationMetadata().size());
+    CloseableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadata(aip.getId(), true);
 
-    Binary rpo_bin = model.retrieveRepresentationPreservationObject(aip.getId(),
-      aip.getRepresentations().get(0).getId());
+    // Files plus one representation
+    Assert.assertEquals(CORPORA_FILES_COUNT + 1, Iterables.size(preservationMetadata));
+    preservationMetadata.close();
+
+    Binary rpo_bin = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
     Representation rpo = PremisUtils.binaryToRepresentation(rpo_bin.getContent(), true);
 
     // Relates to files
@@ -367,7 +371,8 @@ public class InternalPluginsTest {
     aip = model.retrieveAIP(aip.getId());
 
     // Files with Siegfried output
-    Assert.assertEquals(CORPORA_FILES_COUNT, aip.getMetadata().getOtherMetadata().size());
+    Assert.assertEquals(CORPORA_FILES_COUNT,
+      Iterables.size(model.listOtherMetadata(aip.getId(), SiegfriedPlugin.OTHER_METADATA_TYPE, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
@@ -391,19 +396,17 @@ public class InternalPluginsTest {
       RodaConstants.PRESERVATION_REGISTRY_MIME);
     Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey());
 
-    
-    
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
       aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
-    
+
     Assert.assertEquals("text/plain", indFile.getFileFormat().getMimeType());
     Assert.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
     Assert.assertEquals("Plain Text File", indFile.getFileFormat().getFormatDesignationName());
-    
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
-    List<PreservationMetadata> preservationMetadataList = aip.getMetadata().getPreservationMetadata();
+    CloseableIterable<PreservationMetadata> preservationMetadataList = model.listPreservationMetadata(aip.getId(),
+      true);
     for (PreservationMetadata pm : preservationMetadataList) {
       if (pm.getType().equals(PreservationMetadataType.EVENT)) {
         try {
@@ -427,6 +430,7 @@ public class InternalPluginsTest {
         }
       }
     }
+    IOUtils.closeQuietly(preservationMetadataList);
     Assert.assertTrue(found);
 
     Filter filter = new Filter();
@@ -462,7 +466,8 @@ public class InternalPluginsTest {
     aip = model.retrieveAIP(aip.getId());
 
     // Files with Apache Tika output
-    Assert.assertEquals(CORPORA_FILES_COUNT, aip.getMetadata().getOtherMetadata().size());
+    Assert.assertEquals(CORPORA_FILES_COUNT,
+      Iterables.size(model.listOtherMetadata(aip.getId(), TikaFullTextPlugin.OTHER_METADATA_TYPE, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX,

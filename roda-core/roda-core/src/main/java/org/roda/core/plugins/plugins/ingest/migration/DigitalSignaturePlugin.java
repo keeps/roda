@@ -13,6 +13,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -42,7 +43,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -217,7 +217,10 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
       try {
         LOGGER.debug("Processing representation: " + representation);
-        ClosableIterable<File> allFiles = model.listAllFiles(aipId, representation.getId());
+
+        boolean recursive = true;
+        CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
+          recursive);
 
         for (File file : allFiles) {
           LOGGER.debug("Processing file: " + file);
@@ -275,7 +278,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                   newRepresentationID = representation.getId();
                   newRepresentations.add(representation.getId());
                   StoragePath representationPreservationPath = ModelUtils
-                    .getAIPRepresentationPreservationPath(representation.getAipId(), representation.getId());
+                    .getRepresentationPreservationMetadataStoragePath(representation.getAipId(),
+                      representation.getId());
                   storage.deleteResource(representationPreservationPath);
                 }
 
@@ -290,12 +294,14 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                     boolean original = false;
                     newRepresentations.add(newRepresentationID);
                     model.createRepresentation(aipId, newRepresentationID, original, notify);
+
                   }
 
                   // update file on new representation
                   if (!representation.isOriginal()) {
                     model.deleteFile(representation.getAipId(), newRepresentationID, file.getPath(), file.getId(),
                       notify);
+
                   }
 
                   // update file on new representation
@@ -309,6 +315,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                     new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
 
                 } else {
+
                   LOGGER.debug("Process failed on file " + file.getId() + " of representation " + representation.getId()
                     + " from AIP " + aipId);
                   pluginResultState = 2;

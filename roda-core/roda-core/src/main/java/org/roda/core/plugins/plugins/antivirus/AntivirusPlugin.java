@@ -146,7 +146,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
       DirectResourceAccess directAccess = null;
       try {
         LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
-        StoragePath aipPath = ModelUtils.getAIPpath(aip.getId());
+        StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
 
         directAccess = storage.getDirectAccess(aipPath);
         virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());

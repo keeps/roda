@@ -8,13 +8,10 @@
 package org.roda.core.plugins.plugins;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +23,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -50,8 +48,6 @@ import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
-
-import com.google.common.collect.Sets;
 
 public final class PluginHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginHelper.class);
@@ -142,7 +138,7 @@ public final class PluginHelper {
   public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
     PluginState pluginState, String jobId) {
     JobReport jobReport = new JobReport();
-    jobReport.setId(ModelUtils.getJobReportId(jobId, reportItem.getItemId()));
+    jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
     jobReport.setJobId(jobId);
     jobReport.setAipId(reportItem.getItemId());
     jobReport.setObjectId(reportItem.getOtherId());
@@ -157,7 +153,7 @@ public final class PluginHelper {
     jobReport.setReport(report);
 
     try {
-      model.createJobReport(jobReport);
+      model.createOrUpdateJobReport(jobReport);
     } catch (GenericException e) {
       LOGGER.error("Error creating Job Report", e);
     }
@@ -173,7 +169,7 @@ public final class PluginHelper {
         jobReport = model.retrieveJobReport(jobId, aipId);
       } catch (NotFoundException e) {
         jobReport = new JobReport();
-        jobReport.setId(ModelUtils.getJobReportId(jobId, reportItem.getItemId()));
+        jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
         jobReport.setJobId(jobId);
         jobReport.setAipId(reportItem.getItemId());
         jobReport.setObjectId(reportItem.getOtherId());
@@ -187,7 +183,7 @@ public final class PluginHelper {
       jobReport.getReport().addItem(reportItem);
       jobReport.setDateUpdated(new Date());
 
-      model.updateJobReport(jobReport);
+      model.createOrUpdateJobReport(jobReport);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Error while updating Job Report", e);
     }
@@ -233,7 +229,7 @@ public final class PluginHelper {
         job.setEndDate(new Date());
       }
 
-      model.updateJob(job);
+      model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get or update Job from index", e);
     }

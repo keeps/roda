@@ -55,7 +55,7 @@ public class ValidationUtils {
       ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(false);
-    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
+    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);
       Binary binary = model.getStorage().getBinary(storagePath);
@@ -97,7 +97,7 @@ public class ValidationUtils {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     boolean valid = true;
     List<ValidationIssue> issues = new ArrayList<>();
-    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
+    List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       ValidationReport report = isDescriptiveMetadataValid(model, dm, failIfNoSchema);
       valid &= report.isValid();
@@ -285,6 +285,9 @@ public class ValidationUtils {
         report.setValid(false);
         report.setMessage("No schema to validate PREMIS");
       }
+
+      IOUtils.closeQuietly(inputStream);
+      IOUtils.closeQuietly(schemaStream);
     } catch (SAXException | IOException e) {
       report.setValid(false);
       report.setMessage(e.getMessage());

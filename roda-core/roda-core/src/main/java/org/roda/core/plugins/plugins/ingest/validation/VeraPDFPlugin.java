@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -43,7 +45,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
@@ -141,7 +142,9 @@ public class VeraPDFPlugin implements Plugin<AIP> {
         try {
           logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
 
-          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          boolean recursive = true;
+          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
+
           for (File file : allFiles) {
             logger.debug("Processing file: " + file);
 
@@ -159,8 +162,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
 
                 // FIXME file that doesn't get deleted afterwards
                 logger.debug("Running veraPDF validator on " + file.getId());
-                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent().createInputStream(),
-                  file.getId(), profile, hasFeatures);
+                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent(), file.getId(), profile, hasFeatures);
 
                 if (veraPDFResult != null) {
                   resourceList.put(file.getId(), veraPDFResult);
@@ -204,15 +206,18 @@ public class VeraPDFPlugin implements Plugin<AIP> {
 
         // using XPath to discover if the validation was successful or not
         XPath xpath = XPathFactory.newInstance().newXPath();
-        InputSource inputSource = new InputSource(b.getContent().createInputStream());
+        InputStream inputStream = b.getContent().createInputStream();
+        String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+        InputSource inputSource = new InputSource(xmlReport);
         NodeList nodes = (NodeList) xpath.evaluate("//*[@compliant='false']", inputSource, XPathConstants.NODESET);
 
         if (nodes.getLength() > 0) {
           noteStringBuilder.append(fileID + ", ");
-          String xmlReport = IOUtils.toString(b.getContent().createInputStream(), StandardCharsets.UTF_8);
           detailsStringBuilder.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
           state = 2;
         }
+
+        IOUtils.closeQuietly(inputStream);
       }
 
       noteStringBuilder.setLength(noteStringBuilder.length() - 2);

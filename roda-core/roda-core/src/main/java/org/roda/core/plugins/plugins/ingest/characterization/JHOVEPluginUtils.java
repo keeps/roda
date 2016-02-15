@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Map;
@@ -79,7 +80,9 @@ public class JHOVEPluginUtils {
     // FIXME temp file that doesn't get deleted afterwards
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
-    IOUtils.copy(binary.getContent().createInputStream(), fos);
+    InputStream inputStream = binary.getContent().createInputStream();
+    IOUtils.copy(inputStream, fos);
+    IOUtils.closeQuietly(inputStream);
     fos.close();
     return inspect(f);
   }

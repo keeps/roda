@@ -41,6 +41,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -56,7 +57,6 @@ import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StorageTestUtils;
@@ -140,7 +140,7 @@ public class ModelServiceTest {
     assertNull("AIP_1 should not have a parent", aip.getParentId());
     assertTrue(aip.isActive());
 
-    List<String> descriptiveMetadataIds = aip.getMetadata().getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
     assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID));
 
@@ -171,7 +171,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, representation1.getId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ORIGINAL, representation1.isOriginal());
 
-    ClosableIterable<File> allRep1Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    CloseableIterable<File> allRep1Files = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_1_ID, true);
     List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().map(f -> f.getId())
       .collect(Collectors.toList());
     allRep1Files.close();
@@ -184,7 +184,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, representation2.getId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ORIGINAL, representation2.isOriginal());
 
-    ClosableIterable<File> allRep2Files = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_2_ID);
+    CloseableIterable<File> allRep2Files = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_2_ID, true);
     List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().map(f -> f.getId())
       .collect(Collectors.toList());
     allRep2Files.close();
@@ -239,8 +239,7 @@ public class ModelServiceTest {
 
     // test preservation metadata
 
-    Binary preservationObject = model.retrieveRepresentationPreservationObject(aipId,
-      CorporaConstants.REPRESENTATION_1_ID);
+    Binary preservationObject = model.retrievePreservationRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
     lc.xmlns.premisV2.Representation rpo = PremisUtils.binaryToRepresentation(preservationObject.getContent(), true);
 
     List<ObjectIdentifierComplexType> objectIdentifierList = rpo.getObjectIdentifierList();
@@ -277,7 +276,7 @@ public class ModelServiceTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS));
 
-    ClosableIterable<File> allFiles = model.listAllFiles(aipId, CorporaConstants.REPRESENTATION_1_ID);
+    CloseableIterable<File> allFiles = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_1_ID, true);
 
     List<File> reusableList = new ArrayList<>();
     Iterables.addAll(reusableList, allFiles);
@@ -407,7 +406,8 @@ public class ModelServiceTest {
     assertEquals(updatedAIP, retrievedAIP);
 
     // check content is correct
-    StorageTestUtils.testEntityEqualRecursively(corporaService, otherAipPath, storage, ModelUtils.getAIPpath(aipId));
+    StorageTestUtils.testEntityEqualRecursively(corporaService, otherAipPath, storage,
+      ModelUtils.getAIPStoragePath(aipId));
   }
 
   @Test
@@ -417,7 +417,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Iterable<DescriptiveMetadata> list = model.retrieveAIP(aipId).getMetadata().getDescriptiveMetadata();
+    Iterable<DescriptiveMetadata> list = model.retrieveAIP(aipId).getDescriptiveMetadata();
     DescriptiveMetadata descriptiveMetadata1 = model.retrieveDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID);
 
@@ -530,7 +530,7 @@ public class ModelServiceTest {
 
     // check content
     StorageTestUtils.testEntityEqualRecursively(corporaService, corporaRepresentationPath, storage,
-      ModelUtils.getRepresentationPath(aipId, newRepresentationId));
+      ModelUtils.getRepresentationStoragePath(aipId, newRepresentationId));
   }
 
   @Test
@@ -552,7 +552,7 @@ public class ModelServiceTest {
 
     // check content
     StorageTestUtils.testEntityEqualRecursively(corporaService, corporaRepresentationPath, storage,
-      ModelUtils.getRepresentationPath(aipId, CorporaConstants.REPRESENTATION_1_ID));
+      ModelUtils.getRepresentationStoragePath(aipId, CorporaConstants.REPRESENTATION_1_ID));
   }
 
   @Test
@@ -695,8 +695,7 @@ public class ModelServiceTest {
     model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Binary representation_bin = model.retrieveRepresentationPreservationObject(aipId,
-      CorporaConstants.REPRESENTATION_1_ID);
+    Binary representation_bin = model.retrievePreservationRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
 
     lc.xmlns.premisV2.Representation representation = PremisUtils
       .binaryToRepresentation(representation_bin.getContent(), true);

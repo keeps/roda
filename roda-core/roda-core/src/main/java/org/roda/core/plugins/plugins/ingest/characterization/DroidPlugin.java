@@ -102,8 +102,9 @@ public class DroidPlugin implements Plugin<AIP> {
         LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
         DirectResourceAccess directAccess = null;
         try {
-          StoragePath representationPath = ModelUtils.getRepresentationPath(aip.getId(), representation.getId());
-          directAccess = storage.getDirectAccess(representationPath);
+          StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
+            representation.getId());
+          directAccess = storage.getDirectAccess(representationDataPath);
 
           String droidOutput = DroidPluginUtils.runDROIDOnPath(directAccess.getPath());
           LOGGER.debug("DROID OUTPUT: " + droidOutput);
@@ -129,13 +130,13 @@ public class DroidPlugin implements Plugin<AIP> {
           IOUtils.closeQuietly(directAccess);
         }
       }
-      
+
       try {
         model.notifyAIPUpdated(aip.getId());
       } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
         LOGGER.error("Error notifying of AIP update", e);
       }
-      
+
     }
     return null;
   }

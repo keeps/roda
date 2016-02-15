@@ -32,6 +32,7 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -52,11 +53,9 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
-import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -121,7 +120,8 @@ public class JpylyzerPlugin implements Plugin<AIP> {
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
         try {
-          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), representation.getId());
+          boolean recursive = true;
+          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
           for (File file : allFiles) {
             if (!file.isDirectory()) {
               // TODO check if file is JPEG2000

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -35,9 +36,8 @@ import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.slf4j.Logger;
@@ -107,7 +107,7 @@ public class IndexService {
 
   public void reindexAIPs()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    ClosableIterable<AIP> aips = null;
+    CloseableIterable<AIP> aips = null;
     try {
       LOGGER.info(new Date().getTime() + " > Listing AIPs");
       aips = model.listAIPs();
@@ -149,26 +149,28 @@ public class IndexService {
   }
 
   public void reindexJob(Job job) {
-    observer.jobCreated(job);
+    observer.jobCreatedOrUpdated(job);
   }
 
   public void reindexJobReport(JobReport jobReport) {
-    observer.jobReportCreated(jobReport);
+    observer.jobReportCreatedOrUpdated(jobReport);
   }
 
   public void reindexActionLogs()
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    ClosableIterable<Resource> actionLogs = null;
+    CloseableIterable<Resource> actionLogs = null;
 
     try {
+      boolean recursive = false;
       actionLogs = model.getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG));
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
       for (Resource resource : actionLogs) {
-        Binary b = model.getStorage().getBinary(resource.getStoragePath());
-        BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
-
-        reindexActionLog(br);
+        if (resource instanceof Binary) {
+          Binary b = (Binary) resource;
+          BufferedReader br = new BufferedReader(new InputStreamReader(b.getContent().createInputStream()));
+          reindexActionLog(br);
+        }
       }
     } catch (IOException e) {
       throw new GenericException("Error retrieving/processing logs from storage", e);
@@ -187,7 +189,7 @@ public class IndexService {
     String line;
     try {
       while ((line = br.readLine()) != null) {
-        LogEntry entry = ModelUtils.getObjectFromJson(line, LogEntry.class);
+        LogEntry entry = JsonUtils.getObjectFromJson(line, LogEntry.class);
         if (entry != null) {
           reindexActionLog(entry);
         }

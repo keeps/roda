@@ -84,4 +84,8 @@ public class IdUtils {
     return idBuilder.toString();
   }
 
+  public static String getJobReportId(String jobId, String aipId) {
+    return jobId + ID_SEPARATOR + aipId;
+  }
+
 }

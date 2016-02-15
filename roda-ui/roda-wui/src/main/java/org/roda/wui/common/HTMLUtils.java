@@ -28,6 +28,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -40,7 +41,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -85,78 +85,6 @@ public final class HTMLUtils {
     Map<String, Object> stylesheetOpt = messages.getTranslations(
       RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class, true);
     return binaryToHtml(binary, "premis", stylesheetOpt);
-  }
-
-  public static String getPreservationMetadataHTML(String aipId, ModelService model, StorageService storage,
-    Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFile) throws TransformerException, RequestNotValidException,
-      NotFoundException, GenericException, AuthorizationDeniedException {
-    AIP aip = model.retrieveAIP(aipId);
-    StringBuilder s = new StringBuilder();
-    s.append("<span class='preservationMetadata'><div class='title'>PREMIS</div>");
-    for (Representation representation : aip.getRepresentations()) {
-      try {
-        String html = getRepresentationPreservationMetadataHtml(
-          ModelUtils.getAIPRepresentationPreservationPath(aipId, representation.getId()), storage, locale,
-          pagingParametersAgents, pagingParametersEvents, pagingParametersFile);
-        s.append(html);
-      } finally {
-
-      }
-    }
-
-    s.append("</span>");
-
-    return s.toString();
-  }
-
-  public static String getRepresentationPreservationMetadataHtml(StoragePath preservationPath, StorageService storage,
-    final Locale locale, Pair<Integer, Integer> pagingParametersAgents, Pair<Integer, Integer> pagingParametersEvents,
-    Pair<Integer, Integer> pagingParametersFiles) {
-    String html = "";
-    try {
-
-      String tempFolder = RandomStringUtils.randomAlphabetic(10);
-      String tempFolder2 = RandomStringUtils.randomAlphabetic(10);
-      Path p = Paths.get(tempFolder);
-      StorageService tempStorage = new FileStorageService(p);
-      tempStorage.copy(storage, preservationPath, DefaultStoragePath.parse(tempFolder2));
-
-      StringBuilder xml = new StringBuilder("<files>");
-      ClosableIterable<Resource> resources = tempStorage
-        .listResourcesUnderContainer(DefaultStoragePath.parse(tempFolder2));
-      Iterator<Resource> it = resources.iterator();
-      while (it.hasNext()) {
-        Resource r = it.next();
-
-        xml.append("<file>").append(tempFolder).append("/").append(r.getStoragePath().asString()).append("</file>");
-      }
-      resources.close();
-      xml.append("</files>");
-      Path xmlFile = Paths.get(tempFolder, tempFolder2, "list.xml");
-      java.io.File f = xmlFile.toFile();
-      FileUtils.write(f, xml.toString());
-
-      Map<String, Object> parameters = new HashMap<String, Object>();
-      parameters.put("fromEvent", pagingParametersEvents.getFirst());
-      parameters.put("maxEvents", pagingParametersEvents.getSecond());
-      parameters.put("fromAgent", pagingParametersAgents.getFirst());
-      parameters.put("maxAgents", pagingParametersAgents.getSecond());
-      parameters.put("fromFile", pagingParametersFiles.getFirst());
-      parameters.put("maxFiles", pagingParametersFiles.getSecond());
-
-      Messages i18nMessages = RodaCoreFactory.getI18NMessages(locale);
-      Map<String, String> translations = i18nMessages
-        .getTranslations(RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + "premis", String.class, true);
-      parameters.putAll(translations);
-
-      html = fileToHtml(f, "join", parameters);
-      FSUtils.deletePath(p);
-
-    } catch (Exception e) {
-      LOGGER.error(e.getMessage(), e);
-    }
-    return html;
   }
 
   private static String binaryToHtml(Binary binary, String metadataType, Map<String, Object> stylesheetOpt)

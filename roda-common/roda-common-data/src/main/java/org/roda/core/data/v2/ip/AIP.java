@@ -11,9 +11,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.Metadata;
-import org.roda.core.data.v2.ip.metadata.OtherMetadata;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,7 +24,7 @@ public class AIP implements Serializable {
   private boolean active;
   private AIPPermissions permissions;
 
-  private Metadata metadata;
+  private List<DescriptiveMetadata> descriptiveMetadata;
 
   private List<Representation> representations;
 
@@ -35,15 +32,15 @@ public class AIP implements Serializable {
     super();
   }
 
-  public AIP(String id, String parentId, boolean active, AIPPermissions permissions, Metadata metadata,
-    List<Representation> representations) {
+  public AIP(String id, String parentId, boolean active, AIPPermissions permissions,
+    List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations) {
     super();
     this.id = id;
     this.parentId = parentId;
     this.active = active;
     this.permissions = permissions;
 
-    this.metadata = metadata;
+    this.descriptiveMetadata = descriptiveMetadata;
 
     this.representations = representations;
 
@@ -77,23 +74,9 @@ public class AIP implements Serializable {
     this.id = id;
 
     // As id is not serialized to JSON, set the AIP id in metadata and data
-    if (metadata != null) {
-      if (metadata.getDescriptiveMetadata() != null) {
-        for (DescriptiveMetadata descriptiveMetadata : metadata.getDescriptiveMetadata()) {
-          descriptiveMetadata.setAipId(id);
-        }
-      }
-
-      if (metadata.getPreservationMetadata() != null) {
-        for (PreservationMetadata preservationMetadata : metadata.getPreservationMetadata()) {
-          preservationMetadata.setAipId(id);
-        }
-      }
-
-      if (metadata.getOtherMetadata() != null) {
-        for (OtherMetadata otherMetadata : metadata.getOtherMetadata()) {
-          otherMetadata.setAipId(id);
-        }
+    if (descriptiveMetadata != null) {
+      for (DescriptiveMetadata dm : descriptiveMetadata) {
+        dm.setAipId(id);
       }
     }
 
@@ -121,12 +104,12 @@ public class AIP implements Serializable {
     this.permissions = permissions;
   }
 
-  public Metadata getMetadata() {
-    return metadata;
+  public List<DescriptiveMetadata> getDescriptiveMetadata() {
+    return descriptiveMetadata;
   }
 
-  public void setMetadata(Metadata metadata) {
-    this.metadata = metadata;
+  public void setDescriptiveMetadata(List<DescriptiveMetadata> descriptiveMetadata) {
+    this.descriptiveMetadata = descriptiveMetadata;
   }
 
   public List<Representation> getRepresentations() {
@@ -142,8 +125,8 @@ public class AIP implements Serializable {
     final int prime = 31;
     int result = 1;
     result = prime * result + (active ? 1231 : 1237);
+    result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
-    result = prime * result + ((metadata == null) ? 0 : metadata.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((representations == null) ? 0 : representations.hashCode());
@@ -161,15 +144,15 @@ public class AIP implements Serializable {
     AIP other = (AIP) obj;
     if (active != other.active)
       return false;
+    if (descriptiveMetadata == null) {
+      if (other.descriptiveMetadata != null)
+        return false;
+    } else if (!descriptiveMetadata.equals(other.descriptiveMetadata))
+      return false;
     if (id == null) {
       if (other.id != null)
         return false;
     } else if (!id.equals(other.id))
-      return false;
-    if (metadata == null) {
-      if (other.metadata != null)
-        return false;
-    } else if (!metadata.equals(other.metadata))
       return false;
     if (parentId == null) {
       if (other.parentId != null)
@@ -192,7 +175,7 @@ public class AIP implements Serializable {
   @Override
   public String toString() {
     return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", permissions=" + permissions
-      + ", metadata=" + metadata + ", representations=" + representations + "]";
+      + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations + "]";
   }
 
 }

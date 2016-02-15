@@ -8,11 +8,14 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -26,11 +29,11 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -96,13 +99,16 @@ public class ReindexJobPlugin implements Plugin<Job> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Job> list)
     throws PluginException {
 
-    ClosableIterable<Resource> listResourcesUnderDirectory = null;
+    CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
-      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath());
+      boolean recursive = false;
+      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobContainerPath(), recursive);
 
       for (Resource resource : listResourcesUnderDirectory) {
         Binary binary = storage.getBinary(resource.getStoragePath());
-        Job objectFromJson = ModelUtils.getObjectFromJson(binary.getContent().createInputStream(), Job.class);
+        InputStream inputStream = binary.getContent().createInputStream();
+        Job objectFromJson = JsonUtils.getObjectFromJson(inputStream, Job.class);
+        IOUtils.closeQuietly(inputStream);
         index.reindexJob(objectFromJson);
       }
 
@@ -120,12 +126,15 @@ public class ReindexJobPlugin implements Plugin<Job> {
     }
 
     try {
-      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobReportContainerPath());
+      boolean recursive = false;
+      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobReportContainerPath(),
+        recursive);
 
       for (Resource resource : listResourcesUnderDirectory) {
         Binary binary = storage.getBinary(resource.getStoragePath());
-        JobReport objectFromJson = ModelUtils.getObjectFromJson(binary.getContent().createInputStream(),
-          JobReport.class);
+        InputStream inputStream = binary.getContent().createInputStream();
+        JobReport objectFromJson = JsonUtils.getObjectFromJson(inputStream, JobReport.class);
+        IOUtils.closeQuietly(inputStream);
         index.reindexJobReport(objectFromJson);
       }
 

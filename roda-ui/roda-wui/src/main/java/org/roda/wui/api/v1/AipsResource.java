@@ -426,8 +426,8 @@ public class AipsResource {
 
   @GET
   @Path("/{aip_id}/preservation_metadata/{representation_id}")
-  @Produces({"application/json", "application/zip", "text/html"})
-  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file or HTML conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
+  @Produces({"application/json", "application/zip"})
+  @ApiOperation(value = "Get representation preservation metadata", notes = "Get representation preservation metadata (JSON info, ZIP file conversion) for a given representation.\nOptional query params of **start** and **limit** defined the returned array.", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
 
   public Response aipsAipIdPreservationMetadataRepresentationIdGet(

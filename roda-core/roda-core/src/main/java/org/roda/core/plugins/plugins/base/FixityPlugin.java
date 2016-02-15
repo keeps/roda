@@ -17,6 +17,7 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -38,7 +39,6 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -114,7 +114,8 @@ public class FixityPlugin implements Plugin<AIP> {
         boolean inotify = false;
         LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
         try {
-          ClosableIterable<File> allFiles = model.listAllFiles(aip.getId(), r.getId());
+          boolean recursive = true;
+          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), r.getId(), recursive);
 
           List<String> okFileIDS = new ArrayList<String>();
           List<String> koFileIDS = new ArrayList<String>();

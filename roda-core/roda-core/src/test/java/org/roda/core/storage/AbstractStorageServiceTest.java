@@ -230,7 +230,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().createContainer(containerStoragePath);
 
     // 1) list empty container
-    Iterable<Resource> resources = getStorage().listResourcesUnderContainer(containerStoragePath);
+    Iterable<Resource> resources = getStorage().listResourcesUnderContainer(containerStoragePath, false);
     assertNotNull(resources);
     assertNotNull(resources.iterator());
     assertFalse(resources.iterator().hasNext());
@@ -242,7 +242,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     StoragePath directoryStoragePath2 = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
     getStorage().createDirectory(directoryStoragePath2);
 
-    resources = getStorage().listResourcesUnderContainer(containerStoragePath);
+    resources = getStorage().listResourcesUnderContainer(containerStoragePath, false);
     assertNotNull(resources);
     // Resource r1 = new DefaultDirectory(directoryStoragePath1,
     // directoryMetadata1);
@@ -250,6 +250,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // directoryMetadata2);
     // assertThat(resources, containsInAnyOrder(r1, r2));
     assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+
+    // TODO test recursive listing
 
     // cleanup
     getStorage().deleteResource(containerStoragePath);
@@ -372,7 +374,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().createDirectory(directoryStoragePath);
 
     // 1) list empty directory
-    Iterable<Resource> resources = getStorage().listResourcesUnderDirectory(directoryStoragePath);
+    Iterable<Resource> resources = getStorage().listResourcesUnderDirectory(directoryStoragePath, false);
     assertNotNull(resources);
     assertFalse(resources.iterator().hasNext());
 
@@ -390,7 +392,7 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
       .generateRandomResourceStoragePathUnder(subDirectoryStoragePath1);
     getStorage().createDirectory(subSubDirectoryStoragePath1);
 
-    resources = getStorage().listResourcesUnderDirectory(directoryStoragePath);
+    resources = getStorage().listResourcesUnderDirectory(directoryStoragePath, false);
     assertNotNull(resources);
 
     // Resource r1 = new DefaultDirectory(subDirectoryStoragePath1,
@@ -399,6 +401,8 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     // subDirectoryMetadata2);
     // assertThat(resources, containsInAnyOrder(r1, r2));
     assertThat(resources, Matchers.<Resource> iterableWithSize(2));
+
+    // TODO test recursive listing
 
     // cleanup
     getStorage().deleteContainer(containerStoragePath);

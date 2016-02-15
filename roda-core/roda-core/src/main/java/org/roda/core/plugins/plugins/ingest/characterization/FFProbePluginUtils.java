@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -67,7 +68,9 @@ public class FFProbePluginUtils {
 
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
-    IOUtils.copy(binary.getContent().createInputStream(), fos);
+    InputStream inputStream = binary.getContent().createInputStream();
+    IOUtils.copy(inputStream, fos);
+    IOUtils.closeQuietly(inputStream);
     fos.close();
     return inspect(f);
   }

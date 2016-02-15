@@ -116,6 +116,7 @@ import org.roda.core.data.v2.user.RodaGroup;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.model.ModelService;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
@@ -790,8 +791,6 @@ public class SolrUtils {
     query.setRows(sublist.getMaximumElementCount());
     parseAndConfigureFacets(facets, query);
 
-    LOGGER.debug("Solr Query: " + query);
-
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve), query);
       ret = queryResponseToIndexResult(response, classToRetrieve, facets);
@@ -852,7 +851,7 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
 
-    List<String> descriptiveMetadataIds = aip.getMetadata().getDescriptiveMetadata().stream().map(dm -> dm.getId())
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
 
     ret.addField(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID, descriptiveMetadataIds);
@@ -867,7 +866,7 @@ public class SolrUtils {
       // guarding against repeated fields
       Set<String> usedNonRepeatableFields = new HashSet<>();
 
-      for (DescriptiveMetadata metadata : aip.getMetadata().getDescriptiveMetadata()) {
+      for (DescriptiveMetadata metadata : aip.getDescriptiveMetadata()) {
         StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
@@ -1000,7 +999,7 @@ public class SolrUtils {
     entry.setDuration(duration);
     entry.setId(id);
     try {
-      entry.setParameters(ModelUtils.getListFromJson(parameters == null ? "" : parameters, LogEntryParameter.class));
+      entry.setParameters(JsonUtils.getListFromJson(parameters == null ? "" : parameters, LogEntryParameter.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing log entry parameters", e);
     }
@@ -1019,7 +1018,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.LOG_DATETIME, logEntry.getDatetime());
     doc.addField(RodaConstants.LOG_DURATION, logEntry.getDuration());
     doc.addField(RodaConstants.LOG_ID, logEntry.getId());
-    doc.addField(RodaConstants.LOG_PARAMETERS, ModelUtils.getJsonFromObject(logEntry.getParameters()));
+    doc.addField(RodaConstants.LOG_PARAMETERS, JsonUtils.getJsonFromObject(logEntry.getParameters()));
     doc.addField(RodaConstants.LOG_RELATED_OBJECT_ID, logEntry.getRelatedObjectID());
     doc.addField(RodaConstants.LOG_USERNAME, logEntry.getUsername());
     return doc;
@@ -1135,10 +1134,9 @@ public class SolrUtils {
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
     final String eventOutcomeDetailExtension = objectToString(
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
-    final String eventOutcomeDetailNote = objectToString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE));
-    final List<String> agents = objectToListString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
+
+    final String eventOutcomeDetailNote = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE));
+    final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
     final List<String> outcomes = objectToListString(
       doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
     final List<String> sources = objectToListString(
@@ -1154,32 +1152,32 @@ public class SolrUtils {
     ipe.setEventOutcome(eventOutcome);
     ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
     ipe.setEventOutcomeDetailNote(eventOutcomeDetailNote);
-    try{
+    try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
-      for(String s : sources){
-        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      for (String source : sources) {
+        ids.add(JsonUtils.getObjectFromJson(source, LinkingIdentifier.class));
       }
       ipe.setSourcesObjectIds(ids);
-    }catch(Throwable e){
-      LOGGER.error("Error setting event linking source: "+e.getMessage(),e);
+    } catch (Throwable e) {
+      LOGGER.error("Error setting event linking source: " + e.getMessage(), e);
     }
-    try{
+    try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
-      for(String s : outcomes){
-        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      for (String outcome : outcomes) {
+        ids.add(JsonUtils.getObjectFromJson(outcome, LinkingIdentifier.class));
       }
       ipe.setOutcomeObjectIds(ids);
-    }catch(Throwable e){
-      LOGGER.error("Error setting event linking outcome: "+e.getMessage(),e);
+    } catch (Throwable e) {
+      LOGGER.error("Error setting event linking outcome: " + e.getMessage(), e);
     }
-    try{
+    try {
       List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
-      for(String s : agents){
-        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      for (String agent : agents) {
+        ids.add(JsonUtils.getObjectFromJson(agent, LinkingIdentifier.class));
       }
       ipe.setLinkingAgentIds(ids);
-    }catch(Throwable e){
-      LOGGER.error("Error setting event linking agents: "+e.getMessage(),e);
+    } catch (Throwable e) {
+      LOGGER.error("Error setting event linking agents: " + e.getMessage(), e);
     }
     return ipe;
   }
@@ -1343,7 +1341,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
-    doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, ModelUtils.getJsonFromObject(job.getPluginParameters()));
+    doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
 
@@ -1362,7 +1360,7 @@ public class SolrUtils {
     job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE)));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
-    job.setPluginParameters(ModelUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
+    job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
     job.setOrchestratorMethod(
       ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
@@ -1470,7 +1468,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN, jobReport.getLastPluginRan());
     doc.addField(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE, jobReport.getLastPluginRanState());
 
-    doc.addField(RodaConstants.JOB_REPORT_REPORT, ModelUtils.getJsonFromObject(jobReport.getReport()));
+    doc.addField(RodaConstants.JOB_REPORT_REPORT, JsonUtils.getJsonFromObject(jobReport.getReport()));
 
     return doc;
   }
@@ -1488,8 +1486,8 @@ public class SolrUtils {
     jobReport.setLastPluginRanState(
       PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE))));
     try {
-      jobReport.setReport(
-        ModelUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORT)), Report.class));
+      jobReport
+        .setReport(JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORT)), Report.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job report", e);
     }

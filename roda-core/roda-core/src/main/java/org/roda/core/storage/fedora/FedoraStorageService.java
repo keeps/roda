@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.BadRequestException;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
@@ -22,6 +23,7 @@ import org.fcrepo.client.FedoraRepository;
 import org.fcrepo.client.FedoraResource;
 import org.fcrepo.client.ForbiddenException;
 import org.fcrepo.client.impl.FedoraRepositoryImpl;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -29,7 +31,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ClosableIterable;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultContainer;
@@ -44,6 +45,7 @@ import org.roda.core.storage.StorageServiceUtils;
 import org.roda.core.storage.fedora.utils.FedoraConversionUtils;
 import org.roda.core.storage.fedora.utils.FedoraUtils;
 import org.roda.core.storage.fs.FileStorageService;
+import org.roda.core.storage.utils.StorageRecursiveListingUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -115,7 +117,7 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Container> listContainers()
+  public CloseableIterable<Container> listContainers()
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     return new IterableContainer(fedoraRepository);
   }
@@ -173,26 +175,35 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return new IterableResource(fedoraRepository, storagePath);
+    if (recursive == true) {
+      return StorageRecursiveListingUtils.listAllUnderContainer(this, storagePath);
+    } else {
+      return new IterableResource(fedoraRepository, storagePath);
+    }
   }
 
   @Override
-  public Long countResourcesUnderContainer(StoragePath storagePath)
+  public Long countResourcesUnderContainer(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    try {
-      Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
-        .getChildren(null);
-      return Long.valueOf(children.size());
-    } catch (ForbiddenException e) {
-      throw new AuthorizationDeniedException("Could not count resource under directory", e);
-    } catch (BadRequestException e) {
-      throw new RequestNotValidException("Could not count resource under directory", e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new NotFoundException("Could not count resource under directory", e);
-    } catch (FedoraException e) {
-      throw new GenericException("Could not count resource under directory", e);
+
+    if (recursive == true) {
+      return StorageRecursiveListingUtils.countAllUnderContainer(this, storagePath);
+    } else {
+      try {
+        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+          .getChildren(null);
+        return Long.valueOf(children.size());
+      } catch (ForbiddenException e) {
+        throw new AuthorizationDeniedException("Could not count resource under directory", e);
+      } catch (BadRequestException e) {
+        throw new RequestNotValidException("Could not count resource under directory", e);
+      } catch (org.fcrepo.client.NotFoundException e) {
+        throw new NotFoundException("Could not count resource under directory", e);
+      } catch (FedoraException e) {
+        throw new GenericException("Could not count resource under directory", e);
+      }
     }
   }
 
@@ -262,26 +273,34 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public ClosableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath)
+  public CloseableIterable<Resource> listResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    return new IterableResource(fedoraRepository, storagePath);
+    if (recursive) {
+      return StorageRecursiveListingUtils.listAllUnderDirectory(this, storagePath);
+    } else {
+      return new IterableResource(fedoraRepository, storagePath);
+    }
   }
 
   @Override
-  public Long countResourcesUnderDirectory(StoragePath storagePath)
+  public Long countResourcesUnderDirectory(StoragePath storagePath, boolean recursive)
     throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    try {
-      Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
-        .getChildren(null);
-      return Long.valueOf(children.size());
-    } catch (ForbiddenException e) {
-      throw new AuthorizationDeniedException("Could not count resource under directory", e);
-    } catch (BadRequestException e) {
-      throw new RequestNotValidException("Could not count resource under directory", e);
-    } catch (org.fcrepo.client.NotFoundException e) {
-      throw new NotFoundException("Could not count resource under directory", e);
-    } catch (FedoraException e) {
-      throw new GenericException("Could not count resource under directory", e);
+    if (recursive) {
+      return StorageRecursiveListingUtils.countAllUnderDirectory(this, storagePath);
+    } else {
+      try {
+        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+          .getChildren(null);
+        return Long.valueOf(children.size());
+      } catch (ForbiddenException e) {
+        throw new AuthorizationDeniedException("Could not count resource under directory", e);
+      } catch (BadRequestException e) {
+        throw new RequestNotValidException("Could not count resource under directory", e);
+      } catch (org.fcrepo.client.NotFoundException e) {
+        throw new NotFoundException("Could not count resource under directory", e);
+      } catch (FedoraException e) {
+        throw new GenericException("Could not count resource under directory", e);
+      }
     }
   }
 
@@ -578,7 +597,7 @@ public class FedoraStorageService implements StorageService {
             ContentPayload payload = binary.getContent();
             InputStream inputStream = payload.createInputStream();
             Files.copy(inputStream, path);
-            inputStream.close();
+            IOUtils.closeQuietly(inputStream);
           }
         } catch (IOException | AlreadyExistsException e) {
           throw new GenericException(e);

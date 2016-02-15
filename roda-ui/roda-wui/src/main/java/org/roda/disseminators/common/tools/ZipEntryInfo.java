@@ -7,10 +7,11 @@
  */
 package org.roda.disseminators.common.tools;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.nio.file.Path;
+
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
 
 /**
  * Information for zipping
@@ -21,7 +22,7 @@ import java.io.InputStream;
 public class ZipEntryInfo {
   private final String name;
 
-  private final InputStream inputStream;
+  private final ContentPayload payload;
 
   /**
    * Create a new zip entry info
@@ -30,19 +31,19 @@ public class ZipEntryInfo {
    * @param file
    * @throws FileNotFoundException
    */
-  public ZipEntryInfo(String name, File file) throws FileNotFoundException {
-    this(name, new FileInputStream(file));
+  public ZipEntryInfo(String name, Path path) throws FileNotFoundException {
+    this(name, new FSPathContentPayload(path));
   }
 
   /**
    * Create a new zip entry info
    * 
    * @param name
-   * @param is
+   * @param payload
    */
-  public ZipEntryInfo(String name, InputStream is) {
+  public ZipEntryInfo(String name, ContentPayload payload) {
     this.name = name;
-    this.inputStream = is;
+    this.payload = payload;
   }
 
   /**
@@ -54,12 +55,8 @@ public class ZipEntryInfo {
     return name;
   }
 
-  /**
-   * Get zip entry input stream
-   * 
-   * @return the inputstream where read the file to add to zip
-   */
-  public InputStream getInputStream() {
-    return inputStream;
+  public ContentPayload getPayload() {
+    return payload;
   }
+
 }
