@@ -118,9 +118,6 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
 
         model.createRepresentation(aip.getId(), representationId, original, notifyRepresentationCreated);
 
-        // TODO check if this method is indeed needed
-        PluginHelper.createDirectories(model, aip.getId(), representationId);
-
         // create files
 
         if (transferredResource.isFile()) {

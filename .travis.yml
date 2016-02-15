@@ -19,4 +19,4 @@ before_script:
   # Install Unoconv
   - sudo apt-get install unoconv -y
   # Install GhostScript
-  - sudo apt-get install ghostscript -y
+  - sudo apt-get install ghostscript libgs-dev -y

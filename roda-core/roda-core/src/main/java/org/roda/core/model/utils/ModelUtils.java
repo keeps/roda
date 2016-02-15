@@ -190,54 +190,7 @@ public final class ModelUtils {
 
     return ret;
   }
-
-  /**
-   * Returns a list of ids from the children of a certain resource
-   * 
-   * @param storage
-   *          the storage service containing the parent resource
-   * @param path
-   *          the storage path for the parent resource
-   * @throws NotFoundException
-   * @throws GenericException
-   * @throws RequestNotValidException
-   * @throws AuthorizationDeniedException
-   */
-  public static List<String> getChildIds(StorageService storage, StoragePath path, boolean failIfParentDoesNotExist)
-    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
-    List<String> ids = new ArrayList<String>();
-    ClosableIterable<Resource> iterable = null;
-    try {
-      iterable = storage.listResourcesUnderDirectory(path);
-      Iterator<Resource> it = iterable.iterator();
-      while (it.hasNext()) {
-        Resource next = it.next();
-        if (next != null) {
-          StoragePath storagePath = next.getStoragePath();
-          if (!path.asString().equalsIgnoreCase(storagePath.asString())) {
-            ids.add(storagePath.getName());
-          }
-        } else {
-          LOGGER.error("Error while getting IDs for path " + path.asString());
-        }
-      }
-    } catch (NotFoundException e) {
-      if (failIfParentDoesNotExist) {
-        throw e;
-      }
-    }
-
-    if (iterable != null) {
-      try {
-        iterable.close();
-      } catch (IOException e) {
-        LOGGER.warn("Error closing iterator on getIds()", e);
-      }
-    }
-
-    return ids;
-  }
-
+  
   public static StoragePath getAIPcontainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP);
   }

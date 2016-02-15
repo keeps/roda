@@ -52,9 +52,6 @@ public class EARKSIPToAIPPluginUtils {
         boolean original = true;
         model.createRepresentation(aip.getId(), sr.getObjectID(), original, false);
 
-        // TODO check if this is needed
-        PluginHelper.createDirectories(model, aip.getId(), sr.getObjectID());
-
         if (sr.getData() != null && sr.getData().size() > 0) {
           for (IPFile file : sr.getData()) {
             List<String> directoryPath = file.getRelativeFolders();

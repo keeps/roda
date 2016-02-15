@@ -142,7 +142,7 @@ public class FileStorageService implements StorageService {
     Path dirPath = FSUtils.getEntityPath(basePath, storagePath);
     Path directory = null;
     try {
-      directory = Files.createDirectory(dirPath);
+      directory = Files.createDirectories(dirPath);
       return new DefaultDirectory(storagePath);
     } catch (FileAlreadyExistsException e) {
       // cleanup

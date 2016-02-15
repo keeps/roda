@@ -211,65 +211,6 @@ public final class PluginHelper {
     return pm;
   }
 
-  /**
-   * @deprecated This method shouldn't be needed
-   */
-  @Deprecated
-  public static void createDirectories(ModelService model, String aipId, String representationID) {
-    try {
-      model.getStorage().createDirectory(ModelUtils.getRepresentationsPath(aipId));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-    try {
-      model.getStorage().createDirectory(ModelUtils.getRepresentationPath(aipId, representationID));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-    try {
-      model.getStorage().createDirectory(ModelUtils.getMetadataPath(aipId));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-    try {
-      model.getStorage().createDirectory(ModelUtils.getDescriptiveMetadataPath(aipId));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-    try {
-      model.getStorage().createDirectory(ModelUtils.getAIPPreservationMetadataPath(aipId));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-    try {
-      model.getStorage().createDirectory(ModelUtils.getAIPRepresentationPreservationPath(aipId, representationID));
-    } catch (RODAException sse) {
-      LOGGER.error("Error creating directories", sse);
-    }
-
-  }
-
-  @Deprecated
-  private static Map<String, Set<String>> getRepresentationMetadata(String representationId) {
-    SimpleDateFormat iso8601DateFormat = new SimpleDateFormat(RodaConstants.ISO8601);
-    String dateString = iso8601DateFormat.format(new Date());
-    Map<String, Set<String>> data = new HashMap<String, Set<String>>();
-    data.put("active", Sets.newHashSet("true"));
-    data.put("date.created", Sets.newHashSet(dateString));
-    data.put("date.modified", Sets.newHashSet(dateString));
-    data.put("representation.type", Sets.newHashSet(""));
-    data.put("representation.content.model", Sets.newHashSet(""));
-    data.put("representation.dObject.pid", Sets.newHashSet(""));
-    data.put("representation.id", Sets.newHashSet(representationId));
-    data.put("representation.label", Sets.newHashSet(""));
-    data.put("representation.pid", Sets.newHashSet(""));
-    data.put("representation.state", Sets.newHashSet(""));
-    data.put("representation.subtype", Sets.newHashSet(""));
-    data.put("representation.type", Sets.newHashSet(""));
-    data.put("representation.statuses", Sets.newHashSet("original"));
-    return data;
-  }
-
   public static int updateJobStatus(IndexService index, ModelService model, int currentCompletionPercentage,
     int completionPercentageStep, Map<String, String> pluginParameters) {
     int newCurrentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;

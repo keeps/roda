@@ -52,7 +52,6 @@ public class BagitToAIPPluginUtils {
     AIP aip = model.createAIP(active, parentId, permissions, notify);
 
     String representationID = "representation";
-    PluginHelper.createDirectories(model, aip.getId(), representationID);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE);
     if (bag.getPayload() != null) {
