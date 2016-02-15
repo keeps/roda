@@ -15,7 +15,7 @@ before_script:
   # Install ImageMagick
   - sudo apt-get install imagemagick -y
   # Install SoX
-  - sudo apt-get install sox -y
+  - sudo apt-get install sox libsox-fmt-all -y
   # Install Unoconv
   - sudo apt-get install unoconv -y
   # Install GhostScript

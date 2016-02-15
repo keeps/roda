@@ -100,22 +100,22 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
             LOGGER.debug("createPremisForRepresentation  " + representation.getId());
             LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
             boolean inotify = false;
-            PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representation.getId(),
+            PremisSkeletonPluginUtils.runPremisSkeletonOnRepresentation(model, storage, aip, representation.getId(),
               inotify);
           }
           model.notifyAIPUpdated(aip.getId());
 
           state = PluginState.SUCCESS;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
         } catch (RODAException | XmlException e) {
           LOGGER.error("Error processing AIP " + aip.getId(), e);
 
           state = PluginState.FAILURE;
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME, state.toString()), new Attribute(
+            RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
         }
 
         report.addItem(reportItem);

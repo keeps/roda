@@ -60,9 +60,8 @@ public class GhostScriptConvertPluginUtils {
 
     for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
       // TODO add missing pronoms
-      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
-
-      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
     }
 
     return map;

@@ -1,7 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -14,8 +13,8 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxConvertPluginUtils {
 
-  public static String executeSox(Path input, Path output, String commandArguments)
-    throws CommandException, IOException, UnsupportedOperationException {
+  public static String executeSox(Path input, Path output, String commandArguments) throws CommandException,
+    IOException, UnsupportedOperationException {
 
     String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
@@ -56,11 +55,8 @@ public class SoxConvertPluginUtils {
 
     for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
       // TODO add missing pronoms
-      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
-
-      if (mimeExtensions == null)
-        System.out.println("MIME: " + pronom);
-      map.put(pronom, Arrays.asList(mimeExtensions.split(" ")));
+      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
     }
 
     return map;

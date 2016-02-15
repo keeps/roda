@@ -411,7 +411,6 @@ public class InternalConvertPluginsTest {
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
-      String pronom = ifile.getFileFormat().getPronom();
       Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertEquals("application/pdf", fileMimetype);
     }
@@ -431,9 +430,7 @@ public class InternalConvertPluginsTest {
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
-    // XXX needs soffice running
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
-
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
@@ -489,7 +486,6 @@ public class InternalConvertPluginsTest {
     Plugin<?> plugin2 = new SoxConvertPlugin();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters2.put("maxKbytes", "20000");
     parameters2.put("outputFormat", "ogg");
     plugin2.setParameterValues(parameters2);
 
@@ -497,10 +493,10 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(3, aip.getRepresentations().size());
 
-    Assert.assertEquals(0, aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId))
+    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId))
       .count());
 
-    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), aip.getRepresentations().get(2).getId());
+    ClosableIterable<File> newAllFiles = model.listAllFiles(aip.getId(), deletableRepresentationId);
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 

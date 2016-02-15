@@ -206,7 +206,7 @@ public class RodaCoreFactory {
 
   // 20160211 hsilva: this constant should be deleted
   // Test objects
-  private static String aipId = "05c3599c-5fc6-4424-af13-b3b37f6e85da";
+  private static String aipId = "fa0a3100-ac08-4b72-8340-6d858c78ef18";
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -1091,11 +1091,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runPDFtoPDFAPlugin(String maxKbytes) {
+  private static void runPDFtoPDFAPlugin() {
     try {
       Plugin<?> plugin = new PdfToPdfaPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "pdf");
       params.put("outputFormat", "pdf");
       plugin.setParameterValues(params);
@@ -1105,12 +1104,11 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runImageMagickConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runImageMagickConvertPlugin(String inputFormat, String outputFormat) {
     try {
 
       Plugin<?> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1121,13 +1119,11 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runImageMagickConvertRepresentationPlugin(String maxKbytes, String inputFormat,
-    String outputFormat) {
+  private static void runImageMagickConvertRepresentationPlugin(String inputFormat, String outputFormat) {
     try {
 
       Plugin<?> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1138,12 +1134,11 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runImageMagickConvertFilePlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runImageMagickConvertFilePlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new ImageMagickConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
-      params.put("inputFormat", "jpg");
+      params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
       plugin.setParameterValues(params);
@@ -1153,11 +1148,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runSoxConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runSoxConvertPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new SoxConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1168,11 +1162,24 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runGhostScriptConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runSoxConvertRepresentationPlugin(String inputFormat, String outputFormat) {
+    try {
+      Plugin<?> plugin = new SoxConvertPlugin();
+      Map<String, String> params = new HashMap<String, String>();
+      params.put("inputFormat", "");
+      params.put("outputFormat", outputFormat);
+      params.put("commandArguments", "");
+      plugin.setParameterValues(params);
+      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
+    } catch (InvalidParameterException ipe) {
+      LOGGER.error(ipe.getMessage(), ipe);
+    }
+  }
+
+  private static void runGhostScriptConvertPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new GhostScriptConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1183,11 +1190,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runUnoconvConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runUnoconvConvertPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new UnoconvConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1198,11 +1204,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runUnoconvConvertRepresentationPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runUnoconvConvertRepresentationPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new UnoconvConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1213,11 +1218,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runAvconvConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runAvconvConvertPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new AvconvConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "");
       params.put("outputFormat", outputFormat);
       params.put("commandArguments", "");
@@ -1228,11 +1232,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runGeneralCommandConvertPlugin(String maxKbytes, String inputFormat, String outputFormat) {
+  private static void runGeneralCommandConvertPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new GeneralCommandConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "png");
       params.put("outputFormat", "tiff");
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
@@ -1243,12 +1246,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runGeneralCommandConvertRepresentationPlugin(String maxKbytes, String inputFormat,
-    String outputFormat) {
+  private static void runGeneralCommandConvertRepresentationPlugin(String inputFormat, String outputFormat) {
     try {
       Plugin<?> plugin = new GeneralCommandConvertPlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("inputFormat", "png");
       params.put("outputFormat", "tiff");
       params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
@@ -1259,11 +1260,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void runDigitalSignaturePlugin(String maxKbytes, String doVerify, String doExtract, String doStrip) {
+  private static void runDigitalSignaturePlugin(String doVerify, String doExtract, String doStrip) {
     try {
       Plugin<?> plugin = new DigitalSignaturePlugin();
       Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", maxKbytes);
       params.put("doVerify", doVerify);
       params.put("doExtract", doExtract);
       params.put("doStrip", doStrip);
@@ -1566,29 +1566,31 @@ public class RodaCoreFactory {
     } else if ("verapdf".equals(args.get(0))) {
       runVeraPDFPlugin(args.get(1), args.get(2), args.get(3));
     } else if ("pdftopdfa".equals(args.get(0))) {
-      runPDFtoPDFAPlugin(args.get(1));
+      runPDFtoPDFAPlugin();
     } else if ("imagemagickconvert".equals(args.get(0))) {
-      runImageMagickConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runImageMagickConvertPlugin(args.get(1), args.get(2));
     } else if ("imagemagickrepresentationconvert".equals(args.get(0))) {
-      runImageMagickConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
+      runImageMagickConvertRepresentationPlugin(args.get(1), args.get(2));
     } else if ("imagemagickfileconvert".equals(args.get(0))) {
-      runImageMagickConvertFilePlugin(args.get(1), args.get(2), args.get(3));
+      runImageMagickConvertFilePlugin(args.get(1), args.get(2));
     } else if ("soxconvert".equals(args.get(0))) {
-      runSoxConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runSoxConvertPlugin(args.get(1), args.get(2));
+    } else if ("soxrepresentationconvert".equals(args.get(0))) {
+      runSoxConvertRepresentationPlugin(args.get(1), args.get(2));
     } else if ("ghostscriptconvert".equals(args.get(0))) {
-      runGhostScriptConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runGhostScriptConvertPlugin(args.get(1), args.get(2));
     } else if ("unoconvconvert".equals(args.get(0))) {
-      runUnoconvConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runUnoconvConvertPlugin(args.get(1), args.get(2));
     } else if ("unoconvrepresentationconvert".equals(args.get(0))) {
-      runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
+      runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2));
     } else if ("avconvconvert".equals(args.get(0))) {
-      runAvconvConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runAvconvConvertPlugin(args.get(1), args.get(2));
     } else if ("generalcommandconvert".equals(args.get(0))) {
-      runGeneralCommandConvertPlugin(args.get(1), args.get(2), args.get(3));
+      runGeneralCommandConvertPlugin(args.get(1), args.get(2));
     } else if ("generalcommandrepresentationconvert".equals(args.get(0))) {
-      runGeneralCommandConvertRepresentationPlugin(args.get(1), args.get(2), args.get(3));
+      runGeneralCommandConvertRepresentationPlugin(args.get(1), args.get(2));
     } else if ("digitalsignature".equals(args.get(0))) {
-      runDigitalSignaturePlugin(args.get(1), args.get(2), args.get(3), args.get(4));
+      runDigitalSignaturePlugin(args.get(1), args.get(2), args.get(3));
     } else if ("reindexer".equals(args.get(0))) {
       runReindexingPlugins();
     } else if ("jhove".equals(args.get(0))) {

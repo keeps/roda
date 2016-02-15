@@ -53,7 +53,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   private boolean doVerify;
   private boolean doExtract;
   private boolean doStrip;
-  private long maxKbytes;
   private boolean hasPartialSuccessOnOutcome;
   private List<String> applicableTo;
   private List<String> convertableTo;
@@ -65,7 +64,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     doVerify = true;
     doExtract = true;
     doStrip = true;
-    maxKbytes = 20000; // default value: 20000 kb
 
     applicableTo = new ArrayList<>();
     convertableTo = new ArrayList<>();
@@ -84,6 +82,53 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   @Override
   public void shutdown() {
     // do nothing
+  }
+
+  public boolean hasPartialSuccessOnOutcome() {
+    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins",
+      "hasPartialSuccessOnOutcome"));
+  }
+
+  public List<String> getApplicableTo() {
+    return Arrays.asList("pdf");
+  }
+
+  public List<String> getConvertableTo() {
+    return Arrays.asList("pdf");
+  }
+
+  public Map<String, List<String>> getPronomToExtension() {
+    return PdfToPdfaPluginUtils.getPronomToExtension();
+  }
+
+  public Map<String, List<String>> getMimetypeToExtension() {
+    Map<String, List<String>> mimes = new HashMap<String, List<String>>();
+    mimes.put("application/pdf", Arrays.asList("pdf"));
+    return mimes;
+  }
+
+  public boolean getDoVerify() {
+    return doVerify;
+  }
+
+  public void setDoVerify(boolean verify) {
+    doVerify = verify;
+  }
+
+  public boolean getDoExtract() {
+    return doExtract;
+  }
+
+  public void setDoExtract(boolean extract) {
+    doExtract = extract;
+  }
+
+  public boolean getDoStrip() {
+    return doStrip;
+  }
+
+  public void getDoStrip(boolean strip) {
+    doStrip = strip;
   }
 
   @Override
@@ -113,27 +158,21 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // indicates the maximum kbytes the files that will be processed must have
-    if (parameters.containsKey("maxKbytes")) {
-      maxKbytes = Long.parseLong(parameters.get("maxKbytes"));
-    }
-
-    // ver
+    // do the digital signature verification
     if (parameters.containsKey("doVerify")) {
       doVerify = Boolean.parseBoolean(parameters.get("doVerify"));
     }
 
-    // indicates the maximum kbytes the files that will be processed must have
+    // do the digital signature information extraction
     if (parameters.containsKey("doExtract")) {
       doExtract = Boolean.parseBoolean(parameters.get("doExtract"));
     }
 
-    // indicates the maximum kbytes the files that will be processed must have
+    // do the digital signature strip
     if (parameters.containsKey("doStrip")) {
       doStrip = Boolean.parseBoolean(parameters.get("doStrip"));
     }
 
-    fillFileFormatStructures();
   }
 
   @Override
@@ -178,18 +217,19 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
             String fileMimetype = ifile.getFileFormat().getMimeType();
             String filePronom = ifile.getFileFormat().getPronom();
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+            Map<String, List<String>> pronomExtensions = getPronomToExtension();
 
-            if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat))) && ifile.getSize() < (maxKbytes * 1024)) {
+            if (((filePronom != null && pronomExtensions.containsKey(filePronom))
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
+                .contains(fileFormat)))) {
 
-              if (applicableTo.size() > 0) {
+              if (getApplicableTo().size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty()
-                  && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-                  fileFormat = pronomToExtension.get(filePronom).get(0);
+                  && !pronomExtensions.get(filePronom).contains(fileFormat)) {
+                  fileFormat = pronomExtensions.get(filePronom).get(0);
                 } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                  && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+                  && !getMimetypeToExtension().get(fileMimetype).contains(fileFormat)) {
+                  fileFormat = getMimetypeToExtension().get(fileMimetype).get(0);
                 }
               }
 
@@ -356,13 +396,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
-  }
-
-  public void fillFileFormatStructures() {
-    applicableTo.add("pdf");
-    convertableTo.add("pdf");
-    mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
-    pronomToExtension = PdfToPdfaPluginUtils.getPronomToExtension();
   }
 
 }

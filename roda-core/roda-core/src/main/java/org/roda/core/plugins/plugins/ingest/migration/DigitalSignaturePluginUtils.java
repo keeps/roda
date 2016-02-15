@@ -8,7 +8,13 @@ import java.nio.file.Path;
 import java.security.KeyStore;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.roda.core.RodaCoreFactory;
 
 import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.PdfPKCS7;
@@ -65,6 +71,22 @@ public class DigitalSignaturePluginUtils {
 
   public static Path runDigitalSignatureStrip(Path input, String fileFormat) {
     return null;
+  }
+
+  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+
+  public static Map<String, List<String>> getPronomToExtension() {
+    Map<String, List<String>> map = new HashMap<>();
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
+      "inputFormatPronoms");
+
+    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
+      // TODO add missing pronoms
+      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
+    }
+
+    return map;
   }
 
 }

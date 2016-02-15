@@ -31,9 +31,13 @@ import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPluginUtil
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPluginUtils;
 import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 public class AbstractConvertPluginUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   public static void reIndexPlugins(ModelService model, Set<String> aipSet) throws InvalidParameterException,
     RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
@@ -59,9 +63,9 @@ public class AbstractConvertPluginUtils {
   }
 
   public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
-    String aipId, String representationId, boolean notify) throws IOException, RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
-    SAXException, TikaException, ValidationException, XmlException, InvalidParameterException {
+    String aipId, String representationId, boolean notify) throws RequestNotValidException, GenericException,
+    NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
+    TikaException, ValidationException, InvalidParameterException, XmlException, IOException {
 
     AIP aip = model.retrieveAIP(aipId);
     Representation representation = model.retrieveRepresentation(aipId, representationId);
@@ -69,7 +73,7 @@ public class AbstractConvertPluginUtils {
     boolean inotify = false;
     // TODO set agent
     IndexedPreservationAgent agent = null;
-    PremisSkeletonPluginUtils.createPremisForRepresentation(model, storage, aip, representationId, inotify);
+    PremisSkeletonPluginUtils.runPremisSkeletonOnRepresentation(model, storage, aip, representationId, inotify);
     SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, agent,
       createPluginEvent, inotify);
     TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
