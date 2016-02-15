@@ -77,6 +77,7 @@ public final class RodaConstants {
   public static final String CORE_LOG_FOLDER = "log";
   public static final String CORE_SCHEMAS_FOLDER = "schemas";
   public static final String CORE_LDAP_FOLDER = "ldap";
+  public static final String CORE_THEME_FOLDER = "theme";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";

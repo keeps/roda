@@ -9,8 +9,10 @@ package org.roda.wui.api.v1.utils;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -100,6 +102,12 @@ public class ApiUtils {
     }
 
     return new Pair<Integer, Integer>(startInteger, limitInteger);
+  }
+
+  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate) {
+    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename())
+      .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
   }
 
   public static Response okResponse(StreamResponse streamResponse) {

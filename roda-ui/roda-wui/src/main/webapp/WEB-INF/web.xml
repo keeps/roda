@@ -113,7 +113,7 @@
 		<init-param>
 			<description>comma separated list of relative paths to exclude in filter logic</description>
 			<param-name>exclusions</param-name>
-			<param-value>/swagger.json</param-value>
+			<param-value>/swagger.json,/theme/</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>

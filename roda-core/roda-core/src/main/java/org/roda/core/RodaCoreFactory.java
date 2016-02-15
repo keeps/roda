@@ -160,6 +160,8 @@ public class RodaCoreFactory {
   private static Path dataPath;
   private static Path logPath;
   private static Path configPath;
+  private static Path themePath;
+
   private static StorageService storage;
   private static ModelService model;
   private static IndexService index;
@@ -533,6 +535,7 @@ public class RodaCoreFactory {
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
     indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
+    themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
 
     // configure logback
     if (nodeType != NodeType.TEST) {
@@ -582,11 +585,13 @@ public class RodaCoreFactory {
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
+    essentialDirectories.add(themePath);
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
+    essentialDirectories.add(themePath);
 
     for (Path path : essentialDirectories) {
       try {
@@ -773,6 +778,10 @@ public class RodaCoreFactory {
 
   public static Path getConfigPath() {
     return configPath;
+  }
+  
+  public static Path getThemePath() {
+    return themePath;
   }
 
   public static Path getDataPath() {
