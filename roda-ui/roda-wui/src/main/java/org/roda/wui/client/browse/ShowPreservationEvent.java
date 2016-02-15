@@ -10,15 +10,21 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -30,6 +36,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -120,6 +127,9 @@ public class ShowPreservationEvent extends Composite {
 
   @UiField
   Label eventOutcomeLabel;
+
+  @UiField
+  Label outcomeDetailHeader;
   @UiField
   Label eventOutcomeDetailNoteLabel, eventOutcomeDetailNoteValue;
   @UiField
@@ -230,17 +240,7 @@ public class ShowPreservationEvent extends Composite {
     // Source objects
     if (event.getSourcesObjectIds().size() > 0) {
       for (String sourceObjectId : event.getSourcesObjectIds()) {
-        FlowPanel layout = new FlowPanel();
-        layout.addStyleName("list-panel");
-
-        Label idLabel = new Label("Identifier");
-        idLabel.addStyleName("label");
-        // TODO set anchor
-        Label idValue = new Label(sourceObjectId);
-        layout.add(idLabel);
-        layout.add(idValue);
-
-        sourceObjectsPanel.add(layout);
+        addObjectPanel(sourceObjectId, sourceObjectsPanel);
       }
     } else {
       sourceObjectsHeader.setVisible(false);
@@ -250,32 +250,18 @@ public class ShowPreservationEvent extends Composite {
     // Outcome objects
     if (event.getOutcomeObjectIds().size() > 0) {
       for (String outcomeObjectId : event.getOutcomeObjectIds()) {
-        
-        FlowPanel layout = new FlowPanel();
-        layout.addStyleName("list-panel");
-        
-        String[] split = outcomeObjectId.split("/");
-        String aipId = split.length > 0 ? split[0] : null;
-        String repId = split.length > 1 ? split[1] : null;
-        String fileId = split.length > 2 ? split[2] : null;
-
-        
-
-        Label idLabel = new Label("Identifier");
-        idLabel.addStyleName("label");
-        // TODO set anchor
-        Label idValue = new Label(outcomeObjectId);
-        layout.add(idLabel);
-        layout.add(idValue);
-
-        outcomeObjectsPanel.add(layout);
+        addObjectPanel(outcomeObjectId, outcomeObjectsPanel);
       }
     } else {
       outcomeObjectsHeader.setVisible(false);
       outcomeObjectsPanel.setVisible(false);
     }
 
-    // OUTCOME
+    // OUTCOME DETAIL
+
+    outcomeDetailHeader.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailNote())
+      && StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
+
     eventOutcomeLabel.setText(event.getEventOutcome());
 
     if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {
@@ -292,6 +278,88 @@ public class ShowPreservationEvent extends Composite {
       eventOutcomeDetailExtensionValue.setVisible(false);
     }
 
+  }
+
+  private void addObjectPanel(String objectId, FlowPanel objectsPanel) {
+
+    FlowPanel layout = new FlowPanel();
+    layout.addStyleName("list-panel");
+
+    String[] split = objectId.split("/");
+    String aipId = split.length > 0 ? split[0] : null;
+    String repId = split.length > 1 ? split[1] : null;
+    String fileId = split.length > 2 ? split[2] : null;
+
+    // TODO retrieve AIP, Representation or File from bundle and add more
+    // info about it here.
+    // XXX if AIP, Representation or File no longer exist, just add the IDs
+    if (aipId != null && repId != null && fileId != null) {
+      // is a file
+      // TODO retrieve indexed file so we can get the path and id
+      IndexedFile ifile = new IndexedFile("uuid", "aipId", "representationId", Arrays.asList("path"), "id", true,
+        new FileFormat("formatDesignationName", "formatDesignationVersion", "mimeType", "pronom", "extension",
+          new HashMap<String, String>()),
+        "originalName", 120000, false, "creatingApplicationName", "creatingApplicationVersion",
+        "dateCreatedByApplication", Arrays.asList("hash"), "fulltext", "storagePath");
+
+      Label header = new Label("File");
+      header.addStyleName("h5");
+
+      Label nameLabel = new Label("Name");
+      nameLabel.addStyleName("label");
+      Label nameValue = new Label(
+        StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
+
+      Label formatLabel = new Label("Format");
+      nameLabel.addStyleName("label");
+      FileFormat fileFormat = ifile.getFileFormat();
+      // TODO guard nulls
+      Label formatValue = new Label(
+        fileFormat.getFormatDesignationName() + " " + fileFormat.getFormatDesignationVersion());
+
+      // TODO add pronom and mime type
+
+      Label sizeLabel = new Label("Size");
+      nameLabel.addStyleName("label");
+      Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
+
+      // TODO set anchor
+      // Label idValue = new Label(outcomeObjectId);
+
+      List<String> history = new ArrayList<>();
+      history.add(ifile.getAipId());
+      history.add(ifile.getRepresentationId());
+      history.addAll(ifile.getPath());
+      history.add(ifile.getId());
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
+
+      layout.add(header);
+      layout.add(nameLabel);
+      layout.add(nameValue);
+      layout.add(formatLabel);
+      layout.add(formatValue);
+      layout.add(sizeLabel);
+      layout.add(sizeValue);
+      layout.add(link);
+
+      objectsPanel.add(layout);
+    } else if (aipId != null && repId != null) {
+      // is a representation
+      // TODO add representation as in browse
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, aipId, repId));
+      layout.add(link);
+      objectsPanel.add(layout);
+    } else if (aipId != null) {
+      // is an AIP
+      // TODO add AIP level (icon) and title
+      
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, aipId));
+      layout.add(link);
+      
+      objectsPanel.add(layout);
+    } else {
+      // is empty, do nothing
+    }
   }
 
   @UiHandler("backButton")

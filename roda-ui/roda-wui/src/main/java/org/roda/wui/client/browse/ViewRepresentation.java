@@ -190,7 +190,7 @@ public class ViewRepresentation extends Composite {
     }
   };
 
-  private static void jumpTo(IndexedFile selected) {
+  public static void jumpTo(IndexedFile selected) {
     List<String> history = new ArrayList<>();
     history.add(selected.getAipId());
     history.add(selected.getRepresentationId());

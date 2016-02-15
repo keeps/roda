@@ -130,6 +130,11 @@ public class Tools {
     List<String> path = Tools.concat(resolver.getHistoryPath(), extrapath);
     return createHistoryHashLink(path);
   }
+  
+  public static String createHistoryHashLink(HistoryResolver resolver, List<String> extrapath) {
+    List<String> path = Tools.concat(resolver.getHistoryPath(), extrapath);
+    return createHistoryHashLink(path);
+  }
 
   @SafeVarargs
   public static <T> List<T> concat(List<T> list, T... items) {

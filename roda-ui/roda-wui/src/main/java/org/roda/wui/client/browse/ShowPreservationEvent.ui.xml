@@ -69,7 +69,7 @@
 					<g:FlowPanel ui:field="outcomeObjectsPanel" />
 
 					<!-- OUTCOME DETAIL -->
-					<g:Label styleName="h4">
+					<g:Label styleName="h4" ui:field="outcomeDetailHeader">
 						<ui:text from='{messages.preservationEventOutcomeDetailHeader}' />
 					</g:Label>
 					
