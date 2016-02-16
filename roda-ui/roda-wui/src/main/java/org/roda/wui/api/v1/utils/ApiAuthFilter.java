@@ -50,7 +50,7 @@ public class ApiAuthFilter implements Filter {
     HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 
     String path = httpServletRequest.getPathInfo();
-    if (StringUtils.isNotBlank(path) && !exclusions.contains(path)) {
+    if (StringUtils.isNotBlank(path) && pathShouldBeAuthenticationProtected(path)) {
 
       String authorization = httpServletRequest.getHeader("Authorization");
 
@@ -64,6 +64,16 @@ public class ApiAuthFilter implements Filter {
     }
 
     chain.doFilter(request, response);
+  }
+
+  private boolean pathShouldBeAuthenticationProtected(String path) {
+    for (String exclusion : exclusions) {
+      if (path.matches(exclusion)) {
+        return false;
+      }
+    }
+
+    return true;
   }
 
   @Override
