@@ -62,6 +62,9 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   private Map<String, List<String>> pronomToExtension;
   private Map<String, List<String>> mimetypeToExtension;
 
+  public static final String FILE_SUFFIX = ".txt";
+  public static final String OTHER_METADATA_TYPE = "DigitalSignature";
+
   public DigitalSignaturePlugin() {
     logger = LoggerFactory.getLogger(getClass());
     doVerify = true;
@@ -245,14 +248,25 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
               logger.debug("Running DigitalSignaturePlugin on " + file.getId());
 
               if (doVerify) {
-                DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
+                logger.debug("Verying digital signatures on " + file.getId());
+                System.err.println(DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
+                  fileFormat));
               }
 
               if (doExtract) {
-                DigitalSignaturePluginUtils.runDigitalSignatureExtract(directAccess.getPath(), fileFormat);
+                logger.debug("Extracting digital signatures information of " + file.getId());
+
+                Path extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(directAccess.getPath(),
+                  fileFormat);
+                ContentPayload payload = new FSPathContentPayload(extractResult);
+
+                model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
+                  file.getId(), DigitalSignaturePlugin.FILE_SUFFIX, DigitalSignaturePlugin.OTHER_METADATA_TYPE,
+                  payload, true);
               }
 
               if (doStrip) {
+                logger.debug("Stripping digital signatures from " + file.getId());
 
                 if (!representation.isOriginal()) {
                   newRepresentationID = representation.getId();
@@ -267,7 +281,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
                 if (pluginResult != null) {
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
-                  StoragePath storagePath = ModelUtils.getRepresentationPath(aipId, representation.getId());
 
                   if (!newRepresentations.contains(newRepresentationID)) {
                     logger.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
@@ -327,7 +340,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
             notifyReindex);
 
           logger.debug("Creating digital signature plugin event for the representation " + representation.getId());
-          boolean notifyEvent = false;
+          // boolean notifyEvent = false;
           // createEvent(alteredFiles, newFiles, model.retrieveAIP(aipId),
           // newRepresentationID, model, pluginResultState, agent, notifyEvent);
         }
@@ -345,12 +358,13 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     try {
       model.notifyAIPUpdated(aipId);
     } catch (RODAException e) {
-      logger.error("Error running creating agent for DigitalSignaturePlugin", e);
+      logger.error("Error running creating agent for DigitalSignaturePlugin ", e);
     }
 
     return report;
   }
 
+  // FIXME Add event for verify and extract too?
   private void createEventStrip(List<File> alteredFiles, List<File> newFiles, AIP aip, String newRepresentationID,
     ModelService model, int pluginResultState, IndexedPreservationAgent agent, boolean notify) throws PluginException {
 
@@ -401,12 +415,12 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
   @Override
   public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
+    return new Report();
   }
 
   @Override
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    return null;
+    return new Report();
   }
 
   @Override

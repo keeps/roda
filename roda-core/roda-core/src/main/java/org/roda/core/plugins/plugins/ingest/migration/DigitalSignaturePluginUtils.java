@@ -2,7 +2,7 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
@@ -36,64 +36,49 @@ public class DigitalSignaturePluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat) throws SignatureException, IOException {
-    KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
 
+    // FIXME Classpath problems?
+    KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
     PdfReader reader = new PdfReader(input.toString());
     AcroFields af = reader.getAcroFields();
-
-    // Search of the whole signature
     ArrayList names = af.getSignatureNames();
 
     // For every signature :
-    for (int k = 0; k < names.size(); ++k) {
+    for (int k = 0; k < names.size(); k++) {
       String name = (String) names.get(k);
-      // Affichage du nom
       System.out.println("Signature name: " + name);
       System.out.println("Signature covers whole document: " + af.signatureCoversWholeDocument(name));
-      // Affichage sur les revision - version
       System.out.println("Document revision: " + af.getRevision(name) + " of " + af.getTotalRevisions());
-      // Debut de l'extraction de la "revision"
-      FileOutputStream out = new FileOutputStream("d:\\revision_" + af.getRevision(name) + ".pdf");
-      byte bb[] = new byte[8192];
-      InputStream ip = af.extractRevision(name);
-      int n = 0;
-      while ((n = ip.read(bb)) > 0)
-        out.write(bb, 0, n);
-      out.close();
-      ip.close();
-      // Fin extraction revision
 
       PdfPKCS7 pk = af.verifySignature(name);
       Calendar cal = pk.getSignDate();
       Certificate pkc[] = pk.getCertificates();
-      // Information about the certificat, le signataire
       System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
-      // Le document à t'il ete modifié ?
       System.out.println("Document modified: " + !pk.verify());
 
-      // Is the certificate avaible ? Be carefull we search the chain of
-      // certificat
       Object fails[] = PdfPKCS7.verifyCertificates(pkc, kall, null, cal);
       if (fails == null)
         System.out.println("Certificates verified against the KeyStore");
       else
         System.out.println("Certificate failed: " + fails[1]);
+
     }
 
     return "true";
   }
 
-  public static String runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException, IOException {
+  public static Path runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException, IOException {
+    Path output = Files.createTempFile("extraction", ".txt");
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
     ArrayList<?> names = fields.getSignatureNames();
-    String result = "";
+    PrintWriter out = new PrintWriter(output.toString());
 
     for (int i = 0; i < names.size(); i++) {
       String name = (String) names.get(i);
       Item item = fields.getFieldItem(name);
 
-      // TODO Ver o que realmente é para extrair (usar o rups para testar)
+      // TODO Filter the result information using RUPS
       PdfDictionary widget = item.getWidget(0);
       PdfDictionary ap = widget.getAsDict(PdfName.AP);
       PdfStream normal = ap.getAsStream(PdfName.N);
@@ -107,10 +92,12 @@ public class DigitalSignaturePluginUtils {
       byte[] stream = PdfReader.getStreamBytes(n2stream);
 
       String streamResult = new String(stream);
-      result += "Sign " + i + ":\n\n" + streamResult + "\n";
+      out.println("Signature " + i + ":");
+      out.println(streamResult);
     }
 
-    return new String(result);
+    out.close();
+    return output;
   }
 
   public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
