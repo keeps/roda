@@ -6,65 +6,19 @@
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag">
 
 	<ui:style>
-	.banner {
-		background-color: #089de3;
-		position: relative;
-		height: 110px;
-	}
-	
-	.homeLink {
-		padding-left: 30px;
-		height: 110px;
-		cursor: pointer;
-		cursor: hand;
-	}
-	
-	.homeLogo {
-		width: 75px;
-	    height: 75px;
-	    float: left;
-	    margin-right: 20px;
-	    margin-top: 18px;
-	}
-	
-	.homeText {
-		color: white;
-		font-weight: 400;
-		font-size: 58px;
-		line-height: 110px;
-		text-align: left;
-	}
-	
-	.languageSwitcher {
-		position: absolute;
-		top: 10px;
-		right: 40px;
-	}
-	
-	.menu {
-		padding: 0 30px;
-		background-color: #5bbeff;
-	}
 	</ui:style>
-
-	<ui:with field='res'
-		type='org.roda.wui.client.main.logos.LogosBundle' />
 
 	<g:FlowPanel styleName="main">
 		<!-- Header -->
-		<g:FlowPanel styleName="{style.banner}">
-			<wcag:AccessibleFocusPanel styleName="{style.homeLink}" ui:field="homeLinkArea">
-				<g:FlowPanel>
-					<g:Image title="RODA" altText="RODA" styleName="{style.homeLogo}" resource='{res.logo}' />
-					<g:Label styleName="{style.homeText}">RODA</g:Label>
+		<g:FlowPanel styleName="banner">
+			<wcag:AccessibleFocusPanel styleName="homeLink" ui:field="homeLinkArea">
+				<g:FlowPanel ui:field="bannerLogo">
 				</g:FlowPanel>
 			</wcag:AccessibleFocusPanel>
-<!-- 			<i:LanguageSwitcherPanel addStyleNames="{style.languageSwitcher}" -->
-<!-- 				ui:field="languageSwitcherPanel" /> -->
 		</g:FlowPanel>
 
 		<!-- Menu -->
-		<m:Menu ui:field="menu" addStyleNames="{style.menu}" />
+		<m:Menu ui:field="menu" addStyleNames="menu" />
 
 		<!-- Content -->
 		<m:ContentPanel ui:field="contentPanel" />

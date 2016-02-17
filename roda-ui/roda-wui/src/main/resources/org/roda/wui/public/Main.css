@@ -48,22 +48,45 @@
 }
 
 /* @group Banner */
-/*
-.main .banner {
-	background-image: url("images/banner_roda.png");
-	background-repeat: no-repeat;
-	width: 955px;
+.banner {
+	background-color: #089de3;
+	position: relative;
 	height: 110px;
-	margin-top: 10px;
 }
-.main .banner .homeLink {
-	width: 300px;
+	
+.homeLink {
+	padding-left: 30px;
 	height: 110px;
 	cursor: pointer;
 	cursor: hand;
-}*/
-
-/* @end */
+}
+	
+.homeLogo {
+	width: 75px;
+	height: 75px;
+	float: left;
+	margin-right: 20px;
+	margin-top: 18px;
+}
+	
+.homeText {
+	color: white;
+	font-weight: 400;
+	font-size: 58px;
+	line-height: 110px;
+	text-align: left;
+}
+	
+.languageSwitcher {
+	position: absolute;
+	top: 10px;
+	right: 40px;
+}
+	
+.menu {
+	padding: 0 30px;
+	background-color: #5bbeff;
+}
 
 /* @group Language Switcher Panel */
 .wui-languageSwitcher {

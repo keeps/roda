@@ -16,6 +16,7 @@ import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.EntryPoint;
@@ -32,6 +33,7 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -85,9 +87,9 @@ public class Main extends Composite implements EntryPoint {
 
   @UiField
   AccessibleFocusPanel homeLinkArea;
-
-//  @UiField(provided = true)
-//  LanguageSwitcherPanel languageSwitcherPanel;
+  
+  @UiField
+  FlowPanel bannerLogo;
 
   @UiField(provided = true)
   Menu menu;
@@ -101,7 +103,6 @@ public class Main extends Composite implements EntryPoint {
    * Create a new main
    */
   public Main() {
-    // languageSwitcherPanel = new LanguageSwitcherPanel();
     menu = new Menu();
     contentPanel = ContentPanel.getInstance();
 
@@ -124,6 +125,8 @@ public class Main extends Composite implements EntryPoint {
         onHistoryChanged(event.getValue());
       }
     });
+    
+    bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
 
     homeLinkArea.addClickHandler(new ClickHandler() {
 
