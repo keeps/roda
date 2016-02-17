@@ -35,36 +35,42 @@ public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
-  public static String runDigitalSignatureVerify(Path input, String fileFormat) throws SignatureException, IOException {
+  public static String runDigitalSignatureVerify(Path input, String fileFormat) throws IOException {
 
-    // FIXME Classpath problems?
     KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
     PdfReader reader = new PdfReader(input.toString());
     AcroFields af = reader.getAcroFields();
     ArrayList names = af.getSignatureNames();
+    int result = 1;
 
-    // For every signature :
     for (int k = 0; k < names.size(); k++) {
       String name = (String) names.get(k);
       System.out.println("Signature name: " + name);
       System.out.println("Signature covers whole document: " + af.signatureCoversWholeDocument(name));
       System.out.println("Document revision: " + af.getRevision(name) + " of " + af.getTotalRevisions());
 
-      PdfPKCS7 pk = af.verifySignature(name);
-      Calendar cal = pk.getSignDate();
-      Certificate pkc[] = pk.getCertificates();
-      System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
-      System.out.println("Document modified: " + !pk.verify());
+      try {
+        PdfPKCS7 pk = af.verifySignature(name);
+        Calendar cal = pk.getSignDate();
+        Certificate pkc[] = pk.getCertificates();
+        System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
+        System.out.println("Document modified: " + !pk.verify());
 
-      Object fails[] = PdfPKCS7.verifyCertificates(pkc, kall, null, cal);
-      if (fails == null)
-        System.out.println("Certificates verified against the KeyStore");
-      else
-        System.out.println("Certificate failed: " + fails[1]);
+        Object fails[] = PdfPKCS7.verifyCertificates(pkc, kall, null, cal);
+        if (fails == null) {
+          System.out.println("Certificates verified against the KeyStore");
+        } else {
+          System.out.println("Certificate failed: " + fails[1]);
+          result = 0;
+        }
+      } catch (SignatureException | NoSuchFieldError e) {
+        LOGGER.warn("Problem verifying signature '" + name + "' of " + input.getFileName());
+        result = -1;
+      }
 
     }
 
-    return "true";
+    return "RESULT: " + result;
   }
 
   public static Path runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException, IOException {

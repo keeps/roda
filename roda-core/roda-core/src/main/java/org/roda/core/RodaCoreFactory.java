@@ -206,7 +206,7 @@ public class RodaCoreFactory {
 
   // 20160211 hsilva: this constant should be deleted
   // Test objects
-  private static String aipId = "fa0a3100-ac08-4b72-8340-6d858c78ef18";
+  private static String aipId = "116d47fb-25c6-4950-ae84-b4f47f163dd1";
 
   /** Private empty constructor */
   private RodaCoreFactory() {
