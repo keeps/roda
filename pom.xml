@@ -955,7 +955,7 @@
 				<artifactId>fits</artifactId>
 				<version>0.8.10</version>
 			</dependency>
-			<!-- VERAPDF -->
+			<!-- VERAPDF (repackaged with package names relocation) -->
 			<dependency>
 				<artifactId>gui</artifactId>
 				<groupId>org.verapdf</groupId>

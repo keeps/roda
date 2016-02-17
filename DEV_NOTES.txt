@@ -1,6 +1,44 @@
 Known problems
 ----------------
 * Problems may araise when using GWT Dev Mode and having in the classpath a different jetty version
+* Problems with maven dependencies that are fat-jars can be solved, even if this is hard to maintain, through repackaging and package name relocation. 
+For example, if ApacheDS dependency contains bouncycastle and it colides with a certain but needed version of bouncycastle, one might use maven-shade plugin to solve the problem. Steps: 
+	1) Download source code:
+		$> wget http://mirrors.fe.up.pt/pub/apache//directory/apacheds/dist/2.0.0-M21/apacheds-parent-2.0.0-M21-source-release.zip
+	2) Edit file apacheds-parent-2.0.0-M21/all/pom.xml as follows:
+     <plugin>
+       <groupId>org.apache.maven.plugins</groupId>
+       <artifactId>maven-shade-plugin</artifactId>
+       <executions>
+         <execution>
+           <phase>package</phase>
+           <goals>
+             <goal>shade</goal>
+           </goals>
+           <configuration>
+             <promoteTransitiveDependencies>true</promoteTransitiveDependencies>
+             <filters>
+               <filter>
+                 <artifact>org.bouncycastle:bcprov-jdk15on</artifact>
+                 <excludes>
+                   <exclude>META-INF/BCKEY.SF</exclude>
+                   <exclude>META-INF/BCKEY.DSA</exclude>
+                 </excludes>
+               </filter>
+             </filters>
+             <relocations>
+               <relocation>
+                 <pattern>org.bouncycastle</pattern>
+                 <shadedPattern>org.bouncycastle.shaded</shadedPattern>
+               </relocation>
+             </relocations>
+           </configuration>
+         </execution>
+       </executions>
+     </plugin>
+    3) Recompile and grab the artifact
+       $> mvn clean package -Dmaven.test.skip
+       $> cp all/target/apacheds-all-2.0.0-M21.jar ...
 
 Misc
 ----------------
