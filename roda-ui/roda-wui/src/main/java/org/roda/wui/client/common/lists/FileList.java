@@ -22,7 +22,6 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;

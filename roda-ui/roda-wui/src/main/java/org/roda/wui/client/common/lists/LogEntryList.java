@@ -20,7 +20,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.management.UserManagementService;
-import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.ClickableTextCell;
@@ -42,8 +41,6 @@ import com.google.gwt.view.client.ProvidesKey;
 public class LogEntryList extends AsyncTableCell<LogEntry> {
 
   private static final int PAGE_SIZE = 20;
-
-  private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;

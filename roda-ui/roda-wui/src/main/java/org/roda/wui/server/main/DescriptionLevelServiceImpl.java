@@ -22,6 +22,7 @@ public class DescriptionLevelServiceImpl extends RemoteServiceServlet implements
 
   private static final long serialVersionUID = 1133363430147430537L;
 
+  @SuppressWarnings("unused")
   private static final Logger logger = LoggerFactory.getLogger(DescriptionLevelServiceImpl.class);
 
   @Override

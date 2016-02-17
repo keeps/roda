@@ -33,6 +33,7 @@ import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLoginService {
 
   private static final long serialVersionUID = -6898933466651262033L;
+  @SuppressWarnings("unused")
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
   private static final String WUI_LOGIN_CACHE = "WUI_LOGIN_CACHE";
   private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu." ,"ui.role.");
