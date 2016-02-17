@@ -13,6 +13,7 @@ import java.util.Date;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.CacheControl;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -108,6 +109,12 @@ public class ApiUtils {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename())
       .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
+  }
+  
+  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag) {
+    return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
+      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename())
+      .cacheControl(cacheControl).tag(tag).build();
   }
 
   public static Response okResponse(StreamResponse streamResponse) {

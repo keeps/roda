@@ -28,9 +28,12 @@ import org.slf4j.LoggerFactory;
 
 public class Theme extends RodaCoreService {
 
+  @SuppressWarnings("unused")
   private static Logger logger = LoggerFactory.getLogger(Theme.class);
 
   private static String RESOURCE_PATH = "/org/roda/wui/public/";
+
+  private static Date deployDate = new Date();
 
   private Theme() {
     super();
@@ -39,12 +42,8 @@ public class Theme extends RodaCoreService {
   public static StreamResponse getResource(String resourceId) throws IOException, NotFoundException {
     StreamResponse streamResponse = null;
 
-    final Path themePath = RodaCoreFactory.getThemePath();
-    final Path filePath = themePath.resolve(resourceId);
-
-    logger.debug(filePath.toString());
-
-    if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
+    if (validExternalFile(resourceId)) {
+      final Path filePath = RodaCoreFactory.getThemePath().resolve(resourceId);
 
       StreamingOutput streamingOutput = new StreamingOutput() {
 
@@ -54,7 +53,7 @@ public class Theme extends RodaCoreService {
         }
       };
 
-      streamResponse = new StreamResponse(resourceId, MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
+      streamResponse = new StreamResponse(resourceId, Files.probeContentType(filePath), streamingOutput);
 
     } else {
       InputStream inputStream = Theme.class.getResourceAsStream(RESOURCE_PATH + resourceId);
@@ -68,6 +67,7 @@ public class Theme extends RodaCoreService {
           }
         };
 
+        // TODO
         streamResponse = new StreamResponse(resourceId, MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
       } else {
         throw new NotFoundException("File " + resourceId + " doesn't exit!");
@@ -77,16 +77,29 @@ public class Theme extends RodaCoreService {
     return streamResponse;
   }
 
-  public static Date getLastModifiedDate(String resourceId) throws IOException {
+  public static Date getLastModifiedDate(String resourceId, boolean externalFile, boolean internalFile)
+    throws IOException {
     Date modifiedDate = new Date();
 
-    final Path themePath = RodaCoreFactory.getThemePath();
-    final Path filePath = themePath.resolve(resourceId);
-
-    if (Files.exists(filePath) && !Files.isDirectory(filePath)) {
+    if (externalFile) {
+      Path filePath = RodaCoreFactory.getThemePath().resolve(resourceId);
       modifiedDate = new Date(Files.getLastModifiedTime(filePath).toMillis());
+    } else {
+      modifiedDate = deployDate;
     }
 
     return modifiedDate;
+  }
+
+  public static boolean validExternalFile(String resourceId) {
+    Path themePath = RodaCoreFactory.getThemePath();
+    Path filePath = themePath.resolve(resourceId);
+
+    return Files.exists(filePath) && !Files.isDirectory(filePath)
+      && filePath.toAbsolutePath().startsWith(themePath.toAbsolutePath().toString());
+  }
+
+  public static boolean validInternalFile(String resourceId) {
+    return (Theme.class.getResourceAsStream(RESOURCE_PATH + resourceId) != null && !resourceId.contains(".."));
   }
 }

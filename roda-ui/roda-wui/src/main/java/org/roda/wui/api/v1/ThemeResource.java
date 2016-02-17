@@ -16,6 +16,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
@@ -48,18 +49,25 @@ public class ThemeResource {
     @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId,
     @Context Request req) throws IOException, NotFoundException {
 
-    CacheControl cc = new CacheControl();
-    cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
-    cc.setPrivate(true);
+    boolean externalFile = Theme.validExternalFile(resourceId);
+    boolean internalFile = Theme.validInternalFile(resourceId);
 
-    Date lastModifiedDate = Theme.getLastModifiedDate(resourceId);
-    ResponseBuilder builder = req.evaluatePreconditions(lastModifiedDate);
+    if (externalFile || internalFile) {
+      CacheControl cc = new CacheControl();
+      cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
+      cc.setPrivate(true);
 
-    if (builder == null) {
-      return ApiUtils.okResponse(Theme.getResource(resourceId), cc, lastModifiedDate);
-//      return Response.ok(Theme.getResource(resourceId)).build(); //.cacheControl(cc).lastModified(lastModifiedDate).build();
+      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, true, false);
+      EntityTag etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
+      ResponseBuilder builder = req.evaluatePreconditions(etag);
+
+      if (builder == null) {
+        return ApiUtils.okResponse(Theme.getResource(resourceId), cc, etag);
+      } else {
+        return builder.cacheControl(cc).tag(etag).build();
+      }
     } else {
-      return builder.cacheControl(cc).lastModified(lastModifiedDate).build();
+      return Response.status(Response.Status.NOT_FOUND).entity("File not found: " + resourceId).build();
     }
   }
 }
