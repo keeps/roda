@@ -125,7 +125,7 @@ public class MemberManagement extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    memberManagementDescription.add(new HTMLWidgetWrapper("theme/MemberManagementDescription.html"));
+    memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
     
     list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 

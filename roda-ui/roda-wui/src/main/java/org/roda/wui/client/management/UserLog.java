@@ -147,7 +147,7 @@ public class UserLog extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     
-    userLogDescription.add(new HTMLWidgetWrapper("theme/UserLogDescription.html"));
+    userLogDescription.add(new HTMLWidgetWrapper("UserLogDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {

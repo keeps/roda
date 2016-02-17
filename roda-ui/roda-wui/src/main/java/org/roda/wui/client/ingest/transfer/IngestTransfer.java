@@ -184,7 +184,7 @@ public class IngestTransfer extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     
-    ingestTransferDescription.add(new HTMLWidgetWrapper("theme/IngestTransferDescription.html"));
+    ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
     // TODO externalise strings
     searchInputBox.getElement().setPropertyString("placeholder", "Search transferred resources");

@@ -74,7 +74,7 @@ public class Welcome {
   private void init() {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("theme/Welcome.html");
+      layout = new HTMLWidgetWrapper("Welcome.html");
       layout.addStyleName("wui-home");
     }
   }

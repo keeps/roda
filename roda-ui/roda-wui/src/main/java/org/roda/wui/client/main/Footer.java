@@ -21,7 +21,7 @@ public class Footer extends Composite {
     super();
 
     panel = new FlowPanel();
-    layout = new HTMLWidgetWrapper("theme/Footer.html");
+    layout = new HTMLWidgetWrapper("Footer.html");
 
     panel.add(layout);
     initWidget(layout);

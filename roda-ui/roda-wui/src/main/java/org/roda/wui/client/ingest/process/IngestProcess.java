@@ -144,7 +144,7 @@ public class IngestProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
-    ingestProcessDescription.add(new HTMLWidgetWrapper("theme/IngestProcessDescription.html"));
+    ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
     
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {

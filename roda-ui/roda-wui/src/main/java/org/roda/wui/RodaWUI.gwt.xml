@@ -24,6 +24,9 @@
 	<!-- Specify the app entry point class. -->
 	<entry-point class='org.roda.wui.client.main.Main' />
 	<stylesheet src="Main.css" />
+	<stylesheet src="Common.css" />
+	<stylesheet src="/api/v1/theme?resourceId=theme.css" />
+
 	<set-configuration-property name='xsiframe.failIfScriptTag'
 		value='FALSE' />
 </module>

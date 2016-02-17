@@ -78,6 +78,7 @@ public final class RodaConstants {
   public static final String CORE_SCHEMAS_FOLDER = "schemas";
   public static final String CORE_LDAP_FOLDER = "ldap";
   public static final String CORE_THEME_FOLDER = "theme";
+  public static final String CORE_EXAMPLE_THEME_FOLDER = "example-theme";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -88,6 +89,7 @@ public final class RodaConstants {
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
   public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
+  public static final String API_REST_V1_THEME = "api/v1/theme";
   // sub-resources strings
   public static final String API_DATA = "data";
   public static final Object API_FILE = "file";

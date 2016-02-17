@@ -71,7 +71,7 @@ public class PreIngest {
 
   private PreIngest() {
     layout = new VerticalPanel();
-    html = new HTMLWidgetWrapper("theme/PreIngest.html");
+    html = new HTMLWidgetWrapper("PreIngest.html");
 
     // TODO add producer filter parameter
     // Filter classPlanFilter = new Filter();

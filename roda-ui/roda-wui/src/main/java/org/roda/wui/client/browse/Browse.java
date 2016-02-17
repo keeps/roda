@@ -213,7 +213,7 @@ public class Browse extends Composite {
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
     
-    browseDescription.add(new HTMLWidgetWrapper("theme/BrowseDescription.html"));
+    browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     /* TODO set this pages enabled after developed */
     moveItem.setEnabled(false);

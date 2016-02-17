@@ -10,7 +10,6 @@ package org.roda.wui.api.v1;
 import java.io.IOException;
 import java.util.Date;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -36,19 +35,21 @@ public class ThemeResource {
   public static final String ENDPOINT = "/v1/theme";
   public static final String SWAGGER_ENDPOINT = "v1 theme";
 
-  public static final int CACHE_CONTROL_MAX_AGE = 86400;
+  public static final int CACHE_CONTROL_MAX_AGE = 60;
 
   @SuppressWarnings("unused")
   private Logger logger = LoggerFactory.getLogger(getClass());
-
-  @Context
-  private HttpServletRequest request;
-
+  
   @GET
   public Response getResource(
-    @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId,
+    @ApiParam(value = "The resource id", required = true) @QueryParam("resourceId") String resourceId,
+    @ApiParam(value = "The default resource id", required = false) @QueryParam("defaultResourceId") String defaultResourceId,
     @Context Request req) throws IOException, NotFoundException {
 
+    if (!Theme.exists(resourceId) && defaultResourceId != null) {
+      resourceId = defaultResourceId;
+    }
+    
     boolean externalFile = Theme.validExternalFile(resourceId);
     boolean internalFile = Theme.validInternalFile(resourceId);
 
@@ -67,7 +68,7 @@ public class ThemeResource {
         return builder.cacheControl(cc).tag(etag).build();
       }
     } else {
-      return Response.status(Response.Status.NOT_FOUND).entity("File not found: " + resourceId).build();
+      throw new NotFoundException("File not found: " + resourceId);
     }
   }
 }

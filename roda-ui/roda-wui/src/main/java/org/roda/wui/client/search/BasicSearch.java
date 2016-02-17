@@ -173,7 +173,7 @@ public class BasicSearch extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
     
-    searchDescription.add(new HTMLWidgetWrapper("theme/SearchDescription.html"));
+    searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
 
     searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
