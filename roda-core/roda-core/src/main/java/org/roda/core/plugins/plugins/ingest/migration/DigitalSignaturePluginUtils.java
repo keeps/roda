@@ -2,7 +2,9 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.KeyStore;
@@ -16,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,16 +27,18 @@ import com.lowagie.text.pdf.AcroFields.Item;
 import com.lowagie.text.pdf.PRStream;
 import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfObject;
 import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfStream;
+import com.lowagie.text.pdf.PdfString;
 
 public class DigitalSignaturePluginUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
 
-  public static String runDigitalSignatureVerify(Path input, String fileFormat) throws IOException {
+  public static int runDigitalSignatureVerify(Path input, String fileFormat) throws IOException {
 
     KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
     PdfReader reader = new PdfReader(input.toString());
@@ -70,7 +73,7 @@ public class DigitalSignaturePluginUtils {
 
     }
 
-    return "RESULT: " + result;
+    return result;
   }
 
   public static Path runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException, IOException {
@@ -78,14 +81,29 @@ public class DigitalSignaturePluginUtils {
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
     ArrayList<?> names = fields.getSignatureNames();
-    PrintWriter out = new PrintWriter(output.toString());
+    PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(output.toString()),
+      StandardCharsets.UTF_8), true);
 
     for (int i = 0; i < names.size(); i++) {
       String name = (String) names.get(i);
       Item item = fields.getFieldItem(name);
+      String infoResult = "";
 
       // TODO Filter the result information using RUPS
       PdfDictionary widget = item.getWidget(0);
+      PdfDictionary info = widget.getAsDict(PdfName.V);
+
+      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.T, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.NAME, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.REASON, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.LOCATION, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.CONTACTINFO, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.M, "String");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.FILTER, "Object");
+      infoResult = addElementToExtractionResult(infoResult, info, PdfName.SUBFILTER, "Object");
+      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.FT, "Object");
+      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.LOCK, "Boolean");
+
       PdfDictionary ap = widget.getAsDict(PdfName.AP);
       PdfStream normal = ap.getAsStream(PdfName.N);
       PdfDictionary resources = normal.getAsDict(PdfName.RESOURCES);
@@ -93,13 +111,23 @@ public class DigitalSignaturePluginUtils {
       PdfStream frm = xobject.getAsStream(PdfName.FRM);
       PdfDictionary res = frm.getAsDict(PdfName.RESOURCES);
       PdfDictionary xobj = res.getAsDict(PdfName.XOBJECT);
+      PdfStream n0 = xobj.getAsStream(PdfName.N0);
+      PRStream n0stream = (PRStream) n0;
       PdfStream n2 = xobj.getAsStream(PdfName.N2);
       PRStream n2stream = (PRStream) n2;
-      byte[] stream = PdfReader.getStreamBytes(n2stream);
 
-      String streamResult = new String(stream);
-      out.println("Signature " + i + ":");
-      out.println(streamResult);
+      byte[] n2byteStream = PdfReader.getStreamBytes(n2stream);
+      byte[] n0byteStream = PdfReader.getStreamBytes(n0stream);
+      String streamResult = new String(n2byteStream);
+      streamResult += new String(n0byteStream);
+
+      streamResult = streamResult.replaceAll("\\)Tj[\n]*T\\*[\n]*\\(", "");
+      streamResult = streamResult.replaceAll("\n[^\\(].*", "");
+      streamResult = streamResult.replaceFirst(".*\n", "");
+      streamResult = streamResult.replaceAll("\\((.*)\\)Tj", "$1");
+
+      out.println("- Signature " + name + ":\n");
+      out.println(infoResult);
     }
 
     out.close();
@@ -113,6 +141,22 @@ public class DigitalSignaturePluginUtils {
     stamper.setFormFlattening(true);
     stamper.close();
     return output;
+  }
+
+  private static String addElementToExtractionResult(String result, PdfDictionary parent, PdfName element, String type) {
+    if (parent.contains(element)) {
+      if (type.equals("String")) {
+        PdfString elementName = parent.getAsString(element);
+        if (elementName.toString().matches("[0-9a-zA-Z'\\.\\/\\-\\_\\: ]+"))
+          result += element.toString() + ": " + elementName.toString() + "\n";
+      } else if (type.equals("Object")) {
+        PdfObject elementObject = parent.get(element);
+        result += element.toString() + ": " + elementObject.toString() + "\n";
+      } else if (type.equals("Boolean")) {
+        result += element.toString() + ": true\n";
+      }
+    }
+    return result;
   }
 
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
