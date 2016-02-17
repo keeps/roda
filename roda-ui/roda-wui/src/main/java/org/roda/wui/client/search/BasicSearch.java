@@ -35,6 +35,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
@@ -111,6 +112,9 @@ public class BasicSearch extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
+  
+  @UiField
+  FlowPanel searchDescription;
 
   @UiField
   TextBox searchInputBox;
@@ -168,6 +172,8 @@ public class BasicSearch extends Composite {
     FacetUtils.bindFacets(searchResultPanel, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
+    
+    searchDescription.add(new HTMLWidgetWrapper("theme/SearchDescription.html"));
 
     searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 

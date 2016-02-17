@@ -7,19 +7,23 @@
  */
 package org.roda.wui.client.main;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.client.ui.FlowPanel;
 
 public class Footer extends Composite {
-  interface Binder extends UiBinder<Widget, Footer> {
-  }
+
+  private FlowPanel panel;
+  private HTMLWidgetWrapper layout;
 
   public Footer() {
     super();
-    Binder uiBinder = GWT.create(Binder.class);
-    initWidget(uiBinder.createAndBindUi(this));
-  }
 
+    panel = new FlowPanel();
+    layout = new HTMLWidgetWrapper("theme/Footer.html");
+
+    panel.add(layout);
+    initWidget(layout);
+  }
 }

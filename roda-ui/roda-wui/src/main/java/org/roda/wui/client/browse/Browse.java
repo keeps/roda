@@ -40,6 +40,7 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -148,7 +149,7 @@ public class Browse extends Composite {
   Label browseTitle;
 
   @UiField
-  HTML browseDescription;
+  FlowPanel browseDescription;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -208,9 +209,11 @@ public class Browse extends Composite {
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
-
+    
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
+    
+    browseDescription.add(new HTMLWidgetWrapper("theme/BrowseDescription.html"));
 
     /* TODO set this pages enabled after developed */
     moveItem.setEnabled(false);

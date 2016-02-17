@@ -3,7 +3,6 @@
 	<inherits name='com.google.gwt.user.User' />
 
 	<!-- Inherit sub-modules                  -->
-	<inherits name='org.roda.wui.management.user.UserManagement' />
 	<inherits name='org.roda.wui.management.editor.MetadataEditor' />
 	<inherits name='org.roda.wui.management.statistics.Statistics' />
 

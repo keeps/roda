@@ -20,19 +20,8 @@
 					ui:field="browseTitle">
 					<ui:msg description="Browser title">Catalogue</ui:msg>
 				</g:Label>
-				<g:HTML addStyleNames="page-description" ui:field="browseDescription">
-					<p>
-						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec laoreet
-						at sapien vel efficitur. Mauris lacinia nisi a luctus lacinia.
-						Donec est est, scelerisque pulvinar eros a, tempus rutrum augue.
-						Integer scelerisque volutpat metus, a congue libero ullamcorper
-						non. Integer gravida viverra mi, sit amet ultrices lacus efficitur
-						sed. Maecenas vitae varius dolor. Curabitur ut ultrices leo.
-						Vivamus sollicitudin orci ut pellentesque maximus. Nam in enim
-						malesuada, vestibulum purus ac, porta risus. Lorem ipsum dolor sit
-						amet, consectetur adipiscing elit.
-					</p>
-				</g:HTML>
+				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
+				</g:FlowPanel>
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">

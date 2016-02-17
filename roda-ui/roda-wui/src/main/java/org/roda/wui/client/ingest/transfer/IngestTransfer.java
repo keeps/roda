@@ -40,6 +40,7 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
@@ -59,6 +60,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -138,7 +140,7 @@ public class IngestTransfer extends Composite {
   Label ingestTransferTitle;
 
   @UiField
-  HTML ingestTransferDescription;
+  FlowPanel ingestTransferDescription;
 
   @UiField
   BreadcrumbPanel breadcrumb;
@@ -181,6 +183,8 @@ public class IngestTransfer extends Composite {
     transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, "Transferred resources list");
 
     initWidget(uiBinder.createAndBindUi(this));
+    
+    ingestTransferDescription.add(new HTMLWidgetWrapper("theme/IngestTransferDescription.html"));
 
     // TODO externalise strings
     searchInputBox.getElement().setPropertyString("placeholder", "Search transferred resources");

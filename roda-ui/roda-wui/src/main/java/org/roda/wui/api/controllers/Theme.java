@@ -31,9 +31,9 @@ public class Theme extends RodaCoreService {
   @SuppressWarnings("unused")
   private static Logger logger = LoggerFactory.getLogger(Theme.class);
 
-  private static String RESOURCE_PATH = "/org/roda/wui/public/";
+  private static final String RESOURCE_PATH = "/org/roda/wui/public/";
 
-  private static Date deployDate = new Date();
+  private static final Date INITIAL_DATE = new Date();
 
   private Theme() {
     super();
@@ -85,7 +85,7 @@ public class Theme extends RodaCoreService {
       Path filePath = RodaCoreFactory.getThemePath().resolve(resourceId);
       modifiedDate = new Date(Files.getLastModifiedTime(filePath).toMillis());
     } else {
-      modifiedDate = deployDate;
+      modifiedDate = INITIAL_DATE;
     }
 
     return modifiedDate;

@@ -30,6 +30,7 @@ import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -101,6 +102,9 @@ public class IngestProcess extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  
+  @UiField
+  FlowPanel ingestProcessDescription;
 
   @UiField(provided = true)
   JobList jobList;
@@ -140,6 +144,8 @@ public class IngestProcess extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    ingestProcessDescription.add(new HTMLWidgetWrapper("theme/IngestProcessDescription.html"));
+    
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
 

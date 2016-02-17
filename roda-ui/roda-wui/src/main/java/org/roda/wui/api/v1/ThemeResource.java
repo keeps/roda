@@ -57,7 +57,7 @@ public class ThemeResource {
       cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
       cc.setPrivate(true);
 
-      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, true, false);
+      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, externalFile, internalFile);
       EntityTag etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
       ResponseBuilder builder = req.evaluatePreconditions(etag);
 

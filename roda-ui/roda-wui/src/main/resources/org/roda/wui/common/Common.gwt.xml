@@ -7,8 +7,6 @@
   <inherits name="org.roda.core.Core"/>
   <!-- Inherit translation -->
   <inherits name="config.i18n.I18N"/>
-  <!-- Inherit sub modules -->
-  <inherits name="org.roda.wui.common.fileupload.FileUpload"/>
   <!-- Inherit the necessary libraries -->
   <inherits name="org.gwtwidgets.WidgetLibrary"/>
   <!-- Specify the cascade stylesheet -->

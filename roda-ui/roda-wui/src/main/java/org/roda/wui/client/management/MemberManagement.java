@@ -21,6 +21,7 @@ import org.roda.wui.client.common.lists.RodaMemberList;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
@@ -83,6 +84,9 @@ public class MemberManagement extends Composite {
 
   // private UserManagementMessages messages = (UserManagementMessages)
   // GWT.create(UserManagementMessages.class);
+  
+  @UiField
+  FlowPanel memberManagementDescription;
 
   @UiField(provided = true)
   RodaMemberList list;
@@ -121,6 +125,8 @@ public class MemberManagement extends Composite {
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    memberManagementDescription.add(new HTMLWidgetWrapper("theme/MemberManagementDescription.html"));
+    
     list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override

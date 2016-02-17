@@ -27,6 +27,7 @@ import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
@@ -91,6 +92,9 @@ public class UserLog extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
+  
+  @UiField
+  FlowPanel userLogDescription;
 
   @UiField
   DateBox inputDateInitial;
@@ -142,6 +146,8 @@ public class UserLog extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
+    
+    userLogDescription.add(new HTMLWidgetWrapper("theme/UserLogDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {

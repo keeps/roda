@@ -16,7 +16,6 @@
 
 	<!-- Inherit sub-projects -->
 	<inherits name="org.roda.wui.management.Management" />
-	<inherits name="org.roda.wui.ingest.Ingest" />
 
 	<!-- <inherits name='com.google.gwt.user.theme.standard.Standard' /> -->
 	<!-- <inherits name="com.google.gwt.user.theme.chrome.Chrome" /> -->

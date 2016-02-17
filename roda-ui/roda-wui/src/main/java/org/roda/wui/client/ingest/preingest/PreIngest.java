@@ -12,7 +12,6 @@ package org.roda.wui.client.ingest.preingest;
 
 import java.util.List;
 
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.common.client.HistoryResolver;
@@ -72,10 +71,10 @@ public class PreIngest {
 
   private PreIngest() {
     layout = new VerticalPanel();
-    html = new HTMLWidgetWrapper("PreIngest.html");
+    html = new HTMLWidgetWrapper("theme/PreIngest.html");
 
-    Filter classPlanFilter = new Filter();
     // TODO add producer filter parameter
+    // Filter classPlanFilter = new Filter();
     // classPlanFilter.add(new ProducerFilterParameter());
 
     layout.add(html);
