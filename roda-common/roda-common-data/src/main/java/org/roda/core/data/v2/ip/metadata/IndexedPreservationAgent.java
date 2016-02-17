@@ -8,7 +8,7 @@
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.util.List;
 
 public class IndexedPreservationAgent implements Serializable {
   private static final long serialVersionUID = 7864328669898523851L;
@@ -17,46 +17,64 @@ public class IndexedPreservationAgent implements Serializable {
   private String type;
   private String note;
   private String extension;
-  
-  
+  private List<String> roles;
+
   public IndexedPreservationAgent() {
     super();
   }
+
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public String getName() {
     return name;
   }
+
   public void setName(String name) {
     this.name = name;
   }
+
   public String getType() {
     return type;
   }
+
   public void setType(String type) {
     this.type = type;
   }
+
   public String getNote() {
     return note;
   }
+
   public void setNote(String note) {
     this.note = note;
   }
+
   public String getExtension() {
     return extension;
   }
+
   public void setExtension(String extension) {
     this.extension = extension;
   }
+
+  public List<String> getRoles() {
+    return roles;
+  }
+
+  public void setRoles(List<String> roles) {
+    this.roles = roles;
+  }
+
   @Override
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
-      + ", extension=" + extension + "]";
+      + ", extension=" + extension + ", roles=" + roles + "]";
   }
-  
-  
+
 }

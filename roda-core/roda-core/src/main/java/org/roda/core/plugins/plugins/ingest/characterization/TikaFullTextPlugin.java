@@ -36,8 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import scala.noinline;
-
 public class TikaFullTextPlugin implements Plugin<AIP> {
 
   public static final String FILE_SUFFIX = ".html";
@@ -67,6 +65,11 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   @Override
   public String getDescription() {
     return "Extracts the full-text from the representation files";
+  }
+
+  @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override
@@ -103,8 +106,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
     try {
       boolean notifyAgent = true;
-      PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, model,
-        notifyAgent);
+      PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
     } catch (AlreadyExistsException e) {
       // TODO verify agent creation (event)
     } catch (RODAException e) {

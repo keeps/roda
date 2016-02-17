@@ -75,8 +75,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     pronomToExtension = new HashMap<>();
     mimetypeToExtension = new HashMap<>();
 
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   @Override
@@ -90,8 +90,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   }
 
   public boolean hasPartialSuccessOnOutcome() {
-    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins",
-      "hasPartialSuccessOnOutcome"));
+    return Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   public List<String> getApplicableTo() {
@@ -142,6 +142,11 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   }
 
   @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+
+  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -188,10 +193,9 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     try {
       // Agent is detached from AIP
       boolean notify = true;
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model,
-        notify);
+      agent = PremisUtils.createPremisAgentBinary(this, model, notify);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN, model);
+      agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
       LOGGER.error("Error running adding DigitalSignature plugin: " + e.getMessage(), e);
     }
@@ -226,8 +230,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
             Map<String, List<String>> pronomExtensions = getPronomToExtension();
 
             if (((filePronom != null && pronomExtensions.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (getApplicableTo()
-                .contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+              || (getApplicableTo().contains(fileFormat)))) {
 
               if (applicableTo.size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
@@ -248,8 +252,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
-                System.err.println(DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
-                  fileFormat));
+                System.err
+                  .println(DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat));
               }
 
               if (doExtract) {
@@ -259,8 +263,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                   fileFormat);
                 ContentPayload payload = new FSPathContentPayload(extractResult);
 
-                model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(), file
-                  .getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.FILE_SUFFIX,
+                model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
+                  file.getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.FILE_SUFFIX,
                   DigitalSignaturePlugin.OTHER_METADATA_TYPE, payload, true);
               }
 
@@ -270,8 +274,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                 if (!representation.isOriginal()) {
                   newRepresentationID = representation.getId();
                   newRepresentations.add(representation.getId());
-                  StoragePath representationPreservationPath = ModelUtils.getAIPRepresentationPreservationPath(
-                    representation.getAipId(), representation.getId());
+                  StoragePath representationPreservationPath = ModelUtils
+                    .getAIPRepresentationPreservationPath(representation.getAipId(), representation.getId());
                   storage.deleteResource(representationPreservationPath);
                 }
 
@@ -301,16 +305,17 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
-                    RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
+                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
 
                 } else {
-                  LOGGER.debug("Process failed on file " + file.getId() + " of representation "
-                    + representation.getId() + " from AIP " + aipId);
+                  LOGGER.debug("Process failed on file " + file.getId() + " of representation " + representation.getId()
+                    + " from AIP " + aipId);
                   pluginResultState = 2;
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
-                    RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()));
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
+                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()));
+
                 }
               }
             } else {
@@ -347,8 +352,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
 
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
-          RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
+          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
       }
 
       report.addItem(reportItem);

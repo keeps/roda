@@ -37,7 +37,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
-import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
@@ -81,6 +80,11 @@ public class VeraPDFPlugin implements Plugin<AIP> {
   }
 
   @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+
+  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -120,11 +124,9 @@ public class VeraPDFPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
-        model, notifyAgent);
+      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK,
-        model);
+      agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
       logger.error("Error running VeraPDF plugin: " + e.getMessage(), e);
     }

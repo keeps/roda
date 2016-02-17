@@ -1521,7 +1521,7 @@ public class RodaCoreFactory {
   private static void printAgents(Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE,
-      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN));
+      RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE));
     IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist);
 
     for (IndexedPreservationAgent ipa : res.getResults()) {

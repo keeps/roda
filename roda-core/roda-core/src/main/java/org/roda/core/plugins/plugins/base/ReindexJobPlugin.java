@@ -60,6 +60,11 @@ public class ReindexJobPlugin implements Plugin<Job> {
   public String getDescription() {
     return "Clean-up indexes and re-create them from data in storage";
   }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
 
   @Override
   public String getVersion() {

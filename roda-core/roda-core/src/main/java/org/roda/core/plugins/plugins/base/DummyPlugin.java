@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -47,6 +48,11 @@ public class DummyPlugin implements Plugin<AIP> {
   @Override
   public String getDescription() {
     return "Dummy action that just logs the IDs from the AIPs returned from a index search";
+  }
+
+  @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override

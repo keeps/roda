@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,11 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+
+  @Override
   public String getVersion() {
     try {
       return ImageMagickConvertPluginUtils.getVersion();
@@ -39,8 +45,8 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
     return new ImageMagickConvertPlugin();
   }
 
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException {
 
     return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());

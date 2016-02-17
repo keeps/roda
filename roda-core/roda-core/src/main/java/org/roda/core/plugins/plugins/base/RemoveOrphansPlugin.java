@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -49,6 +50,11 @@ public class RemoveOrphansPlugin implements Plugin<IndexedAIP> {
   @Override
   public String getDescription() {
     return "Moves the orphans AIP (not Fonds) to a new parent";
+  }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override

@@ -490,17 +490,18 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_TYPE = "eventType";
   public static final String PRESERVATION_EVENT_OUTCOME = "eventOutcome";
   public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION = "eventOutcomeDetailExtension";
-  public static final Object PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE = "eventOutcomeDetailNote";
+  public static final String PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE = "eventOutcomeDetailNote";
   public static final String PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER = "linkingAgentIdentifier";
   public static final String PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER = "linkingOutcomeObjectIdentifier";
-  public static final Object PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
+  public static final String PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER = "linkingSourceObjectIdentifier";
 
   /* Preservation agents fields */
   public static final String PRESERVATION_AGENT_ID = "id";
   public static final String PRESERVATION_AGENT_NAME = "name";
   public static final String PRESERVATION_AGENT_TYPE = "type";
-  public static final Object PRESERVATION_AGENT_EXTENSION = "extension";
-  public static final Object PRESERVATION_AGENT_NOTE = "note";
+  public static final String PRESERVATION_AGENT_EXTENSION = "extension";
+  public static final String PRESERVATION_AGENT_NOTE = "note";
+  public static final String PRESERVATION_AGENT_ROLES = "roles";
 
   public static final String PRESERVATION_TYPE_AGENT = "agent";
   public static final String PRESERVATION_TYPE_FILE = "file";
@@ -547,15 +548,10 @@ public final class RodaConstants {
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
 
-  public static final String PRESERVATION_AGENT_TYPE_INGEST_TASK = "software:ingest_task";
-  public static final String PRESERVATION_AGENT_TYPE_MIGRATOR = "software:migrator";
-  public static final String PRESERVATION_AGENT_TYPE_DIGITALIZATION = "software:digitalization";
-  public static final String PRESERVATION_AGENT_TYPE_FIXITY_CHECK_PLUGIN = "software:plugin:fixity_check";
-  public static final String PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN = "software:plugin:characterization";
-  public static final String PRESERVATION_AGENT_TYPE_VIRUS_CHECK_PLUGIN = "software:plugin:virus_check";
-  public static final String PRESERVATION_AGENT_TYPE_VERAPDF_CHECK_PLUGIN = "software:plugin:verapdf_check";
-  public static final String PRESERVATION_AGENT_TYPE_CONVERSION_PLUGIN = "software:plugin:conversion";
-  public static final String PRESERVATION_AGENT_TYPE_UNKNOWN_PREFIX = "unknown:";
+  public static final String PRESERVATION_AGENT_TYPE_HARDWARE = "hardware";
+  public static final String PRESERVATION_AGENT_TYPE_ORGANIZATION = "organization";
+  public static final String PRESERVATION_AGENT_TYPE_PERSON = "person";
+  public static final String PRESERVATION_AGENT_TYPE_SOFTWARE = "software";
 
   public static final String PRESERVATION_LEVEL_FULL = "full";
 
@@ -568,6 +564,13 @@ public final class RodaConstants {
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
+  
+  
+  
+  
+  public static final String LINKING_IDENTIFIER_VALUE = "value";
+  public static final String LINKING_IDENTIFIER_TYPE = "type";
+  public static final String LINKING_IDENTIFIER_ROLES = "roles";
   
 
 }

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -65,6 +66,11 @@ public class ExifToolPlugin implements Plugin<AIP> {
   @Override
   public String getDescription() {
     return "Generates the ExifTool output for each file in the AIP";
+  }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override

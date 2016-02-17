@@ -50,6 +50,11 @@ public class LogCleanerPlugin implements Plugin<LogEntry> {
   public String getName() {
     return "Log entries cleaner";
   }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE;
+  }
 
   @Override
   public String getVersion() {

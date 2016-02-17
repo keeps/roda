@@ -52,6 +52,11 @@ public class ReindexAIPPlugin implements Plugin<AIP> {
   public String getDescription() {
     return "Clean-up index and re-create it from data in storage";
   }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
 
   @Override
   public String getVersion() {

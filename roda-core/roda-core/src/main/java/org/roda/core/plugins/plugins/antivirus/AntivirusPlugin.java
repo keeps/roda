@@ -94,6 +94,11 @@ public class AntivirusPlugin implements Plugin<AIP> {
   public String getDescription() {
     return "Verifies if a SIP is free of virus.";
   }
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
 
   @Override
   public String getVersion() {
@@ -121,10 +126,10 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model,
+      agent = PremisUtils.createPremisAgentBinary(this, model,
         notifyAgent);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+      agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
       LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
     }

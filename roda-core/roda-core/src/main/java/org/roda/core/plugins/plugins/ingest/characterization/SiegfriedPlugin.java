@@ -67,6 +67,11 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   }
 
   @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+
+  @Override
   public String getVersion() {
     return SiegfriedPluginUtils.getVersion();
   }
@@ -100,11 +105,9 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
-        model, notifyAgent);
+      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN,
-        model);
+      agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }
@@ -122,7 +125,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
             createsPluginEvent, inotify);
         }
         model.notifyAIPUpdated(aip.getId());
-        
+
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 

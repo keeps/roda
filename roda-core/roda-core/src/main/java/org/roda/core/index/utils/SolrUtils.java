@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -99,6 +100,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -1135,13 +1137,12 @@ public class SolrUtils {
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
     final String eventOutcomeDetailNote = objectToString(
       doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE));
-    final List<String> linkingAgentIdentifiers = objectToListString(
+    final List<String> agents = objectToListString(
       doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
-    final List<String> linkingOutcomeObjectIdentifiers = objectToListString(
+    final List<String> outcomes = objectToListString(
       doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
-    final List<String> linkingSourceObjectIdentifiers = objectToListString(
+    final List<String> sources = objectToListString(
       doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
-
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
     ipe.setAipId(aipID);
@@ -1153,9 +1154,33 @@ public class SolrUtils {
     ipe.setEventOutcome(eventOutcome);
     ipe.setEventOutcomeDetailExtension(eventOutcomeDetailExtension);
     ipe.setEventOutcomeDetailNote(eventOutcomeDetailNote);
-    ipe.setLinkingAgentIds(linkingAgentIdentifiers);
-    ipe.setOutcomeObjectIds(linkingOutcomeObjectIdentifiers);
-    ipe.setSourcesObjectIds(linkingSourceObjectIdentifiers);
+    try{
+      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      for(String s : sources){
+        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      }
+      ipe.setSourcesObjectIds(ids);
+    }catch(Throwable e){
+      LOGGER.error("Error setting event linking source: "+e.getMessage(),e);
+    }
+    try{
+      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      for(String s : outcomes){
+        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      }
+      ipe.setOutcomeObjectIds(ids);
+    }catch(Throwable e){
+      LOGGER.error("Error setting event linking outcome: "+e.getMessage(),e);
+    }
+    try{
+      List<LinkingIdentifier> ids = new ArrayList<LinkingIdentifier>();
+      for(String s : agents){
+        ids.add(ModelUtils.getLinkingIdentifierFromJson(s));
+      }
+      ipe.setLinkingAgentIds(ids);
+    }catch(Throwable e){
+      LOGGER.error("Error setting event linking agents: "+e.getMessage(),e);
+    }
     return ipe;
   }
 
@@ -1165,12 +1190,14 @@ public class SolrUtils {
     final String type = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TYPE));
     final String extension = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_EXTENSION));
     final String note = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE));
+    final List<String> roles = objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
     IndexedPreservationAgent ipa = new IndexedPreservationAgent();
     ipa.setId(id);
     ipa.setName(name);
     ipa.setType(type);
     ipa.setExtension(extension);
     ipa.setNote(note);
+    ipa.setRoles(roles);
     return ipa;
   }
 
@@ -1468,5 +1495,14 @@ public class SolrUtils {
     }
 
     return jobReport;
+  }
+
+  public static SolrInputDocument linkingIdentifierToSolrDocument(LinkingIdentifier i) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField("id", UUID.randomUUID().toString());
+    doc.addField(RodaConstants.LINKING_IDENTIFIER_VALUE, i.getValue());
+    doc.addField(RodaConstants.LINKING_IDENTIFIER_TYPE, i.getType());
+    doc.addField(RodaConstants.LINKING_IDENTIFIER_ROLES, i.getRoles());
+    return doc;
   }
 }

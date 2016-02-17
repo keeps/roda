@@ -61,6 +61,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.user.RodaUser;
@@ -922,14 +923,17 @@ public class BrowserHelper {
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws NotFoundException, GenericException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
+    
+    
+    
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && ipe.getLinkingAgentIds().size() > 0) {
       List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
-      for (String agentID : ipe.getLinkingAgentIds()) {
+      for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
         try {
           IndexedPreservationAgent agent = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class,
-            agentID);
+            agentID.getValue());
           agents.add(agent);
         } catch (NotFoundException | GenericException e) {
           LOGGER.error("Error getting agent " + agentID + ": " + e.getMessage());

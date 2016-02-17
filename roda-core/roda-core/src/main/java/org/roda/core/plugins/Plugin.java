@@ -63,6 +63,13 @@ public interface Plugin<T extends Serializable> {
    * @return a {@link String} with the description of this {@link Plugin}.
    */
   public String getDescription();
+  
+  /**
+   * Returns the type of the agent linked to this {@link Plugin}.
+   * 
+   * @return a {@link String} with the type of the agent of this {@link Plugin}.
+   */
+  public String getAgentType();
 
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this

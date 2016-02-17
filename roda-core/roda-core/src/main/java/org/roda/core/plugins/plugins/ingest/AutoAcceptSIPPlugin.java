@@ -16,12 +16,8 @@ import java.util.Map;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -31,7 +27,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
-import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -59,6 +54,11 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
   @Override
   public String getName() {
     return "Auto accept SIP";
+  }
+
+  @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override
@@ -93,10 +93,9 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model,
-        notifyAgent);
+      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, RodaConstants.PRESERVATION_AGENT_TYPE_INGEST_TASK, model);
+      agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
       LOGGER.error("Error creating auto-accept agent: " + e.getMessage(), e);
     }

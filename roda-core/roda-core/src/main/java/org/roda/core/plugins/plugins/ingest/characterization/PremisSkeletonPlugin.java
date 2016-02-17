@@ -59,6 +59,11 @@ public class PremisSkeletonPlugin implements Plugin<AIP> {
   }
 
   @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+  
+  @Override
   public String getVersion() {
     return "1.0";
   }

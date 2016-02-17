@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 
@@ -21,6 +22,11 @@ public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
   @Override
   public String getDescription() {
     return "Generates a new format file using a generic command line.";
+  }
+
+  @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override

@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
@@ -39,7 +40,12 @@ public class AvconvConvertPlugin extends CommandConvertPlugin {
   public String getDescription() {
     return "Generates a video format file from other video format one using Avconv.";
   }
-
+  
+  @Override
+  public String getAgentType(){
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+  
   @Override
   public String getVersion() {
     try {

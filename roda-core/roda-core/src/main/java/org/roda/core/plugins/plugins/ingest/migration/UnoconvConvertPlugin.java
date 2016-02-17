@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 
@@ -24,6 +25,11 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
+  public String getAgentType() {
+    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  }
+
+  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -34,8 +40,8 @@ public class UnoconvConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException {
 
     return UnoconvConvertPluginUtils.executeUnoconvConvert(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());

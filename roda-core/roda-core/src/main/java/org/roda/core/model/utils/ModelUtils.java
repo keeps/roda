@@ -41,6 +41,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationObject;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
@@ -555,37 +556,6 @@ public final class ModelUtils {
     return ret;
   }
 
-  public static <T> List<IndexedPreservationObject> extractLinkingObjectsFromPreservationBinary(ContentPayload payload,
-    Class<T> c) throws ValidationException, GenericException {
-    boolean validatePremis = false;
-    List<IndexedPreservationObject> objects = new ArrayList<IndexedPreservationObject>();
-    if (c.equals(File.class)) {
-      LOGGER.error("Not implemented!");
-    } else if (c.equals(EventComplexType.class)) {
-      EventComplexType event = PremisUtils.binaryToEvent(payload, validatePremis);
-      List<LinkingObjectIdentifierComplexType> identifiers = event.getLinkingObjectIdentifierList();
-      if (identifiers != null) {
-        for (LinkingObjectIdentifierComplexType loict : identifiers) {
-          IndexedPreservationObject object = new IndexedPreservationObject();
-
-          object.setTitle(loict.getTitle());
-          object.setIdentifierType(loict.getLinkingObjectIdentifierType());
-          object.setIdentifierValue(loict.getLinkingObjectIdentifierValue());
-          object.setRole(loict.getRole());
-          object.setType(loict.getType());
-          objects.add(object);
-        }
-      }
-    } else if (c.equals(Representation.class)) {
-      // TODO
-      LOGGER.error("Not implemented!");
-    } else {
-      // TODO
-      LOGGER.error("Not implemented!");
-    }
-    return objects;
-  }
-
   public static StoragePath getOtherMetadataDirectory(String aipID) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP, aipID,
       RodaConstants.STORAGE_DIRECTORY_METADATA, RodaConstants.STORAGE_DIRECTORY_OTHER);
@@ -706,6 +676,19 @@ public final class ModelUtils {
   public static StoragePath getPreservationFilePathRaw(String aipId, String representationId, String preservationID)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getAIPRepresentationPreservationPath(aipId, representationId), preservationID);
+  }
+
+  public static LinkingIdentifier getLinkingIdentifierFromJson(String json) {
+    LinkingIdentifier ret = new LinkingIdentifier();
+    try {
+      JsonFactory factory = new JsonFactory();
+      ObjectMapper mapper = new ObjectMapper(factory);
+      ret = mapper.readValue(json, new TypeReference<LinkingIdentifier>() {
+      });
+    } catch (IOException e) {
+      LOGGER.error("Error transforming json string to linking identifier", e);
+    }
+    return ret;
   }
 
 }

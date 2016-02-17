@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -241,8 +242,9 @@ public class ShowPreservationEvent extends Composite {
 
     // Source objects
     if (event.getSourcesObjectIds().size() > 0) {
-      for (String sourceObjectId : event.getSourcesObjectIds()) {
-        addObjectPanel(sourceObjectId, sourceObjectsPanel);
+      for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
+        String text = sourceObjectId.getValue();
+        addObjectPanel(text, sourceObjectsPanel);
       }
     } else {
       sourceObjectsHeader.setVisible(false);
@@ -251,8 +253,9 @@ public class ShowPreservationEvent extends Composite {
 
     // Outcome objects
     if (event.getOutcomeObjectIds().size() > 0) {
-      for (String outcomeObjectId : event.getOutcomeObjectIds()) {
-        addObjectPanel(outcomeObjectId, outcomeObjectsPanel);
+      for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
+        String text = outcomeObjectId.getValue();
+        addObjectPanel(text, outcomeObjectsPanel);
       }
     } else {
       outcomeObjectsHeader.setVisible(false);

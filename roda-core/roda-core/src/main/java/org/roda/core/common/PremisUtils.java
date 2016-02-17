@@ -50,6 +50,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
@@ -461,7 +462,7 @@ public class PremisUtils {
 
     return new StringContentPayload(MetadataUtils.saveToString(document, true));
   }
-
+  
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<Fixity>();
     lc.xmlns.premisV2.File f = binaryToFile(premisFile.getContent().createInputStream());
@@ -671,7 +672,7 @@ public class PremisUtils {
   }
 
   public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin,
-    String preservationAgentTypeCharacterizationPlugin, ModelService model, boolean notify)
+    ModelService model, boolean notify)
       throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
@@ -679,14 +680,14 @@ public class PremisUtils {
 
     // TODO set agent extension
     agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
-      RodaConstants.PRESERVATION_AGENT_TYPE_CHARACTERIZATION_PLUGIN, "", plugin.getDescription());
+      plugin.getAgentType(), "", plugin.getDescription());
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
-    IndexedPreservationAgent agent = getPreservationAgent(plugin, preservationAgentTypeCharacterizationPlugin, model);
+    IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
     return agent;
   }
 
   public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin,
-    String preservationAgentTypeCharacterizationPlugin, ModelService model) {
+    ModelService model) {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     IndexedPreservationAgent agent = new IndexedPreservationAgent();
     agent.setId(id);
@@ -721,4 +722,52 @@ public class PremisUtils {
     return identifier;
   }
 
+  public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException{
+    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    EventComplexType event = PremisUtils.binaryToEvent(b.getContent(), true);
+    if(event.getLinkingAgentIdentifierList()!=null && event.getLinkingAgentIdentifierList().size()>0){
+      for(LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()){
+        LinkingIdentifier li = new LinkingIdentifier();
+        li.setType(laict.getLinkingAgentIdentifierType());
+        li.setValue(laict.getLinkingAgentIdentifierValue());
+        li.setRoles(laict.getLinkingAgentRoleList());
+        identifiers.add(li);
+      }
+    }
+    return identifiers;
+  }
+
+  public static List<LinkingIdentifier> extractRelatedSourceFromEvent(Binary binary) throws ValidationException, GenericException {
+    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
+    if(event.getLinkingObjectIdentifierList()!=null && event.getLinkingObjectIdentifierList().size()>0){
+      for(LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()){
+        if(loict.getLinkingObjectIdentifierType().equalsIgnoreCase("source")){
+          LinkingIdentifier li = new LinkingIdentifier();
+          li.setType(loict.getLinkingObjectIdentifierType());
+          li.setValue(loict.getLinkingObjectIdentifierValue());
+          li.setRoles(loict.getLinkingObjectRoleList());
+          identifiers.add(li);
+        }
+      }
+    }
+    return identifiers;
+  }
+  
+  public static List<LinkingIdentifier> extractRelatedOutcomeFromEvent(Binary binary) throws ValidationException, GenericException {
+    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
+    if(event.getLinkingObjectIdentifierList()!=null && event.getLinkingObjectIdentifierList().size()>0){
+      for(LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()){
+        if(loict.getLinkingObjectIdentifierType().equalsIgnoreCase("outcome")){
+          LinkingIdentifier li = new LinkingIdentifier();
+          li.setType(loict.getLinkingObjectIdentifierType());
+          li.setValue(loict.getLinkingObjectIdentifierValue());
+          li.setRoles(loict.getLinkingObjectRoleList());
+          identifiers.add(li);
+        }
+      }
+    }
+    return identifiers;
+  }
 }

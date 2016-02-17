@@ -23,9 +23,9 @@ public class IndexedPreservationEvent implements Serializable {
   private String eventOutcome;
   private String eventOutcomeDetailExtension;
   private String eventOutcomeDetailNote;
-  private List<String> linkingAgentIds;
-  private List<String> outcomeObjectIds;
-  private List<String> sourcesObjectIds;
+  private List<LinkingIdentifier> linkingAgentIds;
+  private List<LinkingIdentifier> outcomeObjectIds;
+  private List<LinkingIdentifier> sourcesObjectIds;
   public String getAipId() {
     return aipId;
   }
@@ -86,22 +86,23 @@ public class IndexedPreservationEvent implements Serializable {
   public void setEventOutcomeDetailNote(String eventOutcomeDetailNote) {
     this.eventOutcomeDetailNote = eventOutcomeDetailNote;
   }
-  public List<String> getLinkingAgentIds() {
+  
+  public List<LinkingIdentifier> getLinkingAgentIds() {
     return linkingAgentIds;
   }
-  public void setLinkingAgentIds(List<String> linkingAgentIds) {
+  public void setLinkingAgentIds(List<LinkingIdentifier> linkingAgentIds) {
     this.linkingAgentIds = linkingAgentIds;
   }
-  public List<String> getOutcomeObjectIds() {
+  public List<LinkingIdentifier> getOutcomeObjectIds() {
     return outcomeObjectIds;
   }
-  public void setOutcomeObjectIds(List<String> outcomeObjectIds) {
+  public void setOutcomeObjectIds(List<LinkingIdentifier> outcomeObjectIds) {
     this.outcomeObjectIds = outcomeObjectIds;
   }
-  public List<String> getSourcesObjectIds() {
+  public List<LinkingIdentifier> getSourcesObjectIds() {
     return sourcesObjectIds;
   }
-  public void setSourcesObjectIds(List<String> sourcesObjectIds) {
+  public void setSourcesObjectIds(List<LinkingIdentifier> sourcesObjectIds) {
     this.sourcesObjectIds = sourcesObjectIds;
   }
   @Override

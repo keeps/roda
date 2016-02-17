@@ -18,6 +18,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -30,6 +31,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -88,6 +90,31 @@ public class IndexModelObserver implements ModelObserver {
           SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationId(),
             pm.getId(), binary);
           LOGGER.debug(premisEventDocument.toString());
+          try {
+            List<LinkingIdentifier> agents = PremisUtils.extractAgentsFromEvent(binary);
+            for(LinkingIdentifier id : agents){
+              premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+            }
+          } catch (org.roda.core.data.v2.validation.ValidationException e) {
+            LOGGER.warn("Error setting linking agent field: "+e.getMessage());
+          }
+          try {
+            List<LinkingIdentifier> sources = PremisUtils.extractRelatedSourceFromEvent(binary);
+            for(LinkingIdentifier id : sources){
+              premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+            }
+          } catch (org.roda.core.data.v2.validation.ValidationException e) {
+            LOGGER.warn("Error setting linking source field: "+e.getMessage());
+          }
+          try {
+            List<LinkingIdentifier> outcomes = PremisUtils.extractRelatedOutcomeFromEvent(binary);
+            for(LinkingIdentifier id : outcomes){
+              premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+            }
+          } catch (org.roda.core.data.v2.validation.ValidationException e) {
+            LOGGER.warn("Error setting linking outcome field: "+e.getMessage());
+          }
+          
           index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
 
         } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
@@ -375,9 +402,33 @@ public class IndexModelObserver implements ModelObserver {
       Binary binary = model.getStorage().getBinary(storagePath);
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
         preservationMetadata.getRepresentationId(), preservationMetadata.getId(), binary);
-
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
+        try {
+          List<LinkingIdentifier> agents = PremisUtils.extractAgentsFromEvent(binary);
+          for(LinkingIdentifier id : agents){
+            premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+          }
+        } catch (org.roda.core.data.v2.validation.ValidationException e) {
+          LOGGER.warn("Error setting linking agent field: "+e.getMessage());
+        }
+        try {
+          List<LinkingIdentifier> sources = PremisUtils.extractRelatedSourceFromEvent(binary);
+          for(LinkingIdentifier id : sources){
+            premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+          }
+        } catch (org.roda.core.data.v2.validation.ValidationException e) {
+          LOGGER.warn("Error setting linking source field: "+e.getMessage());
+        }
+        try {
+          List<LinkingIdentifier> outcomes = PremisUtils.extractRelatedOutcomeFromEvent(binary);
+          for(LinkingIdentifier id : outcomes){
+            premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER, ModelUtils.getJsonFromObject(id));
+          }
+        } catch (org.roda.core.data.v2.validation.ValidationException e) {
+          LOGGER.warn("Error setting linking outcome field: "+e.getMessage());
+        }
+        premisFileDocument.addField("content_type", "parentDocument");
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
         index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
       } else if (type.equals(PreservationMetadataType.AGENT)) {

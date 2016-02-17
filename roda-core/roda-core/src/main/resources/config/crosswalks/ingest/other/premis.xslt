@@ -39,7 +39,7 @@
 		</xsl:if>
 	<xsl:if test="prem:agentNote">
 			<field name="note">
-				<xsl:value-of select="prem:agentExtension/text()" />
+				<xsl:value-of select="prem:agentNote/text()" />
 			</field>
 		</xsl:if>
 	</xsl:template>
@@ -109,31 +109,6 @@
 					<xsl:value-of select="prem:eventIdentifier/prem:eventIdentifierValue/text()" />
 				</field>
 			</xsl:if>
-		</xsl:if>
-		<xsl:if test="prem:linkingAgentIdentifier">
-			<xsl:for-each select="prem:linkingAgentIdentifier">
-				<xsl:if test="prem:linkingAgentIdentifierValue">
-					<field name="linkingAgentIdentifier">
-						<xsl:value-of select="prem:linkingAgentIdentifierValue/text()" />
-					</field>
-				</xsl:if>
-			</xsl:for-each>
-		</xsl:if>
-		<xsl:if test="prem:linkingObjectIdentifier">
-			<xsl:for-each select="prem:linkingObjectIdentifier">
-				<xsl:if test="prem:linkingObjectIdentifierValue">
-					<xsl:if test="prem:linkingObjectIdentifierType/text()='outcome'">
-						<field name="linkingOutcomeObjectIdentifier">
-							<xsl:value-of select="prem:linkingObjectIdentifierValue/text()" />
-						</field>
-					</xsl:if>
-					<xsl:if test="prem:linkingObjectIdentifierType/text()='source'">
-						<field name="linkingSourceObjectIdentifier">
-							<xsl:value-of select="prem:linkingObjectIdentifierValue/text()" />
-						</field>
-					</xsl:if>
-				</xsl:if>
-			</xsl:for-each>
 		</xsl:if>
 	</xsl:template>
 </xsl:stylesheet>
