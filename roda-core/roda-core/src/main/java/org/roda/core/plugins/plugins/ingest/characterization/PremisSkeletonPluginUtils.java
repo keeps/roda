@@ -46,6 +46,7 @@ public class PremisSkeletonPluginUtils {
         PremisUtils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
+    }
       IOUtils.closeQuietly(allFiles);
 
       ContentPayload representationPayload = PremisUtils.representationToBinary(representation);
@@ -56,6 +57,5 @@ public class PremisSkeletonPluginUtils {
         model.notifyAIPUpdated(aip.getId());
       }
     }
-  }
 
 }

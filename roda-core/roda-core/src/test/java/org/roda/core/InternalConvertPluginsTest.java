@@ -500,7 +500,7 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(3, aip.getRepresentations().size());
 
-    Assert.assertEquals(0,
+    Assert.assertEquals(1,
       aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId)).count());
 
     CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(2).getId(),
