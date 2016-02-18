@@ -13,13 +13,17 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.SolrUtilsTest;
 import org.roda.core.model.ModelServiceTest;
+import org.roda.core.plugins.EARKSIPPluginsTest;
+import org.roda.core.plugins.InternalConvertPluginsTest;
+import org.roda.core.plugins.InternalPluginsTest;
 import org.roda.core.storage.fedora.FedoraStorageServiceTest;
 import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
 // TODO add MonitorIndexTest.class when ready
 @SuiteClasses({IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
-  FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class})
+  FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
+  EARKSIPPluginsTest.class})
 public class AllTests {
 
 }

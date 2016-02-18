@@ -7,6 +7,7 @@
  */
 package org.roda.core;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,5 +114,9 @@ public class CorporaConstants {
 
   public static final int YEAR_1213 = 1213;
   public static final int YEAR_2003 = 2003;
+
+  public static String SIP_FOLDER = "SIPs";
+  public static String EARK_SIP = "eark_sip.zip";
+  public static String BAGIT_SIP = "bagit.zip";
 
 }
