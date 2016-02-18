@@ -132,7 +132,7 @@ public class Register extends Composite {
 
       @Override
       public void onSuccess(String result) {
-        if (result != null) {
+        if (result != null && !result.isEmpty()) {
           recaptchaWidget = new RecaptchaWidget(result);
           registerPanel.add(recaptchaWidget);
         } else {

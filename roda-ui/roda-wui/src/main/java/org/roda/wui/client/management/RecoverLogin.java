@@ -141,7 +141,7 @@ public class RecoverLogin extends Composite {
 
       @Override
       public void onSuccess(String result) {
-        if (result != null) {
+        if (result != null && !result.isEmpty()) {
           recaptchaWidget = new RecaptchaWidget(result);
           recoverPanel.add(recaptchaWidget);
         } else {
