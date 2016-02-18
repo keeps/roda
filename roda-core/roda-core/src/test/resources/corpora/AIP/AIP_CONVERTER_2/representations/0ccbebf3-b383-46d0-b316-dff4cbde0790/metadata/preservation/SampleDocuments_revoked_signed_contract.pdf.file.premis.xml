@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>local</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/SampleDocuments_revoked_signed_contract.pdf</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-256</prem:messageDigestAlgorithm>
+      <prem:messageDigest>DA48667AEFB47AC094FE9C248C1703AA65C040EDE764252691DB3FC5EFE0F699</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>130785</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>Acrobat PDF 1.4 - Portable Document Format</prem:formatName>
+        <prem:formatVersion>1.4</prem:formatVersion>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>pronom</prem:formatRegistryName>
+        <prem:formatRegistryKey>fmt/18</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>mime</prem:formatRegistryName>
+        <prem:formatRegistryKey>application/pdf</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:creatingApplication>
+      <prem:dateCreatedByApplication>2007-01-01T06:00:12Z</prem:dateCreatedByApplication>
+    </prem:creatingApplication>
+  </prem:objectCharacteristics>
+  <prem:originalName>SampleDocuments_revoked_signed_contract.pdf</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType/>
+      <prem:contentLocationValue/>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

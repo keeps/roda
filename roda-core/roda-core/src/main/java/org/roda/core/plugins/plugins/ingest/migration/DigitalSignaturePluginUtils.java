@@ -18,6 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,25 +51,28 @@ public class DigitalSignaturePluginUtils {
 
     for (int k = 0; k < names.size(); k++) {
       String name = (String) names.get(k);
-      System.out.println("Signature name: " + name);
-      System.out.println("Signature covers whole document: " + af.signatureCoversWholeDocument(name));
-      System.out.println("Document revision: " + af.getRevision(name) + " of " + af.getTotalRevisions());
+      // System.out.println("Signature name: " + name);
+      // System.out.println("Signature covers whole document: " +
+      // af.signatureCoversWholeDocument(name));
+      // System.out.println("Document revision: " + af.getRevision(name) +
+      // " of " + af.getTotalRevisions());
 
       try {
         PdfPKCS7 pk = af.verifySignature(name);
         Calendar cal = pk.getSignDate();
         Certificate pkc[] = pk.getCertificates();
-        System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
-        System.out.println("Document modified: " + !pk.verify());
+        // System.out.println("Subject: " +
+        // PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
+        // System.out.println("Document modified: " + !pk.verify());
 
         Object fails[] = PdfPKCS7.verifyCertificates(pkc, kall, null, cal);
         if (fails == null) {
-          System.out.println("Certificates verified against the KeyStore");
+          // System.out.println("Certificates verified against the KeyStore");
         } else {
-          System.out.println("Certificate failed: " + fails[1]);
+          // System.out.println("Certificate failed: " + fails[1]);
           result = 0;
         }
-      } catch (SignatureException | NoSuchFieldError e) {
+      } catch (NoSuchFieldError e) {
         LOGGER.warn("Problem verifying signature '" + name + "' of " + input.getFileName());
         result = -1;
       }
@@ -157,6 +163,19 @@ public class DigitalSignaturePluginUtils {
       }
     }
     return result;
+  }
+
+  public static int countSignatures(File f) {
+    int counter = 0;
+    try {
+      PdfReader reader = new PdfReader(ModelUtils.getFileStoragePath(f).asString());
+      AcroFields af = reader.getAcroFields();
+      ArrayList names = af.getSignatureNames();
+      counter = names.size();
+    } catch (IOException | RequestNotValidException e) {
+      LOGGER.error("Error getting path of file " + f.getId());
+    }
+    return counter;
   }
 
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/

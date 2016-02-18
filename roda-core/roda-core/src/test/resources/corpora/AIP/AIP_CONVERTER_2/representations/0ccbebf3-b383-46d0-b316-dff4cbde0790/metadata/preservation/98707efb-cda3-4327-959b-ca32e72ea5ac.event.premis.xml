@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<event xmlns="info:lc/xmlns/premis-v2" xmlns:xlin="http://www.w3.org/1999/xlink">
+  <eventIdentifier>
+    <eventIdentifierType>local</eventIdentifierType>
+    <eventIdentifierValue>98707efb-cda3-4327-959b-ca32e72ea5ac</eventIdentifierValue>
+  </eventIdentifier>
+  <eventType>format identification</eventType>
+  <eventDateTime>2016-02-17T12:53:18.88Z</eventDateTime>
+  <eventDetail>The files of the representation were successfully identified.</eventDetail>
+  <eventOutcomeInformation>
+    <eventOutcome>success</eventOutcome>
+    <eventOutcomeDetail>
+      <eventOutcomeDetailNote>Success</eventOutcomeDetailNote>
+    </eventOutcomeDetail>
+  </eventOutcomeInformation>
+  <linkingAgentIdentifier xlin:type="simple">
+    <linkingAgentIdentifierType>local</linkingAgentIdentifierType>
+    <linkingAgentIdentifierValue>org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin@1.4.4</linkingAgentIdentifierValue>
+  </linkingAgentIdentifier>
+  <linkingObjectIdentifier>
+    <linkingObjectIdentifierType>source</linkingObjectIdentifierType>
+    <linkingObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790</linkingObjectIdentifierValue>
+  </linkingObjectIdentifier>
+</event>

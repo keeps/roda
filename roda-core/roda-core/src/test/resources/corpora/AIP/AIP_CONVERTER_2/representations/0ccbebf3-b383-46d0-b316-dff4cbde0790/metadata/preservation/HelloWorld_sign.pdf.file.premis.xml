@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <prem:objectIdentifier>
+    <prem:objectIdentifierType>local</prem:objectIdentifierType>
+    <prem:objectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/HelloWorld_sign.pdf</prem:objectIdentifierValue>
+  </prem:objectIdentifier>
+  <prem:preservationLevel>
+    <prem:preservationLevelValue>full</prem:preservationLevelValue>
+  </prem:preservationLevel>
+  <prem:objectCharacteristics>
+    <prem:compositionLevel>0</prem:compositionLevel>
+    <prem:fixity>
+      <prem:messageDigestAlgorithm>SHA-256</prem:messageDigestAlgorithm>
+      <prem:messageDigest>E9A59DE1B02021B01C8C5A45A8DF443A006178EC1FE91BE6CA228F55941F270C</prem:messageDigest>
+      <prem:messageDigestOriginator>RODA</prem:messageDigestOriginator>
+    </prem:fixity>
+    <prem:size>11349</prem:size>
+    <prem:format>
+      <prem:formatDesignation>
+        <prem:formatName>Acrobat PDF 1.4 - Portable Document Format</prem:formatName>
+        <prem:formatVersion>1.4</prem:formatVersion>
+      </prem:formatDesignation>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>pronom</prem:formatRegistryName>
+        <prem:formatRegistryKey>fmt/18</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:format>
+      <prem:formatRegistry>
+        <prem:formatRegistryName>mime</prem:formatRegistryName>
+        <prem:formatRegistryKey>application/pdf</prem:formatRegistryKey>
+      </prem:formatRegistry>
+    </prem:format>
+    <prem:creatingApplication>
+      <prem:dateCreatedByApplication>2007-10-14T07:09:12Z</prem:dateCreatedByApplication>
+    </prem:creatingApplication>
+  </prem:objectCharacteristics>
+  <prem:originalName>HelloWorld_sign.pdf</prem:originalName>
+  <prem:storage>
+    <prem:contentLocation>
+      <prem:contentLocationType/>
+      <prem:contentLocationValue/>
+    </prem:contentLocation>
+  </prem:storage>
+</prem:object>

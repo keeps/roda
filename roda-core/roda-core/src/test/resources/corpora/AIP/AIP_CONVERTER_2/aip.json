@@ -1,0 +1,28 @@
+{
+  "parentId":"",
+  "active":true,
+  "permissions":{
+    "insertUsers":[],
+    "insertGroups":[],
+    "readUsers":[],
+    "readGroups":[],
+    "modifyUsers":[],
+    "modifyGroups":[],
+    "removeUsers":[],
+    "removeGroups":[],
+    "grantUsers":[],
+    "grantGroups":[]
+  },
+  "descriptiveMetadata":[
+		{
+			"id":"metadata.xml",
+			"type":"key-value"
+		}
+	],
+  "representations":[
+    {
+      "id":"0ccbebf3-b383-46d0-b316-dff4cbde0790",
+      "original":true
+    }
+  ]
+}
