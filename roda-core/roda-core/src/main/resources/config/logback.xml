@@ -23,26 +23,6 @@
 		</encoder>
 	</appender>
 
-	<!-- FIXME delete after tests - START -->
-	<logger name="org.roda.core.plugins.plugins.antivirus.AntivirusPlugin"
-		additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="CORE_FILEOUT" />
-	</logger>
-
-	<logger
-		name="org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin"
-		additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="CORE_FILEOUT" />
-	</logger>
-
-	<logger name="org.roda.core.RodaCoreFactory" additivity="false">
-		<level value="DEBUG" />
-		<appender-ref ref="CORE_FILEOUT" />
-	</logger>
-	<!-- FIXME delete after tests - END -->
-
 	<logger name="org.roda.core.plugins.PluginManager" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="CORE_FILEOUT" />

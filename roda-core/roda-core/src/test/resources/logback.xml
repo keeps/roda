@@ -3,7 +3,8 @@
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
-			<pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<!-- <pattern>%d [%thread] %-5level %logger{36} - %msg%n</pattern> -->
+			<pattern>%date{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
 		</encoder>
 	</appender>
 
@@ -11,6 +12,12 @@
 		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 	</logger>
+	
+	<logger name="org.apache.solr" additivity="false">
+		<level value="ERROR" />
+		<appender-ref ref="STDOUT" />
+	</logger>
+
 
 	<root level="WARN">
 		<appender-ref ref="STDOUT" />

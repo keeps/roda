@@ -118,8 +118,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       plugin.afterExecute(index, model, storage);
 
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.error("Error running plugin from index", e);
     }
   }
 
@@ -127,7 +126,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
       int multiplier = 0;
-      LOGGER.info("Executing beforeExecute");
+      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
@@ -164,7 +163,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // FIXME catch proper exception
       LOGGER.error("Error executing job", e);
     }
-    LOGGER.info("End of method");
+    LOGGER.info("Ended " + plugin.getName());
     return null;
   }
 
@@ -185,7 +184,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       int multiplier = 0;
-      LOGGER.info("Executing beforeExecute");
+      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
@@ -220,14 +219,15 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       // FIXME catch proper exception
-      e.printStackTrace();
+      LOGGER.error("Error running plugin on all AIPs", e);
     }
-    LOGGER.info("End of method");
+    LOGGER.info("Ended " + plugin.getName());
     return null;
   }
 
   @Override
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+    LOGGER.info("Started " + plugin.getName());
     try {
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
@@ -267,7 +267,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } catch (Exception e) {
       // FIXME catch proper exception
       e.printStackTrace();
+      LOGGER.error("Error while runPluginOnAllRepresentations", e);
     }
+    LOGGER.info("Ended " + plugin.getName());
     return null;
   }
 
@@ -325,7 +327,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       // TODO Auto-generated catch block
-      e.printStackTrace();
+      LOGGER.error("Error while runPluginOnAllFiles", e);
     }
     return null;
 
@@ -363,7 +365,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     List<TransferredResource> resources) {
     try {
       int multiplier = 0;
-      LOGGER.info("Executing beforeExecute");
+      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -394,16 +396,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     } catch (Exception e) {
       // FIXME catch proper exception
-      e.printStackTrace();
+      LOGGER.error("Error while runPluginOnTransferredResources", e);
     }
-    LOGGER.info("End of method");
+    LOGGER.info("Ended " + plugin.getName());
     return null;
   }
 
   @Override
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     try {
-      LOGGER.info("Executing beforeExecute");
+      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
 
       // FIXME what to do with the askFuture???
@@ -411,10 +413,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT)));
 
       plugin.afterExecute(index, model, storage);
-      LOGGER.info("End of method");
+      LOGGER.info("Ended " + plugin.getName());
     } catch (Exception e) {
       // // FIXME catch proper exception
-      e.printStackTrace();
+      LOGGER.error("Error while runPlugin", e);
     }
   }
 
