@@ -566,13 +566,14 @@ public final class RodaConstants {
 
   public static final String PREMIS_RELATIONSHIP_TYPE_STRUCTURAL = "structural";
   public static final String PREMIS_RELATIONSHIP_SUBTYPE_HASPART = "hasPart";
-  
-  
-  
-  
+
   public static final String LINKING_IDENTIFIER_VALUE = "value";
   public static final String LINKING_IDENTIFIER_TYPE = "type";
   public static final String LINKING_IDENTIFIER_ROLES = "roles";
-  
+
+  /*
+   * WUI related
+   */
+  public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
 
 }

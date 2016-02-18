@@ -135,6 +135,7 @@ import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -173,9 +174,6 @@ public class RodaCoreFactory {
   private static boolean TEST_DEPLOY_LDAP = true;
   private static boolean TEST_DEPLOY_FOLDER_MONITOR = true;
   private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
-
-  // Theme resources path
-  private static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
 
   // Core related constants
   private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
@@ -360,7 +358,8 @@ public class RodaCoreFactory {
       if (!Files.exists(solrHome) || FEATURE_OVERRIDE_INDEX_CONFIGS) {
         try {
           Path tempConfig = Files.createTempDirectory(RodaConstants.CORE_INDEX_FOLDER);
-          copyIndexConfigsFromClasspathTo(tempConfig);
+          copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/",
+            tempConfig);
           solrHome = tempConfig.resolve(RodaConstants.CORE_CONFIG_FOLDER).resolve(RodaConstants.CORE_INDEX_FOLDER);
           LOGGER.info("Using SOLR home: " + solrHome);
         } catch (IOException e) {
@@ -398,21 +397,30 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void copyIndexConfigsFromClasspathTo(Path dir) {
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory) {
+    copyFilesFromClasspath(classpathPrefix, destionationDirectory, false);
+  }
+
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory,
+    boolean removeClasspathPrefixFromFinalPath) {
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
-    // classLoadersList.add(ClasspathHelper.staticClassLoader());
 
-    Set<String> resources = new Reflections(new ConfigurationBuilder()
-      .filterInputsBy(new FilterBuilder()
-        .include(FilterBuilder.prefix(RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/")))
-      .setScanners(new ResourcesScanner())
-      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
-        .getResources(Pattern.compile(".*"));
+    Set<String> resources = new Reflections(
+      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
+        .setScanners(new ResourcesScanner())
+        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
+          .getResources(Pattern.compile(".*"));
 
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
-      Path destinyPath = dir.resolve(resource);
+      Path destinyPath;
+      if (removeClasspathPrefixFromFinalPath) {
+        destinyPath = destionationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
+      } else {
+        destinyPath = destionationDirectory.resolve(resource);
+      }
+
       try {
         // create all parent directories
         Files.createDirectories(destinyPath.getParent());
@@ -539,6 +547,8 @@ public class RodaCoreFactory {
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
     indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
     themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
     exampleThemePath = configPath.resolve(RodaConstants.CORE_EXAMPLE_THEME_FOLDER);
 
@@ -590,14 +600,14 @@ public class RodaCoreFactory {
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
-    essentialDirectories.add(themePath);
     essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
     essentialDirectories.add(dataPath);
     essentialDirectories.add(logPath);
     essentialDirectories.add(storagePath);
     essentialDirectories.add(indexDataPath);
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
     essentialDirectories.add(themePath);
-    // essentialDirectories.add(exampleThemePath);
 
     for (Path path : essentialDirectories) {
       try {
@@ -610,36 +620,19 @@ public class RodaCoreFactory {
       }
     }
 
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
     try {
-      Files.walkFileTree(exampleThemePath, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          Files.delete(dir);
-          return FileVisitResult.CONTINUE;
-        }
-
-      });
-      Files.createDirectories(exampleThemePath);
-      copyFiles(exampleThemePath, THEME_RESOURCES_PATH);
-    } catch (IOException e) {
-      LOGGER.error("Unable to create " + exampleThemePath + ". Aborting...", e);
-    }
-  }
-
-  private static void copyFiles(final Path path, String resourcesFolderPath) throws IOException {
-    Path folder = Paths.get(RodaCoreFactory.class.getResource(resourcesFolderPath).getPath());
-    Files.walkFileTree(folder, new SimpleFileVisitor<Path>() {
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        Files.copy(file, path.resolve(file.getFileName()));
-        return FileVisitResult.CONTINUE;
+      try {
+        FSUtils.deletePath(exampleThemePath);
+      } catch (NotFoundException e) {
+        // do nothing and carry on
       }
-    });
+      Files.createDirectories(exampleThemePath);
+      copyFilesFromClasspath(RodaConstants.THEME_RESOURCES_PATH.replaceFirst("/", ""), exampleThemePath, true);
+    } catch (GenericException | IOException e) {
+      LOGGER.error("Unable to create " + exampleThemePath, e);
+    }
   }
 
   public static void shutdown() throws IOException {
@@ -1520,8 +1513,8 @@ public class RodaCoreFactory {
 
   private static void printAgents(Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE,
-      RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE));
+    Filter filter = new Filter(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE));
     IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist);
 
     for (IndexedPreservationAgent ipa : res.getResults()) {

@@ -18,6 +18,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.StreamingOutput;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.common.RodaCoreService;
@@ -27,9 +28,7 @@ import org.slf4j.LoggerFactory;
 public class Theme extends RodaCoreService {
 
   @SuppressWarnings("unused")
-  private static Logger logger = LoggerFactory.getLogger(Theme.class);
-
-  private static final String RESOURCE_PATH = "/org/roda/wui/public/theme/";
+  private static final Logger LOGGER = LoggerFactory.getLogger(Theme.class);
 
   private static final Date INITIAL_DATE = new Date();
 
@@ -41,13 +40,13 @@ public class Theme extends RodaCoreService {
     StreamResponse streamResponse = null;
 
     final Path filePath;
-    
+
     if (validExternalFile(resourceId)) {
       filePath = RodaCoreFactory.getThemePath().resolve(resourceId);
     } else {
-      filePath = Paths.get(Theme.class.getResource(RESOURCE_PATH + resourceId).getPath());
+      filePath = Paths.get(Theme.class.getResource(RodaConstants.THEME_RESOURCES_PATH + resourceId).getPath());
     }
-    
+
     StreamingOutput streamingOutput = new StreamingOutput() {
 
       @Override
@@ -74,7 +73,7 @@ public class Theme extends RodaCoreService {
 
     return modifiedDate;
   }
-  
+
   public static boolean exists(String resourceId) {
     return (validExternalFile(resourceId) || validInternalFile(resourceId));
   }
@@ -88,6 +87,7 @@ public class Theme extends RodaCoreService {
   }
 
   public static boolean validInternalFile(String resourceId) {
-    return (Theme.class.getResourceAsStream(RESOURCE_PATH + resourceId) != null && !resourceId.contains(".."));
+    return (Theme.class.getResourceAsStream(RodaConstants.THEME_RESOURCES_PATH + resourceId) != null
+      && !resourceId.contains(".."));
   }
 }
