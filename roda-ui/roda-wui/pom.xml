@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<name>roda-wui</name>
 	<artifactId>roda-wui</artifactId>
@@ -237,18 +238,12 @@
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
 			<exclusions>
-				<exclusion>
-					<artifactId>asm</artifactId>
-					<groupId>org.ow2.asm</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>asm-commons</artifactId>
-					<groupId>org.ow2.asm</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>asm-debug-all</artifactId>
-					<groupId>org.ow2.asm</groupId>
-				</exclusion>
+				<!-- 20160218 hsilva: this is needed for apache tika parsers, so commenting 
+					out -->
+				<!-- <exclusion> <artifactId>asm</artifactId> <groupId>org.ow2.asm</groupId> 
+					</exclusion> <exclusion> <artifactId>asm-commons</artifactId> <groupId>org.ow2.asm</groupId> 
+					</exclusion> <exclusion> <artifactId>asm-debug-all</artifactId> <groupId>org.ow2.asm</groupId> 
+					</exclusion> -->
 				<exclusion>
 					<artifactId>*</artifactId>
 					<groupId>org.eclipse.jetty</groupId>
@@ -375,7 +370,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<ignore/>
+										<ignore />
 									</action>
 								</pluginExecution>
 							</pluginExecutions>
