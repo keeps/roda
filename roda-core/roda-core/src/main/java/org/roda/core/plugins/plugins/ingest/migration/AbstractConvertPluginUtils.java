@@ -62,10 +62,10 @@ public class AbstractConvertPluginUtils {
     }
   }
 
-  public static void reIndexingRepresentation(IndexService index, ModelService model, StorageService storage,
-    String aipId, String representationId, boolean notify) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException, SAXException,
-    TikaException, ValidationException, InvalidParameterException, XmlException, IOException {
+  public static void reIndexingRepresentationAfterConversion(IndexService index, ModelService model,
+    StorageService storage, String aipId, String representationId, boolean notify) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, PluginException, AlreadyExistsException,
+    SAXException, TikaException, ValidationException, InvalidParameterException, XmlException, IOException {
 
     AIP aip = model.retrieveAIP(aipId);
     Representation representation = model.retrieveRepresentation(aipId, representationId);

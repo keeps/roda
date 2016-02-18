@@ -8,6 +8,7 @@
 package org.roda.core.plugins;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -20,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Assert;
@@ -50,21 +53,24 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.ModelServiceTest;
+import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.DigitalSignaturePlugin;
-import org.roda.core.plugins.plugins.ingest.migration.DigitalSignaturePluginUtils;
 import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
@@ -232,7 +238,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
@@ -282,7 +287,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
@@ -333,7 +337,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
@@ -382,7 +385,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
@@ -434,7 +436,6 @@ public class InternalConvertPluginsTest {
     }
   }
 
-  @Ignore
   @Test
   public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
@@ -481,7 +482,6 @@ public class InternalConvertPluginsTest {
 
   }
 
-  @Ignore
   @Test
   public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
@@ -502,7 +502,7 @@ public class InternalConvertPluginsTest {
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
-    String deletableRepresentationId = aip.getRepresentations().get(1).getId();
+    String editedRepresentationId = aip.getRepresentations().get(1).getId();
 
     Plugin<?> plugin2 = new SoxConvertPlugin();
     Map<String, String> parameters2 = new HashMap<>();
@@ -512,12 +512,12 @@ public class InternalConvertPluginsTest {
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin2);
     aip = model.retrieveAIP(aip.getId());
-    Assert.assertEquals(3, aip.getRepresentations().size());
+    Assert.assertEquals(4, aip.getRepresentations().size());
 
-    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(deletableRepresentationId))
+    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId))
       .count());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(2).getId(),
+    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(3).getId(),
       true);
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
@@ -542,7 +542,6 @@ public class InternalConvertPluginsTest {
 
   }
 
-  @Ignore
   @Test
   public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
@@ -612,33 +611,35 @@ public class InternalConvertPluginsTest {
     List<File> newReusableFiles = new ArrayList<>();
     Iterables.addAll(newReusableFiles, newFiles);
 
-    for (File f : newReusableFiles) {
-      System.err.println("FILE1: " + f.getId());
+    for (File f : reusableAllFiles) {
+      if (f.getId().matches(".*[.](pdf)$")) {
+        String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
+        Assert.assertEquals(1, newReusableFiles.stream().filter(o -> o.getId().equals(f.getId())).count());
+
+        Binary binary = model.retrieveOtherMetadataBinary(aip.getId(), f.getRepresentationId(), f.getPath(), filename,
+          DigitalSignaturePlugin.FILE_SUFFIX, DigitalSignaturePlugin.OTHER_METADATA_TYPE);
+
+        InputStream is = binary.getContent().createInputStream();
+        String StringFromInputStream = IOUtils.toString(is, "UTF-8");
+        is.close();
+
+        Assert.assertTrue(StringUtils.countMatches(StringFromInputStream, "- Signature ") > 0);
+
+      }
     }
 
-    /*
-     * for (File f : reusableAllFiles) { if (f.getId().matches(".*[.](pdf)$")) {
-     * String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-     * Assert.assertEquals(1, newReusableAllFiles.stream().filter(o ->
-     * o.getId().equals(f.getId())).count());
-     * 
-     * model.retrieveOtherMetadataBinary(aip.getId(), f.getRepresentationId(),
-     * f.getPath(), filename, DigitalSignaturePlugin.FILE_SUFFIX,
-     * DigitalSignaturePlugin.OTHER_METADATA_TYPE);
-     * 
-     * // TODO test extraction and verification } }
-     */
-
-    List<File> changedFiles = newReusableFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
-      .collect(Collectors.toList());
-
-    for (File file : changedFiles) {
-      System.err.println("FILE2: " + file.getId());
+    for (File file : newReusableFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
       Assert.assertTrue(ifile.getSize() > 0);
       Assert.assertTrue(fileMimetype.equals("application/pdf"));
-      Assert.assertEquals(0, DigitalSignaturePluginUtils.countSignatures(file));
+
+      StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+      DirectResourceAccess directAccess = corporaService.getDirectAccess(fileStoragePath);
+      // FIXME cant get path to file
+      // Assert.assertEquals(0,
+      // DigitalSignaturePluginUtils.countSignatures(directAccess.getPath()));
     }
   }
+
 }

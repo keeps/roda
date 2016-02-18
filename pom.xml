@@ -622,7 +622,17 @@
 			<dependency>
 				<groupId>org.bouncycastle</groupId>
 				<artifactId>bcprov-jdk15on</artifactId>
-				<version>1.46</version>
+				<version>1.47</version>
+			</dependency>
+			<dependency>
+		        <groupId>org.bouncycastle</groupId>
+		        <artifactId>bcmail-jdk15on</artifactId>
+		        <version>1.47</version>
+		    </dependency>
+			<dependency>
+				<groupId>com.itextpdf</groupId>
+				<artifactId>itextpdf</artifactId>
+				<version>5.3.2</version>
 			</dependency>
 			<dependency>
 				<groupId>org.codehaus.castor</groupId>

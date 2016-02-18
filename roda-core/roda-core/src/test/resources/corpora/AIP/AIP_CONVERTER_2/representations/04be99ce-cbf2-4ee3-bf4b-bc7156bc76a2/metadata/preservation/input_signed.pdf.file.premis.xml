@@ -2,7 +2,7 @@
 <prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
     <prem:objectIdentifierType>local</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/input_signed.pdf</prem:objectIdentifierValue>
+    <prem:objectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/input_signed.pdf</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue>full</prem:preservationLevelValue>

@@ -4,140 +4,153 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.KeyStore;
+import java.security.GeneralSecurityException;
+import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.Certificate;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.pdfbox.io.IOUtils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.File;
-import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.lowagie.text.DocumentException;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.AcroFields.Item;
-import com.lowagie.text.pdf.PRStream;
-import com.lowagie.text.pdf.PdfDictionary;
-import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfObject;
-import com.lowagie.text.pdf.PdfPKCS7;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfStamper;
-import com.lowagie.text.pdf.PdfStream;
-import com.lowagie.text.pdf.PdfString;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.AcroFields.Item;
+import com.itextpdf.text.pdf.PdfDictionary;
+import com.itextpdf.text.pdf.PdfName;
+import com.itextpdf.text.pdf.PdfObject;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfStamper;
+import com.itextpdf.text.pdf.PdfString;
+import com.itextpdf.text.pdf.security.PdfPKCS7;
 
 public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
 
-  public static int runDigitalSignatureVerify(Path input, String fileFormat) throws IOException {
-
-    KeyStore kall = PdfPKCS7.loadCacertsKeyStore();
+  public static int runDigitalSignatureVerify(Path input, String fileFormat) throws IOException,
+    GeneralSecurityException {
+    Security.addProvider(new BouncyCastleProvider());
+    // KeyStore keyStore = PdfPKCS7.loadCacertsKeyStore();
     PdfReader reader = new PdfReader(input.toString());
-    AcroFields af = reader.getAcroFields();
-    ArrayList names = af.getSignatureNames();
+    AcroFields fields = reader.getAcroFields();
+    ArrayList names = fields.getSignatureNames();
     int result = 1;
 
-    for (int k = 0; k < names.size(); k++) {
-      String name = (String) names.get(k);
-      // System.out.println("Signature name: " + name);
-      // System.out.println("Signature covers whole document: " +
-      // af.signatureCoversWholeDocument(name));
-      // System.out.println("Document revision: " + af.getRevision(name) +
-      // " of " + af.getTotalRevisions());
+    for (int i = 0; i < names.size(); i++) {
+      String name = (String) names.get(i);
 
       try {
-        PdfPKCS7 pk = af.verifySignature(name);
-        Calendar cal = pk.getSignDate();
-        Certificate pkc[] = pk.getCertificates();
-        // System.out.println("Subject: " +
-        // PdfPKCS7.getSubjectFields(pk.getSigningCertificate()));
-        // System.out.println("Document modified: " + !pk.verify());
+        PdfPKCS7 pk = fields.verifySignature(name);
 
-        Object fails[] = PdfPKCS7.verifyCertificates(pkc, kall, null, cal);
-        if (fails == null) {
-          // System.out.println("Certificates verified against the KeyStore");
-        } else {
-          // System.out.println("Certificate failed: " + fails[1]);
+        // TODO change verification to certificate
+        boolean verify = pk.verify();
+
+        if (!verify) {
           result = 0;
+          LOGGER.warn("Certificate verification failed: " + verify + " on " + input.getFileName());
         }
       } catch (NoSuchFieldError e) {
         LOGGER.warn("Problem verifying signature '" + name + "' of " + input.getFileName());
         result = -1;
       }
-
     }
-
+    reader.close();
     return result;
   }
 
-  public static Path runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException, IOException {
+  public static List<Path> runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException,
+    IOException {
+
+    Security.addProvider(new BouncyCastleProvider());
+    List<Path> paths = new ArrayList<Path>();
     Path output = Files.createTempFile("extraction", ".txt");
+    Path outputContents = null;
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
     ArrayList<?> names = fields.getSignatureNames();
-    PrintWriter out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(output.toString()),
-      StandardCharsets.UTF_8), true);
+    String filename = input.getFileName().toString();
+    filename = filename.substring(0, filename.lastIndexOf('.'));
+
+    if (names.size() == 0)
+      return null;
+
+    FileOutputStream fos = new FileOutputStream(output.toString());
+    OutputStreamWriter osw = new OutputStreamWriter(fos);
+    PrintWriter out = new PrintWriter(osw, true);
 
     for (int i = 0; i < names.size(); i++) {
       String name = (String) names.get(i);
       Item item = fields.getFieldItem(name);
       String infoResult = "";
 
-      // TODO Filter the result information using RUPS
       PdfDictionary widget = item.getWidget(0);
       PdfDictionary info = widget.getAsDict(PdfName.V);
 
-      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.T, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.NAME, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.REASON, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.LOCATION, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.CONTACTINFO, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.M, "String");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.FILTER, "Object");
-      infoResult = addElementToExtractionResult(infoResult, info, PdfName.SUBFILTER, "Object");
-      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.FT, "Object");
-      infoResult = addElementToExtractionResult(infoResult, widget, PdfName.LOCK, "Boolean");
+      try {
 
-      PdfDictionary ap = widget.getAsDict(PdfName.AP);
-      PdfStream normal = ap.getAsStream(PdfName.N);
-      PdfDictionary resources = normal.getAsDict(PdfName.RESOURCES);
-      PdfDictionary xobject = resources.getAsDict(PdfName.XOBJECT);
-      PdfStream frm = xobject.getAsStream(PdfName.FRM);
-      PdfDictionary res = frm.getAsDict(PdfName.RESOURCES);
-      PdfDictionary xobj = res.getAsDict(PdfName.XOBJECT);
-      PdfStream n0 = xobj.getAsStream(PdfName.N0);
-      PRStream n0stream = (PRStream) n0;
-      PdfStream n2 = xobj.getAsStream(PdfName.N2);
-      PRStream n2stream = (PRStream) n2;
+        PdfPKCS7 pk = fields.verifySignature(name);
+        infoResult += "Name: " + name + "\n";
+        infoResult += "Sign Name: " + pk.getSignName() + "\n";
+        infoResult += "Version: " + pk.getVersion() + "\n";
+        infoResult += "Reason: " + pk.getReason() + "\n";
+        infoResult += "Location: " + pk.getLocation() + "\n";
 
-      byte[] n2byteStream = PdfReader.getStreamBytes(n2stream);
-      byte[] n0byteStream = PdfReader.getStreamBytes(n0stream);
-      String streamResult = new String(n2byteStream);
-      streamResult += new String(n0byteStream);
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
 
-      streamResult = streamResult.replaceAll("\\)Tj[\n]*T\\*[\n]*\\(", "");
-      streamResult = streamResult.replaceAll("\n[^\\(].*", "");
-      streamResult = streamResult.replaceFirst(".*\n", "");
-      streamResult = streamResult.replaceAll("\\((.*)\\)Tj", "$1");
+        if (pk.getTimeStampDate() != null)
+          infoResult += "Timestamp Date: " + formatter.format(pk.getTimeStampDate().getTime()) + "\n";
+
+        if (pk.getSignDate() != null)
+          infoResult += "Sign Date: " + formatter.format(pk.getSignDate().getTime()) + "\n";
+
+        String certChain = "";
+        for (Certificate c : pk.getSignCertificateChain()) {
+          certChain += c.toString() + "/";
+        }
+
+        infoResult += "Certificate Chain: " + certChain + "\n";
+        infoResult += "Digest Algorithm: " + pk.getDigestAlgorithm() + "\n";
+        infoResult += "Hash Algorithm: " + pk.getHashAlgorithm() + "\n";
+        infoResult += "CoversWholeDocument: " + fields.signatureCoversWholeDocument(name) + "\n";
+        infoResult += addElementToExtractionResult(info, PdfName.CONTACTINFO, "String");
+        infoResult += addElementToExtractionResult(info, PdfName.FILTER, "Object");
+        infoResult += addElementToExtractionResult(info, PdfName.SUBFILTER, "Object");
+        infoResult += addElementToExtractionResult(widget, PdfName.FT, "Object");
+        infoResult += addElementToExtractionResult(widget, PdfName.LOCK, "Boolean");
+
+        if (info.contains(PdfName.CONTENTS)) {
+          PdfString elementName = info.getAsString(PdfName.CONTENTS);
+          outputContents = Files.createTempFile("contents", ".pkcs7");
+          Files.write(outputContents, elementName.toUnicodeString().getBytes());
+          infoResult += PdfName.CONTENTS.toString() + ": " + filename + ".pkcs7 \n";
+        }
+      } catch (NoSuchFieldError e) {
+        LOGGER.warn("DS information extraction did not execute properly");
+      }
 
       out.println("- Signature " + name + ":\n");
       out.println(infoResult);
     }
 
-    out.close();
-    return output;
+    IOUtils.closeQuietly(out);
+    IOUtils.closeQuietly(osw);
+    IOUtils.closeQuietly(fos);
+    reader.close();
+
+    paths.add(output);
+    paths.add(outputContents);
+    return paths;
   }
 
   public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
@@ -146,10 +159,12 @@ public class DigitalSignaturePluginUtils {
     PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(output.toString()));
     stamper.setFormFlattening(true);
     stamper.close();
+    reader.close();
     return output;
   }
 
-  private static String addElementToExtractionResult(String result, PdfDictionary parent, PdfName element, String type) {
+  private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
+    String result = "";
     if (parent.contains(element)) {
       if (type.equals("String")) {
         PdfString elementName = parent.getAsString(element);
@@ -165,15 +180,15 @@ public class DigitalSignaturePluginUtils {
     return result;
   }
 
-  public static int countSignatures(File f) {
-    int counter = 0;
+  public static int countSignatures(Path input) {
+    int counter = -1;
     try {
-      PdfReader reader = new PdfReader(ModelUtils.getFileStoragePath(f).asString());
+      PdfReader reader = new PdfReader(input.toString());
       AcroFields af = reader.getAcroFields();
       ArrayList names = af.getSignatureNames();
       counter = names.size();
-    } catch (IOException | RequestNotValidException e) {
-      LOGGER.error("Error getting path of file " + f.getId());
+    } catch (IOException e) {
+      LOGGER.error("Error getting path of file " + e.getMessage());
     }
     return counter;
   }

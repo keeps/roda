@@ -2,7 +2,7 @@
 <prem:object xsi:type="prem:representation" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
     <prem:objectIdentifierType>local</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790</prem:objectIdentifierValue>
+    <prem:objectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue/>
@@ -12,7 +12,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/SampleDocuments_revoked_signed_contract.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/SampleDocuments_revoked_signed_contract.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -20,7 +20,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/HelloWorld_sign.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/HelloWorld_sign.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -28,7 +28,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/input_signed.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/input_signed.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -36,7 +36,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/sample01.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/sample01.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -44,7 +44,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/SampleSignedPDFDocument.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/SampleSignedPDFDocument.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -52,7 +52,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/SampleDocuments_expired_signed_contract.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/SampleDocuments_expired_signed_contract.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
   <prem:relationship>
@@ -60,7 +60,7 @@
     <prem:relationshipSubType>hasPart</prem:relationshipSubType>
     <prem:relatedObjectIdentification>
       <prem:relatedObjectIdentifierType>local</prem:relatedObjectIdentifierType>
-      <prem:relatedObjectIdentifierValue>8785acb5-9dc2-450d-a65e-048a83d5f1ed/0ccbebf3-b383-46d0-b316-dff4cbde0790/SampleDocuments_valid_signed_contract.pdf</prem:relatedObjectIdentifierValue>
+      <prem:relatedObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/SampleDocuments_valid_signed_contract.pdf</prem:relatedObjectIdentifierValue>
     </prem:relatedObjectIdentification>
   </prem:relationship>
 </prem:object>
