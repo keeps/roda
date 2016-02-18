@@ -32,7 +32,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.mutable.MutableLong;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
@@ -172,6 +171,14 @@ public final class FSUtils {
 
     }
 
+  }
+
+  public static void deletePathQuietly(Path path) {
+    try {
+      deletePath(path);
+    } catch (NotFoundException | GenericException e) {
+      // do nothing
+    }
   }
 
   /**

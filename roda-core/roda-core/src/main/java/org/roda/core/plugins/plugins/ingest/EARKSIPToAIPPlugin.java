@@ -29,6 +29,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda_project.commons_ip.model.SIP;
 import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
 import org.slf4j.Logger;
@@ -97,9 +98,10 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
 
       ReportItem reportItem = PluginHelper.createPluginReportItem(transferredResource, this);
 
+      SIP sip = null;
       try {
         LOGGER.debug("Converting " + earkSIPPath + " to AIP");
-        SIP sip = EARKSIP.parse(earkSIPPath);
+        sip = EARKSIP.parse(earkSIPPath);
 
         String parentId = PluginHelper.getParentId(sip.getParentID(), jobDefinedParentId, jobDefinedForceParentId);
 
@@ -123,6 +125,10 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
         LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
+      } finally {
+        if (sip != null) {
+          FSUtils.deletePathQuietly(sip.getBasePath());
+        }
       }
       report.addItem(reportItem);
       PluginHelper.createJobReport(model, this, reportItem, state, PluginHelper.getJobId(parameters));

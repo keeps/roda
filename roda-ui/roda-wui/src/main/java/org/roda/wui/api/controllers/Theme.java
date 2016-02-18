@@ -60,8 +60,7 @@ public class Theme extends RodaCoreService {
     return streamResponse;
   }
 
-  public static Date getLastModifiedDate(String resourceId, boolean externalFile, boolean internalFile)
-    throws IOException {
+  public static Date getLastModifiedDate(String resourceId, boolean externalFile) throws IOException {
     Date modifiedDate = new Date();
 
     if (externalFile) {
@@ -87,7 +86,7 @@ public class Theme extends RodaCoreService {
   }
 
   public static boolean validInternalFile(String resourceId) {
-    return (Theme.class.getResourceAsStream(RodaConstants.THEME_RESOURCES_PATH + resourceId) != null
+    return (Theme.class.getResource(RodaConstants.THEME_RESOURCES_PATH + resourceId) != null
       && !resourceId.contains(".."));
   }
 }

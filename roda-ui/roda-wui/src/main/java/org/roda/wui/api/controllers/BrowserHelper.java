@@ -193,13 +193,7 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
-      if (inputStream != null) {
-        try {
-          inputStream.close();
-        } catch (IOException e) {
-          LOGGER.warn("Error closing resources, possible leak", e);
-        }
-      }
+      IOUtils.closeQuietly(inputStream);
     }
 
     return ret;
@@ -859,8 +853,11 @@ public class BrowserHelper {
             template = IOUtils.toString(templateStream);
           } catch (IOException e) {
             LOGGER.warn("Could not load descriptive metadata type template", e);
+          } finally {
+            IOUtils.closeQuietly(templateStream);
           }
         }
+
         SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, label, template);
         supportedMetadata.add(b);
       }
@@ -878,15 +875,22 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, indexedPreservationEventId);
   }
 
-  public static StreamResponse getTransferredResource(TransferredResource transferredResource)
+  public static StreamResponse getTransferredResource(final TransferredResource transferredResource)
     throws NotFoundException, RequestNotValidException, GenericException {
-    InputStream retrieveFile = RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
 
     StreamingOutput streamingOutput = new StreamingOutput() {
 
       @Override
       public void write(OutputStream os) throws IOException, WebApplicationException {
-        IOUtils.copy(retrieveFile, os);
+        InputStream retrieveFile = null;
+        try {
+          retrieveFile = RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
+          IOUtils.copy(retrieveFile, os);
+        } catch (NotFoundException | RequestNotValidException | GenericException e) {
+          // do nothing
+        } finally {
+          IOUtils.closeQuietly(retrieveFile);
+        }
       }
     };
 
@@ -901,9 +905,7 @@ public class BrowserHelper {
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws NotFoundException, GenericException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
-    
-    
-    
+
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && ipe.getLinkingAgentIds().size() > 0) {

@@ -42,6 +42,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -429,6 +430,8 @@ public class RodaCoreFactory {
       } catch (IOException e) {
         LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
           e.getMessage());
+      } finally {
+        IOUtils.closeQuietly(originStream);
       }
     }
   }

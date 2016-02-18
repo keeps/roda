@@ -1,6 +1,7 @@
 Known problems
 ----------------
 * Problems may araise when using GWT Dev Mode and having in the classpath a different jetty version
+
 * Problems with maven dependencies that are fat-jars can be solved, even if this is hard to maintain, through repackaging and package name relocation. 
 For example, if ApacheDS dependency contains bouncycastle and it colides with a certain but needed version of bouncycastle, one might use maven-shade plugin to solve the problem. Steps: 
 	1) Download source code:
@@ -39,6 +40,24 @@ For example, if ApacheDS dependency contains bouncycastle and it colides with a 
     3) Recompile and grab the artifact
        $> mvn clean package -Dmaven.test.skip
        $> cp all/target/apacheds-all-2.0.0-M21.jar ...
+
+* Tomcat7 behaves oddly when using the following code, throwing an exception (closed stream exception), whereas tomcat8 performs well/correctly
+
+    StreamingOutput streamingOutput = new StreamingOutput() {
+
+      @Override
+      public void write(OutputStream os) throws IOException, WebApplicationException {
+        InputStream retrieveFile = null;
+        try {
+          retrieveFile = RodaCoreFactory.getFolderMonitor().retrieveFile(transferredResource.getFullPath());
+          IOUtils.copy(retrieveFile, os);
+        } catch (NotFoundException | RequestNotValidException | GenericException e) {
+          // do nothing
+        } finally {
+          IOUtils.closeQuietly(retrieveFile);
+        }
+      }
+    };
 
 Misc
 ----------------

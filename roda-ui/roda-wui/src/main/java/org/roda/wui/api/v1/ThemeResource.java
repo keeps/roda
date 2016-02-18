@@ -39,7 +39,7 @@ public class ThemeResource {
 
   @SuppressWarnings("unused")
   private Logger logger = LoggerFactory.getLogger(getClass());
-  
+
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = true) @QueryParam("resourceId") String resourceId,
@@ -49,7 +49,7 @@ public class ThemeResource {
     if (!Theme.exists(resourceId) && defaultResourceId != null) {
       resourceId = defaultResourceId;
     }
-    
+
     boolean externalFile = Theme.validExternalFile(resourceId);
     boolean internalFile = Theme.validInternalFile(resourceId);
 
@@ -58,7 +58,7 @@ public class ThemeResource {
       cc.setMaxAge(CACHE_CONTROL_MAX_AGE);
       cc.setPrivate(true);
 
-      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, externalFile, internalFile);
+      Date lastModifiedDate = Theme.getLastModifiedDate(resourceId, externalFile);
       EntityTag etag = new EntityTag(Long.toString(lastModifiedDate.getTime()));
       ResponseBuilder builder = req.evaluatePreconditions(etag);
 
