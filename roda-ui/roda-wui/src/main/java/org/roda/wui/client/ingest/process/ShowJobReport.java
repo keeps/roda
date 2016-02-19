@@ -19,8 +19,8 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.client.ingest.transfer.IngestTransfer;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -96,7 +96,6 @@ public class ShowJobReport extends Composite {
   private final JobReport jobReport;
   // private final Map<String, PluginInfo> pluginsInfo;
 
-
   @UiField
   Anchor job;
   @UiField
@@ -123,8 +122,7 @@ public class ShowJobReport extends Composite {
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     objectId.setText(jobReport.getObjectId());
-    // TODO fix link to transferred resource
-    objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getObjectId()));
+    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getObjectId()));
 
     if (jobReport.getAipId() != null) {
       aip.setText(jobReport.getAipId());
