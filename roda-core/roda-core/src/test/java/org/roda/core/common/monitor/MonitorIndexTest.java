@@ -28,6 +28,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -83,41 +84,10 @@ public class MonitorIndexTest {
   }
 
   @Test
-  public void testRenameOwner() {
-    try {
-      Path sips = Files.createTempDirectory("sips");
-      IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
-      WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
-      Thread threadWatch = new Thread(watch, "FolderWatcher");
-      threadWatch.start();
-      Thread.sleep(1000);
-      populate(sips);
-      Thread.sleep(1000);
-      MonitorVariables.getInstance().getTaskBlocker().acquire();
-      File[] children = sips.toFile().listFiles();
-      for (File f : children) {
-        File parent = f.getParentFile();
-        File newFolder = new File(parent, UUID.randomUUID().toString());
-        if (f.isDirectory()) { // rename all owners
-          FileUtils.moveDirectory(f, newFolder);
-        }
-      }
-      MonitorVariables.getInstance().getTaskBlocker().release();
-      Thread.sleep(1000);
-      MonitorVariables.getInstance().getTaskBlocker().acquire();
-      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
-      Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
-      MonitorVariables.getInstance().getTaskBlocker().release();
-      assertTrue(fvc.isOk());
-    } catch (InterruptedException | IOException | SolrServerException e) {
-      LOGGER.error("Error in testRenameOwner", e);
-    }
-  }
-
-  @Test
   public void testCopyFolder() throws InterruptedException, IOException, SolrServerException {
-    Path sips = Files.createTempDirectory("sips");
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
     WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
     Thread threadWatch = new Thread(watch, "FolderWatcher");
@@ -147,7 +117,9 @@ public class MonitorIndexTest {
   @Test
   public void testAddEmptyFolder() throws IOException, InterruptedException, SolrServerException {
 
-    Path sips = Files.createTempDirectory("sips");
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
     WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
     Thread threadWatch = new Thread(watch, "FolderWatcher");
@@ -176,7 +148,9 @@ public class MonitorIndexTest {
 
   @Test
   public void testBase() throws IOException, InterruptedException, SolrServerException {
-    Path sips = Files.createTempDirectory("sips");
+    String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
+      RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
+    Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
     IndexFolderObserver ifo = new IndexFolderObserver(solr, sips);
     WatchDir watch = new WatchDir(sips, true, null, null, Arrays.asList(ifo));
     Thread threadWatch = new Thread(watch, "FolderWatcher");
@@ -203,6 +177,7 @@ public class MonitorIndexTest {
 
   private static void populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
     Random randomno) throws IOException {
+    LOGGER.error("Populating: " + path.toString());
     currentLevel++;
     for (int i = 0; i < numberOfItemsByLevel; i++) {
       Path p = null;
@@ -210,6 +185,7 @@ public class MonitorIndexTest {
         if (currentLevel > 1) {
           p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
           Files.write(p, "NUNCAMAISACABA".getBytes());
+          LOGGER.error("FILE: " + p.toString());
         }
       } else {
         p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
@@ -220,6 +196,7 @@ public class MonitorIndexTest {
             for (int j = 0; j < numberOfItemsByLevel; j++) {
               Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
               Files.write(temp, "NUNCAMAISACABA".getBytes());
+              LOGGER.error("FILE: " + temp.toString());
             }
           }
         }

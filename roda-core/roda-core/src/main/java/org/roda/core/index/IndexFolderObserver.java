@@ -9,9 +9,11 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.roda.core.common.monitor.FolderMonitorNIO;
 import org.roda.core.common.monitor.FolderObserver;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -35,18 +37,15 @@ public class IndexFolderObserver implements FolderObserver {
 
   public void transferredResourceAdded(TransferredResource resource) {
     try {
-      // TODO check if indexing ancestors is really needed
-      // if (resource.getAncestorsPaths() != null &&
-      // resource.getAncestorsPaths().size() > 0) {
-      // for (String ancestor : resource.getAncestorsPaths()) {
-      // TransferredResource resourceAncestor = FolderMonitorNIO
-      // .createTransferredResource(basePath.resolve(Paths.get(ancestor)),
-      // Paths.get(resource.getBasePath()));
-      // index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
-      // SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
-      //
-      // }
-      // }
+      if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
+        for (String ancestor : resource.getAncestorsPaths()) {
+          TransferredResource resourceAncestor = FolderMonitorNIO
+            .createTransferredResource(basePath.resolve(Paths.get(ancestor)), basePath);
+          index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+            SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
+
+        }
+      }
 
       index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
 
@@ -68,7 +67,7 @@ public class IndexFolderObserver implements FolderObserver {
     try {
       index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, resource.getId());
       index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + resource.getId() + "\"");
-      if(forceCommit){
+      if (forceCommit) {
         index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       }
     } catch (SolrServerException | IOException e) {
