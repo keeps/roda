@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ead xmlns="http://ead3.archivists.org/schema/">
+    <control>
+        <recordid/>
+        <filedesc>
+            <titlestmt>
+                <titleproper/>
+            </titlestmt>
+        </filedesc>
+        <maintenancestatus value="new"/>
+        <maintenanceagency>
+            <agencyname/>
+        </maintenanceagency>
+        <maintenancehistory>
+            <maintenanceevent>
+                <eventtype value="created"/>
+                <eventdatetime>{{date}}</eventdatetime>
+                <agenttype value="human"/>
+                <agent>{{user}}</agent>
+            </maintenanceevent>
+        </maintenancehistory>
+    </control>
+    <archdesc level="item">
+        <did>
+            <unitid>{{id}}</unitid>
+            <unittitle>{{title}}</unittitle>
+            <unitdate>{{date}}</unitdate>
+        </did>
+        <scopecontent>
+            <p></p>
+        </scopecontent>
+    </archdesc>
+</ead>

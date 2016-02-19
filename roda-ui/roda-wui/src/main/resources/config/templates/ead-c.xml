@@ -1,12 +1,12 @@
 <ead-c xmlns="http://roda.dgarq.gov.pt/2008/EADCSchema" level="item">
   <did>
-    <unitid repositorycode="PT-RODA">Id</unitid>
-    <unittitle>Title</unittitle>
-    <unitdate normal="2016-01-01"></unitdate>
+    <unitid repositorycode="PT-RODA">{{id}}</unitid>
+    <unittitle>{{title}}</unittitle>
+    <unitdate normal="{{date}}"/>
     <physdesc></physdesc>
-    <origination>undefined</origination>    
+    <origination></origination>
   </did>
   <scopecontent>
-    <p>undefined</p>
+    <p></p>
   </scopecontent>
 </ead-c>

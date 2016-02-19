@@ -10,17 +10,22 @@ package org.roda.wui.api.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.stream.Collectors;
 
@@ -89,11 +94,16 @@ import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.util.DateParser;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import com.ibm.icu.text.SimpleDateFormat;
 
 /**
  * 
@@ -830,7 +840,8 @@ public class BrowserHelper {
       IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
   }
 
-  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(Locale locale) throws GenericException {
+  public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
+    throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     String[] types = RodaCoreFactory.getRodaConfiguration().getString("ui.browser.metadata.descriptive.types")
       .split(", ?");
@@ -843,15 +854,21 @@ public class BrowserHelper {
           type);
         String template = null;
         InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + type + ".xml");
-        if (templateStream != null) {
-          try {
-            template = IOUtils.toString(templateStream);
-          } catch (IOException e) {
-            LOGGER.warn("Could not load descriptive metadata type template", e);
-          } finally {
-            IOUtils.closeQuietly(templateStream);
-          }
-        }
+
+        //
+        Map<String, Object> scopes = new HashMap<String, Object>();
+        scopes.put("id", "");
+        scopes.put("title", "");
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        scopes.put("date", format.format(new Date()));
+        scopes.put("user", user.getFullName());
+
+        Writer writer = new StringWriter();
+        MustacheFactory mf = new DefaultMustacheFactory();
+        Mustache mustache = mf.compile(new InputStreamReader(templateStream), type);
+        mustache.execute(writer, scopes);
+        template = writer.toString();
+        IOUtils.closeQuietly(templateStream);
 
         SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, label, template);
         supportedMetadata.add(b);

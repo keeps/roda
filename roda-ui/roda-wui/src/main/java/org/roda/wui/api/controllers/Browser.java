@@ -840,7 +840,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // delegate
-    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(locale);
+    List<SupportedMetadataTypeBundle> supportedMetadata = BrowserHelper.getSupportedMetadata(user, locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
