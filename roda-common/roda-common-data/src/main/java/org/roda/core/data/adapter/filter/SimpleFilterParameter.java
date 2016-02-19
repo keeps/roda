@@ -51,21 +51,34 @@ public class SimpleFilterParameter extends FilterParameter {
     return "SimpleFilterParameter(name=" + getName() + ", value=" + getValue() + ")";
   }
 
-  /**
-   * @see FilterParameter#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof SimpleFilterParameter) {
-      SimpleFilterParameter other = (SimpleFilterParameter) obj;
-      equal = equal && super.equals(other);
-      equal = equal && (getValue() == other.getValue() || getValue().equals(other.getValue()));
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (!(obj instanceof SimpleFilterParameter)) {
+      return false;
+    }
+    SimpleFilterParameter other = (SimpleFilterParameter) obj;
+    if (value == null) {
+      if (other.value != null) {
+        return false;
+      }
+    } else if (!value.equals(other.value)) {
+      return false;
+    }
+    return true;
   }
 
   /**

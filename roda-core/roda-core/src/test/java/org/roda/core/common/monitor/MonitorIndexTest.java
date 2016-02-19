@@ -32,7 +32,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.InternalPluginsTest;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -43,7 +42,7 @@ import org.slf4j.LoggerFactory;
 public class MonitorIndexTest {
   private static final int AUTO_COMMIT_TIMEOUT = 3000;
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(MonitorIndexTest.class);
 
   private static Path basePath;
   private static Path logPath;
@@ -74,7 +73,7 @@ public class MonitorIndexTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    LOGGER.info("Running internal plugins tests under storage {}", basePath);
+    LOGGER.info("Running folder monitor tests under storage {}", basePath);
   }
 
   @AfterClass

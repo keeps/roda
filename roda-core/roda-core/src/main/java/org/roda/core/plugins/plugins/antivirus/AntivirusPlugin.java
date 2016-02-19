@@ -7,10 +7,8 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -19,7 +17,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -29,7 +26,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
@@ -37,6 +33,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -45,10 +42,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AntivirusPlugin implements Plugin<AIP> {
+public class AntivirusPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
-
-  private Map<String, String> parameters;
 
   private String antiVirusClassName;
   private AntiVirus antiVirus = null;
@@ -96,28 +91,8 @@ public class AntivirusPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
   }
 
   @Override
@@ -138,7 +113,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Check for virus", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
@@ -180,8 +155,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
         report.addItem(reportItem);
 
         LOGGER.info("Updating job report");
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-          aip.getId());
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
 
         LOGGER.info("Done job report");
       } catch (Throwable e) {
@@ -204,7 +178,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
       // TODO review below information and externalise strings
       String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK;
       String eventDetails = "All the files from the SIP were verified against an antivirus.";
-      List<String> sourceObjects = Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), null, null, null));
+      List<String> sourceObjects = Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), null, null, null));
       List<String> outcomeObjects = null;
       String outcome = success ? "success" : "failure";
       String outcomeDetailNote = success ? virusCheckResult.getReport()

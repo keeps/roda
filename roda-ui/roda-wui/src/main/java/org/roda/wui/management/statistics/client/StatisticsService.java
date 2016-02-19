@@ -14,7 +14,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.wui.common.client.PrintReportException;
@@ -65,7 +64,7 @@ public interface StatisticsService extends RemoteService {
    * @return a list of statistic entries
    * @throws RODAException
    */
-  public List<StatisticData> getStatisticList(ContentAdapter adapter) throws RODAException;
+//  public List<StatisticData> getStatisticList(ContentAdapter adapter) throws RODAException;
 
   /**
    * Get statistic data processed by statistic functions
@@ -78,8 +77,8 @@ public interface StatisticsService extends RemoteService {
    * @return the result statistic data
    * @throws RODAException
    */
-  public List<StatisticData> getStatisticList(ContentAdapter adapter, List<StatisticFunction> functions,
-    Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
+//  public List<StatisticData> getStatisticList(ContentAdapter adapter, List<StatisticFunction> functions,
+//    Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
 
   /**
    * Get statistic stacked list. When using adapter queries that return a set on
@@ -95,9 +94,9 @@ public interface StatisticsService extends RemoteService {
    * @return A list of stacks, one for each type.
    * @throws RODAException
    */
-  public List<List<StatisticData>> getStatisticStackedList(ContentAdapter adapter, List<StatisticFunction> functions,
-    Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
-
-  public void setStatisticListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
+//  public List<List<StatisticData>> getStatisticStackedList(ContentAdapter adapter, List<StatisticFunction> functions,
+//    Segmentation segmentation, Date initialDate, Date finalDate) throws RODAException;
+//
+//  public void setStatisticListReportInfo(ContentAdapter adapter, String localeString) throws PrintReportException;
 
 }

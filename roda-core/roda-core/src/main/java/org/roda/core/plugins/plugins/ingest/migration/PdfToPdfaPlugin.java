@@ -16,12 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 import org.verapdf.core.VeraPDFException;
 
-public class PdfToPdfaPlugin extends AbstractConvertPlugin {
+public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
 
   @Override
   public String getName() {
@@ -34,18 +33,13 @@ public class PdfToPdfaPlugin extends AbstractConvertPlugin {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
 
   @Override
-  public Plugin<Serializable> cloneMe() {
-    return new PdfToPdfaPlugin();
+  public Plugin<T> cloneMe() {
+    return new PdfToPdfaPlugin<T>();
   }
 
   @Override

@@ -25,22 +25,34 @@ public abstract class FilterParameter implements Serializable {
   public FilterParameter() {
   }
 
-  /**
-   * 
-   * 
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof FilterParameter) {
-      FilterParameter other = (FilterParameter) obj;
-      equal = equal && (getName() == other.getName() || getName().equals(other.getName()));
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof FilterParameter)) {
+      return false;
+    }
+    FilterParameter other = (FilterParameter) obj;
+    if (name == null) {
+      if (other.name != null) {
+        return false;
+      }
+    } else if (!name.equals(other.name)) {
+      return false;
+    }
+    return true;
   }
 
   /**

@@ -50,8 +50,6 @@ import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceTest;
-import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -60,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class EARKSIPPluginsTest {
+  private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
 
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
@@ -76,8 +75,6 @@ public class EARKSIPPluginsTest {
 
   private static Path corporaPath;
   private static StorageService corporaService;
-
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @Before
   public void setUp() throws Exception {
@@ -98,7 +95,7 @@ public class EARKSIPPluginsTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.info("Running internal plugins tests under storage {}", basePath);
+    LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
   }
 
   @After
@@ -115,7 +112,7 @@ public class EARKSIPPluginsTest {
     f.addFolderObserver(observer);
 
     while (!f.isFullyInitialized()) {
-      logger.info("Waiting for folder monitor to initialize...");
+      LOGGER.info("Waiting for folder monitor to initialize...");
       Thread.sleep(1000);
     }
 
@@ -128,7 +125,7 @@ public class EARKSIPPluginsTest {
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
 
-    logger.info("Waiting for soft-commit");
+    LOGGER.info("Waiting for soft-commit");
     Thread.sleep(AUTO_COMMIT_TIMEOUT);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class, CorporaConstants.EARK_SIP);

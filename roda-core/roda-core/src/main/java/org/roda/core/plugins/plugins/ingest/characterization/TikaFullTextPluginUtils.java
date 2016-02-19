@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class TikaFullTextPluginUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPluginUtils.class);
 
   private static final Tika tika = new Tika();

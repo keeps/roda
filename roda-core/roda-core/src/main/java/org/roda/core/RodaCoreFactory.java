@@ -941,7 +941,7 @@ public class RodaCoreFactory {
   }
 
   public static int getRodaConfigurationAsInt(int defaultValue, String... keyParts) {
-    return rodaConfiguration.getInt(getConfigurationKey(keyParts), 0);
+    return rodaConfiguration.getInt(getConfigurationKey(keyParts), defaultValue);
   }
 
   public static int getRodaConfigurationAsInt(String... keyParts) {
@@ -1625,7 +1625,7 @@ public class RodaCoreFactory {
 
     instantiate();
     if (getNodeType() == NodeType.MASTER) {
-      if (args.size() > 0) {
+      if (!args.isEmpty()) {
         mainMasterTasks(args);
       } else {
         printMainUsage();

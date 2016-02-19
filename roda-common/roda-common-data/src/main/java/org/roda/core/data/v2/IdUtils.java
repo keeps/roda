@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.data.v2;
 
 import java.util.List;
@@ -5,9 +12,14 @@ import java.util.List;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
-public class IdUtils {
-  public static final String ID_SEPARATOR = "-";
-  public static final String LINKING_ID_SEPARATOR = "/";
+public final class IdUtils {
+  private static final String ID_SEPARATOR = "-";
+  private static final String LINKING_ID_SEPARATOR = "/";
+
+  /** Private empty constructor */
+  private IdUtils() {
+
+  }
 
   public static String getRepresentationId(String aipId, String representationId) {
     StringBuilder idBuilder = new StringBuilder();
@@ -35,82 +47,77 @@ public class IdUtils {
     return getFileId(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
   }
 
-  public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
+  public static String getFileDirectoryPathId(List<String> path) {
     StringBuilder idBuilder = new StringBuilder();
-    idBuilder.append(type.toString());
-    if (aipId != null) {
-      idBuilder.append(ID_SEPARATOR);    idBuilder.append(type.toString());
-
-      idBuilder.append(aipId);
-    }
-    if (representationId != null) {
-      idBuilder.append(ID_SEPARATOR);
-      idBuilder.append(representationId);
-    }
-    if (fileDirectoryPath != null) {
-      for (String dir : fileDirectoryPath) {
-        idBuilder.append(ID_SEPARATOR);
-        idBuilder.append(dir);
+    for (String string : path) {
+      if (idBuilder.length() > 0) {
+        idBuilder.append(LINKING_ID_SEPARATOR);
       }
-    }
-    if (fileId != null) {
-      idBuilder.append(ID_SEPARATOR);
-      idBuilder.append(fileId);
+      idBuilder.append(string);
     }
     return idBuilder.toString();
   }
 
+  public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
+    return getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
+  }
+
+  public static String getLinkingIdentifierId(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) {
+    return getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
+  }
+
   public static String getOtherMetadataId(String type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    StringBuilder idBuilder = new StringBuilder();
-    idBuilder.append(type);
-    if (aipId != null) {
-      idBuilder.append(ID_SEPARATOR);
-      idBuilder.append(aipId);
-    }
-    if (representationId != null) {
-      idBuilder.append(ID_SEPARATOR);
-      idBuilder.append(representationId);
-    }
-    if (fileDirectoryPath != null) {
-      for (String dir : fileDirectoryPath) {
-        idBuilder.append(ID_SEPARATOR);
-        idBuilder.append(dir);
-      }
-    }
-    if (fileId != null) {
-      idBuilder.append(ID_SEPARATOR);
-      idBuilder.append(fileId);
-    }
-    return idBuilder.toString();
+    return getFileId(aipId, representationId, fileDirectoryPath, fileId, type, ID_SEPARATOR);
   }
 
   public static String getJobReportId(String jobId, String aipId) {
     return jobId + ID_SEPARATOR + aipId;
   }
 
-  public static String getLinkingIdentifier(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
+  public static String[] splitLinkingId(String id) {
+    return id.split(LINKING_ID_SEPARATOR);
+  }
+
+  public static String getFileIdFromLinkingId(String linkingId) {
+    return linkingId.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+  }
+
+  private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+    String type, String separator) {
     StringBuilder idBuilder = new StringBuilder();
-    if (aipId != null) {
-      idBuilder.append(aipId);
+
+    if (type != null) {
+      idBuilder.append(type);
     }
-    if (representationId != null) {
-      idBuilder.append(LINKING_ID_SEPARATOR);
-      idBuilder.append(representationId);
+    addNonNullStringToBuilder(idBuilder, aipId, separator);
+    addNonNullStringToBuilder(idBuilder, representationId, separator);
+    addNonNullStringToBuilder(idBuilder, fileDirectoryPath, separator);
+    addNonNullStringToBuilder(idBuilder, fileId, separator);
+
+    return idBuilder.toString();
+  }
+
+  private static StringBuilder addNonNullStringToBuilder(StringBuilder idBuilder, String string, String separator) {
+    if (string != null) {
+      if (idBuilder.length() > 0) {
+        idBuilder.append(separator);
+      }
+      idBuilder.append(string);
     }
-    if (fileDirectoryPath != null) {
-      for (String dir : fileDirectoryPath) {
-        idBuilder.append(LINKING_ID_SEPARATOR);
-        idBuilder.append(dir);
+    return idBuilder;
+  }
+
+  private static StringBuilder addNonNullStringToBuilder(StringBuilder idBuilder, List<String> strings,
+    String separator) {
+    if (strings != null) {
+      for (String string : strings) {
+        idBuilder.append(separator).append(string);
       }
     }
-    if (fileId != null) {
-      idBuilder.append(LINKING_ID_SEPARATOR);
-      idBuilder.append(fileId);
-    }
-    return idBuilder.toString();
+    return idBuilder;
   }
 
 }

@@ -145,7 +145,6 @@ public class DescriptionLevelManager implements Serializable {
     return ALL_BUT_REPRESENTATIONS_DESCRIPTION_LEVELS;
   }
 
-
   private void loadDescriptionLevelHierarchy(Map<Object, Object> descriptionLevels) throws RequestNotValidException {
 
     // instantiate objects to contain the description levels (both String
@@ -182,6 +181,7 @@ public class DescriptionLevelManager implements Serializable {
         REPRESENTATION_DESCRIPTION_LEVELS = splitChildLevelsAsObjects(value);
       } else if (key.matches("^level\\.[^.]+")) {
         String level = key.substring("level.".length());
+        DescriptionLevel descLevel = new DescriptionLevel(level);
 
         // process information about child levels
         childLevels = splitChildLevelsAsObjects(value);
@@ -191,11 +191,11 @@ public class DescriptionLevelManager implements Serializable {
           tempList = CHILDREN_TO_PARENT_MAPPING.get(childrenLevel.getLevel());
           if (tempList == null) {
             tempList = new ArrayList<DescriptionLevel>();
-            tempList.add(new DescriptionLevel(level));
+            tempList.add(descLevel);
             CHILDREN_TO_PARENT_MAPPING.put(childrenLevel.getLevel(), tempList);
           } else {
-            if (!tempList.contains(level)) {
-              tempList.add(new DescriptionLevel(level));
+            if (!tempList.contains(descLevel)) {
+              tempList.add(descLevel);
             }
             CHILDREN_TO_PARENT_MAPPING.put(childrenLevel.getLevel(), tempList);
           }

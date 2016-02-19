@@ -136,20 +136,20 @@ public class StackedStatisticMiniPanel extends StatisticMiniPanel {
   @Override
   public void update() {
     loading.show();
-    StatisticsService.Util.getInstance().getStatisticStackedList(getContentAdapter(), getFunctions(),
-      getSegmentation(), getInitialDate(), getFinalDate(), new AsyncCallback<List<List<StatisticData>>>() {
-
-        public void onFailure(Throwable caught) {
-          logger.error("Could not get statistics list", caught);
-          loading.hide();
-        }
-
-        public void onSuccess(List<List<StatisticData>> statistics) {
-          update(statistics);
-          loading.hide();
-        }
-
-      });
+//    StatisticsService.Util.getInstance().getStatisticStackedList(getContentAdapter(), getFunctions(),
+//      getSegmentation(), getInitialDate(), getFinalDate(), new AsyncCallback<List<List<StatisticData>>>() {
+//
+//        public void onFailure(Throwable caught) {
+//          logger.error("Could not get statistics list", caught);
+//          loading.hide();
+//        }
+//
+//        public void onSuccess(List<List<StatisticData>> statistics) {
+//          update(statistics);
+//          loading.hide();
+//        }
+//
+//      });
   }
 
   protected void update(List<List<StatisticData>> statistics) {

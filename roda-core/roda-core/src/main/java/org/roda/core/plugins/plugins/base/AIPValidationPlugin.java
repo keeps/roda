@@ -11,13 +11,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -32,6 +30,7 @@ import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -40,7 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // FIXME rename this to SIPValidationPlugin
-public class AIPValidationPlugin implements Plugin<AIP> {
+public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
@@ -57,8 +56,6 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
   public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
     "Validate Premis", PluginParameterType.BOOLEAN, "true", true, false, "Validate Premis");
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -81,11 +78,6 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -101,16 +93,6 @@ public class AIPValidationPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
-  }
-
-  @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     IndexedPreservationAgent agent = null;
@@ -123,18 +105,18 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       LOGGER.error("Error creating antivirus PREMIS agent", e);
     }
 
-    boolean validateDescriptiveMetadata = Boolean.parseBoolean(parameters.getOrDefault(
+    boolean validateDescriptiveMetadata = Boolean.parseBoolean(getParameterValues().getOrDefault(
       PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getId(), PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getDefaultValue()));
-    boolean validatePremis = Boolean.parseBoolean(
-      parameters.getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(), PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
-    boolean forceDescriptiveMetadataType = Boolean.parseBoolean(parameters.getOrDefault(
+    boolean validatePremis = Boolean.parseBoolean(getParameterValues().getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(),
+      PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
+    boolean forceDescriptiveMetadataType = Boolean.parseBoolean(getParameterValues().getOrDefault(
       PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getId(), PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getDefaultValue()));
-    String metadataType = parameters.getOrDefault(PARAMETER_METADATA_TYPE.getId(),
+    String metadataType = getParameterValues().getOrDefault(PARAMETER_METADATA_TYPE.getId(),
       PARAMETER_METADATA_TYPE.getDefaultValue());
 
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "SIP syntax check", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
@@ -147,8 +129,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
       }
 
       try {
-        PluginHelper.updateJobReport(model, index, this, reportItem, PluginState.SUCCESS,
-          PluginHelper.getJobId(parameters), aip.getId());
+        PluginHelper.updateJobReport(model, index, this, reportItem, PluginState.SUCCESS, aip.getId());
       } catch (Throwable t) {
 
       }
@@ -167,7 +148,7 @@ public class AIPValidationPlugin implements Plugin<AIP> {
         boolean inotify = false;
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), representation.getId(), null, null)), null,
+          Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representation.getId(), null, null)), null,
           success ? "success" : "failure", success ? "success" : "Error", "", agent, inotify);
       }
       if (notify) {

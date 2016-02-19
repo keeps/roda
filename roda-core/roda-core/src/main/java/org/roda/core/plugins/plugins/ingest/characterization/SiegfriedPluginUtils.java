@@ -45,7 +45,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SiegfriedPluginUtils {
-
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
@@ -59,8 +58,7 @@ public class SiegfriedPluginUtils {
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
       List<String> command = getBatchCommand(sourceDirectory);
-      String siegfriedOutput = CommandUtility.execute(command, false);
-      return siegfriedOutput;
+      return CommandUtility.execute(command, false);
     } catch (CommandException e) {
       throw new PluginException("Error while executing Siegfried command");
     }

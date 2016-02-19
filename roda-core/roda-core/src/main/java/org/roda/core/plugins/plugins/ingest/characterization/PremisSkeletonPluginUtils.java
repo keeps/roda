@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
@@ -47,15 +54,15 @@ public class PremisSkeletonPluginUtils {
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
     }
-      IOUtils.closeQuietly(allFiles);
+    IOUtils.closeQuietly(allFiles);
 
-      ContentPayload representationPayload = PremisUtils.representationToBinary(representation);
-      model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, representationId, aip.getId(),
-        representationId, representationPayload, notifyInSteps);
+    ContentPayload representationPayload = PremisUtils.representationToBinary(representation);
+    model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, representationId, aip.getId(),
+      representationId, representationPayload, notifyInSteps);
 
-      if (notify) {
-        model.notifyAIPUpdated(aip.getId());
-      }
+    if (notify) {
+      model.notifyAIPUpdated(aip.getId());
     }
+  }
 
 }

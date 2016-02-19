@@ -18,12 +18,10 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
@@ -31,12 +29,12 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -47,10 +45,8 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TransferredResourceToAIPPlugin implements Plugin<TransferredResource> {
+public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -72,28 +68,8 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
   }
 
   @Override
@@ -102,7 +78,7 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(parameters);
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(getParameterValues());
 
     for (TransferredResource transferredResource : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(transferredResource, this);
@@ -116,7 +92,6 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
         boolean notifyCreatedAIP = false;
 
         final AIP aip = model.createAIP(active, parentId, permissions, notifyCreatedAIP);
-
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
         boolean notifyRepresentationCreated = false;
@@ -130,49 +105,13 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
           List<String> directoryPath = new ArrayList<>();
           ContentPayload payload = new FSPathContentPayload(transferredResourcePath);
           boolean notifyFileCreated = false;
+
           model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
         } else {
-          EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-          Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
-            @Override
-            public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-              return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-              String fileId = file.getFileName().toString();
-              List<String> directoryPath = extractDirectoryPath(transferredResourcePath, file);
-              try {
-                ContentPayload payload = new FSPathContentPayload(file);
-                boolean notifyFileCreated = false;
-                File createdFile = model.createFile(aip.getId(), representationId, directoryPath, fileId, payload,
-                  notifyFileCreated);
-                LOGGER.debug("Created " + createdFile);
-              } catch (RODAException e) {
-                // TODO log or mark nothing to do
-              }
-              return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-              return FileVisitResult.CONTINUE;
-            }
-
-            @Override
-            public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-              return FileVisitResult.CONTINUE;
-            }
-          });
+          processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
         }
 
-        StringBuilder b = new StringBuilder();
-        b.append("<metadata>");
-        b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
-        b.append("</metadata>");
-
-        ContentPayload metadataPayload = new StringContentPayload(b.toString());
+        ContentPayload metadataPayload = getMetadataPayload(transferredResource);
         boolean notifyDescriptiveMetadataCreated = false;
 
         // TODO make the following strings constants
@@ -194,10 +133,56 @@ public class TransferredResourceToAIPPlugin implements Plugin<TransferredResourc
       }
 
       report.addItem(reportItem);
-      PluginHelper.createJobReport(model, this, reportItem, state, PluginHelper.getJobId(parameters));
+      PluginHelper.createJobReport(model, this, reportItem, state);
 
     }
     return report;
+  }
+
+  private void processTransferredResourceDirectory(ModelService model, Path transferredResourcePath, final AIP aip,
+    final String representationId) throws IOException {
+    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+    Files.walkFileTree(transferredResourcePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
+      @Override
+      public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        String fileId = file.getFileName().toString();
+        List<String> directoryPath = extractDirectoryPath(transferredResourcePath, file);
+        try {
+          ContentPayload payload = new FSPathContentPayload(file);
+          boolean notifyFileCreated = false;
+          File createdFile = model.createFile(aip.getId(), representationId, directoryPath, fileId, payload,
+            notifyFileCreated);
+          LOGGER.debug("Created " + createdFile);
+        } catch (RODAException e) {
+          // TODO log or mark nothing to do
+        }
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        return FileVisitResult.CONTINUE;
+      }
+    });
+  }
+
+  private ContentPayload getMetadataPayload(TransferredResource transferredResource) {
+    StringBuilder b = new StringBuilder();
+    b.append("<metadata>");
+    b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
+    b.append("</metadata>");
+
+    return new StringContentPayload(b.toString());
   }
 
   private List<String> extractDirectoryPath(Path transferredResourcePath, Path file) {

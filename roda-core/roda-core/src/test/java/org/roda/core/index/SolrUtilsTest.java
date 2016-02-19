@@ -28,7 +28,6 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.ClassificationSchemeFilterParameter;
 import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -143,16 +142,6 @@ public class SolrUtilsTest {
         stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
-    }
-
-    // 6) filter with one ClassificationSchemeFilterParameter
-    try {
-      filter = new Filter();
-      filter.add(new ClassificationSchemeFilterParameter());
-      stringFilter = SolrUtils.parseFilter(filter);
-      fail("An exception should have been thrown but it wasn't!");
-    } catch (RequestNotValidException e) {
-      // do nothing as it was expected
     }
 
     // 7) filter with one LikeFilterParameter

@@ -10,7 +10,6 @@ package org.roda.wui.management.statistics.client;
 import java.util.List;
 
 import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -22,9 +21,7 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.management.statistics.client.StatisticsPanel.ValueDimension;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ClickListener;
 import com.google.gwt.user.client.ui.DockPanel;
 import com.google.gwt.user.client.ui.HasAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
@@ -32,7 +29,6 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * 
@@ -213,23 +209,23 @@ public class IngestStatistics extends StatisticTab {
     Sorter sorter = new Sorter();
     sorter.add(new SortParameter("datetime", true));
     Sublist subList = new Sublist(0, 1);
-    ContentAdapter adapter = new ContentAdapter(filter, sorter, subList);
-    StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
-
-      public void onFailure(Throwable caught) {
-        callback.onFailure(caught);
-      }
-
-      public void onSuccess(List<StatisticData> result) {
-        if (result.size() > 0) {
-          callback.onSuccess(result.get(0));
-        } else {
-          callback.onSuccess(null);
-        }
-
-      }
-
-    });
+//    ContentAdapter adapter = new ContentAdapter(filter, sorter, subList);
+//    StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
+//
+//      public void onFailure(Throwable caught) {
+//        callback.onFailure(caught);
+//      }
+//
+//      public void onSuccess(List<StatisticData> result) {
+//        if (result.size() > 0) {
+//          callback.onSuccess(result.get(0));
+//        } else {
+//          callback.onSuccess(null);
+//        }
+//
+//      }
+//
+//    });
 
   }
 

@@ -33,13 +33,94 @@ public class JobReport implements Serializable {
   public JobReport() {
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
+    result = prime * result + ((dateCreated == null) ? 0 : dateCreated.hashCode());
+    result = prime * result + ((dateUpdated == null) ? 0 : dateUpdated.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((jobId == null) ? 0 : jobId.hashCode());
+    result = prime * result + ((lastPluginRan == null) ? 0 : lastPluginRan.hashCode());
+    result = prime * result + ((lastPluginRanState == null) ? 0 : lastPluginRanState.hashCode());
+    result = prime * result + ((objectId == null) ? 0 : objectId.hashCode());
+    result = prime * result + ((report == null) ? 0 : report.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    if (obj instanceof JobReport) {
-      JobReport other = (JobReport) obj;
-      return getId().equals(other.getId());
-    } else {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
+    if (!(obj instanceof JobReport)) {
+      return false;
+    }
+    JobReport other = (JobReport) obj;
+    if (aipId == null) {
+      if (other.aipId != null) {
+        return false;
+      }
+    } else if (!aipId.equals(other.aipId)) {
+      return false;
+    }
+    if (dateCreated == null) {
+      if (other.dateCreated != null) {
+        return false;
+      }
+    } else if (!dateCreated.equals(other.dateCreated)) {
+      return false;
+    }
+    if (dateUpdated == null) {
+      if (other.dateUpdated != null) {
+        return false;
+      }
+    } else if (!dateUpdated.equals(other.dateUpdated)) {
+      return false;
+    }
+    if (id == null) {
+      if (other.id != null) {
+        return false;
+      }
+    } else if (!id.equals(other.id)) {
+      return false;
+    }
+    if (jobId == null) {
+      if (other.jobId != null) {
+        return false;
+      }
+    } else if (!jobId.equals(other.jobId)) {
+      return false;
+    }
+    if (lastPluginRan == null) {
+      if (other.lastPluginRan != null) {
+        return false;
+      }
+    } else if (!lastPluginRan.equals(other.lastPluginRan)) {
+      return false;
+    }
+    if (lastPluginRanState != other.lastPluginRanState) {
+      return false;
+    }
+    if (objectId == null) {
+      if (other.objectId != null) {
+        return false;
+      }
+    } else if (!objectId.equals(other.objectId)) {
+      return false;
+    }
+    if (report == null) {
+      if (other.report != null) {
+        return false;
+      }
+    } else if (!report.equals(other.report)) {
+      return false;
+    }
+    return true;
   }
 
   public String getId() {

@@ -30,13 +30,13 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -44,13 +44,12 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class SiegfriedPlugin implements Plugin<AIP> {
+public class SiegfriedPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
+
   public static final String OTHER_METADATA_TYPE = "Siegfried";
   public static final String FILE_SUFFIX = ".json";
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
-
-  private Map<String, String> parameters;
   private boolean createsPluginEvent = true;
 
   @Override
@@ -73,32 +72,17 @@ public class SiegfriedPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return SiegfriedPluginUtils.getVersion();
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
+    super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (parameters.containsKey("createsPluginEvent")) {
-      createsPluginEvent = Boolean.parseBoolean(parameters.get("createsPluginEvent"));
+    if (getParameterValues().containsKey("createsPluginEvent")) {
+      createsPluginEvent = Boolean.parseBoolean(getParameterValues().get("createsPluginEvent"));
     }
   }
 
@@ -119,8 +103,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
     }
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File format identification", aip.getId(),
-        null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<String> sources = new ArrayList<String>();
@@ -136,7 +119,8 @@ public class SiegfriedPlugin implements Plugin<AIP> {
           while (it.hasNext()) {
             File f = it.next();
             if (!f.isDirectory()) {
-              sources.add(IdUtils.getLinkingIdentifier(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId()));
+              sources
+                .add(IdUtils.getLinkingIdentifierId(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId()));
             }
           }
 
@@ -173,8 +157,7 @@ public class SiegfriedPlugin implements Plugin<AIP> {
       // script
       try {
         if (createsPluginEvent) {
-          PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-            aip.getId());
+          PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
         }
       } catch (Throwable t) {
 

@@ -9,16 +9,16 @@ package org.roda.core.data.common;
 
 public class Pair<K, V> {
 
-  public static <K, V> Pair<K, V> create(K key, V value) {
-    return new Pair<K, V>(key, value);
-  }
-
   private K fst;
   private V snd;
 
   public Pair(K first, V second) {
     this.fst = first;
     this.snd = second;
+  }
+
+  public static <K, V> Pair<K, V> create(K key, V value) {
+    return new Pair<K, V>(key, value);
   }
 
   public K getFirst() {
@@ -37,18 +37,42 @@ public class Pair<K, V> {
     this.snd = value;
   }
 
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((fst == null) ? 0 : fst.hashCode());
+    result = prime * result + ((snd == null) ? 0 : snd.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean res = true;
-    if (obj != this) {
-      res = false;
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
     }
     if (!(obj instanceof Pair)) {
-      res = false;
+      return false;
     }
-    Pair<?, ?> pair = (Pair<?, ?>) obj;
-    if (!(this.fst.equals(pair.getFirst())) || !(this.snd.equals(pair.getSecond()))) {
-      res = false;
+    Pair<?, ?> other = (Pair<?, ?>) obj;
+    if (fst == null) {
+      if (other.fst != null) {
+        return false;
+      }
+    } else if (!fst.equals(other.fst)) {
+      return false;
     }
-    return res;
+    if (snd == null) {
+      if (other.snd != null) {
+        return false;
+      }
+    } else if (!snd.equals(other.snd)) {
+      return false;
+    }
+    return true;
   }
+
 }

@@ -919,7 +919,7 @@ public class BrowserHelper {
     Map<String, IndexedFile> files = new HashMap<String, IndexedFile>();
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
-    if (ipe.getLinkingAgentIds() != null && ipe.getLinkingAgentIds().size() > 0) {
+    if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
       List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
       for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
         try {
@@ -932,59 +932,39 @@ public class BrowserHelper {
       }
       eventBundle.setAgents(agents);
     }
-    if ((ipe.getSourcesObjectIds() != null && ipe.getSourcesObjectIds().size() > 0)
-      || (ipe.getOutcomeObjectIds() != null && ipe.getOutcomeObjectIds().size() > 0)) {
-      if ((ipe.getSourcesObjectIds() != null && ipe.getSourcesObjectIds().size() > 0)) {
-        for (LinkingIdentifier i : ipe.getSourcesObjectIds()) {
-          String[] tokens = i.getValue().split(IdUtils.LINKING_ID_SEPARATOR);
-          if (tokens.length == 1) {
-            // AIP
-            LOGGER.warn("AIP");
-          } else if (tokens.length == 2) {
-            // REPRESENTATION
-            LOGGER.warn("REPRESENTATION");
-          } else {
-            // FILE
-            String aipId = tokens[0];
-            String representationId = tokens[1];
-            String fileId = tokens[tokens.length - 1];
-            List<String> fileDirectoryPath = new ArrayList<String>();
-            if (tokens.length > 3) {
-              fileDirectoryPath = Arrays.asList(Arrays.copyOfRange(tokens, 2, tokens.length - 1));
-            }
-            IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-              IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
-            files.put(i.getValue(), file);
-          }
-        }
+    if ((ipe.getSourcesObjectIds() != null && !ipe.getSourcesObjectIds().isEmpty())
+      || (ipe.getOutcomeObjectIds() != null && !ipe.getOutcomeObjectIds().isEmpty())) {
+
+      if ((ipe.getSourcesObjectIds() != null && !ipe.getSourcesObjectIds().isEmpty())) {
+        processLinkingIdentifiers(files, ipe.getSourcesObjectIds());
       }
 
-      if ((ipe.getOutcomeObjectIds() != null && ipe.getOutcomeObjectIds().size() > 0)) {
-        for (LinkingIdentifier i : ipe.getOutcomeObjectIds()) {
-          String[] tokens = i.getValue().split(IdUtils.LINKING_ID_SEPARATOR);
-          if (tokens.length == 1) {
-            // AIP
-
-          } else if (tokens.length == 2) {
-            // REPRESENTATION
-          } else {
-            // FILE
-            String aipId = tokens[0];
-            String representationId = tokens[1];
-            String fileId = tokens[tokens.length - 1];
-            List<String> fileDirectoryPath = new ArrayList<String>();
-            if (tokens.length > 3) {
-              fileDirectoryPath = Arrays.asList(Arrays.copyOfRange(tokens, 2, tokens.length - 1));
-            }
-            IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-              IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
-            files.put(i.getValue(), file);
-          }
-        }
+      if ((ipe.getOutcomeObjectIds() != null && !ipe.getOutcomeObjectIds().isEmpty())) {
+        processLinkingIdentifiers(files, ipe.getOutcomeObjectIds());
       }
       eventBundle.setFiles(files);
     }
 
     return eventBundle;
+  }
+
+  private static Map<String, IndexedFile> processLinkingIdentifiers(Map<String, IndexedFile> files,
+    List<LinkingIdentifier> linkingIdentifiers) throws NotFoundException, GenericException {
+    for (LinkingIdentifier identifier : linkingIdentifiers) {
+      String[] tokens = IdUtils.splitLinkingId(identifier.getValue());
+      if (tokens.length == 1) {
+        // AIP
+        LOGGER.warn("AIP");
+      } else if (tokens.length == 2) {
+        // REPRESENTATION
+        LOGGER.warn("REPRESENTATION");
+      } else {
+        // FILE
+        IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+          IdUtils.getFileIdFromLinkingId(identifier.getValue()));
+        files.put(identifier.getValue(), file);
+      }
+    }
+    return files;
   }
 }

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
@@ -8,11 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 
-public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
+public class GeneralCommandConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
   @Override
   public String getName() {
@@ -25,18 +31,13 @@ public class GeneralCommandConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
 
   @Override
-  public Plugin<Serializable> cloneMe() {
-    return new GeneralCommandConvertPlugin();
+  public Plugin<T> cloneMe() {
+    return new GeneralCommandConvertPlugin<T>();
   }
 
   @Override

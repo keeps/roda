@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({FSUtils.class})
 public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStorageService> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageServiceTest.class);
 
   private static Path basePathForTests;
   private static FileStorageService storage;
@@ -56,8 +57,6 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
   public static void tearDown() throws NotFoundException, GenericException {
     FSUtils.deletePath(basePathForTests);
   }
-
-  final Logger logger = LoggerFactory.getLogger(FileStorageServiceTest.class);
 
   @Test
   public void testClassInstantiation() throws RODAException {
@@ -120,7 +119,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
 
   @Override
   public void cleanUp() {
-    logger.trace("Cleanning up");
+    LOGGER.trace("Cleanning up");
     try {
       // recursively delete directory
       Files.walkFileTree(basePathForTests, new SimpleFileVisitor<Path>() {
@@ -140,7 +139,7 @@ public class FileStorageServiceTest extends AbstractStorageServiceTest<FileStora
       // re-create directory
       Files.createDirectory(basePathForTests);
     } catch (IOException e) {
-      logger.error("Could not clean up", e);
+      LOGGER.error("Could not clean up", e);
     }
   }
 

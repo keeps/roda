@@ -12,7 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
@@ -20,7 +19,6 @@ import org.roda.core.common.PremisUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -30,12 +28,12 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -45,11 +43,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FixityPlugin implements Plugin<AIP> {
+public class FixityPlugin extends AbstractPlugin<AIP> {
   private ContentPayload agent;
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() {
@@ -71,28 +67,8 @@ public class FixityPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
   }
 
   @Override
@@ -163,7 +139,7 @@ public class FixityPlugin implements Plugin<AIP> {
               PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
-                Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), r.getId(), null, null)), null, "failure",
+                Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), r.getId(), null, null)), null, "failure",
                 "Reason", sb.toString(), agent, inotify);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {

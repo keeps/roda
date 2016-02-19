@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
@@ -46,7 +53,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
@@ -59,7 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
+public abstract class AbstractConvertPlugin<T extends Serializable> extends AbstractPlugin<T> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
   private String inputFormat;
@@ -91,16 +98,6 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
 
   public abstract Map<String, List<String>> getMimetypeToExtension();
 
-  public abstract String getName();
-
-  public abstract String getDescription();
-
-  public abstract String getAgentType();
-
-  public abstract String getVersion();
-
-  public abstract Plugin<Serializable> cloneMe();
-
   public String getInputFormat() {
     return this.inputFormat;
   }
@@ -125,6 +122,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return true;
   }
 
+  @Override
   public List<PluginParameter> getParameters() {
     List<PluginParameter> params = new ArrayList<PluginParameter>();
 
@@ -135,6 +133,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return params;
   }
 
+  @Override
   public Map<String, String> getParameterValues() {
     Map<String, String> parametersMap = new HashMap<String, String>();
     parametersMap.put("inputFormat", getInputFormat());
@@ -143,6 +142,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     return parametersMap;
   }
 
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     // input image format
     if (parameters.containsKey("inputFormat")) {
@@ -155,7 +155,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     }
   }
 
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Serializable> list)
+  @Override
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
 
     IndexedPreservationAgent agent = null;
@@ -169,13 +170,14 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       LOGGER.error("Error running adding Conversion plugin: " + e.getMessage(), e);
     }
 
-    if (list.size() > 0) {
-      if (list.get(0) instanceof AIP)
-        return executeOnAIP(index, model, storage, (List<AIP>) (List<?>) list, agent);
-      if (list.get(0) instanceof Representation)
-        return executeOnRepresentation(index, model, storage, (List<Representation>) (List<?>) list, agent);
-      if (list.get(0) instanceof File)
-        return executeOnFile(index, model, storage, (List<File>) (List<?>) list, agent);
+    if (!list.isEmpty()) {
+      if (list.get(0) instanceof AIP) {
+        return executeOnAIP(index, model, storage, (List<AIP>) list, agent);
+      } else if (list.get(0) instanceof Representation) {
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list, agent);
+      } else if (list.get(0) instanceof File) {
+        return executeOnFile(index, model, storage, (List<File>) list, agent);
+      }
     }
 
     return new Report();
@@ -199,8 +201,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
         int pluginResultState = 1;
-        ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", representation.getId(),
-          null);
+        ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
         try {
           LOGGER.debug("Processing representation: " + representation);
@@ -331,7 +332,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       aipId = representation.getAipId();
       int pluginResultState = 1;
       boolean notify = true;
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Convert format", representation.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
 
@@ -459,7 +460,7 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
         LOGGER.debug("Processing file " + file.getId());
 
         newRepresentationID = UUID.randomUUID().toString();
-        reportItem = PluginHelper.createPluginReportItem(this, "Convert format", file.getId(), null);
+        reportItem = PluginHelper.createPluginReportItem(this, file.getId(), null);
 
         if (!file.isDirectory()) {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -567,11 +568,11 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
     } else {
       for (File file : alteredFiles)
         premisSourceFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(IdUtils.getLinkingIdentifierId(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
 
       for (File file : newFiles)
         premisTargetFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifier(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(IdUtils.getLinkingIdentifierId(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }
@@ -592,8 +593,8 @@ public abstract class AbstractConvertPlugin implements Plugin<Serializable> {
       PluginHelper.createPluginEvent(aipId, null, null, null, model, RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION,
         "Some files may have been format converted on a new representation", premisSourceFilesIdentifiers,
         premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), detailExtension, agent, notify);
-    } catch (RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
     }
   }

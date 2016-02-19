@@ -61,7 +61,6 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.ModelServiceTest;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -79,7 +78,7 @@ public class IndexServiceTest {
   private static Path corporaPath;
   private static StorageService corporaService;
 
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(IndexServiceTest.class);
 
   @BeforeClass
   public static void setUp() throws Exception {
@@ -101,7 +100,7 @@ public class IndexServiceTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.debug("Running index tests under storage {}", basePath);
+    LOGGER.debug("Running index tests under storage {}", basePath);
   }
 
   @AfterClass

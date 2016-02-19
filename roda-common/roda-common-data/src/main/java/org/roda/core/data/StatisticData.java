@@ -44,23 +44,50 @@ public class StatisticData implements Serializable {
     setValue(value);
   }
 
-  /**
-   * Check for equality
-   * 
-   * @param o
-   * @return true if o is an instance of {@link StatisticData} and timestamp,
-   *         type and value are equal to the ones of this instance
-   */
-  public boolean equals(Object o) {
-    boolean equal;
-    if (o != null && o instanceof StatisticData) {
-      StatisticData other = (StatisticData) o;
-      equal = other.getTimestamp().equals(getTimestamp()) && other.getType().equals(getType())
-        && other.getValue().equals(getValue());
-    } else {
-      equal = false;
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((timestamp == null) ? 0 : timestamp.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((value == null) ? 0 : value.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof StatisticData)) {
+      return false;
+    }
+    StatisticData other = (StatisticData) obj;
+    if (timestamp == null) {
+      if (other.timestamp != null) {
+        return false;
+      }
+    } else if (!timestamp.equals(other.timestamp)) {
+      return false;
+    }
+    if (type == null) {
+      if (other.type != null) {
+        return false;
+      }
+    } else if (!type.equals(other.type)) {
+      return false;
+    }
+    if (value == null) {
+      if (other.value != null) {
+        return false;
+      }
+    } else if (!value.equals(other.value)) {
+      return false;
+    }
+    return true;
   }
 
   /**

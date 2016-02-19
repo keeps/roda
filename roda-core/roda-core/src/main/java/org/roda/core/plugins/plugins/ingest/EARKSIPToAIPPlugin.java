@@ -9,22 +9,19 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -35,10 +32,8 @@ import org.roda_project.commons_ip.model.impl.eark.EARKSIP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
+public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -60,28 +55,8 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
   }
 
   @Override
@@ -90,8 +65,8 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(parameters);
-    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(parameters);
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(getParameterValues());
+    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(getParameterValues());
 
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
@@ -131,7 +106,7 @@ public class EARKSIPToAIPPlugin implements Plugin<TransferredResource> {
         }
       }
       report.addItem(reportItem);
-      PluginHelper.createJobReport(model, this, reportItem, state, PluginHelper.getJobId(parameters));
+      PluginHelper.createJobReport(model, this, reportItem, state);
     }
     return report;
   }

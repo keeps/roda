@@ -61,20 +61,34 @@ public class DescriptionLevel implements Serializable {
     setLevel(level);
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((level == null) ? 0 : level.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = false;
-
-    if (obj != null && obj instanceof DescriptionLevel) {
-      DescriptionLevel other = (DescriptionLevel) obj;
-      equal = getLevel() == other.getLevel() || getLevel().equals(other.getLevel());
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof DescriptionLevel)) {
+      return false;
+    }
+    DescriptionLevel other = (DescriptionLevel) obj;
+    if (level == null) {
+      if (other.level != null) {
+        return false;
+      }
+    } else if (!level.equals(other.level)) {
+      return false;
+    }
+    return true;
   }
 
   /**

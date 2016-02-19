@@ -72,20 +72,34 @@ public class Filter implements Serializable {
     return "Filter [parameters=" + parameters + "]";
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof Filter) {
-      Filter other = (Filter) obj;
-      equal = parameters.equals(other.parameters);
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof Filter)) {
+      return false;
+    }
+    Filter other = (Filter) obj;
+    if (parameters == null) {
+      if (other.parameters != null) {
+        return false;
+      }
+    } else if (!parameters.equals(other.parameters)) {
+      return false;
+    }
+    return true;
   }
 
   /**

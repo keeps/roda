@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
@@ -9,12 +16,11 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
-public class GhostScriptConvertPlugin extends CommandConvertPlugin {
+public class GhostScriptConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
   @Override
   public String getName() {
@@ -24,11 +30,6 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
   @Override
   public String getDescription() {
     return "Converts files using GhostScript.";
-  }
-
-  @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override
@@ -42,8 +43,8 @@ public class GhostScriptConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Plugin<Serializable> cloneMe() {
-    return new GhostScriptConvertPlugin();
+  public Plugin<T> cloneMe() {
+    return new GhostScriptConvertPlugin<T>();
   }
 
   @Override

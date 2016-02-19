@@ -296,7 +296,7 @@ public class PluginManager {
       List<PluginInfo> list = new ArrayList<>();
       list.add(pluginInfo);
       pluginInfoPerType.put(pluginType, list);
-    } else if (!pluginInfoPerType.get(pluginType).contains(plugin)) {
+    } else if (!pluginInfoPerType.get(pluginType).contains(pluginInfo)) {
       pluginInfoPerType.get(pluginType).add(pluginInfo);
     }
 

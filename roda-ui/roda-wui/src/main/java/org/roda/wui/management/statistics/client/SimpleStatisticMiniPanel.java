@@ -111,19 +111,19 @@ public class SimpleStatisticMiniPanel extends StatisticMiniPanel {
 
   @Override
   public void update() {
-    StatisticsService.Util.getInstance().getStatisticList(getContentAdapter(), getFunctions(), getSegmentation(),
-      getInitialDate(), getFinalDate(), new AsyncCallback<List<StatisticData>>() {
-
-        public void onFailure(Throwable caught) {
-          logger.error("Could not get statistics list", caught);
-
-        }
-
-        public void onSuccess(List<StatisticData> statistics) {
-          update(statistics);
-        }
-
-      });
+//    StatisticsService.Util.getInstance().getStatisticList(getContentAdapter(), getFunctions(), getSegmentation(),
+//      getInitialDate(), getFinalDate(), new AsyncCallback<List<StatisticData>>() {
+//
+//        public void onFailure(Throwable caught) {
+//          logger.error("Could not get statistics list", caught);
+//
+//        }
+//
+//        public void onSuccess(List<StatisticData> statistics) {
+//          update(statistics);
+//        }
+//
+//      });
   }
 
   protected void update(List<StatisticData> statistics) {

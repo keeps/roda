@@ -83,22 +83,22 @@ public class SimpleStatisticReportPanel extends StatisticReportPanel {
   @Override
   public void update() {
     loading.show();
-    StatisticsService.Util.getInstance().getStatisticList(getContentAdapter(), getFunctions(), getSegmentation(),
-      getInitialDate(), getFinalDate(), new AsyncCallback<List<StatisticData>>() {
-
-        public void onFailure(Throwable caught) {
-          logger.error("Could not get statistics list", caught);
-          loading.hide();
-        }
-
-        public void onSuccess(List<StatisticData> statistics) {
-          logger.debug("got statistics, updating chart...");
-          update(statistics);
-          logger.debug("update finished");
-          loading.hide();
-        }
-
-      });
+//    StatisticsService.Util.getInstance().getStatisticList(getContentAdapter(), getFunctions(), getSegmentation(),
+//      getInitialDate(), getFinalDate(), new AsyncCallback<List<StatisticData>>() {
+//
+//        public void onFailure(Throwable caught) {
+//          logger.error("Could not get statistics list", caught);
+//          loading.hide();
+//        }
+//
+//        public void onSuccess(List<StatisticData> statistics) {
+//          logger.debug("got statistics, updating chart...");
+//          update(statistics);
+//          logger.debug("update finished");
+//          loading.hide();
+//        }
+//
+//      });
 
   }
 

@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,12 +19,12 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -33,15 +32,12 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TikaFullTextPlugin implements Plugin<AIP> {
-
-  public static final String FILE_SUFFIX = ".html";
-
-  public static final String OTHER_METADATA_TYPE = "ApacheTika";
+public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
 
-  private Map<String, String> parameters;
+  public static final String FILE_SUFFIX = ".html";
+  public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
 
@@ -65,32 +61,17 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
+    super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (parameters.containsKey("createsPluginEvent")) {
-      createsPluginEvent = Boolean.parseBoolean(parameters.get("createsPluginEvent"));
+    if (getParameterValues().containsKey("createsPluginEvent")) {
+      createsPluginEvent = Boolean.parseBoolean(getParameterValues().get("createsPluginEvent"));
     }
   }
 
@@ -111,8 +92,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
     }
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "File metadata and full-text extraction",
-        aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       LOGGER.debug("Processing AIP " + aip.getId());
       try {
@@ -136,8 +116,7 @@ public class TikaFullTextPlugin implements Plugin<AIP> {
 
       report.addItem(reportItem);
       if (createsPluginEvent) {
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-          aip.getId());
+        PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
       }
     }
 

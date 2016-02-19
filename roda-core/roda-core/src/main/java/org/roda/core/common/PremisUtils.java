@@ -109,7 +109,7 @@ public class PremisUtils {
     return fixity;
   }
 
-  public static boolean isPremisV2(Binary binary, Path configBasePath) throws IOException, SAXException {
+  public static boolean isPremisV2(Binary binary) throws IOException, SAXException {
     boolean premisV2 = true;
     InputStream inputStream = binary.getContent().createInputStream();
     InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
@@ -122,7 +122,7 @@ public class PremisUtils {
     try {
       validator.validate(xmlFile);
       List<SAXParseException> errors = errorHandler.getErrors();
-      if (errors.size() > 0) {
+      if (!errors.isEmpty()) {
         premisV2 = false;
       }
     } catch (SAXException e) {
@@ -133,18 +133,18 @@ public class PremisUtils {
     return premisV2;
   }
 
-  public static Binary updatePremisToV3IfNeeded(Binary binary, Path configBasePath) throws IOException, SAXException,
-    TransformerException, RequestNotValidException, NotFoundException, GenericException {
-    if (isPremisV2(binary, configBasePath)) {
+  public static Binary updatePremisToV3IfNeeded(Binary binary) throws IOException, SAXException, TransformerException,
+    RequestNotValidException, NotFoundException, GenericException {
+    if (isPremisV2(binary)) {
       LOGGER.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
-      return updatePremisV2toV3(binary, configBasePath);
+      return updatePremisV2toV3(binary);
     } else {
       return binary;
     }
 
   }
 
-  private static Binary updatePremisV2toV3(Binary binary, Path configBasePath)
+  private static Binary updatePremisV2toV3(Binary binary)
     throws IOException, TransformerException, RequestNotValidException, NotFoundException, GenericException {
     InputStream transformerStream = null;
     InputStream bais = null;
@@ -162,10 +162,6 @@ public class PremisUtils {
       Files.copy(bais, p, StandardCopyOption.REPLACE_EXISTING);
 
       return (Binary) FSUtils.convertPathToResource(p.getParent(), p);
-    } catch (IOException e) {
-      throw e;
-    } catch (TransformerException e) {
-      throw e;
     } finally {
       IOUtils.closeQuietly(transformerStream);
       IOUtils.closeQuietly(bais);
@@ -180,14 +176,17 @@ public class PremisUtils {
       errors = new ArrayList<SAXParseException>();
     }
 
+    @Override
     public void warning(SAXParseException e) throws SAXException {
       errors.add(e);
     }
 
+    @Override
     public void error(SAXParseException e) throws SAXException {
       errors.add(e);
     }
 
+    @Override
     public void fatalError(SAXParseException e) throws SAXException {
       errors.add(e);
     }
@@ -247,12 +246,12 @@ public class PremisUtils {
   private static CreatingApplicationComplexType getCreatingApplication(lc.xmlns.premisV2.File f) {
     ObjectCharacteristicsComplexType occt;
     CreatingApplicationComplexType cact;
-    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
       occt = f.getObjectCharacteristicsList().get(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getCreatingApplicationList() != null && occt.getCreatingApplicationList().size() > 0) {
+    if (occt.getCreatingApplicationList() != null && !occt.getCreatingApplicationList().isEmpty()) {
       cact = occt.getCreatingApplicationArray(0);
     } else {
       cact = occt.addNewCreatingApplication();
@@ -263,12 +262,12 @@ public class PremisUtils {
   public static FormatRegistryComplexType getFormatRegistry(lc.xmlns.premisV2.File f, String registryName) {
     ObjectCharacteristicsComplexType occt;
     FormatRegistryComplexType frct = null;
-    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
       occt = f.getObjectCharacteristicsList().get(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
+    if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
       for (FormatComplexType fct : occt.getFormatList()) {
         if (fct.getFormatRegistry() != null) {
           if (fct.getFormatRegistry().getFormatRegistryName().equalsIgnoreCase(registryName)) {
@@ -294,12 +293,12 @@ public class PremisUtils {
     ObjectCharacteristicsComplexType occt;
     FormatComplexType fct;
     FormatDesignationComplexType fdct;
-    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
       occt = f.getObjectCharacteristicsList().get(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
+    if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
       fct = occt.getFormatList().get(0);
     } else {
       fct = occt.addNewFormat();
@@ -462,9 +461,9 @@ public class PremisUtils {
     List<Fixity> fixities = new ArrayList<Fixity>();
     InputStream inputStream = premisFile.getContent().createInputStream();
     lc.xmlns.premisV2.File f = binaryToFile(inputStream);
-    if (f.getObjectCharacteristicsList() != null && f.getObjectCharacteristicsList().size() > 0) {
+    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
       ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
-      if (occt.getFixityList() != null && occt.getFixityList().size() > 0) {
+      if (occt.getFixityList() != null && !occt.getFixityList().isEmpty()) {
         for (FixityComplexType fct : occt.getFixityList()) {
           Fixity fix = new Fixity();
           fix.setMessageDigest(fct.getMessageDigest());
@@ -635,10 +634,10 @@ public class PremisUtils {
 
         // TODO extension
       }
-      if (premisFile.getObjectCharacteristicsList() != null && premisFile.getObjectCharacteristicsList().size() > 0) {
+      if (premisFile.getObjectCharacteristicsList() != null && !premisFile.getObjectCharacteristicsList().isEmpty()) {
         ObjectCharacteristicsComplexType occt = premisFile.getObjectCharacteristicsList().get(0);
         doc.setField(RodaConstants.FILE_SIZE, occt.getSize());
-        if (occt.getFixityList() != null && occt.getFixityList().size() > 0) {
+        if (occt.getFixityList() != null && !occt.getFixityList().isEmpty()) {
           List<String> hashes = new ArrayList<>();
           for (FixityComplexType fct : occt.getFixityList()) {
             StringBuilder fixityPrint = new StringBuilder();
@@ -654,7 +653,7 @@ public class PremisUtils {
           }
           doc.addField(RodaConstants.FILE_HASH, hashes);
         }
-        if (occt.getFormatList() != null && occt.getFormatList().size() > 0) {
+        if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
           FormatComplexType fct = occt.getFormatList().get(0);
           if (fct.getFormatDesignation() != null) {
             doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName());
@@ -673,7 +672,7 @@ public class PremisUtils {
           }
           // TODO extension
         }
-        if (occt.getCreatingApplicationList() != null && occt.getCreatingApplicationList().size() > 0) {
+        if (occt.getCreatingApplicationList() != null && !occt.getCreatingApplicationList().isEmpty()) {
           CreatingApplicationComplexType cact = occt.getCreatingApplicationList().get(0);
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, cact.getCreatingApplicationName());
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
@@ -728,7 +727,7 @@ public class PremisUtils {
   public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(b.getContent(), true);
-    if (event.getLinkingAgentIdentifierList() != null && event.getLinkingAgentIdentifierList().size() > 0) {
+    if (event.getLinkingAgentIdentifierList() != null && !event.getLinkingAgentIdentifierList().isEmpty()) {
       for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()) {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setType(laict.getLinkingAgentIdentifierType());
@@ -744,7 +743,7 @@ public class PremisUtils {
     throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if (event.getLinkingObjectIdentifierList() != null && event.getLinkingObjectIdentifierList().size() > 0) {
+    if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
       for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
         if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("source")) {
           LinkingIdentifier li = new LinkingIdentifier();
@@ -762,7 +761,7 @@ public class PremisUtils {
     throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if (event.getLinkingObjectIdentifierList() != null && event.getLinkingObjectIdentifierList().size() > 0) {
+    if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
       for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
         if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("outcome")) {
           LinkingIdentifier li = new LinkingIdentifier();

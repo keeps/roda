@@ -30,6 +30,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -44,7 +45,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DefaultIngestPlugin implements Plugin<TransferredResource> {
+public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
@@ -85,7 +86,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
     "Auto accept SIP", PluginParameterType.BOOLEAN, "true", true, false, "Automatically accept SIPs.");
 
-  private Map<String, String> parameters;
   private int totalSteps = 8;
   private int currentCompletionPercentage = 0;
   private int completionPercentageStep = 100 / totalSteps;
@@ -104,11 +104,6 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public String getName() {
     return "Default Ingest Plugin";
-  }
-
-  @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override
@@ -138,13 +133,8 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   }
 
   @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
+    super.setParameterValues(parameters);
     completionPercentageStep = calculateCompletionPercentageStep();
   }
 
@@ -158,14 +148,14 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
 
-    PluginHelper.updateJobStatus(index, model, 0, parameters);
+    PluginHelper.updateJobStatus(index, model, 0, this);
 
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
-    String parentId = PluginHelper.getStringFromParameters(parameters, PARAMETER_PARENT_ID);
-    boolean forceParentId = PluginHelper.getBooleanFromParameters(parameters, PARAMETER_FORCE_PARENT_ID);
-    parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
-    parameters.put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
+    String parentId = PluginHelper.getStringFromParameters(this, PARAMETER_PARENT_ID);
+    boolean forceParentId = PluginHelper.getBooleanFromParameters(this, PARAMETER_FORCE_PARENT_ID);
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
 
     // 1) transform TransferredResource into an AIP
     // 1.1) obtain list of AIPs that were successfully transformed from
@@ -174,28 +164,28 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, parameters);
+      completionPercentageStep, this);
 
     // 2) do virus check
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_VIRUS_CHECK)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, parameters);
+        completionPercentageStep, this);
     }
 
     // 2.1) do pdftopdfa conversion
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_PDFTOPDFA_CONVERSION)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_PDFTOPDFA_CONVERSION)) {
       Map<String, String> params = new HashMap<String, String>();
       params.put("maxKbytes", "20000");
       pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, parameters);
+        completionPercentageStep, this);
     }
 
     // 2.2) do verapdf check
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_VERAPDF_CHECK)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VERAPDF_CHECK)) {
       Map<String, String> params = new HashMap<String, String>();
       params.put("profile", "1b");
       params.put("hasFeatures", "False");
@@ -203,51 +193,51 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, parameters);
+        completionPercentageStep, this);
     }
 
     // 3) create premis skeleton
     pluginReport = createPremisSkeleton(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, parameters);
+      completionPercentageStep, this);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, parameters);
+      completionPercentageStep, this);
 
     // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, parameters);
+      completionPercentageStep, this);
 
     // 6) do file format identification (sieg)
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, parameters);
+        completionPercentageStep, this);
     }
 
     // 7) do metadata and full text extraction (tika)
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, parameters);
+        completionPercentageStep, this);
     }
 
     // 8) do auto accept
-    if (PluginHelper.verifyIfStepShouldBePerformed(parameters, PARAMETER_DO_AUTO_ACCEPT)) {
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_AUTO_ACCEPT)) {
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
     }
 
-    PluginHelper.updateJobStatus(index, model, 100, parameters);
+    PluginHelper.updateJobStatus(index, model, 100, this);
 
     return report;
   }
@@ -256,7 +246,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     int effectiveTotalSteps = totalSteps;
     for (PluginParameter pluginParameter : getParameters()) {
       if (pluginParameter.getType() == PluginParameterType.BOOLEAN
-        && !PluginHelper.verifyIfStepShouldBePerformed(parameters, pluginParameter)) {
+        && !PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
         effectiveTotalSteps--;
       }
     }
@@ -302,8 +292,8 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
           report.addItem(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
-        } else
-          if (StringUtils.isNotBlank(reportItem.getItemId()) && aipIdToObjectId.get(reportItem.getItemId()) != null) {
+        } else if (StringUtils.isNotBlank(reportItem.getItemId())
+          && aipIdToObjectId.get(reportItem.getItemId()) != null) {
           reports.get(aipIdToObjectId.get(reportItem.getItemId())).addItem(reportItem);
         }
       }
@@ -316,7 +306,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
     List<TransferredResource> transferredResources) {
     Report report = null;
 
-    String pluginClassName = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(),
+    String pluginClassName = getParameterValues().getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(),
       PARAMETER_SIP_TO_AIP_CLASS.getDefaultValue());
 
     Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
@@ -424,7 +414,7 @@ public class DefaultIngestPlugin implements Plugin<TransferredResource> {
   @Override
   public boolean areParameterValuesValid() {
     boolean areValid = true;
-    String sipToAipClass = parameters.getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(), "");
+    String sipToAipClass = getParameterValues().getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(), "");
     if (StringUtils.isNotBlank(sipToAipClass)) {
       Plugin<?> plugin = RodaCoreFactory.getPluginManager().getPlugin(sipToAipClass);
       if (plugin == null || plugin.getType() != PluginType.SIP_TO_AIP) {

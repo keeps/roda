@@ -132,6 +132,9 @@ import org.slf4j.LoggerFactory;
 public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
 
+  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
+    Arrays.asList("title", "level", "dateInitial", "dateFinal"));
+
   /** Private empty constructor */
   private SolrUtils() {
 
@@ -803,9 +806,6 @@ public class SolrUtils {
     throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
-
-  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
-    Arrays.asList("title", "level", "dateInitial", "dateFinal"));
 
   // FIXME see how to handle active and all the other that are not being put in
   // the indexedaip

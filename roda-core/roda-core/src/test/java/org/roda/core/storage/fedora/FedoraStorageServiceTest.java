@@ -15,8 +15,6 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -48,15 +46,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration("/fcrepo/spring-test/test-container.xml")
 public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraStorageService> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
 
-  static final String PROTOCOL = "http";
-  static final String HOSTNAME = "localhost";
-  static final int SERVER_PORT = determineOpenDoorAndSetFedoraProperty(9999);
-  static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
+  private static final String PROTOCOL = "http";
+  private static final String HOSTNAME = "localhost";
+  private static final int SERVER_PORT = determineOpenDoorAndSetFedoraProperty(9999);
+  private static final String serverAddress = PROTOCOL + "://" + HOSTNAME + ":" + SERVER_PORT + "/";
 
-  final Logger logger = LoggerFactory.getLogger(FedoraStorageServiceTest.class);
-
-  final FedoraStorageService storage = new FedoraStorageService(serverAddress);
+  private final FedoraStorageService storage = new FedoraStorageService(serverAddress);
 
   @AfterClass
   public static void tearDown() throws NotFoundException, GenericException {
@@ -102,7 +99,7 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
         storage.deleteContainer(container.getStoragePath());
       }
     } catch (RODAException e) {
-      logger.error("Error cleaning up", e);
+      LOGGER.error("Error cleaning up", e);
     }
   }
 

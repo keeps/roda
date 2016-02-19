@@ -8,29 +8,24 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -40,7 +35,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JHOVEPlugin implements Plugin<AIP> {
+public class JHOVEPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(JHOVEPlugin.class);
 
   @Override
@@ -61,30 +56,10 @@ public class JHOVEPlugin implements Plugin<AIP> {
   public String getDescription() {
     return "Update the premis files with the object characterization";
   }
-  
-  @Override
-  public String getAgentType(){
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
 
   @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return new HashMap<>();
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
   }
 
   @Override

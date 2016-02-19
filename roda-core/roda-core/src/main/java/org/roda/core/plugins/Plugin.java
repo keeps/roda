@@ -63,7 +63,7 @@ public interface Plugin<T extends Serializable> {
    * @return a {@link String} with the description of this {@link Plugin}.
    */
   public String getDescription();
-  
+
   /**
    * Returns the type of the agent linked to this {@link Plugin}.
    * 
@@ -98,6 +98,8 @@ public interface Plugin<T extends Serializable> {
    */
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
 
+  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+
   /**
    * Executes the {@link Plugin}.
    * 
@@ -108,11 +110,7 @@ public interface Plugin<T extends Serializable> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException;
 
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
-
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
-
-  // public Report getCurrentReport();
 
   /**
    * Method to return Plugin type (so it can be grouped for different purposes)
@@ -127,6 +125,11 @@ public interface Plugin<T extends Serializable> {
 
   /**
    * Method that validates the parameters provided to the Plugin
+   * 
+   * FIXME this should be changed to return a report
    */
   public boolean areParameterValuesValid();
+
+  // TODO 20160222 hsilva: do we need this???
+  // public Report getReport();
 }

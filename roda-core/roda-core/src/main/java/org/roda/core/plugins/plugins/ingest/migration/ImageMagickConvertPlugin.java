@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.IOException;
@@ -8,12 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
-public class ImageMagickConvertPlugin extends CommandConvertPlugin {
+public class ImageMagickConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
   @Override
   public String getName() {
@@ -23,11 +29,6 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   @Override
   public String getDescription() {
     return "Generates an image format file from other image format one using Imagemagick.";
-  }
-
-  @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
   @Override
@@ -41,8 +42,8 @@ public class ImageMagickConvertPlugin extends CommandConvertPlugin {
   }
 
   @Override
-  public Plugin<Serializable> cloneMe() {
-    return new ImageMagickConvertPlugin();
+  public Plugin<T> cloneMe() {
+    return new ImageMagickConvertPlugin<T>();
   }
 
   public String executePlugin(Path inputPath, Path outputPath, String fileFormat)

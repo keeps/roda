@@ -93,7 +93,7 @@ public class ModelServiceTest {
   private static Path corporaPath;
   private static StorageService corporaService;
 
-  private static final Logger logger = LoggerFactory.getLogger(ModelServiceTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelServiceTest.class);
 
   @BeforeClass
   public static void setUp() throws IOException, URISyntaxException, GenericException {
@@ -101,7 +101,7 @@ public class ModelServiceTest {
     corporaPath = Paths.get(corporaURL.toURI());
     corporaService = new FileStorageService(corporaPath);
 
-    logger.debug("Running model test under storage: " + basePath);
+    LOGGER.debug("Running model test under storage: " + basePath);
   }
 
   @Before

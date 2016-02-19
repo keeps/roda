@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.MissingResourceException;
 
 import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.wui.common.client.ClientLogger;
@@ -267,14 +266,14 @@ public abstract class StatisticsPanel extends Composite {
 
   protected abstract FilterParameter getTypeFilterParameter();
 
-  protected ContentAdapter getContentAdapter() {
-    Filter filter = new Filter();
-    filter.add(getTypeFilterParameter());
-
-    ContentAdapter adapter = new ContentAdapter();
-    adapter.setFilter(filter);
-    return adapter;
-  }
+//  protected ContentAdapter getContentAdapter() {
+//    Filter filter = new Filter();
+//    filter.add(getTypeFilterParameter());
+//
+//    ContentAdapter adapter = new ContentAdapter();
+//    adapter.setFilter(filter);
+//    return adapter;
+//  }
 
   private static final DateTimeFormat YEAR_FORMAT = DateTimeFormat.getFormat("yyyy");
   private static final DateTimeFormat MONTH_FORMAT = DateTimeFormat.getFormat("yyyy-MM");

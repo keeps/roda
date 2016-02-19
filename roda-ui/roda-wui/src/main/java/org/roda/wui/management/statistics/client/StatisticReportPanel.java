@@ -13,17 +13,14 @@ package org.roda.wui.management.statistics.client;
 import java.util.List;
 
 import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.wui.common.client.images.CommonImageBundle;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.DatePicker;
 import org.roda.wui.common.client.widgets.ElementPanel;
-import org.roda.wui.common.client.widgets.LazyVerticalList;
 import org.roda.wui.common.client.widgets.WUIButton;
 import org.roda.wui.common.client.widgets.WUIWindow;
-import org.roda.wui.common.client.widgets.LazyVerticalList.ContentSource;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -66,7 +63,7 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
   private final Image changeDateInterval;
 
   private final ChartWidget chartWidget;
-  private final LazyVerticalList<StatisticData> lazyList;
+//  private final LazyVerticalList<StatisticData> lazyList;
 
   private WUIWindow dateIntervalPickerWindow = null;
   private Grid dateIntervalPickerLayout = null;
@@ -164,60 +161,60 @@ public abstract class StatisticReportPanel extends StatisticsPanel {
     Filter lazyListFilter = new Filter();
     lazyListFilter.add(getTypeFilterParameter());
 
-    lazyList = new LazyVerticalList<StatisticData>(new ContentSource<StatisticData>() {
+//    lazyList = new LazyVerticalList<StatisticData>(new ContentSource<StatisticData>() {
+//
+//      public void getCount(Filter filter, AsyncCallback<Integer> callback) {
+//        StatisticsService.Util.getInstance().getStatisticCount(filter, callback);
+//
+//      }
+//
+//      public ElementPanel<StatisticData> getElementPanel(StatisticData element) {
+//        return new StatisticListItem(element);
+//      }
+//
+//      public void getElements(ContentAdapter adapter, final AsyncCallback<StatisticData[]> callback) {
+//        StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
+//
+//          public void onFailure(Throwable caught) {
+//            callback.onFailure(caught);
+//
+//          }
+//
+//          public void onSuccess(List<StatisticData> result) {
+//            callback.onSuccess(result.toArray(new StatisticData[] {}));
+//
+//          }
+//
+//        });
+//
+//      }
+//
+//      public String getTotalMessage(int total) {
+//        return total + " " + constants.statisticsReportListTotal();
+//      }
+//
+//      public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
+//        StatisticsService.Util.getInstance().setStatisticListReportInfo(adapter, locale, callback);
+//
+//      }
+//
+//    }, false, lazyListFilter);
 
-      public void getCount(Filter filter, AsyncCallback<Integer> callback) {
-        StatisticsService.Util.getInstance().getStatisticCount(filter, callback);
-
-      }
-
-      public ElementPanel<StatisticData> getElementPanel(StatisticData element) {
-        return new StatisticListItem(element);
-      }
-
-      public void getElements(ContentAdapter adapter, final AsyncCallback<StatisticData[]> callback) {
-        StatisticsService.Util.getInstance().getStatisticList(adapter, new AsyncCallback<List<StatisticData>>() {
-
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-
-          }
-
-          public void onSuccess(List<StatisticData> result) {
-            callback.onSuccess(result.toArray(new StatisticData[] {}));
-
-          }
-
-        });
-
-      }
-
-      public String getTotalMessage(int total) {
-        return total + " " + constants.statisticsReportListTotal();
-      }
-
-      public void setReportInfo(ContentAdapter adapter, String locale, AsyncCallback<Void> callback) {
-        StatisticsService.Util.getInstance().setStatisticListReportInfo(adapter, locale, callback);
-
-      }
-
-    }, false, lazyListFilter);
-
-    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderDate(), "statistic-list-header-date",
-      new SortParameter[] {new SortParameter("datetime", true)}, false);
-    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderType(), "statistic-list-header-type",
-      new SortParameter[] {new SortParameter("type", true)}, false);
-    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderValue(), "statistic-list-header-value",
-      new SortParameter[] {new SortParameter("value", true)}, false);
-
-    lazyList.getHeader().setFillerHeader(2);
-    lazyList.getHeader().setSelectedHeader(0);
-
-    lazyList.setScrollHeight("325px");
+//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderDate(), "statistic-list-header-date",
+//      new SortParameter[] {new SortParameter("datetime", true)}, false);
+//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderType(), "statistic-list-header-type",
+//      new SortParameter[] {new SortParameter("type", true)}, false);
+//    lazyList.getHeader().addHeader(constants.statisticsReportListHeaderValue(), "statistic-list-header-value",
+//      new SortParameter[] {new SortParameter("value", true)}, false);
+//
+//    lazyList.getHeader().setFillerHeader(2);
+//    lazyList.getHeader().setSelectedHeader(0);
+//
+//    lazyList.setScrollHeight("325px");
 
     // Add to window
     window.addTab(chartLayout, constants.statisticsReportChart());
-    window.addTab(lazyList.getWidget(), constants.statisticsReportList());
+//    window.addTab(lazyList.getWidget(), constants.statisticsReportList());
 
     window.selectTab(0);
 

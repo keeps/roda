@@ -53,21 +53,34 @@ public class Sublist implements Serializable {
       + ")";
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + firstElementIndex;
+    result = prime * result + maximumElementCount;
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof Sublist) {
-      Sublist other = (Sublist) obj;
-      equal = equal && (getFirstElementIndex() == other.getFirstElementIndex());
-      equal = equal && (getMaximumElementCount() == other.getMaximumElementCount());
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof Sublist)) {
+      return false;
+    }
+    Sublist other = (Sublist) obj;
+    if (firstElementIndex != other.firstElementIndex) {
+      return false;
+    }
+    if (maximumElementCount != other.maximumElementCount) {
+      return false;
+    }
+    return true;
   }
 
   /**

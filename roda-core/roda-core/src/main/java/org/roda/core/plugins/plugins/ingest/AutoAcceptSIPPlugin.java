@@ -8,15 +8,12 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -24,12 +21,12 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -37,10 +34,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AutoAcceptSIPPlugin implements Plugin<AIP> {
+public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -58,11 +53,6 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -70,21 +60,6 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
   @Override
   public String getDescription() {
     return "Automatically accepts SIPs ingested without manual validation";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return parameters;
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    this.parameters = parameters;
   }
 
   @Override
@@ -105,7 +80,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Auto accept SIP", aip.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
       String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP " + aip.getId());
@@ -127,8 +102,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
       createEvent(outcomeDetail, state, aip, model, agent);
       report.addItem(reportItem);
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, PluginHelper.getJobId(parameters),
-        aip.getId());
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
     }
 
     return report;
@@ -144,7 +118,7 @@ public class AutoAcceptSIPPlugin implements Plugin<AIP> {
         boolean notify = false;
         PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
-          Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), representation.getId(), null, null)), null,
+          Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representation.getId(), null, null)), null,
           success ? "success" : "failure", success ? "" : "Error", outcomeDetail, agent, notify);
       }
       model.notifyAIPUpdated(aip.getId());

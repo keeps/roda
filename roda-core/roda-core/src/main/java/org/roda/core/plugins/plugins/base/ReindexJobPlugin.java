@@ -9,8 +9,6 @@ package org.roda.core.plugins.plugins.base;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,13 +22,13 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.JobReport;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -39,7 +37,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexJobPlugin implements Plugin<Job> {
+public class ReindexJobPlugin extends AbstractPlugin<Job> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexJobPlugin.class);
   private boolean clearIndexes = true;
@@ -63,11 +61,6 @@ public class ReindexJobPlugin implements Plugin<Job> {
   public String getDescription() {
     return "Clean-up indexes and re-create them from data in storage";
   }
-  
-  @Override
-  public String getAgentType(){
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
 
   @Override
   public String getVersion() {
@@ -75,17 +68,8 @@ public class ReindexJobPlugin implements Plugin<Job> {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return new HashMap<>();
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
     if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE) != null) {
       try {
         clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE));
@@ -115,14 +99,8 @@ public class ReindexJobPlugin implements Plugin<Job> {
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("", e);
-    }
-
-    try {
-      if (listResourcesUnderDirectory != null) {
-        listResourcesUnderDirectory.close();
-      }
-    } catch (IOException e) {
-      LOGGER.warn("");
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
     try {
@@ -141,14 +119,8 @@ public class ReindexJobPlugin implements Plugin<Job> {
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
       LOGGER.error("", e);
-    }
-
-    try {
-      if (listResourcesUnderDirectory != null) {
-        listResourcesUnderDirectory.close();
-      }
-    } catch (IOException e) {
-      LOGGER.warn("");
+    } finally {
+      IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
     return null;

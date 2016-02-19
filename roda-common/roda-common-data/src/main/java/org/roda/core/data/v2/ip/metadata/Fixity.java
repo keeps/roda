@@ -30,7 +30,7 @@ public class Fixity implements Serializable {
    * 
    * @param fixity
    */
-  private Fixity(Fixity fixity) {
+  public Fixity(Fixity fixity) {
     this(fixity.getMessageDigest(), fixity.getMessageDigestAlgorithm(), fixity.getMessageDigestOriginator());
   }
 
@@ -48,30 +48,50 @@ public class Fixity implements Serializable {
     setMessageDigestOriginator(messageDigestOriginator);
   }
 
-  // @Override
-  // protected Object clone() {
-  // return new Fixity(this);
-  // }
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((messageDigest == null) ? 0 : messageDigest.hashCode());
+    result = prime * result + ((messageDigestAlgorithm == null) ? 0 : messageDigestAlgorithm.hashCode());
+    result = prime * result + ((messageDigestOriginator == null) ? 0 : messageDigestOriginator.hashCode());
+    return result;
+  }
 
-  /**
-   * @param obj
-   * 
-   * @return <code>true</code> if the objects are equal and <code>false</code>
-   *         otherwise.
-   * 
-   * @see RODAObject#equals(Object)
-   */
   @Override
   public boolean equals(Object obj) {
-    if (obj != null && obj instanceof Fixity) {
-      Fixity other = (Fixity) obj;
-
-      return (getMessageDigestAlgorithm() == other.getMessageDigestAlgorithm()
-        || getMessageDigestAlgorithm().equals(other.getMessageDigestAlgorithm()))
-        && (getMessageDigest() == other.getMessageDigest() || getMessageDigest().equals(getMessageDigest()));
-    } else {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
+    if (!(obj instanceof Fixity)) {
+      return false;
+    }
+    Fixity other = (Fixity) obj;
+    if (messageDigest == null) {
+      if (other.messageDigest != null) {
+        return false;
+      }
+    } else if (!messageDigest.equals(other.messageDigest)) {
+      return false;
+    }
+    if (messageDigestAlgorithm == null) {
+      if (other.messageDigestAlgorithm != null) {
+        return false;
+      }
+    } else if (!messageDigestAlgorithm.equals(other.messageDigestAlgorithm)) {
+      return false;
+    }
+    if (messageDigestOriginator == null) {
+      if (other.messageDigestOriginator != null) {
+        return false;
+      }
+    } else if (!messageDigestOriginator.equals(other.messageDigestOriginator)) {
+      return false;
+    }
+    return true;
   }
 
   /**

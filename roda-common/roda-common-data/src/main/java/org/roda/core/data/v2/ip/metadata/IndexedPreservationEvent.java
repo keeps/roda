@@ -26,85 +26,111 @@ public class IndexedPreservationEvent implements Serializable {
   private List<LinkingIdentifier> linkingAgentIds;
   private List<LinkingIdentifier> outcomeObjectIds;
   private List<LinkingIdentifier> sourcesObjectIds;
+
   public String getAipId() {
     return aipId;
   }
+
   public void setAipId(String aipId) {
     this.aipId = aipId;
   }
+
   public String getRepresentationId() {
     return representationId;
   }
+
   public void setRepresentationId(String representationId) {
     this.representationId = representationId;
   }
+
   public String getFileId() {
     return fileId;
   }
+
   public void setFileId(String fileId) {
     this.fileId = fileId;
   }
+
   public String getId() {
     return id;
   }
+
   public void setId(String id) {
     this.id = id;
   }
+
   public Date getEventDateTime() {
     return eventDateTime;
   }
+
   public void setEventDateTime(Date eventDateTime) {
     this.eventDateTime = eventDateTime;
   }
+
   public String getEventDetail() {
     return eventDetail;
   }
+
   public void setEventDetail(String eventDetail) {
     this.eventDetail = eventDetail;
   }
+
   public String getEventType() {
     return eventType;
   }
+
   public void setEventType(String eventType) {
     this.eventType = eventType;
   }
+
   public String getEventOutcome() {
     return eventOutcome;
   }
+
   public void setEventOutcome(String eventOutcome) {
     this.eventOutcome = eventOutcome;
   }
+
   public String getEventOutcomeDetailExtension() {
     return eventOutcomeDetailExtension;
   }
+
   public void setEventOutcomeDetailExtension(String eventOutcomeDetailExtension) {
     this.eventOutcomeDetailExtension = eventOutcomeDetailExtension;
   }
+
   public String getEventOutcomeDetailNote() {
     return eventOutcomeDetailNote;
   }
+
   public void setEventOutcomeDetailNote(String eventOutcomeDetailNote) {
     this.eventOutcomeDetailNote = eventOutcomeDetailNote;
   }
-  
+
   public List<LinkingIdentifier> getLinkingAgentIds() {
     return linkingAgentIds;
   }
+
   public void setLinkingAgentIds(List<LinkingIdentifier> linkingAgentIds) {
     this.linkingAgentIds = linkingAgentIds;
   }
+
   public List<LinkingIdentifier> getOutcomeObjectIds() {
     return outcomeObjectIds;
   }
+
   public void setOutcomeObjectIds(List<LinkingIdentifier> outcomeObjectIds) {
     this.outcomeObjectIds = outcomeObjectIds;
   }
+
   public List<LinkingIdentifier> getSourcesObjectIds() {
     return sourcesObjectIds;
   }
+
   public void setSourcesObjectIds(List<LinkingIdentifier> sourcesObjectIds) {
     this.sourcesObjectIds = sourcesObjectIds;
   }
+
   @Override
   public String toString() {
     return "IndexedPreservationEvent [aipId=" + aipId + ", representationId=" + representationId + ", fileId=" + fileId
@@ -114,6 +140,4 @@ public class IndexedPreservationEvent implements Serializable {
       + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + "]";
   }
 
-  
- 
 }

@@ -55,21 +55,38 @@ public class SortParameter implements Serializable {
     return "SortParameter(name=" + getName() + ", descending=" + isDescending() + ")";
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + (descending ? 1231 : 1237);
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof SortParameter) {
-      SortParameter other = (SortParameter) obj;
-      equal = equal && (getName() == other.getName() || getName().equals(other.getName()));
-      equal = equal && (isDescending() == other.isDescending());
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof SortParameter)) {
+      return false;
+    }
+    SortParameter other = (SortParameter) obj;
+    if (descending != other.descending) {
+      return false;
+    }
+    if (name == null) {
+      if (other.name != null) {
+        return false;
+      }
+    } else if (!name.equals(other.name)) {
+      return false;
+    }
+    return true;
   }
 
   /**

@@ -23,12 +23,12 @@ import org.slf4j.LoggerFactory;
 public class ClassLoaderUtility {
 
   // Log object
-  private static Logger logger = LoggerFactory.getLogger(ClassLoaderUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClassLoaderUtility.class);
 
   // Parameters
-  private static final Class[] parameters = new Class[] {URL.class};
+  private static final Class[] PARAMETERS = new Class[] {URL.class};
 
-  public static ClassLoader classLoader = ClassLoaderUtility.class.getClassLoader();
+  private static final ClassLoader CLASS_LOADER = ClassLoaderUtility.class.getClassLoader();
 
   /**
    * Add file to CLASSPATH
@@ -70,7 +70,7 @@ public class ClassLoaderUtility {
     for (int i = 0; i < urls.length; i++) {
 
       if (StringUtils.equalsIgnoreCase(urls[i].toString(), url.toString())) {
-        logger.debug("URL " + url + " is already in the CLASSPATH");
+        LOGGER.debug("URL " + url + " is already in the CLASSPATH");
         return;
       }
     }
@@ -78,7 +78,7 @@ public class ClassLoaderUtility {
     Class sysclass = URLClassLoader.class;
 
     try {
-      Method method = sysclass.getDeclaredMethod("addURL", parameters);
+      Method method = sysclass.getDeclaredMethod("addURL", PARAMETERS);
       method.setAccessible(true);
       method.invoke(sysLoader, new Object[] {url});
     } catch (Throwable t) {
@@ -105,9 +105,9 @@ public class ClassLoaderUtility {
       throw new IllegalArgumentException("className cannot be null");
     }
 
-    logger.trace("Loading class " + className + " with ClassLoader " + classLoader.getClass().getSimpleName());
+    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
-    Class clazz = classLoader.loadClass(className);
+    Class clazz = CLASS_LOADER.loadClass(className);
 
     return clazz.newInstance();
   }
@@ -133,9 +133,9 @@ public class ClassLoaderUtility {
       throw new IllegalArgumentException("className cannot be null");
     }
 
-    URLClassLoader clazzLoader = new URLClassLoader(urls, classLoader);
+    URLClassLoader clazzLoader = new URLClassLoader(urls, CLASS_LOADER);
 
-    logger.trace("Loading class " + className + " with ClassLoader " + classLoader.getClass().getSimpleName());
+    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
     Class clazz = clazzLoader.loadClass(className);
     return clazz.newInstance();
@@ -167,9 +167,9 @@ public class ClassLoaderUtility {
     filePath = "jar:file://" + filePath + "!/";
     URL url = new File(filePath).toURL();
 
-    URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, classLoader);
+    URLClassLoader clazzLoader = new URLClassLoader(new URL[] {url}, CLASS_LOADER);
 
-    logger.trace("Loading class " + className + " with ClassLoader " + classLoader.getClass().getSimpleName());
+    LOGGER.trace("Loading class " + className + " with ClassLoader " + CLASS_LOADER.getClass().getSimpleName());
 
     Class clazz = clazzLoader.loadClass(className);
 

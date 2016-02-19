@@ -289,7 +289,7 @@ public class ShowPreservationEvent extends Composite {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("list-panel");
 
-    String[] split = objectId.split("/");
+    String[] split = IdUtils.splitLinkingId(objectId);
     String aipId = split.length > 0 ? split[0] : null;
     String repId = split.length > 1 ? split[1] : null;
     String fileId = split.length > 2 ? split[2] : null;
@@ -312,7 +312,7 @@ public class ShowPreservationEvent extends Composite {
       if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
         pathLabel = new Label("Path");
         pathLabel.addStyleName("label");
-        pathValue = new Label(Tools.join(ifile.getPath(), IdUtils.LINKING_ID_SEPARATOR));
+        pathValue = new Label(IdUtils.getFileDirectoryPathId(ifile.getPath()));
       }
 
       Label formatLabel = new Label("Format");

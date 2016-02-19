@@ -7,36 +7,13 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.StringReader;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
@@ -44,12 +21,12 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
@@ -58,13 +35,8 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
-public class FFProbePlugin implements Plugin<AIP> {
+public class FFProbePlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FFProbePlugin.class);
 
   @Override
@@ -87,28 +59,8 @@ public class FFProbePlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
-  }
-
-  @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return new HashMap<>();
-  }
-
-  @Override
-  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
-    // no params
   }
 
   @Override
@@ -148,45 +100,6 @@ public class FFProbePlugin implements Plugin<AIP> {
       }
     }
     return null;
-  }
-
-  private Map<String, Path> parseMediaInfoOutput(String mediaInfoOutput) throws ParserConfigurationException,
-    SAXException, IOException, TransformerFactoryConfigurationError, TransformerException, XPathExpressionException {
-    Map<String, Path> parsed = new HashMap<String, Path>();
-
-    XPathFactory factory = XPathFactory.newInstance();
-    XPath xpath = factory.newXPath();
-    XPathExpression expr = xpath.compile("//Complete_name");
-
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    DocumentBuilder db = dbf.newDocumentBuilder();
-    InputSource is = new InputSource();
-    is.setCharacterStream(new StringReader(mediaInfoOutput));
-
-    Document doc = db.parse(is);
-    NodeList nodes = doc.getElementsByTagName("File");
-    for (int i = 0; i < nodes.getLength(); i++) {
-      Node node = nodes.item(i);
-      Path nodeResult = Files.createTempFile("mediaInfo", ".xml");
-      FileWriter fw = new FileWriter(nodeResult.toFile());
-      Transformer transformer = TransformerFactory.newInstance().newTransformer();
-      transformer.transform(new DOMSource(node), new StreamResult(fw));
-      String fileName = extractFileName(nodeResult);
-      String[] tokens = fileName.split("/");
-      fileName = tokens[tokens.length - 1];
-      parsed.put(fileName, nodeResult);
-    }
-    return parsed;
-  }
-
-  private String extractFileName(Path nodeResult) throws ParserConfigurationException, IOException, SAXException {
-    DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    DocumentBuilder db = dbf.newDocumentBuilder();
-    InputSource is = new InputSource();
-    is.setCharacterStream(Files.newBufferedReader(nodeResult));
-    Document doc = db.parse(is);
-    NodeList nodes = doc.getElementsByTagName("Complete_name");
-    return nodes.item(0).getTextContent();
   }
 
   @Override

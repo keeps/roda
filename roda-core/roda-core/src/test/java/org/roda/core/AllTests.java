@@ -21,10 +21,9 @@ import org.roda.core.storage.fedora.FedoraStorageServiceTest;
 import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
-// TODO add MonitorIndexTest.class when ready
 @SuiteClasses({IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
   FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
-  EARKSIPPluginsTest.class,MonitorIndexTest.class})
+  EARKSIPPluginsTest.class, MonitorIndexTest.class})
 public class AllTests {
 
 }

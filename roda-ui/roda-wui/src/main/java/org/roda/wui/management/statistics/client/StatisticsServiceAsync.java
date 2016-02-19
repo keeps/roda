@@ -10,11 +10,6 @@
  */
 package org.roda.wui.management.statistics.client;
 
-import java.util.Date;
-import java.util.List;
-
-import org.roda.core.data.StatisticData;
-import org.roda.core.data.adapter.ContentAdapter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RODAException;
 
@@ -42,7 +37,7 @@ public interface StatisticsServiceAsync {
    * @return a list of statistic entries
    * @throws RODAException
    */
-  public void getStatisticList(ContentAdapter adapter, AsyncCallback<List<StatisticData>> callback);
+//  public void getStatisticList(ContentAdapter adapter, AsyncCallback<List<StatisticData>> callback);
 
   /**
    * Get statistic data processed by statistic functions
@@ -55,8 +50,8 @@ public interface StatisticsServiceAsync {
    * @return the result statistic data
    * @throws RODAException
    */
-  public void getStatisticList(ContentAdapter adapter, List<StatisticFunction> functions, Segmentation segmentation,
-    Date initialDate, Date finalDate, AsyncCallback<List<StatisticData>> callback);
+//  public void getStatisticList(ContentAdapter adapter, List<StatisticFunction> functions, Segmentation segmentation,
+//    Date initialDate, Date finalDate, AsyncCallback<List<StatisticData>> callback);
 
   /**
    * Get statistic stacked list. When using adapter queries that return a set on
@@ -72,9 +67,9 @@ public interface StatisticsServiceAsync {
    * @return A list of stacks, one for each type.
    * @throws RODAException
    */
-  public void getStatisticStackedList(ContentAdapter adapter, List<StatisticFunction> functions,
-    Segmentation segmentation, Date initialDate, Date finalDate, AsyncCallback<List<List<StatisticData>>> callback);
-
-  public void setStatisticListReportInfo(ContentAdapter adapter, String localeString, AsyncCallback<Void> callback);
+//  public void getStatisticStackedList(ContentAdapter adapter, List<StatisticFunction> functions,
+//    Segmentation segmentation, Date initialDate, Date finalDate, AsyncCallback<List<List<StatisticData>>> callback);
+//
+//  public void setStatisticListReportInfo(ContentAdapter adapter, String localeString, AsyncCallback<Void> callback);
 
 }

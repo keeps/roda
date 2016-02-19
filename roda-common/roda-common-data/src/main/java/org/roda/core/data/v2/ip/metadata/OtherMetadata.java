@@ -10,8 +10,6 @@ package org.roda.core.data.v2.ip.metadata;
 import java.io.Serializable;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class OtherMetadata implements Serializable {
 
   private static final long serialVersionUID = 7643339238489130326L;

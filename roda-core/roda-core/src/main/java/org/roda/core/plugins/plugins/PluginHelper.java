@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -51,7 +52,7 @@ public final class PluginHelper {
   private PluginHelper() {
   }
 
-  public static Report createPluginReport(Plugin<?> plugin) {
+  public static <T extends Serializable> Report createPluginReport(Plugin<T> plugin) {
     Report report = new Report();
     report.setType(Report.TYPE_PLUGIN_REPORT);
     report.setTitle("Report of plugin " + plugin.getName());
@@ -63,12 +64,14 @@ public final class PluginHelper {
     return report;
   }
 
-  public static ReportItem createPluginReportItem(TransferredResource transferredResource, Plugin<?> plugin) {
-    return createPluginReportItem(plugin, "Extract SIP", null, transferredResource.getId());
+  public static <T extends Serializable> ReportItem createPluginReportItem(TransferredResource transferredResource,
+    Plugin<T> plugin) {
+    return createPluginReportItem(plugin, null, transferredResource.getId());
   }
 
-  public static ReportItem createPluginReportItem(Plugin<?> plugin, String title, String itemId, String otherId) {
-    ReportItem reportItem = new ReportItem(title);
+  public static <T extends Serializable> ReportItem createPluginReportItem(Plugin<T> plugin, String itemId,
+    String otherId) {
+    ReportItem reportItem = new ReportItem(plugin.getName());
     if (itemId != null) {
       reportItem.setItemId(itemId);
     }
@@ -89,17 +92,18 @@ public final class PluginHelper {
     return reportItem;
   }
 
-  public static String getJobId(Map<String, String> pluginParameters) {
-    return pluginParameters.get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
+  private static <T extends Serializable> String getJobId(Plugin<T> plugin) {
+    return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
-  public static boolean getBooleanFromParameters(Map<String, String> pluginParameters,
+  public static <T extends Serializable> boolean getBooleanFromParameters(Plugin<T> plugin,
     PluginParameter pluginParameter) {
-    return verifyIfStepShouldBePerformed(pluginParameters, pluginParameter);
+    return verifyIfStepShouldBePerformed(plugin, pluginParameter);
   }
 
-  public static String getStringFromParameters(Map<String, String> pluginParameters, PluginParameter pluginParameter) {
-    return pluginParameters.getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
+  public static <T extends Serializable> String getStringFromParameters(Plugin<T> plugin,
+    PluginParameter pluginParameter) {
+    return plugin.getParameterValues().getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
   }
 
   public static String getParentIdFromParameters(Map<String, String> pluginParameters) {
@@ -110,9 +114,9 @@ public final class PluginHelper {
     return new Boolean(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
   }
 
-  public static boolean verifyIfStepShouldBePerformed(Map<String, String> pluginParameters,
+  public static <T extends Serializable> boolean verifyIfStepShouldBePerformed(Plugin<T> plugin,
     PluginParameter pluginParameter) {
-    String paramValue = getStringFromParameters(pluginParameters, pluginParameter);
+    String paramValue = getStringFromParameters(plugin, pluginParameter);
     return Boolean.parseBoolean(paramValue);
   }
 
@@ -126,13 +130,14 @@ public final class PluginHelper {
     return ret;
   }
 
-  public static Job getJobFromIndex(IndexService index, Map<String, String> pluginParameters)
+  public static <T extends Serializable> Job getJobFromIndex(IndexService index, Plugin<T> plugin)
     throws NotFoundException, GenericException {
-    return index.retrieve(Job.class, getJobId(pluginParameters));
+    return index.retrieve(Job.class, getJobId(plugin));
   }
 
-  public static void createJobReport(ModelService model, Plugin<?> plugin, ReportItem reportItem,
-    PluginState pluginState, String jobId) {
+  public static <T extends Serializable> void createJobReport(ModelService model, Plugin<T> plugin,
+    ReportItem reportItem, PluginState pluginState) {
+    String jobId = getJobId(plugin);
     JobReport jobReport = new JobReport();
     jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
     jobReport.setJobId(jobId);
@@ -155,12 +160,11 @@ public final class PluginHelper {
     }
   }
 
-  public static void updateJobReport(ModelService model, IndexService index, Plugin<?> plugin, ReportItem reportItem,
-    PluginState pluginState, String jobId, String aipId) {
-
+  public static <T extends Serializable> void updateJobReport(ModelService model, IndexService index, Plugin<T> plugin,
+    ReportItem reportItem, PluginState pluginState, String aipId) {
+    String jobId = getJobId(plugin);
     try {
       JobReport jobReport;
-
       try {
         jobReport = model.retrieveJobReport(jobId, aipId);
       } catch (NotFoundException e) {
@@ -193,8 +197,8 @@ public final class PluginHelper {
       GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
     List<LinkingIdentifier> sourcesID = new ArrayList<LinkingIdentifier>();
-    if(sources!=null && sources.size()>0){
-      for(String s : sources){
+    if (sources != null && !sources.isEmpty()) {
+      for (String s : sources) {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setValue(s);
         li.setType("local");
@@ -202,15 +206,15 @@ public final class PluginHelper {
       }
     }
     List<LinkingIdentifier> targetsID = new ArrayList<LinkingIdentifier>();
-    if(targets!=null && targets.size()>0){
-      for(String t : targets){
+    if (targets != null && !targets.isEmpty()) {
+      for (String t : targets) {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setValue(t);
         li.setType("local");
         targetsID.add(li);
       }
     }
-    
+
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sourcesID,
       targetsID, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
@@ -223,19 +227,19 @@ public final class PluginHelper {
     return pm;
   }
 
-  public static int updateJobStatus(IndexService index, ModelService model, int currentCompletionPercentage,
-    int completionPercentageStep, Map<String, String> pluginParameters) {
+  public static <T extends Serializable> int updateJobStatus(IndexService index, ModelService model,
+    int currentCompletionPercentage, int completionPercentageStep, Plugin<T> plugin) {
     int newCurrentCompletionPercentage = currentCompletionPercentage + completionPercentageStep;
-    updateJobStatus(index, model, newCurrentCompletionPercentage, pluginParameters);
+    updateJobStatus(index, model, newCurrentCompletionPercentage, plugin);
 
     return newCurrentCompletionPercentage;
   }
 
-  public static void updateJobStatus(IndexService index, ModelService model, int newCompletionPercentage,
-    Map<String, String> pluginParameters) {
+  public static <T extends Serializable> void updateJobStatus(IndexService index, ModelService model,
+    int newCompletionPercentage, Plugin<T> plugin) {
     try {
       LOGGER.debug("New job completionPercentage: " + newCompletionPercentage);
-      Job job = PluginHelper.getJobFromIndex(index, pluginParameters);
+      Job job = PluginHelper.getJobFromIndex(index, plugin);
       job.setCompletionPercentage(newCompletionPercentage);
 
       if (newCompletionPercentage == 0) {

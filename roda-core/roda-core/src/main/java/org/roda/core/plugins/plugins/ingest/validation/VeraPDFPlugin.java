@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.ingest.validation;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -35,12 +34,12 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -52,7 +51,7 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-public class VeraPDFPlugin implements Plugin<AIP> {
+public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
   private String profile = "1b";
   private boolean hasFeatures = false;
@@ -81,27 +80,13 @@ public class VeraPDFPlugin implements Plugin<AIP> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return new ArrayList<>();
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return new HashMap<>();
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
     // indicates what validation profile will be used
     if (parameters.containsKey("profile")) {
       profile = parameters.get("profile");
@@ -249,7 +234,7 @@ public class VeraPDFPlugin implements Plugin<AIP> {
       PluginHelper.createPluginEvent(aip.getId(), representationId, null, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
         "All the files from the AIP were submitted to a veraPDF validation.",
-        Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), representationId, null, null)), null, outcome,
+        Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representationId, null, null)), null, outcome,
         noteStringBuilder.toString(), null, agent, notify);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);

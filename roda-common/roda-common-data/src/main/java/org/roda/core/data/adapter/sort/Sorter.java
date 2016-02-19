@@ -50,20 +50,34 @@ public class Sorter implements Serializable {
     setParameters(parameters);
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((parameters == null) ? 0 : parameters.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof Sorter) {
-      Sorter other = (Sorter) obj;
-      equal = equal && (getParameters() == other.getParameters() || getParameters().equals(other.getParameters()));
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof Sorter)) {
+      return false;
+    }
+    Sorter other = (Sorter) obj;
+    if (parameters == null) {
+      if (other.parameters != null) {
+        return false;
+      }
+    } else if (!parameters.equals(other.parameters)) {
+      return false;
+    }
+    return true;
   }
 
   /**

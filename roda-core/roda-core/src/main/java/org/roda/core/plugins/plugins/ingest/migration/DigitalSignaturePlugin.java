@@ -1,6 +1,5 @@
 package org.roda.core.plugins.plugins.ingest.migration;
 
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -213,8 +212,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
       int pluginResultState = 1;
       int verified = 1;
       boolean notify = true;
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, "Digital Signature treatment",
-        representation.getId(), null);
+      ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
         LOGGER.debug("Processing representation: " + representation);
@@ -403,9 +401,9 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
         // TODO This is not right, source is in one representation and outcome
         // is in another
         premisSourceFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
         premisTargetFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifier(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
       }
     }
 

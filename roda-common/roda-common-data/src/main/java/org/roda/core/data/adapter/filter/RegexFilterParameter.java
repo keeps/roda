@@ -50,21 +50,34 @@ public class RegexFilterParameter extends FilterParameter {
     return "RegexFilterParameter(name=" + getName() + ", regex=" + getRegex() + ")";
   }
 
-  /**
-   * @see FilterParameter#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((regex == null) ? 0 : regex.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = true;
-
-    if (obj != null && obj instanceof RegexFilterParameter) {
-      RegexFilterParameter other = (RegexFilterParameter) obj;
-      equal = equal && super.equals(other);
-      equal = equal && (getRegex() == other.getRegex() || getRegex().equals(other.getRegex()));
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (!(obj instanceof RegexFilterParameter)) {
+      return false;
+    }
+    RegexFilterParameter other = (RegexFilterParameter) obj;
+    if (regex == null) {
+      if (other.regex != null) {
+        return false;
+      }
+    } else if (!regex.equals(other.regex)) {
+      return false;
+    }
+    return true;
   }
 
   /**

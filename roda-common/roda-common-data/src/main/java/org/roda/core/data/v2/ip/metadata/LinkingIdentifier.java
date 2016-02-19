@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.data.v2.ip.metadata;
 
 import java.io.Serializable;
@@ -5,10 +12,11 @@ import java.util.List;
 
 public class LinkingIdentifier implements Serializable {
   private static final long serialVersionUID = -7150474519365697758L;
-  String type;
-  String value;
-  List<String> roles;
-  
+
+  private String type;
+  private String value;
+  private List<String> roles;
+
   public LinkingIdentifier() {
     super();
   }
@@ -41,7 +49,5 @@ public class LinkingIdentifier implements Serializable {
   public String toString() {
     return "LinkingIdentifier [type=" + type + ", value=" + value + ", roles=" + roles + "]";
   }
-  
-  
-  
+
 }

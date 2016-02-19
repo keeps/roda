@@ -214,13 +214,13 @@ public class ValidationUtils {
         validator.setErrorHandler(errorHandler);
         try {
           validator.validate(xmlFile);
-          ret.setValid(errorHandler.getErrors().size() == 0);
+          ret.setValid(errorHandler.getErrors().isEmpty());
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             ret.addIssue(convertSAXParseException(saxParseException));
           }
         } catch (SAXException e) {
           LOGGER.error("Error validating descriptive binary " + descriptiveMetadataType, e);
-          ret.setValid(errorHandler.getErrors().size() > 0);
+          ret.setValid(false);
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             ret.addIssue(convertSAXParseException(saxParseException));
           }
@@ -269,7 +269,7 @@ public class ValidationUtils {
         validator.setErrorHandler(errorHandler);
         try {
           validator.validate(xmlFile);
-          report.setValid(errorHandler.getErrors().size() == 0);
+          report.setValid(errorHandler.getErrors().isEmpty());
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             report.addIssue(convertSAXParseException(saxParseException));
           }
@@ -303,14 +303,17 @@ public class ValidationUtils {
       errors = new ArrayList<SAXParseException>();
     }
 
+    @Override
     public void warning(SAXParseException e) throws SAXException {
       errors.add(e);
     }
 
+    @Override
     public void error(SAXParseException e) throws SAXException {
       errors.add(e);
     }
 
+    @Override
     public void fatalError(SAXParseException e) throws SAXException {
       errors.add(e);
     }
