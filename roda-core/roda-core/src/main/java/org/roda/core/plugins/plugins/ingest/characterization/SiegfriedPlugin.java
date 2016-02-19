@@ -64,12 +64,12 @@ public class SiegfriedPlugin implements Plugin<AIP> {
 
   @Override
   public String getName() {
-    return "Siegfried characterization action";
+    return "Siegfried file format identification";
   }
 
   @Override
   public String getDescription() {
-    return "Update the premis files with the object characterization";
+    return "Identify file format and update preservation metadata";
   }
 
   @Override

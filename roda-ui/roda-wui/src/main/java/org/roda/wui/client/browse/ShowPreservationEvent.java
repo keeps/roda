@@ -311,7 +311,7 @@ public class ShowPreservationEvent extends Composite {
       
       Label pathLabel = null;
       Label pathValue = null;
-      if(ifile.getPath()!=null){
+      if(ifile.getPath()!=null && !ifile.getPath().isEmpty()){
         pathLabel = new Label("Path");
         pathLabel.addStyleName("label");
         pathValue = new Label(Tools.join(ifile.getPath(), IdUtils.LINKING_ID_SEPARATOR));
