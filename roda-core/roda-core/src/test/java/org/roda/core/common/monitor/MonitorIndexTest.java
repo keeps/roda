@@ -177,7 +177,6 @@ public class MonitorIndexTest {
 
   private static void populate(Path path, int numberOfItemsByLevel, int numberOfLevels, int currentLevel,
     Random randomno) throws IOException {
-    LOGGER.error("Populating: " + path.toString());
     currentLevel++;
     for (int i = 0; i < numberOfItemsByLevel; i++) {
       Path p = null;
@@ -185,7 +184,6 @@ public class MonitorIndexTest {
         if (currentLevel > 1) {
           p = Files.createFile(path.resolve(UUID.randomUUID().toString() + ".txt"));
           Files.write(p, "NUNCAMAISACABA".getBytes());
-          LOGGER.error("FILE: " + p.toString());
         }
       } else {
         p = Files.createDirectory(path.resolve(UUID.randomUUID().toString()));
@@ -196,7 +194,6 @@ public class MonitorIndexTest {
             for (int j = 0; j < numberOfItemsByLevel; j++) {
               Path temp = Files.createFile(p.resolve(UUID.randomUUID().toString() + ".txt"));
               Files.write(temp, "NUNCAMAISACABA".getBytes());
-              LOGGER.error("FILE: " + temp.toString());
             }
           }
         }
