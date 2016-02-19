@@ -7,7 +7,7 @@
  */
 package org.roda.core.plugins.plugins;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -21,13 +21,11 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -41,9 +39,7 @@ import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -190,15 +186,35 @@ public final class PluginHelper {
 
   }
 
-  public static PreservationMetadata createPluginEvent(String aipID, String representationID, String fileID,
-    ModelService model, String eventType, String eventDetails, List<String> sources, List<String> targets,
-    String outcome, String outcomeDetailNote, String outcomeDetailExtension, IndexedPreservationAgent agent,
-    boolean notify) throws IOException, RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+  public static PreservationMetadata createPluginEvent(String aipID, String representationID, List<String> filePath,
+    String fileID, ModelService model, String eventType, String eventDetails, List<String> sources,
+    List<String> targets, String outcome, String outcomeDetailNote, String outcomeDetailExtension,
+    IndexedPreservationAgent agent, boolean notify) throws RequestNotValidException, NotFoundException,
+      GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     String id = UUID.randomUUID().toString();
-    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
-      targets, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
-    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, premisEvent, notify);
+    List<LinkingIdentifier> sourcesID = new ArrayList<LinkingIdentifier>();
+    if(sources!=null && sources.size()>0){
+      for(String s : sources){
+        LinkingIdentifier li = new LinkingIdentifier();
+        li.setValue(s);
+        li.setType("local");
+        sourcesID.add(li);
+      }
+    }
+    List<LinkingIdentifier> targetsID = new ArrayList<LinkingIdentifier>();
+    if(targets!=null && targets.size()>0){
+      for(String t : targets){
+        LinkingIdentifier li = new LinkingIdentifier();
+        li.setValue(t);
+        li.setType("local");
+        targetsID.add(li);
+      }
+    }
+    
+    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sourcesID,
+      targetsID, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
+    model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
+      premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
     pm.setAipId(aipID);
     pm.setRepresentationId(representationID);
@@ -232,38 +248,6 @@ public final class PluginHelper {
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get or update Job from index", e);
-    }
-  }
-
-  public static void createPremisEventPerRepresentation(ModelService model, AIP aip, PluginState state,
-    String eventType, String eventDetails, String detailExtension, IndexedPreservationAgent agent, boolean notify)
-      throws PluginException {
-    String outcome = "";
-    switch (state) {
-      case SUCCESS:
-        outcome = "success";
-        break;
-      case PARTIAL_SUCCESS:
-        outcome = "partial success";
-        break;
-      case FAILURE:
-      default:
-        outcome = "failure";
-        break;
-    }
-    try {
-      boolean success = (state == PluginState.SUCCESS);
-      for (Representation representation : aip.getRepresentations()) {
-        boolean inotify = false;
-        createPluginEvent(aip.getId(), representation.getId(), null, model, eventType, eventDetails,
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
-          outcome, success ? "Success" : "Error", detailExtension, agent, inotify);
-      }
-      if (notify) {
-        model.notifyAIPUpdated(aip.getId());
-      }
-    } catch (IOException | RODAException e) {
-      throw new PluginException(e.getMessage(), e);
     }
   }
 

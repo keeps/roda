@@ -7,7 +7,6 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -24,6 +23,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -94,9 +94,9 @@ public class AntivirusPlugin implements Plugin<AIP> {
   public String getDescription() {
     return "Verifies if a SIP is free of virus.";
   }
-  
+
   @Override
-  public String getAgentType(){
+  public String getAgentType() {
     return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
   }
 
@@ -126,8 +126,7 @@ public class AntivirusPlugin implements Plugin<AIP> {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model,
-        notifyAgent);
+      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(this, model);
     } catch (RODAException e) {
@@ -201,25 +200,25 @@ public class AntivirusPlugin implements Plugin<AIP> {
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
       String representationId = null;
       String fileId = null;
-
+      List<String> filePath = null;
       // TODO review below information and externalise strings
       String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK;
       String eventDetails = "All the files from the SIP were verified against an antivirus.";
-      List<String> sourceObjects = Arrays.asList(aip.getId());
+      List<String> sourceObjects = Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), null, null, null));
       List<String> outcomeObjects = null;
       String outcome = success ? "success" : "failure";
       String outcomeDetailNote = success ? virusCheckResult.getReport()
         : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
       String outcomeDetailExtension = null;
 
-      PluginHelper.createPluginEvent(aip.getId(), representationId, fileId, model, eventType, eventDetails,
+      PluginHelper.createPluginEvent(aip.getId(), representationId, filePath, fileId, model, eventType, eventDetails,
         sourceObjects, outcomeObjects, outcome, outcomeDetailNote, outcomeDetailExtension, agent, inotify);
 
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }
-    } catch (IOException | RequestNotValidException | NotFoundException | GenericException
-      | AuthorizationDeniedException | ValidationException | AlreadyExistsException e) {
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+      | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);
     }
   }

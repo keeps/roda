@@ -7,6 +7,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 
 public class IdUtils {
   public static final String ID_SEPARATOR = "-";
+  public static final String LINKING_ID_SEPARATOR = "/";
 
   public static String getRepresentationId(String aipId, String representationId) {
     StringBuilder idBuilder = new StringBuilder();
@@ -39,7 +40,8 @@ public class IdUtils {
     StringBuilder idBuilder = new StringBuilder();
     idBuilder.append(type.toString());
     if (aipId != null) {
-      idBuilder.append(ID_SEPARATOR);
+      idBuilder.append(ID_SEPARATOR);    idBuilder.append(type.toString());
+
       idBuilder.append(aipId);
     }
     if (representationId != null) {
@@ -86,6 +88,29 @@ public class IdUtils {
 
   public static String getJobReportId(String jobId, String aipId) {
     return jobId + ID_SEPARATOR + aipId;
+  }
+
+  public static String getLinkingIdentifier(String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
+    StringBuilder idBuilder = new StringBuilder();
+    if (aipId != null) {
+      idBuilder.append(aipId);
+    }
+    if (representationId != null) {
+      idBuilder.append(LINKING_ID_SEPARATOR);
+      idBuilder.append(representationId);
+    }
+    if (fileDirectoryPath != null) {
+      for (String dir : fileDirectoryPath) {
+        idBuilder.append(LINKING_ID_SEPARATOR);
+        idBuilder.append(dir);
+      }
+    }
+    if (fileId != null) {
+      idBuilder.append(LINKING_ID_SEPARATOR);
+      idBuilder.append(fileId);
+    }
+    return idBuilder.toString();
   }
 
 }

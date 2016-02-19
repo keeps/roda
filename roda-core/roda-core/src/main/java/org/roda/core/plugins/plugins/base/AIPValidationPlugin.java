@@ -19,6 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -164,15 +165,15 @@ public class AIPValidationPlugin implements Plugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         boolean inotify = false;
-        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, model,
+        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
-          Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representation.getId())), null,
+          Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), representation.getId(), null, null)), null,
           success ? "success" : "failure", success ? "success" : "Error", "", agent, inotify);
       }
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }
-    } catch (IOException | RODAException e) {
+    } catch (RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }
 

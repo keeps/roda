@@ -18,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -31,12 +30,10 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -85,8 +82,8 @@ public class SiegfriedPluginUtils {
     return version;
   }
 
-  public static void runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, IndexedPreservationAgent agent, boolean createsPluginEvent, boolean notify)
+  public static String runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    AIP aip, Representation representation, IndexedPreservationAgent agent)
       throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException, PluginException {
 
@@ -144,7 +141,6 @@ public class SiegfriedPluginUtils {
               ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
               model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
                 premis_file_payload, inotify);
-
             } catch (NotFoundException e) {
               LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
             } catch (RODAException e) {
@@ -154,13 +150,7 @@ public class SiegfriedPluginUtils {
         }
       }
     }
-
-    if (createsPluginEvent) {
-      PluginHelper.createPremisEventPerRepresentation(model, aip, PluginState.SUCCESS,
-        RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
-        "The files of the representation were successfully identified.", siegfriedOutput, agent, notify);
-    }
-
+    return siegfriedOutput;
   }
 
 }

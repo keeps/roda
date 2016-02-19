@@ -162,7 +162,8 @@ public class VeraPDFPlugin implements Plugin<AIP> {
 
                 // FIXME file that doesn't get deleted afterwards
                 logger.debug("Running veraPDF validator on " + file.getId());
-                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent(), file.getId(), profile, hasFeatures);
+                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent(), file.getId(), profile,
+                  hasFeatures);
 
                 if (veraPDFResult != null) {
                   resourceList.put(file.getId(), veraPDFResult);
@@ -245,10 +246,10 @@ public class VeraPDFPlugin implements Plugin<AIP> {
 
       // FIXME revise PREMIS generation
       boolean notify = false;
-      PluginHelper.createPluginEvent(aip.getId(), representationId, null, model,
+      PluginHelper.createPluginEvent(aip.getId(), representationId, null, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
         "All the files from the AIP were submitted to a veraPDF validation.",
-        Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), representationId)), null, outcome,
+        Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), representationId, null, null)), null, outcome,
         noteStringBuilder.toString(), null, agent, notify);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);

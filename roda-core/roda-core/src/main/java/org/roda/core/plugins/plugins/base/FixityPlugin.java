@@ -22,6 +22,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -159,15 +160,15 @@ public class FixityPlugin implements Plugin<AIP> {
               }
               sb.append("</ul>");
 
-              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
-                Arrays.asList(PremisUtils.createPremisRepresentationIdentifier(aip.getId(), r.getId())), null,
-                "failure", "Reason", sb.toString(), agent, inotify);
+                Arrays.asList(IdUtils.getLinkingIdentifier(aip.getId(), r.getId(), null, null)), null, "failure",
+                "Reason", sb.toString(), agent, inotify);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {
               LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
-              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, model,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
                 null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), agent,

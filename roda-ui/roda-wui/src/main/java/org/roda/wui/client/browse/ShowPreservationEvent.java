@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -244,7 +245,7 @@ public class ShowPreservationEvent extends Composite {
     if (event.getSourcesObjectIds().size() > 0) {
       for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
         String text = sourceObjectId.getValue();
-        addObjectPanel(text, sourceObjectsPanel);
+        addObjectPanel(sourceObjectId.getValue(), bundle, sourceObjectsPanel);
       }
     } else {
       sourceObjectsHeader.setVisible(false);
@@ -255,7 +256,7 @@ public class ShowPreservationEvent extends Composite {
     if (event.getOutcomeObjectIds().size() > 0) {
       for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
         String text = outcomeObjectId.getValue();
-        addObjectPanel(text, outcomeObjectsPanel);
+        addObjectPanel(text,bundle, outcomeObjectsPanel);
       }
     } else {
       outcomeObjectsHeader.setVisible(false);
@@ -285,7 +286,7 @@ public class ShowPreservationEvent extends Composite {
 
   }
 
-  private void addObjectPanel(String objectId, FlowPanel objectsPanel) {
+  private void addObjectPanel(String objectId, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
 
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("list-panel");
@@ -299,14 +300,7 @@ public class ShowPreservationEvent extends Composite {
     // info about it here.
     // XXX if AIP, Representation or File no longer exist, just add the IDs
     if (aipId != null && repId != null && fileId != null) {
-      // is a file
-      // TODO retrieve indexed file so we can get the path and id
-      IndexedFile ifile = new IndexedFile("uuid", "aipId", "representationId", Arrays.asList("path"), "id", true,
-        new FileFormat("formatDesignationName", "formatDesignationVersion", "mimeType", "pronom", "extension",
-          new HashMap<String, String>()),
-        "originalName", 120000, false, "creatingApplicationName", "creatingApplicationVersion",
-        "dateCreatedByApplication", Arrays.asList("hash"), "fulltext", "storagePath");
-
+      IndexedFile ifile = bundle.getFiles().get(objectId);
       Label header = new Label("File");
       header.addStyleName("h5");
 
@@ -314,9 +308,17 @@ public class ShowPreservationEvent extends Composite {
       nameLabel.addStyleName("label");
       Label nameValue = new Label(
         StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
+      
+      Label pathLabel = null;
+      Label pathValue = null;
+      if(ifile.getPath()!=null){
+        pathLabel = new Label("Path");
+        pathLabel.addStyleName("label");
+        pathValue = new Label(Tools.join(ifile.getPath(), IdUtils.LINKING_ID_SEPARATOR));
+      }
 
       Label formatLabel = new Label("Format");
-      nameLabel.addStyleName("label");
+      formatLabel.addStyleName("label");
       FileFormat fileFormat = ifile.getFileFormat();
       // TODO guard nulls
       Label formatValue = new Label(
@@ -325,7 +327,7 @@ public class ShowPreservationEvent extends Composite {
       // TODO add pronom and mime type
 
       Label sizeLabel = new Label("Size");
-      nameLabel.addStyleName("label");
+      sizeLabel.addStyleName("label");
       Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
 
       // TODO set anchor
@@ -341,6 +343,10 @@ public class ShowPreservationEvent extends Composite {
       layout.add(header);
       layout.add(nameLabel);
       layout.add(nameValue);
+      if(pathValue!=null){
+        layout.add(pathLabel);
+        layout.add(pathValue);
+      }
       layout.add(formatLabel);
       layout.add(formatValue);
       layout.add(sizeLabel);

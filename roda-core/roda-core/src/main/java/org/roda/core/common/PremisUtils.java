@@ -48,6 +48,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -95,7 +96,6 @@ import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
 
 public class PremisUtils {
-  private static final String SEPARATOR = "/";
   private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
   private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
@@ -313,8 +313,8 @@ public class PremisUtils {
   }
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
-    List<String> sources, List<String> targets, String outcome, String detailNote, String detailExtension,
-    List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, String outcome, String detailNote,
+    String detailExtension, List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
@@ -324,17 +324,17 @@ public class PremisUtils {
     ect.setEventType(type);
     ect.setEventDetail(details);
     if (sources != null) {
-      for (String source : sources) {
+      for (LinkingIdentifier source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(source);
+        loict.setLinkingObjectIdentifierValue(source.getValue());
         loict.setLinkingObjectIdentifierType("source");
       }
     }
 
     if (targets != null) {
-      for (String target : targets) {
+      for (LinkingIdentifier target : targets) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(target);
+        loict.setLinkingObjectIdentifierValue(target.getValue());
         loict.setLinkingObjectIdentifierType("target");
       }
     }
@@ -401,7 +401,8 @@ public class PremisUtils {
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
     oict.setObjectIdentifierType("local");
-    String identifier = createPremisRepresentationIdentifier(aipID, representationId);
+    String identifier = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_REPRESENTATION, aipID,
+      representationId, null, null);
     oict.setObjectIdentifierValue(identifier);
     representation.addNewPreservationLevel().setPreservationLevelValue("");
 
@@ -414,7 +415,8 @@ public class PremisUtils {
     lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
     file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
-    String identifier = createPremisFileIdentifier(originalFile);
+    String identifier = IdUtils.getFileId(originalFile.getAipId(), originalFile.getRepresentationId(),
+      originalFile.getPath(), originalFile.getId());
     oict.setObjectIdentifierValue(identifier);
     oict.setObjectIdentifierType("local");
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
@@ -455,7 +457,7 @@ public class PremisUtils {
 
     return new StringContentPayload(MetadataUtils.saveToString(document, true));
   }
-  
+
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<Fixity>();
     InputStream inputStream = premisFile.getContent().createInputStream();
@@ -687,23 +689,21 @@ public class PremisUtils {
     return doc;
   }
 
-  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin,
-    ModelService model, boolean notify)
-      throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin, ModelService model, boolean notify)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     ContentPayload agentPayload;
 
     // TODO set agent extension
-    agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(),
-      plugin.getAgentType(), "", plugin.getDescription());
+    agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
+      plugin.getDescription());
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
     return agent;
   }
 
-  public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin,
-    ModelService model) {
+  public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin, ModelService model) {
     String id = plugin.getClass().getName() + "@" + plugin.getVersion();
     IndexedPreservationAgent agent = new IndexedPreservationAgent();
     agent.setId(id);
@@ -720,29 +720,16 @@ public class PremisUtils {
     relationship.setRelationshipSubType(relationshipSubType);
     RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
     roict.setRelatedObjectIdentifierType(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL);
-    roict.setRelatedObjectIdentifierValue(createPremisFileIdentifier(file));
+    String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, file.getAipId(),
+      file.getRepresentationId(), file.getPath(), file.getId());
+    roict.setRelatedObjectIdentifierValue(id);
   }
 
-  public static String createPremisRepresentationIdentifier(String aipId, String representationId) {
-    return aipId + SEPARATOR + representationId;
-  }
-
-  public static String createPremisFileIdentifier(File f) {
-    String identifier = createPremisRepresentationIdentifier(f.getAipId(), f.getRepresentationId());
-    if (f.getPath() != null && f.getPath().size() > 0) {
-      identifier += SEPARATOR;
-      identifier += StringUtils.join(f.getPath(), SEPARATOR);
-    }
-    identifier += SEPARATOR;
-    identifier += f.getId();
-    return identifier;
-  }
-
-  public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException{
+  public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(b.getContent(), true);
-    if(event.getLinkingAgentIdentifierList()!=null && event.getLinkingAgentIdentifierList().size()>0){
-      for(LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()){
+    if (event.getLinkingAgentIdentifierList() != null && event.getLinkingAgentIdentifierList().size() > 0) {
+      for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()) {
         LinkingIdentifier li = new LinkingIdentifier();
         li.setType(laict.getLinkingAgentIdentifierType());
         li.setValue(laict.getLinkingAgentIdentifierValue());
@@ -753,12 +740,13 @@ public class PremisUtils {
     return identifiers;
   }
 
-  public static List<LinkingIdentifier> extractRelatedSourceFromEvent(Binary binary) throws ValidationException, GenericException {
+  public static List<LinkingIdentifier> extractRelatedSourceFromEvent(Binary binary)
+    throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if(event.getLinkingObjectIdentifierList()!=null && event.getLinkingObjectIdentifierList().size()>0){
-      for(LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()){
-        if(loict.getLinkingObjectIdentifierType().equalsIgnoreCase("source")){
+    if (event.getLinkingObjectIdentifierList() != null && event.getLinkingObjectIdentifierList().size() > 0) {
+      for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
+        if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("source")) {
           LinkingIdentifier li = new LinkingIdentifier();
           li.setType(loict.getLinkingObjectIdentifierType());
           li.setValue(loict.getLinkingObjectIdentifierValue());
@@ -769,13 +757,14 @@ public class PremisUtils {
     }
     return identifiers;
   }
-  
-  public static List<LinkingIdentifier> extractRelatedOutcomeFromEvent(Binary binary) throws ValidationException, GenericException {
+
+  public static List<LinkingIdentifier> extractRelatedOutcomeFromEvent(Binary binary)
+    throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if(event.getLinkingObjectIdentifierList()!=null && event.getLinkingObjectIdentifierList().size()>0){
-      for(LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()){
-        if(loict.getLinkingObjectIdentifierType().equalsIgnoreCase("outcome")){
+    if (event.getLinkingObjectIdentifierList() != null && event.getLinkingObjectIdentifierList().size() > 0) {
+      for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
+        if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("outcome")) {
           LinkingIdentifier li = new LinkingIdentifier();
           li.setType(loict.getLinkingObjectIdentifierType());
           li.setValue(loict.getLinkingObjectIdentifierValue());

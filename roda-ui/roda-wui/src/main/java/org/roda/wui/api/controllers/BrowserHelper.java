@@ -916,7 +916,7 @@ public class BrowserHelper {
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws NotFoundException, GenericException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
-
+    Map<String, IndexedFile> files = new HashMap<String, IndexedFile>();
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && ipe.getLinkingAgentIds().size() > 0) {
@@ -932,6 +932,59 @@ public class BrowserHelper {
       }
       eventBundle.setAgents(agents);
     }
+    if ((ipe.getSourcesObjectIds() != null && ipe.getSourcesObjectIds().size() > 0)
+      || (ipe.getOutcomeObjectIds() != null && ipe.getOutcomeObjectIds().size() > 0)) {
+      if ((ipe.getSourcesObjectIds() != null && ipe.getSourcesObjectIds().size() > 0)) {
+        for (LinkingIdentifier i : ipe.getSourcesObjectIds()) {
+          String[] tokens = i.getValue().split(IdUtils.LINKING_ID_SEPARATOR);
+          if (tokens.length == 1) {
+            // AIP
+            LOGGER.warn("AIP");
+          } else if (tokens.length == 2) {
+            // REPRESENTATION
+            LOGGER.warn("REPRESENTATION");
+          } else {
+            // FILE
+            String aipId = tokens[0];
+            String representationId = tokens[1];
+            String fileId = tokens[tokens.length - 1];
+            List<String> fileDirectoryPath = new ArrayList<String>();
+            if (tokens.length > 3) {
+              fileDirectoryPath = Arrays.asList(Arrays.copyOfRange(tokens, 2, tokens.length - 1));
+            }
+            IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+              IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
+            files.put(i.getValue(), file);
+          }
+        }
+      }
+
+      if ((ipe.getOutcomeObjectIds() != null && ipe.getOutcomeObjectIds().size() > 0)) {
+        for (LinkingIdentifier i : ipe.getOutcomeObjectIds()) {
+          String[] tokens = i.getValue().split(IdUtils.LINKING_ID_SEPARATOR);
+          if (tokens.length == 1) {
+            // AIP
+
+          } else if (tokens.length == 2) {
+            // REPRESENTATION
+          } else {
+            // FILE
+            String aipId = tokens[0];
+            String representationId = tokens[1];
+            String fileId = tokens[tokens.length - 1];
+            List<String> fileDirectoryPath = new ArrayList<String>();
+            if (tokens.length > 3) {
+              fileDirectoryPath = Arrays.asList(Arrays.copyOfRange(tokens, 2, tokens.length - 1));
+            }
+            IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+              IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
+            files.put(i.getValue(), file);
+          }
+        }
+      }
+      eventBundle.setFiles(files);
+    }
+
     return eventBundle;
   }
 }
