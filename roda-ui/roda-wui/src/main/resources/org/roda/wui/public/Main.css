@@ -4074,6 +4074,46 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
+				OFFICE WINDOW
+************************************************/
+.gwt-PopupPanelGlass {
+	background-color: rgba(0, 0, 0, 0.25);
+}
+
+.office-window-dock {
+	background-color: white;
+}
+
+.office-window-title {
+	font-size: 15pt;
+	font-weight: bold;
+	margin: 20px;
+	overflow: hidden;
+}
+
+.office-window-center {
+	padding: 0 20px;
+}
+
+.office-window-bottom {
+	padding: 20px;
+}
+
+.office-window-bottom .wui-button {
+	margin-left: 10px;
+}
+
+.office-window-shadow .shadow-up-left {
+	width: 30px;
+	height: 30px;
+	background: url("images/shadow/shadow-up-left.png") no-repeat;
+	_background: none;
+	filter: progid:DXImageTransform.Microsoft.AlphaImageLoader(  
+		    src=   
+		   'images/shadow/shadow-up-left.png', sizingMethod=       'scale');
+}
+
+/**********************************************
 				RECAPTCHA
 ************************************************/
 #recaptcha_div {
