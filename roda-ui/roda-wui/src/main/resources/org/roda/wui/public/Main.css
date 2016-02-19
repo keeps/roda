@@ -879,184 +879,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-				LOGIN
-************************************************/
-.wui-login {
-	position: relative;
-	width: 250px;
-	padding-top: 5px;
-}
-
-.wui-login .wui-login-message {
-	width: 250px;
-	position: absolute;
-	top: 5px;
-	left: 40px;
-	color: #ffffff;
-}
-
-.wui-login .wui-login-layout-guest {
-	
-}
-
-.wui-login .wui-login-box-user {
-	width: 180px;
-	_width: 184px;
-	position: absolute;
-	top: 33px;
-	left: 40px;
-	padding: 2px;
-	border: 1px solid black;
-	font-size: 9pt;
-	color: #58595b;
-	text-align: left;
-}
-
-.wui-login .wui-login-box-pass {
-	width: 180px;
-	_width: 184px;
-	position: absolute;
-	top: 62px;
-	left: 40px;
-	padding: 2px;
-	border: 1px solid black;
-	font-size: 9pt;
-	color: #58595b;
-}
-
-.wui-login .wui-login-box-user-dummy {
-	color: #58595b;
-}
-
-.wui-password-label {
-	position: absolute;
-	left: 43px;
-	top: 65px;
-	width: 150px;
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 9pt;
-	overflow: hidden;
-	color: #58595b;
-}
-
-.wui-password-button {
-	position: absolute;
-	left: 207px;
-	top: 66px;
-	cursor: pointer;
-	cursor: hand;
-}
-
-.wui-login .wui-login-box-pass-dummy {
-	width: 150px;
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 9pt;
-	color: #999;
-	margin-bottom: 5px;
-}
-
-.wui-login .wui-login-layout-logged {
-	
-}
-
-.wui-login .wui-logout-button {
-	width: 200px;
-	position: absolute;
-	top: 65px;
-	left: 40px;
-	color: #ffffff;
-	padding-bottom: 3px;
-	border-bottom: 1px dashed #ffffff;
-	cursor: pointer;
-	cursor: hand;
-}
-
-.wui-login .wui-logout-button-hover {
-	text-decoration: underline;
-}
-
-.wui-login .wui-loginLinks {
-	position: absolute;
-	top: 88px;
-	left: 40px;
-}
-
-.wui-login .wui-loginLinks .loginLink a {
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 9pt;
-	color: #ffffff;
-	text-decoration: none;
-	white-space: nowrap;
-}
-
-.wui-login .wui-loginLinks .loginLink:hover a {
-	text-decoration: underline;
-}
-
-.wui-login .wui-loginLinks .separator {
-	font-family: 'Ubuntu', sans-serif;
-	font-size: 9pt;
-	color: #ffffff;
-}
-
-/**********************************************
-				LOGIN CAS
-************************************************/
-.wui-login .wui-loginLinks {
-	position: relative;
-	top: 0;
-	left: 0;
-	margin-top: 20px;
-}
-
-.wui-login .wui-login-login, .wui-login .wui-login-user {
-	margin-top: 12px;
-}
-
-.wui-login .loginLink {
-	color: white;
-}
-
-.wui-login .loginLink:hover {
-	text-decoration: underline;
-	cursor: hand;
-	cursor: pointer;
-}
-
-/**********************************************
-				LOGIN DIALOG
-************************************************/
-.wui-login-dialog {
-	
-}
-
-.wui-login-dialog .username-label {
-	margin: 5px;
-	white-space: nowrap;
-}
-
-.wui-login-dialog .username-box {
-	
-}
-
-.wui-login-dialog .password-label {
-	margin: 5px;
-	white-space: nowrap;
-}
-
-.wui-login-dialog .password-box {
-	
-}
-
-.wui-login-dialog .login {
-	
-}
-
-.wui-login-dialog .cancel {
-	margin-right: 10px;
-}
-
-/**********************************************
 				MENU
 ************************************************/
 .gwt-MenuBar {
@@ -2735,7 +2557,180 @@ td.datePickerMonth, td.datePickerYear {
 
 .list-panel:first-of-type {
 	margin-top: 0;
-} 
+}
+
+
+/**********************************************
+				LOGIN CAS
+************************************************/
+.wui-login {
+	position: relative;
+	width: 250px;
+	padding-top: 5px;
+}
+
+.wui-login .wui-login-message {
+	width: 250px;
+	position: absolute;
+	top: 5px;
+	left: 40px;
+	color: #ffffff;
+}
+
+.wui-login .wui-login-layout-guest {
+	
+}
+
+.wui-login .wui-login-box-user {
+	width: 180px;
+	_width: 184px;
+	position: absolute;
+	top: 33px;
+	left: 40px;
+	padding: 2px;
+	border: 1px solid black;
+	font-size: 9pt;
+	color: #58595b;
+	text-align: left;
+}
+
+.wui-login .wui-login-box-pass {
+	width: 180px;
+	_width: 184px;
+	position: absolute;
+	top: 62px;
+	left: 40px;
+	padding: 2px;
+	border: 1px solid black;
+	font-size: 9pt;
+	color: #58595b;
+}
+
+.wui-login .wui-login-box-user-dummy {
+	color: #58595b;
+}
+
+.wui-password-label {
+	position: absolute;
+	left: 43px;
+	top: 65px;
+	width: 150px;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 9pt;
+	overflow: hidden;
+	color: #58595b;
+}
+
+.wui-password-button {
+	position: absolute;
+	left: 207px;
+	top: 66px;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-login .wui-login-box-pass-dummy {
+	width: 150px;
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 9pt;
+	color: #999;
+	margin-bottom: 5px;
+}
+
+.wui-login .wui-login-layout-logged {
+	
+}
+
+.wui-login .wui-logout-button {
+	width: 200px;
+	position: absolute;
+	top: 65px;
+	left: 40px;
+	color: #ffffff;
+	padding-bottom: 3px;
+	border-bottom: 1px dashed #ffffff;
+	cursor: pointer;
+	cursor: hand;
+}
+
+.wui-login .wui-logout-button-hover {
+	text-decoration: underline;
+}
+
+.wui-login .wui-loginLinks {
+	position: absolute;
+	top: 88px;
+	left: 40px;
+}
+
+.wui-login .wui-loginLinks .loginLink a {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 9pt;
+	color: #ffffff;
+	text-decoration: none;
+	white-space: nowrap;
+}
+
+.wui-login .wui-loginLinks .loginLink:hover a {
+	text-decoration: underline;
+}
+
+.wui-login .wui-loginLinks .separator {
+	font-family: 'Ubuntu', sans-serif;
+	font-size: 9pt;
+	color: #ffffff;
+}
+
+.wui-login .wui-loginLinks {
+	position: relative;
+	top: 0;
+	left: 0;
+	margin-top: 20px;
+}
+
+.wui-login .wui-login-login, .wui-login .wui-login-user {
+	margin-top: 12px;
+}
+
+.wui-login .loginLink {
+	color: white;
+}
+
+.wui-login .loginLink:hover {
+	text-decoration: underline;
+	cursor: hand;
+	cursor: pointer;
+}
+
+.wui-login-dialog {
+	
+}
+
+.wui-login-dialog .username-label {
+	margin: 5px;
+	white-space: nowrap;
+}
+
+.wui-login-dialog .username-box {
+	
+}
+
+.wui-login-dialog .password-label {
+	margin: 5px;
+	white-space: nowrap;
+}
+
+.wui-login-dialog .password-box {
+	
+}
+
+.wui-login-dialog .login {
+	
+}
+
+.wui-login-dialog .cancel {
+	margin-right: 10px;
+}
 
 /**********************************************
 				LOGIN
