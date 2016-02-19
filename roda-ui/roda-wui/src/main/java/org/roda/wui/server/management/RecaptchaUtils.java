@@ -3,6 +3,7 @@ package org.roda.wui.server.management;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -12,6 +13,7 @@ import org.roda.wui.client.management.recaptcha.RecaptchaException;
 
 public class RecaptchaUtils {
   public static void recaptchaVerify(String secret, String captcha) throws RecaptchaException {
+    BufferedReader bufferedReader = null;
     try {
       String urlParameters = "secret=" + secret + "&response=" + captcha;
       String url = "https://www.google.com/recaptcha/api/siteverify?" + urlParameters;
@@ -24,7 +26,7 @@ public class RecaptchaUtils {
       HttpResponse response = client.execute(request);
 
       StringBuilder builder = new StringBuilder();
-      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+      bufferedReader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 
       for (String line = null; (line = bufferedReader.readLine()) != null;) {
         builder.append(line).append("\n");
@@ -36,6 +38,8 @@ public class RecaptchaUtils {
       }
     } catch (Exception e) {
       throw new RecaptchaException("ReCAPTCHA verification failed", e);
+    } finally {
+      IOUtils.closeQuietly(bufferedReader);
     }
   }
 }

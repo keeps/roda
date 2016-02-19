@@ -66,7 +66,11 @@ public class GwtCacheServer extends HttpServlet {
     InputStream resource = request.getSession().getServletContext().getResourceAsStream(path);
 
     if (resource != null) {
-      IOUtils.copy(resource, response.getOutputStream());
+      try {
+        IOUtils.copy(resource, response.getOutputStream());
+      } finally {
+        IOUtils.closeQuietly(resource);
+      }
     } else {
       response.sendError(HttpServletResponse.SC_NOT_FOUND, path + " was not found in resources");
     }

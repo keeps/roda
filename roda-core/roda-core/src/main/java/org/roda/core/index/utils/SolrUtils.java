@@ -245,9 +245,7 @@ public class SolrUtils {
       throw new GenericException(
         "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename, e);
     }
-    return
-
-    validateDescriptiveMetadataFields(doc);
+    return validateDescriptiveMetadataFields(doc);
   }
 
   private static SolrInputDocument validateDescriptiveMetadataFields(SolrInputDocument doc) {

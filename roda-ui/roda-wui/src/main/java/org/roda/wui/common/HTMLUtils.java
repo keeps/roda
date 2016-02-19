@@ -8,44 +8,22 @@
 package org.roda.wui.common;
 
 import java.io.CharArrayWriter;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.RandomStringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
-import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.DefaultStoragePath;
-import org.roda.core.storage.Resource;
-import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,18 +73,6 @@ public final class HTMLUtils {
     } catch (TransformerException | IOException e) {
       LOGGER.error("Error transforming binary into HTML (type=" + metadataType + ")", e);
       throw new GenericException("Error transforming binary into HTML (type=" + metadataType + ")", e);
-    }
-  }
-
-  private static String fileToHtml(File file, String metadataType, Map<String, Object> stylesheetOpt)
-    throws GenericException {
-    try {
-      Reader reader = new InputStreamReader(new FileInputStream(file));
-      return fileToHtml(reader, metadataType, stylesheetOpt);
-    } catch (TransformerException | IOException e) {
-      LOGGER.error("Error transforming file into HTML (type=" + metadataType + ")", e);
-
-      throw new GenericException("Error transforming file into HTML (type=" + metadataType + ")", e);
     }
   }
 

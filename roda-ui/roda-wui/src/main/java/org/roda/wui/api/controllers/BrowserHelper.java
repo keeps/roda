@@ -75,6 +75,7 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -722,13 +723,7 @@ public class BrowserHelper {
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP descriptive metadata file", e);
     } finally {
-      if (file != null && Files.exists(file)) {
-        try {
-          Files.delete(file);
-        } catch (IOException e) {
-          LOGGER.warn("Error while deleting temporary file", e);
-        }
-      }
+      FSUtils.deletePathQuietly(file);
     }
 
   }
