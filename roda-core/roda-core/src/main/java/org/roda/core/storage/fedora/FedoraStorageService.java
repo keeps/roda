@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -31,6 +32,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultContainer;
@@ -615,6 +617,37 @@ public class FedoraStorageService implements StorageService {
 
     };
     return ret;
+  }
+
+  @Override
+  public List<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void createBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void revertBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void deleteBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
   }
 
 }

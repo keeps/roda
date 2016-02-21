@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.common.iterables.CloseableIterable;
@@ -21,6 +22,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
@@ -421,6 +423,37 @@ public class FileStorageService implements StorageService {
       }
     };
     return ret;
+  }
+
+  @Override
+  public List<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public void createBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void revertBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void deleteBinaryVersion(StoragePath storagePath, String version) {
+    // TODO Auto-generated method stub
+    
   }
 
 }
