@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -199,5 +201,8 @@ public interface BrowserService extends RemoteService {
 
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
+  
+  Map<String, Date> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
 }

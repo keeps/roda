@@ -10,7 +10,9 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -129,5 +131,8 @@ public interface BrowserServiceAsync {
     AsyncCallback<IndexedPreservationAgent> callback);
 
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
+
+  void listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId,
+    AsyncCallback<Map<String, Date>> callback);
 
 }

@@ -78,6 +78,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -966,5 +967,17 @@ public class BrowserHelper {
       }
     }
     return files;
+  }
+
+  public static Map<String, Date> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    CloseableIterable<BinaryVersion> binaryVersions = RodaCoreFactory.getStorageService()
+      .listBinaryVersions(storagePath);
+    Map<String, Date> ret = new HashMap<>();
+    for (BinaryVersion binaryVersion : binaryVersions) {
+      ret.put(binaryVersion.getLabel(), binaryVersion.getCreatedDate());
+    }
+    return ret;
   }
 }

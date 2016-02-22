@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.xml.transform.TransformerException;
 
@@ -934,7 +935,8 @@ public class Browser extends RodaCoreService {
     return resource;
   }
 
-  public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaUser user, String eventId) throws AuthorizationDeniedException, NotFoundException, GenericException {
+  public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaUser user, String eventId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // TODO maybe update permissions...
@@ -953,5 +955,27 @@ public class Browser extends RodaCoreService {
       INDEX_PRESERVATION_EVENT_ID, eventId);
 
     return resource;
+  }
+
+  public static Map<String, Date> listDescriptiveMetadataVersions(RodaUser user, String aipId,
+    String descriptiveMetadataId)
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    Map<String, Date> versions = BrowserHelper.listDescriptiveMetadataVersions(aipId, descriptiveMetadataId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "listDescriptiveMetadataVersions", null, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId);
+    return versions;
   }
 }

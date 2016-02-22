@@ -9,8 +9,10 @@ package org.roda.wui.server.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -421,5 +423,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.retrievePreservationEventViewBundle(user, eventId);
+  }
+
+  @Override
+  public Map<String, Date> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.listDescriptiveMetadataVersions(user, aipId, descriptiveMetadataId);
   }
 }

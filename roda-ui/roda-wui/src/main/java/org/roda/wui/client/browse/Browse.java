@@ -209,10 +209,10 @@ public class Browse extends Composite {
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
-    
+
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     /* TODO set this pages enabled after developed */
@@ -268,6 +268,9 @@ public class Browse extends Composite {
       ViewRepresentation.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(PreservationEvents.RESOLVER.getHistoryToken())) {
       PreservationEvents.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
+      DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -623,6 +626,12 @@ public class Browse extends Composite {
 
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
+
+            // History link
+            String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+            String historyLinkHtml = "<a href='" + historyLink
+              + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
+            b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
 
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);

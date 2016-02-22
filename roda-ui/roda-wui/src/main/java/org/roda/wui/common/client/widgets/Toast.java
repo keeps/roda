@@ -187,4 +187,9 @@ public class Toast extends PopupPanel {
   public MessagePopupType getType() {
     return type;
   }
+
+  public static void showError(Throwable caught) {
+    showError(caught.getClass().getName(), caught.getMessage());
+    
+  }
 }
