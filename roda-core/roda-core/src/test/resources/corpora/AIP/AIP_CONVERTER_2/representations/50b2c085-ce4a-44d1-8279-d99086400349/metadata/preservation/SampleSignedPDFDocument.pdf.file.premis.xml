@@ -2,7 +2,7 @@
 <prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
     <prem:objectIdentifierType>local</prem:objectIdentifierType>
-    <prem:objectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2/input_signed.pdf</prem:objectIdentifierValue>
+    <prem:objectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a/50b2c085-ce4a-44d1-8279-d99086400349/SampleSignedPDFDocument.pdf</prem:objectIdentifierValue>
   </prem:objectIdentifier>
   <prem:preservationLevel>
     <prem:preservationLevelValue>full</prem:preservationLevelValue>
@@ -11,20 +11,20 @@
     <prem:compositionLevel>0</prem:compositionLevel>
     <prem:fixity>
       <prem:messageDigestAlgorithm>SHA-256</prem:messageDigestAlgorithm>
-      <prem:messageDigest>1DE29B87E03563E57E30EEC6ACC785028327635790417F78B2803AC0413F8A8B</prem:messageDigest>
+      <prem:messageDigest>7F83DF32B19C0CCC5B5244BC3277E61E22E6D61E5DE5370311151895B18970C4</prem:messageDigest>
       <prem:messageDigestOriginator>RODA</prem:messageDigestOriginator>
     </prem:fixity>
-    <prem:size>336768</prem:size>
+    <prem:size>272318</prem:size>
     <prem:format>
       <prem:formatDesignation>
-        <prem:formatName>Acrobat PDF 1.5 - Portable Document Format</prem:formatName>
-        <prem:formatVersion>1.5</prem:formatVersion>
+        <prem:formatName>Acrobat PDF 1.6 - Portable Document Format</prem:formatName>
+        <prem:formatVersion>1.6</prem:formatVersion>
       </prem:formatDesignation>
     </prem:format>
     <prem:format>
       <prem:formatRegistry>
         <prem:formatRegistryName>pronom</prem:formatRegistryName>
-        <prem:formatRegistryKey>fmt/19</prem:formatRegistryKey>
+        <prem:formatRegistryKey>fmt/20</prem:formatRegistryKey>
       </prem:formatRegistry>
     </prem:format>
     <prem:format>
@@ -34,10 +34,10 @@
       </prem:formatRegistry>
     </prem:format>
     <prem:creatingApplication>
-      <prem:dateCreatedByApplication>2015-01-26T04:29:04Z</prem:dateCreatedByApplication>
+      <prem:dateCreatedByApplication>2009-07-16T14:46:25Z</prem:dateCreatedByApplication>
     </prem:creatingApplication>
   </prem:objectCharacteristics>
-  <prem:originalName>input_signed.pdf</prem:originalName>
+  <prem:originalName>SampleSignedPDFDocument.pdf</prem:originalName>
   <prem:storage>
     <prem:contentLocation>
       <prem:contentLocationType/>

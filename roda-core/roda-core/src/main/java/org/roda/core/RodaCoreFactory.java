@@ -126,13 +126,13 @@ import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugi
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;

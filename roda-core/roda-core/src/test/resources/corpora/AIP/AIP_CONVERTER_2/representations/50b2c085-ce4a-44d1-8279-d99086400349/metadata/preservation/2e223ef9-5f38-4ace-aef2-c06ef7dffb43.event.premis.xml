@@ -2,10 +2,10 @@
 <event xmlns="info:lc/xmlns/premis-v2" xmlns:xlin="http://www.w3.org/1999/xlink">
   <eventIdentifier>
     <eventIdentifierType>local</eventIdentifierType>
-    <eventIdentifierValue>1b22d478-4803-4aba-87bd-d852c73dd689</eventIdentifierValue>
+    <eventIdentifierValue>2e223ef9-5f38-4ace-aef2-c06ef7dffb43</eventIdentifierValue>
   </eventIdentifier>
   <eventType>format identification</eventType>
-  <eventDateTime>2016-02-19T10:57:26.18Z</eventDateTime>
+  <eventDateTime>2016-02-19T16:22:06.57Z</eventDateTime>
   <eventDetail>The files of the representation were successfully identified.</eventDetail>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
@@ -19,6 +19,6 @@
   </linkingAgentIdentifier>
   <linkingObjectIdentifier>
     <linkingObjectIdentifierType>source</linkingObjectIdentifierType>
-    <linkingObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2</linkingObjectIdentifierValue>
+    <linkingObjectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a/50b2c085-ce4a-44d1-8279-d99086400349</linkingObjectIdentifierValue>
   </linkingObjectIdentifier>
 </event>

@@ -1,4 +1,4 @@
-package org.roda.core.plugins.plugins.ingest.migration;
+package org.roda.core.plugins.plugins.ingest.validation;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -40,6 +40,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.ingest.migration.AbstractConvertPluginUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -70,7 +71,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     verificationAffectsOnOutcome = true;
 
     applicableTo = Arrays.asList("pdf");
-    pronomToExtension = PdfToPdfaPluginUtils.getPronomToExtension();
+    pronomToExtension = DigitalSignaturePluginUtils.getPronomToExtension();
     mimetypeToExtension = new HashMap<>();
     mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
   }
@@ -234,16 +235,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
               || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
                 .contains(fileFormat)))) {
 
-              if (applicableTo.size() > 0) {
-                if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
-                  && !pronomToExtension.get(filePronom).contains(fileFormat)) {
-                  fileFormat = pronomToExtension.get(filePronom).get(0);
-                } else if (fileMimetype != null && !fileMimetype.isEmpty()
-                  && mimetypeToExtension.get(fileMimetype) != null
-                  && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
-                  fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
-                }
-              }
+              fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
 
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
@@ -253,7 +245,7 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
-                verified = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
+                verified = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath());
                 verifiedFiles.put(file.getId(), verified);
                 if (verified != null && verificationAffectsOnOutcome)
                   pluginResultState = 0;
@@ -261,10 +253,10 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(
-                  directAccess.getPath(), fileFormat);
+                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(directAccess
+                  .getPath());
 
-                if (extractResult.get(0) != null) {
+                if (extractResult.size() > 0) {
                   ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
                   ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
@@ -280,7 +272,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
                   extractedFiles.add(file);
                 }
-
               }
 
               if (doStrip) {
@@ -424,6 +415,19 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
     }
+  }
+
+  private String getNewFileFormat(String fileFormat, String filePronom, String fileMimetype) {
+    if (applicableTo.size() > 0) {
+      if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
+        && !pronomToExtension.get(filePronom).contains(fileFormat)) {
+        fileFormat = pronomToExtension.get(filePronom).get(0);
+      } else if (fileMimetype != null && !fileMimetype.isEmpty() && mimetypeToExtension.get(fileMimetype) != null
+        && !mimetypeToExtension.get(fileMimetype).contains(fileFormat)) {
+        fileFormat = mimetypeToExtension.get(fileMimetype).get(0);
+      }
+    }
+    return fileFormat;
   }
 
   @Override

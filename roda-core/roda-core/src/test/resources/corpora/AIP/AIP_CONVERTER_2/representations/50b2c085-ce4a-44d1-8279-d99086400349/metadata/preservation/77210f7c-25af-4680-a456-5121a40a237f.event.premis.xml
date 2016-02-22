@@ -2,10 +2,10 @@
 <event xmlns="info:lc/xmlns/premis-v2" xmlns:xlin="http://www.w3.org/1999/xlink">
   <eventIdentifier>
     <eventIdentifierType>local</eventIdentifierType>
-    <eventIdentifierValue>243f5bac-527e-4d01-9824-07c8458a51f5</eventIdentifierValue>
+    <eventIdentifierValue>77210f7c-25af-4680-a456-5121a40a237f</eventIdentifierValue>
   </eventIdentifier>
   <eventType>ingestion</eventType>
-  <eventDateTime>2016-02-19T10:57:28.69Z</eventDateTime>
+  <eventDateTime>2016-02-19T16:22:09.54Z</eventDateTime>
   <eventDetail>The SIP was successfully accepted.</eventDetail>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
@@ -19,6 +19,6 @@
   </linkingAgentIdentifier>
   <linkingObjectIdentifier>
     <linkingObjectIdentifierType>source</linkingObjectIdentifierType>
-    <linkingObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef/04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2</linkingObjectIdentifierValue>
+    <linkingObjectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a/50b2c085-ce4a-44d1-8279-d99086400349</linkingObjectIdentifierValue>
   </linkingObjectIdentifier>
 </event>

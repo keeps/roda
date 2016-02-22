@@ -2,10 +2,10 @@
 <event xmlns="info:lc/xmlns/premis-v2" xmlns:xlin="http://www.w3.org/1999/xlink">
   <eventIdentifier>
     <eventIdentifierType>local</eventIdentifierType>
-    <eventIdentifierValue>84c0066f-b260-4d66-91ea-8d59463d3fc8</eventIdentifierValue>
+    <eventIdentifierValue>a90c4489-d112-4c64-b601-423b6881cfb3</eventIdentifierValue>
   </eventIdentifier>
   <eventType>virus check</eventType>
-  <eventDateTime>2016-02-19T10:57:24.64Z</eventDateTime>
+  <eventDateTime>2016-02-19T16:22:04.66Z</eventDateTime>
   <eventDetail>All the files from the SIP were verified against an antivirus.</eventDetail>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
@@ -14,11 +14,11 @@
 Known viruses: 4267749
 Engine version: 0.98.7
 Scanned directories: 6
-Scanned files: 9
+Scanned files: 10
 Infected files: 0
-Data scanned: 2.88 MB
-Data read: 1.22 MB (ratio 2.36:1)
-Time: 13.600 sec (0 m 13 s)</eventOutcomeDetailNote>
+Data scanned: 3.35 MB
+Data read: 1.40 MB (ratio 2.40:1)
+Time: 13.849 sec (0 m 13 s)</eventOutcomeDetailNote>
     </eventOutcomeDetail>
   </eventOutcomeInformation>
   <linkingAgentIdentifier xlin:type="simple">
@@ -27,6 +27,6 @@ Time: 13.600 sec (0 m 13 s)</eventOutcomeDetailNote>
   </linkingAgentIdentifier>
   <linkingObjectIdentifier>
     <linkingObjectIdentifierType>source</linkingObjectIdentifierType>
-    <linkingObjectIdentifierValue>0d323271-1e39-48c5-96a5-5d57b7eeb6ef</linkingObjectIdentifierValue>
+    <linkingObjectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a</linkingObjectIdentifierValue>
   </linkingObjectIdentifier>
 </event>
