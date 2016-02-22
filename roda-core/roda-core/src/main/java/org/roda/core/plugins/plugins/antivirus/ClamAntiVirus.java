@@ -134,7 +134,7 @@ public class ClamAntiVirus implements AntiVirus {
 
       // clamscan -r -i bin/ 2> /dev/null
       String clamavBin = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.internal.virus_check.clamav.bin", "/usr/bin/clamscan");
+        .getString("core.plugins.internal.virus_check.clamav.bin", "clamscan");
       ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, "-ri", path.toString());
 
       // processBuilder.redirectErrorStream();
