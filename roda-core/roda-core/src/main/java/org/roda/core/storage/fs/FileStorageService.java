@@ -152,8 +152,12 @@ public class FileStorageService implements StorageService {
 
     // remove history
     Path resourceHistoryPath = historyPath.resolve(containerPath);
-    FSUtils.deletePath(resourceHistoryPath);
-    FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
+    try {
+      FSUtils.deletePath(resourceHistoryPath);
+      FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
+    } catch (NotFoundException e) {
+      // nothing to do
+    }
   }
 
   @Override
@@ -382,8 +386,12 @@ public class FileStorageService implements StorageService {
 
     // remove history
     Path resourceHistoryPath = historyPath.resolve(resourcePath);
-    FSUtils.deletePath(resourceHistoryPath);
-    FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
+    try {
+      FSUtils.deletePath(resourceHistoryPath);
+      FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
+    } catch (NotFoundException e) {
+      // nothing to do
+    }
   }
 
   public Path resolve(StoragePath storagePath) {

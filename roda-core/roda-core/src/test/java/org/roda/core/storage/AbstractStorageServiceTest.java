@@ -951,6 +951,17 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     } catch (NotFoundException e) {
       // do nothing
     }
+    
+    // 10) delete binary and all its history
+    getStorage().deleteResource(binaryStoragePath);
+    
+    try {
+      getStorage().getBinaryVersion(binaryStoragePath, version1);
+      fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+    
 
     // cleanup
     getStorage().deleteContainer(containerStoragePath);

@@ -66,7 +66,7 @@ public class EARKSIPPluginsTest {
   private static final String CORPORA_TEST1 = "test1";
   private static final String CORPORA_TEST1_TXT = "test1.txt";
   private static final int GENERATED_FILE_SIZE = 100;
-  private static final int AUTO_COMMIT_TIMEOUT = 2000;
+  private static final int AUTO_COMMIT_TIMEOUT = 2500;
   private static Path basePath;
   private static Path logPath;
 
