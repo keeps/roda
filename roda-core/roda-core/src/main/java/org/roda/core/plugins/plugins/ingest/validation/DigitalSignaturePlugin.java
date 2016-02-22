@@ -29,7 +29,6 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
-import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
@@ -37,6 +36,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
@@ -49,7 +49,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DigitalSignaturePlugin implements Plugin<Representation> {
+public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
   private boolean doVerify;
@@ -136,11 +136,6 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   }
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
-  }
-
-  @Override
   public String getVersion() {
     return "1.0";
   }
@@ -151,17 +146,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
   }
 
   @Override
-  public List<PluginParameter> getParameters() {
-    return null;
-  }
-
-  @Override
-  public Map<String, String> getParameterValues() {
-    return null;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
     // do the digital signature verification
     if (parameters.containsKey("doVerify")) {
       doVerify = Boolean.parseBoolean(parameters.get("doVerify"));

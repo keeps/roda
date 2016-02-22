@@ -271,8 +271,8 @@ public class PluginManager {
   private <T extends Serializable> void loadInternalPlugins() {
     Reflections reflections = new Reflections(
       RodaCoreFactory.getRodaConfigurationAsString("core", "plugins", "internal", "package"));
-    Set<Class<? extends Plugin>> plugins = reflections.getSubTypesOf(Plugin.class);
-    for (Class<? extends Plugin> plugin : plugins) {
+    Set<Class<? extends AbstractPlugin>> plugins = reflections.getSubTypesOf(AbstractPlugin.class);
+    for (Class<? extends AbstractPlugin> plugin : plugins) {
       if (!Modifier.isAbstract(plugin.getModifiers())) {
         Plugin<?> p;
         try {
