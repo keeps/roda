@@ -207,10 +207,11 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
       String newRepresentationID = UUID.randomUUID().toString();
       List<File> alteredFiles = new ArrayList<File>();
       List<File> extractedFiles = new ArrayList<File>();
-      Map<String, Integer> verifiedFiles = new HashMap<String, Integer>();
+      List<File> newFiles = new ArrayList<File>();
+      Map<String, String> verifiedFiles = new HashMap<String, String>();
       aipId = representation.getAipId();
       int pluginResultState = 1;
-      int verified = 1;
+      String verified = null;
       boolean notify = true;
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
@@ -230,8 +231,8 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
-              || (applicableTo.contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
+                .contains(fileFormat)))) {
 
               if (applicableTo.size() > 0) {
                 if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
@@ -254,26 +255,26 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
                 verified = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
                 verifiedFiles.put(file.getId(), verified);
-                if (verified != 1 && verificationAffectsOnOutcome)
+                if (verified != null && verificationAffectsOnOutcome)
                   pluginResultState = 0;
               }
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                List<Path> extractResult = DigitalSignaturePluginUtils
-                  .runDigitalSignatureExtract(directAccess.getPath(), fileFormat);
+                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(
+                  directAccess.getPath(), fileFormat);
 
                 if (extractResult.get(0) != null) {
                   ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
                   ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
-                  model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
-                    file.getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.FILE_SUFFIX,
+                  model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(), file
+                    .getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.FILE_SUFFIX,
                     DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
 
                   if (extractResult.get(1) != null) {
-                    model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
-                      file.getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.CONTENTS_SUFFIX,
+                    model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(), file
+                      .getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.CONTENTS_SUFFIX,
                       DigitalSignaturePlugin.OTHER_METADATA_TYPE, contentsPayload, true);
                   }
 
@@ -299,20 +300,21 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
                   // update file on new representation
                   String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + fileFormat);
-                  model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload, notify);
+                  File f = model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload, notify);
                   alteredFiles.add(file);
+                  newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
 
                 } else {
 
-                  LOGGER.debug("Process failed on file " + file.getId() + " of representation " + representation.getId()
-                    + " from AIP " + aipId);
+                  LOGGER.debug("Process failed on file " + file.getId() + " of representation "
+                    + representation.getId() + " from AIP " + aipId);
                   pluginResultState = 2;
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
+                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+                    RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
                 }
               }
             } else {
@@ -339,14 +341,14 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
 
         LOGGER.debug("Creating digital signature plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
-        createEvent(alteredFiles, extractedFiles, verifiedFiles, model.retrieveAIP(aipId), newRepresentationID, model,
-          pluginResultState, agent, notifyEvent);
+        createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
+          newRepresentationID, model, pluginResultState, agent, notifyEvent);
 
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
+        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(), new Attribute(
+          RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
       }
 
       report.addItem(reportItem);
@@ -361,9 +363,9 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     return report;
   }
 
-  private void createEvent(List<File> alteredFiles, List<File> extractedFiles, Map<String, Integer> verifiedFiles,
-    AIP aip, String newRepresentationID, ModelService model, int pluginResultState, IndexedPreservationAgent agent,
-    boolean notify) throws PluginException {
+  private void createEvent(List<File> alteredFiles, List<File> extractedFiles, List<File> newFiles,
+    Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, int pluginResultState,
+    IndexedPreservationAgent agent, boolean notify) throws PluginException {
 
     List<String> premisSourceFilesIdentifiers = new ArrayList<String>();
     List<String> premisTargetFilesIdentifiers = new ArrayList<String>();
@@ -396,14 +398,14 @@ public class DigitalSignaturePlugin implements Plugin<Representation> {
     if (alteredFiles.size() == 0) {
       stringBuilder.append("No file was stripped on this representation.");
     } else {
-      stringBuilder.append("The digital signature (DS) operation stripped files. ");
+      stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
-        // TODO This is not right, source is in one representation and outcome
-        // is in another
-        premisSourceFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
-        premisTargetFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
+        premisSourceFilesIdentifiers.add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(),
+          file.getPath(), file.getId()));
+      }
+      for (File file : newFiles) {
+        premisTargetFilesIdentifiers.add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(),
+          file.getPath(), file.getId()));
       }
     }
 

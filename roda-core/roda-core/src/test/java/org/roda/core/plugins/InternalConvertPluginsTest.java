@@ -593,7 +593,7 @@ public class InternalConvertPluginsTest {
     Plugin<Representation> plugin = new DigitalSignaturePlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("doVerify", "False");
+    parameters.put("doVerify", "True");
     parameters.put("doExtract", "True");
     parameters.put("doStrip", "True");
     plugin.setParameterValues(parameters);
