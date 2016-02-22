@@ -175,10 +175,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         String fieldName = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "field");
         String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
         String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-
+        boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+        
         searchField.setField(fieldName);
         searchField.setType(fieldType);
         searchField.setLabel(messages.getTranslation(fieldLabelI18N));
+        searchField.setFixed(fieldFixed);
 
         searchFields.add(searchField);
       }

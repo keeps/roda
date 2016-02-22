@@ -14,6 +14,15 @@ public class SearchField implements Serializable {
   private String field;
   private String label;
   private String type;
+  private boolean fixed;
+
+  public boolean isFixed() {
+    return fixed;
+  }
+
+  public void setFixed(boolean fixed) {
+    this.fixed = fixed;
+  }
 
   public String getField() {
     return field;
@@ -41,7 +50,7 @@ public class SearchField implements Serializable {
 
   @Override
   public String toString() {
-    return "SearchField [field=" + field + ", label=" + label + ", type=" + type + "]";
+    return "SearchField [field=" + field + ", label=" + label + ", type=" + type + ", fixed=" + fixed + "]";
   }
 
 }

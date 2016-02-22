@@ -44,7 +44,11 @@ public class ListboxUtils {
 
     listbox.insertItem(item, value, indexToInsert);
     return indexToInsert;
-
   }
 
+  public static final void copyValues(ListBox listBoxOrigin, ListBox listBoxDestination) {
+    for (int i = 0; i < listBoxOrigin.getItemCount(); i++) {
+      listBoxDestination.addItem(listBoxOrigin.getItemText(i), listBoxOrigin.getValue(i)); 
+    }
+  }
 }

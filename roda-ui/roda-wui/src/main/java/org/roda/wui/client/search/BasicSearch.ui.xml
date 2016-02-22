@@ -59,8 +59,6 @@
 					<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
 						styleName="searchAdvancedFieldsPanel empty" />
 					<g:FlowPanel styleName="searchAdvancedFieldAdd">
-						<g:ListBox styleName="form-listbox {style.addlistbox}"
-							ui:field="searchAdvancedFieldOptions" />
 						<g:Button styleName="btn btn-plus {style.addbutton}"
 							ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
 						<g:Button styleName="btn btn-search {style.searchbutton}"

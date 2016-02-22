@@ -2471,6 +2471,10 @@ td.datePickerMonth, td.datePickerYear {
 	border-top: 2px solid #089de3;
 }
 
+.search-field {
+	display: inline-block;
+}
+
 .search-field-label {
 	display: inline;
 }
