@@ -181,7 +181,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Ingest transfer")
   String ingestTransferTitle();
+  
+  @DefaultMessage("Transferred resources list")
+  String ingestTransferList();
 
+  @DefaultMessage("Search transferred resources...")
+  String ingestTransferSearchPlaceHolder();
+  
   @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}")
   String ingestTransferItemInfo(Date creationDate, String readableFileSize);
 

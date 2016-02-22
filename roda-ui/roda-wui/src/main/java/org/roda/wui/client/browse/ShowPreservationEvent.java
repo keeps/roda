@@ -11,8 +11,6 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
@@ -245,7 +243,7 @@ public class ShowPreservationEvent extends Composite {
     if (event.getSourcesObjectIds().size() > 0) {
       for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
         String text = sourceObjectId.getValue();
-        addObjectPanel(sourceObjectId.getValue(), bundle, sourceObjectsPanel);
+        addObjectPanel(text, bundle, sourceObjectsPanel);
       }
     } else {
       sourceObjectsHeader.setVisible(false);
@@ -256,7 +254,7 @@ public class ShowPreservationEvent extends Composite {
     if (event.getOutcomeObjectIds().size() > 0) {
       for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
         String text = outcomeObjectId.getValue();
-        addObjectPanel(text,bundle, outcomeObjectsPanel);
+        addObjectPanel(text, bundle, outcomeObjectsPanel);
       }
     } else {
       outcomeObjectsHeader.setVisible(false);
@@ -308,10 +306,10 @@ public class ShowPreservationEvent extends Composite {
       nameLabel.addStyleName("label");
       Label nameValue = new Label(
         StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
-      
+
       Label pathLabel = null;
       Label pathValue = null;
-      if(ifile.getPath()!=null && !ifile.getPath().isEmpty()){
+      if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
         pathLabel = new Label("Path");
         pathLabel.addStyleName("label");
         pathValue = new Label(Tools.join(ifile.getPath(), IdUtils.LINKING_ID_SEPARATOR));
@@ -343,7 +341,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(header);
       layout.add(nameLabel);
       layout.add(nameValue);
-      if(pathValue!=null){
+      if (pathValue != null) {
         layout.add(pathLabel);
         layout.add(pathValue);
       }
@@ -363,10 +361,10 @@ public class ShowPreservationEvent extends Composite {
     } else if (aipId != null) {
       // is an AIP
       // TODO add AIP level (icon) and title
-      
+
       Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, aipId));
       layout.add(link);
-      
+
       objectsPanel.add(layout);
     } else {
       // is empty, do nothing

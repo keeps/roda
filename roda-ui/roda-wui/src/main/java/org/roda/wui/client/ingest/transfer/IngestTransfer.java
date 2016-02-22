@@ -179,15 +179,13 @@ public class IngestTransfer extends Composite {
   private IngestTransfer() {
     Facets facets = null;
 
-    // TODO externalise strings
-    transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, "Transferred resources list");
+    transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList());
 
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
 
-    // TODO externalise strings
-    searchInputBox.getElement().setPropertyString("placeholder", "Search transferred resources");
+    searchInputBox.getElement().setPropertyString("placeholder", messages.ingestTransferSearchPlaceHolder());
 
     searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
