@@ -8,10 +8,13 @@
 package org.roda.core.storage.fs;
 
 import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
-import java.util.List;
+import java.nio.file.StandardCopyOption;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.roda.core.common.iterables.CloseableIterable;
@@ -48,7 +51,10 @@ public class FileStorageService implements StorageService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FileStorageService.class);
 
+  private static final String HISTORY_SUFFIX = "-history";
+
   private final Path basePath;
+  private final Path historyPath;
 
   public FileStorageService(Path basePath) throws GenericException {
     this.basePath = basePath;
@@ -64,10 +70,29 @@ public class FileStorageService implements StorageService {
     } else if (!Files.isReadable(basePath)) {
       throw new GenericException("Cannot read from base path " + basePath);
     } else if (!Files.isWritable(basePath)) {
-      throw new GenericException("Cannot write from base path " + basePath);
+      throw new GenericException("Cannot write to base path " + basePath);
     } else {
       // do nothing
     }
+
+    this.historyPath = basePath.getParent().resolve(basePath.getFileName() + HISTORY_SUFFIX);
+    if (!Files.exists(historyPath)) {
+      try {
+        Files.createDirectories(historyPath);
+      } catch (IOException e) {
+        throw new GenericException("Could not created base path " + historyPath, e);
+
+      }
+    } else if (!Files.isDirectory(historyPath)) {
+      throw new GenericException("History path is not a directory " + historyPath);
+    } else if (!Files.isReadable(historyPath)) {
+      throw new GenericException("Cannot read from history path " + historyPath);
+    } else if (!Files.isWritable(historyPath)) {
+      throw new GenericException("Cannot write to history path " + historyPath);
+    } else {
+      // do nothing
+    }
+
   }
 
   @Override
@@ -124,6 +149,11 @@ public class FileStorageService implements StorageService {
   public void deleteContainer(StoragePath storagePath) throws NotFoundException, GenericException {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
     FSUtils.deletePath(containerPath);
+
+    // remove history
+    Path resourceHistoryPath = historyPath.resolve(containerPath);
+    FSUtils.deletePath(resourceHistoryPath);
+    FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
   }
 
   @Override
@@ -349,6 +379,11 @@ public class FileStorageService implements StorageService {
   public void deleteResource(StoragePath storagePath) throws NotFoundException, GenericException {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
     FSUtils.deletePath(resourcePath);
+
+    // remove history
+    Path resourceHistoryPath = historyPath.resolve(resourcePath);
+    FSUtils.deletePath(resourceHistoryPath);
+    FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
   }
 
   public Path resolve(StoragePath storagePath) {
@@ -426,34 +461,151 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public List<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+  public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    // TODO Auto-generated method stub
-    return null;
+    Path fauxPath = historyPath.resolve(storagePath.asString());
+    Path parent = fauxPath.getParent();
+    final String baseName = fauxPath.getFileName().toString();
+
+    CloseableIterable<BinaryVersion> iterable;
+
+    try {
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
+        new DirectoryStream.Filter<Path>() {
+
+          @Override
+          public boolean accept(Path entry) throws IOException {
+            return entry.getFileName().toString().startsWith(baseName);
+          }
+        });
+
+      final Iterator<Path> pathIterator = directoryStream.iterator();
+      iterable = new CloseableIterable<BinaryVersion>() {
+
+        @Override
+        public Iterator<BinaryVersion> iterator() {
+          return new Iterator<BinaryVersion>() {
+
+            @Override
+            public boolean hasNext() {
+              return pathIterator.hasNext();
+            }
+
+            @Override
+            public BinaryVersion next() {
+              Path next = pathIterator.next();
+              BinaryVersion ret;
+              try {
+                ret = FSUtils.convertPathToBinaryVersion(historyPath, next);
+              } catch (GenericException | NotFoundException | RequestNotValidException e) {
+                LOGGER.error("Error while list path " + basePath + " while parsing resource " + next, e);
+                ret = null;
+              }
+
+              return ret;
+            }
+
+          };
+        }
+
+        @Override
+        public void close() throws IOException {
+          directoryStream.close();
+        }
+      };
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not find versions of " + storagePath, e);
+    } catch (IOException e) {
+      throw new GenericException("Error finding version of " + storagePath, e);
+    }
+
+    return iterable;
   }
 
   @Override
-  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    return null;
+  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    Path binVersionPath = FSUtils.getEntityPath(historyPath, storagePath, version);
+    return FSUtils.convertPathToBinaryVersion(historyPath, binVersionPath);
   }
 
   @Override
-  public void createBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException {
+    Path binPath = FSUtils.getEntityPath(basePath, storagePath);
+    Path binVersionPath = FSUtils.getEntityPath(historyPath, storagePath, version);
+
+    if (!Files.exists(binPath)) {
+      throw new NotFoundException("Binary does not exist: " + binPath);
+    }
+
+    if (!Files.isRegularFile(binPath)) {
+      throw new RequestNotValidException("Not a regular file: " + binPath);
+    }
+
+    if (Files.exists(binVersionPath)) {
+      throw new AlreadyExistsException("Binary version already exists: " + binVersionPath);
+    }
+
+    try {
+      // ensuring parent exists
+      Path parent = binVersionPath.getParent();
+      if (!Files.exists(parent)) {
+        Files.createDirectories(parent);
+      }
+
+      // writing file
+      Files.copy(binPath, binVersionPath);
+      return FSUtils.convertPathToBinaryVersion(historyPath, binVersionPath);
+    } catch (IOException e) {
+      throw new GenericException("Could not create binary", e);
+    }
+
   }
 
   @Override
-  public void revertBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    
+  public void revertBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, RequestNotValidException, GenericException {
+    Path binPath = FSUtils.getEntityPath(basePath, storagePath);
+    Path binVersionPath = FSUtils.getEntityPath(historyPath, storagePath, version);
+
+    if (!Files.exists(binPath)) {
+      throw new NotFoundException("Binary does not exist: " + binPath);
+    }
+
+    if (!Files.isRegularFile(binPath)) {
+      throw new RequestNotValidException("Not a regular file: " + binPath);
+    }
+
+    if (!Files.exists(binVersionPath)) {
+      throw new NotFoundException("Binary version does not exist: " + binVersionPath);
+    }
+
+    try {
+      // writing file
+      Files.copy(binVersionPath, binPath, StandardCopyOption.REPLACE_EXISTING);
+    } catch (IOException e) {
+      throw new GenericException("Could not create binary", e);
+    }
+
   }
 
   @Override
-  public void deleteBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    
+  public void deleteBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    Path binVersionPath = FSUtils.getEntityPath(historyPath, storagePath, version);
+    try {
+      Files.delete(binVersionPath);
+
+      // cleanup created parents
+      FSUtils.deleteEmptyAncestorsQuietly(binVersionPath);
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not find binary version: " + binVersionPath, e);
+    } catch (IOException e) {
+      throw new GenericException("Could not delete binary version: " + binVersionPath, e);
+    }
   }
 
 }

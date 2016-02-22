@@ -7,9 +7,10 @@
  */
 package org.roda.core.storage;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public interface BinaryVersion {
+public interface BinaryVersion extends Serializable {
 
   Binary getBinary();
 

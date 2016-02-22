@@ -8,7 +8,6 @@
 package org.roda.core.storage;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.roda.core.data.v2.ip.StoragePath;
 

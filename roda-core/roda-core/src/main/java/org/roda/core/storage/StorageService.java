@@ -7,8 +7,6 @@
  */
 package org.roda.core.storage;
 
-import java.util.List;
-
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -337,16 +335,20 @@ public interface StorageService {
     AuthorizationDeniedException;
 
   public DirectResourceAccess getDirectAccess(StoragePath storagePath);
-  
-  public List<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+
+  public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException;
 
-  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version);
+  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, NotFoundException, GenericException;
 
-  public void createBinaryVersion(StoragePath storagePath, String version);
-  
-  public void revertBinaryVersion(StoragePath storagePath, String version);
-  
-  public void deleteBinaryVersion(StoragePath storagePath, String version);
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException;
+
+  public void revertBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, RequestNotValidException, GenericException;
+
+  public void deleteBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, GenericException, RequestNotValidException;
 
 }

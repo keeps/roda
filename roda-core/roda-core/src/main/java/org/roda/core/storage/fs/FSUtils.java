@@ -24,6 +24,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,13 +35,17 @@ import java.util.stream.Stream;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
@@ -57,6 +62,7 @@ import org.slf4j.LoggerFactory;
 public final class FSUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FSUtils.class);
+  private static final char VERSION_SEP = '_';
 
   /**
    * Private empty constructor
@@ -236,6 +242,15 @@ public final class FSUtils {
    */
   public static Path getEntityPath(Path basePath, StoragePath storagePath) {
     Path resourcePath = basePath.resolve(storagePath.asString());
+    return resourcePath;
+  }
+
+  public static Path getEntityPath(Path basePath, StoragePath storagePath, String version) throws RequestNotValidException {
+    if (version.indexOf(VERSION_SEP) >= 0) {
+      throw new RequestNotValidException("Cannot use '" + VERSION_SEP + "' in version " + version);
+    }
+
+    Path resourcePath = basePath.resolve(storagePath.asString() + VERSION_SEP + version);
     return resourcePath;
   }
 
@@ -496,6 +511,46 @@ public final class FSUtils {
     return resource;
   }
 
+  public static BinaryVersion convertPathToBinaryVersion(Path historyPath, Path path)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    BinaryVersion ret = null;
+
+    if (!Files.exists(path)) {
+      throw new NotFoundException("Cannot find file version at " + path);
+    }
+
+    // storage path
+    Path relativePath = historyPath.relativize(path);
+    String fileName = relativePath.getFileName().toString();
+    int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
+
+    if (lastIndexOfDot <= 0 || lastIndexOfDot == fileName.length() - 1) {
+      throw new RequestNotValidException("Bad name for versioned file: " + path);
+    }
+
+    String version = fileName.substring(lastIndexOfDot + 1);
+    String realFileName = fileName.substring(0, lastIndexOfDot);
+    Path realFilePath = relativePath.getParent().resolve(realFileName);
+
+    StoragePath storagePath = DefaultStoragePath.parse(realFilePath.toString());
+
+    // construct
+    ContentPayload content = new FSPathContentPayload(path);
+    long sizeInBytes;
+    try {
+      sizeInBytes = Files.size(path);
+      Map<String, String> contentDigest = null;
+      Binary binary = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
+      // TODO get created date from a metadata file
+      Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
+      ret = new DefaultBinaryVersion(binary, version, createdDate);
+    } catch (IOException e) {
+      throw new GenericException("Could not get file size", e);
+    }
+
+    return ret;
+  }
+
   /**
    * Converts a path into a container
    * 
@@ -613,6 +668,90 @@ public final class FSUtils {
     } while (file == null);
 
     return file;
+  }
+
+  public static CloseableIterable<BinaryVersion> listBinaryVersions(Path historyPath, StoragePath storagePath)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Path fauxPath = historyPath.resolve(storagePath.asString());
+    final Path parent = fauxPath.getParent();
+    final String baseName = fauxPath.getFileName().toString();
+
+    CloseableIterable<BinaryVersion> iterable;
+
+    try {
+      final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
+        new DirectoryStream.Filter<Path>() {
+
+          @Override
+          public boolean accept(Path entry) throws IOException {
+            String fileName = entry.getFileName().toString();
+            int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
+
+            return lastIndexOfDot > 0 ? fileName.substring(0, lastIndexOfDot).equals(baseName) : false;
+          }
+        });
+
+      final Iterator<Path> pathIterator = directoryStream.iterator();
+      iterable = new CloseableIterable<BinaryVersion>() {
+
+        @Override
+        public Iterator<BinaryVersion> iterator() {
+          return new Iterator<BinaryVersion>() {
+
+            @Override
+            public boolean hasNext() {
+              return pathIterator.hasNext();
+            }
+
+            @Override
+            public BinaryVersion next() {
+              Path next = pathIterator.next();
+              BinaryVersion ret;
+              try {
+                ret = convertPathToBinaryVersion(historyPath, next);
+              } catch (GenericException | NotFoundException | RequestNotValidException e) {
+                LOGGER.error("Error while list path " + parent + " while parsing resource " + next, e);
+                ret = null;
+              }
+
+              return ret;
+            }
+
+          };
+        }
+
+        @Override
+        public void close() throws IOException {
+          directoryStream.close();
+        }
+      };
+
+    } catch (NoSuchFileException e) {
+      throw new NotFoundException("Could not find versions of " + storagePath, e);
+    } catch (IOException e) {
+      throw new GenericException("Error finding version of " + storagePath, e);
+    }
+
+    return iterable;
+  }
+
+  public static void deleteEmptyAncestorsQuietly(Path binVersionPath) {
+    if (binVersionPath == null) {
+      return;
+    }
+
+    Path parent = binVersionPath.getParent();
+    while (parent != null) {
+      try {
+        Files.deleteIfExists(parent);
+        parent = binVersionPath.getParent();
+      } catch (DirectoryNotEmptyException e) {
+        // cancel clean-up
+        parent = null;
+      } catch (IOException e) {
+        LOGGER.warn("Could not cleanup binary version directories", e);
+      }
+    }
   }
 
 }

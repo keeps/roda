@@ -18,13 +18,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.apache.commons.io.IOUtils;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Test;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -32,6 +35,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.fs.FSUtils;
+
+import jersey.repackaged.com.google.common.collect.Iterables;
 
 /**
  * 
@@ -883,5 +888,72 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
   }
 
   // TODO test move from different storage
+
+  @Test
+  public void testBinaryVersions() throws RODAException, IOException {
+
+    // create container
+    final StoragePath containerStoragePath = StorageTestUtils.generateRandomContainerStoragePath();
+    getStorage().createContainer(containerStoragePath);
+
+    // 1) create binary
+    final StoragePath binaryStoragePath = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+
+    final ContentPayload payload1 = new RandomMockContentPayload();
+    getStorage().createBinary(binaryStoragePath, payload1, false);
+
+    // 2) create binary version
+    String version1 = "v1";
+    getStorage().createBinaryVersion(binaryStoragePath, version1);
+
+    // 3) update binary
+    final ContentPayload payload2 = new RandomMockContentPayload();
+    getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false);
+
+    // 4) create binary version 2
+    String version2 = "v2";
+    getStorage().createBinaryVersion(binaryStoragePath, version2);
+
+    // 5) create a version that already exists
+    try {
+      getStorage().createBinaryVersion(binaryStoragePath, version1);
+      fail("Should have thrown an AlreadyExistsException");
+    } catch (AlreadyExistsException e) {
+      // expected exception
+    }
+
+    // 6) list binary versions
+    CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
+    List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
+    Iterables.addAll(reusableBinaryVersions, binaryVersions);
+
+    assertEquals(2, reusableBinaryVersions.size());
+
+    // 7) get binary version
+    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, version1);
+    assertEquals(version1, binaryVersion1.getLabel());
+    assertNotNull(binaryVersion1.getCreatedDate());
+    assertTrue(
+      IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
+
+    // 8) revert to previous version
+    getStorage().revertBinaryVersion(binaryStoragePath, version1);
+
+    Binary binary = getStorage().getBinary(binaryStoragePath);
+    testBinaryContent(binary, payload1);
+
+    // 9) delete binary version
+    getStorage().deleteBinaryVersion(binaryStoragePath, version1);
+
+    try {
+      getStorage().getBinaryVersion(binaryStoragePath, version1);
+      fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
+    // cleanup
+    getStorage().deleteContainer(containerStoragePath);
+  }
 
 }

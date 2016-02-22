@@ -68,6 +68,7 @@ import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.util.DateParser;
 
 /**
  * Class that "relates" Model & Storage
@@ -473,6 +474,10 @@ public class ModelService extends ModelObservable {
     boolean asReference = false;
     boolean createIfNotExists = false;
 
+    // Create version snapshot
+    createBinaryVersion(binaryPath);
+
+    // Update
     storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists);
 
     // set descriptive metadata type
@@ -492,6 +497,24 @@ public class ModelService extends ModelObservable {
     notifyDescriptiveMetadataUpdated(ret);
 
     return ret;
+  }
+
+  private void createBinaryVersion(StoragePath binaryPath) throws RequestNotValidException, NotFoundException, GenericException {
+    String version = DateParser.getIsoDate(new Date());
+    try {
+      storage.createBinaryVersion(binaryPath, version);
+    } catch (AlreadyExistsException e) {
+      boolean created = false;
+      int i = 1;
+      while (!created) {
+        String extVersion = version + i;
+        try {
+          storage.createBinaryVersion(binaryPath, extVersion);
+        } catch (AlreadyExistsException e1) {
+          LOGGER.warn("Struggling to create an unique binary version for " + binaryPath, e1);
+        }
+      }
+    }
   }
 
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId)

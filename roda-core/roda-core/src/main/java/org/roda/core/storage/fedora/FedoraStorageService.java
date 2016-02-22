@@ -12,7 +12,6 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
-import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -620,7 +619,7 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public List<BinaryVersion> listBinaryVersions(StoragePath storagePath)
+  public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     // TODO Auto-generated method stub
     return null;
@@ -633,21 +632,21 @@ public class FedoraStorageService implements StorageService {
   }
 
   @Override
-  public void createBinaryVersion(StoragePath storagePath, String version) {
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, String version) {
     // TODO Auto-generated method stub
-    
+    return null;
   }
 
   @Override
   public void revertBinaryVersion(StoragePath storagePath, String version) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void deleteBinaryVersion(StoragePath storagePath, String version) {
     // TODO Auto-generated method stub
-    
+
   }
 
 }
