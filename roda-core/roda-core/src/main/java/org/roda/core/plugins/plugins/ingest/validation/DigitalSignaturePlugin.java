@@ -70,10 +70,12 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     doStrip = true;
     verificationAffectsOnOutcome = true;
 
-    applicableTo = Arrays.asList("pdf");
+    applicableTo = Arrays.asList("pdf", "docx");
     pronomToExtension = DigitalSignaturePluginUtils.getPronomToExtension();
     mimetypeToExtension = new HashMap<>();
     mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
+    mimetypeToExtension.put("tools.mimetype.application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      Arrays.asList("docx"));
   }
 
   @Override
@@ -198,7 +200,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       Map<String, String> verifiedFiles = new HashMap<String, String>();
       aipId = representation.getAipId();
       int pluginResultState = 1;
-      String verified = null;
+      String verification = null;
       boolean notify = true;
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
@@ -231,16 +233,17 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
-                verified = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath());
-                verifiedFiles.put(file.getId(), verified);
-                if (verified != null && verificationAffectsOnOutcome)
+                verification = DigitalSignaturePluginUtils
+                  .runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
+                verifiedFiles.put(file.getId(), verification);
+                if (verification != null && verificationAffectsOnOutcome)
                   pluginResultState = 0;
               }
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(directAccess
-                  .getPath());
+                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(
+                  directAccess.getPath(), fileFormat);
 
                 if (extractResult.size() > 0) {
                   ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));

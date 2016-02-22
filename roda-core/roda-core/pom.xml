@@ -547,6 +547,11 @@
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.santuario</groupId>
+			<artifactId>xmlsec</artifactId>
+			<version>2.0.5</version>
+		</dependency>
 		<!-- Plugins related dependencies - end -->
 		<dependency>
 			<groupId>org.reflections</groupId>

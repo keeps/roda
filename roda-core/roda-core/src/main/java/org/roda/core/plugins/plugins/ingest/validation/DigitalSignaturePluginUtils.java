@@ -43,6 +43,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.pdfbox.io.IOUtils;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.opc.OPCPackage;
+import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -67,7 +72,42 @@ public class DigitalSignaturePluginUtils {
   private static final String PDF_OBJECT = "Object";
   private static final String PDF_BOOLEAN = "Boolean";
 
-  public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
+  public static String runDigitalSignatureVerify(Path input, String fileFormat) throws IOException,
+    GeneralSecurityException {
+    if (fileFormat.equals("pdf")) {
+      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyPDF(input);
+    } else if (fileFormat.equals("docx")) {
+      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyDOCX(input);
+    }
+
+    String result = "Not a supported format";
+    return result;
+  }
+
+  public static List<Path> runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException,
+    IOException {
+    if (fileFormat.equals("pdf")) {
+      return DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
+    } else if (fileFormat.equals("docx")) {
+      return DigitalSignaturePluginUtils.runDigitalSignatureExtractDOCX(input);
+    }
+
+    return new ArrayList<Path>();
+  }
+
+  public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
+    Path output = Files.createTempFile("stripped", "." + fileFormat);
+
+    if (fileFormat.equals("pdf")) {
+      DigitalSignaturePluginUtils.runDigitalSignatureStripPDF(input, output);
+    } else if (fileFormat.equals("docx")) {
+      DigitalSignaturePluginUtils.runDigitalSignatureStripDOCX(input, output);
+    }
+
+    return output;
+  }
+
+  private static String runDigitalSignatureVerifyPDF(Path input) throws IOException, GeneralSecurityException {
     Security.addProvider(new BouncyCastleProvider());
 
     PdfReader reader = new PdfReader(input.toString());
@@ -84,7 +124,21 @@ public class DigitalSignaturePluginUtils {
         cert.checkValidity();
 
         if (!DigitalSignaturePluginUtils.isCertificateSelfSigned(cert)) {
-          verifyCertificateChain(pk, cert);
+
+          Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
+          Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+
+          for (Certificate c : pk.getSignCertificateChain()) {
+            X509Certificate x509c = (X509Certificate) c;
+            x509c.checkValidity();
+
+            if (DigitalSignaturePluginUtils.isCertificateSelfSigned(c))
+              trustedRootCerts.add(c);
+            else
+              intermediateCerts.add(c);
+          }
+
+          verifyCertificateChain(trustedRootCerts, intermediateCerts, cert);
           if (pk.getCRLs() != null) {
             for (CRL crl : pk.getCRLs()) {
               if (crl.isRevoked(cert)) {
@@ -106,7 +160,47 @@ public class DigitalSignaturePluginUtils {
     return result;
   }
 
-  public static List<Path> runDigitalSignatureExtract(Path input) throws SignatureException, IOException {
+  private static String runDigitalSignatureVerifyDOCX(Path input) throws IOException, GeneralSecurityException {
+    boolean isValid = true;
+    try {
+      OPCPackage pkg = OPCPackage.open(input.toString(), PackageAccess.READ);
+      SignatureConfig sic = new SignatureConfig();
+      sic.setOpcPackage(pkg);
+
+      SignatureInfo si = new SignatureInfo();
+      si.setSignatureConfig(sic);
+      isValid = si.verifySignature();
+
+      Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
+      Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+
+      List<X509Certificate> certChain = sic.getSigningCertificateChain();
+
+      // TODO why null?
+      if (certChain != null) {
+        for (X509Certificate c : certChain) {
+          c.checkValidity();
+
+          if (DigitalSignaturePluginUtils.isCertificateSelfSigned(c))
+            trustedRootCerts.add(c);
+          else
+            intermediateCerts.add(c);
+        }
+
+        verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
+      }
+
+    } catch (InvalidFormatException e) {
+      LOGGER.warn("Error opening a document file");
+      isValid = false;
+    } catch (CertificateExpiredException | CertificateNotYetValidException e) {
+      return "Signing certificate does not pass the validity check";
+    }
+
+    return isValid ? "Passed" : "Not passed";
+  }
+
+  private static List<Path> runDigitalSignatureExtractPDF(Path input) throws SignatureException, IOException {
     Security.addProvider(new BouncyCastleProvider());
 
     List<Path> paths = new ArrayList<Path>();
@@ -182,14 +276,20 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
-    Path output = Files.createTempFile("stripped", "." + fileFormat);
+  private static List<Path> runDigitalSignatureExtractDOCX(Path input) throws SignatureException, IOException {
+    return new ArrayList<Path>();
+  }
+
+  private static void runDigitalSignatureStripPDF(Path input, Path output) throws IOException, DocumentException {
     PdfReader reader = new PdfReader(input.toString());
     PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(output.toString()));
     stamper.setFormFlattening(true);
     stamper.close();
     reader.close();
-    return output;
+  }
+
+  private static void runDigitalSignatureStripDOCX(Path input, Path output) throws IOException, DocumentException {
+    return;
   }
 
   private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
@@ -220,22 +320,9 @@ public class DigitalSignaturePluginUtils {
     }
   }
 
-  private static void verifyCertificateChain(PdfPKCS7 pk, X509Certificate cert) throws CertPathBuilderException,
-    CertificateException, NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
-
-    Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
-    Set<Certificate> intermediateCerts = new HashSet<Certificate>();
-
-    intermediateCerts.add(cert);
-    for (Certificate c : pk.getSignCertificateChain()) {
-      if (!c.equals(cert)) {
-        if (DigitalSignaturePluginUtils.isCertificateSelfSigned(c)) {
-          trustedRootCerts.add(c);
-        } else {
-          intermediateCerts.add(c);
-        }
-      }
-    }
+  private static void verifyCertificateChain(Set<Certificate> trustedRootCerts, Set<Certificate> intermediateCerts,
+    X509Certificate cert) throws CertPathBuilderException, CertificateException, NoSuchAlgorithmException,
+    NoSuchProviderException, InvalidAlgorithmParameterException {
 
     if (trustedRootCerts.size() > 0) {
       // Create the selector that specifies the starting certificate
