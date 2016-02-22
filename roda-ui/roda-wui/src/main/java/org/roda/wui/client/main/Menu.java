@@ -26,6 +26,7 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.Preferences;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.search.BasicSearch;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
@@ -73,13 +74,10 @@ public class Menu extends Composite {
   @UiField
   MenuBar rightMenu;
 
-  // private final MenuBar aboutMenu;
   private final MenuItem about;
 
-  // private final MenuBar disseminationMenu;
   private MenuItem dissemination_browse;
   private MenuItem dissemination_searchBasic;
-  // private MenuItem dissemination_searchAdvanced;
 
   private final MenuBar ingestMenu;
   private MenuItem ingest_pre;
@@ -87,10 +85,16 @@ public class Menu extends Composite {
   private MenuItem ingest_list;
 
   private final MenuBar administrationMenu;
+  private MenuItem administration_actions;
   private MenuItem administration_user;
-  // private MenuItem administration_event;
-  // private MenuItem administration_statistics;
   private MenuItem administration_log;
+  private MenuItem administration_preferences;
+
+  private final MenuBar planningMenu;
+  private MenuItem planning_monitoring;
+  private MenuItem planning_risk;
+  private MenuItem planning_agents;
+  private MenuItem planning_format;
 
   private final MenuBar userMenu;
 
@@ -107,8 +111,6 @@ public class Menu extends Composite {
   public Menu() {
     initWidget(uiBinder.createAndBindUi(this));
 
-    // about = new MenuItem(constants.title_about(),
-    // createCommand(Welcome.RESOLVER.getHistoryPath()));
     about = customMenuItem("fa fa-home", constants.title_about(), "menu-item-label", null,
       createCommand(Welcome.RESOLVER.getHistoryPath()));
 
@@ -123,22 +125,26 @@ public class Menu extends Composite {
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
     ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
       createCommand(IngestProcess.RESOLVER.getHistoryPath()));
-    // ingestMenu.addItem(constants.title_ingest_help(),
-    // createCommand(Ingest.RESOLVER.getHistoryPath() + ".help"));
 
     administrationMenu = new MenuBar(true);
+    administration_actions = administrationMenu.addItem(constants.title_administration_actions(),
+      createCommand(Management.RESOLVER.getHistoryPath()));
     administration_user = administrationMenu.addItem(constants.title_administration_user(),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
-    // administration_event =
-    // administrationMenu.addItem(constants.title_administration_event(),
-    // createCommand(EventManagement.getInstance().getHistoryPath()));
-    // administration_statistics =
-    // administrationMenu.addItem(constants.title_administration_statistics(),
-    // createCommand(Statistics.getInstance().getHistoryPath()));
     administration_log = administrationMenu.addItem(constants.title_administration_log(),
       createCommand(UserLog.RESOLVER.getHistoryPath()));
-    // administrationMenu.addItem(constants.title_administration_help(),
-    // createCommand(Management.RESOLVER + ".help"));
+    administration_preferences = administrationMenu.addItem(constants.title_administration_preferences(),
+      createCommand(Management.RESOLVER.getHistoryPath()));
+    
+    planningMenu = new MenuBar(true);
+    planning_monitoring = planningMenu.addItem(constants.title_planning_monitoring(),
+      createCommand(Planning.RESOLVER.getHistoryPath()));
+    planning_risk = planningMenu.addItem(constants.title_planning_risk(),
+      createCommand(Planning.RESOLVER.getHistoryPath()));
+    planning_agents = planningMenu.addItem(constants.title_planning_agents(),
+      createCommand(Planning.RESOLVER.getHistoryPath()));
+    planning_format = planningMenu.addItem(constants.title_planning_format(),
+      createCommand(Planning.RESOLVER.getHistoryPath()));
 
     userMenu = new MenuBar(true);
     userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.RESOLVER.getHistoryPath()));
@@ -220,21 +226,26 @@ public class Menu extends Composite {
     updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(constants.title_ingest(), ingestMenu), 3);
 
     // Administration
+    updateResolverSubItemVisibility(Management.RESOLVER, administration_actions);
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
-    // updateResolverSubItemVisibility(EventManagement.RESOLVER,
-    // administration_event);
-    // updateResolverSubItemVisibility(Statistics.RESOLVER,
-    // administration_statistics);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
+    updateResolverSubItemVisibility(Management.RESOLVER, administration_preferences);
     updateResolverTopItemVisibility(Management.RESOLVER,
       new MenuItem(constants.title_administration(), administrationMenu), 4);
+    
+    // Planning
+    updateResolverSubItemVisibility(Planning.RESOLVER, planning_monitoring);
+    updateResolverSubItemVisibility(Planning.RESOLVER, planning_risk);
+    updateResolverSubItemVisibility(Planning.RESOLVER, planning_agents);
+    updateResolverSubItemVisibility(Planning.RESOLVER, planning_format);
+    updateResolverTopItemVisibility(Planning.RESOLVER, new MenuItem(constants.title_planning(), planningMenu), 5);
 
     // User
     if (user.isGuest()) {
       rightMenu
         .addItem(customMenuItem("fa fa-user", constants.loginLogin(), "menu-item-label", null, createLoginCommand()));
-      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label menu-register", null,
-        createCommand(Register.RESOLVER.getHistoryPath())));
+      rightMenu.addItem(customMenuItem("fa fa-user-plus", constants.loginRegister(), "menu-item-label menu-register",
+        null, createCommand(Register.RESOLVER.getHistoryPath())));
     } else {
       rightMenu.addItem(customMenuItem("fa fa-cog", constants.title_settings(), "menu-item-label", settingsMenu, null));
       rightMenu.addItem(customMenuItem("fa fa-user", user.getName(), "menu-item-label", userMenu, null));
@@ -304,7 +315,6 @@ public class Menu extends Composite {
   private void setLanguageMenu() {
     String locale = LocaleInfo.getCurrentLocale().getLocaleName();
 
-    // TODO externalize supported languages
     Map<String, String> supportedLanguages = new HashMap<String, String>();
     supportedLanguages.put("en", languagesConstants.lang_en());
     supportedLanguages.put("pt_PT", languagesConstants.lang_pt());

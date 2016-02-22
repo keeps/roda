@@ -99,6 +99,10 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @DefaultStringValue("Administration")
   public String title_administration();
 
+  @Key("title.administration.actions")
+  @DefaultStringValue("Preservation actions")
+  public String title_administration_actions();
+  
   @Key("title.administration.user")
   @DefaultStringValue("User Management")
   public String title_administration_user();
@@ -132,12 +136,36 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String title_administration_statistics();
 
   @Key("title.administration.log")
-  @DefaultStringValue("Log")
+  @DefaultStringValue("Activity log")
   public String title_administration_log();
 
   @Key("title.administration.help")
   @DefaultStringValue("Help")
   public String title_administration_help();
+  
+  @Key("title.administration.preferences")
+  @DefaultStringValue("Preferences")
+  public String title_administration_preferences();
+  
+  @Key("title.planning")
+  @DefaultStringValue("Planning")
+  public String title_planning();
+  
+  @Key("title.planning.monitoring")
+  @DefaultStringValue("Internal monitoring")
+  public String title_planning_monitoring();
+  
+  @Key("title.planning.risk")
+  @DefaultStringValue("Risk register")
+  public String title_planning_risk();
+  
+  @Key("title.planning.agents")
+  @DefaultStringValue("Agents register")
+  public String title_planning_agents();
+  
+  @Key("title.planning.format")
+  @DefaultStringValue("Format register")
+  public String title_planning_format();
 
   @Key("title.ingest")
   @DefaultStringValue("Ingest")
@@ -171,11 +199,11 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @DefaultStringValue("Help")
   public String title_ingest_help();
   
-  @Key("title.ingest.settings")
+  @Key("title.settings")
   @DefaultStringValue("Settings")
   public String title_settings();
   
-  @Key("title.ingest.language")
+  @Key("title.language")
   @DefaultStringValue("Language")
   public String title_language();
  
