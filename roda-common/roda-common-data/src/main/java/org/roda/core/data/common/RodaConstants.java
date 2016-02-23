@@ -555,10 +555,7 @@ public final class RodaConstants {
       return text;
     }
   }
-  public static final String PRESERVATION_AGENT_TYPE_HARDWARE = "hardware";
-  public static final String PRESERVATION_AGENT_TYPE_ORGANIZATION = "organization";
-  public static final String PRESERVATION_AGENT_TYPE_PERSON = "person";
-  public static final String PRESERVATION_AGENT_TYPE_SOFTWARE = "software";
+
   
   public enum PreservationAgentType {
     HARDWARE("hardware"), ORGANIZATION("organizaation"),

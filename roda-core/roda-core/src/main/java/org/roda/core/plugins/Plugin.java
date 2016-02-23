@@ -102,6 +102,13 @@ public interface Plugin<T extends Serializable> {
   public String getPreservationEventFailureMessage();
   
   /**
+   * Returns the tool output of the execution preservation event linked to this {@link Plugin}.
+   * 
+   * @return a {@link String} with the tool output of the execution event of this {@link Plugin}.
+   */
+  public String getToolOutput();
+  
+  /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
    * {@link Plugin}.
    * 

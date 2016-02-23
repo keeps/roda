@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +47,8 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
+  
+  private String output;
 
   @Override
   public void init() throws PluginException {
@@ -72,6 +75,14 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public String getToolOutput(){
+    return output;
+  }
+  
+  public void setToolOutput(String o){
+    this.output = o;
+  }
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -93,13 +104,14 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
       LOGGER.debug("Processing AIP " + aip.getId());
       try {
+        List<String> outputs = new ArrayList<String>();
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
           boolean inotify = false;
-          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
+          outputs.addAll(TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify));
         }
         model.notifyAIPUpdated(aip.getId());
-
+        setToolOutput(String.join("\n", outputs));
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
       } catch (RODAException e) {

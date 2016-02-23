@@ -37,5 +37,10 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
       this.parameterValues = parameters;
     }
   }
+  
+  @Override
+  public String getToolOutput(){
+    return "";
+  }
 
 }

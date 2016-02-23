@@ -74,6 +74,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.NodeType;
+import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
@@ -1519,7 +1520,7 @@ public class RodaCoreFactory {
   private static void printAgents(Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
     Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE));
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, PreservationAgentType.SOFTWARE.toString()));
     IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist);
 
     for (IndexedPreservationAgent ipa : res.getResults()) {

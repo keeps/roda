@@ -10,6 +10,8 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -44,7 +46,7 @@ public class TikaFullTextPluginUtils {
 
   private static final Tika tika = new Tika();
 
-  public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
+  public static List<String> runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
     AIP aip, Representation representation, boolean notify) throws NotFoundException, GenericException,
       RequestNotValidException, AuthorizationDeniedException, ValidationException {
 
@@ -52,6 +54,8 @@ public class TikaFullTextPluginUtils {
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
     boolean inotify = false;
+    List<String> outputs = new ArrayList<String>();
+    
     for (File file : allFiles) {
 
       if (!file.isDirectory()) {
@@ -71,6 +75,7 @@ public class TikaFullTextPluginUtils {
               return new ReaderInputStream(reader);
             }
           });
+          outputs.add(IOUtils.toString(payload.createInputStream(), "UTF-8"));
           model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
             TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, inotify);
         } catch (IOException e) {
@@ -105,5 +110,6 @@ public class TikaFullTextPluginUtils {
     if (notify) {
       model.notifyAIPUpdated(aip.getId());
     }
+    return outputs;
   }
 }

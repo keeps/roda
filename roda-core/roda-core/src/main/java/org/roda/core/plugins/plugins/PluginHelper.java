@@ -215,6 +215,9 @@ public final class PluginHelper {
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
 
+    if(plugin.getToolOutput()!=null){
+      outcomeDetailNote+="\n"+plugin.getToolOutput();
+    }
     ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(),
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, targets,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
