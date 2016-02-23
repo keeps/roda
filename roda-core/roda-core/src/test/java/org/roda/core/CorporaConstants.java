@@ -7,7 +7,6 @@
  */
 package org.roda.core;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -85,7 +84,7 @@ public class CorporaConstants {
   public static final String REPRESENTATION_PREMIS_XML = "representation.premis.xml";
   public static final String PRESERVATION_LEVEL_FULL = "full";
   public static final String REPRESENTATION_CONVERTER_ID_1 = "d10867d6-0612-41a4-9095-0a0283cd8bc3";
-  public static final String REPRESENTATION_CONVERTER_ID_2 = "04be99ce-cbf2-4ee3-bf4b-bc7156bc76a2";
+  public static final String REPRESENTATION_CONVERTER_ID_2 = "50b2c085-ce4a-44d1-8279-d99086400349";
 
   public static final String AGENT_RODA_8 = "roda_8";
   public static final String METS_XML = "METS.xml";
