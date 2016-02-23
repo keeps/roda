@@ -41,6 +41,7 @@ import org.slf4j.LoggerFactory;
  * s.
  * 
  * @author Rui Castro
+ * @author Hélder Silva <hsilva@keep.pt>
  */
 public class PluginManager {
   private static final Logger LOGGER = LoggerFactory.getLogger(PluginManager.class);
