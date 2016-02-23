@@ -620,10 +620,10 @@ public class Browse extends Composite {
     return downloadButton;
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataViewBundle bundle,
-    final AsyncCallback<SafeHtml> callback) {
-    String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+  private void getDescriptiveMetadataHTML(final String aipId, final String descId,
+    final DescriptiveMetadataViewBundle bundle, final AsyncCallback<SafeHtml> callback) {
+    SafeUri uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
@@ -681,7 +681,7 @@ public class Browse extends Composite {
                 + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
-            
+
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink

@@ -1492,7 +1492,7 @@ td.datePickerMonth, td.datePickerYear {
 	text-align: center;
 }
 
-.descriptiveMetadataLink:hover {
+.descriptiveMetadataLink:hover, .descriptiveMetadataLink-selected  {
 	color: white;
 	background-color: #089de3;
 }
@@ -4132,3 +4132,29 @@ td.datePickerMonth, td.datePickerYear {
 #recaptcha_div {
 	margin-top: 20px;
 }
+
+
+/**********************************************
+	DESCRIPTIVE METADATA VERSIONS
+************************************************/
+.wui-browse-metadata-descriptive-versions-type {
+	/* 	border-bottom: 1px solid rgba(167, 169, 172, 0.5); */
+	border-bottom: 2px solid #089de3;
+	color: #089de3;
+	font-size: 1.5rem;
+	margin-top: 10px;
+}
+
+.wui-browse-metadata-descriptive-versions .descriptiveMetadata {
+	padding: 5px;	
+}
+
+.wui-browse-metadata-descriptive-versions .descriptiveMetadataLink {
+	float: right;
+	margin-left: 5px;	
+}
+
+.wui-browse-metadata-descriptive-versions .code-pre {
+	margin-top: 5px;
+}
+

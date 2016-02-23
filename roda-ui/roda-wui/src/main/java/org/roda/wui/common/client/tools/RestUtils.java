@@ -71,8 +71,12 @@ public class RestUtils {
   }
 
   public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId) {
+    return createDescriptiveMetadataDownloadUri(aipId, descId, null);
+  }
 
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml
+  public static SafeUri createDescriptiveMetadataDownloadUri(String aipId, String descId, String versionId) {
+
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml&version={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
@@ -81,14 +85,19 @@ public class RestUtils {
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_XML);
 
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+    }
+
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static String createDescriptiveMetadataHTMLUri(String aipId, String descId) {
+  public static SafeUri createDescriptiveMetadataHTMLUri(String aipId, String descId) {
     return createDescriptiveMetadataHTMLUri(aipId, descId, null);
   }
 
-  public static String createDescriptiveMetadataHTMLUri(String aipId, String descId, String versionId) {
+  public static SafeUri createDescriptiveMetadataHTMLUri(String aipId, String descId, String versionId) {
     // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=html&version={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
@@ -107,7 +116,7 @@ public class RestUtils {
     b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(LocaleInfo.getCurrentLocale().getLocaleName());
 
-    return b.toString();
+    return UriUtils.fromSafeConstant(b.toString());
   }
 
   public static SafeUri createPreservationMetadataDownloadUri(String aipId) {

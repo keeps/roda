@@ -12,12 +12,19 @@
 	
 	</ui:style>
 
-	<g:FlowPanel styleName="wui-browse-edit-metadata"
+	<g:FlowPanel styleName="wui-browse-metadata-descriptive-versions"
 		addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Descriptive metadata history</g:Label>
 				<g:ListBox ui:field="list" />
+				<g:Label styleName="wui-browse-metadata-descriptive-versions-type"
+					ui:field="descriptiveMetadataType" />
+				<g:FocusPanel ui:field="showXml" styleName="descriptiveMetadataLink">
+					<g:HTML>
+						<i class="fa fa-code"></i>
+					</g:HTML>
+				</g:FocusPanel>
 				<g:HTML ui:field="preview" />
 
 			</g:FlowPanel>

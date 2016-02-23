@@ -38,13 +38,16 @@ import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -112,11 +115,20 @@ public class DescriptiveMetadataHistory extends Composite {
   private final String descriptiveMetadataId;
   private final DescriptiveMetadataVersionsBundle bundle;
 
+  private boolean inHTML = true;
+  private String selectedVersion = null;
+
   @UiField
   ListBox list;
 
   @UiField
+  Label descriptiveMetadataType;
+
+  @UiField
   HTML preview;
+
+  @UiField
+  FocusPanel showXml;
 
   @UiField
   Button buttonRevert;
@@ -165,19 +177,23 @@ public class DescriptiveMetadataHistory extends Composite {
       @Override
       public void onChange(ChangeEvent event) {
         String versionKey = list.getSelectedValue();
-        updatePreview(versionKey);
+        selectedVersion = versionKey;
+        updatePreview();
       }
     });
 
+    descriptiveMetadataType.setText(bundle.getDescriptiveMetadata().getLabel());
+
     if (versionList.size() > 0) {
       list.setSelectedIndex(0);
-      updatePreview(versionList.get(0).getKey());
+      selectedVersion = versionList.get(0).getKey();
+      updatePreview();
     }
 
   }
 
-  protected void updatePreview(String versionKey) {
-    getDescriptiveMetadataHTML(aipId, descriptiveMetadataId, versionKey, new AsyncCallback<SafeHtml>() {
+  protected void updatePreview() {
+    getDescriptiveMetadata(aipId, descriptiveMetadataId, selectedVersion, inHTML, new AsyncCallback<SafeHtml>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -187,14 +203,25 @@ public class DescriptiveMetadataHistory extends Composite {
       @Override
       public void onSuccess(SafeHtml html) {
         preview.setHTML(html);
+        if (inHTML) {
+          preview.removeStyleName("code-pre");
+        } else {
+          preview.addStyleName("code-pre");
+        }
       }
     });
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final String versionKey,
-    final AsyncCallback<SafeHtml> callback) {
-    String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
-    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+  private void getDescriptiveMetadata(final String aipId, final String descId, final String versionKey,
+    final boolean inHTML, final AsyncCallback<SafeHtml> callback) {
+
+    SafeUri uri;
+    if (inHTML) {
+      uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
+    } else {
+      uri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId, versionKey);
+    }
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri.asString());
     requestBuilder.setHeader("Authorization", "Custom");
     try {
       requestBuilder.sendRequest(null, new RequestCallback() {
@@ -202,10 +229,14 @@ public class DescriptiveMetadataHistory extends Composite {
         @Override
         public void onResponseReceived(Request request, Response response) {
           if (200 == response.getStatusCode()) {
-            String html = response.getText();
+            String text = response.getText();
 
             SafeHtmlBuilder b = new SafeHtmlBuilder();
-            b.append(SafeHtmlUtils.fromTrustedString(html));
+            if (inHTML) {
+              b.append(SafeHtmlUtils.fromTrustedString(text));
+            } else {
+              b.append(SafeHtmlUtils.fromString(text));
+            }
             SafeHtml safeHtml = b.toSafeHtml();
 
             callback.onSuccess(safeHtml);
@@ -238,9 +269,33 @@ public class DescriptiveMetadataHistory extends Composite {
           callback.onFailure(exception);
         }
       });
-    } catch (RequestException e) {
+    } catch (
+
+    RequestException e)
+
+    {
       callback.onFailure(e);
     }
+
+  }
+
+  public boolean isInHTML() {
+    return inHTML;
+  }
+
+  public void setInHTML(boolean inHTML) {
+    this.inHTML = inHTML;
+    if (inHTML) {
+      showXml.removeStyleName("descriptiveMetadataLink-selected");
+    } else {
+      showXml.addStyleName("descriptiveMetadataLink-selected");
+    }
+  }
+
+  @UiHandler("showXml")
+  void buttonShowXmlHandler(ClickEvent e) {
+    setInHTML(!isInHTML());
+    updatePreview();
   }
 
   @UiHandler("buttonRevert")
