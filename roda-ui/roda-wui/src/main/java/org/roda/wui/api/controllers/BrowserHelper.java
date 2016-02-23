@@ -89,6 +89,7 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
@@ -104,6 +105,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
+import com.google.common.collect.Iterables;
 
 /**
  * 
@@ -164,29 +166,49 @@ public class BrowserHelper {
 
   private static List<DescriptiveMetadataViewBundle> getDescriptiveMetadataBundles(String aipId, final Locale locale)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
-    List<DescriptiveMetadata> listDescriptiveMetadataBinaries = RodaCoreFactory.getModelService().retrieveAIP(aipId)
-      .getDescriptiveMetadata();
+    ModelService model = RodaCoreFactory.getModelService();
+    List<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.retrieveAIP(aipId).getDescriptiveMetadata();
 
     List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
 
-    Messages messages = RodaCoreFactory.getI18NMessages(locale);
     for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
-      DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
-      bundle.setId(descriptiveMetadata.getId());
-      if (descriptiveMetadata.getType() != null) {
-        try {
+      DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
 
-          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
-            + descriptiveMetadata.getType().toLowerCase()));
-
-        } catch (MissingResourceException e) {
-          bundle.setLabel(descriptiveMetadata.getId());
-        }
-      }
       descriptiveMetadataList.add(bundle);
+
     }
 
     return descriptiveMetadataList;
+  }
+
+  private static DescriptiveMetadataViewBundle getDescriptiveMetadataBundle(String aipId,
+    DescriptiveMetadata descriptiveMetadata, final Locale locale)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    Messages messages = RodaCoreFactory.getI18NMessages(locale);
+    DescriptiveMetadataViewBundle bundle = new DescriptiveMetadataViewBundle();
+    bundle.setId(descriptiveMetadata.getId());
+    if (descriptiveMetadata.getType() != null) {
+      try {
+
+        bundle.setLabel(messages.getTranslation(
+          RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase()));
+
+      } catch (MissingResourceException e) {
+        bundle.setLabel(descriptiveMetadata.getId());
+      }
+    }
+    bundle.setHasHistory(!Iterables.isEmpty(model.getStorage()
+      .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
+    return bundle;
+  }
+
+  private static DescriptiveMetadataViewBundle getDescriptiveMetadataBundle(String aipId, String descriptiveMetadataId,
+    final Locale locale)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, descriptiveMetadataId);
+    return getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
   }
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId,
@@ -1029,5 +1051,18 @@ public class BrowserHelper {
       ret.put(binaryVersion.getLabel(), binaryVersion.getCreatedDate());
     }
     return ret;
+  }
+
+  public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String metadataId,
+    Locale locale) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    DescriptiveMetadataVersionsBundle bundle = new DescriptiveMetadataVersionsBundle();
+
+    IndexedAIP aip = getIndexedAIP(aipId);
+    DescriptiveMetadataViewBundle descriptiveMetadataBundle = getDescriptiveMetadataBundle(aipId, metadataId, locale);
+    Map<String, Date> versions = listDescriptiveMetadataVersions(aipId, metadataId);
+    bundle.setAip(aip);
+    bundle.setDescriptiveMetadata(descriptiveMetadataBundle);
+    bundle.setVersions(versions);
+    return bundle;
   }
 }

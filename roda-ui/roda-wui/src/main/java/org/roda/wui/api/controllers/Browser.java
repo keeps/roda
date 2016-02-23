@@ -42,6 +42,7 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.RodaCoreService;
@@ -106,6 +107,26 @@ public class Browser extends RodaCoreService {
 
     // delegate
     DescriptiveMetadataEditBundle bundle = BrowserHelper.getDescriptiveMetadataEditBundle(aipId, metadataId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getDescriptiveMetadataEditBundle", aipId, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+
+    return bundle;
+  }
+
+  public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(RodaUser user, String aipId,
+    String metadataId, Locale locale)
+      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    DescriptiveMetadataVersionsBundle bundle = BrowserHelper.getDescriptiveMetadataVersionsBundle(aipId, metadataId,
+      locale);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

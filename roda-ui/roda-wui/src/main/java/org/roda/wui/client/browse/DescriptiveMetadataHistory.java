@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.roda.wui.client.common.UserLogin;
@@ -35,6 +34,7 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -64,8 +64,8 @@ public class DescriptiveMetadataHistory extends Composite {
         final String aipId = historyTokens.get(0);
         final String descriptiveMetadataId = historyTokens.get(1);
 
-        BrowserService.Util.getInstance().listDescriptiveMetadataVersions(aipId, descriptiveMetadataId,
-          new AsyncCallback<Map<String, Date>>() {
+        BrowserService.Util.getInstance().getDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
+          LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -73,8 +73,8 @@ public class DescriptiveMetadataHistory extends Composite {
           }
 
           @Override
-          public void onSuccess(Map<String, Date> versions) {
-            DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, descriptiveMetadataId, versions);
+          public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+            DescriptiveMetadataHistory widget = new DescriptiveMetadataHistory(aipId, descriptiveMetadataId, bundle);
             callback.onSuccess(widget);
           }
         });
@@ -110,7 +110,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private final String aipId;
   private final String descriptiveMetadataId;
-  private final Map<String, Date> versions;
+  private final DescriptiveMetadataVersionsBundle bundle;
 
   @UiField
   ListBox list;
@@ -134,15 +134,15 @@ public class DescriptiveMetadataHistory extends Composite {
    *          the user to edit
    */
   public DescriptiveMetadataHistory(final String aipId, final String descriptiveMetadataId,
-    Map<String, Date> versions) {
+    DescriptiveMetadataVersionsBundle bundle) {
     this.aipId = aipId;
     this.descriptiveMetadataId = descriptiveMetadataId;
-    this.versions = versions;
+    this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
 
     // sort
-    List<Entry<String, Date>> versionList = new ArrayList<>(versions.entrySet());
+    List<Entry<String, Date>> versionList = new ArrayList<>(bundle.getVersions().entrySet());
     Collections.sort(versionList, new Comparator<Entry<String, Date>>() {
 
       @Override

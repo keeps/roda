@@ -15,15 +15,17 @@ public class DescriptiveMetadataViewBundle implements Serializable {
 
   private String id;
   private String label;
+  private boolean hasHistory;
 
   public DescriptiveMetadataViewBundle() {
     super();
   }
 
-  public DescriptiveMetadataViewBundle(String id, String label) {
+  public DescriptiveMetadataViewBundle(String id, String label, boolean hasHistory) {
     super();
     this.id = id;
     this.label = label;
+    this.hasHistory = hasHistory;
   }
 
   public String getId() {
@@ -40,5 +42,13 @@ public class DescriptiveMetadataViewBundle implements Serializable {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public boolean hasHistory() {
+    return hasHistory;
+  }
+
+  public void setHasHistory(boolean hasHistory) {
+    this.hasHistory = hasHistory;
   }
 }

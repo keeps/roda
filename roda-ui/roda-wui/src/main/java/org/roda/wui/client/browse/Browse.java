@@ -13,7 +13,9 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -401,12 +403,14 @@ public class Browse extends Composite {
       itemDates.setText(getDatesText(aip));
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
+      final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
       for (DescriptiveMetadataViewBundle bundle : descMetadata) {
         String title = bundle.getLabel() != null ? bundle.getLabel() : bundle.getId();
         HTML container = new HTML();
         container.addStyleName("metadataContent");
         itemMetadata.add(container, title);
         descriptiveMetadataContainers.add(Pair.create(bundle.getId(), container));
+        bundles.put(bundle.getId(), bundle);
       }
 
       HandlerRegistration tabHandler = itemMetadata.addSelectionHandler(new SelectionHandler<Integer>() {
@@ -417,8 +421,9 @@ public class Browse extends Composite {
             Pair<String, HTML> pair = descriptiveMetadataContainers.get(event.getSelectedItem());
             String descId = pair.getFirst();
             final HTML html = pair.getSecond();
+            final DescriptiveMetadataViewBundle bundle = bundles.get(descId);
             if (html.getText().length() == 0) {
-              getDescriptiveMetadataHTML(aipId, descId, new AsyncCallback<SafeHtml>() {
+              getDescriptiveMetadataHTML(aipId, descId, bundle, new AsyncCallback<SafeHtml>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -615,7 +620,7 @@ public class Browse extends Composite {
     return downloadButton;
   }
 
-  private void getDescriptiveMetadataHTML(final String aipId, final String descId,
+  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final DescriptiveMetadataViewBundle bundle,
     final AsyncCallback<SafeHtml> callback) {
     String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
@@ -631,12 +636,13 @@ public class Browse extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
-            // History link
-            String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
-            String historyLinkHtml = "<a href='" + historyLink
-              + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
-            b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
-
+            if (bundle.hasHistory()) {
+              // History link
+              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLinkHtml = "<a href='" + historyLink
+                + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
+            }
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink
@@ -668,6 +674,14 @@ public class Browse extends Composite {
             SafeHtmlBuilder b = new SafeHtmlBuilder();
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='descriptiveMetadataLinks'>"));
 
+            if (bundle.hasHistory()) {
+              // History link
+              String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
+              String historyLinkHtml = "<a href='" + historyLink
+                + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
+              b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
+            }
+            
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink

@@ -9,10 +9,8 @@ package org.roda.wui.server.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -47,6 +45,7 @@ import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
+import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
@@ -428,9 +427,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Map<String, Date> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
-    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+  public DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId,
+    String descriptiveMetadataId, String localeString)
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.listDescriptiveMetadataVersions(user, aipId, descriptiveMetadataId);
+    Locale locale = ServerTools.parseLocale(localeString);
+    return Browser.getDescriptiveMetadataVersionsBundle(user, aipId, descriptiveMetadataId, locale);
   }
 }
