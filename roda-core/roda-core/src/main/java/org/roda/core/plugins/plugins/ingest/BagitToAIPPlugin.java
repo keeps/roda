@@ -52,7 +52,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getDescription() {
-    return "Generic bagit zip file";
+    return "BagIt as a zip file";
   }
 
   @Override

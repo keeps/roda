@@ -81,7 +81,7 @@ public class SiegfriedPluginUtils {
   }
 
   public static String runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, IndexedPreservationAgent agent)
+    AIP aip, Representation representation)
       throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
       AuthorizationDeniedException, PluginException {
 

@@ -21,19 +21,15 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -107,15 +103,6 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      logger.error("Error running VeraPDF plugin: " + e.getMessage(), e);
-    }
 
     for (AIP aip : list) {
       logger.debug("Processing AIP " + aip.getId());
@@ -168,7 +155,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         }
 
         logger.debug("Creating veraPDF event for the representation " + representation.getId());
-        createEvent(resourceList, aip, representation.getId(), model, state, agent);
+        createEvent(resourceList, aip, representation.getId(), model, state);
       }
     }
 
@@ -176,7 +163,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createEvent(Map<String, Path> resourceList, AIP aip, String representationId, ModelService model,
-    int state, IndexedPreservationAgent agent) throws PluginException {
+    int state) throws PluginException {
 
     try {
       // building the detail extension for the plugin event
@@ -231,11 +218,11 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
       // FIXME revise PREMIS generation
       boolean notify = false;
-      PluginHelper.createPluginEvent(aip.getId(), representationId, null, null, model,
+      PluginHelper.createPluginEvent(this, aip.getId(), representationId, null, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
         "All the files from the AIP were submitted to a veraPDF validation.",
         Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representationId, null, null)), null, outcome,
-        noteStringBuilder.toString(), null, agent, notify);
+        noteStringBuilder.toString(), null, notify);
     } catch (Throwable e) {
       throw new PluginException(e.getMessage(), e);
     }

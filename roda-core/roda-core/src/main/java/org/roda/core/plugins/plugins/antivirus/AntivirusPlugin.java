@@ -12,18 +12,15 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -98,15 +95,6 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
-    }
 
     Report report = PluginHelper.createPluginReport(this);
 
@@ -151,7 +139,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       try {
         LOGGER.info("Creating event");
         boolean notify = true;
-        createEvent(virusCheckResult, exception, state, aip, model, agent, notify);
+        createEvent(virusCheckResult, exception, state, aip, model, notify);
         report.addItem(reportItem);
 
         LOGGER.info("Updating job report");
@@ -167,7 +155,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
-    ModelService model, IndexedPreservationAgent agent, boolean notify) throws PluginException {
+    ModelService model, boolean notify) throws PluginException {
 
     try {
       boolean inotify = false;
@@ -185,8 +173,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
       String outcomeDetailExtension = null;
 
-      PluginHelper.createPluginEvent(aip.getId(), representationId, filePath, fileId, model, eventType, eventDetails,
-        sourceObjects, outcomeObjects, outcome, outcomeDetailNote, outcomeDetailExtension, agent, inotify);
+      PluginHelper.createPluginEvent(this, aip.getId(), representationId, filePath, fileId, model, eventType,
+        eventDetails, sourceObjects, outcomeObjects, outcome, outcomeDetailNote, outcomeDetailExtension, inotify);
 
       if (notify) {
         model.notifyAIPUpdated(aip.getId());

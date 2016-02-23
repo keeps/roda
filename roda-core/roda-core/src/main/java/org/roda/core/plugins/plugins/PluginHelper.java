@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -190,11 +191,22 @@ public final class PluginHelper {
 
   }
 
-  public static PreservationMetadata createPluginEvent(String aipID, String representationID, List<String> filePath,
-    String fileID, ModelService model, String eventType, String eventDetails, List<String> sources,
-    List<String> targets, String outcome, String outcomeDetailNote, String outcomeDetailExtension,
-    IndexedPreservationAgent agent, boolean notify) throws RequestNotValidException, NotFoundException,
-      GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+  public static PreservationMetadata createPluginEvent(Plugin<?> plugin, String aipID, String representationID,
+    List<String> filePath, String fileID, ModelService model, String eventType, String eventDetails,
+    List<String> sources, List<String> targets, String outcome, String outcomeDetailNote, String outcomeDetailExtension,
+    boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
+
+    IndexedPreservationAgent agent = null;
+    try {
+      boolean notifyAgent = true;
+      agent = PremisUtils.createPremisAgentBinary(plugin, model, notifyAgent);
+    } catch (AlreadyExistsException e) {
+      agent = PremisUtils.getPreservationAgent(plugin, model);
+    } catch (RODAException e) {
+      LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
+    }
+
     String id = UUID.randomUUID().toString();
     List<LinkingIdentifier> sourcesID = new ArrayList<LinkingIdentifier>();
     if (sources != null && !sources.isEmpty()) {

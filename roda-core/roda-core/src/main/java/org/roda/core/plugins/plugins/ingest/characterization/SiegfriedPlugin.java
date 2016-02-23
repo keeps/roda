@@ -92,15 +92,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
-    }
+    
 
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
@@ -112,7 +104,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
           siegfriedOutputs
-            .add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation, agent));
+            .add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation));
 
           CloseableIterable<File> files = model.listFilesUnder(aip.getId(), representation.getId(), true);
           Iterator<File> it = files.iterator();
@@ -128,10 +120,10 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         boolean inotify = false;
         if (createsPluginEvent) {
           try {
-            PluginHelper.createPluginEvent(aip.getId(), null, null, null, model,
+            PluginHelper.createPluginEvent(this,aip.getId(), null, null, null, model,
               RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
               "The files of the representation were successfully identified.", sources, null,
-              PluginState.SUCCESS.name(), StringUtils.join(siegfriedOutputs), "", agent, inotify);
+              PluginState.SUCCESS.name(), StringUtils.join(siegfriedOutputs), "", inotify);
           } catch (ValidationException e) {
             LOGGER.error("Error creating Premis event: " + e.getMessage(), e);
           }

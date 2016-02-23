@@ -7,18 +7,14 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -66,16 +62,6 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error creating auto-accept agent: " + e.getMessage(), e);
-    }
-
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
@@ -99,7 +85,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
           .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, outcomeDetail));
       }
 
-      createEvent(outcomeDetail, state, aip, model, agent);
+      createEvent(outcomeDetail, state, aip, model);
       report.addItem(reportItem);
 
       PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
@@ -108,18 +94,18 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model,
-    IndexedPreservationAgent agent) throws PluginException {
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
+    throws PluginException {
 
     try {
       boolean success = (state == PluginState.SUCCESS);
 
       for (Representation representation : aip.getRepresentations()) {
         boolean notify = false;
-        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, null, model,
+        PluginHelper.createPluginEvent(this, aip.getId(), representation.getId(), null, null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_INGESTION, "The SIP was successfully accepted.",
           Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representation.getId(), null, null)), null,
-          success ? "success" : "failure", success ? "" : "Error", outcomeDetail, agent, notify);
+          success ? "success" : "failure", success ? "" : "Error", outcomeDetail, notify);
       }
       model.notifyAIPUpdated(aip.getId());
     } catch (RODAException e) {

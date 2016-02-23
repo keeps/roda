@@ -95,15 +95,6 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error creating antivirus PREMIS agent", e);
-    }
 
     boolean validateDescriptiveMetadata = Boolean.parseBoolean(getParameterValues().getOrDefault(
       PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getId(), PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getDefaultValue()));
@@ -146,10 +137,10 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         boolean inotify = false;
-        PluginHelper.createPluginEvent(aip.getId(), representation.getId(), null, null, model,
+        PluginHelper.createPluginEvent(this,aip.getId(), representation.getId(), null, null, model,
           RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION, "The AIP format was validated.",
           Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representation.getId(), null, null)), null,
-          success ? "success" : "failure", success ? "success" : "Error", "", agent, inotify);
+          success ? "success" : "failure", success ? "success" : "Error", "", inotify);
       }
       if (notify) {
         model.notifyAIPUpdated(aip.getId());

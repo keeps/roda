@@ -18,7 +18,6 @@ import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -26,7 +25,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -74,16 +72,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
-    IndexedPreservationAgent agent = null;
-    try {
-      boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error running creating antivirus agent: " + e.getMessage(), e);
-    }
 
     for (AIP aip : list) {
 
@@ -136,19 +124,18 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
               }
               sb.append("</ul>");
 
-              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, null, model,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
                 Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), r.getId(), null, null)), null, "failure",
-                "Reason", sb.toString(), agent, inotify);
+                "Reason", sb.toString(), inotify);
               notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
             } else {
               LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
-              PreservationMetadata pm = PluginHelper.createPluginEvent(aip.getId(), r.getId(), null, null, model,
+              PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
-                null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), agent,
-                inotify);
+                null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), inotify);
               notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);
             }
           }

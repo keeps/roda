@@ -25,7 +25,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.tika.exception.TikaException;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -41,7 +40,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -159,32 +157,21 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
 
-    IndexedPreservationAgent agent = null;
-    try {
-      // Agent is detached from AIP
-      boolean notify = true;
-      agent = PremisUtils.createPremisAgentBinary(this, model, notify);
-    } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(this, model);
-    } catch (RODAException e) {
-      LOGGER.error("Error running adding Conversion plugin: " + e.getMessage(), e);
-    }
-
     if (!list.isEmpty()) {
       if (list.get(0) instanceof AIP) {
-        return executeOnAIP(index, model, storage, (List<AIP>) list, agent);
+        return executeOnAIP(index, model, storage, (List<AIP>) list);
       } else if (list.get(0) instanceof Representation) {
-        return executeOnRepresentation(index, model, storage, (List<Representation>) list, agent);
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
       } else if (list.get(0) instanceof File) {
-        return executeOnFile(index, model, storage, (List<File>) list, agent);
+        return executeOnFile(index, model, storage, (List<File>) list);
       }
     }
 
     return new Report();
   }
 
-  private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list,
-    IndexedPreservationAgent agent) throws PluginException {
+  private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+    throws PluginException {
 
     Report report = PluginHelper.createPluginReport(this);
     String detailExtension = "";
@@ -264,7 +251,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                   reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
                     new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()),
 
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
 
                   LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                     + " of representation " + representation.getId() + " from AIP " + aip.getId());
@@ -295,7 +282,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, newFiles, aip.getId(), newRepresentationID, model, outputFormat, pluginResultState,
-          detailExtension, agent, notifyEvent);
+          detailExtension, notifyEvent);
         report.addItem(reportItem);
       }
 
@@ -317,7 +304,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   private Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    List<Representation> list, IndexedPreservationAgent agent) throws PluginException {
+    List<Representation> list) throws PluginException {
 
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
@@ -430,7 +417,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
       boolean notifyEvent = false;
       createEvent(alteredFiles, newFiles, aipId, newRepresentationID, model, outputFormat, pluginResultState,
-        detailExtension, agent, notifyEvent);
+        detailExtension, notifyEvent);
     }
 
     try {
@@ -442,8 +429,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     return report;
   }
 
-  private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list,
-    IndexedPreservationAgent agent) throws PluginException {
+  private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
 
     int pluginResultState = 1;
     Set<String> aipSet = new HashSet<String>();
@@ -535,7 +522,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
       boolean notifyEvent = false;
       createEvent(Arrays.asList(file), newFiles, file.getAipId(), newRepresentationID, model, outputFormat,
-        pluginResultState, detailExtension, agent, notifyEvent);
+        pluginResultState, detailExtension, notifyEvent);
       report.addItem(reportItem);
     }
 
@@ -552,8 +539,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
-    ModelService model, String outputFormat, int pluginResultState, String detailExtension,
-    IndexedPreservationAgent agent, boolean notify) throws PluginException {
+    ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
+      throws PluginException {
 
     List<String> premisSourceFilesIdentifiers = new ArrayList<String>();
     List<String> premisTargetFilesIdentifiers = new ArrayList<String>();
@@ -590,9 +577,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEvent(aipId, null, null, null, model, RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION,
+      PluginHelper.createPluginEvent(this, aipId, null, null, null, model,
+        RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION,
         "Some files may have been format converted on a new representation", premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), detailExtension, agent, notify);
+        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), detailExtension, notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
