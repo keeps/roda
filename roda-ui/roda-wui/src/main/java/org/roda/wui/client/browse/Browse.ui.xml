@@ -33,6 +33,9 @@
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
 				<g:TabPanel ui:field="itemMetadata" addStyleNames="browseItemMetadata" />
+				<g:Button addStyleNames="btn btn-plus" ui:field="newDescriptiveMetadata">
+					<ui:msg>New descriptive metadata</ui:msg>
+				</g:Button>
 				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
 					<ui:msg>Sublevels</ui:msg>
 				</g:Label>

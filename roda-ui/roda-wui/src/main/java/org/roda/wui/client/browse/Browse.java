@@ -30,7 +30,6 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
-import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
@@ -141,6 +140,7 @@ public class Browse extends Composite {
 
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
+  @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private String aipId;
@@ -165,6 +165,9 @@ public class Browse extends Composite {
 
   @UiField
   TabPanel itemMetadata;
+
+  @UiField
+  Button newDescriptiveMetadata;
 
   @UiField
   Label fondsPanelTitle;
@@ -251,7 +254,6 @@ public class Browse extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     clear();
-    JavascriptUtils.smoothScrollSimple(itemTitle.getElement());
     if (historyTokens.size() == 0) {
       viewAction();
       callback.onSuccess(this);
@@ -332,6 +334,8 @@ public class Browse extends Composite {
     itemMetadata.setVisible(false);
     itemMetadata.clear();
     removeHandlerRegistrations();
+
+    newDescriptiveMetadata.setVisible(false);
 
     viewingTop = false;
     fondsPanelTitle.setVisible(false);
@@ -441,9 +445,7 @@ public class Browse extends Composite {
         @Override
         public void onSelection(SelectionEvent<Integer> event) {
           if (event.getSelectedItem() == addTabIndex) {
-            if (aipId != null) {
-              Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
-            }
+            newDescriptiveMetadataRedirect();
           }
         }
       });
@@ -456,6 +458,8 @@ public class Browse extends Composite {
       if (!descMetadata.isEmpty()) {
         itemMetadata.setVisible(true);
         itemMetadata.selectTab(0);
+      } else {
+        newDescriptiveMetadata.setVisible(true);
       }
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
@@ -725,7 +729,6 @@ public class Browse extends Composite {
     if (path.equals(History.getToken())) {
       historyUpdated = false;
     } else {
-      logger.debug("calling new history token");
       Tools.newHistory(path);
       historyUpdated = true;
     }
@@ -793,4 +796,14 @@ public class Browse extends Composite {
     }
   }
 
+  @UiHandler("newDescriptiveMetadata")
+  void buttonNewDescriptiveMetadataHandler(ClickEvent e) {
+    newDescriptiveMetadataRedirect();
+  }
+  
+  private void newDescriptiveMetadataRedirect() {
+    if (aipId != null) {
+      Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+    }
+  }
 }
