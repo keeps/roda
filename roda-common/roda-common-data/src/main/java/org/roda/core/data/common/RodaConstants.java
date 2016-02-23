@@ -538,7 +538,14 @@ public final class RodaConstants {
    * object modification object validation quality review quarantine recovery
    * redaction replication SIP creation storage migration unpacking unquarantine
    */
-  public static final String PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK = "virus check";
+  public static final String PRESERVATION_EVENT_TYPE_VIRUS_CHECK = "virus check";
+  public static final String PRESERVATION_EVENT_TYPE_INGEST_START = "ingest start";
+  public static final String PRESERVATION_EVENT_TYPE_MESSAGE_DIGEST_CALCULATION = "message digest calculation";
+  public static final String PRESERVATION_EVENT_TYPE_METADATA_EXTRACTION = "metadata extraction";
+  public static final String PRESERVATION_EVENT_TYPE_ACCESSION = "accession";
+  public static final String PRESERVATION_EVENT_TYPE_DIGITAL_SIGNATURE_VALIDATION = "digital signature validation";
+  public static final String PRESERVATION_EVENT_TYPE_WELLFORMEDNESS_CHECK = "wellformedness check";
+
   /*
    * wellformedness check
    */
@@ -575,5 +582,9 @@ public final class RodaConstants {
    * WUI related
    */
   public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
+  
+  
+  
+  
 
 }

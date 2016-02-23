@@ -10,18 +10,23 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.common.PremisUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -35,7 +40,9 @@ import org.slf4j.LoggerFactory;
 public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
-
+  private static final String EVENT_DESCRIPTION = "Extraction of technical metadata using Apache Tika.";
+  private static final String EVENT_SUCESS_MESSAGE = "Successfully extracted technical metadata from file.";
+  private static final String EVENT_FAILURE_MESSAGE = "Failed to extract technical metadata from file.";
   public static final String FILE_SUFFIX = ".html";
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
@@ -82,15 +89,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
 
-    try {
-      boolean notifyAgent = true;
-      PremisUtils.createPremisAgentBinary(this, model, notifyAgent);
-    } catch (AlreadyExistsException e) {
-      // TODO verify agent creation (event)
-    } catch (RODAException e) {
-      LOGGER.error("Error create PREMIS agent for Apache Tika", e);
-    }
-
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
@@ -115,8 +113,24 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
       }
 
       report.addItem(reportItem);
+
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
+
       if (createsPluginEvent) {
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
+        try {
+          List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model);
+          List<LinkingIdentifier> outcomes = null;
+          boolean notify = true;
+          String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_METADATA_EXTRACTION;
+          String outcome = state.name();
+          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+            sources, outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "",
+            notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
+        }
+
       }
     }
 

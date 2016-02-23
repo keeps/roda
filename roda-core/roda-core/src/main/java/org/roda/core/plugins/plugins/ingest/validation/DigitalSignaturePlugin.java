@@ -20,11 +20,13 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -61,6 +63,10 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   public static final String FILE_SUFFIX = ".txt";
   public static final String CONTENTS_SUFFIX = ".pkcs7";
   public static final String OTHER_METADATA_TYPE = "DigitalSignature";
+
+  private static final String EVENT_DESCRIPTION = "Checked if digital signatures were valid.";
+  private static final String EVENT_SUCESS_MESSAGE = "Digital signatures were valid.";
+  private static final String EVENT_FAILURE_MESSAGE = " Failed to validate the digital signature or invalid signature.";
 
   public DigitalSignaturePlugin() {
     doVerify = true;
@@ -132,7 +138,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   @Override
   public String getName() {
-    return "Digital signature handler";
+    return "Validation of digital signature";
   }
 
   @Override
@@ -142,7 +148,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   @Override
   public String getDescription() {
-    return "Plugin that can verify, extract and strip documents digital signature";
+    return "Check if a digital signatures are valid.";
   }
 
   @Override
@@ -333,11 +339,11 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, int pluginResultState,
     boolean notify) throws PluginException {
 
-    List<String> premisSourceFilesIdentifiers = new ArrayList<String>();
-    List<String> premisTargetFilesIdentifiers = new ArrayList<String>();
+    List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
-    String outcome = "success";
+    boolean success = true;
     StringBuilder stringBuilder = new StringBuilder();
 
     if (doVerify) {
@@ -366,26 +372,27 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     } else {
       stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
-        premisSourceFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
+        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
+          file.getRepresentationId(), file.getPath(), file.getId()));
       }
       for (File file : newFiles) {
-        premisTargetFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aip.getId(), file.getRepresentationId(), file.getPath(), file.getId()));
+        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
+          file.getRepresentationId(), file.getPath(), file.getId()));
       }
     }
 
     // Digital Signature plugin did not run correctly
     if (pluginResultState == 0) {
-      outcome = "failure";
+      success = false;
     }
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model,
-        RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-        "Digital Signature Plugin was executed on a representation", premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), null, notify);
+      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_DIGITAL_SIGNATURE_VALIDATION;
+      String outcome = success ? PluginState.SUCCESS.name() : PluginState.FAILURE.name();
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome,
+        success ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

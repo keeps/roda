@@ -72,7 +72,7 @@ public class AbstractConvertPluginUtils {
     boolean createPluginEvent = false;
     boolean inotify = false;
     // TODO set agent
-    PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representationId, inotify);
+    PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representationId);
     SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation);
     TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
 

@@ -25,6 +25,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -193,9 +196,9 @@ public final class PluginHelper {
 
   public static PreservationMetadata createPluginEvent(Plugin<?> plugin, String aipID, String representationID,
     List<String> filePath, String fileID, ModelService model, String eventType, String eventDetails,
-    List<String> sources, List<String> targets, String outcome, String outcomeDetailNote, String outcomeDetailExtension,
-    boolean notify) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, String outcome, String outcomeDetailNote,
+    String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
 
     IndexedPreservationAgent agent = null;
     try {
@@ -208,27 +211,9 @@ public final class PluginHelper {
     }
 
     String id = UUID.randomUUID().toString();
-    List<LinkingIdentifier> sourcesID = new ArrayList<LinkingIdentifier>();
-    if (sources != null && !sources.isEmpty()) {
-      for (String s : sources) {
-        LinkingIdentifier li = new LinkingIdentifier();
-        li.setValue(s);
-        li.setType("local");
-        sourcesID.add(li);
-      }
-    }
-    List<LinkingIdentifier> targetsID = new ArrayList<LinkingIdentifier>();
-    if (targets != null && !targets.isEmpty()) {
-      for (String t : targets) {
-        LinkingIdentifier li = new LinkingIdentifier();
-        li.setValue(t);
-        li.setType("local");
-        targetsID.add(li);
-      }
-    }
 
-    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sourcesID,
-      targetsID, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
+    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
+      targets, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
       premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
@@ -265,6 +250,32 @@ public final class PluginHelper {
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Unable to get or update Job from index", e);
     }
+  }
+
+  public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource) {
+    LinkingIdentifier li = new LinkingIdentifier();
+    li.setValue(IdUtils.getLinkingIdentifierId(LinkingObjectType.TRANSFERRED_RESOURCE, transferredResource));
+    li.setType("URN");
+    return li;
+  }
+
+  public static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String aipID, String representationID,
+    List<String> filePath, String fileID) {
+    LinkingIdentifier li = new LinkingIdentifier();
+    li.setValue(IdUtils.getLinkingIdentifierId(type, aipID, representationID, filePath, fileID));
+    li.setType("URN");
+    return li;
+  }
+
+  public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, ModelService model) {
+    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    if (aip.getRepresentations() != null && aip.getRepresentations().size() > 0) {
+      for (Representation representation : aip.getRepresentations()) {
+        identifiers
+          .add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(), null, null));
+      }
+    }
+    return identifiers;
   }
 
 }

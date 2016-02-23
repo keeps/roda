@@ -16,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
@@ -23,10 +24,12 @@ import java.util.UUID;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -48,6 +51,10 @@ import org.slf4j.LoggerFactory;
 public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
 
+  private static final String EVENT_DESCRIPTION = "Extracted objects from package in file/folder format.";
+  private static final String EVENT_SUCESS_MESSAGE = "The SIP has been successfuly unpacked.";
+  private static final String EVENT_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
+
   @Override
   public void init() throws PluginException {
   }
@@ -59,12 +66,12 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
   @Override
   public String getName() {
-    return "Uploaded file/directory";
+    return "Uploaded file/folder";
   }
 
   @Override
   public String getDescription() {
-    return "Understands a file/directory as an SIP";
+    return "Treats a file/folder as a SIP.";
   }
 
   @Override
@@ -123,6 +130,15 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         state = PluginState.SUCCESS;
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource));
+        List<LinkingIdentifier> outcomes = Arrays
+          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
+        boolean notify = true;
+        String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_INGEST_START;
+        String outcome = PluginState.SUCCESS.name();
+        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+          sources, outcomes, outcome, EVENT_SUCESS_MESSAGE, "", notify);
 
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);

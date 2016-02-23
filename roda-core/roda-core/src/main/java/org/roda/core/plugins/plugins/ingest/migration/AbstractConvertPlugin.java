@@ -35,11 +35,13 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -67,6 +69,13 @@ import org.xml.sax.SAXException;
 public abstract class AbstractConvertPlugin<T extends Serializable> extends AbstractPlugin<T> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
+  
+  //TODO update plugin messages
+  private static final String EVENT_DESCRIPTION = "XXXXXXXXXX";
+  private static final String EVENT_SUCESS_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXX";
+  private static final String EVENT_FAILURE_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+  
+  
   private String inputFormat;
   private String outputFormat;
 
@@ -542,8 +551,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
       throws PluginException {
 
-    List<String> premisSourceFilesIdentifiers = new ArrayList<String>();
-    List<String> premisTargetFilesIdentifiers = new ArrayList<String>();
+    List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
+    List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
     String outcome = "success";
@@ -555,11 +564,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     } else {
       for (File file : alteredFiles)
         premisSourceFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE,aipId, file.getRepresentationId(), file.getPath(), file.getId()));
 
       for (File file : newFiles)
         premisTargetFilesIdentifiers
-          .add(IdUtils.getLinkingIdentifierId(aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+          .add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE,aipId, file.getRepresentationId(), file.getPath(), file.getId()));
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }
@@ -577,6 +586,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
     // FIXME revise PREMIS generation
     try {
+      
+      
       PluginHelper.createPluginEvent(this, aipId, null, null, null, model,
         RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION,
         "Some files may have been format converted on a new representation", premisSourceFilesIdentifiers,

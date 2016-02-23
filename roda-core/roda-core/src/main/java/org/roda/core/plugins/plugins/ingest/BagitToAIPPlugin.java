@@ -9,11 +9,14 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -35,6 +38,10 @@ import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
+
+  private static final String EVENT_DESCRIPTION = "Extracted objects from package in BagIt format.";
+  private static final String EVENT_SUCESS_MESSAGE = "The SIP has been successfuly unpacked.";
+  private static final String EVENT_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
 
   @Override
   public void init() throws PluginException {
@@ -96,6 +103,15 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
           reportItem = reportItem
             .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found: " + parentId));
         }
+
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource));
+        List<LinkingIdentifier> outcomes = Arrays
+          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aipCreated.getId(), null, null, null));
+        boolean notify = true;
+        String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_INGEST_START;
+        String outcome = PluginState.SUCCESS.name();
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+          sources, outcomes, outcome, EVENT_SUCESS_MESSAGE, "", notify);
 
         LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {

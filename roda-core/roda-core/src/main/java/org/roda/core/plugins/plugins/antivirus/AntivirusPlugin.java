@@ -18,9 +18,10 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -41,6 +42,10 @@ import org.slf4j.LoggerFactory;
 
 public class AntivirusPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AntivirusPlugin.class);
+
+  private static final String EVENT_DESCRIPTION = "Scanned package for malicious programs using ClamAV.";
+  private static final String EVENT_SUCESS_MESSAGE = "The package does not contain any known malicious programs.";
+  private static final String EVENT_FAILURE_MESSAGE = "A malicious program was detected inside the package.";
 
   private String antiVirusClassName;
   private AntiVirus antiVirus = null;
@@ -84,7 +89,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Verifies if a SIP is free of virus.";
+    return "Scans a package for malicious programs using ClamAV.";
   }
 
   @Override
@@ -158,23 +163,18 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     ModelService model, boolean notify) throws PluginException {
 
     try {
-      boolean inotify = false;
       boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
-      String representationId = null;
-      String fileId = null;
-      List<String> filePath = null;
-      // TODO review below information and externalise strings
-      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK;
-      String eventDetails = "All the files from the SIP were verified against an antivirus.";
-      List<String> sourceObjects = Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), null, null, null));
-      List<String> outcomeObjects = null;
-      String outcome = success ? "success" : "failure";
-      String outcomeDetailNote = success ? virusCheckResult.getReport()
-        : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
-      String outcomeDetailExtension = null;
 
-      PluginHelper.createPluginEvent(this, aip.getId(), representationId, filePath, fileId, model, eventType,
-        eventDetails, sourceObjects, outcomeObjects, outcome, outcomeDetailNote, outcomeDetailExtension, inotify);
+      String outcomeDetailExtension = success ? virusCheckResult.getReport()
+        : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
+
+      List<LinkingIdentifier> sources = Arrays
+        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
+      List<LinkingIdentifier> outcomes = null;
+      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_VIRUS_CHECK;
+      String outcome = success?PluginState.SUCCESS.name():PluginState.FAILURE.name();
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION, sources,
+        outcomes, outcome, success ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, outcomeDetailExtension, notify);
 
       if (notify) {
         model.notifyAIPUpdated(aip.getId());

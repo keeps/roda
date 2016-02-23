@@ -296,7 +296,7 @@ public class InternalPluginsTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
-      RodaConstants.PRESERVATION_EVENT_TYPE_ANTIVIRUS_CHECK));
+      RodaConstants.PRESERVATION_EVENT_TYPE_VIRUS_CHECK));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
       new Sublist(0, 10));

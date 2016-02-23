@@ -36,7 +36,7 @@ public class PremisSkeletonPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, StorageService storage, AIP aip,
-    String representationId, boolean notify) throws IOException, RequestNotValidException, GenericException,
+    String representationId) throws IOException, RequestNotValidException, GenericException,
       NotFoundException, AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
 
     Representation representation = PremisUtils.createBaseRepresentation(aip.getId(), representationId);
@@ -59,10 +59,6 @@ public class PremisSkeletonPluginUtils {
     ContentPayload representationPayload = PremisUtils.representationToBinary(representation);
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, representationId, aip.getId(),
       representationId, representationPayload, notifyInSteps);
-
-    if (notify) {
-      model.notifyAIPUpdated(aip.getId());
-    }
   }
 
 }

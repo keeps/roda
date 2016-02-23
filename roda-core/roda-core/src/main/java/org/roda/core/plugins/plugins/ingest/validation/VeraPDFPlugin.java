@@ -23,7 +23,12 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AlreadyExistsException;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -32,6 +37,8 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -55,6 +62,10 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private boolean hasPartialSuccessOnOutcome = Boolean
     .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
+  private static final String EVENT_DESCRIPTION = "Checked if digital signatures were valid.";
+  private static final String EVENT_SUCESS_MESSAGE = "Digital signatures were valid.";
+  private static final String EVENT_FAILURE_MESSAGE = " Failed to validate the digital signature or invalid signature.";
+  
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -67,12 +78,12 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "VeraPDF validation action";
+    return "PDF/A format validator";
   }
 
   @Override
   public String getDescription() {
-    return "Validates PDFA format of the AIP files";
+    return "PDF/A format validator using VeraPDF.";
   }
 
   @Override
@@ -164,10 +175,11 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(Map<String, Path> resourceList, AIP aip, String representationId, ModelService model,
     int state) throws PluginException {
-
+    PluginState pluginState = PluginState.SUCCESS;
+    String outcomeDetails = null;
     try {
       // building the detail extension for the plugin event
-      String outcome = "success";
+      
       StringBuilder noteStringBuilder = new StringBuilder();
       StringBuilder detailsStringBuilder = new StringBuilder();
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
@@ -198,33 +210,39 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
       // all file have passed the validation
       if (state == 1) {
-        outcome = "success";
+        pluginState = PluginState.SUCCESS;
         noteStringBuilder.setLength(0);
         detailsStringBuilder.setLength(0);
       }
       // veraPDF plugin did not run correctly
       if (state == 0 || (state == 2 && hasPartialSuccessOnOutcome == false)) {
-        outcome = "failure";
+        pluginState = PluginState.FAILURE;
         noteStringBuilder.setLength(0);
         detailsStringBuilder.setLength(0);
       }
       // some files did not pass the verification
       if (state == 2 && hasPartialSuccessOnOutcome == true) {
-        outcome = "partial success";
+        pluginState = PluginState.PARTIAL_SUCCESS;
       }
 
       logger.debug("The veraPDF validation on the representation " + representationId + " of AIP " + aip.getId()
-        + " finished with a status: " + outcome + ".");
-
-      // FIXME revise PREMIS generation
-      boolean notify = false;
-      PluginHelper.createPluginEvent(this, aip.getId(), representationId, null, null, model,
-        RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION,
-        "All the files from the AIP were submitted to a veraPDF validation.",
-        Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), representationId, null, null)), null, outcome,
-        noteStringBuilder.toString(), null, notify);
+        + " finished with a status: " + pluginState.name() + ".");
+      
+      outcomeDetails = noteStringBuilder.toString();
     } catch (Throwable e) {
-      throw new PluginException(e.getMessage(), e);
+      pluginState = PluginState.FAILURE;
+      outcomeDetails = e.getMessage();
+      logger.error("Error executing VeraPDF plugin: "+e.getMessage(),e);
+    }
+    String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION;
+    boolean notify = false;
+    
+    try{
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+        null, null, pluginState.name(),
+        pluginState==PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, outcomeDetails, notify);
+    }catch(AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException | ValidationException | AlreadyExistsException e){
+      logger.error("Error creating event: "+e.getMessage(),e);
     }
 
   }

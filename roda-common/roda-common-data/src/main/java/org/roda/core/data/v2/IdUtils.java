@@ -10,11 +10,16 @@ package org.roda.core.data.v2;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
   private static final String LINKING_ID_SEPARATOR = "/";
+
+  public enum LinkingObjectType {
+    TRANSFERRED_RESOURCE, AIP, REPRESENTATION, FILE
+  }
 
   /** Private empty constructor */
   private IdUtils() {
@@ -63,9 +68,13 @@ public final class IdUtils {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
   }
 
-  public static String getLinkingIdentifierId(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) {
+  public static String getLinkingIdentifierId(LinkingObjectType type, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId) {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
+  }
+
+  public static String getLinkingIdentifierId(LinkingObjectType type, TransferredResource transferredResource) {
+    return type + ":" + transferredResource.getFullPath();
   }
 
   public static String getOtherMetadataId(String type, String aipId, String representationId,

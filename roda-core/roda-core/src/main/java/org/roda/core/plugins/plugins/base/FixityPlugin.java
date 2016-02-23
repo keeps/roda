@@ -42,8 +42,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FixityPlugin extends AbstractPlugin<AIP> {
-  private ContentPayload agent;
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
+  
+//TODO update plugin messages
+ private static final String EVENT_DESCRIPTION = "XXXXXXXXXX";
+ private static final String EVENT_SUCESS_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXX";
+ private static final String EVENT_FAILURE_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXXXX";
 
   @Override
   public void init() {
@@ -124,19 +128,20 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
               }
               sb.append("</ul>");
 
-              PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
+              //TODO FIXE PREMIS EVENT CREATION
+             /* PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository",
                 Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), r.getId(), null, null)), null, "failure",
                 "Reason", sb.toString(), inotify);
-              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);
+              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);*/
             } else {
-              LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
+              /*LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
               PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
                 RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
                 "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
                 null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), inotify);
-              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);
+              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);*/
             }
           }
           IOUtils.closeQuietly(allFiles);

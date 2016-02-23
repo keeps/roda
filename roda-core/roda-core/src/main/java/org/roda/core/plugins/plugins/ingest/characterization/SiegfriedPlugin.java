@@ -8,26 +8,20 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.PremisUtils;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -46,7 +40,9 @@ import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
-
+  private static final String EVENT_DESCRIPTION = "Identified the object's file formats and versions using Siegfried.";
+  private static final String EVENT_SUCESS_MESSAGE = "File formats were identified and recorded in PREMIS objects.";
+  private static final String EVENT_FAILURE_MESSAGE = "Failed to identify file formats in the package.";
   public static final String OTHER_METADATA_TYPE = "Siegfried";
   public static final String FILE_SUFFIX = ".json";
 
@@ -63,12 +59,12 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Siegfried file format identification";
+    return "Format identification";
   }
 
   @Override
   public String getDescription() {
-    return "Identify file format and update preservation metadata";
+    return "Identification of the object's file formats and versions using Siegfried.";
   }
 
   @Override
@@ -92,47 +88,25 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
     Report report = PluginHelper.createPluginReport(this);
     PluginState state;
-    
 
     for (AIP aip : list) {
       ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
-      List<String> sources = new ArrayList<String>();
+      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
+      List<String> siegfriedOutputs = new ArrayList<String>();
       try {
-        List<String> siegfriedOutputs = new ArrayList<String>();
+
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
           siegfriedOutputs
             .add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation));
-
-          CloseableIterable<File> files = model.listFilesUnder(aip.getId(), representation.getId(), true);
-          Iterator<File> it = files.iterator();
-          while (it.hasNext()) {
-            File f = it.next();
-            if (!f.isDirectory()) {
-              sources
-                .add(IdUtils.getLinkingIdentifierId(f.getAipId(), f.getRepresentationId(), f.getPath(), f.getId()));
-            }
-          }
-
-        }
-        boolean inotify = false;
-        if (createsPluginEvent) {
-          try {
-            PluginHelper.createPluginEvent(this,aip.getId(), null, null, null, model,
-              RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION,
-              "The files of the representation were successfully identified.", sources, null,
-              PluginState.SUCCESS.name(), StringUtils.join(siegfriedOutputs), "", inotify);
-          } catch (ValidationException e) {
-            LOGGER.error("Error creating Premis event: " + e.getMessage(), e);
-          }
+          sources.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(),
+            representation.getId(), null, null));
         }
         model.notifyAIPUpdated(aip.getId());
-
         state = PluginState.SUCCESS;
         reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
-
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
@@ -145,15 +119,23 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
       report.addItem(reportItem);
 
-      // TODO Remove try catch... only added to run siegfried plugin via sh
-      // script
-      try {
-        if (createsPluginEvent) {
-          PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
+      if (createsPluginEvent) {
+        try {
+          sources.clear();
+          List<LinkingIdentifier> outcomes = null;
+          boolean notify = true;
+          String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION;
+          String outcome = state.name();
+          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
+            sources, outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "",
+            notify);
+        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+          | AuthorizationDeniedException | AlreadyExistsException e) {
+          LOGGER.error("Error creating event: " + e.getMessage(), e);
         }
-      } catch (Throwable t) {
-
       }
+
+      PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
     }
     return report;
   }
