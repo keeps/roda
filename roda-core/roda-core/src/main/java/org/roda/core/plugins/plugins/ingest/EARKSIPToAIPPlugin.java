@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -38,9 +39,7 @@ import org.slf4j.LoggerFactory;
 public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
 
-  private static final String EVENT_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
-  private static final String EVENT_SUCESS_MESSAGE = "The SIP has been successfuly unpacked.";
-  private static final String EVENT_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
+  
 
   @Override
   public void init() throws PluginException {
@@ -103,10 +102,8 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
         List<LinkingIdentifier> outcomes = Arrays
           .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aipCreated.getId(), null, null, null));
         boolean notify = true;
-        String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_INGEST_START;
-        String outcome = PluginState.SUCCESS.name();
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-          sources, outcomes, outcome, EVENT_SUCESS_MESSAGE, "", notify);
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes, state, "",
+          notify);
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
         state = PluginState.FAILURE;
@@ -151,6 +148,26 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.INGEST_START;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Extracted objects from package in E-ARK SIP format.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "The SIP has been successfuly unpacked.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "The ingest process failed to unpack the SIP.";
   }
 
 }

@@ -38,6 +38,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -295,8 +296,8 @@ public class InternalPluginsTest {
     Assert.assertTrue(found);
 
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
-      RodaConstants.PRESERVATION_EVENT_TYPE_VIRUS_CHECK));
+    filter.add(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, PreservationEventType.VIRUS_CHECK.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
       new Sublist(0, 10));
@@ -435,7 +436,7 @@ public class InternalPluginsTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE,
-      RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION));
+      PreservationEventType.FORMAT_IDENTIFICATION.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
       new Sublist(0, 10));

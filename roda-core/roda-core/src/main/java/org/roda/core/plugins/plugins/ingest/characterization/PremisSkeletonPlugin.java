@@ -8,14 +8,12 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -23,10 +21,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Attribute;
@@ -47,10 +42,6 @@ import org.slf4j.LoggerFactory;
 
 public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
-
-  private static final String EVENT_DESCRIPTION = "Created base PREMIS objects with file original name and file fixity information (SHA-256).";
-  private static final String EVENT_SUCESS_MESSAGE = "PREMIS objects were successfully created.";
-  private static final String EVENT_FAILURE_MESSAGE = "Failed to create PREMIS objects from files.";
 
   private boolean createsPluginEvent = true;
 
@@ -125,10 +116,7 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
           List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model);
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_MESSAGE_DIGEST_CALCULATION;
-          String outcome = state.name();
-          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-            sources, outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "",
+          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
             notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
@@ -169,6 +157,26 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.MESSAGE_DIGEST_CALCULATION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Created base PREMIS objects with file original name and file fixity information (SHA-256).";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "PREMIS objects were successfully created.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to create PREMIS objects from files.";
   }
 
 }

@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
@@ -37,12 +38,7 @@ import org.slf4j.LoggerFactory;
 
 // FIXME rename this to SIPValidationPlugin
 public class AIPValidationPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
-
-  // TODO update plugin messages
-  private static final String EVENT_DESCRIPTION = "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
-  private static final String EVENT_SUCESS_MESSAGE = "Descriptive metadata is well formed and complete.";
-  private static final String EVENT_FAILURE_MESSAGE = "Descriptive metadata was not well formed or failed to meet the established ingest policy.";
+  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);  
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
@@ -133,14 +129,11 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(AIP aip, ModelService model, boolean valid,boolean notify) throws PluginException {
     try {
-
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
       List<LinkingIdentifier> outcomes = null;
-      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_WELLFORMEDNESS_CHECK;
-      String outcome = valid ? PluginState.SUCCESS.name() : PluginState.FAILURE.name();
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION, sources,
-        outcomes, outcome, valid ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
+        valid ? PluginState.SUCCESS : PluginState.FAILURE, "", notify);
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }
@@ -175,5 +168,25 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+  
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.WELLFORMEDNESS_CHECK;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Checked whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "Descriptive metadata is well formed and complete.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Descriptive metadata was not well formed or failed to meet the established ingest policy.";
   }
 }

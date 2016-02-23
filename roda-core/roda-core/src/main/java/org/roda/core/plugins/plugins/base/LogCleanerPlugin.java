@@ -16,6 +16,7 @@ import java.util.Map;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -120,4 +121,24 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
     return true;
   }
 
+  // TODO FIX
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+  }
 }

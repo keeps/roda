@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -37,9 +38,7 @@ import org.slf4j.LoggerFactory;
 public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
 
-  private static final String EVENT_DESCRIPTION = "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository. ";
-  private static final String EVENT_SUCESS_MESSAGE = "The AIP was successfully added to the repository's inventory.";
-  private static final String EVENT_FAILURE_MESSAGE = "Failed to add the AIP to the repository's inventory.";
+  
 
   @Override
   public void init() throws PluginException {
@@ -109,10 +108,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model);
       List<LinkingIdentifier> outcomes = null;
       boolean notify = true;
-      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_ACCESSION;
-      String outcome = state.name();
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION, sources,
-        outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
+        notify);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);
@@ -144,6 +141,26 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.ACCESSION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "The AIP was successfully added to the repository's inventory.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to add the AIP to the repository's inventory.";
   }
 
 }

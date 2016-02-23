@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
@@ -50,10 +51,6 @@ import org.slf4j.LoggerFactory;
 
 public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
-
-  private static final String EVENT_DESCRIPTION = "Extracted objects from package in file/folder format.";
-  private static final String EVENT_SUCESS_MESSAGE = "The SIP has been successfuly unpacked.";
-  private static final String EVENT_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
 
   @Override
   public void init() throws PluginException {
@@ -135,11 +132,8 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         List<LinkingIdentifier> outcomes = Arrays
           .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
         boolean notify = true;
-        String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_INGEST_START;
-        String outcome = PluginState.SUCCESS.name();
-        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-          sources, outcomes, outcome, EVENT_SUCESS_MESSAGE, "", notify);
-
+        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
+          notify);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         state = PluginState.FAILURE;
@@ -235,6 +229,26 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.INGEST_START;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Extracted objects from package in file/folder format.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "The SIP has been successfuly unpacked.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "The ingest process failed to unpack the SIP.";
   }
 
 }

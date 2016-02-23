@@ -12,6 +12,7 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -63,10 +64,6 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   public static final String FILE_SUFFIX = ".txt";
   public static final String CONTENTS_SUFFIX = ".pkcs7";
   public static final String OTHER_METADATA_TYPE = "DigitalSignature";
-
-  private static final String EVENT_DESCRIPTION = "Checked if digital signatures were valid.";
-  private static final String EVENT_SUCESS_MESSAGE = "Digital signatures were valid.";
-  private static final String EVENT_FAILURE_MESSAGE = " Failed to validate the digital signature or invalid signature.";
 
   public DigitalSignaturePlugin() {
     doVerify = true;
@@ -343,7 +340,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
-    boolean success = true;
+    PluginState state = PluginState.SUCCESS;
     StringBuilder stringBuilder = new StringBuilder();
 
     if (doVerify) {
@@ -383,16 +380,13 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
     // Digital Signature plugin did not run correctly
     if (pluginResultState == 0) {
-      success = false;
+      state = PluginState.FAILURE;
     }
 
     // FIXME revise PREMIS generation
     try {
-      String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_DIGITAL_SIGNATURE_VALIDATION;
-      String outcome = success ? PluginState.SUCCESS.name() : PluginState.FAILURE.name();
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-        premisSourceFilesIdentifiers, premisTargetFilesIdentifiers, outcome,
-        success ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, stringBuilder.toString(), notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, premisSourceFilesIdentifiers,
+        premisTargetFilesIdentifiers, state, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
@@ -435,6 +429,26 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.DIGITAL_SIGNATURE_VALIDATION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Checked if digital signatures were valid.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "Digital signatures were valid.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to validate the digital signature or invalid signature.";
   }
 
 }

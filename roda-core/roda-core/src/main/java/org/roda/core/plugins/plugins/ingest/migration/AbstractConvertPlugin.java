@@ -27,6 +27,7 @@ import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -69,13 +70,7 @@ import org.xml.sax.SAXException;
 public abstract class AbstractConvertPlugin<T extends Serializable> extends AbstractPlugin<T> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(AbstractConvertPlugin.class);
-  
-  //TODO update plugin messages
-  private static final String EVENT_DESCRIPTION = "XXXXXXXXXX";
-  private static final String EVENT_SUCESS_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXX";
-  private static final String EVENT_FAILURE_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXXXX";
-  
-  
+
   private String inputFormat;
   private String outputFormat;
 
@@ -545,7 +540,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException;
+
+  throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
     ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
@@ -555,7 +551,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
-    String outcome = "success";
+    PluginState outcome = PluginState.SUCCESS;
     StringBuilder stringBuilder = new StringBuilder();
 
     if (alteredFiles.size() == 0) {
@@ -563,35 +559,30 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         .append("No file was successfully converted on this representation due to plugin or command line issues.");
     } else {
       for (File file : alteredFiles)
-        premisSourceFilesIdentifiers
-          .add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE,aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
+          file.getRepresentationId(), file.getPath(), file.getId()));
 
       for (File file : newFiles)
-        premisTargetFilesIdentifiers
-          .add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE,aipId, file.getRepresentationId(), file.getPath(), file.getId()));
+        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
+          file.getRepresentationId(), file.getPath(), file.getId()));
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }
 
     // Conversion plugin did not run correctly
     if (pluginResultState == 0 || (pluginResultState == 2 && hasPartialSuccessOnOutcome() == false)) {
-      outcome = "failure";
+      outcome = PluginState.FAILURE;
       stringBuilder.setLength(0);
     }
 
     // some files were not converted
     if (pluginResultState == 2 && hasPartialSuccessOnOutcome() == true) {
-      outcome = "partial success";
+      outcome = PluginState.PARTIAL_SUCCESS;
     }
 
-    // FIXME revise PREMIS generation
     try {
-      
-      
-      PluginHelper.createPluginEvent(this, aipId, null, null, null, model,
-        RodaConstants.PRESERVATION_EVENT_TYPE_MIGRATION,
-        "Some files may have been format converted on a new representation", premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), detailExtension, notify);
+      PluginHelper.createPluginEvent(this, aipId, null, null, null, model, premisSourceFilesIdentifiers,
+        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
@@ -646,6 +637,27 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.MIGRATION;
+  }
+
+  // TODO fix details...
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXX.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXX.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXXXXxx.";
   }
 
 }

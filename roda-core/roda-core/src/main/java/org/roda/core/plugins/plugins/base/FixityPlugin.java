@@ -10,16 +10,14 @@ package org.roda.core.plugins.plugins.base;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -34,20 +32,13 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class FixityPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
-  
-//TODO update plugin messages
- private static final String EVENT_DESCRIPTION = "XXXXXXXXXX";
- private static final String EVENT_SUCESS_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXX";
- private static final String EVENT_FAILURE_MESSAGE = "XXXXXXXXXXXXXXXXXXXXXXXXXX";
 
   @Override
   public void init() {
@@ -128,20 +119,31 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
               }
               sb.append("</ul>");
 
-              //TODO FIXE PREMIS EVENT CREATION
-             /* PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
-                RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository",
-                Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(), r.getId(), null, null)), null, "failure",
-                "Reason", sb.toString(), inotify);
-              notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS, pm);*/
+              // TODO FIXE PREMIS EVENT CREATION
+              /*
+               * PreservationMetadata pm = PluginHelper.createPluginEvent(this,
+               * aip.getId(), r.getId(), null, null, model,
+               * RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+               * "Checksums recorded in PREMIS were compared with the files in the repository"
+               * , Arrays.asList(IdUtils.getLinkingIdentifierId(aip.getId(),
+               * r.getId(), null, null)), null, "failure", "Reason",
+               * sb.toString(), inotify);
+               * notifyUserOfFixityCheckError(r.getId(), okFileIDS, koFileIDS,
+               * pm);
+               */
             } else {
-              /*LOGGER.debug("Fixity OK for representation " + r.getId() + " of AIP " + aip.getId());
-              PreservationMetadata pm = PluginHelper.createPluginEvent(this, aip.getId(), r.getId(), null, null, model,
-                RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
-                "Checksums recorded in PREMIS were compared with the files in the repository", Arrays.asList(r.getId()),
-                null, "success", okFileIDS.size() + " files checked successfully", okFileIDS.toString(), inotify);
-              notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS, pm);*/
+              /*
+               * LOGGER.debug("Fixity OK for representation " + r.getId() +
+               * " of AIP " + aip.getId()); PreservationMetadata pm =
+               * PluginHelper.createPluginEvent(this, aip.getId(), r.getId(),
+               * null, null, model,
+               * RodaConstants.PRESERVATION_EVENT_TYPE_FIXITY_CHECK,
+               * "Checksums recorded in PREMIS were compared with the files in the repository"
+               * , Arrays.asList(r.getId()), null, "success", okFileIDS.size() +
+               * " files checked successfully", okFileIDS.toString(), inotify);
+               * notifyUserOfFixityCheckSucess(r.getId(), okFileIDS, koFileIDS,
+               * pm);
+               */
             }
           }
           IOUtils.closeQuietly(allFiles);
@@ -199,5 +201,26 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  // TODO FIX
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 }

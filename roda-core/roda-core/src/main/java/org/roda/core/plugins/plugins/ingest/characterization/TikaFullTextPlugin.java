@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -40,9 +41,7 @@ import org.slf4j.LoggerFactory;
 public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPlugin.class);
-  private static final String EVENT_DESCRIPTION = "Extraction of technical metadata using Apache Tika.";
-  private static final String EVENT_SUCESS_MESSAGE = "Successfully extracted technical metadata from file.";
-  private static final String EVENT_FAILURE_MESSAGE = "Failed to extract technical metadata from file.";
+
   public static final String FILE_SUFFIX = ".html";
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
@@ -121,10 +120,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model);
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_METADATA_EXTRACTION;
-          String outcome = state.name();
-          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-            sources, outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "",
+          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
             notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
@@ -168,6 +164,26 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.METADATA_EXTRACTION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Extraction of technical metadata using Apache Tika.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "Successfully extracted technical metadata from file.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to extract technical metadata from file.";
   }
 
 }

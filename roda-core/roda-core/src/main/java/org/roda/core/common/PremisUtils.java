@@ -43,6 +43,7 @@ import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlValidationError;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -362,7 +363,7 @@ public class PremisUtils {
 
   }
 
-  public static ContentPayload createPremisAgentBinary(String id, String name, String type, String extension,
+  public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type, String extension,
     String note) throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
@@ -371,7 +372,7 @@ public class PremisUtils {
     agentIdentifier.setAgentIdentifierType("local");
     agentIdentifier.setAgentIdentifierValue(id);
 
-    act.setAgentType(type);
+    act.setAgentType(type.toString());
 
     if (StringUtils.isNotBlank(name)) {
       act.addAgentName(name);

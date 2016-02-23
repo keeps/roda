@@ -11,6 +11,8 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants.PreservationAgentType;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -67,10 +69,38 @@ public interface Plugin<T extends Serializable> {
   /**
    * Returns the type of the agent linked to this {@link Plugin}.
    * 
-   * @return a {@link String} with the type of the agent of this {@link Plugin}.
+   * @return a {@link PreservationAgentType} with the type of the agent of this {@link Plugin}.
    */
-  public String getAgentType();
-
+  public PreservationAgentType getAgentType();
+  
+  /**
+   * Returns the type of the execution preservation event linked to this {@link Plugin}.
+   * 
+   * @return a {@link PreservationEventType} with the type of the execution event of this {@link Plugin}.
+   */
+  public PreservationEventType getPreservationEventType();
+  
+  /**
+   * Returns the description of the execution preservation event linked to this {@link Plugin}.
+   * 
+   * @return a {@link String} with the description of the execution event of this {@link Plugin}.
+   */
+  public String getPreservationEventDescription();
+  
+  /**
+   * Returns the success message of the execution preservation event linked to this {@link Plugin}.
+   * 
+   * @return a {@link String} with the success message of the execution event of this {@link Plugin}.
+   */
+  public String getPreservationEventSuccessMessage();
+  
+  /**
+   * Returns the failure message of the execution preservation event linked to this {@link Plugin}.
+   * 
+   * @return a {@link String} with the failure message of the execution event of this {@link Plugin}.
+   */
+  public String getPreservationEventFailureMessage();
+  
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
    * {@link Plugin}.

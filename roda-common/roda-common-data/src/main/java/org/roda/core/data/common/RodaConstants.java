@@ -509,59 +509,12 @@ public final class RodaConstants {
   public static final String PRESERVATION_TYPE_FILE = "file";
   public static final String PRESERVATION_TYPE_EVENT = "type";
 
-  /*
-   * accession adding emulation information appraisal capture compression
-   * creation data carrier migration deaccession decompression decryption
-   * deletion deselection digital signature validation dissemination file
-   * extension change file system analysis file system extraction filename
-   * change
-   */
-  public static final String PRESERVATION_EVENT_TYPE_FIXITY_CHECK = "fixity check";
-  /*
-   * forensic feature analysis
-   */
-  public static final String PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION = "format identification";
-
-  public static final String PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION = "format validation";
-  /*
-   * identifier assignment imaging Information Package merging Information
-   * Package splitting ingest end ingest start
-   */
-  public static final String PRESERVATION_EVENT_TYPE_INGESTION = "ingestion";
-  /*
-   * message digest calculation metadata extraction (propertyExtraction)
-   * metadata modification
-   */
-  public static final String PRESERVATION_EVENT_TYPE_MIGRATION = "migration";
-  public static final String PRESERVATION_EVENT_TYPE_NORMALIZATION = "normalization";
-  /*
-   * object modification object validation quality review quarantine recovery
-   * redaction replication SIP creation storage migration unpacking unquarantine
-   */
-  public static final String PRESERVATION_EVENT_TYPE_VIRUS_CHECK = "virus check";
-  public static final String PRESERVATION_EVENT_TYPE_INGEST_START = "ingest start";
-  public static final String PRESERVATION_EVENT_TYPE_MESSAGE_DIGEST_CALCULATION = "message digest calculation";
-  public static final String PRESERVATION_EVENT_TYPE_METADATA_EXTRACTION = "metadata extraction";
-  public static final String PRESERVATION_EVENT_TYPE_ACCESSION = "accession";
-  public static final String PRESERVATION_EVENT_TYPE_DIGITAL_SIGNATURE_VALIDATION = "digital signature validation";
-  public static final String PRESERVATION_EVENT_TYPE_WELLFORMEDNESS_CHECK = "wellformedness check";
-
-  /*
-   * wellformedness check
-   */
-
   public static final String PRESERVATION_EVENT_AGENT_ROLE_INGEST_TASK = "ingest task";
   public static final String PRESERVATION_EVENT_AGENT_ROLE_PRESERVATION_TASK = "preservation task";
   public static final String PRESERVATION_EVENT_AGENT_ROLE_VALIDATION_TASK = "validation task";
   public static final String PRESERVATION_EVENT_AGENT_ROLE_EXECUTING_PROGRAM_TASK = "executing program task";
 
   public static final String PRESERVATION_EVENT_OBJECT_ROLE_TARGET = "target";
-
-  public static final String PRESERVATION_AGENT_TYPE_HARDWARE = "hardware";
-  public static final String PRESERVATION_AGENT_TYPE_ORGANIZATION = "organization";
-  public static final String PRESERVATION_AGENT_TYPE_PERSON = "person";
-  public static final String PRESERVATION_AGENT_TYPE_SOFTWARE = "software";
-
   public static final String PRESERVATION_LEVEL_FULL = "full";
 
   /**
@@ -582,9 +535,45 @@ public final class RodaConstants {
    * WUI related
    */
   public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
+
+  public enum PreservationEventType {
+    FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
+    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
+    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
+    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
+    WELLFORMEDNESS_CHECK("wellformedness check");
+
+    private final String text;
+
+    private PreservationEventType(final String text) {
+      this.text = text;
+    }
+
+    @Override
+    public String toString() {
+      return text;
+    }
+  }
+  public static final String PRESERVATION_AGENT_TYPE_HARDWARE = "hardware";
+  public static final String PRESERVATION_AGENT_TYPE_ORGANIZATION = "organization";
+  public static final String PRESERVATION_AGENT_TYPE_PERSON = "person";
+  public static final String PRESERVATION_AGENT_TYPE_SOFTWARE = "software";
   
-  
-  
-  
+  public enum PreservationAgentType {
+    HARDWARE("hardware"), ORGANIZATION("organizaation"),
+    PERSON("person"), SOFTWARE("software");
+
+    private final String text;
+
+    private PreservationAgentType(final String text) {
+      this.text = text;
+    }
+
+    @Override
+    public String toString() {
+      return text;
+    }
+  }
 
 }

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 
@@ -16,8 +17,8 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
   private Map<String, String> parameterValues = new HashMap<String, String>();
 
   @Override
-  public String getAgentType() {
-    return RodaConstants.PRESERVATION_AGENT_TYPE_SOFTWARE;
+  public PreservationAgentType getAgentType() {
+    return PreservationAgentType.SOFTWARE;
   }
 
   @Override

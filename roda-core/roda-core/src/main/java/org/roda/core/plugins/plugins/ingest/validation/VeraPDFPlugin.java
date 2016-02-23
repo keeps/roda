@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.ingest.validation;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,7 +21,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -35,10 +34,10 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -62,10 +61,6 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private boolean hasPartialSuccessOnOutcome = Boolean
     .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
-  private static final String EVENT_DESCRIPTION = "Checked if digital signatures were valid.";
-  private static final String EVENT_SUCESS_MESSAGE = "Digital signatures were valid.";
-  private static final String EVENT_FAILURE_MESSAGE = " Failed to validate the digital signature or invalid signature.";
-  
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -179,7 +174,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
     String outcomeDetails = null;
     try {
       // building the detail extension for the plugin event
-      
+
       StringBuilder noteStringBuilder = new StringBuilder();
       StringBuilder detailsStringBuilder = new StringBuilder();
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
@@ -227,22 +222,22 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
       logger.debug("The veraPDF validation on the representation " + representationId + " of AIP " + aip.getId()
         + " finished with a status: " + pluginState.name() + ".");
-      
+
       outcomeDetails = noteStringBuilder.toString();
     } catch (Throwable e) {
       pluginState = PluginState.FAILURE;
       outcomeDetails = e.getMessage();
-      logger.error("Error executing VeraPDF plugin: "+e.getMessage(),e);
+      logger.error("Error executing VeraPDF plugin: " + e.getMessage(), e);
     }
-    String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_VALIDATION;
     boolean notify = false;
-    
-    try{
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-        null, null, pluginState.name(),
-        pluginState==PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, outcomeDetails, notify);
-    }catch(AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException | ValidationException | AlreadyExistsException e){
-      logger.error("Error creating event: "+e.getMessage(),e);
+
+    try {
+      // TODO fix linking identifiers
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, null, null, pluginState,
+        outcomeDetails, notify);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | ValidationException | AlreadyExistsException e) {
+      logger.error("Error creating event: " + e.getMessage(), e);
     }
 
   }
@@ -270,6 +265,26 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.FORMAT_VALIDATION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Checked if digital signatures were valid.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "Digital signatures were valid.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to validate the digital signature or invalid signature.";
   }
 
 }

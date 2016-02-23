@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.JobReport.PluginState;
@@ -108,5 +109,26 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  // TODO FIX
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 }

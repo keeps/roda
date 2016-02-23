@@ -195,10 +195,10 @@ public final class PluginHelper {
   }
 
   public static PreservationMetadata createPluginEvent(Plugin<?> plugin, String aipID, String representationID,
-    List<String> filePath, String fileID, ModelService model, String eventType, String eventDetails,
-    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, String outcome, String outcomeDetailNote,
-    String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
 
     IndexedPreservationAgent agent = null;
     try {
@@ -211,9 +211,13 @@ public final class PluginHelper {
     }
 
     String id = UUID.randomUUID().toString();
+    // TODO 3 states... only 2 messages
+    String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
+      : plugin.getPreservationEventFailureMessage();
 
-    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(), eventType, eventDetails, sources,
-      targets, outcome, outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
+    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(),
+      plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, targets,
+      outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
       premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();

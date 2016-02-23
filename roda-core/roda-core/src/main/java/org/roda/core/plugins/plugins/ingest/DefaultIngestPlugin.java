@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -425,5 +426,26 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     }
 
     return areValid;
+  }
+
+  //TODO FIX...
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXX";
   }
 }

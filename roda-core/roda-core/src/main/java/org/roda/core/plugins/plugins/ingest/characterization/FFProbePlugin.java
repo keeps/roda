@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -129,4 +130,24 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
+  // TODO FIX
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+  }
 }

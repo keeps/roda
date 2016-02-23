@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -40,9 +41,7 @@ import org.slf4j.LoggerFactory;
 
 public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPlugin.class);
-  private static final String EVENT_DESCRIPTION = "Identified the object's file formats and versions using Siegfried.";
-  private static final String EVENT_SUCESS_MESSAGE = "File formats were identified and recorded in PREMIS objects.";
-  private static final String EVENT_FAILURE_MESSAGE = "Failed to identify file formats in the package.";
+
   public static final String OTHER_METADATA_TYPE = "Siegfried";
   public static final String FILE_SUFFIX = ".json";
 
@@ -124,10 +123,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
           sources.clear();
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          String eventType = RodaConstants.PRESERVATION_EVENT_TYPE_FORMAT_IDENTIFICATION;
-          String outcome = state.name();
-          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, eventType, EVENT_DESCRIPTION,
-            sources, outcomes, outcome, state == PluginState.SUCCESS ? EVENT_SUCESS_MESSAGE : EVENT_FAILURE_MESSAGE, "",
+          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
             notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
@@ -171,6 +167,26 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
   @Override
   public boolean areParameterValuesValid() {
     return true;
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.FORMAT_IDENTIFICATION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "Identified the object's file formats and versions using Siegfried.";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "File formats were identified and recorded in PREMIS objects.";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "Failed to identify file formats in the package.";
   }
 
 }
