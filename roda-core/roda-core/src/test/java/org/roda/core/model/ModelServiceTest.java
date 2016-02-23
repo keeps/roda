@@ -461,9 +461,10 @@ public class ModelServiceTest {
     final Binary binary = corporaService
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
+    String message = "message with spaces on it";
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
-      "test");
+      message);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -471,11 +472,23 @@ public class ModelServiceTest {
     assertEquals(updatedDescriptiveMetadata, retrievedDescriptiveMetadata);
 
     // check content
-    Binary updatedDescriptiveMetadataBinary = storage
-      .getBinary(ModelUtils.getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata));
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(updatedDescriptiveMetadata);
+    Binary updatedDescriptiveMetadataBinary = storage.getBinary(storagePath);
     assertTrue(IOUtils.contentEquals(binary.getContent().createInputStream(),
       updatedDescriptiveMetadataBinary.getContent().createInputStream()));
 
+    // check if binary version was created
+    assertEquals(1, Iterables.size(storage.listBinaryVersions(storagePath)));
+
+    // check if binary version message collisions are well treated
+    model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+    model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+    model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+
+    assertEquals(4, Iterables.size(storage.listBinaryVersions(storagePath)));
   }
 
   @Test

@@ -35,8 +35,6 @@ import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -157,10 +155,9 @@ public class DescriptiveMetadataHistory extends Composite {
     for (Entry<String, Date> version : versionList) {
       String versionKey = version.getKey();
       Date createdDate = version.getValue();
-      list.addItem(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(createdDate), versionKey);
 
-      // Tools.createHistoryHashLink(RESOLVER, aipId, descriptiveMetadataId,
-      // versionKey))
+      list.addItem(messages.descriptiveMetadataHistoryLabel(versionKey, createdDate), versionKey);
+
     }
 
     list.addChangeHandler(new ChangeHandler() {
@@ -196,7 +193,6 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private void getDescriptiveMetadataHTML(final String aipId, final String descId, final String versionKey,
     final AsyncCallback<SafeHtml> callback) {
-    // TODO retrieve requested version
     String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
     RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
     requestBuilder.setHeader("Authorization", "Custom");
@@ -250,12 +246,13 @@ public class DescriptiveMetadataHistory extends Composite {
   @UiHandler("buttonRevert")
   void buttonRevertHandler(ClickEvent e) {
     // TODO
-
+    Toast.showInfo("Sorry", "Feature not yet implemented");
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
     // TODO
+    Toast.showInfo("Sorry", "Feature not yet implemented");
   }
 
   @UiHandler("buttonCancel")

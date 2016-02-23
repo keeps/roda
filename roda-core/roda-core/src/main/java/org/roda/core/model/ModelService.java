@@ -520,8 +520,11 @@ public class ModelService extends ModelObservable {
         i++;
         try {
           storage.createBinaryVersion(binaryPath, version);
+          created = true;
         } catch (AlreadyExistsException e1) {
-          LOGGER.warn("Struggling to create an unique binary version for " + binaryPath, e1);
+          if (i > 100) {
+            LOGGER.warn("Struggling to create an unique binary version for " + binaryPath);
+          }
         }
       }
     }

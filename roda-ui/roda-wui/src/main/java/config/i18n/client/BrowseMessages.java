@@ -478,6 +478,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Extension")
   String preservationEventOutcomeDetailExtension();
 
+  @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
+
 
 
 }
