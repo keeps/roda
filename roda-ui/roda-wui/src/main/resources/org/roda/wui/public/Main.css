@@ -25,6 +25,15 @@ a {
 	color: #089de3;
 }
 
+select {
+    color: #444;
+    padding: 5px;
+    line-height: 1.6;
+    font-weight: 400;
+    font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 1.3rem;
+}
+
 .clickable {
 	cursor: pointer;
 }

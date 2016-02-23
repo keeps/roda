@@ -115,6 +115,7 @@ public final class RodaConstants {
   public static final String API_PATH_PARAM_REPRESENTATION_ID = "representation_id";
   public static final String API_PATH_PARAM_FILE_UUID = "file_uuid";
   public static final String API_PATH_PARAM_METADATA_ID = "metadata_id";
+  public static final String API_QUERY_PARAM_VERSION = "version";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
 

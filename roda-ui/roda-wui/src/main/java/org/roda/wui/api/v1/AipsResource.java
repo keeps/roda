@@ -325,6 +325,7 @@ public class AipsResource {
   public Response aipsAipIdDescriptiveMetadataMetadataIdGet(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing metadata file to retrieve", required = true) @PathParam(RodaConstants.API_PATH_PARAM_METADATA_ID) String metadataId,
+    @ApiParam(value = "The ID of the existing metadata file version to retrieve", required = true) @QueryParam(RodaConstants.API_QUERY_PARAM_VERSION) String versionId,
     @ApiParam(value = "Choose format in which to get the metadata", allowableValues = "xml, html", defaultValue = "xml") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "The language for the HTML output", allowableValues = "pt_PT, en_US", defaultValue = RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @DefaultValue(RodaConstants.API_QUERY_VALUE_LANG_DEFAULT) @QueryParam(RodaConstants.API_QUERY_KEY_LANG) String language)
       throws RODAException {
@@ -332,8 +333,13 @@ public class AipsResource {
       // get user
       RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
       // delegate action to controller
-      StreamResponse aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat,
-        language);
+      StreamResponse aipDescriptiveMetadata;
+      if (versionId == null) {
+        aipDescriptiveMetadata = Browser.getAipDescritiveMetadata(user, aipId, metadataId, acceptFormat, language);
+      } else {
+        aipDescriptiveMetadata = Browser.getAipDescritiveMetadataVersion(user, aipId, metadataId, versionId,
+          acceptFormat, language);
+      }
 
       return ApiUtils.okResponse(aipDescriptiveMetadata);
 

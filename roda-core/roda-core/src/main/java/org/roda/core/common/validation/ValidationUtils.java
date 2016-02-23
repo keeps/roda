@@ -65,7 +65,9 @@ public class ValidationUtils {
           report.setValid(report.isValid() && dmReport.isValid());
           report.getIssues().addAll(dmReport.getIssues());
         }
-        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType);
+        // XXX review why should a validation method update data
+        String message = "Forcing metadata type to " + fallbackMetadataType;
+        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType, message);
         report.setValid(true);
         LOGGER.debug(storagePath + " valid for metadata type " + fallbackMetadataType);
 

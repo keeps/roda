@@ -85,7 +85,11 @@ public class RestUtils {
   }
 
   public static String createDescriptiveMetadataHTMLUri(String aipId, String descId) {
-    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=xml
+    return createDescriptiveMetadataHTMLUri(aipId, descId, null);
+  }
+
+  public static String createDescriptiveMetadataHTMLUri(String aipId, String descId, String versionId) {
+    // api/v1/aips/{aip_id}/descriptive_metadata/{descId}?acceptFormat=html&version={versionId}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
@@ -93,6 +97,11 @@ public class RestUtils {
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_HTML);
+
+    if (versionId != null) {
+      b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_PARAM_VERSION)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(versionId);
+    }
 
     // locale
     b.append(RodaConstants.API_QUERY_SEP).append(RodaConstants.API_QUERY_KEY_LANG)

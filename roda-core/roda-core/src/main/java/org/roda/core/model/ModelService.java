@@ -21,6 +21,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -466,8 +467,9 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType) throws RequestNotValidException,
-      GenericException, NotFoundException, AuthorizationDeniedException, ValidationException {
+    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String message)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+      ValidationException {
     DescriptiveMetadata ret = null;
 
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
@@ -475,7 +477,7 @@ public class ModelService extends ModelObservable {
     boolean createIfNotExists = false;
 
     // Create version snapshot
-    createBinaryVersion(binaryPath);
+    createBinaryVersion(binaryPath, message);
 
     // Update
     storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists);
@@ -499,17 +501,25 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  private void createBinaryVersion(StoragePath binaryPath) throws RequestNotValidException, NotFoundException, GenericException {
-    String version = DateParser.getIsoDate(new Date());
+  private void createBinaryVersion(StoragePath binaryPath, String label)
+    throws RequestNotValidException, NotFoundException, GenericException {
+
+    String version;
+    if (StringUtils.isNotBlank(label)) {
+      version = label;
+    } else {
+      version = DateParser.getIsoDate(new Date());
+    }
     try {
       storage.createBinaryVersion(binaryPath, version);
     } catch (AlreadyExistsException e) {
       boolean created = false;
       int i = 1;
       while (!created) {
-        String extVersion = version + i;
+        version = label + " (" + i + ")";
+        i++;
         try {
-          storage.createBinaryVersion(binaryPath, extVersion);
+          storage.createBinaryVersion(binaryPath, version);
         } catch (AlreadyExistsException e1) {
           LOGGER.warn("Struggling to create an unique binary version for " + binaryPath, e1);
         }

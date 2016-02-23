@@ -20,13 +20,24 @@ import java.util.Map.Entry;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.RestErrorOverlayType;
+import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JsonUtils;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
+import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,8 +46,8 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
@@ -104,7 +115,10 @@ public class DescriptiveMetadataHistory extends Composite {
   private final Map<String, Date> versions;
 
   @UiField
-  FlowPanel layout;
+  ListBox list;
+
+  @UiField
+  HTML preview;
 
   @UiField
   Button buttonRevert;
@@ -140,23 +154,97 @@ public class DescriptiveMetadataHistory extends Composite {
     });
 
     // create list layout
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant("<ol>"));
     for (Entry<String, Date> version : versionList) {
       String versionKey = version.getKey();
       Date createdDate = version.getValue();
-      b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
-      b.append(SafeHtmlUtils.fromSafeConstant("<a href='"));
-      b.append(SafeHtmlUtils
-        .fromSafeConstant(Tools.createHistoryHashLink(RESOLVER, aipId, descriptiveMetadataId, versionKey)));
-      b.append(SafeHtmlUtils.fromSafeConstant("'>"));
-      b.append(SafeHtmlUtils.fromString(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(createdDate)));
-      b.append(SafeHtmlUtils.fromSafeConstant("</a>"));
-      b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
-    }
-    b.append(SafeHtmlUtils.fromSafeConstant("</ol>"));
+      list.addItem(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(createdDate), versionKey);
 
-    layout.add(new HTML(b.toSafeHtml()));
+      // Tools.createHistoryHashLink(RESOLVER, aipId, descriptiveMetadataId,
+      // versionKey))
+    }
+
+    list.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String versionKey = list.getSelectedValue();
+        updatePreview(versionKey);
+      }
+    });
+
+    if (versionList.size() > 0) {
+      list.setSelectedIndex(0);
+      updatePreview(versionList.get(0).getKey());
+    }
+
+  }
+
+  protected void updatePreview(String versionKey) {
+    getDescriptiveMetadataHTML(aipId, descriptiveMetadataId, versionKey, new AsyncCallback<SafeHtml>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        Toast.showError(caught);
+      }
+
+      @Override
+      public void onSuccess(SafeHtml html) {
+        preview.setHTML(html);
+      }
+    });
+  }
+
+  private void getDescriptiveMetadataHTML(final String aipId, final String descId, final String versionKey,
+    final AsyncCallback<SafeHtml> callback) {
+    // TODO retrieve requested version
+    String uri = RestUtils.createDescriptiveMetadataHTMLUri(aipId, descId, versionKey);
+    RequestBuilder requestBuilder = new RequestBuilder(RequestBuilder.GET, uri);
+    requestBuilder.setHeader("Authorization", "Custom");
+    try {
+      requestBuilder.sendRequest(null, new RequestCallback() {
+
+        @Override
+        public void onResponseReceived(Request request, Response response) {
+          if (200 == response.getStatusCode()) {
+            String html = response.getText();
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+            b.append(SafeHtmlUtils.fromTrustedString(html));
+            SafeHtml safeHtml = b.toSafeHtml();
+
+            callback.onSuccess(safeHtml);
+          } else {
+            String text = response.getText();
+            String message;
+            try {
+              RestErrorOverlayType error = (RestErrorOverlayType) JsonUtils.safeEval(text);
+              message = error.getMessage();
+            } catch (IllegalArgumentException e) {
+              message = text;
+            }
+
+            SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+            // error message
+            b.append(SafeHtmlUtils.fromSafeConstant("<div class='error'>"));
+            b.append(messages.descriptiveMetadataTranformToHTMLError());
+            b.append(SafeHtmlUtils.fromSafeConstant("<pre><code>"));
+            b.append(SafeHtmlUtils.fromString(message));
+            b.append(SafeHtmlUtils.fromSafeConstant("</core></pre>"));
+            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+
+            callback.onSuccess(b.toSafeHtml());
+          }
+        }
+
+        @Override
+        public void onError(Request request, Throwable exception) {
+          callback.onFailure(exception);
+        }
+      });
+    } catch (RequestException e) {
+      callback.onFailure(e);
+    }
   }
 
   @UiHandler("buttonRevert")

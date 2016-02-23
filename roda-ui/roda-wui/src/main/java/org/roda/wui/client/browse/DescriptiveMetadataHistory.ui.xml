@@ -17,7 +17,8 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Descriptive metadata history</g:Label>
-				<g:FlowPanel ui:field="layout"/>
+				<g:ListBox ui:field="list" />
+				<g:HTML ui:field="preview" />
 
 			</g:FlowPanel>
 

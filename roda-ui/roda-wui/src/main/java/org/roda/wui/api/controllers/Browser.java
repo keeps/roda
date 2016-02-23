@@ -265,6 +265,31 @@ public class Browser extends RodaCoreService {
 
   }
 
+  public static StreamResponse getAipDescritiveMetadataVersion(RodaUser user, String aipId, String metadataId,
+    String versionId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
+      TransformerException, NotFoundException, RequestNotValidException {
+    Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
+
+    // check user permissions
+    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    UserUtility.checkObjectModifyPermissions(user, aip);
+
+    // delegate
+    StreamResponse aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadataVersion(aipId, metadataId, versionId,
+      acceptFormat, language);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getAipDescritiveMetadata", aipId, duration,
+      RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
+
+    return aipDescritiveMetadata;
+
+  }
+
   public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
       throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
@@ -506,8 +531,9 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
+    String message = "Updated by " + user.getName();
     DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataPayload);
+      metadataPayload, message);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -629,7 +655,9 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail, true);
+    String message = "Updated by " + user.getName();
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, message, is, fileDetail,
+      true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -648,7 +676,9 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, is, fileDetail, true);
+    String message = "Updated by " + user.getName();
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, message, is, fileDetail,
+      true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
