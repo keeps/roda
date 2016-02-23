@@ -19,8 +19,11 @@ import java.util.Map;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
+import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.Browse;
@@ -141,10 +144,10 @@ public class BasicSearch extends Composite {
   @UiField(provided = true)
   FlowPanel facetHasRepresentations;
 
-//  @UiField
-//  DateBox inputDateInitial;
-//  @UiField
-//  DateBox inputDateFinal;
+  // @UiField
+  // DateBox inputDateInitial;
+  // @UiField
+  // DateBox inputDateFinal;
 
   ListBox searchAdvancedFieldOptions;
 
@@ -211,28 +214,32 @@ public class BasicSearch extends Composite {
 
     });
 
-//    DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-//    ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
-//
-//      @Override
-//      public void onValueChange(ValueChangeEvent<Date> event) {
-//        updateDateFilter();
-//      }
-//
-//    };
-//
-//    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
-//    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
-//
-//    inputDateInitial.setFormat(dateFormat);
-//    inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-//    inputDateInitial.setFireNullValues(true);
-//    inputDateInitial.addValueChangeHandler(valueChangeHandler);
-//
-//    inputDateFinal.setFormat(dateFormat);
-//    inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-//    inputDateFinal.setFireNullValues(true);
-//    inputDateFinal.addValueChangeHandler(valueChangeHandler);
+    // DefaultFormat dateFormat = new
+    // DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
+    // ValueChangeHandler<Date> valueChangeHandler = new
+    // ValueChangeHandler<Date>() {
+    //
+    // @Override
+    // public void onValueChange(ValueChangeEvent<Date> event) {
+    // updateDateFilter();
+    // }
+    //
+    // };
+    //
+    // inputDateInitial.getElement().setPropertyString("placeholder",
+    // messages.sidebarFilterFromDate());
+    // inputDateFinal.getElement().setPropertyString("placeholder",
+    // messages.sidebarFilterToDatePlaceHolder());
+    //
+    // inputDateInitial.setFormat(dateFormat);
+    // inputDateInitial.getDatePicker().setYearArrowsVisible(true);
+    // inputDateInitial.setFireNullValues(true);
+    // inputDateInitial.addValueChangeHandler(valueChangeHandler);
+    //
+    // inputDateFinal.setFormat(dateFormat);
+    // inputDateFinal.getDatePicker().setYearArrowsVisible(true);
+    // inputDateFinal.setFireNullValues(true);
+    // inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
     BrowserService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
@@ -271,15 +278,16 @@ public class BasicSearch extends Composite {
     }
   }
 
-//  private void updateDateFilter() {
-//    Date dateInitial = inputDateInitial.getDatePicker().getValue();
-//    Date dateFinal = inputDateFinal.getDatePicker().getValue();
-//
-//    DateIntervalFilterParameter filterParameter = new DateIntervalFilterParameter(RodaConstants.AIP_DATE_INITIAL,
-//      RodaConstants.AIP_DATE_FINAL, dateInitial, dateFinal);
-//
-//    searchResultPanel.setFilter(new Filter(filterParameter));
-//  }
+  // private void updateDateFilter() {
+  // Date dateInitial = inputDateInitial.getDatePicker().getValue();
+  // Date dateFinal = inputDateFinal.getDatePicker().getValue();
+  //
+  // DateIntervalFilterParameter filterParameter = new
+  // DateIntervalFilterParameter(RodaConstants.AIP_DATE_INITIAL,
+  // RodaConstants.AIP_DATE_FINAL, dateInitial, dateFinal);
+  //
+  // searchResultPanel.setFilter(new Filter(filterParameter));
+  // }
 
   protected void view(String id) {
     Tools.newHistory(Browse.RESOLVER, id);
@@ -297,11 +305,10 @@ public class BasicSearch extends Composite {
     for (int i = 0; i < searchAdvancedFieldsPanel.getWidgetCount(); i++) {
       SearchAdvancedFieldPanel searchAdvancedFieldPanel = (SearchAdvancedFieldPanel) searchAdvancedFieldsPanel
         .getWidget(i);
-      String field = searchAdvancedFieldPanel.getField();
-      String value = searchAdvancedFieldPanel.getValue();
+      FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
 
-      if (value != null && value.trim().length() > 0) {
-        parameters.add(new BasicSearchFilterParameter(field, value));
+      if (filterParameter != null) {
+        parameters.add(filterParameter);
       }
     }
 
@@ -465,18 +472,28 @@ public class BasicSearch extends Composite {
       return searchAdvancedFields.getSelectedValue();
     }
 
-    public String getValue() {
+    public FilterParameter getFilter() {
+      FilterParameter filterParameter = null;
+      String field = searchAdvancedFields.getSelectedValue();
       SearchField searchField = searchFields.get(searchAdvancedFields.getSelectedValue());
 
-      if (searchField.getType().equals("date")) {
-      } else if (searchField.getType().equals("date_interval")) {
-      } else if (searchField.getType().equals("numeric")) {
-      } else if (searchField.getType().equals("numeric_interval")) {
-      } else if (searchField.getType().equals("storage")) {
+      // TODO validate inputs!
+      if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
+        filterParameter = new BasicSearchFilterParameter(field, inputDateBox.getValue().toString());
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
+        filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
+          inputDateBoxTo.getValue());
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
+        filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
+        filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
+          Long.valueOf(inputNumericTo.getValue()));
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
       } else {
+        filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
       }
 
-      return inputText.getValue();
+      return filterParameter;
     }
 
     public void setValue(String field) {
@@ -485,17 +502,17 @@ public class BasicSearch extends Composite {
       leftPanel.add(searchAdvancedFields);
       leftPanel.removeStyleName("full_width");
 
-      if (searchField.getType().equals("date")) {
+      if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
         leftPanel.add(inputDateBox);
-      } else if (searchField.getType().equals("date_interval")) {
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
         leftPanel.add(inputDateBoxFrom);
         leftPanel.add(inputDateBoxTo);
-      } else if (searchField.getType().equals("numeric")) {
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
         leftPanel.add(inputNumeric);
-      } else if (searchField.getType().equals("numeric_interval")) {
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
         leftPanel.add(inputNumericFrom);
         leftPanel.add(inputNumericTo);
-      } else if (searchField.getType().equals("storage")) {
+      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
       } else {
         leftPanel.add(inputText);
         leftPanel.addStyleName("full_width");

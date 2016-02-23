@@ -534,11 +534,6 @@ public final class RodaConstants {
 
   public static final String PRESERVATION_LINKING_OBJECT_SOURCE = "source";
   public static final String PRESERVATION_LINKING_OBJECT_OUTCOME = "outcome";
-  /*
-   * WUI related
-   */
-  public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
-  
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
@@ -560,10 +555,8 @@ public final class RodaConstants {
     }
   }
 
-  
   public enum PreservationAgentType {
-    HARDWARE("hardware"), ORGANIZATION("organizaation"),
-    PERSON("person"), SOFTWARE("software");
+    HARDWARE("hardware"), ORGANIZATION("organization"), PERSON("person"), SOFTWARE("software");
 
     private final String text;
 
@@ -576,5 +569,17 @@ public final class RodaConstants {
       return text;
     }
   }
+
+  /*
+   * WUI related
+   */
+  public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
+
+  public static final String SEARCH_FIELD_TYPE_TEXT = "text";
+  public static final String SEARCH_FIELD_TYPE_DATE = "date";
+  public static final String SEARCH_FIELD_TYPE_DATE_INTERVAL = "date_interval";
+  public static final String SEARCH_FIELD_TYPE_NUMERIC = "numeric";
+  public static final String SEARCH_FIELD_TYPE_NUMERIC_INTERVAL = "numeric_interval";
+  public static final String SEARCH_FIELD_TYPE_STORAGE = "storage";
 
 }
