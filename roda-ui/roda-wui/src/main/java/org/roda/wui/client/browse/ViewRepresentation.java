@@ -621,13 +621,13 @@ public class ViewRepresentation extends Composite {
   }
 
   private void showFilePreview() {
-    filesPanel.removeStyleName("fullWidth");
+    filesPanel.removeStyleName("full_width");
     previewPanel.setCellWidth(filePreviewPanel, "100%");
     filePreviewPanel.setVisible(true);
   }
 
   private void hideFilePreview() {
-    filesPanel.addStyleName("fullWidth");
+    filesPanel.addStyleName("full_width");
     previewPanel.setCellWidth(filePreviewPanel, "0px");
     filePreviewPanel.setVisible(false);
   }

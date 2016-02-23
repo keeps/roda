@@ -39,7 +39,7 @@
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Producers
+							Creators
 						</g:Label>
 						<g:FlowPanel ui:field="producerFacets" />
 					</g:FlowPanel>

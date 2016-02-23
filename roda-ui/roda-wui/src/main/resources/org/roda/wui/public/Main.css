@@ -733,6 +733,17 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 14pt;
 }
 
+.static-page h4 {
+	font-size: 12pt;
+}
+
+@media (min-width: 768px) {
+	.max-width {
+    	max-width: 998px;
+    	margin: 0 auto;
+	}
+}
+
 .link {
 	font-size: 12px;
 	text-decoration: none;
@@ -2481,7 +2492,21 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .search-field {
-	display: inline-block;
+	margin-right: 20px;
+	height: 35px;
+}
+
+.search-field-left-panel {
+	float: left;
+	display: inline-flex;
+}
+
+.search-field-left-panel.full_width {
+	width: 100%;
+}
+
+.search-field-left-panel select {
+	margin-right: 5px;
 }
 
 .search-field-label {
@@ -2490,8 +2515,18 @@ td.datePickerMonth, td.datePickerYear {
 
 .search-field-remove {
 	font-size: 1.2rem;
-	margin-left: 5px;
-	float: right;
+	width: 20px;
+	margin-right: -20px;
+	margin-top: 7px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	cursor: hand;
+	color: rgba(0,0,0, 0.5);
+}
+
+.search-field-left-panel .form-textbox-small {
+/* 	width: 49%; */
 }
 
 .searchAdvancedFieldsPanel+.searchAdvancedFieldAdd {
@@ -2860,7 +2895,7 @@ td.datePickerMonth, td.datePickerYear {
 	border-right: 1px solid #eee;
 }
 
-.viewRepresentationFilesPanel.fullWidth {
+.viewRepresentationFilesPanel.full_width {
 	width: 100%;
 	margin-right: 0px;
 	border: none;
@@ -2874,7 +2909,7 @@ td.datePickerMonth, td.datePickerYear {
 	overflow-y: auto;
 }
 
-.viewRepresentationFilesPanel.fullWidth .fileListScroll {
+.viewRepresentationFilesPanel.full_width .fileListScroll {
 	height: auto;
 }
 

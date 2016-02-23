@@ -51,4 +51,14 @@ public class ListboxUtils {
       listBoxDestination.addItem(listBoxOrigin.getItemText(i), listBoxOrigin.getValue(i)); 
     }
   }
+
+  public static void select(ListBox listBox, String field) {
+    boolean found = false;
+    for (int i = 0; i < listBox.getItemCount() && !found; i++) {
+      if (listBox.getValue(i).equals(field)) {
+        listBox.setSelectedIndex(i);
+        found = true;
+      }
+    }
+  }
 }

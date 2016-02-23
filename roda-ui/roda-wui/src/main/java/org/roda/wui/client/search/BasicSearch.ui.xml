@@ -16,7 +16,6 @@
 
 		.searchbutton {
 		float: right;
-		margin-top: 5px;
 		}
 	</ui:style>
 
@@ -81,16 +80,16 @@
 						</g:Label>
 						<g:FlowPanel ui:field="facetHasRepresentations" />
 					</g:FlowPanel>
-					<g:Label addStyleNames="h5 sidebar-facet-title">
-						<ui:text from='{messages.sidebarFilterDates}' />
-					</g:Label>
-					<d:DateBox
-						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-						ui:field="inputDateInitial" />
-					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
-					<d:DateBox
-						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
-						ui:field="inputDateFinal" />
+<!-- 					<g:Label addStyleNames="h5 sidebar-facet-title"> -->
+<!-- 						<ui:text from='{messages.sidebarFilterDates}' /> -->
+<!-- 					</g:Label> -->
+<!-- 					<d:DateBox -->
+<!-- 						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date" -->
+<!-- 						ui:field="inputDateInitial" /> -->
+<!-- 					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label> -->
+<!-- 					<d:DateBox -->
+<!-- 						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date" -->
+<!-- 						ui:field="inputDateFinal" /> -->
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
