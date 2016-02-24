@@ -22,7 +22,7 @@ public class GeneralCommandConvertPlugin<T extends Serializable> extends Command
 
   @Override
   public String getName() {
-    return "General conversion";
+    return "General command based conversion";
   }
 
   @Override

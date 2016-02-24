@@ -17,6 +17,6 @@ before_script:
   # Install SoX
   - sudo apt-get install sox libsox-fmt-all -y
   # Install Unoconv
-  - sudo apt-get install unoconv -y
+  - sudo apt-get install libreoffice unoconv -y
   # Install GhostScript
   - sudo apt-get install ghostscript libgs-dev -y
