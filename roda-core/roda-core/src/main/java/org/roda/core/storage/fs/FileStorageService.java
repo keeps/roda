@@ -34,6 +34,7 @@ import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
+import org.roda.core.storage.EmptyClosableIterable;
 import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
@@ -476,6 +477,10 @@ public class FileStorageService implements StorageService {
     final String baseName = fauxPath.getFileName().toString();
 
     CloseableIterable<BinaryVersion> iterable;
+    
+    if(!Files.exists(parent)){
+      return new EmptyClosableIterable<>();
+    }
 
     try {
       final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
