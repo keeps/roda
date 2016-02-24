@@ -48,7 +48,7 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -1175,16 +1175,16 @@ public class ModelService extends ModelObservable {
     notifyFileUpdated(file);
   }
 
-  public JobReport retrieveJobReport(String jobId, String aipId)
+  public Report retrieveJobReport(String jobId, String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(IdUtils.getJobReportId(jobId, aipId));
     Binary binary = storage.getBinary(jobReportPath);
-    JobReport ret;
+    Report ret;
     InputStream inputStream = null;
     try {
       inputStream = binary.getContent().createInputStream();
-      ret = JsonUtils.getObjectFromJson(inputStream, JobReport.class);
+      ret = JsonUtils.getObjectFromJson(inputStream, Report.class);
     } catch (IOException e) {
       throw new GenericException("Error reading job report", e);
     } finally {
@@ -1193,7 +1193,7 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void createOrUpdateJobReport(JobReport jobReport) throws GenericException {
+  public void createOrUpdateJobReport(Report jobReport) throws GenericException {
     // create job report in storage
     try {
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);

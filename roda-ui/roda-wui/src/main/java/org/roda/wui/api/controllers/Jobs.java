@@ -21,7 +21,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 
@@ -97,7 +97,27 @@ public class Jobs extends RodaCoreService {
     return findJobs;
   }
 
-  public static IndexResult<JobReport> findJobReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+  // FIXME
+  public static void pauseJob(RodaUser user, String jobId) {
+
+  }
+
+  // FIXME
+  public static void resumeJob(RodaUser user, String jobId) {
+
+  }
+
+  // FIXME
+  public static void stopJob(RodaUser user, String jobId) {
+
+  }
+
+  // FIXME
+  public static void deleteJob(RodaUser user, String jobId) {
+
+  }
+
+  public static IndexResult<Report> findJobReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws GenericException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -105,31 +125,30 @@ public class Jobs extends RodaCoreService {
     // TODO ???
 
     // delegate
-    IndexResult<JobReport> findJobReports = JobsHelper.findJobReports(filter, sorter, sublist, facets);
+    IndexResult<Report> findReports = JobsHelper.findJobReports(filter, sorter, sublist, facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "findJobReports", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM,
-      filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
+    registerAction(user, JOBS_COMPONENT, "findReports", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
+      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
-    return findJobReports;
+    return findReports;
   }
 
-  public static JobReport retrieveJobReport(RodaUser user, String jobReportId)
-    throws NotFoundException, GenericException {
+  public static Report retrieveJobReport(RodaUser user, String ReportId) throws NotFoundException, GenericException {
     Date startDate = new Date();
 
     // check user permissions
     // TODO ???
 
     // delegate
-    JobReport jobReport = JobsHelper.retrieveJobReport(jobReportId);
+    Report Report = JobsHelper.retrieveJobReport(ReportId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "retrieveJobReport", null, duration, RodaConstants.JOB_REPORT_ID, jobReportId);
+    registerAction(user, JOBS_COMPONENT, "retrieveReport", null, duration, RodaConstants.JOB_REPORT_ID, ReportId);
 
-    return jobReport;
+    return Report;
   }
 
   /*

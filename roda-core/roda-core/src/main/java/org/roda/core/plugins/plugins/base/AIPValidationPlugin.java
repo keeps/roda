@@ -17,14 +17,12 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationReport;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -38,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 // FIXME rename this to SIPValidationPlugin
 public class AIPValidationPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);  
+  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
@@ -105,35 +103,39 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
-
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
         ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
           validateDescriptiveMetadata, metadataType, validatePremis, model, aip.getId());
         reports.add(report);
+        if (report.isValid()) {
+          reportItem.setPluginState(PluginState.SUCCESS);
+        } else {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(report.toString());
+        }
+
         boolean notify = true;
-        createEvent(aip, model, report.isValid(),notify);
+        createEvent(aip, model, reportItem.getPluginState(), notify);
       } catch (RODAException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
 
       try {
-        PluginHelper.updateJobReport(model, index, this, reportItem, PluginState.SUCCESS, aip.getId());
-      } catch (Throwable t) {
-
+        PluginHelper.updateJobReport(this, model, index, reportItem);
+      } catch (Throwable e) {
+        LOGGER.error("Error updating job report", e);
       }
     }
     return null;
   }
 
-  private void createEvent(AIP aip, ModelService model, boolean valid,boolean notify) throws PluginException {
+  private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
     try {
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
+        aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
-        valid ? PluginState.SUCCESS : PluginState.FAILURE, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "", notify);
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }
@@ -169,7 +171,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   public boolean areParameterValuesValid() {
     return true;
   }
-  
+
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.WELLFORMEDNESS_CHECK;

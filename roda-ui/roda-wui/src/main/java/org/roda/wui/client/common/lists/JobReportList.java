@@ -17,8 +17,8 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
@@ -45,7 +45,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class JobReportList extends AsyncTableCell<JobReport> {
+public class JobReportList extends AsyncTableCell<Report> {
 
   private static final String STATUS_ERROR = "<i class='fa fa-exclamation-triangle error'></i>";
 
@@ -56,10 +56,11 @@ public class JobReportList extends AsyncTableCell<JobReport> {
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
-  private Column<JobReport, SafeHtml> objectIdColumn;
-  private Column<JobReport, Date> updatedDateColumn;
-  private TextColumn<JobReport> lastPluginRunColumn;
-  private Column<JobReport, SafeHtml> lastPluginRunStateColumn;
+  private Column<Report, SafeHtml> objectIdColumn;
+  private Column<Report, Date> updatedDateColumn;
+  private TextColumn<Report> lastPluginRunColumn;
+  private Column<Report, SafeHtml> lastPluginRunStateColumn;
+  private TextColumn<Report> completionStatusColumn;
 
   private final Map<String, PluginInfo> pluginsInfo;
 
@@ -73,22 +74,22 @@ public class JobReportList extends AsyncTableCell<JobReport> {
   }
 
   @Override
-  protected void configureDisplay(CellTable<JobReport> display) {
+  protected void configureDisplay(CellTable<Report> display) {
 
-    objectIdColumn = new Column<JobReport, SafeHtml>(new SafeHtmlCell()) {
+    objectIdColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(JobReport jobReport) {
+      public SafeHtml getValue(Report Report) {
         SafeHtml ret = null;
-        if (jobReport != null) {
+        if (Report != null) {
           SafeHtmlBuilder b = new SafeHtmlBuilder();
-          String objId = jobReport.getObjectId();
+          String objId = Report.getOtherId();
           if (objId != null) {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-input'>"));
             b.append(SafeHtmlUtils.fromString(objId));
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
           }
 
-          String aipId = jobReport.getAipId();
+          String aipId = Report.getItemId();
           if (aipId != null) {
             b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-output'>"));
             b.append(SafeHtmlUtils.fromSafeConstant("<span class='job-report-object-output-icon'>&#10551;</span>"));
@@ -102,26 +103,26 @@ public class JobReportList extends AsyncTableCell<JobReport> {
       }
     };
 
-    updatedDateColumn = new Column<JobReport, Date>(
+    updatedDateColumn = new Column<Report, Date>(
       new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
-      public Date getValue(JobReport job) {
+      public Date getValue(Report job) {
         return job != null ? job.getDateUpdated() : null;
       }
     };
 
-    lastPluginRunColumn = new TextColumn<JobReport>() {
+    lastPluginRunColumn = new TextColumn<Report>() {
 
       @Override
-      public String getValue(JobReport job) {
+      public String getValue(Report job) {
         String value = null;
         if (job != null) {
-          if (job.getLastPluginRan() != null) {
-            PluginInfo pluginInfo = pluginsInfo.get(job.getLastPluginRan());
+          if (job.getPlugin() != null) {
+            PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
             if (pluginInfo != null) {
               value = messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion());
             } else {
-              value = job.getLastPluginRan();
+              value = job.getPlugin();
             }
           }
         }
@@ -130,13 +131,13 @@ public class JobReportList extends AsyncTableCell<JobReport> {
       }
     };
 
-    lastPluginRunStateColumn = new Column<JobReport, SafeHtml>(new SafeHtmlCell()) {
+    lastPluginRunStateColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(JobReport jobReport) {
+      public SafeHtml getValue(Report Report) {
         SafeHtml ret = null;
-        if (jobReport != null) {
+        if (Report != null) {
 
-          switch (jobReport.getLastPluginRanState()) {
+          switch (Report.getPluginState()) {
             case SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(STATUS_OK);
               break;
@@ -150,16 +151,32 @@ public class JobReportList extends AsyncTableCell<JobReport> {
       }
     };
 
+    completionStatusColumn = new TextColumn<Report>() {
+
+      @Override
+      public String getValue(Report report) {
+        String value = "";
+        if (report != null) {
+          value = report.getCompletionPercentage() + "% (" + report.getStepsCompleted() + "/" + report.getTotalSteps()
+            + ")";
+        }
+
+        return value;
+      }
+    };
+
     objectIdColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
+    completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
     display.addColumn(objectIdColumn, "Information Packages");
     display.addColumn(updatedDateColumn, "Last updated at");
     display.addColumn(lastPluginRunColumn, "Last run task");
     display.addColumn(lastPluginRunStateColumn, SafeHtmlUtils.fromSafeConstant(STATUS_OK));
+    display.addColumn(completionStatusColumn, "Completion status");
 
     display.setColumnWidth(objectIdColumn, "100%");
 
@@ -175,16 +192,15 @@ public class JobReportList extends AsyncTableCell<JobReport> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList,
-    AsyncCallback<IndexResult<JobReport>> callback) {
+  protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Report>> callback) {
 
     Filter filter = getFilter();
 
-    Map<Column<JobReport, ?>, String> columnSortingKeyMap = new HashMap<Column<JobReport, ?>, String>();
-    columnSortingKeyMap.put(objectIdColumn, RodaConstants.JOB_REPORT_OBJECT_ID);
+    Map<Column<Report, ?>, String> columnSortingKeyMap = new HashMap<Column<Report, ?>, String>();
+    columnSortingKeyMap.put(objectIdColumn, RodaConstants.JOB_REPORT_OTHER_ID);
     columnSortingKeyMap.put(updatedDateColumn, RodaConstants.JOB_REPORT_DATE_UPDATE);
-    columnSortingKeyMap.put(lastPluginRunColumn, RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN);
-    columnSortingKeyMap.put(lastPluginRunStateColumn, RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE);
+    columnSortingKeyMap.put(lastPluginRunColumn, RodaConstants.JOB_REPORT_PLUGIN);
+    columnSortingKeyMap.put(lastPluginRunStateColumn, RodaConstants.JOB_REPORT_PLUGIN_STATE);
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
@@ -192,11 +208,11 @@ public class JobReportList extends AsyncTableCell<JobReport> {
   }
 
   @Override
-  protected ProvidesKey<JobReport> getKeyProvider() {
-    return new ProvidesKey<JobReport>() {
+  protected ProvidesKey<Report> getKeyProvider() {
+    return new ProvidesKey<Report>() {
 
       @Override
-      public Object getKey(JobReport item) {
+      public Object getKey(Report item) {
         return item.getId();
       }
     };

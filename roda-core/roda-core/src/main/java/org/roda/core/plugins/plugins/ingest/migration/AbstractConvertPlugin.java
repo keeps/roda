@@ -43,13 +43,11 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -192,7 +190,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
         int pluginResultState = 1;
-        ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
         try {
           LOGGER.debug("Processing representation: " + representation);
@@ -244,18 +242,13 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+                  reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
 
                 } catch (CommandException e) {
                   detailExtension += file.getId() + ": " + e.getOutput();
                   pluginResultState = 2;
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()),
-
-                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+                  reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
                   LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                     + " of representation " + representation.getId() + " from AIP " + aip.getId());
@@ -278,16 +271,14 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = 0;
 
-          reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()),
-            new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         }
 
         LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, newFiles, aip.getId(), newRepresentationID, model, outputFormat, pluginResultState,
           detailExtension, notifyEvent);
-        report.addItem(reportItem);
+        report.addReport(reportItem);
       }
 
       try {
@@ -323,7 +314,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       aipId = representation.getAipId();
       int pluginResultState = 1;
       boolean notify = true;
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
 
@@ -374,17 +365,13 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 newFiles.add(newFile);
                 IOUtils.closeQuietly(directAccess);
 
-                reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()),
-                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+                reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
 
               } catch (CommandException e) {
                 detailExtension += file.getId() + ": " + e.getOutput();
                 pluginResultState = 2;
 
-                reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()),
-                  new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+                reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
                 LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                   + " of representation " + representation.getId() + " from AIP " + representation.getAipId());
@@ -395,7 +382,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
           }
         }
         IOUtils.closeQuietly(allFiles);
-        report.addItem(reportItem);
+        report.addReport(reportItem);
 
         // add unchanged files to the new representation
         if (alteredFiles.size() > 0) {
@@ -412,10 +399,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
 
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
-        report.addItem(reportItem);
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+        report.addReport(reportItem);
       }
 
       LOGGER.debug("Creating convert plugin event for the representation " + representation.getId());
@@ -444,7 +429,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     ArrayList<File> newFiles = new ArrayList<File>();
     String detailExtension = "";
     Report report = PluginHelper.createPluginReport(this);
-    ReportItem reportItem = null;
+    Report reportItem = null;
 
     for (File file : list) {
       try {
@@ -496,17 +481,13 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
               newFiles.add(f);
               aipSet.add(file.getAipId());
 
-              reportItem = PluginHelper.setPluginReportItemInfo(reportItem, file.getId(),
-                new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()),
-                new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, result));
+              reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
 
             } catch (CommandException e) {
               detailExtension += file.getId() + ": " + e.getOutput();
               pluginResultState = 2;
 
-              reportItem = PluginHelper.setPluginReportItemInfo(reportItem, file.getId(),
-                new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.PARTIAL_SUCCESS.toString()),
-                new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+              reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
               LOGGER.debug("Conversion (" + fileFormat + " to " + outputFormat + ") failed on file " + file.getId()
                 + " of representation " + file.getRepresentationId() + " from AIP " + file.getAipId());
@@ -519,15 +500,13 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
 
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, file.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       }
 
       boolean notifyEvent = false;
       createEvent(Arrays.asList(file), newFiles, file.getAipId(), newRepresentationID, model, outputFormat,
         pluginResultState, detailExtension, notifyEvent);
-      report.addItem(reportItem);
+      report.addReport(reportItem);
     }
 
     try {
@@ -541,7 +520,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
 
-  throws UnsupportedOperationException, IOException, CommandException;
+    throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
     ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
@@ -560,11 +539,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     } else {
       for (File file : alteredFiles)
         premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
       for (File file : newFiles)
         premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }

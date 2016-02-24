@@ -35,7 +35,7 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -521,7 +521,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void jobReportCreatedOrUpdated(JobReport jobReport) {
+  public void jobReportCreatedOrUpdated(Report jobReport) {
     boolean forceCommit = false;
     addDocumentToIndex(RodaConstants.INDEX_JOB_REPORT, SolrUtils.jobReportToSolrDocument(jobReport),
       "Error creating Job Report", forceCommit);

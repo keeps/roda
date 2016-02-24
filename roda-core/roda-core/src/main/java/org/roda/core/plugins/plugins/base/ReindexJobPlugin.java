@@ -22,7 +22,6 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -112,7 +111,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
       for (Resource resource : listResourcesUnderDirectory) {
         Binary binary = storage.getBinary(resource.getStoragePath());
         InputStream inputStream = binary.getContent().createInputStream();
-        JobReport objectFromJson = JsonUtils.getObjectFromJson(inputStream, JobReport.class);
+        Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
         IOUtils.closeQuietly(inputStream);
         index.reindexJobReport(objectFromJson);
       }

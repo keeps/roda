@@ -32,7 +32,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -152,7 +152,7 @@ public class IndexService {
     observer.jobCreatedOrUpdated(job);
   }
 
-  public void reindexJobReport(JobReport jobReport) {
+  public void reindexJobReport(Report jobReport) {
     observer.jobReportCreatedOrUpdated(jobReport);
   }
 

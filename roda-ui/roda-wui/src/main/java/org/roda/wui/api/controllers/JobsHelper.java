@@ -23,7 +23,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
@@ -105,13 +105,13 @@ public class JobsHelper {
     return jobs;
   }
 
-  public static IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public static IndexResult<Report> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist, facets);
+    return RodaCoreFactory.getIndexService().find(Report.class, filter, sorter, sublist, facets);
   }
 
-  public static JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException {
-    return RodaCoreFactory.getIndexService().retrieve(JobReport.class, jobReportId);
+  public static Report retrieveJobReport(String ReportId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Report.class, ReportId);
   }
 
 }

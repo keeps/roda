@@ -17,7 +17,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -189,7 +189,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyJobReportCreatedOrUpdated(JobReport jobReport) {
+  protected void notifyJobReportCreatedOrUpdated(Report jobReport) {
     for (ModelObserver observer : observers) {
       observer.jobReportCreatedOrUpdated(jobReport);
     }

@@ -19,11 +19,11 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
@@ -173,7 +173,7 @@ public class ShowJob extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        JobReport jobReport = jobReports.getSelectionModel().getSelectedObject();
+        Report jobReport = jobReports.getSelectionModel().getSelectedObject();
         GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
         Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
       }

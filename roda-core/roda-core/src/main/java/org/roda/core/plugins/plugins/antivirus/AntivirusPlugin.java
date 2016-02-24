@@ -23,11 +23,9 @@ import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -103,7 +101,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
@@ -116,18 +114,15 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
         state = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, virusCheckResult.getReport()));
+
+        reportItem.setPluginState(state).setPluginDetails(virusCheckResult.getReport());
 
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
       } catch (RuntimeException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException e) {
         state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem.setPluginState(state).setPluginDetails(e.getMessage());
 
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
@@ -142,10 +137,10 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         LOGGER.info("Creating event");
         boolean notify = true;
         createEvent(virusCheckResult, exception, state, aip, model, notify);
-        report.addItem(reportItem);
+        report.addReport(reportItem);
 
         LOGGER.info("Updating job report");
-        PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
+        PluginHelper.updateJobReport(this, model, index, reportItem);
 
         LOGGER.info("Done job report");
       } catch (Throwable e) {
@@ -165,8 +160,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       String outcomeDetailExtension = success ? virusCheckResult.getReport()
         : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
 
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
+        aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
         success ? PluginState.SUCCESS : PluginState.FAILURE, outcomeDetailExtension, notify);

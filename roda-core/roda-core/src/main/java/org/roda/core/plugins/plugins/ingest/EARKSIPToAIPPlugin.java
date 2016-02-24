@@ -18,11 +18,9 @@ import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -38,8 +36,6 @@ import org.slf4j.LoggerFactory;
 
 public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
-
-  
 
   @Override
   public void init() throws PluginException {
@@ -69,15 +65,14 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
-    PluginState state;
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(getParameterValues());
-    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(getParameterValues());
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(this);
+    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(this);
 
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
 
-      ReportItem reportItem = PluginHelper.createPluginReportItem(transferredResource, this);
+      Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
 
       SIP sip = null;
       try {
@@ -88,36 +83,31 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
 
-        state = PluginState.SUCCESS;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aipCreated.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        reportItem.setItemId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
         if (sip.getParentID() != null && aipCreated.getParentId() == null) {
           LOGGER.error("PARENT NOT FOUND!");
-          reportItem = reportItem
-            .addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, "Parent not found"));
+          reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getParentID()));
         }
 
-        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays
-          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aipCreated.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> sources = Arrays.asList(
+          PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
+          aipCreated.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes, state, "",
-          notify);
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes,
+          PluginState.SUCCESS, "", notify);
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
-        state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
       } finally {
         if (sip != null) {
           FSUtils.deletePathQuietly(sip.getBasePath());
         }
       }
-      report.addItem(reportItem);
-      PluginHelper.createJobReport(model, this, reportItem, state);
+      report.addReport(reportItem);
+      PluginHelper.createJobReport(this, model, reportItem);
 
     }
     return report;

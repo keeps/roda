@@ -31,11 +31,9 @@ import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -80,12 +78,11 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
-    PluginState state;
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(getParameterValues());
+    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(this);
 
     for (TransferredResource transferredResource : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(transferredResource, this);
+      Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
 
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
@@ -124,26 +121,23 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
         model.notifyAIPCreated(aip.getId());
 
-        state = PluginState.SUCCESS;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+        reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays
-          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> sources = Arrays.asList(
+          PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
+          aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
-          notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
+          reportItem.getPluginState(), "", notify);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
-        state = PluginState.FAILURE;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, null,
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS, e.getMessage()));
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+
       }
 
-      report.addItem(reportItem);
-      PluginHelper.createJobReport(model, this, reportItem, state);
+      report.addReport(reportItem);
+      PluginHelper.createJobReport(this, model, reportItem);
 
     }
     return report;

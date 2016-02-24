@@ -10,15 +10,11 @@
  */
 package org.roda.wui.common.client.widgets;
 
-import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
 
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.DisclosurePanel;
 import com.google.gwt.user.client.ui.FlexTable;
-import com.google.gwt.user.client.ui.HasAlignment;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -63,45 +59,47 @@ public class ReportPanel extends Composite {
 
   private void updateAttributes() {
     int row = 0;
-    for (Attribute attrb : report.getAttributes()) {
-      Label name = new Label(attrb.getName());
-      Label value = new Label(attrb.getValue());
-
-      attributes.setWidget(row, 0, name);
-      attributes.setWidget(row, 1, value);
-
-      attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
-      name.addStyleName("attribute-name");
-      value.addStyleName("attribute-value");
-
-      row++;
-    }
+    // for (Attribute attrb : report.getAttributes()) {
+    // Label name = new Label(attrb.getName());
+    // Label value = new Label(attrb.getValue());
+    //
+    // attributes.setWidget(row, 0, name);
+    // attributes.setWidget(row, 1, value);
+    //
+    // attributes.getCellFormatter().setVerticalAlignment(row, 0,
+    // HasAlignment.ALIGN_TOP);
+    // name.addStyleName("attribute-name");
+    // value.addStyleName("attribute-value");
+    //
+    // row++;
+    // }
   }
 
   private void updateItems() {
-    for (ReportItem item : report.getItems()) {
+    for (Report item : report.getReports()) {
       Widget reportItemPanel = createReportItemPanel(item);
       items.add(reportItemPanel);
     }
   }
 
-  private Widget createReportItemPanel(ReportItem item) {
+  private Widget createReportItemPanel(Report item) {
     DisclosurePanel disclosure = new DisclosurePanel(item.getTitle());
     FlexTable attributes = new FlexTable();
     int row = 0;
-    for (Attribute attrb : item.getAttributes()) {
-      Label name = new Label(attrb.getName());
-      Label value = new Label(attrb.getValue());
-
-      attributes.setWidget(row, 0, name);
-      attributes.setWidget(row, 1, value);
-
-      attributes.getCellFormatter().setVerticalAlignment(row, 0, HasAlignment.ALIGN_TOP);
-      name.addStyleName("attribute-name");
-      value.addStyleName("attribute-value");
-
-      row++;
-    }
+    // for (Attribute attrb : item.getAttributes()) {
+    // Label name = new Label(attrb.getName());
+    // Label value = new Label(attrb.getValue());
+    //
+    // attributes.setWidget(row, 0, name);
+    // attributes.setWidget(row, 1, value);
+    //
+    // attributes.getCellFormatter().setVerticalAlignment(row, 0,
+    // HasAlignment.ALIGN_TOP);
+    // name.addStyleName("attribute-name");
+    // value.addStyleName("attribute-value");
+    //
+    // row++;
+    // }
 
     disclosure.setContent(attributes);
     disclosure.addStyleName("report-item");

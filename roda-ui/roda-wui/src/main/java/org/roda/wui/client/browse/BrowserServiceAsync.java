@@ -24,9 +24,9 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -105,9 +105,9 @@ public interface BrowserServiceAsync {
   void retrieveJobBundle(String jobId, AsyncCallback<JobBundle> callback);
 
   void findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<JobReport>> callback);
+    AsyncCallback<IndexResult<Report>> callback);
 
-  void retrieveJobReport(String jobReportId, AsyncCallback<JobReport> callback);
+  void retrieveJobReport(String jobReportId, AsyncCallback<Report> callback);
 
   void getViewersProperties(AsyncCallback<Viewers> callback);
 

@@ -105,23 +105,21 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="jobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="itemId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="otherId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="title" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="dateUpdated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="jobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="lastPluginRan" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="lastPluginRanState" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="report" type="string" indexed="false" stored="true" required="false" multiValued="false" />
-   <!-- 
-   <field name="transition_datetime" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="transition_description" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="transition_from" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="transition_sipID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="transition_taskID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="transition_to" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="transition_success" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
-   -->
+   <field name="completionPercentage" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="stepsCompleted" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="totalSteps" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="pluginState" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="pluginDetails" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+   
+   <field name="reports" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+ 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)

@@ -53,4 +53,10 @@ public class ValidationReport implements Serializable {
     }
     issues.add(issue);
   }
+
+  @Override
+  public String toString() {
+    return "ValidationReport [valid=" + valid + ", message=" + message + ", issues=" + issues + "]";
+  }
+
 }

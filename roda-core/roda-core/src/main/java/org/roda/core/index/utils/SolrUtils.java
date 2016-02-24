@@ -104,10 +104,9 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.jobs.JobReport;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.user.Group;
@@ -709,7 +708,7 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_PRESERVATION_AGENTS;
     } else if (resultClass.equals(LogEntry.class)) {
       indexName = RodaConstants.INDEX_ACTION_LOG;
-    } else if (resultClass.equals(JobReport.class)) {
+    } else if (resultClass.equals(Report.class)) {
       indexName = RodaConstants.INDEX_JOB_REPORT;
     } else if (resultClass.equals(User.class)) {
       LOGGER.warn("Use " + RODAMember.class.getCanonicalName() + " instead of " + User.class.getCanonicalName());
@@ -739,7 +738,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
     } else if (resultClass.equals(LogEntry.class)) {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
-    } else if (resultClass.equals(JobReport.class)) {
+    } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
     } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
       || resultClass.equals(Group.class)) {
@@ -1454,38 +1453,46 @@ public class SolrUtils {
     return file;
   }
 
-  public static SolrInputDocument jobReportToSolrDocument(JobReport jobReport) {
+  public static SolrInputDocument jobReportToSolrDocument(Report jobReport) {
     SolrInputDocument doc = new SolrInputDocument();
 
     doc.addField(RodaConstants.JOB_REPORT_ID, jobReport.getId());
+    doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
+    doc.addField(RodaConstants.JOB_REPORT_ITEM_ID, jobReport.getItemId());
+    doc.addField(RodaConstants.JOB_REPORT_OTHER_ID, jobReport.getOtherId());
+    doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
     doc.addField(RodaConstants.JOB_REPORT_DATE_CREATED, jobReport.getDateCreated());
     doc.addField(RodaConstants.JOB_REPORT_DATE_UPDATE, jobReport.getDateUpdated());
-    doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
-    doc.addField(RodaConstants.JOB_REPORT_AIP_ID, jobReport.getAipId());
-    doc.addField(RodaConstants.JOB_REPORT_OBJECT_ID, jobReport.getObjectId());
-    doc.addField(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN, jobReport.getLastPluginRan());
-    doc.addField(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE, jobReport.getLastPluginRanState());
-
-    doc.addField(RodaConstants.JOB_REPORT_REPORT, JsonUtils.getJsonFromObject(jobReport.getReport()));
+    doc.addField(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE, jobReport.getCompletionPercentage());
+    doc.addField(RodaConstants.JOB_REPORT_STEPS_COMPLETED, jobReport.getStepsCompleted());
+    doc.addField(RodaConstants.JOB_REPORT_TOTAL_STEPS, jobReport.getTotalSteps());
+    doc.addField(RodaConstants.JOB_REPORT_PLUGIN, jobReport.getPlugin());
+    doc.addField(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReport.getPluginState());
+    doc.addField(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, jobReport.getPluginDetails());
+    doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
 
     return doc;
   }
 
-  private static JobReport solrDocumentToJobReport(SolrDocument doc) {
-    JobReport jobReport = new JobReport();
+  private static Report solrDocumentToJobReport(SolrDocument doc) {
+    Report jobReport = new Report();
 
     jobReport.setId(objectToString(doc.get(RodaConstants.JOB_REPORT_ID)));
+    jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
+    jobReport.setItemId(objectToString(doc.get(RodaConstants.JOB_REPORT_ITEM_ID)));
+    jobReport.setOtherId(objectToString(doc.get(RodaConstants.JOB_REPORT_OTHER_ID)));
+    jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));
-    jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
-    jobReport.setAipId(objectToString(doc.get(RodaConstants.JOB_REPORT_AIP_ID)));
-    jobReport.setObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OBJECT_ID)));
-    jobReport.setLastPluginRan(objectToString(doc.get(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN)));
-    jobReport.setLastPluginRanState(
-      PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_LAST_PLUGIN_RAN_STATE))));
+    jobReport.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE)));
+    jobReport.setStepsCompleted(objectToInteger(doc.get(RodaConstants.JOB_REPORT_STEPS_COMPLETED)));
+    jobReport.setTotalSteps(objectToInteger(doc.get(RodaConstants.JOB_REPORT_TOTAL_STEPS)));
+    jobReport.setPlugin(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN)));
+    jobReport.setPluginState(PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE))));
+    jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS)));
     try {
       jobReport
-        .setReport(JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORT)), Report.class));
+        .setReports(JsonUtils.getListFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORTS)), Report.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job report", e);
     }

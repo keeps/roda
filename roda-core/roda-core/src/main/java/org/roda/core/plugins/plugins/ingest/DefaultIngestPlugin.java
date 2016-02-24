@@ -28,7 +28,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -88,8 +87,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "Auto accept SIP", PluginParameterType.BOOLEAN, "true", true, false, "Automatically accept SIPs.");
 
   private int totalSteps = 8;
-  private int currentCompletionPercentage = 0;
-  private int completionPercentageStep = 100 / totalSteps;
+  private int stepsCompleted = 0;
+  // private int completionPercentageStep = (int) (100f / totalSteps);
   private Map<String, String> aipIdToObjectId;
 
   @Override
@@ -136,7 +135,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    completionPercentageStep = calculateCompletionPercentageStep();
+    // completionPercentageStep = calculateCompletionPercentageStep();
   }
 
   @Override
@@ -145,11 +144,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     Report report = PluginHelper.createPluginReport(this);
     Report pluginReport;
 
-    // FIXME
+    // aipId > report
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
 
-    PluginHelper.updateJobStatus(index, model, 0, this);
+    PluginHelper.updateJobStatus(this, index, model, 0);
 
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
@@ -158,21 +157,22 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
 
+    // 0.1) set total number of steps (sent to each plugin via parameters)
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, totalSteps + "");
+
     // 1) transform TransferredResource into an AIP
     // 1.1) obtain list of AIPs that were successfully transformed from
     // transferred resources
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
-    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, this);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
-      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, this);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
     }
 
     // 2.1) do pdftopdfa conversion
@@ -181,8 +181,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       params.put("maxKbytes", "20000");
       pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
-      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, this);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
     }
 
     // 2.2) do verapdf check
@@ -193,43 +192,37 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       params.put("maxKbytes", "20000");
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
-      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, this);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
     }
 
     // 3) create premis skeleton
     pluginReport = createPremisSkeleton(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, this);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, this);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
     // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
-    currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-      completionPercentageStep, this);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
     // 6) do file format identification (sieg)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
-      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, this);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
     }
 
     // 7) do metadata and full text extraction (tika)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
-      currentCompletionPercentage = PluginHelper.updateJobStatus(index, model, currentCompletionPercentage,
-        completionPercentageStep, this);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
     }
 
     // 8) do auto accept
@@ -238,7 +231,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       reports = mergeReports(reports, pluginReport);
     }
 
-    PluginHelper.updateJobStatus(index, model, 100, this);
+    PluginHelper.updateJobStatus(this, index, model, 100);
 
     return report;
   }
@@ -276,8 +269,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private List<String> getAIPsIdsFromReport(Map<String, Report> reports) {
     List<String> aipIds = new ArrayList<>();
     for (Entry<String, Report> entry : reports.entrySet()) {
-      if (StringUtils.isNoneBlank(entry.getValue().getItems().get(0).getItemId())) {
-        aipIds.add(entry.getValue().getItems().get(0).getItemId());
+      if (StringUtils.isNoneBlank(entry.getValue().getReports().get(0).getItemId())) {
+        aipIds.add(entry.getValue().getReports().get(0).getItemId());
       }
     }
 
@@ -286,16 +279,16 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
   private Map<String, Report> mergeReports(Map<String, Report> reports, Report plugin) {
     if (plugin != null) {
-      for (ReportItem reportItem : plugin.getItems()) {
+      for (Report reportItem : plugin.getReports()) {
         if (StringUtils.isNotBlank(reportItem.getOtherId())) {
           aipIdToObjectId.put(reportItem.getItemId(), reportItem.getOtherId());
           Report report = new Report();
-          report.addItem(reportItem);
+          report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
         } else if (StringUtils.isNotBlank(reportItem.getItemId())
           && aipIdToObjectId.get(reportItem.getItemId()) != null) {
-          reports.get(aipIdToObjectId.get(reportItem.getItemId())).addItem(reportItem);
+          reports.get(aipIdToObjectId.get(reportItem.getItemId())).addReport(reportItem);
         }
       }
     }
@@ -428,7 +421,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return areValid;
   }
 
-  //TODO FIX...
+  // TODO FIX...
   @Override
   public PreservationEventType getPreservationEventType() {
     return null;

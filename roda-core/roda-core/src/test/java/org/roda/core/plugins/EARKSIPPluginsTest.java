@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
+import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -46,8 +47,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.jobs.Attribute;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
@@ -134,28 +135,8 @@ public class EARKSIPPluginsTest {
 
   private void assertReports(List<Report> reports) {
     for (Report report : reports) {
-      boolean outcome = getReportOutcome(report);
-      String outcomeDetails = getReportOutcomeDetails(report);
-      Assert.assertTrue(outcomeDetails, outcome);
+      Assert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
     }
-  }
-
-  private String getReportOutcomeDetails(Report report) {
-    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
-      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME_DETAILS)) {
-        return attribute.getValue();
-      }
-    }
-    return "";
-  }
-
-  private boolean getReportOutcome(Report report) {
-    for (Attribute attribute : report.getItems().get(0).getAttributes()) {
-      if (attribute.getName().equals(RodaConstants.REPORT_ATTR_OUTCOME)) {
-        return attribute.getValue().equalsIgnoreCase(RodaConstants.REPORT_ATTR_OUTCOME_SUCCESS);
-      }
-    }
-    return false;
   }
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,

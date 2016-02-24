@@ -30,8 +30,8 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.Jobs;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -112,7 +112,7 @@ public class JobsResource {
   // FIXME WIP - not working yet
   @GET
   @Path("/{jobId}/reports")
-  public Response getJobReport(@PathParam("jobId") String jobId,
+  public Response getReport(@PathParam("jobId") String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
 
     try {
@@ -120,12 +120,12 @@ public class JobsResource {
       filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
       Sorter sorter = null;
       Sublist sublist = new Sublist();
-      IndexResult<JobReport> find = RodaCoreFactory.getIndexService().find(JobReport.class, filter, sorter, sublist);
+      IndexResult<Report> find = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter, sublist);
 
       StringBuilder sb = new StringBuilder();
 
-      for (JobReport jobReport : find.getResults()) {
-        sb.append(jobReport.toString());
+      for (Report Report : find.getResults()) {
+        sb.append(Report.toString());
         sb.append("<br/>");
       }
 

@@ -10,14 +10,11 @@ package org.roda.core.plugins.plugins.ingest;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -62,23 +59,21 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
-    PluginState state;
 
     for (AIP aip : list) {
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       LOGGER.debug("Checking producer authorization for AIP " + aip.getId());
 
       // FIXME implement producer authorization logic
-
-      state = PluginState.SUCCESS;
-      reportItem.setItemId(aip.getId());
-      reportItem.addAttribute(new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
+      reportItem.setPluginState(PluginState.SUCCESS)
+        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
       LOGGER.debug("Done with checking producer authorization for AIP " + aip.getId());
 
-      report.addItem(reportItem);
+      report.addReport(reportItem);
 
-      PluginHelper.updateJobReport(model, index, this, reportItem, state, aip.getId());
+      PluginHelper.updateJobReport(this, model, index, reportItem);
+
     }
 
     return report;

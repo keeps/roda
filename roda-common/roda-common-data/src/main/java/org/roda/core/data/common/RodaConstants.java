@@ -422,20 +422,26 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
   public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
   public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
+  public static final String PLUGIN_PARAMS_TOTAL_STEPS = "parameter.total_steps";
   public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";
-  public static final String JOB_REPORT_AIP_ID = "aipId";
-  public static final String JOB_REPORT_OBJECT_ID = "objectId";
   public static final String JOB_REPORT_JOB_ID = "jobId";
-  public static final String JOB_REPORT_REPORT = "report";
+  public static final String JOB_REPORT_ITEM_ID = "itemId";
+  public static final String JOB_REPORT_OTHER_ID = "otherId";
+  public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
   public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
-  public static final String JOB_REPORT_LAST_PLUGIN_RAN = "lastPluginRan";
-  public static final String JOB_REPORT_LAST_PLUGIN_RAN_STATE = "lastPluginRanState";
+  public static final String JOB_REPORT_COMPLETION_PERCENTAGE = "completionPercentage";
+  public static final String JOB_REPORT_STEPS_COMPLETED = "stepsCompleted";
+  public static final String JOB_REPORT_TOTAL_STEPS = "totalSteps";
+  public static final String JOB_REPORT_PLUGIN = "plugin";
+  public static final String JOB_REPORT_PLUGIN_STATE = "pluginState";
+  public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
+  public static final String JOB_REPORT_REPORTS = "reports";
 
   public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";

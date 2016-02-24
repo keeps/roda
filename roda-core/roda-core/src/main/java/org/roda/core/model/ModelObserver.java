@@ -16,7 +16,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -73,7 +73,7 @@ public interface ModelObserver {
 
   public void jobDeleted(String jobId);
 
-  public void jobReportCreatedOrUpdated(JobReport jobReport);
+  public void jobReportCreatedOrUpdated(Report jobReport);
 
   public void jobReportDeleted(String jobReportId);
 

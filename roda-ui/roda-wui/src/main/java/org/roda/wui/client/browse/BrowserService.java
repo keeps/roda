@@ -25,9 +25,9 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.JobReport;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
@@ -166,7 +166,7 @@ public interface BrowserService extends RemoteService {
 
   JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  IndexResult<JobReport> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  IndexResult<Report> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws GenericException, RequestNotValidException;
 
   Viewers getViewersProperties() throws GenericException;
@@ -174,7 +174,7 @@ public interface BrowserService extends RemoteService {
   List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
     throws AuthorizationDeniedException, GenericException;
 
-  JobReport retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
+  Report retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
 
   IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
     Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;

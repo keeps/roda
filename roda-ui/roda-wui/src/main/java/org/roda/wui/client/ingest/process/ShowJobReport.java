@@ -12,9 +12,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -49,7 +47,7 @@ public class ShowJobReport extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobReport(jobReportId, new AsyncCallback<JobReport>() {
+        BrowserService.Util.getInstance().retrieveJobReport(jobReportId, new AsyncCallback<Report>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -57,7 +55,7 @@ public class ShowJobReport extends Composite {
           }
 
           @Override
-          public void onSuccess(JobReport jobReport) {
+          public void onSuccess(Report jobReport) {
             ShowJobReport showJob = new ShowJobReport(jobReport);
             callback.onSuccess(showJob);
           }
@@ -93,7 +91,7 @@ public class ShowJobReport extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final JobReport jobReport;
+  private final Report jobReport;
   // private final Map<String, PluginInfo> pluginsInfo;
 
   @UiField
@@ -114,19 +112,19 @@ public class ShowJobReport extends Composite {
   @UiField
   Button buttonBack;
 
-  public ShowJobReport(JobReport jobReport) {
+  public ShowJobReport(Report jobReport) {
     this.jobReport = jobReport;
 
     initWidget(uiBinder.createAndBindUi(this));
 
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
-    objectId.setText(jobReport.getObjectId());
-    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getObjectId()));
+    objectId.setText(jobReport.getOtherId());
+    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getOtherId()));
 
-    if (jobReport.getAipId() != null) {
-      aip.setText(jobReport.getAipId());
-      aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getAipId()));
+    if (jobReport.getItemId() != null) {
+      aip.setText(jobReport.getItemId());
+      aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getItemId()));
     } else {
       // TODO show better message
       aip.setText("No AIP created");
@@ -135,18 +133,7 @@ public class ShowJobReport extends Composite {
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
 
-    for (Attribute attribute : jobReport.getReport().getAttributes()) {
-      if (attribute.getValue() != null && attribute.getValue().length() > 0) {
-        Label attributeLabel = new Label(attribute.getName());
-        attributeLabel.setStyleName("label");
-        reportAttributes.add(attributeLabel);
-
-        Label attributeValue = new Label(attribute.getValue());
-        reportAttributes.add(attributeValue);
-      }
-    }
-
-    for (ReportItem reportItem : jobReport.getReport().getItems()) {
+    for (Report reportItem : jobReport.getReports()) {
       Label reportItemTitleLabel = new Label(reportItem.getTitle());
       reportItemTitleLabel.setStyleName("report-item-title");
       reportItems.add(reportItemTitleLabel);
@@ -155,23 +142,40 @@ public class ShowJobReport extends Composite {
       reportItemAttributes.addStyleName("report-item-attributes");
       reportItems.add(reportItemAttributes);
 
-      for (Attribute attribute : reportItem.getAttributes()) {
-        if (attribute.getValue() != null && attribute.getValue().length() > 0) {
-          Label attributeLabel = new Label(attribute.getName());
-          attributeLabel.setStyleName("label");
-          reportItemAttributes.add(attributeLabel);
+      // FIXME
+      Label attributeLabel = new Label("Plugin");
+      attributeLabel.setStyleName("label");
+      reportItemAttributes.add(attributeLabel);
+      Label attributeValue = new Label(reportItem.getPlugin());
+      reportItemAttributes.add(attributeValue);
 
-          Label attributeValue = new Label(attribute.getValue());
-          reportItemAttributes.add(attributeValue);
+      attributeLabel = new Label("Start datetime");
+      attributeLabel.setStyleName("label");
+      reportItemAttributes.add(attributeLabel);
+      attributeValue = new Label(dateTimeFormat.format(reportItem.getDateCreated()));
+      reportItemAttributes.add(attributeValue);
 
-          if (attribute.getName().equals("outcomeDetails")) {
-            attributeValue.addStyleName("code-pre");
-          }
-        }
+      attributeLabel = new Label("End datetime");
+      attributeLabel.setStyleName("label");
+      reportItemAttributes.add(attributeLabel);
+      attributeValue = new Label(dateTimeFormat.format(reportItem.getDateUpdated()));
+      reportItemAttributes.add(attributeValue);
+
+      attributeLabel = new Label("Outcome");
+      attributeLabel.setStyleName("label");
+      reportItemAttributes.add(attributeLabel);
+      attributeValue = new Label(reportItem.getPluginState().toString());
+      reportItemAttributes.add(attributeValue);
+
+      if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
+        attributeLabel = new Label("Outcome details");
+        attributeLabel.setStyleName("label");
+        reportItemAttributes.add(attributeLabel);
+        attributeValue = new Label(reportItem.getPluginDetails());
+        attributeValue.addStyleName("code-pre");
+        reportItemAttributes.add(attributeValue);
       }
-
     }
-
   }
 
   @UiHandler("buttonBack")

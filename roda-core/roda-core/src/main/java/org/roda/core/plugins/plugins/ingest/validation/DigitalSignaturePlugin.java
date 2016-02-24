@@ -35,11 +35,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
-import org.roda.core.data.v2.jobs.Attribute;
-import org.roda.core.data.v2.jobs.JobReport.PluginState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.ReportItem;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -198,7 +196,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       int pluginResultState = 1;
       String verification = null;
       boolean notify = true;
-      ReportItem reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
         LOGGER.debug("Processing representation: " + representation);
@@ -280,8 +278,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                   alteredFiles.add(file);
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.SUCCESS.toString()));
+                  reportItem.setPluginState(PluginState.SUCCESS);
 
                 } else {
 
@@ -289,8 +286,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     + " from AIP " + aipId);
                   pluginResultState = 2;
 
-                  reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-                    new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
+                  reportItem.setPluginState(PluginState.FAILURE);
                 }
               }
             } else {
@@ -323,11 +319,11 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
-        reportItem = PluginHelper.setPluginReportItemInfo(reportItem, representation.getId(),
-          new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, PluginState.FAILURE.toString()));
+        reportItem.setPluginState(PluginState.FAILURE);
+
       }
 
-      report.addItem(reportItem);
+      report.addReport(reportItem);
     }
 
     try {
@@ -377,11 +373,11 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
         premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       }
       for (File file : newFiles) {
         premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       }
     }
 
