@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -72,7 +73,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            Toast.showError(caught);
+            AsyncRequestUtils.defaultFailureTreatment(caught);
           }
 
           @Override
@@ -113,7 +114,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private final String aipId;
   private final String descriptiveMetadataId;
-  private final DescriptiveMetadataVersionsBundle bundle;
+  private DescriptiveMetadataVersionsBundle bundle;
 
   private boolean inHTML = true;
   private String selectedVersion = null;
@@ -146,13 +147,28 @@ public class DescriptiveMetadataHistory extends Composite {
    *          the user to edit
    */
   public DescriptiveMetadataHistory(final String aipId, final String descriptiveMetadataId,
-    DescriptiveMetadataVersionsBundle bundle) {
+    final DescriptiveMetadataVersionsBundle bundle) {
     this.aipId = aipId;
     this.descriptiveMetadataId = descriptiveMetadataId;
     this.bundle = bundle;
 
     initWidget(uiBinder.createAndBindUi(this));
 
+    init();
+
+    list.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String versionKey = list.getSelectedValue();
+        selectedVersion = versionKey;
+        updatePreview();
+      }
+    });
+
+  }
+
+  private void init() {
     // sort
     List<Entry<String, Date>> versionList = new ArrayList<>(bundle.getVersions().entrySet());
     Collections.sort(versionList, new Comparator<Entry<String, Date>>() {
@@ -169,18 +185,7 @@ public class DescriptiveMetadataHistory extends Composite {
       Date createdDate = version.getValue();
 
       list.addItem(messages.descriptiveMetadataHistoryLabel(versionKey, createdDate), versionKey);
-
     }
-
-    list.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        String versionKey = list.getSelectedValue();
-        selectedVersion = versionKey;
-        updatePreview();
-      }
-    });
 
     descriptiveMetadataType.setText(bundle.getDescriptiveMetadata().getLabel());
 
@@ -189,7 +194,6 @@ public class DescriptiveMetadataHistory extends Composite {
       selectedVersion = versionList.get(0).getKey();
       updatePreview();
     }
-
   }
 
   protected void updatePreview() {
@@ -300,14 +304,66 @@ public class DescriptiveMetadataHistory extends Composite {
 
   @UiHandler("buttonRevert")
   void buttonRevertHandler(ClickEvent e) {
-    // TODO
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+    BrowserService.Util.getInstance().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
+      new AsyncCallback<Void>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncRequestUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          Toast.showInfo("Done", "Version reverted");
+          Tools.newHistory(Browse.RESOLVER, aipId);
+        }
+      });
   }
 
   @UiHandler("buttonRemove")
   void buttonRemoveHandler(ClickEvent e) {
-    // TODO
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+    BrowserService.Util.getInstance().removeDescriptiveMetadataVersion(aipId, descriptiveMetadataId, selectedVersion,
+      new AsyncCallback<Void>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncRequestUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(Void result) {
+          Toast.showInfo("Done", "Version deleted");
+          refresh();
+          if (bundle.getVersions().isEmpty()) {
+            Tools.newHistory(Browse.RESOLVER, aipId);
+          }
+        }
+      });
+  }
+
+  protected void refresh() {
+    BrowserService.Util.getInstance().getDescriptiveMetadataVersionsBundle(aipId, descriptiveMetadataId,
+      LocaleInfo.getCurrentLocale().getLocaleName(), new AsyncCallback<DescriptiveMetadataVersionsBundle>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncRequestUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(DescriptiveMetadataVersionsBundle bundle) {
+          DescriptiveMetadataHistory.this.bundle = bundle;
+          clean();
+          init();
+        }
+      });
+  }
+
+  protected void clean() {
+    list.clear();
+    descriptiveMetadataType.setText("");
+    selectedVersion = null;
+    preview.setHTML("");
   }
 
   @UiHandler("buttonCancel")

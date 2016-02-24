@@ -1065,4 +1065,17 @@ public class BrowserHelper {
     bundle.setVersions(versions);
     return bundle;
   }
+
+  public static void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+    String message) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    RodaCoreFactory.getModelService().createBinaryVersion(storagePath, message);
+    RodaCoreFactory.getStorageService().revertBinaryVersion(storagePath, versionId);
+  }
+
+  public static void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+  }
 }

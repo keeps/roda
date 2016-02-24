@@ -174,8 +174,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
         String fieldName = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "field");
         String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
         String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-        boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
-        
+        boolean fieldFixed = Boolean
+          .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+
         searchField.setField(fieldName);
         searchField.setType(fieldType);
         searchField.setLabel(messages.getTranslation(fieldLabelI18N));
@@ -433,5 +434,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getDescriptiveMetadataVersionsBundle(user, aipId, descriptiveMetadataId, locale);
+  }
+
+  @Override
+  public void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.revertDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
+  }
+
+  @Override
+  public void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.removeDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
   }
 }

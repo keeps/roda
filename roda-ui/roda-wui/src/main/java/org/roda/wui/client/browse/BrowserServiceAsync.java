@@ -133,4 +133,10 @@ public interface BrowserServiceAsync {
   void getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId, String localeString,
     AsyncCallback<DescriptiveMetadataVersionsBundle> callback);
 
+  void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+    AsyncCallback<Void> callback);
+
+  void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+    AsyncCallback<Void> callback);
+
 }

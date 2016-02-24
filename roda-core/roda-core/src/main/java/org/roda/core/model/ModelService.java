@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -501,31 +502,26 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  private void createBinaryVersion(StoragePath binaryPath, String label)
-    throws RequestNotValidException, NotFoundException, GenericException {
+  public void createBinaryVersion(StoragePath binaryPath, String label)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
 
     String version;
-    if (StringUtils.isNotBlank(label)) {
-      version = label;
-    } else {
-      version = DateParser.getIsoDate(new Date());
+    int i = Iterables.size(storage.listBinaryVersions(binaryPath));
+
+    if (StringUtils.isBlank(label)) {
+      label = DateParser.getIsoDate(new Date());
     }
-    try {
-      storage.createBinaryVersion(binaryPath, version);
-    } catch (AlreadyExistsException e) {
-      boolean created = false;
-      int i = 1;
-      while (!created) {
-        version = label + " (" + i + ")";
-        i++;
-        try {
-          storage.createBinaryVersion(binaryPath, version);
-          created = true;
-        } catch (AlreadyExistsException e1) {
-          if (i > 100) {
-            LOGGER.warn("Struggling to create an unique binary version for " + binaryPath);
-          }
-        }
+
+    boolean created = false;
+    int retries = 100;
+    while (!created && --retries > 0) {
+      version = label + " (" + (i++ + 1) + ")";
+      try {
+        storage.createBinaryVersion(binaryPath, version);
+        created = true;
+      } catch (AlreadyExistsException e) {
+        LOGGER
+          .warn("Struggling to create an unique binary version for " + binaryPath + " (retries left " + retries + ")");
       }
     }
   }

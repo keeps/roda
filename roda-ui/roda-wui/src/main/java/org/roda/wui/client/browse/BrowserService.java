@@ -199,9 +199,15 @@ public interface BrowserService extends RemoteService {
 
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
-  
+
   DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId,
     String localeString)
       throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
+  void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
 }

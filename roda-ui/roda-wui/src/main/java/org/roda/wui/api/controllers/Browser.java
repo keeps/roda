@@ -1029,4 +1029,50 @@ public class Browser extends RodaCoreService {
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId);
     return versions;
   }
+
+  public static void revertDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
+    String versionId)
+      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    // TODO externalize this message
+    String message = "Reverted by " + user.getId();
+    BrowserHelper.revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId, message);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "revertDescriptiveMetadataVersion", null, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId,
+      RodaConstants.API_QUERY_PARAM_VERSION, versionId);
+  }
+
+  public static void removeDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
+    String versionId)
+      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // TODO maybe update permissions...
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // TODO if not admin, add to filter a constraint for the resource to belong
+    // to this user
+
+    // delegate
+    BrowserHelper.removeDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "removeDescriptiveMetadataVersion", null, duration,
+      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId,
+      RodaConstants.API_QUERY_PARAM_VERSION, versionId);
+  }
 }

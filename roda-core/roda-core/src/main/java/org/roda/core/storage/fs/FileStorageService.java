@@ -151,14 +151,9 @@ public class FileStorageService implements StorageService {
     Path containerPath = FSUtils.getEntityPath(basePath, storagePath);
     FSUtils.deletePath(containerPath);
 
-    // remove history
-    Path resourceHistoryPath = historyPath.resolve(containerPath);
-    try {
-      FSUtils.deletePath(resourceHistoryPath);
-      FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
-    } catch (NotFoundException e) {
-      // nothing to do
-    }
+    // cleanup history
+    deleteAllBinaryVersionsUnder(storagePath);
+
   }
 
   @Override
@@ -385,14 +380,8 @@ public class FileStorageService implements StorageService {
     Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
     FSUtils.deletePath(resourcePath);
 
-    // remove history
-    Path resourceHistoryPath = historyPath.resolve(resourcePath);
-    try {
-      FSUtils.deletePath(resourceHistoryPath);
-      FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
-    } catch (NotFoundException e) {
-      // nothing to do
-    }
+    // cleanup history
+    deleteAllBinaryVersionsUnder(storagePath);
   }
 
   public Path resolve(StoragePath storagePath) {
@@ -477,8 +466,8 @@ public class FileStorageService implements StorageService {
     final String baseName = fauxPath.getFileName().toString();
 
     CloseableIterable<BinaryVersion> iterable;
-    
-    if(!Files.exists(parent)){
+
+    if (!Files.exists(parent)) {
       return new EmptyClosableIterable<>();
     }
 
@@ -618,6 +607,48 @@ public class FileStorageService implements StorageService {
       throw new NotFoundException("Could not find binary version: " + binVersionPath, e);
     } catch (IOException e) {
       throw new GenericException("Could not delete binary version: " + binVersionPath, e);
+    }
+  }
+
+  private void deleteAllBinaryVersionsUnder(StoragePath storagePath) {
+
+    Path resourcePath = FSUtils.getEntityPath(basePath, storagePath);
+
+    Path relativePath = basePath.relativize(resourcePath);
+    Path resourceHistoryPath = historyPath.resolve(relativePath);
+    try {
+      if (Files.isDirectory(resourceHistoryPath)) {
+        try {
+          FSUtils.deletePath(resourceHistoryPath);
+        } catch (GenericException e) {
+          LOGGER.warn("Could not delete history under " + resourceHistoryPath, e);
+        }
+      } else {
+        Path parent = resourceHistoryPath.getParent();
+        final String baseName = resourceHistoryPath.getFileName().toString();
+
+        if (Files.exists(parent)) {
+          try {
+            final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
+              new DirectoryStream.Filter<Path>() {
+
+                @Override
+                public boolean accept(Path entry) throws IOException {
+                  return entry.getFileName().toString().startsWith(baseName);
+                }
+              });
+
+            for (Path p : directoryStream) {
+              Files.delete(p);
+            }
+          } catch (IOException e) {
+            LOGGER.warn("Could not delete history under " + resourceHistoryPath, e);
+          }
+        }
+      }
+      FSUtils.deleteEmptyAncestorsQuietly(resourceHistoryPath);
+    } catch (NotFoundException e) {
+      // nothing to do
     }
   }
 
