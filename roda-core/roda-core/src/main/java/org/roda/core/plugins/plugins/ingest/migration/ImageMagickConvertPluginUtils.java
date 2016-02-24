@@ -36,7 +36,8 @@ public class ImageMagickConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("convert", "--version");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "versionCommand");
+    String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }

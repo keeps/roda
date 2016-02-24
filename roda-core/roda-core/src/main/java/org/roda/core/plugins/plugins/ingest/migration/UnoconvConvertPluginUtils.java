@@ -37,7 +37,8 @@ public class UnoconvConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("soffice", "-h");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "versionCommand");
+    String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
     }

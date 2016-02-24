@@ -79,7 +79,7 @@ public class InternalConvertPluginsTest {
   private static Path logPath;
   private static ModelService model;
   private static IndexService index;
-  private static int numberOfFiles = 18;
+  private static int numberOfFiles = 17;
   private static Path corporaPath;
   private static StorageService corporaService;
 
@@ -486,10 +486,10 @@ public class InternalConvertPluginsTest {
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, allFiles);
 
-    Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
+    Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters.put("outputFormat", "tiff");
+    parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
@@ -497,10 +497,10 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(2, aip.getRepresentations().size());
     String editedRepresentationId = aip.getRepresentations().get(1).getId();
 
-    Plugin<Representation> plugin2 = new SoxConvertPlugin<Representation>();
+    Plugin<Representation> plugin2 = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
-    parameters2.put("outputFormat", "ogg");
+    parameters2.put("outputFormat", "tiff");
     plugin2.setParameterValues(parameters2);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
@@ -609,7 +609,7 @@ public class InternalConvertPluginsTest {
         Assert.assertEquals(1, newReusableFiles.stream().filter(o -> o.getId().equals(f.getId())).count());
 
         Binary binary = model.retrieveOtherMetadataBinary(aip.getId(), f.getRepresentationId(), f.getPath(), filename,
-          DigitalSignaturePlugin.FILE_SUFFIX, DigitalSignaturePlugin.OTHER_METADATA_TYPE);
+          ".txt", "DigitalSignature");
 
         Assert.assertTrue(binary.getSizeInBytes() > 0);
 

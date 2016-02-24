@@ -16,7 +16,11 @@ before_script:
   - sudo apt-get install imagemagick -y
   # Install SoX
   - sudo apt-get install sox libsox-fmt-all -y
-  # Install Unoconv
-  - sudo apt-get install libreoffice unoconv -y
   # Install GhostScript
   - sudo apt-get install ghostscript libgs-dev -y
+  # Install Unoconv
+  - sudo add-apt-repository ppa:libreoffice/ppa -y
+  - sudo apt-get update
+  - sudo apt-get install libreoffice -y
+  - sudo apt-get install unoconv -y
+  - sudo apt-get --only-upgrade install cpio fonts-opensymbol initscripts libc6 libgcrypt11 libgraphite2-3 libnss3 libreoffice-avmedia-backend-gstreamer libreoffice-pdfimport multiarch-support sysv-rc sysvinit-utils -y

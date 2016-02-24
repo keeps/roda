@@ -32,7 +32,11 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
 
   @Override
   public String getVersion() {
-    return "1.0";
+    try {
+      return UnoconvConvertPluginUtils.getVersion();
+    } catch (UnsupportedOperationException | CommandException | IOException e) {
+      return "1.0";
+    }
   }
 
   @Override
@@ -41,8 +45,8 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     return UnoconvConvertPluginUtils.executeUnoconvConvert(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());

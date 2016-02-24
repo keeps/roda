@@ -37,7 +37,8 @@ public class AvconvConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("avconv", "-version");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "versionCommand");
+    String version = CommandUtility.execute(command.split("\\s+"));
     version = version.replace("Copyright", "?");
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('?'));

@@ -10,7 +10,6 @@ package org.roda.core.plugins.plugins.ingest.validation;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,22 +64,15 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   private Map<String, List<String>> pronomToExtension;
   private Map<String, List<String>> mimetypeToExtension;
 
-  public static final String FILE_SUFFIX = ".txt";
-  public static final String CONTENTS_SUFFIX = ".pkcs7";
-  public static final String OTHER_METADATA_TYPE = "DigitalSignature";
-
   public DigitalSignaturePlugin() {
     doVerify = true;
     doExtract = true;
     doStrip = true;
     verificationAffectsOnOutcome = true;
 
-    applicableTo = Arrays.asList("pdf", "docx");
+    applicableTo = DigitalSignaturePluginUtils.getInputExtensions();
     pronomToExtension = DigitalSignaturePluginUtils.getPronomToExtension();
-    mimetypeToExtension = new HashMap<>();
-    mimetypeToExtension.put("application/pdf", Arrays.asList("pdf"));
-    mimetypeToExtension.put("tools.mimetype.application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      Arrays.asList("docx"));
+    mimetypeToExtension = DigitalSignaturePluginUtils.getMimetypeToExtension();
   }
 
   @Override
@@ -235,23 +227,10 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                List<Path> extractResult = DigitalSignaturePluginUtils
-                  .runDigitalSignatureExtract(directAccess.getPath(), fileFormat);
+                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(model, file,
+                  directAccess.getPath(), fileFormat);
 
                 if (extractResult.size() > 0) {
-                  ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-                  ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
-
-                  model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
-                    file.getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.FILE_SUFFIX,
-                    DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
-
-                  if (extractResult.get(1) != null) {
-                    model.createOtherMetadata(representation.getAipId(), representation.getId(), file.getPath(),
-                      file.getId().substring(0, file.getId().lastIndexOf('.')), DigitalSignaturePlugin.CONTENTS_SUFFIX,
-                      DigitalSignaturePlugin.OTHER_METADATA_TYPE, contentsPayload, true);
-                  }
-
                   extractedFiles.add(file);
                 }
               }
@@ -285,6 +264,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     + " from AIP " + aipId);
                   pluginResultState = 2;
 
+                  // FIXME set plugin details
                   reportItem.setPluginState(PluginState.FAILURE);
                 }
               }
@@ -318,7 +298,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = 0;
-        reportItem.setPluginState(PluginState.FAILURE);
+        // FIXME set plugin details
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
       }
 

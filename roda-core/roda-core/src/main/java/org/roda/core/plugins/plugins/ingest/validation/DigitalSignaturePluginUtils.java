@@ -7,10 +7,14 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -36,23 +40,57 @@ import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
+import javax.xml.crypto.MarshalException;
+import javax.xml.crypto.URIDereferencer;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
+import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
+import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
+import org.apache.poi.poifs.crypt.dsig.facets.XAdESXLSignatureFacet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.pdf.AcroFields;
@@ -71,28 +109,68 @@ public class DigitalSignaturePluginUtils {
   private static final String PDF_STRING = "String";
   private static final String PDF_OBJECT = "Object";
   private static final String PDF_BOOLEAN = "Boolean";
+  private static final String OTHER_METADATA_TYPE = "DigitalSignature";
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat) throws IOException,
     GeneralSecurityException {
+
     if (fileFormat.equals("pdf")) {
       return DigitalSignaturePluginUtils.runDigitalSignatureVerifyPDF(input);
-    } else if (fileFormat.equals("docx")) {
-      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyDOCX(input);
+    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyOOXML(input);
+    } else if (fileFormat.equals("odt")) {
+      // FIXME ODF verification has problems
+      // return DigitalSignaturePluginUtils.runDigitalSignatureVerifyODT(input);
     }
 
-    String result = "Not a supported format";
-    return result;
+    return "Not a supported format";
   }
 
-  public static List<Path> runDigitalSignatureExtract(Path input, String fileFormat) throws SignatureException,
-    IOException {
+  public static List<Path> runDigitalSignatureExtract(ModelService model, File file, Path input, String fileFormat)
+    throws SignatureException, IOException, RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
+
+    List<Path> extractResult = new ArrayList<Path>();
+
     if (fileFormat.equals("pdf")) {
-      return DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
-    } else if (fileFormat.equals("docx")) {
-      return DigitalSignaturePluginUtils.runDigitalSignatureExtractDOCX(input);
+      extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
+
+      if (extractResult.size() > 0) {
+        ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+        ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
+
+        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId().substring(0, file.getId().lastIndexOf('.')), ".txt",
+          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+
+        if (extractResult.get(1) != null) {
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            contentsPayload, true);
+        }
+      }
+    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+      Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
+      extractResult = new ArrayList<Path>(extractMap.keySet());
+
+      for (Path p : extractResult) {
+        ContentPayload mainPayload = new FSPathContentPayload(p);
+        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+      }
+    } else if (fileFormat.equals("odt")) {
+      extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODT(input);
+
+      if (extractResult.size() > 0) {
+        ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+          file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
+          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+      }
     }
 
-    return new ArrayList<Path>();
+    return extractResult;
   }
 
   public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
@@ -100,8 +178,10 @@ public class DigitalSignaturePluginUtils {
 
     if (fileFormat.equals("pdf")) {
       DigitalSignaturePluginUtils.runDigitalSignatureStripPDF(input, output);
-    } else if (fileFormat.equals("docx")) {
-      DigitalSignaturePluginUtils.runDigitalSignatureStripDOCX(input, output);
+    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+      DigitalSignaturePluginUtils.runDigitalSignatureStripOOXML(input, output);
+    } else if (fileFormat.equals("odt")) {
+      DigitalSignaturePluginUtils.runDigitalSignatureStripODT(input, output);
     }
 
     return output;
@@ -160,7 +240,7 @@ public class DigitalSignaturePluginUtils {
     return result;
   }
 
-  private static String runDigitalSignatureVerifyDOCX(Path input) throws IOException, GeneralSecurityException {
+  private static String runDigitalSignatureVerifyOOXML(Path input) throws IOException, GeneralSecurityException {
     boolean isValid = true;
     try {
       OPCPackage pkg = OPCPackage.open(input.toString(), PackageAccess.READ);
@@ -169,15 +249,13 @@ public class DigitalSignaturePluginUtils {
 
       SignatureInfo si = new SignatureInfo();
       si.setSignatureConfig(sic);
-      isValid = si.verifySignature();
+      for (SignaturePart sp : si.getSignatureParts()) {
+        isValid = isValid && sp.validate();
 
-      Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
-      Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+        Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
+        Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+        List<X509Certificate> certChain = sp.getCertChain();
 
-      List<X509Certificate> certChain = sic.getSigningCertificateChain();
-
-      // TODO why null?
-      if (certChain != null) {
         for (X509Certificate c : certChain) {
           c.checkValidity();
 
@@ -191,12 +269,49 @@ public class DigitalSignaturePluginUtils {
       }
 
     } catch (InvalidFormatException e) {
-      LOGGER.warn("Error opening a document file");
-      isValid = false;
+      return "Error opening a document file";
     } catch (CertificateExpiredException | CertificateNotYetValidException e) {
       return "Signing certificate does not pass the validity check";
+    } catch (CertPathBuilderException e) {
+      return "Signing certificate chain does not pass the verification";
     }
 
+    return isValid ? "Passed" : "Not passed";
+  }
+
+  private static String runDigitalSignatureVerifyODT(Path input) throws IOException, GeneralSecurityException {
+    boolean isValid = true;
+    ZipFile zipFile = new ZipFile(input.toString());
+    Enumeration<?> enumeration;
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      String entryName = entry.getName();
+      if (entryName.equalsIgnoreCase("META-INF/documentsignatures.xml")) {
+        InputStream zipStream = zipFile.getInputStream(entry);
+        InputSource inputSource = new InputSource(zipStream);
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        DocumentBuilder documentBuilder;
+        try {
+          documentBuilder = documentBuilderFactory.newDocumentBuilder();
+          Document document = documentBuilder.parse(inputSource);
+          NodeList signatureNodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
+          for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
+            Node signatureNode = signatureNodeList.item(idx);
+            if (!verifySignature(signatureNode)) {
+              isValid = isValid && false;
+            }
+          }
+
+        } catch (ParserConfigurationException | SAXException e) {
+          return "Signatures document can not be parsed";
+        } catch (MarshalException | XMLSignatureException | URISyntaxException e) {
+          return "Signatures are not valid";
+        }
+      }
+    }
+
+    zipFile.close();
     return isValid ? "Passed" : "Not passed";
   }
 
@@ -276,8 +391,46 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  private static List<Path> runDigitalSignatureExtractDOCX(Path input) throws SignatureException, IOException {
-    return new ArrayList<Path>();
+  private static Map<Path, String> runDigitalSignatureExtractOOXML(Path input) throws SignatureException, IOException {
+    Map<Path, String> paths = new HashMap<Path, String>();
+
+    ZipFile zipFile = new ZipFile(input.toString());
+    Enumeration<?> enumeration;
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      String entryName = entry.getName();
+      if (entryName.startsWith("_xmlsignatures") && entryName.endsWith(".xml")) {
+        Path extractedSignature = Files.createTempFile("extraction", ".xml");
+        InputStream zipStream = zipFile.getInputStream(entry);
+        FileUtils.copyInputStreamToFile(zipStream, extractedSignature.toFile());
+        paths.put(extractedSignature, entryName.substring(entryName.lastIndexOf('/') + 1, entryName.lastIndexOf('.')));
+        IOUtils.closeQuietly(zipStream);
+      }
+    }
+
+    zipFile.close();
+    return paths;
+  }
+
+  private static List<Path> runDigitalSignatureExtractODT(Path input) throws SignatureException, IOException {
+    List<Path> paths = new ArrayList<Path>();
+
+    ZipFile zipFile = new ZipFile(input.toString());
+    Enumeration<?> enumeration;
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      String entryName = entry.getName();
+      if (entryName.equalsIgnoreCase("META-INF/documentsignatures.xml")) {
+        Path extractedSignature = Files.createTempFile("extraction", ".xml");
+        InputStream zipStream = zipFile.getInputStream(entry);
+        FileUtils.copyInputStreamToFile(zipStream, extractedSignature.toFile());
+        paths.add(extractedSignature);
+        IOUtils.closeQuietly(zipStream);
+      }
+    }
+
+    zipFile.close();
+    return paths;
   }
 
   private static void runDigitalSignatureStripPDF(Path input, Path output) throws IOException, DocumentException {
@@ -288,8 +441,72 @@ public class DigitalSignaturePluginUtils {
     reader.close();
   }
 
-  private static void runDigitalSignatureStripDOCX(Path input, Path output) throws IOException, DocumentException {
-    return;
+  private static void runDigitalSignatureStripOOXML(Path input, Path output) throws IOException, DocumentException {
+    ZipOutputStream zout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output.toFile())));
+    ZipFile zipFile = new ZipFile(input.toString());
+    Enumeration<?> enumeration;
+
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      String entryName = entry.getName();
+      if (!entryName.startsWith("_xmlsignatures")) {
+
+        InputStream zipStream = zipFile.getInputStream(entry);
+        ZipEntry destEntry = new ZipEntry(entryName);
+        zout.putNextEntry(destEntry);
+
+        byte[] data = new byte[(int) entry.getSize()];
+        while ((zipStream.read(data, 0, (int) entry.getSize())) != -1) {
+        }
+
+        if (entryName.equalsIgnoreCase("_rels/.rels")) {
+          String content = new String(data);
+          content = content.replaceAll("<Relationship [^>]*?_xmlsignatures[^>]*?/>", "");
+          data = content.getBytes();
+        }
+
+        if (entryName.equalsIgnoreCase("[Content_Types].xml")) {
+          String content = new String(data);
+          content = content.replaceAll("<Override [^>]*?_xmlsignatures[^>]*?/>", "");
+          data = content.getBytes();
+        }
+
+        zout.write(data);
+        zout.closeEntry();
+        IOUtils.closeQuietly(zipStream);
+      }
+    }
+
+    IOUtils.closeQuietly(zout);
+    zipFile.close();
+  }
+
+  private static void runDigitalSignatureStripODT(Path input, Path output) throws IOException, DocumentException {
+    ZipOutputStream zout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output.toFile())));
+    ZipFile zipFile = new ZipFile(input.toString());
+    Enumeration<?> enumeration;
+
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      String entryName = entry.getName();
+      if (!entryName.equalsIgnoreCase("META-INF/documentsignatures.xml") && entry.getSize() > 0) {
+
+        InputStream zipStream = zipFile.getInputStream(entry);
+        ZipEntry destEntry = new ZipEntry(entryName);
+        zout.putNextEntry(destEntry);
+
+        byte[] data = new byte[(int) entry.getSize()];
+        while ((zipStream.read(data, 0, (int) entry.getSize())) != -1) {
+        }
+
+        zout.write(data);
+        zout.closeEntry();
+        IOUtils.closeQuietly(zipStream);
+      }
+    }
+
+    IOUtils.closeQuietly(zout);
+    zipFile.close();
   }
 
   private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
@@ -365,6 +582,25 @@ public class DigitalSignaturePluginUtils {
     return counter;
   }
 
+  private static boolean verifySignature(Node signatureNode) throws MarshalException, XMLSignatureException,
+    MalformedURLException, URISyntaxException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+    Element signedPropertiesElement = (Element) ((Element) signatureNode).getElementsByTagNameNS(
+      XAdESXLSignatureFacet.MS_DIGSIG_NS, "SignedProperties").item(0);
+    if (signedPropertiesElement != null) {
+      signedPropertiesElement.setIdAttribute("Id", true);
+    }
+
+    DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
+    XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+    DigestMethod dm = xmlSignatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+    Reference r = xmlSignatureFactory.newReference(signatureNode.getBaseURI(), dm);
+    domValidateContext.setURIDereferencer((URIDereferencer) r);
+    XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
+    boolean validity = xmlSignature.validate(domValidateContext);
+    return validity;
+  }
+
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
 
   public static Map<String, List<String>> getPronomToExtension() {
@@ -379,6 +615,28 @@ public class DigitalSignaturePluginUtils {
     }
 
     return map;
+  }
+
+  public static Map<String, List<String>> getMimetypeToExtension() {
+    Map<String, List<String>> map = new HashMap<>();
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
+      "inputFormatMimetypes");
+
+    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
+      // TODO add missing mimetypes
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
+
+      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
+    }
+
+    return map;
+  }
+
+  public static List<String> getInputExtensions() {
+    // TODO add missing extensions
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
+      "inputFormatExtensions");
+    return Arrays.asList(inputFormatExtensions.split(" "));
   }
 
 }

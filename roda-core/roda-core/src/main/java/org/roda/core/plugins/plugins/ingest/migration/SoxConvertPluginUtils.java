@@ -41,7 +41,8 @@ public class SoxConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("sox", "--version");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "versionCommand");
+    String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.replace(" ", "");
       version = version.substring(0, version.indexOf('\n'));

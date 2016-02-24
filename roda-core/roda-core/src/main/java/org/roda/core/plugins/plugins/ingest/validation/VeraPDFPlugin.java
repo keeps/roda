@@ -60,8 +60,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private String profile = "1b";
   private boolean hasFeatures = false;
   private long maxKbytes = 20000; // default 20000 kb
-  private boolean hasPartialSuccessOnOutcome = Boolean
-    .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  private boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
+    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
 
   @Override
   public void init() throws PluginException {
@@ -277,17 +277,17 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked if digital signatures were valid.";
+    return "Checked if PDF files were veraPDF valid.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Digital signatures were valid.";
+    return "PDF files were veraPDF validated.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to validate the digital signature or invalid signature.";
+    return "Failed to validate the PDF files with veraPDF.";
   }
 
 }

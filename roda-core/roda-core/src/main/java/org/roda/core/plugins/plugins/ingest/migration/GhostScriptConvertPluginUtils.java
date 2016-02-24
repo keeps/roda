@@ -50,7 +50,8 @@ public class GhostScriptConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String version = CommandUtility.execute("gs", "--version");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "versionCommand");
+    String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
       version = version.replace(" ", "_");
