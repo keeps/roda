@@ -19,11 +19,8 @@ import java.util.Map;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
-import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
-import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.Browse;
@@ -39,11 +36,12 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -55,8 +53,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.DateBox;
-import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
@@ -90,6 +86,7 @@ public class BasicSearch extends Composite {
       return "search";
     }
   };
+
   private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.AIP__ALL, "*"));
 
   private static BasicSearch instance = null;
@@ -115,6 +112,9 @@ public class BasicSearch extends Composite {
   FlowPanel searchDescription;
 
   @UiField
+  ListBox searchInputListBox;
+
+  @UiField
   TextBox searchInputBox;
 
   @UiField
@@ -133,6 +133,12 @@ public class BasicSearch extends Composite {
   FlowPanel searchAdvancedFieldsPanel;
 
   @UiField
+  FlowPanel filesSearchAdvancedFieldsPanel;
+
+  @UiField
+  FlowPanel representationsSearchAdvancedFieldsPanel;
+
+  @UiField
   Button searchAdvancedFieldOptionsAdd;
 
   @UiField
@@ -144,23 +150,15 @@ public class BasicSearch extends Composite {
   @UiField(provided = true)
   FlowPanel facetHasRepresentations;
 
-  // @UiField
-  // DateBox inputDateInitial;
-  // @UiField
-  // DateBox inputDateFinal;
-
   ListBox searchAdvancedFieldOptions;
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
-  // private final Map<String, TextBox> searchFieldTextBoxes = new
-  // HashMap<String, TextBox>();
 
   private BasicSearch() {
     Filter filter = DEFAULT_FILTER;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    // TODO externalise strings
-    searchResultPanel = new AIPList(filter, facets, "Search results");
+    searchResultPanel = new AIPList(filter, facets, messages.searchResults());
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
@@ -174,6 +172,24 @@ public class BasicSearch extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
+
+    searchInputListBox.addItem(messages.searchListBoxObjects(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
+    searchInputListBox.addItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
+    searchInputListBox.addItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
+
+    searchInputListBox.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
+          showSearchAdvancedFieldsPanel();
+        } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
+          showRepresentationsSearchAdvancedFieldsPanel();
+        } else {
+          showFilesSearchAdvancedFieldsPanel();
+        }
+      }
+    });
 
     searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -214,33 +230,6 @@ public class BasicSearch extends Composite {
 
     });
 
-    // DefaultFormat dateFormat = new
-    // DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-    // ValueChangeHandler<Date> valueChangeHandler = new
-    // ValueChangeHandler<Date>() {
-    //
-    // @Override
-    // public void onValueChange(ValueChangeEvent<Date> event) {
-    // updateDateFilter();
-    // }
-    //
-    // };
-    //
-    // inputDateInitial.getElement().setPropertyString("placeholder",
-    // messages.sidebarFilterFromDate());
-    // inputDateFinal.getElement().setPropertyString("placeholder",
-    // messages.sidebarFilterToDatePlaceHolder());
-    //
-    // inputDateInitial.setFormat(dateFormat);
-    // inputDateInitial.getDatePicker().setYearArrowsVisible(true);
-    // inputDateInitial.setFireNullValues(true);
-    // inputDateInitial.addValueChangeHandler(valueChangeHandler);
-    //
-    // inputDateFinal.setFormat(dateFormat);
-    // inputDateFinal.getDatePicker().setYearArrowsVisible(true);
-    // inputDateFinal.setFireNullValues(true);
-    // inputDateFinal.addValueChangeHandler(valueChangeHandler);
-
     BrowserService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
         @Override
@@ -259,14 +248,63 @@ public class BasicSearch extends Composite {
 
           for (SearchField searchField : searchFields) {
             if (searchField.isFixed()) {
-              SearchAdvancedFieldPanel searchAdvancedFieldPanel = new SearchAdvancedFieldPanel(
-                BasicSearch.this.searchFields, searchAdvancedFieldOptions);
-              addSearchFieldPanel(searchAdvancedFieldPanel);
-              searchAdvancedFieldPanel.selectSearchField(searchField.getField());
+              SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+              searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
+              searchFieldPanel.setSearchFields(BasicSearch.this.searchFields);
+              addSearchFieldPanel(searchFieldPanel);
+              searchFieldPanel.selectSearchField(searchField.getField());
             }
           }
         }
       });
+
+    createRepresentationsSearchAdvancedFieldsPanel();
+    createFilesSearchAdvancedFieldsPanel();
+    showSearchAdvancedFieldsPanel();
+  }
+  
+  // TODO define search fields
+  private void createRepresentationsSearchAdvancedFieldsPanel() {
+    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+    searchFieldPanel.simpleSearchField("1", "1", "text");
+    
+    SearchFieldPanel searchFieldPanel2 = new SearchFieldPanel();
+    searchFieldPanel2.simpleSearchField("2", "2", "date_interval");
+    
+    SearchFieldPanel searchFieldPanel3 = new SearchFieldPanel();
+    searchFieldPanel3.simpleSearchField("3", "3", "numeric");
+    
+    SearchFieldPanel searchFieldPanel4 = new SearchFieldPanel();
+    searchFieldPanel4.simpleSearchField("4", "4", "storage");
+    
+    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel);
+    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel2);
+    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel3);
+    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel4);
+  }
+
+  // TODO define search fields
+  private void createFilesSearchAdvancedFieldsPanel() {
+    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+    searchFieldPanel.simpleSearchField("filename", "Filename", "text");
+    
+    SearchFieldPanel searchFieldPanel2 = new SearchFieldPanel();
+    searchFieldPanel2.simpleSearchField("2", "2", "date_interval");
+    
+    SearchFieldPanel searchFieldPanel3 = new SearchFieldPanel();
+    searchFieldPanel3.simpleSearchField("3", "3", "numeric");
+    
+    SearchFieldPanel searchFieldPanel4 = new SearchFieldPanel();
+    searchFieldPanel4.simpleSearchField("filesize", "Filesize", "storage");
+    
+    SearchFieldPanel searchFieldPanel5 = new SearchFieldPanel();
+    searchFieldPanel5.simpleSearchField("fulltext", "Fulltext", "text");
+    
+    filesSearchAdvancedFieldsPanel.add(searchFieldPanel);
+    filesSearchAdvancedFieldsPanel.add(searchFieldPanel2);
+    filesSearchAdvancedFieldsPanel.add(searchFieldPanel3);
+    filesSearchAdvancedFieldsPanel.add(searchFieldPanel4);
+    filesSearchAdvancedFieldsPanel.add(searchFieldPanel5);
   }
 
   private void showSearchAdvancedPanel() {
@@ -277,17 +315,6 @@ public class BasicSearch extends Composite {
       searchAdvancedDisclosureButton.removeStyleName("open");
     }
   }
-
-  // private void updateDateFilter() {
-  // Date dateInitial = inputDateInitial.getDatePicker().getValue();
-  // Date dateFinal = inputDateFinal.getDatePicker().getValue();
-  //
-  // DateIntervalFilterParameter filterParameter = new
-  // DateIntervalFilterParameter(RodaConstants.AIP_DATE_INITIAL,
-  // RodaConstants.AIP_DATE_FINAL, dateInitial, dateFinal);
-  //
-  // searchResultPanel.setFilter(new Filter(filterParameter));
-  // }
 
   protected void view(String id) {
     Tools.newHistory(Browse.RESOLVER, id);
@@ -303,8 +330,7 @@ public class BasicSearch extends Composite {
     }
 
     for (int i = 0; i < searchAdvancedFieldsPanel.getWidgetCount(); i++) {
-      SearchAdvancedFieldPanel searchAdvancedFieldPanel = (SearchAdvancedFieldPanel) searchAdvancedFieldsPanel
-        .getWidget(i);
+      SearchFieldPanel searchAdvancedFieldPanel = (SearchFieldPanel) searchAdvancedFieldsPanel.getWidget(i);
       FilterParameter filterParameter = searchAdvancedFieldPanel.getFilter();
 
       if (filterParameter != null) {
@@ -319,7 +345,6 @@ public class BasicSearch extends Composite {
       filter = new Filter(parameters);
     }
     searchResultPanel.setFilter(filter);
-
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -334,10 +359,11 @@ public class BasicSearch extends Composite {
 
   @UiHandler("searchAdvancedFieldOptionsAdd")
   void handleSearchAdvancedFieldAdd(ClickEvent e) {
-    SearchAdvancedFieldPanel searchAdvancedFieldPanel = new SearchAdvancedFieldPanel(searchFields,
-      searchAdvancedFieldOptions);
-    searchAdvancedFieldPanel.selectFirstSearchField();
-    addSearchFieldPanel(searchAdvancedFieldPanel);
+    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+    searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
+    searchFieldPanel.setSearchFields(searchFields);
+    searchFieldPanel.selectFirstSearchField();
+    addSearchFieldPanel(searchFieldPanel);
   }
 
   @UiHandler("searchAdvancedGo")
@@ -345,8 +371,8 @@ public class BasicSearch extends Composite {
     doSearch();
   }
 
-  private void addSearchFieldPanel(final SearchAdvancedFieldPanel searchAdvancedFieldPanel) {
-    searchAdvancedFieldsPanel.add(searchAdvancedFieldPanel);
+  private void addSearchFieldPanel(final SearchFieldPanel searchFieldPanel) {
+    searchAdvancedFieldsPanel.add(searchFieldPanel);
     searchAdvancedFieldsPanel.removeStyleName("empty");
     searchAdvancedGo.setEnabled(true);
 
@@ -354,7 +380,7 @@ public class BasicSearch extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        searchAdvancedFieldsPanel.remove(searchAdvancedFieldPanel);
+        searchAdvancedFieldsPanel.remove(searchFieldPanel);
         if (searchAdvancedFieldsPanel.getWidgetCount() == 0) {
           searchAdvancedFieldsPanel.addStyleName("empty");
           searchAdvancedGo.setEnabled(false);
@@ -362,161 +388,24 @@ public class BasicSearch extends Composite {
       }
     };
 
-    searchAdvancedFieldPanel.addRemoveClickHandler(clickHandler);
+    searchFieldPanel.addRemoveClickHandler(clickHandler);
   }
 
-  public class SearchAdvancedFieldPanel extends Composite {
-    private FlowPanel panel;
-    private FlowPanel leftPanel;
-    private ListBox searchAdvancedFields;
-    private Map<String, SearchField> searchFields;
-    private Button remove = new Button("<i class=\"fa fa-close\"></i>");
+  public void showSearchAdvancedFieldsPanel() {
+    searchAdvancedFieldsPanel.setVisible(true);
+    filesSearchAdvancedFieldsPanel.setVisible(false);
+    representationsSearchAdvancedFieldsPanel.setVisible(false);
+  }
 
-    // Text
-    private TextBox inputText;
-    // Date
-    private DateBox inputDateBox;
-    // Date interval
-    private DateBox inputDateBoxFrom;
-    private DateBox inputDateBoxTo;
-    // Numeric
-    private TextBox inputNumeric;
-    // Numeric interval
-    private TextBox inputNumericFrom;
-    private TextBox inputNumericTo;
-    // Storage
+  public void showRepresentationsSearchAdvancedFieldsPanel() {
+    searchAdvancedFieldsPanel.setVisible(false);
+    filesSearchAdvancedFieldsPanel.setVisible(false);
+    representationsSearchAdvancedFieldsPanel.setVisible(true);
+  }
 
-    public SearchAdvancedFieldPanel(Map<String, SearchField> searchFields, ListBox searchAdvancedFieldOptions) {
-      panel = new FlowPanel();
-      leftPanel = new FlowPanel();
-      searchAdvancedFields = new ListBox();
-
-      DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
-
-      inputText = new TextBox();
-
-      inputDateBox = new DateBox();
-      inputDateBox.setFormat(dateFormat);
-      inputDateBox.getDatePicker().setYearArrowsVisible(true);
-      inputDateBox.setFireNullValues(true);
-      inputDateBox.getElement().setPropertyString("placeholder", "yyyy-mm-dd");
-
-      inputDateBoxFrom = new DateBox();
-      inputDateBoxFrom.setFormat(dateFormat);
-      inputDateBoxFrom.getDatePicker().setYearArrowsVisible(true);
-      inputDateBoxFrom.setFireNullValues(true);
-      inputDateBoxFrom.getElement().setPropertyString("placeholder", "yyyy-mm-dd");
-
-      inputDateBoxTo = new DateBox();
-      inputDateBoxTo.setFormat(dateFormat);
-      inputDateBoxTo.getDatePicker().setYearArrowsVisible(true);
-      inputDateBoxTo.setFireNullValues(true);
-      inputDateBoxTo.getElement().setPropertyString("placeholder", "yyyy-mm-dd");
-
-      inputNumeric = new TextBox();
-      inputNumeric.getElement().setPropertyString("placeholder", "Ex: 1000");
-      inputNumericFrom = new TextBox();
-      inputNumericFrom.getElement().setPropertyString("placeholder", "Ex: 0");
-      inputNumericTo = new TextBox();
-      inputNumericTo.getElement().setPropertyString("placeholder", "Ex: 1000");
-
-      this.searchFields = searchFields;
-
-      ListboxUtils.copyValues(searchAdvancedFieldOptions, searchAdvancedFields);
-
-      panel.add(leftPanel);
-      panel.add(remove);
-
-      initWidget(panel);
-
-      searchAdvancedFields.addStyleName("form-listbox");
-
-      searchAdvancedFields.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          setValue(searchAdvancedFields.getSelectedValue());
-        }
-      });
-
-      panel.addStyleName("search-field");
-      leftPanel.addStyleName("search-field-left-panel");
-      leftPanel.addStyleName("full_width");
-      remove.addStyleName("search-field-remove");
-
-      inputText.addStyleName("form-textbox");
-      inputDateBox.addStyleName("form-textbox form-textbox-small");
-      inputDateBoxFrom.addStyleName("form-textbox form-textbox-small");
-      inputDateBoxTo.addStyleName("form-textbox form-textbox-small");
-      inputNumeric.addStyleName("form-textbox form-textbox-small");
-      inputNumericFrom.addStyleName("form-textbox form-textbox-small");
-      inputNumericTo.addStyleName("form-textbox form-textbox-small");
-    }
-
-    public void selectSearchField(String field) {
-      ListboxUtils.select(searchAdvancedFields, field);
-      setValue(field);
-    }
-
-    public void selectFirstSearchField() {
-      if (searchAdvancedFields.getItemCount() > 0) {
-        setValue(searchAdvancedFields.getValue(0));
-      }
-    }
-
-    public void addRemoveClickHandler(ClickHandler clickHandler) {
-      remove.addClickHandler(clickHandler);
-    }
-
-    public String getField() {
-      return searchAdvancedFields.getSelectedValue();
-    }
-
-    public FilterParameter getFilter() {
-      FilterParameter filterParameter = null;
-      String field = searchAdvancedFields.getSelectedValue();
-      SearchField searchField = searchFields.get(searchAdvancedFields.getSelectedValue());
-
-      // TODO validate inputs!
-      if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
-        filterParameter = new BasicSearchFilterParameter(field, inputDateBox.getValue().toString());
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
-        filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
-          inputDateBoxTo.getValue());
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
-        filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
-        filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
-          Long.valueOf(inputNumericTo.getValue()));
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
-      } else {
-        filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
-      }
-
-      return filterParameter;
-    }
-
-    public void setValue(String field) {
-      SearchField searchField = searchFields.get(field);
-      leftPanel.clear();
-      leftPanel.add(searchAdvancedFields);
-      leftPanel.removeStyleName("full_width");
-
-      if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
-        leftPanel.add(inputDateBox);
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
-        leftPanel.add(inputDateBoxFrom);
-        leftPanel.add(inputDateBoxTo);
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
-        leftPanel.add(inputNumeric);
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
-        leftPanel.add(inputNumericFrom);
-        leftPanel.add(inputNumericTo);
-      } else if (searchField.getType().equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
-      } else {
-        leftPanel.add(inputText);
-        leftPanel.addStyleName("full_width");
-      }
-    }
+  public void showFilesSearchAdvancedFieldsPanel() {
+    searchAdvancedFieldsPanel.setVisible(false);
+    filesSearchAdvancedFieldsPanel.setVisible(true);
+    representationsSearchAdvancedFieldsPanel.setVisible(false);
   }
 }

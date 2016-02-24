@@ -575,6 +575,9 @@ public final class RodaConstants {
    */
   public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
 
+  public static final String SEARCH_LIST_BOX_ITEMS = "items";
+  public static final String SEARCH_LIST_BOX_REPRESENTATIONS = "representations";
+  public static final String SEARCH_LIST_BOX_FILES = "files";
   public static final String SEARCH_FIELD_TYPE_TEXT = "text";
   public static final String SEARCH_FIELD_TYPE_DATE = "date";
   public static final String SEARCH_FIELD_TYPE_DATE_INTERVAL = "date_interval";

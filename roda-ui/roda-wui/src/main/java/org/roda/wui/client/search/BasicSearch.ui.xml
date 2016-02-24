@@ -31,7 +31,10 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="searchPanel">
 					<g:FlowPanel styleName="searchPanelLeft">
-						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+						<g:ListBox ui:field="searchInputListBox" addStyleNames="searchListBox" />
+						<g:FlowPanel styleName="searchPanelLeftInput">
+							<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+						</g:FlowPanel>
 					</g:FlowPanel>
 					<g:FlowPanel styleName="searchPanelRight">
 						<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
@@ -57,6 +60,10 @@
 					ui:field="searchAdvancedPanel">
 					<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
 						styleName="searchAdvancedFieldsPanel empty" />
+					<g:FlowPanel ui:field="representationsSearchAdvancedFieldsPanel"
+						styleName="searchAdvancedFieldsPanel empty" />
+					<g:FlowPanel ui:field="filesSearchAdvancedFieldsPanel"
+						styleName="searchAdvancedFieldsPanel empty" />
 					<g:FlowPanel styleName="searchAdvancedFieldAdd">
 						<g:Button styleName="btn btn-plus {style.addbutton}"
 							ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
@@ -80,16 +87,6 @@
 						</g:Label>
 						<g:FlowPanel ui:field="facetHasRepresentations" />
 					</g:FlowPanel>
-<!-- 					<g:Label addStyleNames="h5 sidebar-facet-title"> -->
-<!-- 						<ui:text from='{messages.sidebarFilterDates}' /> -->
-<!-- 					</g:Label> -->
-<!-- 					<d:DateBox -->
-<!-- 						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date" -->
-<!-- 						ui:field="inputDateInitial" /> -->
-<!-- 					<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label> -->
-<!-- 					<d:DateBox -->
-<!-- 						addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date" -->
-<!-- 						ui:field="inputDateFinal" /> -->
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

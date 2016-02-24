@@ -13,6 +13,8 @@ package org.roda.wui.client.planning;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
@@ -34,7 +36,8 @@ public class Planning {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      callback.onSuccess(true);
+      // TODO define check roles
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -80,7 +83,7 @@ public class Planning {
       init();
       callback.onSuccess(page);
     } else {
-      
+
     }
   }
 }

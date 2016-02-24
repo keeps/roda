@@ -389,8 +389,38 @@ public interface BrowseMessages extends Messages {
   String browseRemoveConfirmDialogMessage();
 
   /************* Search ****************/
-  @DefaultMessage("Search records...")
+  @DefaultMessage("Intelectual entities")
+  String searchListBoxObjects();
+  
+  @DefaultMessage("Representations")
+  String searchListBoxRepresentations();
+  
+  @DefaultMessage("Files")
+  String searchListBoxFiles();
+  
+  @DefaultMessage("Search...")
   String searchPlaceHolder();
+  
+  @DefaultMessage("Search results")
+  String searchResults();
+  
+  @DefaultMessage("2008-05-12")
+  String searchFieldDatePlaceHolder();
+  
+  @DefaultMessage("2008-05-12")
+  String searchFieldDateFromPlaceHolder();
+  
+  @DefaultMessage("2016-06-20")
+  String searchFieldDateToPlaceHolder();
+  
+  @DefaultMessage("42")
+  String searchFieldNumericPlaceHolder();
+  
+  @DefaultMessage("42")
+  String searchFieldNumericFromPlaceHolder();
+  
+  @DefaultMessage("108")
+  String searchFieldNumericToPlaceHolder();
 
   /************* Preservation Event List ****************/
 

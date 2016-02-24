@@ -250,7 +250,8 @@ pre>code {
 	width: auto;
 }
 
-.form-textbox-small+.form-textbox-small {
+.form-textbox-small+.form-textbox-small,
+.form-textbox-small+.form-listbox {
 	margin-left: 5px;
 }
 
@@ -1297,6 +1298,10 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseBreadcrumb {
+}
+
+.browseNewDescriptiveMetadataButton {
+	margin-bottom: 20px;
 }
 
 .browseItemPanel {
@@ -2388,11 +2393,32 @@ td.datePickerMonth, td.datePickerYear {
 .searchPanel {
 	margin-right: 80px;
 	height: 40px;
+	background-color: #eee;
 }
 
 .searchPanelLeft {
 	float: left;
 	width: 100%;
+	display: table;
+}
+
+.searchPanelLeft select {
+	display: table-cell;
+	vertical-align: top;
+	background-color: #089de3;
+	color: white;
+	height: 4rem;
+    line-height: 4rem;
+    font-size: 1.5rem;
+	border: none;
+	padding-left: 20px;
+	padding-right: 20px;
+}
+
+.searchPanelLeft .searchPanelLeftInput {
+	display: table-cell;
+	width: 100%;
+	vertical-align: top;
 }
 
 .searchPanelRight {
@@ -2423,7 +2449,6 @@ td.datePickerMonth, td.datePickerYear {
 	cursor: hand;
 	position: relative;
 	float: left;
-	/* 	margin-right: -40px; */
     height: 40px;
     width: 40px;
     background-color: #089de3;
@@ -2498,19 +2523,29 @@ td.datePickerMonth, td.datePickerYear {
 
 .search-field-left-panel {
 	float: left;
-	display: inline-flex;
-}
-
-.search-field-left-panel.full_width {
-	width: 100%;
+	display: table;
 }
 
 .search-field-left-panel select {
+	display: table-cell;
+	vertical-align: top;
 	margin-right: 5px;
+	overflow: hidden !important;
+	max-width: 250px;
+	height: 28px;
 }
 
+.search-field-left-panel .search-field-input-panel {
+	display: table-cell;
+	vertical-align: top;
+}
+
+.search-field-left-panel .search-field-input-panel.full_width {
+	width: 100%;
+}
+	
 .search-field-label {
-	display: inline;
+	width: 120px;
 }
 
 .search-field-remove {
@@ -2526,7 +2561,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .search-field-left-panel .form-textbox-small {
-/* 	width: 49%; */
+	max-width: 85px;
 }
 
 .searchAdvancedFieldsPanel+.searchAdvancedFieldAdd {
