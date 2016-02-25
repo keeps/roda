@@ -21,8 +21,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -60,6 +58,7 @@ import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
@@ -70,7 +69,6 @@ import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.util.DateParser;
 
 /**
  * Class that "relates" Model & Storage
@@ -478,7 +476,7 @@ public class ModelService extends ModelObservable {
     boolean createIfNotExists = false;
 
     // Create version snapshot
-    createBinaryVersion(binaryPath, message);
+    storage.createBinaryVersion(binaryPath, message);
 
     // Update
     storage.updateBinaryContent(binaryPath, descriptiveMetadataPayload, asReference, createIfNotExists);
@@ -502,30 +500,6 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void createBinaryVersion(StoragePath binaryPath, String label)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-
-    String version;
-    int i = Iterables.size(storage.listBinaryVersions(binaryPath));
-
-    if (StringUtils.isBlank(label)) {
-      label = DateParser.getIsoDate(new Date());
-    }
-
-    boolean created = false;
-    int retries = 100;
-    while (!created && --retries > 0) {
-      version = label + " (" + (i++ + 1) + ")";
-      try {
-        storage.createBinaryVersion(binaryPath, version);
-        created = true;
-      } catch (AlreadyExistsException e) {
-        LOGGER
-          .warn("Struggling to create an unique binary version for " + binaryPath + " (retries left " + retries + ")");
-      }
-    }
-  }
-
   public void deleteDescriptiveMetadata(String aipId, String descriptiveMetadataId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
@@ -545,6 +519,22 @@ public class ModelService extends ModelObservable {
 
     notifyDescriptiveMetadataDeleted(aipId, descriptiveMetadataId);
 
+  }
+
+  public CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+    return storage.listBinaryVersions(binaryPath);
+  }
+
+  public BinaryVersion revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
+    String message) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
+
+    BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, message);
+    storage.revertBinaryVersion(binaryPath, versionId);
+
+    return currentVersion;
   }
 
   public Representation retrieveRepresentation(String aipId, String representationId)

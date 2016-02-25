@@ -14,7 +14,9 @@ public interface BinaryVersion extends Serializable {
 
   Binary getBinary();
 
-  String getLabel();
+  String getId();
+  
+  String getMessage();
 
   Date getCreatedDate();
 

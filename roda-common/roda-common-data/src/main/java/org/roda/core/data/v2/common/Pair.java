@@ -5,16 +5,24 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.common;
+package org.roda.core.data.v2.common;
 
-public class Pair<K, V> {
+import java.io.Serializable;
 
-  private K fst;
-  private V snd;
+public class Pair<K, V> implements Serializable {
+
+  private static final long serialVersionUID = 7007664193360343231L;
+
+  private K first;
+  private V second;
+
+  public Pair() {
+    super();
+  }
 
   public Pair(K first, V second) {
-    this.fst = first;
-    this.snd = second;
+    this.first = first;
+    this.second = second;
   }
 
   public static <K, V> Pair<K, V> create(K key, V value) {
@@ -22,27 +30,27 @@ public class Pair<K, V> {
   }
 
   public K getFirst() {
-    return this.fst;
+    return this.first;
   }
 
   public void setFirst(K value) {
-    this.fst = value;
+    this.first = value;
   }
 
   public V getSecond() {
-    return this.snd;
+    return this.second;
   }
 
   public void setSecond(V value) {
-    this.snd = value;
+    this.second = value;
   }
 
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((fst == null) ? 0 : fst.hashCode());
-    result = prime * result + ((snd == null) ? 0 : snd.hashCode());
+    result = prime * result + ((first == null) ? 0 : first.hashCode());
+    result = prime * result + ((second == null) ? 0 : second.hashCode());
     return result;
   }
 
@@ -58,18 +66,18 @@ public class Pair<K, V> {
       return false;
     }
     Pair<?, ?> other = (Pair<?, ?>) obj;
-    if (fst == null) {
-      if (other.fst != null) {
+    if (first == null) {
+      if (other.first != null) {
         return false;
       }
-    } else if (!fst.equals(other.fst)) {
+    } else if (!first.equals(other.first)) {
       return false;
     }
-    if (snd == null) {
-      if (other.snd != null) {
+    if (second == null) {
+      if (other.second != null) {
         return false;
       }
-    } else if (!snd.equals(other.snd)) {
+    } else if (!second.equals(other.second)) {
       return false;
     }
     return true;

@@ -49,7 +49,6 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.Pair;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -58,6 +57,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -87,6 +87,7 @@ import org.roda.disseminators.common.tools.ZipEntryInfo;
 import org.roda.disseminators.common.tools.ZipTools;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
+import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
@@ -1041,16 +1042,12 @@ public class BrowserHelper {
     return files;
   }
 
-  public static Map<String, Date> listDescriptiveMetadataVersions(String aipId, String descriptiveMetadataId)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public static CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId,
+    String descriptiveMetadataId)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
-    CloseableIterable<BinaryVersion> binaryVersions = RodaCoreFactory.getStorageService()
-      .listBinaryVersions(storagePath);
-    Map<String, Date> ret = new HashMap<>();
-    for (BinaryVersion binaryVersion : binaryVersions) {
-      ret.put(binaryVersion.getLabel(), binaryVersion.getCreatedDate());
-    }
-    return ret;
+    return RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
+
   }
 
   public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String metadataId,
@@ -1059,18 +1056,23 @@ public class BrowserHelper {
 
     IndexedAIP aip = getIndexedAIP(aipId);
     DescriptiveMetadataViewBundle descriptiveMetadataBundle = getDescriptiveMetadataBundle(aipId, metadataId, locale);
-    Map<String, Date> versions = listDescriptiveMetadataVersions(aipId, metadataId);
+
+    List<BinaryVersionBundle> versionBundles = new ArrayList<>();
+
+    for (BinaryVersion v : listDescriptiveMetadataVersions(aipId, metadataId)) {
+      versionBundles.add(new BinaryVersionBundle(v.getId(), v.getMessage(), v.getCreatedDate()));
+    }
+
     bundle.setAip(aip);
     bundle.setDescriptiveMetadata(descriptiveMetadataBundle);
-    bundle.setVersions(versions);
+    bundle.setVersions(versionBundles);
     return bundle;
   }
 
   public static void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     String message) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
-    RodaCoreFactory.getModelService().createBinaryVersion(storagePath, message);
-    RodaCoreFactory.getStorageService().revertBinaryVersion(storagePath, versionId);
+    RodaCoreFactory.getModelService().revertDescriptiveMetadataVersion(aipId, descriptiveMetadataId, versionId,
+      message);
   }
 
   public static void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)

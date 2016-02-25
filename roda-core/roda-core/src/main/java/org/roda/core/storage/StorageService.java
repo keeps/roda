@@ -342,8 +342,8 @@ public interface StorageService {
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException;
 
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, String version)
-    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException;
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, String message)
+    throws RequestNotValidException, NotFoundException, GenericException;
 
   public void revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException;

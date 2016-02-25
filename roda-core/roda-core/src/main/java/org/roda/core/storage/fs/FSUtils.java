@@ -40,6 +40,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
@@ -63,6 +64,7 @@ public final class FSUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(FSUtils.class);
   private static final char VERSION_SEP = '_';
+  private static final String METADATA_SUFFIX = ".json";
 
   /**
    * Private empty constructor
@@ -245,7 +247,8 @@ public final class FSUtils {
     return resourcePath;
   }
 
-  public static Path getEntityPath(Path basePath, StoragePath storagePath, String version) throws RequestNotValidException {
+  public static Path getEntityPath(Path basePath, StoragePath storagePath, String version)
+    throws RequestNotValidException {
     if (version.indexOf(VERSION_SEP) >= 0) {
       throw new RequestNotValidException("Cannot use '" + VERSION_SEP + "' in version " + version);
     }
@@ -511,16 +514,23 @@ public final class FSUtils {
     return resource;
   }
 
-  public static BinaryVersion convertPathToBinaryVersion(Path historyPath, Path path)
+  public static Path getBinaryHistoryMetadataPath(Path historyDataPath, Path historyMetadataPath, Path path) {
+    Path relativePath = historyDataPath.relativize(path);
+    String fileName = relativePath.getFileName().toString();
+    Path metadataPath = historyMetadataPath.resolve(relativePath.getParent().resolve(fileName + METADATA_SUFFIX));
+    return metadataPath;
+  }
+
+  public static BinaryVersion convertPathToBinaryVersion(Path historyDataPath, Path historyMetadataPath, Path path)
     throws RequestNotValidException, NotFoundException, GenericException {
-    BinaryVersion ret = null;
+    DefaultBinaryVersion ret = null;
 
     if (!Files.exists(path)) {
       throw new NotFoundException("Cannot find file version at " + path);
     }
 
     // storage path
-    Path relativePath = historyPath.relativize(path);
+    Path relativePath = historyDataPath.relativize(path);
     String fileName = relativePath.getFileName().toString();
     int lastIndexOfDot = fileName.lastIndexOf(VERSION_SEP);
 
@@ -528,9 +538,10 @@ public final class FSUtils {
       throw new RequestNotValidException("Bad name for versioned file: " + path);
     }
 
-    String version = fileName.substring(lastIndexOfDot + 1);
+    String id = fileName.substring(lastIndexOfDot + 1);
     String realFileName = fileName.substring(0, lastIndexOfDot);
     Path realFilePath = relativePath.getParent().resolve(realFileName);
+    Path metadataPath = historyMetadataPath.resolve(relativePath.getParent().resolve(fileName + METADATA_SUFFIX));
 
     StoragePath storagePath = DefaultStoragePath.parse(realFilePath.toString());
 
@@ -541,9 +552,16 @@ public final class FSUtils {
       sizeInBytes = Files.size(path);
       Map<String, String> contentDigest = null;
       Binary binary = new DefaultBinary(storagePath, content, sizeInBytes, false, contentDigest);
-      // TODO get created date from a metadata file
-      Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
-      ret = new DefaultBinaryVersion(binary, version, createdDate);
+
+      if (Files.exists(metadataPath)) {
+        ret = JsonUtils.readObjectFromFile(metadataPath, DefaultBinaryVersion.class);
+        ret.setBinary(binary);
+      } else {
+        Date createdDate = new Date(Files.readAttributes(path, BasicFileAttributes.class).creationTime().toMillis());
+        String message = "";
+        ret = new DefaultBinaryVersion(binary, id, message, createdDate);
+      }
+
     } catch (IOException e) {
       throw new GenericException("Could not get file size", e);
     }
@@ -670,9 +688,10 @@ public final class FSUtils {
     return file;
   }
 
-  public static CloseableIterable<BinaryVersion> listBinaryVersions(Path historyPath, StoragePath storagePath)
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Path fauxPath = historyPath.resolve(storagePath.asString());
+  public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
+    final Path historyMetadataPath, final StoragePath storagePath)
+      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Path fauxPath = historyDataPath.resolve(storagePath.asString());
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
 
@@ -708,7 +727,7 @@ public final class FSUtils {
               Path next = pathIterator.next();
               BinaryVersion ret;
               try {
-                ret = convertPathToBinaryVersion(historyPath, next);
+                ret = convertPathToBinaryVersion(historyDataPath, historyMetadataPath, next);
               } catch (GenericException | NotFoundException | RequestNotValidException e) {
                 LOGGER.error("Error while list path " + parent + " while parsing resource " + next, e);
                 ret = null;
@@ -735,16 +754,16 @@ public final class FSUtils {
     return iterable;
   }
 
-  public static void deleteEmptyAncestorsQuietly(Path binVersionPath) {
+  public static void deleteEmptyAncestorsQuietly(Path binVersionPath, Path upToParent) {
     if (binVersionPath == null) {
       return;
     }
 
     Path parent = binVersionPath.getParent();
-    while (parent != null) {
+    while (parent != null && !parent.equals(upToParent)) {
       try {
         Files.deleteIfExists(parent);
-        parent = binVersionPath.getParent();
+        parent = parent.getParent();
       } catch (DirectoryNotEmptyException e) {
         // cancel clean-up
         parent = null;

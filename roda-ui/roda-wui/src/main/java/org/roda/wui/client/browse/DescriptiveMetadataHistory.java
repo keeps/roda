@@ -15,7 +15,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.Map.Entry;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
@@ -170,28 +169,29 @@ public class DescriptiveMetadataHistory extends Composite {
 
   private void init() {
     // sort
-    List<Entry<String, Date>> versionList = new ArrayList<>(bundle.getVersions().entrySet());
-    Collections.sort(versionList, new Comparator<Entry<String, Date>>() {
+    List<BinaryVersionBundle> versionList = new ArrayList<>(bundle.getVersions());
+    Collections.sort(versionList, new Comparator<BinaryVersionBundle>() {
 
       @Override
-      public int compare(Entry<String, Date> d1, Entry<String, Date> d2) {
-        return (int) (d2.getValue().getTime() - d1.getValue().getTime());
+      public int compare(BinaryVersionBundle v1, BinaryVersionBundle v2) {
+        return (int) (v2.getCreatedDate().getTime() - v1.getCreatedDate().getTime());
       }
     });
 
     // create list layout
-    for (Entry<String, Date> version : versionList) {
-      String versionKey = version.getKey();
-      Date createdDate = version.getValue();
+    for (BinaryVersionBundle version : versionList) {
+      String versionKey = version.getId();
+      String message = version.getMessage();
+      Date createdDate = version.getCreatedDate();
 
-      list.addItem(messages.descriptiveMetadataHistoryLabel(versionKey, createdDate), versionKey);
+      list.addItem(messages.descriptiveMetadataHistoryLabel(message, createdDate), versionKey);
     }
 
     descriptiveMetadataType.setText(bundle.getDescriptiveMetadata().getLabel());
 
     if (versionList.size() > 0) {
       list.setSelectedIndex(0);
-      selectedVersion = versionList.get(0).getKey();
+      selectedVersion = versionList.get(0).getId();
       updatePreview();
     }
   }

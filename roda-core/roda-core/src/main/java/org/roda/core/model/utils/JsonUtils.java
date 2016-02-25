@@ -41,12 +41,15 @@ public class JsonUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(JsonUtils.class);
 
-  public static void appendObjectToFile(Object object, Path file) throws GenericException {
+  public static <T> T readObjectFromFile(Path jsonFile, Class<T> objectClass) throws GenericException {
+    InputStream stream;
     try {
-      String json = getJsonFromObject(object) + "\n";
-      Files.write(file, json.getBytes(), StandardOpenOption.APPEND);
+      stream = Files.newInputStream(jsonFile);
+      T obj = getObjectFromJson(stream, objectClass);
+      IOUtils.closeQuietly(stream);
+      return obj;
     } catch (IOException e) {
-      throw new GenericException("Error writing object, as json, to file", e);
+      throw new GenericException(e);
     }
   }
 
@@ -54,6 +57,15 @@ public class JsonUtils {
     try {
       String json = getJsonFromObject(object);
       Files.write(file, json.getBytes(), StandardOpenOption.CREATE);
+    } catch (IOException e) {
+      throw new GenericException("Error writing object, as json, to file", e);
+    }
+  }
+
+  public static void appendObjectToFile(Object object, Path file) throws GenericException {
+    try {
+      String json = getJsonFromObject(object) + "\n";
+      Files.write(file, json.getBytes(), StandardOpenOption.APPEND);
     } catch (IOException e) {
       throw new GenericException("Error writing object, as json, to file", e);
     }

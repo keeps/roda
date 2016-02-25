@@ -8,9 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 
@@ -21,14 +19,14 @@ public class DescriptiveMetadataVersionsBundle implements Serializable {
   private IndexedAIP aip;
   private List<IndexedAIP> aipAncestors;
   private DescriptiveMetadataViewBundle descriptiveMetadata;
-  private Map<String, Date> versions;
+  private List<BinaryVersionBundle> versions;
 
   public DescriptiveMetadataVersionsBundle() {
     super();
   }
 
   public DescriptiveMetadataVersionsBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
-    DescriptiveMetadataViewBundle descriptiveMetadata, Map<String, Date> versions) {
+    DescriptiveMetadataViewBundle descriptiveMetadata, List<BinaryVersionBundle> versions) {
     super();
     this.aip = aip;
     this.aipAncestors = aipAncestors;
@@ -60,11 +58,11 @@ public class DescriptiveMetadataVersionsBundle implements Serializable {
     this.descriptiveMetadata = descriptiveMetadata;
   }
 
-  public Map<String, Date> getVersions() {
+  public List<BinaryVersionBundle> getVersions() {
     return versions;
   }
 
-  public void setVersions(Map<String, Date> versions) {
+  public void setVersions(List<BinaryVersionBundle> versions) {
     this.versions = versions;
   }
 

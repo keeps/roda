@@ -16,7 +16,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.roda.core.storage.ContentPayload;
 
 public class RandomMockContentPayload implements ContentPayload {
   private String content;

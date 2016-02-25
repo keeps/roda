@@ -903,65 +903,59 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
     getStorage().createBinary(binaryStoragePath, payload1, false);
 
     // 2) create binary version
-    String version1 = "v1";
-    getStorage().createBinaryVersion(binaryStoragePath, version1);
+    String message1 = "v1";
+    BinaryVersion v1 = getStorage().createBinaryVersion(binaryStoragePath, message1);
 
     // 3) update binary
     final ContentPayload payload2 = new RandomMockContentPayload();
     getStorage().updateBinaryContent(binaryStoragePath, payload2, false, false);
 
     // 4) create binary version 2
-    String version2 = "v2";
-    getStorage().createBinaryVersion(binaryStoragePath, version2);
+    String message2 = "v2";
+    BinaryVersion v2 = getStorage().createBinaryVersion(binaryStoragePath, message2);
 
-    // 5) create a version that already exists
-    try {
-      getStorage().createBinaryVersion(binaryStoragePath, version1);
-      fail("Should have thrown an AlreadyExistsException");
-    } catch (AlreadyExistsException e) {
-      // expected exception
-    }
+    // 5) create a version with a message that already exists
+    BinaryVersion v3 = getStorage().createBinaryVersion(binaryStoragePath, message1);
 
     // 6) list binary versions
     CloseableIterable<BinaryVersion> binaryVersions = getStorage().listBinaryVersions(binaryStoragePath);
     List<BinaryVersion> reusableBinaryVersions = new ArrayList<>();
     Iterables.addAll(reusableBinaryVersions, binaryVersions);
 
-    assertEquals(2, reusableBinaryVersions.size());
+    assertEquals(3, reusableBinaryVersions.size());
 
     // 7) get binary version
-    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, version1);
-    assertEquals(version1, binaryVersion1.getLabel());
+    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+    assertEquals(message1, binaryVersion1.getMessage());
     assertNotNull(binaryVersion1.getCreatedDate());
     assertTrue(
       IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
 
     // 8) revert to previous version
-    getStorage().revertBinaryVersion(binaryStoragePath, version1);
+    getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
 
     Binary binary = getStorage().getBinary(binaryStoragePath);
     testBinaryContent(binary, payload1);
 
     // 9) delete binary version
-    getStorage().deleteBinaryVersion(binaryStoragePath, version1);
+    getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
 
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, version1);
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
       fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
     }
-    
+
     // 10) delete binary and all its history
     getStorage().deleteResource(binaryStoragePath);
-    
+
     try {
-      getStorage().getBinaryVersion(binaryStoragePath, version1);
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
       fail("Should have thrown NotFoundException");
     } catch (NotFoundException e) {
       // do nothing
     }
-    
 
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
