@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class JsonUtils {
 
@@ -126,8 +128,8 @@ public class JsonUtils {
     try {
       JsonFactory factory = new JsonFactory();
       ObjectMapper mapper = new ObjectMapper(factory);
-      ret = mapper.readValue(json, new TypeReference<List<T>>() {
-      });
+      TypeFactory t = TypeFactory.defaultInstance();
+      ret = mapper.readValue(json, t.constructCollectionType(ArrayList.class, objectClass));
     } catch (IOException e) {
       throw new GenericException("Error while parsing JSON", e);
     }
