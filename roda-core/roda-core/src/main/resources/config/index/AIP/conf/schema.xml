@@ -132,7 +132,7 @@
    <field name="dateInitial" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="dateFinal" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
 
-   <field name="_all" type="text_general" indexed="true" stored="false" multiValued="true" />
+   <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 
@@ -192,7 +192,7 @@
         is added to the index.  It's used either to index the same field differently,
         or to add multiple fields to the same field for easier/faster searching.  -->
  <copyField source="title" dest="title_sort" />
- <copyField source="*" dest="_all" />
+ <copyField source="*" dest="search" />
     <!--
    <copyField source="title" dest="text"/>
    <copyField source="body" dest="text"/>

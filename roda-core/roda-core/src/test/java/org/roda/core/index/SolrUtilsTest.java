@@ -107,10 +107,10 @@ public class SolrUtilsTest {
     // 3) filter with one SimpleFilterParameter (uses exact match)
     try {
       filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP__ALL, fonds));
+      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, fonds));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(%s: \"%s\")", RodaConstants.AIP__ALL, fonds), stringFilter);
+      assertEquals(String.format("(%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds), stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
     }
@@ -119,12 +119,12 @@ public class SolrUtilsTest {
     // combined with AND operator)
     try {
       filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP__ALL, fonds));
-      filter.add(new SimpleFilterParameter(RodaConstants.AIP__ALL, series));
+      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, fonds));
+      filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, series));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.AIP__ALL, fonds, RodaConstants.AIP__ALL, series),
+        String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
         stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
@@ -134,11 +134,11 @@ public class SolrUtilsTest {
     // each of the values, and they will be combined using OR operator)
     try {
       filter = new Filter();
-      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP__ALL, oneOfManyValues));
+      filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_SEARCH, oneOfManyValues));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.AIP__ALL, fonds, RodaConstants.AIP__ALL, series),
+        String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
         stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
@@ -178,11 +178,11 @@ public class SolrUtilsTest {
     // 11) filter with one BasicSearchFilterParameter
     try {
       filter = new Filter();
-      filter.add(new BasicSearchFilterParameter(RodaConstants.AIP__ALL, fondsOrSeries));
+      filter.add(new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, fondsOrSeries));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
       assertEquals(
-        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.AIP__ALL, fonds, RodaConstants.AIP__ALL, series),
+        String.format("(%s: (%s) AND %s: (%s))", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
         stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
@@ -191,10 +191,10 @@ public class SolrUtilsTest {
     // 12) filter with one EmptyKeyFilterParameter
     try {
       filter = new Filter();
-      filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP__ALL));
+      filter.add(new EmptyKeyFilterParameter(RodaConstants.AIP_SEARCH));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.AIP__ALL), stringFilter);
+      assertEquals(String.format("(*:* NOT %s:*)", RodaConstants.AIP_SEARCH), stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
     }

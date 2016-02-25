@@ -390,7 +390,7 @@ public interface BrowseMessages extends Messages {
 
   /************* Search ****************/
   @DefaultMessage("Intelectual entities")
-  String searchListBoxObjects();
+  String searchListBoxItems();
   
   @DefaultMessage("Representations")
   String searchListBoxRepresentations();

@@ -288,7 +288,7 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTION = "description";
   public static final String AIP_STATE = "state";
   public static final String AIP_LABEL = "label";
-  public static final String AIP__ALL = "_all";
+  public static final String AIP_SEARCH = "search";
 
   /*
    * Descriptive Metadata fields
@@ -306,6 +306,7 @@ public final class RodaConstants {
   public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
   public static final String SRO_SIZE_IN_BYTES = "sizeInBytes";
   public static final String SRO_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
+  public static final String SRO_SEARCH = "search";
 
   /*
    * SEPM FIELDS

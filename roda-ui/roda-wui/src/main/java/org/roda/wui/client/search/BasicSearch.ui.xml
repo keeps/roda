@@ -58,7 +58,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="searchAdvancedPanel"
 					ui:field="searchAdvancedPanel">
-					<g:FlowPanel ui:field="searchAdvancedFieldsPanel"
+					<g:FlowPanel ui:field="itemsSearchAdvancedFieldsPanel"
 						styleName="searchAdvancedFieldsPanel empty" />
 					<g:FlowPanel ui:field="representationsSearchAdvancedFieldsPanel"
 						styleName="searchAdvancedFieldsPanel empty" />
@@ -71,6 +71,7 @@
 							ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 					</g:FlowPanel>
 				</g:FlowPanel>
+				<g:FlowPanel>
 				<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
