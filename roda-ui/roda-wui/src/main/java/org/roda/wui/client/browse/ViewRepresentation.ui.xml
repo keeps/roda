@@ -34,7 +34,7 @@
 						</g:FlowPanel>
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="fileListScroll">
-						<lists:FileList ui:field="filesList" />
+						<lists:SimpleFileList ui:field="filesList" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<!-- RIGHT PANEL -->

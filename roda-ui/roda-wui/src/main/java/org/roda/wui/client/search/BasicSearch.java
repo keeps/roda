@@ -23,11 +23,13 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
-import org.roda.wui.client.common.lists.FileList;
+import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -157,7 +159,7 @@ public class BasicSearch extends Composite {
   FlowPanel facetHasRepresentations;
 
   AIPList itemsSearchResultPanel;
-  FileList filesSearchResultPanel;
+  SearchFileList filesSearchResultPanel;
 
   ListBox searchAdvancedFieldOptions;
 
@@ -292,10 +294,6 @@ public class BasicSearch extends Composite {
     }
   }
 
-  protected void view(String id) {
-    Tools.newHistory(Browse.RESOLVER, id);
-  }
-
   public void doSearch() {
     Filter filter = DEFAULT_FILTER_AIP;
     String basicQuery = searchInputBox.getText();
@@ -398,8 +396,6 @@ public class BasicSearch extends Composite {
     representationsSearchAdvancedFieldsPanel.setVisible(false);
   }
 
-  
-
   public void showRepresentationsSearchAdvancedFieldsPanel() {
     searchResultPanel.clear();
 
@@ -420,7 +416,7 @@ public class BasicSearch extends Composite {
     filesSearchAdvancedFieldsPanel.setVisible(true);
     representationsSearchAdvancedFieldsPanel.setVisible(false);
   }
-  
+
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
@@ -430,20 +426,34 @@ public class BasicSearch extends Composite {
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
     facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
     FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
-    
+
     itemsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedAIP aip = itemsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (aip != null) {
-          view(aip.getId());
+          Tools.newHistory(Browse.RESOLVER, aip.getId());
         }
       }
     });
+
   }
-  
+
   private void createFilesSearchResultPanel() {
-    filesSearchResultPanel = new FileList(DEFAULT_FILTER_FILES, null, messages.searchResults());
+    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, null, messages.searchResults());
+
+    // TODO facets
+
+    filesSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedFile file = filesSearchResultPanel.getSelectionModel().getSelectedObject();
+        if (file != null) {
+          ViewRepresentation.jumpTo(file);
+        }
+      }
+    });
   }
 }

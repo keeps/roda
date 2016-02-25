@@ -28,7 +28,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.FileList;
+import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -241,7 +241,7 @@ public class ViewRepresentation extends Composite {
   AccessibleFocusPanel searchInputButton;
 
   @UiField(provided = true)
-  FileList filesList;
+  SimpleFileList filesList;
 
   @UiField
   FlowPanel filePreviewPanel;
@@ -316,7 +316,7 @@ public class ViewRepresentation extends Composite {
     }
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
-    filesList = new FileList(defaultFilter, null, null);
+    filesList = new SimpleFileList(defaultFilter, null, null);
 
     initWidget(uiBinder.createAndBindUi(this));
 

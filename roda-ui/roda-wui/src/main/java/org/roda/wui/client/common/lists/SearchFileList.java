@@ -20,6 +20,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -33,22 +34,23 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class FileList extends AsyncTableCell<IndexedFile> {
+public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
   private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<IndexedFile, SafeHtml> iconColumn;
+  private TextColumn<IndexedFile> pathColumn;
   private TextColumn<IndexedFile> filenameColumn;
   private TextColumn<IndexedFile> mimetypeColumn;
   private TextColumn<IndexedFile> lengthColumn;
 
-  public FileList() {
+  public SearchFileList() {
     this(null, null, null);
   }
 
-  public FileList(Filter filter, Facets facets, String summary) {
+  public SearchFileList(Filter filter, Facets facets, String summary) {
     super(filter, facets, summary);
   }
 
@@ -68,6 +70,23 @@ public class FileList extends AsyncTableCell<IndexedFile> {
           logger.error("Trying to display a NULL item");
         }
         return null;
+      }
+    };
+
+    pathColumn = new TextColumn<IndexedFile>() {
+
+      @Override
+      public String getValue(IndexedFile file) {
+        String path = null;
+        if (file != null) {
+          if (file.getPath() != null) {
+            path = Tools.join(file.getPath(), "/");
+          } else {
+            path = "";
+          }
+        }
+
+        return path;
       }
     };
 
@@ -109,18 +128,24 @@ public class FileList extends AsyncTableCell<IndexedFile> {
     // TODO externalize strings into constants
     display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
     display.addColumn(filenameColumn, "Name");
-    // display.addColumn(mimetypeColumn, "Mimetype");
-    // display.addColumn(lengthColumn, "Length");
+    display.addColumn(pathColumn, "Path");
+    display.addColumn(mimetypeColumn, "Mimetype");
+    display.addColumn(lengthColumn, "Length");
     display.setColumnWidth(iconColumn, "35px");
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(filenameColumn, "100%");
+    // display.setColumnWidth(pathColumn, "100%");
+
+    filenameColumn.setCellStyleNames("nowrap");
+    mimetypeColumn.setCellStyleNames("nowrap");
+    lengthColumn.setCellStyleNames("nowrap");
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
 
     addStyleName("my-files-table");
     emptyInfo.addStyleName("my-files-empty-info");
+
   }
 
   @Override
