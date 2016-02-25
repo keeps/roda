@@ -320,8 +320,9 @@ public class InternalPluginsTest {
 
     CloseableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadata(aip.getId(), true);
 
-    // Files plus one representation
-    Assert.assertEquals(CORPORA_FILES_COUNT + 1, Iterables.size(preservationMetadata));
+    // Files plus one representation + 1 SIP To AIP Event + 1 Premis Skeleton
+    // Event
+    Assert.assertEquals(CORPORA_FILES_COUNT + 3, Iterables.size(preservationMetadata));
     preservationMetadata.close();
 
     Binary rpo_bin = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());

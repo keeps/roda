@@ -46,16 +46,16 @@ public class TikaFullTextPluginUtils {
 
   private static final Tika tika = new Tika();
 
-  public static List<String> runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, boolean notify) throws NotFoundException, GenericException,
-      RequestNotValidException, AuthorizationDeniedException, ValidationException {
+  public static List<String> runTikaFullTextOnRepresentation(IndexService index, ModelService model,
+    StorageService storage, AIP aip, Representation representation, boolean notify) throws NotFoundException,
+      GenericException, RequestNotValidException, AuthorizationDeniedException, ValidationException {
 
     boolean recursive = true;
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
     boolean inotify = false;
     List<String> outputs = new ArrayList<String>();
-    
+
     for (File file : allFiles) {
 
       if (!file.isDirectory()) {
@@ -75,9 +75,14 @@ public class TikaFullTextPluginUtils {
               return new ReaderInputStream(reader);
             }
           });
-          outputs.add(IOUtils.toString(payload.createInputStream(), "UTF-8"));
+
           model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
             TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, inotify);
+          model.updateFile(file);
+          Binary b = model.retrieveOtherMetadataBinary(aip.getId(), representation.getId(), file.getPath(),
+            file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
+          outputs.add(IOUtils.toString(b.getContent().createInputStream(), "UTF-8"));
+
         } catch (IOException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
