@@ -91,7 +91,7 @@ public class IndexModelObserver implements ModelObserver {
 
             SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationId(),
               pm.getId(), binary);
-            LOGGER.debug(premisEventDocument.toString());
+            LOGGER.trace(premisEventDocument.toString());
             try {
               List<LinkingIdentifier> agents = PremisUtils.extractAgentsFromEvent(binary);
               for (LinkingIdentifier id : agents) {
@@ -240,7 +240,7 @@ public class IndexModelObserver implements ModelObserver {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
       index.commit(RodaConstants.INDEX_AIP);
-      LOGGER.debug("Adding AIP: " + aipDoc);
+      LOGGER.trace("Adding AIP: " + aipDoc);
     } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
       | NotFoundException | AuthorizationDeniedException e) {
       if (!safemode) {

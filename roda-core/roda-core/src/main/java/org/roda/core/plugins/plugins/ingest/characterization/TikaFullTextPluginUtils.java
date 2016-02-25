@@ -22,6 +22,7 @@ import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
@@ -83,7 +84,7 @@ public class TikaFullTextPluginUtils {
             file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
           outputs.add(IOUtils.toString(b.getContent().createInputStream(), "UTF-8"));
 
-        } catch (IOException e) {
+        } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);

@@ -149,7 +149,7 @@ public class FileList extends AsyncTableCell<IndexedFile> {
 
       @Override
       public Object getKey(IndexedFile item) {
-        return item.getId();
+        return item.getUuid();
       }
     };
   }
