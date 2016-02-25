@@ -185,9 +185,18 @@ public final class PluginHelper {
 
   }
 
+  public static <T extends Serializable> void createPluginEvent(Plugin<T> plugin, String aipID, String representationID,
+    List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
+    createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, sources, targets, outcome,
+      outcomeDetailExtension, notify, new Date());
+  }
+
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
-    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
+    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify, Date startDate)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
 
@@ -202,14 +211,12 @@ public final class PluginHelper {
     }
 
     String id = UUID.randomUUID().toString();
-    // TODO 3 states... only 2 messages
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
-
     if (plugin.getToolOutput() != null) {
       outcomeDetailNote += "\n" + plugin.getToolOutput();
     }
-    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, new Date(),
+    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, targets,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
@@ -271,10 +278,20 @@ public final class PluginHelper {
 
   public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, ModelService model, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
-    if (aip.getRepresentations() != null && aip.getRepresentations().size() > 0) {
+    if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
       for (Representation representation : aip.getRepresentations()) {
         identifiers.add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(),
           null, null, role));
+      }
+    }
+    return identifiers;
+  }
+
+  public static List<LinkingIdentifier> getLinkingIdentifiers(List<TransferredResource> resources, String role) {
+    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
+    if (resources != null && !resources.isEmpty()) {
+      for (TransferredResource tr : resources) {
+        identifiers.add(getLinkingIdentifier(tr, role));
       }
     }
     return identifiers;

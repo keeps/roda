@@ -8,6 +8,8 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,17 +19,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -91,6 +97,26 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   // private int completionPercentageStep = (int) (100f / totalSteps);
   private Map<String, String> aipIdToObjectId;
 
+  private String successMessage;
+  private String failureMessage;
+  private String partialMessage;
+  private PreservationEventType eventType;
+  private String eventDescription;
+
+  // TODO currently, this is the only plugin that creates 2 events...
+
+  public static String START_SUCCESS = "The ingest process has started.";
+  public static String START_FAILURE = "The ingest process has started.";
+  public static String START_PARTIAL = "The ingest process has started.";
+  public static String START_DESCRIPTION = "The ingest process has started.";
+  public static PreservationEventType START_TYPE = PreservationEventType.INGEST_START;
+
+  public static String END_SUCCESS = "The ingest process has successfully ended.";
+  public static String END_FAILURE = "Failed to conclude the ingest process.";
+  public static String END_PARTIAL = "The ingest process ended, however, some of the SIPs could not be successfully ingested.";
+  public static String END_DESCRIPTION = "The ingest process has ended.";
+  public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
+
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -103,7 +129,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getName() {
-    return "Default Ingest Plugin";
+    return "Default ingest workflow";
   }
 
   @Override
@@ -113,7 +139,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public String getDescription() {
-    return "Performs all the tasks needed to ingest an SIP into the repository and therefore creating an AIP";
+    return "Performs all the tasks needed to ingest a SIP into the repository and therefore creating an AIP.";
   }
 
   @Override
@@ -141,6 +167,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
+    setPreservationEventType(START_TYPE);
+    setPreservationSuccessMessage(START_SUCCESS);
+    setPreservationFailureMessage(START_FAILURE);
+    setPreservationEventDescription(START_DESCRIPTION);
+    Date startDate = new Date();
     Report report = PluginHelper.createPluginReport(this);
     Report pluginReport;
 
@@ -167,6 +198,17 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+
+    for (AIP aip : aips) {
+      try {
+        boolean notify = true;
+        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, null, null, PluginState.SUCCESS, "",
+          notify, startDate);
+      } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
+        | ValidationException | AlreadyExistsException e) {
+        LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
+      }
+    }
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
@@ -231,20 +273,27 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       reports = mergeReports(reports, pluginReport);
     }
 
+    // create event based on report...
+    setPreservationEventType(END_TYPE);
+    setPreservationSuccessMessage(END_SUCCESS);
+    setPreservationFailureMessage(END_FAILURE);
+    setPreservationEventDescription(END_DESCRIPTION);
+    for (AIP aip : aips) {
+      try {
+        boolean notify = true;
+        PluginHelper.createPluginEvent(this, aip.getId(),
+          null, null, null, model, Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(),
+            null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
+          null, PluginState.SUCCESS, "", notify);
+      } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
+        | ValidationException | AlreadyExistsException e) {
+        LOGGER.warn("Error creating ingest end event: " + e.getMessage(), e);
+      }
+    }
+
     PluginHelper.updateJobStatus(this, index, model, 100);
 
     return report;
-  }
-
-  private int calculateCompletionPercentageStep() {
-    int effectiveTotalSteps = totalSteps;
-    for (PluginParameter pluginParameter : getParameters()) {
-      if (pluginParameter.getType() == PluginParameterType.BOOLEAN
-        && !PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
-        effectiveTotalSteps--;
-      }
-    }
-    return 100 / effectiveTotalSteps;
   }
 
   private List<AIP> getAIPsFromReports(IndexService index, ModelService model, StorageService storage,
@@ -421,24 +470,39 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return areValid;
   }
 
-  // TODO FIX...
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return eventType;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return eventDescription;
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXX";
+    return successMessage;
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXX";
+    return failureMessage;
+  }
+
+  public void setPreservationEventType(PreservationEventType t) {
+    this.eventType = t;
+  }
+
+  public void setPreservationSuccessMessage(String message) {
+    this.successMessage = message;
+  }
+
+  public void setPreservationFailureMessage(String message) {
+    this.failureMessage = message;
+  }
+
+  public void setPreservationEventDescription(String description) {
+    this.eventDescription = description;
   }
 }

@@ -226,7 +226,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.INGEST_START;
+    return PreservationEventType.UNPACKING;
   }
 
   @Override

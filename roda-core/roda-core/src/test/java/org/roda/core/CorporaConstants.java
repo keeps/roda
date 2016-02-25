@@ -7,6 +7,7 @@
  */
 package org.roda.core;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -117,5 +118,6 @@ public class CorporaConstants {
   public static String SIP_FOLDER = "SIPs";
   public static String EARK_SIP = "eark_sip.zip";
   public static String BAGIT_SIP = "bagit.zip";
+  public static String TRANSFERRED_RESOURCE = "transferredresource";
 
 }

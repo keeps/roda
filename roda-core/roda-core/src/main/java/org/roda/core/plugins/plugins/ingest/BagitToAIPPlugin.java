@@ -94,7 +94,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
         List<LinkingIdentifier> sources = Arrays.asList(
           PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
         List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-          aipCreated.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          aipCreated.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes,
           reportItem.getPluginState(), "", notify);
@@ -141,7 +141,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.INGEST_START;
+    return PreservationEventType.UNPACKING;
   }
 
   @Override

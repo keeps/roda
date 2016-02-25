@@ -545,10 +545,10 @@ public final class RodaConstants {
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
     FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
-    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"),
+    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
     MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
-    WELLFORMEDNESS_CHECK("wellformedness check");
+    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking");
 
     private final String text;
 
