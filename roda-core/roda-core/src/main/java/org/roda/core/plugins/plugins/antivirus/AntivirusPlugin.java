@@ -166,7 +166,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
 
       List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
+        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
         success ? PluginState.SUCCESS : PluginState.FAILURE, outcomeDetailExtension, notify);

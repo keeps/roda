@@ -128,9 +128,9 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         reportItem = PluginHelper.setPluginReportItemInfo(reportItem, aip.getId(),
           new Attribute(RodaConstants.REPORT_ATTR_OUTCOME, state.toString()));
 
-        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource));
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
         List<LinkingIdentifier> outcomes = Arrays
-          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
+          .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",
           notify);

@@ -370,11 +370,11 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
         premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId()));
+          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       }
       for (File file : newFiles) {
         premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId()));
+          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       }
     }
 

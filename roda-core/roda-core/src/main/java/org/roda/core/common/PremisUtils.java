@@ -327,7 +327,10 @@ public class PremisUtils {
       for (LinkingIdentifier source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(source.getValue());
-        loict.setLinkingObjectIdentifierType("source");
+        loict.setLinkingObjectIdentifierType(source.getType());
+        if (source.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(source.getRoles().toArray(new String[source.getRoles().size()]));
+        }
       }
     }
 
@@ -335,7 +338,10 @@ public class PremisUtils {
       for (LinkingIdentifier target : targets) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(target.getValue());
-        loict.setLinkingObjectIdentifierType("target");
+        loict.setLinkingObjectIdentifierType(target.getType());
+        if (target.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(target.getRoles().toArray(new String[target.getRoles().size()]));
+        }
       }
     }
 
@@ -363,8 +369,8 @@ public class PremisUtils {
 
   }
 
-  public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type, String extension,
-    String note) throws GenericException, ValidationException {
+  public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
+    String extension, String note) throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
     AgentComplexType act = agent.addNewAgent();
@@ -740,39 +746,21 @@ public class PremisUtils {
     return identifiers;
   }
 
-  public static List<LinkingIdentifier> extractRelatedSourceFromEvent(Binary binary)
+  public static List<LinkingIdentifier> extractObjectFromEvent(Binary binary)
     throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
     if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
       for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
-        if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("source")) {
           LinkingIdentifier li = new LinkingIdentifier();
           li.setType(loict.getLinkingObjectIdentifierType());
           li.setValue(loict.getLinkingObjectIdentifierValue());
           li.setRoles(loict.getLinkingObjectRoleList());
           identifiers.add(li);
-        }
       }
     }
     return identifiers;
   }
 
-  public static List<LinkingIdentifier> extractRelatedOutcomeFromEvent(Binary binary)
-    throws ValidationException, GenericException {
-    List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
-    EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
-      for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
-        if (loict.getLinkingObjectIdentifierType().equalsIgnoreCase("outcome")) {
-          LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType());
-          li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(loict.getLinkingObjectRoleList());
-          identifiers.add(li);
-        }
-      }
-    }
-    return identifiers;
-  }
+  
 }

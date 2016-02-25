@@ -560,11 +560,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     } else {
       for (File file : alteredFiles)
         premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId()));
+          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
 
       for (File file : newFiles)
         premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId()));
+          file.getRepresentationId(), file.getPath(), file.getId(),RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }

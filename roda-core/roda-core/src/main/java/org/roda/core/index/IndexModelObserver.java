@@ -102,7 +102,7 @@ public class IndexModelObserver implements ModelObserver {
               LOGGER.warn("Error setting linking agent field: " + e.getMessage());
             }
             try {
-              List<LinkingIdentifier> sources = PremisUtils.extractRelatedSourceFromEvent(binary);
+              List<LinkingIdentifier> sources = PremisUtils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : sources) {
                 premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
                   JsonUtils.getJsonFromObject(id));
@@ -111,7 +111,7 @@ public class IndexModelObserver implements ModelObserver {
               LOGGER.warn("Error setting linking source field: " + e.getMessage());
             }
             try {
-              List<LinkingIdentifier> outcomes = PremisUtils.extractRelatedOutcomeFromEvent(binary);
+              List<LinkingIdentifier> outcomes = PremisUtils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : outcomes) {
                 premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
                   JsonUtils.getJsonFromObject(id));
@@ -423,7 +423,7 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.warn("Error setting linking agent field: " + e.getMessage());
         }
         try {
-          List<LinkingIdentifier> sources = PremisUtils.extractRelatedSourceFromEvent(binary);
+          List<LinkingIdentifier> sources = PremisUtils.extractObjectFromEvent(binary);
           for (LinkingIdentifier id : sources) {
             premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
               JsonUtils.getJsonFromObject(id));
@@ -432,7 +432,7 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.warn("Error setting linking source field: " + e.getMessage());
         }
         try {
-          List<LinkingIdentifier> outcomes = PremisUtils.extractRelatedOutcomeFromEvent(binary);
+          List<LinkingIdentifier> outcomes = PremisUtils.extractObjectFromEvent(binary);
           for (LinkingIdentifier id : outcomes) {
             premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
               JsonUtils.getJsonFromObject(id));

@@ -65,16 +65,32 @@ public final class IdUtils {
 
   public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    return getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
+    return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
   }
 
   public static String getLinkingIdentifierId(LinkingObjectType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    return getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
+    return type+":"+getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
   }
 
   public static String getLinkingIdentifierId(LinkingObjectType type, TransferredResource transferredResource) {
-    return type + ":" + transferredResource.getFullPath();
+    return type + ":" + transferredResource.getRelativePath();
+  }
+  
+  public static LinkingObjectType getLinkingIdentifierType(String value) {
+    if(value.contains(":")){
+      return LinkingObjectType.valueOf(value.split(":")[0]);
+    }else{
+      return null;
+    }
+  }
+  
+  public static String getLinkingObjectPath(String path) {
+    if(path.contains(":")){
+      return path.substring(path.indexOf(":")+1);
+    }else{
+      return null;
+    }
   }
 
   public static String getOtherMetadataId(String type, String aipId, String representationId,
@@ -129,4 +145,5 @@ public final class IdUtils {
     return idBuilder;
   }
 
+  
 }

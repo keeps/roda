@@ -57,6 +57,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
+import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -1025,18 +1026,20 @@ public class BrowserHelper {
   private static Map<String, IndexedFile> processLinkingIdentifiers(Map<String, IndexedFile> files,
     List<LinkingIdentifier> linkingIdentifiers) throws NotFoundException, GenericException {
     for (LinkingIdentifier identifier : linkingIdentifiers) {
-      String[] tokens = IdUtils.splitLinkingId(identifier.getValue());
-      if (tokens.length == 1) {
-        // AIP
-        LOGGER.warn("AIP");
-      } else if (tokens.length == 2) {
-        // REPRESENTATION
-        LOGGER.warn("REPRESENTATION");
-      } else {
-        // FILE
-        IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-          IdUtils.getFileIdFromLinkingId(identifier.getValue()));
-        files.put(identifier.getValue(), file);
+      LinkingObjectType linkingType = IdUtils.getLinkingIdentifierType(identifier.getValue());
+
+      if (linkingType != LinkingObjectType.TRANSFERRED_RESOURCE) {
+        String[] tokens = IdUtils.splitLinkingId(IdUtils.getLinkingObjectPath(identifier.getValue()));
+        if (tokens.length == 1) {
+          // AIP
+        } else if (tokens.length == 2) {
+          // REPRESENTATION
+        } else {
+          // FILE
+          IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+            IdUtils.getFileIdFromLinkingId(identifier.getValue()));
+          files.put(identifier.getValue(), file);
+        }
       }
     }
     return files;

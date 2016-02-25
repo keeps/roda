@@ -105,7 +105,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     try {
-      List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model);
+      List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
       List<LinkingIdentifier> outcomes = null;
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",

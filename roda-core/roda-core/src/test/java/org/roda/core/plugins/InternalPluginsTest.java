@@ -61,6 +61,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
+import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
@@ -499,7 +500,23 @@ public class InternalPluginsTest {
 
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());
+  }
+  
+  @Test
+  public void testAutoAccept()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, InvalidDateException {
+    AIP aip = ingestCorpora();
 
+    Plugin<AIP> autoAcceptPlugin = new AutoAcceptSIPPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    autoAcceptPlugin.setParameterValues(parameters);
+
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(autoAcceptPlugin, Arrays.asList(aip.getId()));
+
+    aip = model.retrieveAIP(aip.getId());
+
+    Assert.assertTrue(aip.isActive());    
   }
 
 }

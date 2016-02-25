@@ -259,27 +259,29 @@ public final class PluginHelper {
     }
   }
 
-  public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource) {
+  public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(IdUtils.getLinkingIdentifierId(LinkingObjectType.TRANSFERRED_RESOURCE, transferredResource));
     li.setType("URN");
+    li.setRoles(Arrays.asList(role));
     return li;
   }
 
   public static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String aipID, String representationID,
-    List<String> filePath, String fileID) {
+    List<String> filePath, String fileID, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(IdUtils.getLinkingIdentifierId(type, aipID, representationID, filePath, fileID));
     li.setType("URN");
+    li.setRoles(Arrays.asList(role));
     return li;
   }
 
-  public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, ModelService model) {
+  public static List<LinkingIdentifier> getLinkingRepresentations(AIP aip, ModelService model, String role) {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     if (aip.getRepresentations() != null && aip.getRepresentations().size() > 0) {
       for (Representation representation : aip.getRepresentations()) {
         identifiers
-          .add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(), null, null));
+          .add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(), null, null,role));
       }
     }
     return identifiers;

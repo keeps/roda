@@ -101,7 +101,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
           siegfriedOutputs
             .add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation));
           sources.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(),
-            representation.getId(), null, null));
+            representation.getId(), null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
         }
         model.notifyAIPUpdated(aip.getId());
         state = PluginState.SUCCESS;
@@ -120,7 +120,6 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
       if (createsPluginEvent) {
         try {
-          sources.clear();
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
           PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "",

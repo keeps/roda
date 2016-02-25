@@ -130,7 +130,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   private void createEvent(AIP aip, ModelService model, boolean valid,boolean notify) throws PluginException {
     try {
       List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null));
+        .asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP, aip.getId(), null, null, null,RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
         valid ? PluginState.SUCCESS : PluginState.FAILURE, "", notify);

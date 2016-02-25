@@ -532,10 +532,13 @@ public final class RodaConstants {
   public static final String LINKING_IDENTIFIER_TYPE = "type";
   public static final String LINKING_IDENTIFIER_ROLES = "roles";
 
+  public static final String PRESERVATION_LINKING_OBJECT_SOURCE = "source";
+  public static final String PRESERVATION_LINKING_OBJECT_OUTCOME = "outcome";
   /*
    * WUI related
    */
   public static final String THEME_RESOURCES_PATH = "/org/roda/wui/public/theme/";
+  
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
