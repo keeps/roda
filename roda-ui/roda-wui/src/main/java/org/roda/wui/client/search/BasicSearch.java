@@ -27,6 +27,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.FileList;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -128,8 +129,8 @@ public class BasicSearch extends Composite {
   @UiField
   AccessibleFocusPanel searchAdvancedDisclosureButton;
 
-  @UiField(provided = true)
-  AIPList searchResultPanel;
+  @UiField
+  FlowPanel searchResultPanel;
 
   @UiField
   FlowPanel searchAdvancedPanel;
@@ -155,25 +156,18 @@ public class BasicSearch extends Composite {
   @UiField(provided = true)
   FlowPanel facetHasRepresentations;
 
+  AIPList itemsSearchResultPanel;
+  FileList filesSearchResultPanel;
+
   ListBox searchAdvancedFieldOptions;
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
 
   private BasicSearch() {
-    Filter filter = DEFAULT_FILTER_AIP;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
-      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultPanel = new AIPList(filter, facets, messages.searchResults());
-    
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
     searchAdvancedFieldOptions = new ListBox();
-
-    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
-    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
-    FacetUtils.bindFacets(searchResultPanel, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -193,17 +187,6 @@ public class BasicSearch extends Composite {
           showRepresentationsSearchAdvancedFieldsPanel();
         } else {
           showFilesSearchAdvancedFieldsPanel();
-        }
-      }
-    });
-
-    searchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedAIP aip = searchResultPanel.getSelectionModel().getSelectedObject();
-        if (aip != null) {
-          view(aip.getId());
         }
       }
     });
@@ -318,16 +301,17 @@ public class BasicSearch extends Composite {
     String basicQuery = searchInputBox.getText();
 
     if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
-      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, itemsSearchAdvancedFieldsPanel);
-      searchResultPanel.setFilter(filter);
+      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH,
+        itemsSearchAdvancedFieldsPanel);
+      itemsSearchResultPanel.setFilter(filter);
     } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
       filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.SRO_SEARCH,
         representationsSearchAdvancedFieldsPanel);
-      searchResultPanel.setFilter(filter);
+      itemsSearchResultPanel.setFilter(filter);
     } else {
       filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH,
         filesSearchAdvancedFieldsPanel);
-      searchResultPanel.setFilter(filter);
+      filesSearchResultPanel.setFilter(filter);
     }
   }
 
@@ -359,7 +343,7 @@ public class BasicSearch extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      searchResultPanel.refresh();
+      itemsSearchResultPanel.refresh();
       callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);
@@ -402,20 +386,64 @@ public class BasicSearch extends Composite {
   }
 
   public void showSearchAdvancedFieldsPanel() {
+    if (itemsSearchResultPanel == null) {
+      createItemsSearchResultPanel();
+    }
+
+    searchResultPanel.clear();
+    searchResultPanel.add(itemsSearchResultPanel);
+
     itemsSearchAdvancedFieldsPanel.setVisible(true);
     filesSearchAdvancedFieldsPanel.setVisible(false);
     representationsSearchAdvancedFieldsPanel.setVisible(false);
   }
 
+  
+
   public void showRepresentationsSearchAdvancedFieldsPanel() {
+    searchResultPanel.clear();
+
     itemsSearchAdvancedFieldsPanel.setVisible(false);
     filesSearchAdvancedFieldsPanel.setVisible(false);
     representationsSearchAdvancedFieldsPanel.setVisible(true);
   }
 
   public void showFilesSearchAdvancedFieldsPanel() {
+    if (filesSearchResultPanel == null) {
+      createFilesSearchResultPanel();
+    }
+
+    searchResultPanel.clear();
+    searchResultPanel.add(filesSearchResultPanel);
+
     itemsSearchAdvancedFieldsPanel.setVisible(false);
     filesSearchAdvancedFieldsPanel.setVisible(true);
     representationsSearchAdvancedFieldsPanel.setVisible(false);
+  }
+  
+  private void createItemsSearchResultPanel() {
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
+      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
+    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults());
+
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
+    facetPanels.put(RodaConstants.AIP_HAS_REPRESENTATIONS, facetHasRepresentations);
+    FacetUtils.bindFacets(itemsSearchResultPanel, facetPanels);
+    
+    itemsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedAIP aip = itemsSearchResultPanel.getSelectionModel().getSelectedObject();
+        if (aip != null) {
+          view(aip.getId());
+        }
+      }
+    });
+  }
+  
+  private void createFilesSearchResultPanel() {
+    filesSearchResultPanel = new FileList(DEFAULT_FILTER_FILES, null, messages.searchResults());
   }
 }

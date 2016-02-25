@@ -71,8 +71,10 @@
 							ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel>
-				<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" />
+				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel">
+<!-- 					<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" /> -->
+<!-- 					<lists:FileList addStyleNames="searchResults" ui:field="filesSearchResultPanel" /> -->
+				</g:FlowPanel>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">

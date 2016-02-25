@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.FilterParameter;
+import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -196,25 +198,33 @@ public class SearchFieldPanel extends Composite {
   public FilterParameter getFilter() {
     FilterParameter filterParameter = null;
     String type = searchField.getType();
-    String field = searchField.getSearchFields().get(0);
+    List<String> searchFields = searchField.getSearchFields();
 
-    if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE)) {
+    if (searchFields != null && searchFields.size() >= 1) {
+      String field = searchFields.get(0);
 
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)) {
-
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC)) {
-
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
-
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
-
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
-
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_LIST)) {
-
-    } else {
-      if (!inputText.getValue().isEmpty())
+      if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && inputDateBox.getValue() != null) {
+        filterParameter = new BasicSearchFilterParameter(field, inputDateBox.getValue().toString());
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
+        && inputDateBoxTo.getValue() != null && searchFields.size() >= 2) {
+        String fieldTo = searchField.getSearchFields().get(1);
+        filterParameter = new DateIntervalFilterParameter(field, fieldTo, inputDateBoxFrom.getValue(),
+          inputDateBoxTo.getValue());
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
+        && inputDateBoxTo.getValue() != null) {
+        filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
+          inputDateBoxTo.getValue());
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC) && !inputNumeric.getValue().isEmpty()) {
+        filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
+        filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
+          Long.valueOf(inputNumericTo.getValue()));
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_LIST)) {
+      } else if (!inputText.getValue().isEmpty()) {
         filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
+      }
     }
 
     return filterParameter;
