@@ -17,8 +17,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.UUID;
 
-import org.jgroups.util.UUID;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -637,7 +637,8 @@ public class FileStorageService implements StorageService {
     try {
       if (Files.isDirectory(resourceHistoryDataPath)) {
         try {
-          Path resourceHistoryMetadataPath = historyMetadataPath.resolve(historyDataPath.relativize(resourceHistoryDataPath));
+          Path resourceHistoryMetadataPath = historyMetadataPath
+            .resolve(historyDataPath.relativize(resourceHistoryDataPath));
           FSUtils.deletePath(resourceHistoryDataPath);
           FSUtils.deletePath(resourceHistoryMetadataPath);
 
