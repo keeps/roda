@@ -3204,6 +3204,10 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				INGEST
 ************************************************/
+.wui-ingest-pre {
+	width: 100%;
+}
+
 .wui-ingest-transfer .wui-breadcrumbPanel {
 	position: relative;
 }
