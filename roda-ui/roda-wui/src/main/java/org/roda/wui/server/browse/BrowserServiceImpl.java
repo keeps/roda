@@ -159,9 +159,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.getAncestors(user, aip);
   }
-
-  // FIXME see if there is a best way to deal with "hierarchical" keys
-  // FIXME deal with non-configured/badly-configured keys
+  
   @Override
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
@@ -171,18 +169,23 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       String[] fields = fieldsNamesString.split(",");
       for (String field : fields) {
         SearchField searchField = new SearchField();
-        String fieldName = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "field");
+        
+        String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
         String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
         String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-        boolean fieldFixed = Boolean
-          .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
-
-        searchField.setField(fieldName);
-        searchField.setType(fieldType);
-        searchField.setLabel(messages.getTranslation(fieldLabelI18N));
-        searchField.setFixed(fieldFixed);
-
-        searchFields.add(searchField);
+        boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+        
+        if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
+          List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
+          
+          searchField.setId(field);
+          searchField.setSearchFields(fieldsNamesList);
+          searchField.setType(fieldType);
+          searchField.setLabel(messages.getTranslation(fieldLabelI18N));
+          searchField.setFixed(fieldFixed);
+          
+          searchFields.add(searchField);
+        }
       }
     }
     return searchFields;

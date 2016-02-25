@@ -2516,9 +2516,17 @@ td.datePickerMonth, td.datePickerYear {
 	border-top: 2px solid #089de3;
 }
 
+.searchAdvancedFieldsPanel {
+	margin-bottom: 15px;
+}
+
 .search-field {
 	margin-right: 20px;
 	height: 35px;
+}
+
+.search-field.full_width {
+	margin-right: 0px;
 }
 
 .search-field-left-panel {
@@ -2546,6 +2554,9 @@ td.datePickerMonth, td.datePickerYear {
 	
 .search-field-label {
 	width: 120px;
+	text-align: right;
+	margin-right: 10px;
+	padding-top: 2px;
 }
 
 .search-field-remove {

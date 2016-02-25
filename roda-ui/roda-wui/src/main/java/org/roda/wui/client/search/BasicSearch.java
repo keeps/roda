@@ -242,8 +242,8 @@ public class BasicSearch extends Composite {
           BasicSearch.this.searchFields.clear();
           for (SearchField searchField : searchFields) {
             ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(),
-              searchField.getField());
-            BasicSearch.this.searchFields.put(searchField.getField(), searchField);
+              searchField.getId());
+            BasicSearch.this.searchFields.put(searchField.getId(), searchField);
           }
 
           for (SearchField searchField : searchFields) {
@@ -252,7 +252,7 @@ public class BasicSearch extends Composite {
               searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
               searchFieldPanel.setSearchFields(BasicSearch.this.searchFields);
               addSearchFieldPanel(searchFieldPanel);
-              searchFieldPanel.selectSearchField(searchField.getField());
+              searchFieldPanel.selectSearchField(searchField.getId());
             }
           }
         }
@@ -262,49 +262,36 @@ public class BasicSearch extends Composite {
     createFilesSearchAdvancedFieldsPanel();
     showSearchAdvancedFieldsPanel();
   }
-  
+
   // TODO define search fields
   private void createRepresentationsSearchAdvancedFieldsPanel() {
-    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-    searchFieldPanel.simpleSearchField("1", "1", "text");
-    
-    SearchFieldPanel searchFieldPanel2 = new SearchFieldPanel();
-    searchFieldPanel2.simpleSearchField("2", "2", "date_interval");
-    
-    SearchFieldPanel searchFieldPanel3 = new SearchFieldPanel();
-    searchFieldPanel3.simpleSearchField("3", "3", "numeric");
-    
-    SearchFieldPanel searchFieldPanel4 = new SearchFieldPanel();
-    searchFieldPanel4.simpleSearchField("4", "4", "storage");
-    
-    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel);
-    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel2);
-    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel3);
-    representationsSearchAdvancedFieldsPanel.add(searchFieldPanel4);
+    SearchFieldPanel typeField = new SearchFieldPanel();
+    typeField.simpleSearchField(RodaConstants.SRO_ORIGINAL, "Original", "boolean");
+    representationsSearchAdvancedFieldsPanel.add(typeField);
   }
 
   // TODO define search fields
   private void createFilesSearchAdvancedFieldsPanel() {
-    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-    searchFieldPanel.simpleSearchField("filename", "Filename", "text");
-    
-    SearchFieldPanel searchFieldPanel2 = new SearchFieldPanel();
-    searchFieldPanel2.simpleSearchField("2", "2", "date_interval");
-    
-    SearchFieldPanel searchFieldPanel3 = new SearchFieldPanel();
-    searchFieldPanel3.simpleSearchField("3", "3", "numeric");
-    
-    SearchFieldPanel searchFieldPanel4 = new SearchFieldPanel();
-    searchFieldPanel4.simpleSearchField("filesize", "Filesize", "storage");
-    
-    SearchFieldPanel searchFieldPanel5 = new SearchFieldPanel();
-    searchFieldPanel5.simpleSearchField("fulltext", "Fulltext", "text");
-    
-    filesSearchAdvancedFieldsPanel.add(searchFieldPanel);
-    filesSearchAdvancedFieldsPanel.add(searchFieldPanel2);
-    filesSearchAdvancedFieldsPanel.add(searchFieldPanel3);
-    filesSearchAdvancedFieldsPanel.add(searchFieldPanel4);
-    filesSearchAdvancedFieldsPanel.add(searchFieldPanel5);
+    SearchFieldPanel filenameField = new SearchFieldPanel();
+    SearchFieldPanel formatField = new SearchFieldPanel();
+    SearchFieldPanel extensionField = new SearchFieldPanel();
+    SearchFieldPanel mimetypeField = new SearchFieldPanel();
+    SearchFieldPanel sizeField = new SearchFieldPanel();
+    SearchFieldPanel fulltextField = new SearchFieldPanel();
+
+    filenameField.simpleSearchField(RodaConstants.FILE_FILEID, "Filename", "text");
+    formatField.simpleSearchField(RodaConstants.FILE_FILEFORMAT, "Format", "list");
+    extensionField.simpleSearchField(RodaConstants.FILE_EXTENSION, "Extension", "text");
+    mimetypeField.simpleSearchField(RodaConstants.FILE_FORMAT_MIMETYPE, "Mimetype", "text");
+    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, "Filesize", "storage");
+    fulltextField.simpleSearchField(RodaConstants.FILE_FULLTEXT, "Fulltext", "text");
+
+    filesSearchAdvancedFieldsPanel.add(filenameField);
+    filesSearchAdvancedFieldsPanel.add(formatField);
+    filesSearchAdvancedFieldsPanel.add(extensionField);
+    filesSearchAdvancedFieldsPanel.add(mimetypeField);
+    filesSearchAdvancedFieldsPanel.add(sizeField);
+    filesSearchAdvancedFieldsPanel.add(fulltextField);
   }
 
   private void showSearchAdvancedPanel() {
@@ -320,6 +307,7 @@ public class BasicSearch extends Composite {
     Tools.newHistory(Browse.RESOLVER, id);
   }
 
+  // TODO support files and representations search
   public void doSearch() {
     List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 

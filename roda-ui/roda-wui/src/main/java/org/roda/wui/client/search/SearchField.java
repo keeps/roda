@@ -8,28 +8,42 @@
 package org.roda.wui.client.search;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class SearchField implements Serializable {
   private static final long serialVersionUID = -2809811191632936028L;
-  private String field;
+  private String id;
+  private List<String> searchFields;
   private String label;
   private String type;
   private boolean fixed;
 
-  public boolean isFixed() {
-    return fixed;
+  public SearchField() {
+    super();
   }
 
-  public void setFixed(boolean fixed) {
-    this.fixed = fixed;
+  public SearchField(String id, List<String> searchFields, String label, String type) {
+    super();
+    this.id = id;
+    this.searchFields = searchFields;
+    this.label = label;
+    this.type = type;
   }
 
-  public String getField() {
-    return field;
+  public String getId() {
+    return id;
   }
 
-  public void setField(String field) {
-    this.field = field;
+  public void setId(String id) {
+    this.id = id;
+  }
+
+  public List<String> getSearchFields() {
+    return searchFields;
+  }
+
+  public void setSearchFields(List<String> searchFields) {
+    this.searchFields = searchFields;
   }
 
   public String getLabel() {
@@ -48,9 +62,17 @@ public class SearchField implements Serializable {
     this.type = type;
   }
 
-  @Override
-  public String toString() {
-    return "SearchField [field=" + field + ", label=" + label + ", type=" + type + ", fixed=" + fixed + "]";
+  public boolean isFixed() {
+    return fixed;
   }
 
+  public void setFixed(boolean fixed) {
+    this.fixed = fixed;
+  }
+
+  @Override
+  public String toString() {
+    return "SearchField [id=" + id + ", searchFields=" + searchFields + ", label=" + label + ", type=" + type
+      + ", fixed=" + fixed + "]";
+  }
 }
