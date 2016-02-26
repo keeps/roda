@@ -9,7 +9,7 @@ package org.roda.core.data.v2.ip;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
-public class IndexedRepresentation extends Representation implements IsIndexed{
+public class IndexedRepresentation extends Representation implements IsIndexed {
 
   private static final long serialVersionUID = -950545608880793468L;
 

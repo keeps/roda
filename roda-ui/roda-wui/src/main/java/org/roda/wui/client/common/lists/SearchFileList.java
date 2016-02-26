@@ -135,7 +135,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
     display.setColumnWidth(iconColumn, "35px");
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
-    // display.setColumnWidth(pathColumn, "100%");
+    display.setColumnWidth(pathColumn, "100%");
 
     filenameColumn.setCellStyleNames("nowrap");
     mimetypeColumn.setCellStyleNames("nowrap");

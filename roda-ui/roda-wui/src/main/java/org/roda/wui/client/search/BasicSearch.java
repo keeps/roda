@@ -24,11 +24,13 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -159,6 +161,7 @@ public class BasicSearch extends Composite {
   FlowPanel facetHasRepresentations;
 
   AIPList itemsSearchResultPanel;
+  RepresentationList representationsSearchResultPanel;
   SearchFileList filesSearchResultPanel;
 
   ListBox searchAdvancedFieldOptions;
@@ -397,7 +400,12 @@ public class BasicSearch extends Composite {
   }
 
   public void showRepresentationsSearchAdvancedFieldsPanel() {
+    if (representationsSearchResultPanel == null) {
+      createRepresentationsSearchResultPanel();
+    }
+
     searchResultPanel.clear();
+    searchResultPanel.add(representationsSearchResultPanel);
 
     itemsSearchAdvancedFieldsPanel.setVisible(false);
     filesSearchAdvancedFieldsPanel.setVisible(false);
@@ -438,6 +446,24 @@ public class BasicSearch extends Composite {
       }
     });
 
+  }
+
+  private void createRepresentationsSearchResultPanel() {
+    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, null,
+      messages.searchResults());
+
+    // TODO facets
+
+    representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
+        if (rep != null) {
+          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId());
+        }
+      }
+    });
   }
 
   private void createFilesSearchResultPanel() {

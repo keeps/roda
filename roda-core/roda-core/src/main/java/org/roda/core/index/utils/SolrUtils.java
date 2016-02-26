@@ -702,6 +702,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_AIP;
     } else if (resultClass.equals(Representation.class)) {
       indexName = RodaConstants.INDEX_REPRESENTATION;
+    } else if (resultClass.equals(IndexedRepresentation.class)) {
+      indexName = RodaConstants.INDEX_REPRESENTATION;
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       indexName = RodaConstants.INDEX_PRESERVATION_EVENTS;
     } else if (resultClass.equals(IndexedPreservationAgent.class)) {
@@ -734,7 +736,7 @@ public class SolrUtils {
     T ret;
     if (resultClass.equals(IndexedAIP.class)) {
       ret = resultClass.cast(solrDocumentToIndexAIP(doc));
-    } else if (resultClass.equals(Representation.class)) {
+    } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
     } else if (resultClass.equals(LogEntry.class)) {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
