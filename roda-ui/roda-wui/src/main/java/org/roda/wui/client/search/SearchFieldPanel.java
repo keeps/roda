@@ -13,7 +13,8 @@ import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.user.client.ui.Button;
@@ -66,8 +67,8 @@ public class SearchFieldPanel extends Composite {
   private ListBox inputStorageSizeList;
   // Boolean
   private CheckBox inputCheckBox;
-  // Enum
-  private ListBox inputListBox;
+  // Suggestion
+  private SearchSuggestBox<?> inputSearchSuggestBox = null;
 
   public SearchFieldPanel() {
     panel = new FlowPanel();
@@ -123,16 +124,14 @@ public class SearchFieldPanel extends Composite {
 
     inputCheckBox = new CheckBox();
 
-    inputListBox = new ListBox();
-
     panel.add(leftPanel);
 
     initWidget(panel);
 
-    searchAdvancedFields.addClickHandler(new ClickHandler() {
+    searchAdvancedFields.addChangeHandler(new ChangeHandler() {
 
       @Override
-      public void onClick(ClickEvent event) {
+      public void onChange(ChangeEvent event) {
         listBoxSearchField(searchAdvancedFields.getSelectedValue());
       }
     });
@@ -156,7 +155,6 @@ public class SearchFieldPanel extends Composite {
     inputStorageSizeTo.addStyleName("form-textbox form-textbox-small");
     inputStorageSizeList.addStyleName("form-listbox");
     inputCheckBox.addStyleName("form-checkbox");
-    inputListBox.addStyleName("form-listbox");
   }
 
   public SearchField getSearchField() {
@@ -194,7 +192,6 @@ public class SearchFieldPanel extends Composite {
     return searchAdvancedFields.getSelectedValue();
   }
 
-  // TODO validate inputs!
   public FilterParameter getFilter() {
     FilterParameter filterParameter = null;
     String type = searchField.getType();
@@ -207,11 +204,13 @@ public class SearchFieldPanel extends Composite {
         filterParameter = new BasicSearchFilterParameter(field, inputDateBox.getValue().toString());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
         && inputDateBoxTo.getValue() != null && searchFields.size() >= 2) {
+        // TODO validate inputs!
         String fieldTo = searchField.getSearchFields().get(1);
         filterParameter = new DateIntervalFilterParameter(field, fieldTo, inputDateBoxFrom.getValue(),
           inputDateBoxTo.getValue());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
         && inputDateBoxTo.getValue() != null) {
+        // TODO validate inputs!
         filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
           inputDateBoxTo.getValue());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC) && !inputNumeric.getValue().isEmpty()) {
@@ -220,8 +219,11 @@ public class SearchFieldPanel extends Composite {
         filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
           Long.valueOf(inputNumericTo.getValue()));
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
+        // TODO validate inputs!
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_LIST)) {
+        // TODO validate inputs!
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
+        filterParameter = new BasicSearchFilterParameter(field, inputSearchSuggestBox.getValue());
       } else if (!inputText.getValue().isEmpty()) {
         filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
       }
@@ -275,11 +277,17 @@ public class SearchFieldPanel extends Composite {
       inputPanel.add(inputStorageSizeList);
     } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
       inputPanel.add(inputCheckBox);
-    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_LIST)) {
-      inputPanel.add(inputListBox);
+    } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
     } else {
       inputPanel.add(inputText);
       inputPanel.addStyleName("full_width");
     }
+  }
+
+  public void addInputSearchSuggestBox(SearchSuggestBox<?> searchSuggestBox) {
+    this.inputSearchSuggestBox = searchSuggestBox;
+    inputPanel.add(searchSuggestBox);
+    inputSearchSuggestBox.addStyleName("form-textbox");
+    inputPanel.addStyleName("full_width");
   }
 }

@@ -592,6 +592,6 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_NUMERIC_INTERVAL = "numeric_interval";
   public static final String SEARCH_FIELD_TYPE_STORAGE = "storage";
   public static final String SEARCH_FIELD_TYPE_BOOLEAN = "boolean";
-  public static final String SEARCH_FIELD_TYPE_LIST = "list";
+  public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
 
 }

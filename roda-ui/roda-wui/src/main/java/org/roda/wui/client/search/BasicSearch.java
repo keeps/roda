@@ -257,32 +257,38 @@ public class BasicSearch extends Composite {
     showSearchAdvancedFieldsPanel();
   }
 
-  // TODO define search fields
   private void createRepresentationsSearchAdvancedFieldsPanel() {
     SearchFieldPanel typeField = new SearchFieldPanel();
-    typeField.simpleSearchField(RodaConstants.SRO_ORIGINAL, "Original", "boolean");
+    typeField.simpleSearchField(RodaConstants.SRO_ORIGINAL, messages.searchRepresentationFieldOriginal(),
+      RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN);
     representationsSearchAdvancedFieldsPanel.add(typeField);
   }
 
-  // TODO define search fields
   private void createFilesSearchAdvancedFieldsPanel() {
     SearchFieldPanel filenameField = new SearchFieldPanel();
     SearchFieldPanel formatField = new SearchFieldPanel();
-    SearchFieldPanel extensionField = new SearchFieldPanel();
     SearchFieldPanel mimetypeField = new SearchFieldPanel();
     SearchFieldPanel sizeField = new SearchFieldPanel();
     SearchFieldPanel fulltextField = new SearchFieldPanel();
 
-    filenameField.simpleSearchField(RodaConstants.FILE_FILEID, "Filename", "text");
-    formatField.simpleSearchField(RodaConstants.FILE_FILEFORMAT, "Format", "list");
-    extensionField.simpleSearchField(RodaConstants.FILE_EXTENSION, "Extension", "text");
-    mimetypeField.simpleSearchField(RodaConstants.FILE_FORMAT_MIMETYPE, "Mimetype", "text");
-    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, "Filesize", "storage");
-    fulltextField.simpleSearchField(RodaConstants.FILE_FULLTEXT, "Fulltext", "text");
+    filenameField.simpleSearchField(RodaConstants.FILE_FILEID, messages.searchFileFieldFilename(),
+      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
+    formatField.simpleSearchField(RodaConstants.FILE_FILEFORMAT, messages.searchFileFieldFormat(),
+      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
+    mimetypeField.simpleSearchField(RodaConstants.FILE_FORMAT_MIMETYPE, messages.searchFileFieldMimetype(),
+      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
+    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, messages.searchFileFieldMimetype(),
+      RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
+    fulltextField.simpleSearchField(RodaConstants.FILE_FULLTEXT, messages.searchFileFieldFulltext(),
+      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
+
+    formatField
+      .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT));
+    mimetypeField.addInputSearchSuggestBox(
+      new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE));
 
     filesSearchAdvancedFieldsPanel.add(filenameField);
     filesSearchAdvancedFieldsPanel.add(formatField);
-    filesSearchAdvancedFieldsPanel.add(extensionField);
     filesSearchAdvancedFieldsPanel.add(mimetypeField);
     filesSearchAdvancedFieldsPanel.add(sizeField);
     filesSearchAdvancedFieldsPanel.add(fulltextField);
@@ -308,7 +314,7 @@ public class BasicSearch extends Composite {
     } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
       filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.SRO_SEARCH,
         representationsSearchAdvancedFieldsPanel);
-      itemsSearchResultPanel.setFilter(filter);
+      representationsSearchResultPanel.setFilter(filter);
     } else {
       filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH,
         filesSearchAdvancedFieldsPanel);

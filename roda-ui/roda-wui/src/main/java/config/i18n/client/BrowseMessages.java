@@ -421,6 +421,24 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("108")
   String searchFieldNumericToPlaceHolder();
+  
+  @DefaultMessage("Original")
+  String searchRepresentationFieldOriginal();
+  
+  @DefaultMessage("Filename")
+  String searchFileFieldFilename();
+  
+  @DefaultMessage("Format")
+  String searchFileFieldFormat();
+  
+  @DefaultMessage("Mimetype")
+  String searchFileFieldMimetype();
+  
+  @DefaultMessage("Filesize")
+  String searchFileFieldFilesize();
+  
+  @DefaultMessage("Fulltext")
+  String searchFileFieldFulltext();
 
   /************* Preservation Event List ****************/
 

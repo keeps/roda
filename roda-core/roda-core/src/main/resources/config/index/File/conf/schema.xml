@@ -112,13 +112,13 @@
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="formatMimetype" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="formatVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="formatPronom" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="formatMimetype" type="lowercase" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="formatVersion" type="lowercase" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="formatPronom" type="lowercase" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <!-- <field name="storagePath" type="string" indexed="true" stored="true" required="false" multiValued="false" /> -->
    <field name="isEntryPoint" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
-   <field name="fileFormat" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="fileFormat" type="lowercase" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="originalName" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="size" type="long" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="isDirectory" type="boolean" indexed="true" stored="true" required="false" multiValued="false" /> 
