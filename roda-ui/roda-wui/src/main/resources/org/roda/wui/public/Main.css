@@ -738,6 +738,39 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 12pt;
 }
 
+.static-page .feature-img {
+	float: left;
+	width: 32px;
+}
+
+.static-page .feature-img img {
+	width: 100% !important;
+}
+
+.static-page .feature-text {
+	margin-left: 40px;
+}
+
+.static-page .feature-text h3 {
+	margin-top: 0px;
+}
+
+@media (min-width: 768px) {
+	.static-page .feature {
+		padding-top: 30px;
+	}
+
+	.static-page .feature-img {
+		float: left;
+		width: 64px;
+	}
+
+	.static-page .feature-text {
+		margin-left: 80px;
+		padding-right: 20px;
+	}
+}
+
 @media (min-width: 768px) {
 	.max-width {
     	max-width: 998px;
