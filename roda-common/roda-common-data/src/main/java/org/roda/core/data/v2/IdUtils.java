@@ -70,25 +70,25 @@ public final class IdUtils {
 
   public static String getLinkingIdentifierId(LinkingObjectType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
-    return type+":"+getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
+    return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
   }
 
   public static String getLinkingIdentifierId(LinkingObjectType type, TransferredResource transferredResource) {
     return type + ":" + transferredResource.getRelativePath();
   }
-  
+
   public static LinkingObjectType getLinkingIdentifierType(String value) {
-    if(value.contains(":")){
+    if (value.contains(":")) {
       return LinkingObjectType.valueOf(value.split(":")[0]);
-    }else{
+    } else {
       return null;
     }
   }
-  
+
   public static String getLinkingObjectPath(String path) {
-    if(path.contains(":")){
-      return path.substring(path.indexOf(":")+1);
-    }else{
+    if (path.contains(":")) {
+      return path.substring(path.indexOf(":") + 1);
+    } else {
       return null;
     }
   }
@@ -107,7 +107,21 @@ public final class IdUtils {
   }
 
   public static String getFileIdFromLinkingId(String linkingId) {
-    return linkingId.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+    String path = getLinkingObjectPath(linkingId);
+    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+  }
+
+  public static String getRepresentationIdFromLinkingId(String linkingId) {
+    String path = getLinkingObjectPath(linkingId);
+    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
+  }
+
+  public static String getAipIdFromLinkingId(String linkingId) {
+    return getLinkingObjectPath(linkingId);
+  }
+
+  public static String getTransferredResourceIdFromLinkingId(String linkingId) {
+    return getLinkingObjectPath(linkingId);
   }
 
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
@@ -145,5 +159,4 @@ public final class IdUtils {
     return idBuilder;
   }
 
-  
 }

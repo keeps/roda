@@ -17,7 +17,10 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -298,100 +301,186 @@ public class ShowPreservationEvent extends Composite {
     layout.addStyleName("list-panel");
 
     if (object.getType().equalsIgnoreCase("URN")) {
-      LinkingObjectType type = IdUtils.getLinkingIdentifierType(object.getValue());
+      String idValue = object.getValue();
+      LinkingObjectType type = IdUtils.getLinkingIdentifierType(idValue);
+
       if (type == LinkingObjectType.TRANSFERRED_RESOURCE) {
-        String path = IdUtils.getLinkingObjectPath(object.getValue());
-        GWT.log("Event source path: " + path);
-        Anchor link = new Anchor("open",
-          Tools.createHistoryHashLink(IngestTransfer.RESOLVER, IdUtils.splitLinkingId(path)));
-        layout.add(link);
-        objectsPanel.add(layout);
+        addTransferredResourcePanel(bundle, layout, idValue);
+      } else if (type == LinkingObjectType.FILE) {
+        addFilePanel(bundle, layout, idValue);
+      } else if (type == LinkingObjectType.REPRESENTATION) {
+        addRepresentationPanel(bundle, layout, idValue);
+      } else if (type == LinkingObjectType.AIP) {
+        addAipPanel(bundle, layout, idValue);
       } else {
-        String path = IdUtils.getLinkingObjectPath(object.getValue());
-
-        String[] split = IdUtils.splitLinkingId(path);
-        String aipId = split.length > 0 ? split[0] : null;
-        String repId = split.length > 1 ? split[1] : null;
-        String fileId = split.length > 2 ? split[2] : null;
-
-        // TODO retrieve AIP, Representation or File from bundle and add more
-        // info about it here.
-        // XXX if AIP, Representation or File no longer exist, just add the IDs
-        if (aipId != null && repId != null && fileId != null) {
-          IndexedFile ifile = bundle.getFiles().get(path);
-          Label header = new Label("File");
-          header.addStyleName("h5");
-
-          Label nameLabel = new Label("Name");
-          nameLabel.addStyleName("label");
-          Label nameValue = new Label(
-            StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
-
-          Label pathLabel = null;
-          Label pathValue = null;
-          if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
-            pathLabel = new Label("Path");
-            pathLabel.addStyleName("label");
-            pathValue = new Label(IdUtils.getFileDirectoryPathId(ifile.getPath()));
-          }
-
-          Label formatLabel = new Label("Format");
-          formatLabel.addStyleName("label");
-          FileFormat fileFormat = ifile.getFileFormat();
-          // TODO guard nulls
-          Label formatValue = new Label(
-            fileFormat.getFormatDesignationName() + " " + fileFormat.getFormatDesignationVersion());
-
-          // TODO add pronom and mime type
-
-          Label sizeLabel = new Label("Size");
-          sizeLabel.addStyleName("label");
-          Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
-
-          // TODO set anchor
-          // Label idValue = new Label(outcomeObjectId);
-
-          List<String> history = new ArrayList<>();
-          history.add(ifile.getAipId());
-          history.add(ifile.getRepresentationId());
-          history.addAll(ifile.getPath());
-          history.add(ifile.getId());
-          Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
-
-          layout.add(header);
-          layout.add(nameLabel);
-          layout.add(nameValue);
-          if (pathValue != null) {
-            layout.add(pathLabel);
-            layout.add(pathValue);
-          }
-          layout.add(formatLabel);
-          layout.add(formatValue);
-          layout.add(sizeLabel);
-          layout.add(sizeValue);
-          layout.add(link);
-
-          objectsPanel.add(layout);
-        } else if (aipId != null && repId != null) {
-          // is a representation
-          // TODO add representation as in browse
-          Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, aipId, repId));
-          layout.add(link);
-          objectsPanel.add(layout);
-        } else if (aipId != null) {
-          // is an AIP
-          // TODO add AIP level (icon) and title
-
-          Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, aipId));
-          layout.add(link);
-
-          objectsPanel.add(layout);
-        } else {
-          // is empty, do nothing
-        }
+        // TODO send warning
       }
-    }
 
+      objectsPanel.add(layout);
+    }
+  }
+
+  private void addAipPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+    // TODO add AIP level (icon) and title
+
+    Label header = new Label("Intellectual entity");
+    header.addStyleName("h5");
+    layout.add(header);
+
+    IndexedAIP iAIP = bundle.getAips().get(idValue);
+
+    if (iAIP != null) {
+
+      Label titleLabel = new Label("Title");
+      titleLabel.addStyleName("label");
+      Label titleValue = new Label(iAIP.getTitle());
+
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+
+      layout.add(titleLabel);
+      layout.add(titleValue);
+      layout.add(link);
+
+    } else {
+      Label idLabel = new Label("Identifier (not found)");
+      idLabel.addStyleName("label");
+      String path = IdUtils.getLinkingObjectPath(idValue);
+      Label id_Value = new Label(path);
+
+      layout.add(idLabel);
+      layout.add(id_Value);
+    }
+  }
+
+  private void addRepresentationPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+    Label header = new Label("Representation");
+    header.addStyleName("h5");
+    layout.add(header);
+
+    IndexedRepresentation irep = bundle.getRepresentations().get(idValue);
+
+    if (irep != null) {
+
+      Label originalLabel = new Label("Original");
+      originalLabel.addStyleName("label");
+      Label originalValue = new Label(irep.isOriginal() ? "original" : "alternative");
+
+      Anchor link = new Anchor("open",
+        Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getId(), irep.getId()));
+
+      layout.add(originalLabel);
+      layout.add(originalValue);
+      layout.add(link);
+    } else {
+      Label idLabel = new Label("Identifier (not found)");
+      idLabel.addStyleName("label");
+      Label id_Value = new Label(idValue);
+
+      layout.add(idLabel);
+      layout.add(id_Value);
+    }
+  }
+
+  private void addFilePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+    Label header = new Label("File");
+    header.addStyleName("h5");
+    layout.add(header);
+
+    IndexedFile ifile = bundle.getFiles().get(idValue);
+
+    if (ifile != null) {
+      Label nameLabel = new Label("Name");
+      nameLabel.addStyleName("label");
+      Label nameValue = new Label(
+        StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
+
+      Label pathLabel = null;
+      Label pathValue = null;
+      if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
+        pathLabel = new Label("Path");
+        pathLabel.addStyleName("label");
+        pathValue = new Label(IdUtils.getFileDirectoryPathId(ifile.getPath()));
+      }
+
+      Label formatLabel = new Label("Format");
+      formatLabel.addStyleName("label");
+      FileFormat fileFormat = ifile.getFileFormat();
+      // TODO guard nulls
+      Label formatValue = new Label(
+        fileFormat.getFormatDesignationName() + " " + fileFormat.getFormatDesignationVersion());
+
+      // TODO add pronom and mime type
+
+      Label sizeLabel = new Label("Size");
+      sizeLabel.addStyleName("label");
+      Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
+
+      // TODO set anchor
+      // Label idValue = new Label(outcomeObjectId);
+
+      List<String> history = new ArrayList<>();
+      history.add(ifile.getAipId());
+      history.add(ifile.getRepresentationId());
+      history.addAll(ifile.getPath());
+      history.add(ifile.getId());
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
+
+      layout.add(nameLabel);
+      layout.add(nameValue);
+      if (pathValue != null) {
+        layout.add(pathLabel);
+        layout.add(pathValue);
+      }
+      layout.add(formatLabel);
+      layout.add(formatValue);
+      layout.add(sizeLabel);
+      layout.add(sizeValue);
+      layout.add(link);
+
+    } else {
+      Label idLabel = new Label("Identifier (not found)");
+      idLabel.addStyleName("label");
+      String path = IdUtils.getLinkingObjectPath(idValue);
+      Label id_Value = new Label(path);
+
+      layout.add(idLabel);
+      layout.add(id_Value);
+    }
+  }
+
+  private void addTransferredResourcePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+    Label header = new Label("Transferred resource");
+    header.addStyleName("h5");
+    layout.add(header);
+
+    TransferredResource tr = bundle.getTransferredResources().get(idValue);
+
+    if (tr != null) {
+      Label nameLabel = new Label("Name");
+      nameLabel.addStyleName("label");
+      Label nameValue = new Label(tr.getName());
+
+      Label pathLabel = new Label("Path");
+      pathLabel.addStyleName("label");
+      Label pathValue = new Label(tr.getFullPath());
+
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getId()));
+
+      layout.add(nameLabel);
+      layout.add(nameValue);
+      layout.add(pathLabel);
+      layout.add(pathValue);
+      layout.add(link);
+
+    } else {
+      Label idLabel = new Label("Identifier (not found)");
+      idLabel.addStyleName("label");
+      String path = IdUtils.getLinkingObjectPath(idValue);
+      Label id_Value = new Label(path);
+
+      layout.add(idLabel);
+      layout.add(id_Value);
+    }
   }
 
   @UiHandler("backButton")

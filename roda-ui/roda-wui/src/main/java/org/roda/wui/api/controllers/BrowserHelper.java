@@ -64,6 +64,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -907,20 +908,6 @@ public class BrowserHelper {
     return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
   }
 
-  // public static IndexResult<IndexedFile> findFiles(Filter filter, Sorter
-  // sorter, Sublist sublist, Facets facets)
-  // throws GenericException, RequestNotValidException {
-  // return RodaCoreFactory.getIndexService().find(IndexedFile.class, filter,
-  // sorter, sublist, facets);
-  // }
-  //
-  // public static IndexedFile retrieveFile(String aipId, String
-  // representationId, List<String> fileDirectoryPath,
-  // String fileId) throws NotFoundException, GenericException {
-  // return RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-  // IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
-  // }
-
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
     throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
@@ -983,7 +970,10 @@ public class BrowserHelper {
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws NotFoundException, GenericException {
     PreservationEventViewBundle eventBundle = new PreservationEventViewBundle();
+    Map<String, IndexedAIP> aips = new HashMap<String, IndexedAIP>();
+    Map<String, IndexedRepresentation> representations = new HashMap<String, IndexedRepresentation>();
     Map<String, IndexedFile> files = new HashMap<String, IndexedFile>();
+    Map<String, TransferredResource> transferredResources = new HashMap<String, TransferredResource>();
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
@@ -999,42 +989,51 @@ public class BrowserHelper {
       }
       eventBundle.setAgents(agents);
     }
-    if ((ipe.getSourcesObjectIds() != null && !ipe.getSourcesObjectIds().isEmpty())
-      || (ipe.getOutcomeObjectIds() != null && !ipe.getOutcomeObjectIds().isEmpty())) {
 
-      if ((ipe.getSourcesObjectIds() != null && !ipe.getSourcesObjectIds().isEmpty())) {
-        processLinkingIdentifiers(files, ipe.getSourcesObjectIds());
-      }
+    List<LinkingIdentifier> allLinkingIdentifiers = new ArrayList<>();
 
-      if ((ipe.getOutcomeObjectIds() != null && !ipe.getOutcomeObjectIds().isEmpty())) {
-        processLinkingIdentifiers(files, ipe.getOutcomeObjectIds());
-      }
-      eventBundle.setFiles(files);
+    if (ipe.getSourcesObjectIds() != null) {
+      allLinkingIdentifiers.addAll(ipe.getSourcesObjectIds());
     }
+
+    if (ipe.getOutcomeObjectIds() != null) {
+      allLinkingIdentifiers.addAll(ipe.getOutcomeObjectIds());
+    }
+
+    for (LinkingIdentifier identifier : allLinkingIdentifiers) {
+      String idValue = identifier.getValue();
+      LinkingObjectType linkingType = IdUtils.getLinkingIdentifierType(idValue);
+
+      try {
+        if (LinkingObjectType.AIP.equals(linkingType)) {
+          String uuid = IdUtils.getAipIdFromLinkingId(idValue);
+          IndexedAIP aip = retrieve(IndexedAIP.class, uuid);
+          aips.put(idValue, aip);
+        } else if (LinkingObjectType.REPRESENTATION.equals(linkingType)) {
+          String uuid = IdUtils.getRepresentationIdFromLinkingId(idValue);
+          IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid);
+          representations.put(idValue, rep);
+        } else if (LinkingObjectType.FILE.equals(linkingType)) {
+          IndexedFile file = retrieve(IndexedFile.class, IdUtils.getFileIdFromLinkingId(idValue));
+          files.put(idValue, file);
+        } else if (LinkingObjectType.TRANSFERRED_RESOURCE.equals(linkingType)) {
+          String uuid = IdUtils.getTransferredResourceIdFromLinkingId(idValue);
+          TransferredResource tr = retrieve(TransferredResource.class, uuid);
+          transferredResources.put(idValue, tr);
+        } else {
+          LOGGER.warn("No support for linking object type: " + linkingType);
+        }
+      } catch (NotFoundException e) {
+        // nothing to do
+      }
+    }
+
+    eventBundle.setAips(aips);
+    eventBundle.setRepresentations(representations);
+    eventBundle.setFiles(files);
+    eventBundle.setTransferredResources(transferredResources);
 
     return eventBundle;
-  }
-
-  private static Map<String, IndexedFile> processLinkingIdentifiers(Map<String, IndexedFile> files,
-    List<LinkingIdentifier> linkingIdentifiers) throws NotFoundException, GenericException {
-    for (LinkingIdentifier identifier : linkingIdentifiers) {
-      LinkingObjectType linkingType = IdUtils.getLinkingIdentifierType(identifier.getValue());
-
-      if (linkingType != LinkingObjectType.TRANSFERRED_RESOURCE) {
-        String[] tokens = IdUtils.splitLinkingId(IdUtils.getLinkingObjectPath(identifier.getValue()));
-        if (tokens.length == 1) {
-          // AIP
-        } else if (tokens.length == 2) {
-          // REPRESENTATION
-        } else {
-          // FILE
-          IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-            IdUtils.getFileIdFromLinkingId(identifier.getValue()));
-          files.put(identifier.getValue(), file);
-        }
-      }
-    }
-    return files;
   }
 
   public static CloseableIterable<BinaryVersion> listDescriptiveMetadataVersions(String aipId,

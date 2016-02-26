@@ -11,7 +11,10 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 
@@ -20,19 +23,25 @@ public class PreservationEventViewBundle implements Serializable {
   private static final long serialVersionUID = -8540304346599230183L;
   private IndexedPreservationEvent event;
   private List<IndexedPreservationAgent> agents;
-  private Map<String,IndexedFile> files;
-  
-  
+  private Map<String, IndexedAIP> aips;
+  private Map<String, IndexedRepresentation> representations;
+  private Map<String, IndexedFile> files;
+  private Map<String, TransferredResource> transferredResources;
 
   public PreservationEventViewBundle() {
     super();
   }
 
-  public PreservationEventViewBundle(IndexedPreservationEvent event, List<IndexedPreservationAgent> agents, Map<String,IndexedFile> files) {
+  public PreservationEventViewBundle(IndexedPreservationEvent event, List<IndexedPreservationAgent> agents,
+    Map<String, IndexedAIP> aips, Map<String, IndexedRepresentation> representations, Map<String, IndexedFile> files,
+    Map<String, TransferredResource> transferredResources) {
     super();
     this.event = event;
     this.agents = agents;
+    this.aips = aips;
+    this.representations = representations;
     this.files = files;
+    this.transferredResources = transferredResources;
   }
 
   public IndexedPreservationEvent getEvent() {
@@ -50,8 +59,6 @@ public class PreservationEventViewBundle implements Serializable {
   public void setAgents(List<IndexedPreservationAgent> agents) {
     this.agents = agents;
   }
-  
-  
 
   public Map<String, IndexedFile> getFiles() {
     return files;
@@ -61,9 +68,35 @@ public class PreservationEventViewBundle implements Serializable {
     this.files = files;
   }
 
+  public Map<String, IndexedAIP> getAips() {
+    return aips;
+  }
+
+  public void setAips(Map<String, IndexedAIP> aips) {
+    this.aips = aips;
+  }
+
+  public Map<String, IndexedRepresentation> getRepresentations() {
+    return representations;
+  }
+
+  public void setRepresentations(Map<String, IndexedRepresentation> representations) {
+    this.representations = representations;
+  }
+
+  public Map<String, TransferredResource> getTransferredResources() {
+    return transferredResources;
+  }
+
+  public void setTransferredResources(Map<String, TransferredResource> transferredResources) {
+    this.transferredResources = transferredResources;
+  }
+
   @Override
   public String toString() {
-    return "PreservationEventViewBundle [event=" + event + ", agents=" + agents + "]";
+    return "PreservationEventViewBundle [event=" + event + ", agents=" + agents + ", aips=" + aips
+      + ", representations=" + representations + ", files=" + files + ", transferredResources=" + transferredResources
+      + "]";
   }
 
 }
