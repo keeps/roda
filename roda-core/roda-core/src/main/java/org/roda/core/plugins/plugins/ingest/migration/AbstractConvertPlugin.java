@@ -85,8 +85,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   public boolean hasPartialSuccessOnOutcome() {
-    return Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins",
+      "hasPartialSuccessOnOutcome"));
   }
 
   public abstract List<String> getApplicableTo();
@@ -519,11 +519,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   public abstract String executePlugin(Path inputPath, Path outputPath, String fileFormat)
 
-    throws UnsupportedOperationException, IOException, CommandException;
+  throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
     ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
-      throws PluginException {
+    throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
@@ -574,9 +574,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     Map<String, List<String>> mimetypeToExtension) {
     if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat().isEmpty()))
       && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-        || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-        || (applicableTo.contains(fileFormat)))
-      && (convertableTo.size() == 0 || convertableTo.contains(outputFormat)))
+        || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+          .contains(fileFormat))) && (convertableTo.size() == 0 || convertableTo.contains(outputFormat)))
       return true;
     else
       return false;
@@ -600,7 +599,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   private void createNewFilesOnRepresentation(StorageService storage, ModelService model, List<File> unchangedFiles,
     String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
+    AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
 
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
@@ -624,20 +623,19 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     return PreservationEventType.MIGRATION;
   }
 
-  // TODO fix details...
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXX.";
+    return "Converted, if possible, files to a new format (" + outputFormat + ").";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXX.";
+    return "Files were successfully converted to a new format.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXXXXxx.";
+    return "File conversion failed.";
   }
 
 }

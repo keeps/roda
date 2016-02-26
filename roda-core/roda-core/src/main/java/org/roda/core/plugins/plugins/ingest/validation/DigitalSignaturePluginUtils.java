@@ -67,6 +67,7 @@ import org.apache.pdfbox.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
+import org.apache.poi.openxml4j.opc.PackagePart;
 import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
@@ -74,6 +75,7 @@ import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 import org.apache.poi.poifs.crypt.dsig.facets.XAdESXLSignatureFacet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -83,6 +85,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -111,80 +114,25 @@ public class DigitalSignaturePluginUtils {
   private static final String PDF_BOOLEAN = "Boolean";
   private static final String OTHER_METADATA_TYPE = "DigitalSignature";
 
-  public static String runDigitalSignatureVerify(Path input, String fileFormat) throws IOException,
-    GeneralSecurityException {
+  /*** VERIFY FUNCTIONS ***/
 
-    if (fileFormat.equals("pdf")) {
-      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyPDF(input);
-    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-      return DigitalSignaturePluginUtils.runDigitalSignatureVerifyOOXML(input);
-    } else if (fileFormat.equals("odt")) {
-      // FIXME ODF verification has problems
-      // return DigitalSignaturePluginUtils.runDigitalSignatureVerifyODT(input);
+  public static String runDigitalSignatureVerify(Path input, String fileFormat) {
+
+    try {
+      if (fileFormat.equals("pdf")) {
+        return DigitalSignaturePluginUtils.runDigitalSignatureVerifyPDF(input);
+      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+        return DigitalSignaturePluginUtils.runDigitalSignatureVerifyOOXML(input);
+      } else if (fileFormat.equals("odt")) {
+        // FIXME ODF verification has problems
+        // return
+        // DigitalSignaturePluginUtils.runDigitalSignatureVerifyODF(input);
+      }
+    } catch (IOException | GeneralSecurityException e) {
+      LOGGER.warn("Problems running digital signature verification");
     }
 
     return "Not a supported format";
-  }
-
-  public static List<Path> runDigitalSignatureExtract(ModelService model, File file, Path input, String fileFormat)
-    throws SignatureException, IOException, RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
-
-    List<Path> extractResult = new ArrayList<Path>();
-
-    if (fileFormat.equals("pdf")) {
-      extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
-
-      if (extractResult.size() > 0) {
-        ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-        ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
-
-        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
-          file.getId().substring(0, file.getId().lastIndexOf('.')), ".txt",
-          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
-
-        if (extractResult.get(1) != null) {
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-            contentsPayload, true);
-        }
-      }
-    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-      Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
-      extractResult = new ArrayList<Path>(extractMap.keySet());
-
-      for (Path p : extractResult) {
-        ContentPayload mainPayload = new FSPathContentPayload(p);
-        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
-          file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
-          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
-      }
-    } else if (fileFormat.equals("odt")) {
-      extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODT(input);
-
-      if (extractResult.size() > 0) {
-        ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-        model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
-          file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
-          DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
-      }
-    }
-
-    return extractResult;
-  }
-
-  public static Path runDigitalSignatureStrip(Path input, String fileFormat) throws IOException, DocumentException {
-    Path output = Files.createTempFile("stripped", "." + fileFormat);
-
-    if (fileFormat.equals("pdf")) {
-      DigitalSignaturePluginUtils.runDigitalSignatureStripPDF(input, output);
-    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-      DigitalSignaturePluginUtils.runDigitalSignatureStripOOXML(input, output);
-    } else if (fileFormat.equals("odt")) {
-      DigitalSignaturePluginUtils.runDigitalSignatureStripODT(input, output);
-    }
-
-    return output;
   }
 
   private static String runDigitalSignatureVerifyPDF(Path input) throws IOException, GeneralSecurityException {
@@ -279,7 +227,7 @@ public class DigitalSignaturePluginUtils {
     return isValid ? "Passed" : "Not passed";
   }
 
-  private static String runDigitalSignatureVerifyODT(Path input) throws IOException, GeneralSecurityException {
+  private static String runDigitalSignatureVerifyODF(Path input) throws IOException, GeneralSecurityException {
     boolean isValid = true;
     ZipFile zipFile = new ZipFile(input.toString());
     Enumeration<?> enumeration;
@@ -296,13 +244,10 @@ public class DigitalSignaturePluginUtils {
           documentBuilder = documentBuilderFactory.newDocumentBuilder();
           Document document = documentBuilder.parse(inputSource);
           NodeList signatureNodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
-          for (int idx = 0; idx < signatureNodeList.getLength(); idx++) {
-            Node signatureNode = signatureNodeList.item(idx);
-            if (!verifySignature(signatureNode)) {
-              isValid = isValid && false;
-            }
+          for (int i = 0; i < signatureNodeList.getLength(); i++) {
+            Node signatureNode = signatureNodeList.item(i);
+            isValid = isValid && verifySignatureODF(signatureNode);
           }
-
         } catch (ParserConfigurationException | SAXException e) {
           return "Signatures document can not be parsed";
         } catch (MarshalException | XMLSignatureException | URISyntaxException e) {
@@ -313,6 +258,58 @@ public class DigitalSignaturePluginUtils {
 
     zipFile.close();
     return isValid ? "Passed" : "Not passed";
+  }
+
+  /*** EXTRACT FUNCTIONS ***/
+
+  public static List<Path> runDigitalSignatureExtract(ModelService model, File file, Path input, String fileFormat) {
+
+    List<Path> extractResult = new ArrayList<Path>();
+
+    try {
+      if (fileFormat.equals("pdf")) {
+        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
+
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            mainPayload, true);
+
+          if (extractResult.get(1) != null) {
+            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+              contentsPayload, true);
+          }
+        }
+      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+        Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
+        extractResult = new ArrayList<Path>(extractMap.keySet());
+
+        for (Path p : extractResult) {
+          ContentPayload mainPayload = new FSPathContentPayload(p);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+        }
+      } else if (fileFormat.equals("odt")) {
+        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODF(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            mainPayload, true);
+        }
+      }
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException | SignatureException e) {
+      LOGGER.warn("Problems running a document digital signature extraction");
+    }
+
+    return extractResult;
   }
 
   private static List<Path> runDigitalSignatureExtractPDF(Path input) throws SignatureException, IOException {
@@ -412,7 +409,7 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  private static List<Path> runDigitalSignatureExtractODT(Path input) throws SignatureException, IOException {
+  private static List<Path> runDigitalSignatureExtractODF(Path input) throws SignatureException, IOException {
     List<Path> paths = new ArrayList<Path>();
 
     ZipFile zipFile = new ZipFile(input.toString());
@@ -433,6 +430,27 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
+  /*** STRIP FUNCTIONS ***/
+
+  public static Path runDigitalSignatureStrip(Path input, String fileFormat) {
+    try {
+      Path output = Files.createTempFile("stripped", "." + fileFormat);
+
+      if (fileFormat.equals("pdf")) {
+        DigitalSignaturePluginUtils.runDigitalSignatureStripPDF(input, output);
+      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+        DigitalSignaturePluginUtils.runDigitalSignatureStripOOXML(input, output);
+      } else if (fileFormat.equals("odt")) {
+        DigitalSignaturePluginUtils.runDigitalSignatureStripODF(input, output);
+      }
+
+      return output;
+    } catch (IOException | AlreadyExistsException | GenericException | InvalidFormatException | DocumentException e) {
+      LOGGER.warn("Problems running a document stripping");
+      return null;
+    }
+  }
+
   private static void runDigitalSignatureStripPDF(Path input, Path output) throws IOException, DocumentException {
     PdfReader reader = new PdfReader(input.toString());
     PdfStamper stamper = new PdfStamper(reader, new FileOutputStream(output.toString()));
@@ -441,47 +459,28 @@ public class DigitalSignaturePluginUtils {
     reader.close();
   }
 
-  private static void runDigitalSignatureStripOOXML(Path input, Path output) throws IOException, DocumentException {
-    ZipOutputStream zout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output.toFile())));
-    ZipFile zipFile = new ZipFile(input.toString());
-    Enumeration<?> enumeration;
+  private static void runDigitalSignatureStripOOXML(Path input, Path output) throws IOException,
+    AlreadyExistsException, GenericException, InvalidFormatException {
 
-    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
-      ZipEntry entry = (ZipEntry) enumeration.nextElement();
-      String entryName = entry.getName();
-      if (!entryName.startsWith("_xmlsignatures")) {
+    FSUtils.copy(input, output, true);
+    OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE);
+    String signatureContentType = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
+    String signatureRelType = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
 
-        InputStream zipStream = zipFile.getInputStream(entry);
-        ZipEntry destEntry = new ZipEntry(entryName);
-        zout.putNextEntry(destEntry);
-
-        byte[] data = new byte[(int) entry.getSize()];
-        while ((zipStream.read(data, 0, (int) entry.getSize())) != -1) {
-        }
-
-        if (entryName.equalsIgnoreCase("_rels/.rels")) {
-          String content = new String(data);
-          content = content.replaceAll("<Relationship [^>]*?_xmlsignatures[^>]*?/>", "");
-          data = content.getBytes();
-        }
-
-        if (entryName.equalsIgnoreCase("[Content_Types].xml")) {
-          String content = new String(data);
-          content = content.replaceAll("<Override [^>]*?_xmlsignatures[^>]*?/>", "");
-          data = content.getBytes();
-        }
-
-        zout.write(data);
-        zout.closeEntry();
-        IOUtils.closeQuietly(zipStream);
-      }
+    ArrayList<PackagePart> pps = pkg.getPartsByContentType(signatureContentType);
+    for (PackagePart pp : pps) {
+      pkg.removePart(pp);
     }
 
-    IOUtils.closeQuietly(zout);
-    zipFile.close();
+    ArrayList<PackagePart> ppct = pkg.getPartsByRelationshipType(signatureRelType);
+    for (PackagePart pp : ppct) {
+      pkg.removePart(pp);
+    }
+
+    pkg.close();
   }
 
-  private static void runDigitalSignatureStripODT(Path input, Path output) throws IOException, DocumentException {
+  private static void runDigitalSignatureStripODF(Path input, Path output) throws IOException, DocumentException {
     ZipOutputStream zout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output.toFile())));
     ZipFile zipFile = new ZipFile(input.toString());
     Enumeration<?> enumeration;
@@ -508,6 +507,8 @@ public class DigitalSignaturePluginUtils {
     IOUtils.closeQuietly(zout);
     zipFile.close();
   }
+
+  /*** SUB FUNCTIONS ***/
 
   private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
     String result = "";
@@ -569,6 +570,25 @@ public class DigitalSignaturePluginUtils {
     }
   }
 
+  private static boolean verifySignatureODF(Node signatureNode) throws MarshalException, XMLSignatureException,
+    MalformedURLException, URISyntaxException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+    Element signedPropertiesElement = (Element) ((Element) signatureNode).getElementsByTagNameNS(
+      XAdESXLSignatureFacet.MS_DIGSIG_NS, "SignedProperties").item(0);
+    if (signedPropertiesElement != null) {
+      signedPropertiesElement.setIdAttribute("Id", true);
+    }
+
+    DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
+    XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
+    DigestMethod dm = xmlSignatureFactory.newDigestMethod(DigestMethod.SHA1, null);
+    Reference r = xmlSignatureFactory.newReference(signatureNode.getBaseURI(), dm);
+    // FIXME URIDereferencer needs fix
+    domValidateContext.setURIDereferencer((URIDereferencer) r);
+    XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
+    return xmlSignature.validate(domValidateContext);
+  }
+
   public static int countSignatures(Path base, StoragePath input, String intermediatePath) {
     int counter = -1;
     try {
@@ -582,26 +602,8 @@ public class DigitalSignaturePluginUtils {
     return counter;
   }
 
-  private static boolean verifySignature(Node signatureNode) throws MarshalException, XMLSignatureException,
-    MalformedURLException, URISyntaxException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-
-    Element signedPropertiesElement = (Element) ((Element) signatureNode).getElementsByTagNameNS(
-      XAdESXLSignatureFacet.MS_DIGSIG_NS, "SignedProperties").item(0);
-    if (signedPropertiesElement != null) {
-      signedPropertiesElement.setIdAttribute("Id", true);
-    }
-
-    DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
-    XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
-    DigestMethod dm = xmlSignatureFactory.newDigestMethod(DigestMethod.SHA1, null);
-    Reference r = xmlSignatureFactory.newReference(signatureNode.getBaseURI(), dm);
-    domValidateContext.setURIDereferencer((URIDereferencer) r);
-    XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
-    boolean validity = xmlSignature.validate(domValidateContext);
-    return validity;
-  }
-
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
+  /*************************** FILLING FILE FORMAT STRUCTURES FUNCTIONS ***************************/
 
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
@@ -625,7 +627,6 @@ public class DigitalSignaturePluginUtils {
     for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
       // TODO add missing mimetypes
       String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
-
       map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
     }
 
