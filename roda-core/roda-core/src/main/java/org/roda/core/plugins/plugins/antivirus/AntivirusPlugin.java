@@ -19,7 +19,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -160,10 +159,10 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       String outcomeDetailExtension = success ? virusCheckResult.getReport()
         : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
 
-      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-        aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      List<LinkingIdentifier> sources = Arrays
+        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
+      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes,
         success ? PluginState.SUCCESS : PluginState.FAILURE, outcomeDetailExtension, notify);
 
       if (notify) {

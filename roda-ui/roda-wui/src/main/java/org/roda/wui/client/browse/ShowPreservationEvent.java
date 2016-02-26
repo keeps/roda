@@ -38,7 +38,6 @@ import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
@@ -246,9 +245,11 @@ public class ShowPreservationEvent extends Composite {
     // Source objects
     if (event.getSourcesObjectIds().size() > 0) {
       for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
-        if(sourceObjectId.getRoles()!=null && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)){
-        addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
-      }
+        if (sourceObjectId.getRoles() != null
+          && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)) {
+          GWT.log("Event source id: " + sourceObjectId);
+          addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
+        }
       }
     } else {
       sourceObjectsHeader.setVisible(false);
@@ -258,8 +259,9 @@ public class ShowPreservationEvent extends Composite {
     // Outcome objects
     if (event.getOutcomeObjectIds().size() > 0) {
       for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
-        if(outcomeObjectId.getRoles()!=null && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)){
-        addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
+        if (outcomeObjectId.getRoles() != null
+          && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)) {
+          addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
         }
       }
     } else {
@@ -295,14 +297,16 @@ public class ShowPreservationEvent extends Composite {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("list-panel");
 
-    if(object.getType().equalsIgnoreCase("URN")){
+    if (object.getType().equalsIgnoreCase("URN")) {
       LinkingObjectType type = IdUtils.getLinkingIdentifierType(object.getValue());
-      if(type==LinkingObjectType.TRANSFERRED_RESOURCE){
+      if (type == LinkingObjectType.TRANSFERRED_RESOURCE) {
         String path = IdUtils.getLinkingObjectPath(object.getValue());
-        Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, path));
+        GWT.log("Event source path: " + path);
+        Anchor link = new Anchor("open",
+          Tools.createHistoryHashLink(IngestTransfer.RESOLVER, IdUtils.splitLinkingId(path)));
         layout.add(link);
         objectsPanel.add(layout);
-      }else{
+      } else {
         String path = IdUtils.getLinkingObjectPath(object.getValue());
 
         String[] split = IdUtils.splitLinkingId(path);
@@ -387,8 +391,7 @@ public class ShowPreservationEvent extends Composite {
         }
       }
     }
-    
-    
+
   }
 
   @UiHandler("backButton")

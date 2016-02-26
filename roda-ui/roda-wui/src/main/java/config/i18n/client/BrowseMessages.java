@@ -214,6 +214,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();
+  
+  @DefaultMessage("Download")
+  String ingestTransferButtonDownload();
 
   @DefaultMessage("New folder")
   String ingestTransferButtonCreateFolder();

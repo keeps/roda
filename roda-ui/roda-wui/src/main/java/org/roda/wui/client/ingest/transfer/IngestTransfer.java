@@ -146,7 +146,13 @@ public class IngestTransfer extends Composite {
   BreadcrumbPanel breadcrumb;
 
   @UiField
+  FlowPanel searchPanel;
+
+  @UiField
   TextBox searchInputBox;
+
+  @UiField
+  Button download;
 
   @UiField
   AccessibleFocusPanel searchInputButton;
@@ -209,17 +215,9 @@ public class IngestTransfer extends Composite {
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
-        if (r != null && !r.isFile()) {
+        if (r != null) {
           searchInputBox.setText("");
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
-        } else if (r != null && r.isFile()) {
-
-          SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(
-            transferredResourceList.getSelectionModel().getSelectedObject().getId());
-          Window.Location.assign(downloadUri.asString());
-
-          // disable selection
-          transferredResourceList.getSelectionModel().clear();
         }
       }
     });
@@ -253,10 +251,21 @@ public class IngestTransfer extends Composite {
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
 
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
-    transferredResourceList.setFilter(filter);
+    if (r.isFile()) {
+      // TODO add big download button
+      searchPanel.setVisible(false);
+      transferredResourceList.setVisible(false);
+      download.setVisible(true);
+    } else {
 
+      Filter filter = new Filter(
+        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
+      transferredResourceList.setFilter(filter);
+
+      searchPanel.setVisible(true);
+      transferredResourceList.setVisible(true);
+      download.setVisible(false);
+    }
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
 
@@ -277,6 +286,8 @@ public class IngestTransfer extends Composite {
     itemDates.setText("");
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
+
+    download.setVisible(false);
 
     transferredResourceList.setFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
@@ -533,5 +544,13 @@ public class IngestTransfer extends Composite {
     filter.add(parameters);
 
     transferredResourceList.setFilter(filter);
+  }
+
+  @UiHandler("download")
+  public void handleDownload(ClickEvent e) {
+    if (resource != null) {
+      SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getId());
+      Window.Location.assign(downloadUri.asString());
+    }
   }
 }

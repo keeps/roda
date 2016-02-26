@@ -19,7 +19,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -97,8 +96,8 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
           siegfriedOutputs
             .add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation));
-          sources.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(),
-            representation.getId(), null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
+            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
         }
         model.notifyAIPUpdated(aip.getId());
         reportItem.setPluginState(PluginState.SUCCESS);
@@ -116,8 +115,8 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         try {
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
-            reportItem.getPluginState(), "", notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
+            notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

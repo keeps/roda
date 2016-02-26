@@ -15,7 +15,6 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -132,10 +131,10 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
     try {
-      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-        aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      List<LinkingIdentifier> sources = Arrays
+        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes, state, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, "", notify);
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }

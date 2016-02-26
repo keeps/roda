@@ -28,7 +28,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -367,17 +366,17 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
         stringBuilder.append(extracts.substring(0, extracts.lastIndexOf(',')) + ". ");
     }
 
-    if (alteredFiles.size() == 0) {
+    if (alteredFiles.isEmpty()) {
       stringBuilder.append("No file was stripped on this representation.");
     } else {
       stringBuilder.append("The digital signature (DS) operation stripped some files. ");
       for (File file : alteredFiles) {
-        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
+          file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       }
       for (File file : newFiles) {
-        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aip.getId(),
-          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aip.getId(), file.getRepresentationId(),
+          file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       }
     }
 
@@ -388,7 +387,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, premisSourceFilesIdentifiers,
+      PluginHelper.createPluginEvent(this, aip.getId(), model, premisSourceFilesIdentifiers,
         premisTargetFilesIdentifiers, state, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {

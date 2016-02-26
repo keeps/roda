@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest.validation;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -233,8 +235,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
     try {
       // TODO fix linking identifiers
-      PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, null, null, pluginState,
-        outcomeDetails, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, Arrays.asList(PluginHelper
+        .getLinkingIdentifier(aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null,
+        pluginState, outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       logger.error("Error creating event: " + e.getMessage(), e);

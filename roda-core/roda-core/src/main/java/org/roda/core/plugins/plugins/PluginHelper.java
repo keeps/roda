@@ -185,16 +185,41 @@ public final class PluginHelper {
 
   }
 
-  public static <T extends Serializable> void createPluginEvent(Plugin<T> plugin, String aipID, String representationID,
-    List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
-    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
-    createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, sources, targets, outcome,
+  /**
+   * For AIP
+   */
+  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+    ModelService model, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcome,
+    String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
+      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipID, null, null, null, model, sources, targets, outcome, outcomeDetailExtension,
+      notify, new Date());
+  }
+
+  /**
+   * For REPRESENTATION
+   */
+  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+    String representationID, ModelService model, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
+    PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
+      NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipID, representationID, null, null, model, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
+  /**
+   * For FILE
+   */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+    String representationID, List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
+    List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
+    return createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, sources, targets, outcome,
+      outcomeDetailExtension, notify, new Date());
+  }
+
+  private static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify, Date startDate)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
@@ -207,6 +232,7 @@ public final class PluginHelper {
     } catch (AlreadyExistsException e) {
       agent = PremisUtils.getPreservationAgent(plugin, model);
     } catch (RODAException e) {
+      // FIXME what??? Siegfried???
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
     }
 
@@ -267,7 +293,20 @@ public final class PluginHelper {
     return li;
   }
 
-  public static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String aipID, String representationID,
+  public static LinkingIdentifier getLinkingIdentifier(String aipID, String role) {
+    return getLinkingIdentifier(LinkingObjectType.AIP, aipID, null, null, null, role);
+  }
+
+  public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, String role) {
+    return getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aipID, representationID, null, null, role);
+  }
+
+  public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, List<String> filePath,
+    String fileID, String role) {
+    return getLinkingIdentifier(LinkingObjectType.FILE, aipID, representationID, null, null, role);
+  }
+
+  private static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String aipID, String representationID,
     List<String> filePath, String fileID, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
     li.setValue(IdUtils.getLinkingIdentifierId(type, aipID, representationID, filePath, fileID));
@@ -280,8 +319,7 @@ public final class PluginHelper {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     if (aip.getRepresentations() != null && !aip.getRepresentations().isEmpty()) {
       for (Representation representation : aip.getRepresentations()) {
-        identifiers.add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(),
-          null, null, role));
+        identifiers.add(getLinkingIdentifier(aip.getId(), representation.getId(), role));
       }
     }
     return identifiers;

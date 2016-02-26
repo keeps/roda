@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -89,11 +88,11 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
         List<LinkingIdentifier> sources = Arrays.asList(
           PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-          aipCreated.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> outcomes = Arrays.asList(
+          PluginHelper.getLinkingIdentifier(aipCreated.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes,
-          PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, sources, outcomes, PluginState.SUCCESS, "",
+          notify);
         LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());

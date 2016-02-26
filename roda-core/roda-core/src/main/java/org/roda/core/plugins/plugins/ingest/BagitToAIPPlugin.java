@@ -93,11 +93,11 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
         List<LinkingIdentifier> sources = Arrays.asList(
           PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-          aipCreated.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> outcomes = Arrays.asList(
+          PluginHelper.getLinkingIdentifier(aipCreated.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), null, null, null, model, sources, outcomes,
-          reportItem.getPluginState(), "", notify);
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, sources, outcomes, reportItem.getPluginState(),
+          "", notify);
 
         LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
       } catch (Throwable e) {

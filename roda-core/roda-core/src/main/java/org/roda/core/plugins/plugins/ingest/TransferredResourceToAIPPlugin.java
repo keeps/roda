@@ -25,7 +25,6 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
@@ -124,11 +123,11 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
         List<LinkingIdentifier> sources = Arrays.asList(
           PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(LinkingObjectType.AIP,
-          aip.getId(), null, null, null, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> outcomes = Arrays
+          .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
-          reportItem.getPluginState(), "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
+          notify);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());

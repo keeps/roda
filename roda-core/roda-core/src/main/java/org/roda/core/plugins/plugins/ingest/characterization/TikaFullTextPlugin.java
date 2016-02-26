@@ -129,8 +129,8 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
             RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), null, null, null, model, sources, outcomes,
-            reportItem.getPluginState(), "", notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
+            notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

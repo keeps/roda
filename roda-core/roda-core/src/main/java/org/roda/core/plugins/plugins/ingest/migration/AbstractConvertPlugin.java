@@ -36,7 +36,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -537,13 +536,15 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       stringBuilder
         .append("No file was successfully converted on this representation due to plugin or command line issues.");
     } else {
-      for (File file : alteredFiles)
-        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      for (File file : alteredFiles) {
+        premisSourceFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(),
+          file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      }
 
-      for (File file : newFiles)
-        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(LinkingObjectType.FILE, aipId,
-          file.getRepresentationId(), file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      for (File file : newFiles) {
+        premisTargetFilesIdentifiers.add(PluginHelper.getLinkingIdentifier(aipId, file.getRepresentationId(),
+          file.getPath(), file.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      }
 
       stringBuilder.append("The source files were converted to a new format (." + outputFormat + ")");
     }
@@ -560,8 +561,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     }
 
     try {
-      PluginHelper.createPluginEvent(this, aipId, null, null, null, model, premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, outcome, stringBuilder.toString(), notify);
+      PluginHelper.createPluginEvent(this, aipId, model, premisSourceFilesIdentifiers, premisTargetFilesIdentifiers,
+        outcome, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);

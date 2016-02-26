@@ -7,7 +7,7 @@
 	xmlns:m="urn:import:org.roda.wui.client.main">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -30,7 +30,7 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<g:FlowPanel styleName="searchPanel">
+				<g:FlowPanel styleName="searchPanel" ui:field="searchPanel">
 					<g:FlowPanel styleName="searchPanelLeft">
 						<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
 					</g:FlowPanel>
@@ -47,6 +47,9 @@
 				</g:FlowPanel>
 				<lists:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
+				<g:Button addStyleNames="btn btn-download" ui:field="download">
+					<ui:text from='{messages.ingestTransferButtonDownload}' />
+				</g:Button>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
