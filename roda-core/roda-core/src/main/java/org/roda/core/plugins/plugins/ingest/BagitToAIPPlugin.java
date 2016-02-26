@@ -67,9 +67,6 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(this);
-    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(this);
-
     for (TransferredResource transferredResource : list) {
       Path bagitPath = Paths.get(transferredResource.getFullPath());
 
@@ -84,8 +81,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
           throw new BagitNotValidException(result.getMessages() + "");
         }
 
-        String parentId = PluginHelper.getParentId(bag.getBagInfoTxt().get("parent"), jobDefinedParentId,
-          jobDefinedForceParentId);
+        String parentId = PluginHelper.getParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml", parentId);
 

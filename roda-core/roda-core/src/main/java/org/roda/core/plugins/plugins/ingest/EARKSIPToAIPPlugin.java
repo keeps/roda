@@ -66,9 +66,6 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(this);
-    boolean jobDefinedForceParentId = PluginHelper.getForceParentIdFromParameters(this);
-
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
 
@@ -79,7 +76,7 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
         LOGGER.debug("Converting " + earkSIPPath + " to AIP");
         sip = EARKSIP.parse(earkSIPPath);
 
-        String parentId = PluginHelper.getParentId(sip.getParentID(), jobDefinedParentId, jobDefinedForceParentId);
+        String parentId = PluginHelper.getParentId(this, index, sip.getParentID());
 
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
 

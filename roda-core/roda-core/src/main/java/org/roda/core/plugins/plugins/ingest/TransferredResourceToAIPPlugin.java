@@ -79,7 +79,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
 
-    String jobDefinedParentId = PluginHelper.getParentIdFromParameters(this);
+    String parentId = PluginHelper.getParentId(this, index, null);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
@@ -88,7 +88,6 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
 
         boolean active = false;
-        String parentId = jobDefinedParentId;
         AIPPermissions permissions = new AIPPermissions();
         boolean notifyCreatedAIP = false;
 

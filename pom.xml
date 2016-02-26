@@ -1035,7 +1035,7 @@
 			<dependency>
 				<groupId>org.roda-project</groupId>
 				<artifactId>commons-ip</artifactId>
-				<version>1.0.0-alpha8</version>
+				<version>1.0.0-alpha9</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -19,7 +20,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.model.ModelService;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -28,6 +28,7 @@ import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
+import org.roda_project.commons_ip.utils.METSEnums.MetadataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,9 +68,9 @@ public class EARKSIPToAIPPluginUtils {
       for (IPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
         String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
         ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
-        String type = (dm.getMetadataType() != null) ? dm.getMetadataType().toString() : "";
+        String metadataType = getMetadataType(dm);
 
-        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, type, false);
+        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, false);
       }
     }
 
@@ -77,5 +78,18 @@ public class EARKSIPToAIPPluginUtils {
 
     return model.retrieveAIP(aip.getId());
 
+  }
+
+  private static String getMetadataType(IPDescriptiveMetadata dm) {
+    MetadataType metadataType = dm.getMetadataType();
+    String type = "";
+    if (metadataType != null) {
+      if (metadataType == MetadataType.OTHER && StringUtils.isNotBlank(metadataType.getOtherType())) {
+        type = metadataType.getOtherType();
+      } else {
+        type = metadataType.getType();
+      }
+    }
+    return type;
   }
 }

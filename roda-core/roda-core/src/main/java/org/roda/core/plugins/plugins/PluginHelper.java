@@ -87,11 +87,11 @@ public final class PluginHelper {
     return plugin.getParameterValues().getOrDefault(pluginParameter.getId(), pluginParameter.getDefaultValue());
   }
 
-  public static <T extends Serializable> String getParentIdFromParameters(Plugin<T> plugin) {
+  private static <T extends Serializable> String getParentIdFromParameters(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_PARENT_ID);
   }
 
-  public static <T extends Serializable> boolean getForceParentIdFromParameters(Plugin<T> plugin) {
+  private static <T extends Serializable> boolean getForceParentIdFromParameters(Plugin<T> plugin) {
     return new Boolean(plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID));
   }
 
@@ -114,14 +114,29 @@ public final class PluginHelper {
     return Boolean.parseBoolean(paramValue);
   }
 
-  public static String getParentId(String sipParentId, String jobDefinedParentId, boolean jobDefinedForceParentId) {
-    String ret = sipParentId;
+  public static <T extends Serializable> String getParentId(Plugin<T> plugin, IndexService index, String sipParentId) {
+    String parentId = sipParentId;
+    String jobDefinedParentId = getParentIdFromParameters(plugin);
+    boolean jobDefinedForceParentId = getForceParentIdFromParameters(plugin);
 
+    // lets see if parentId should be overwritten
     if ((StringUtils.isBlank(sipParentId) && StringUtils.isNotBlank(jobDefinedParentId)) || jobDefinedForceParentId) {
-      ret = jobDefinedParentId;
+      parentId = jobDefinedParentId;
     }
 
-    return ret;
+    // last check: see if parent exist in the index
+    if (StringUtils.isNotBlank(parentId)) {
+      try {
+        index.retrieve(AIP.class, parentId);
+      } catch (NotFoundException | GenericException e) {
+        // could not find parent id
+        parentId = null;
+      }
+    } else {
+      parentId = null;
+    }
+
+    return parentId;
   }
 
   public static <T extends Serializable> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
@@ -258,8 +273,8 @@ public final class PluginHelper {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
     if (aip.getRepresentations() != null && aip.getRepresentations().size() > 0) {
       for (Representation representation : aip.getRepresentations()) {
-        identifiers
-          .add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(), null, null,role));
+        identifiers.add(getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aip.getId(), representation.getId(),
+          null, null, role));
       }
     }
     return identifiers;
