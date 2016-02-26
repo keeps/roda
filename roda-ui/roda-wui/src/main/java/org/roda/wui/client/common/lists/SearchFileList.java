@@ -23,6 +23,7 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -164,7 +165,8 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      BrowserService.Util.getInstance().findFiles(filter, sorter, sublist, getFacets(), callback);
+      BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
+        LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
   }
 

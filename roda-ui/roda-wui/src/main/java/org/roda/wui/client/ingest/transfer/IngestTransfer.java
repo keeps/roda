@@ -314,7 +314,7 @@ public class IngestTransfer extends Composite {
     } else {
       String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);
       if (transferredResourceId != null) {
-        BrowserService.Util.getInstance().retrieveTransferredResource(transferredResourceId,
+        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceId,
           new AsyncCallback<TransferredResource>() {
 
             @Override

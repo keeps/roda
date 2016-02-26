@@ -17,6 +17,8 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.index.IsIndexed;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -24,7 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
  */
 @XmlRootElement(name = "job")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Job implements Serializable {
+public class Job implements IsIndexed, Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
   public static enum JOB_STATE {

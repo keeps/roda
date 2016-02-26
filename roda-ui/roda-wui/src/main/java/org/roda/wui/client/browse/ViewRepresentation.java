@@ -143,7 +143,9 @@ public class ViewRepresentation extends Composite {
                 }
                 final String fileId = historyTokens.get(historyTokens.size() - 1);
 
-                BrowserService.Util.getInstance().retrieveFile(aipId, representationId, fileDirectoryPath, fileId,
+                String fileUUID = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
+
+                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
                   new AsyncCallback<IndexedFile>() {
 
                   @Override

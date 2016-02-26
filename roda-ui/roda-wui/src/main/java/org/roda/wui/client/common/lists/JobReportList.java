@@ -25,6 +25,7 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -204,7 +205,8 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().findJobReports(filter, sorter, sublist, getFacets(), callback);
+    BrowserService.Util.getInstance().find(JobReport.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 
   @Override

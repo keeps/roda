@@ -229,7 +229,7 @@ public class ShowJob extends Composite {
 
         @Override
         public void run() {
-          BrowserService.Util.getInstance().retrieveJob(job.getId(), new AsyncCallback<Job>() {
+          BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), new AsyncCallback<Job>() {
 
             @Override
             public void onFailure(Throwable caught) {

@@ -10,18 +10,11 @@ package org.roda.wui.api.controllers;
 import java.util.Date;
 
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 
@@ -61,94 +54,6 @@ public class Jobs extends RodaCoreService {
     registerAction(user, JOBS_COMPONENT, "createJob", null, duration, "job", updatedJob);
 
     return updatedJob;
-  }
-
-  public static Job getJob(RodaUser user, String jobId) throws NotFoundException, GenericException {
-    Date startDate = new Date();
-
-    // check user permissions
-    // TODO ???
-
-    // delegate
-    Job job = JobsHelper.retrieveJob(jobId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "getJob", null, duration, RodaConstants.JOB_ID, job.getId());
-
-    return job;
-  }
-
-  public static IndexResult<Job> findJobs(RodaUser user, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    Date startDate = new Date();
-
-    // check user permissions
-    // TODO ???
-
-    // delegate
-    IndexResult<Job> findJobs = JobsHelper.findJobs(filter, sorter, sublist, facets);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "findJobs", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
-      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
-
-    return findJobs;
-  }
-
-  // FIXME
-  public static void pauseJob(RodaUser user, String jobId) {
-
-  }
-
-  // FIXME
-  public static void resumeJob(RodaUser user, String jobId) {
-
-  }
-
-  // FIXME
-  public static void stopJob(RodaUser user, String jobId) {
-
-  }
-
-  // FIXME
-  public static void deleteJob(RodaUser user, String jobId) {
-
-  }
-
-  public static IndexResult<Report> findJobReports(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException {
-    Date startDate = new Date();
-
-    // check user permissions
-    // TODO ???
-
-    // delegate
-    IndexResult<Report> findReports = JobsHelper.findJobReports(filter, sorter, sublist, facets);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "findReports", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
-      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
-
-    return findReports;
-  }
-
-  public static Report retrieveJobReport(RodaUser user, String ReportId) throws NotFoundException, GenericException {
-    Date startDate = new Date();
-
-    // check user permissions
-    // TODO ???
-
-    // delegate
-    Report Report = JobsHelper.retrieveJobReport(ReportId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "retrieveReport", null, duration, RodaConstants.JOB_REPORT_ID, ReportId);
-
-    return Report;
   }
 
   /*

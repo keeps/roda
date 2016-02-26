@@ -47,7 +47,7 @@ public class ShowJobReport extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String jobReportId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveJobReport(jobReportId, new AsyncCallback<Report>() {
+        BrowserService.Util.getInstance().retrieve(Report.class.getName(), jobReportId, new AsyncCallback<Report>() {
 
           @Override
           public void onFailure(Throwable caught) {

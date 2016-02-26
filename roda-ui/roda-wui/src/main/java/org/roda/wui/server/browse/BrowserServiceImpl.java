@@ -25,8 +25,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -35,7 +35,6 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
@@ -121,37 +120,41 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getDescriptiveMetadataEditBundle(user, aipId, descId);
   }
 
-  @Override
-  public IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String localeString) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    IndexResult<IndexedAIP> result = Browser.findDescriptiveMetadata(user, filter, sorter, sublist, facets);
-    return I18nUtility.translate(result, IndexedAIP.class, localeString);
+  @SuppressWarnings("unchecked")
+  private <T extends Serializable> Class<T> parseClass(String classNameToReturn) throws GenericException {
+    Class<T> classToReturn;
+    try {
+      classToReturn = (Class<T>) Class.forName(classNameToReturn);
+    } catch (ClassNotFoundException e) {
+      throw new GenericException("Could not find class " + classNameToReturn);
+    }
+    return classToReturn;
   }
 
   @Override
-  public IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+  public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets, String localeString)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Class<T> classToReturn = parseClass(classNameToReturn);
+    IndexResult<T> result = Browser.find(user, classToReturn, filter, sorter, sublist, facets);
+    return I18nUtility.translate(result, classToReturn, localeString);
+  }
+
+  @Override
+  public <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.findFiles(user, filter, sorter, sublist, facets);
+    Class<T> classToReturn = parseClass(classNameToReturn);
+    return Browser.count(user, classToReturn, filter);
   }
 
   @Override
-  public IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.retrieveFile(user, aipId, representationId, fileDirectoryPath, fileId);
-  }
-
-  public Long countDescriptiveMetadata(Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.countDescriptiveMetadata(user, filter);
-  }
-
-  public IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.getIndexedAip(user, pid);
+    Class<T> classToReturn = parseClass(classNameToReturn);
+    return Browser.retrieve(user, classToReturn, id);
   }
 
   public List<IndexedAIP> getAncestors(IndexedAIP aip)
@@ -159,7 +162,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.getAncestors(user, aip);
   }
-  
+
   @Override
   public List<SearchField> getSearchFields(String localeString) throws GenericException {
     List<SearchField> searchFields = new ArrayList<SearchField>();
@@ -169,21 +172,22 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
       String[] fields = fieldsNamesString.split(",");
       for (String field : fields) {
         SearchField searchField = new SearchField();
-        
+
         String fieldsNames = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fields");
         String fieldType = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "type");
         String fieldLabelI18N = RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "i18n");
-        boolean fieldFixed = Boolean.valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
-        
+        boolean fieldFixed = Boolean
+          .valueOf(RodaCoreFactory.getRodaConfigurationAsString("ui", "search", "fields", field, "fixed"));
+
         if (fieldsNames != null && fieldType != null && fieldLabelI18N != null) {
           List<String> fieldsNamesList = Arrays.asList(fieldsNames.split(","));
-          
+
           searchField.setId(field);
           searchField.setSearchFields(fieldsNamesList);
           searchField.setType(fieldType);
           searchField.setLabel(messages.getTranslation(fieldLabelI18N));
           searchField.setFixed(fieldFixed);
-          
+
           searchFields.add(searchField);
         }
       }
@@ -245,20 +249,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.removeDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
   }
 
-  @Override
-  public IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.findTransferredResources(user, filter, sorter, sublist, facets);
-  }
-
-  @Override
-  public TransferredResource retrieveTransferredResource(String transferredResourceId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.retrieveTransferredResource(user, transferredResourceId);
-  }
-
   public String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
@@ -279,24 +269,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    IndexResult<Job> result = Jobs.findJobs(user, filter, sorter, sublist, facets);
-    return I18nUtility.translate(result, Job.class, localeString);
-  }
-
-  @Override
-  public Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Jobs.getJob(user, jobId);
-  }
-
-  @Override
   public JobBundle retrieveJobBundle(String jobId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Job job = Jobs.getJob(user, jobId);
+    Job job = Browser.retrieve(user, Job.class, jobId);
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
     PluginInfo basePlugin = RodaCoreFactory.getPluginManager().getPluginInfo(job.getPlugin());
@@ -344,19 +320,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return bundle;
   }
 
-  @Override
-  public IndexResult<Report> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Jobs.findJobReports(user, filter, sorter, sublist, facets);
-  }
-
-  @Override
-  public Report retrieveJobReport(String jobReportId) throws NotFoundException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Jobs.retrieveJobReport(user, jobReportId);
-  }
-
   public Viewers getViewersProperties() {
     Viewers viewers = new Viewers();
     String viewersString = RodaCoreFactory.getRodaConfigurationAsString("ui", "viewers");
@@ -398,29 +361,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.findIndexedPreservationEvents(user, filter, sorter, sublist, facets);
-  }
-
-  @Override
-  public IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.retrieveIndexedPreservationEvent(user, indexedPreservationEventId);
-  }
-
-  @Override
   public boolean isRegisterActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
-  }
-
-  @Override
-  public IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.retrieveIndexedPreservationAgent(user, indexedPreservationAgentId);
   }
 
   @Override

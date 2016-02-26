@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.FileAlreadyExistsException;
@@ -125,7 +126,7 @@ public class BrowserHelper {
     BrowseItemBundle itemBundle = new BrowseItemBundle();
 
     // set aip
-    IndexedAIP aip = getIndexedAIP(aipId);
+    IndexedAIP aip = retrieve(IndexedAIP.class, aipId);
     itemBundle.setAIP(aip);
 
     // set aip ancestors
@@ -238,13 +239,19 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().getAncestors(aip);
   }
 
-  protected static IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException {
-    IndexResult<IndexedAIP> aips = RodaCoreFactory.getIndexService().find(IndexedAIP.class, filter, sorter, sublist,
-      facets);
-    LOGGER.debug(String.format("findDescriptiveMetadata(%1$s,%2$s,%3$s)=%4$s", filter, sorter, sublist, aips));
+  protected static <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets);
+  }
 
-    return aips;
+  protected static <T extends Serializable> Long count(Class<T> returnClass, Filter filter)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().count(returnClass, filter);
+  }
+
+  protected static <T extends Serializable> T retrieve(Class<T> returnClass, String id)
+    throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
   }
 
   private static IndexResult<Representation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
@@ -265,19 +272,11 @@ public class BrowserHelper {
 
   }
 
-  protected static Long countDescriptiveMetadata(Filter filter) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().count(IndexedAIP.class, filter);
-  }
-
   public static void validateGetAipRepresentationFileParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
         + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
-  }
-
-  protected static IndexedAIP getIndexedAIP(String aipId) throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
   }
 
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
@@ -812,15 +811,20 @@ public class BrowserHelper {
 
   }
 
-  public static IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(TransferredResource.class, filter, sorter, sublist, facets);
-  }
-
-  public static TransferredResource retrieveTransferredResource(String transferredResourceId)
-    throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, transferredResourceId);
-  }
+  // public static IndexResult<TransferredResource>
+  // findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
+  // Facets facets) throws GenericException, RequestNotValidException {
+  // return RodaCoreFactory.getIndexService().find(TransferredResource.class,
+  // filter, sorter, sublist, facets);
+  // }
+  //
+  // public static TransferredResource retrieveTransferredResource(String
+  // transferredResourceId)
+  // throws GenericException, NotFoundException {
+  // return
+  // RodaCoreFactory.getIndexService().retrieve(TransferredResource.class,
+  // transferredResourceId);
+  // }
 
   public static String createTransferredResourcesFolder(String parent, String folderName, boolean forceCommit)
     throws GenericException {
@@ -903,16 +907,19 @@ public class BrowserHelper {
     return RodaCoreFactory.getFolderMonitor().isFullyInitialized();
   }
 
-  public static IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, sorter, sublist, facets);
-  }
-
-  public static IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) throws NotFoundException, GenericException {
-    return RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
-      IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
-  }
+  // public static IndexResult<IndexedFile> findFiles(Filter filter, Sorter
+  // sorter, Sublist sublist, Facets facets)
+  // throws GenericException, RequestNotValidException {
+  // return RodaCoreFactory.getIndexService().find(IndexedFile.class, filter,
+  // sorter, sublist, facets);
+  // }
+  //
+  // public static IndexedFile retrieveFile(String aipId, String
+  // representationId, List<String> fileDirectoryPath,
+  // String fileId) throws NotFoundException, GenericException {
+  // return RodaCoreFactory.getIndexService().retrieve(IndexedFile.class,
+  // IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId));
+  // }
 
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
     throws GenericException {
@@ -951,16 +958,6 @@ public class BrowserHelper {
     return supportedMetadata;
   }
 
-  public static IndexResult<IndexedPreservationEvent> findIndexedPreservationEvents(Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(IndexedPreservationEvent.class, filter, sorter, sublist, facets);
-  }
-
-  public static IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
-    throws GenericException, NotFoundException {
-    return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, indexedPreservationEventId);
-  }
-
   public static StreamResponse getTransferredResource(final TransferredResource transferredResource)
     throws NotFoundException, RequestNotValidException, GenericException {
 
@@ -981,11 +978,6 @@ public class BrowserHelper {
     };
 
     return new StreamResponse(transferredResource.getName(), MediaType.APPLICATION_OCTET_STREAM, streamingOutput);
-  }
-
-  public static IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
-    throws NotFoundException, GenericException {
-    return RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class, indexedPreservationAgentId);
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
@@ -1057,7 +1049,7 @@ public class BrowserHelper {
     Locale locale) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     DescriptiveMetadataVersionsBundle bundle = new DescriptiveMetadataVersionsBundle();
 
-    IndexedAIP aip = getIndexedAIP(aipId);
+    IndexedAIP aip = retrieve(IndexedAIP.class, aipId);
     DescriptiveMetadataViewBundle descriptiveMetadataBundle = getDescriptiveMetadataBundle(aipId, metadataId, locale);
 
     List<BinaryVersionBundle> versionBundles = new ArrayList<>();

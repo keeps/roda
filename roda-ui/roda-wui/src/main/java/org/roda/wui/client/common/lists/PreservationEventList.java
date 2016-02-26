@@ -23,6 +23,7 @@ import org.roda.wui.client.browse.BrowserService;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -209,7 +210,8 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().findIndexedPreservationEvent(filter, sorter, sublist, getFacets(), callback);
+    BrowserService.Util.getInstance().find(IndexedPreservationEvent.class.getName(), filter, sorter, sublist,
+      getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 
   @Override

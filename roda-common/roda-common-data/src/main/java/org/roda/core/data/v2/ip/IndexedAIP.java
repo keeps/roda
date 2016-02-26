@@ -7,19 +7,19 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.v2.index.IsIndexed;
 
 /**
  * This class contains the indexed information about an AIP.
  * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
-public class IndexedAIP implements Serializable {
+public class IndexedAIP implements IsIndexed {
   private static final long serialVersionUID = 38813680938917204L;
 
   // FIXME this should be defined from DescriptionLevelManager information

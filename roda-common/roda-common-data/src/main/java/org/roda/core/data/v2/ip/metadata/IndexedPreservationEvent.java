@@ -11,7 +11,9 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class IndexedPreservationEvent implements Serializable {
+import org.roda.core.data.v2.index.IsIndexed;
+
+public class IndexedPreservationEvent implements IsIndexed {
   private static final long serialVersionUID = 7328069950706217131L;
   private String aipId;
   private String representationId;

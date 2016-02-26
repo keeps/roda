@@ -16,17 +16,12 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -39,25 +34,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public interface BrowserServiceAsync {
 
-  void countDescriptiveMetadata(Filter filter, AsyncCallback<Long> callback);
-
-  void findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String locale,
-    AsyncCallback<IndexResult<IndexedAIP>> callback);
-
   void getItemBundle(String aipId, String localeString, AsyncCallback<BrowseItemBundle> callback);
 
   void getDescriptiveMetadataEditBundle(String aipId, String descId,
     AsyncCallback<DescriptiveMetadataEditBundle> callback);
-
-  /**
-   * Get simple description object
-   * 
-   * @param pid
-   *          the object id
-   * @return {@link SimpleDescriptionObject}
-   * @throws RODAException
-   */
-  public void getIndexedAIP(String pid, AsyncCallback<IndexedAIP> callback);
 
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
@@ -74,27 +54,11 @@ public interface BrowserServiceAsync {
   void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle newBundle,
     AsyncCallback<Void> asyncCallback);
 
-  void findTransferredResources(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<TransferredResource>> callback);
-
-  void retrieveTransferredResource(String transferredResourceId, AsyncCallback<TransferredResource> callback);
-
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
   void removeTransferredResources(List<String> ids, AsyncCallback<Void> callback);
 
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
-
-  void findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<IndexedFile>> callback);
-
-  void retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
-    AsyncCallback<IndexedFile> callback);
-
-  void findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString,
-    AsyncCallback<IndexResult<Job>> callback);
-
-  void retrieveJob(String jobId, AsyncCallback<Job> callback);
 
   void createJob(Job job, AsyncCallback<Job> callback);
 
@@ -104,29 +68,15 @@ public interface BrowserServiceAsync {
 
   void retrieveJobBundle(String jobId, AsyncCallback<JobBundle> callback);
 
-  void findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<Report>> callback);
-
-  void retrieveJobReport(String jobReportId, AsyncCallback<Report> callback);
-
   void getViewersProperties(AsyncCallback<Viewers> callback);
 
   void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
-
-  void findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<IndexedPreservationEvent>> callback);
-
-  void retrieveIndexedPreservationEvent(String indexedPreservationEventId,
-    AsyncCallback<IndexedPreservationEvent> callback);
 
   void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
   void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
 
   void isRegisterActive(AsyncCallback<Boolean> callback);
-
-  void retrieveIndexedPreservationAgent(String indexedPreservationAgentId,
-    AsyncCallback<IndexedPreservationAgent> callback);
 
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 
@@ -138,5 +88,12 @@ public interface BrowserServiceAsync {
 
   void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId,
     AsyncCallback<Void> callback);
+
+  <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, String localeString, AsyncCallback<IndexResult<T>> callback);
+
+  void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
+
+  <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
 }

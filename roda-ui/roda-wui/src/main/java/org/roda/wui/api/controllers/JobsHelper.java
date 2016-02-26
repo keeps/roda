@@ -12,10 +12,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -23,7 +19,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
@@ -86,15 +81,6 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  public static Job retrieveJob(String jobId) throws NotFoundException, GenericException {
-    return RodaCoreFactory.getIndexService().retrieve(Job.class, jobId);
-  }
-
-  public static IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(Job.class, filter, sorter, sublist, facets);
-  }
-
   public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
     org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
@@ -103,15 +89,6 @@ public class JobsHelper {
     }
 
     return jobs;
-  }
-
-  public static IndexResult<Report> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(Report.class, filter, sorter, sublist, facets);
-  }
-
-  public static Report retrieveJobReport(String ReportId) throws NotFoundException, GenericException {
-    return RodaCoreFactory.getIndexService().retrieve(Report.class, ReportId);
   }
 
 }

@@ -148,7 +148,7 @@ public class JobList extends AsyncTableCell<Job> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().findJobs(filter, sorter, sublist, getFacets(),
+    BrowserService.Util.getInstance().find(Job.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 

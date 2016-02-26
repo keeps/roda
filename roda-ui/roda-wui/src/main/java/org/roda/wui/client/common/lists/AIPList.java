@@ -152,7 +152,7 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
 
       GWT.log("Filter: " + filter);
 
-      BrowserService.Util.getInstance().findDescriptiveMetadata(filter, sorter, sublist, getFacets(),
+      BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
 

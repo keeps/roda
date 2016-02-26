@@ -67,7 +67,7 @@ public class JobsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Jobs.findJobs(user, null, null,
+    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(user, Job.class, null, null,
       new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
 
     // transform controller method output
@@ -104,7 +104,7 @@ public class JobsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Job job = org.roda.wui.api.controllers.Jobs.getJob(user, jobId);
+    Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
 
     return Response.ok(job, mediaType).build();
   }

@@ -8,6 +8,7 @@
 package org.roda.wui.api.controllers;
 
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +31,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
@@ -135,45 +133,47 @@ public class Browser extends RodaCoreService {
     return bundle;
   }
 
-  public static IndexResult<IndexedAIP> findDescriptiveMetadata(RodaUser user, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public static <T extends Serializable> IndexResult<T> find(RodaUser user, Class<T> classToReturn, Filter filter,
+    Sorter sorter, Sublist sublist, Facets facets)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
+    // TODO check permissions for each class
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexResult<IndexedAIP> descriptiveMetadata = BrowserHelper.findDescriptiveMetadata(filter, sorter, sublist,
-      facets);
+    IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findDescriptiveMetadata", null, duration,
+    registerAction(user, BROWSER_COMPONENT, "find", null, duration, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
       RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
 
-    return descriptiveMetadata;
+    return ret;
   }
 
-  public static Long countDescriptiveMetadata(RodaUser user, Filter filter)
+  public static <T extends Serializable> Long count(RodaUser user, Class<T> classToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
+    // TODO check permissions for each class
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    Long count = BrowserHelper.countDescriptiveMetadata(filter);
+    Long count = BrowserHelper.count(classToReturn, filter);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "countDescriptiveMetadata", null, duration,
+    registerAction(user, BROWSER_COMPONENT, "count", null, duration, "class", classToReturn.getSimpleName(),
       RodaConstants.CONTROLLER_FILTER_PARAM, filter.toString());
 
     return count;
   }
 
-  public static IndexedAIP getIndexedAip(RodaUser user, String aipId)
+  public static <T extends Serializable> T retrieve(RodaUser user, Class<T> classToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
@@ -181,14 +181,18 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    T ret = BrowserHelper.retrieve(classToReturn, id);
 
     // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getIndexedAip", aipId, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
-      aipId);
+    String aipId = null;
+    if (classToReturn.equals(IndexedAIP.class)) {
+      aipId = id;
+    }
 
-    return aip;
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieve", aipId, duration, "class", classToReturn.getSimpleName());
+
+    return ret;
   }
 
   public static List<IndexedAIP> getAncestors(RodaUser user, IndexedAIP aip)
@@ -222,7 +226,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipRepresentationParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
@@ -245,7 +249,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateListAipDescriptiveMetadataParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
@@ -269,7 +273,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -294,7 +298,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipDescritiveMetadataParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -319,7 +323,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateListAipPreservationMetadataParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
@@ -344,7 +348,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipRepresentationPreservationMetadataParams(acceptFormat, language);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
@@ -367,7 +371,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
@@ -391,7 +395,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
@@ -412,7 +416,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
@@ -432,7 +436,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectRemovePermissions(user, aip);
 
     // delegate
@@ -460,9 +464,9 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
-    aip = BrowserHelper.getIndexedAIP(parentId);
+    aip = BrowserHelper.retrieve(IndexedAIP.class, parentId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -484,7 +488,7 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
     if (parentId != null) {
-      IndexedAIP parentSDO = BrowserHelper.getIndexedAIP(parentId);
+      IndexedAIP parentSDO = BrowserHelper.retrieve(IndexedAIP.class, parentId);
       UserUtility.checkObjectModifyPermissions(user, parentSDO);
     } else {
       // TODO check user role to create top-level AIPs
@@ -506,7 +510,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -525,7 +529,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -547,7 +551,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -569,7 +573,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -587,7 +591,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -607,7 +611,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -627,7 +631,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -649,7 +653,7 @@ public class Browser extends RodaCoreService {
     BrowserHelper.validateGetAipRepresentationFileParams(acceptFormat);
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectModifyPermissions(user, aip);
 
     // delegate
@@ -671,7 +675,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
@@ -692,7 +696,7 @@ public class Browser extends RodaCoreService {
     Date startDate = new Date();
 
     // check user permissions
-    IndexedAIP aip = BrowserHelper.getIndexedAIP(aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectInsertPermissions(user, aip);
 
     // delegate
@@ -705,49 +709,6 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "postDescriptiveMetadataFile", aipId, duration,
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, metadataId);
 
-  }
-
-  public static IndexResult<TransferredResource> findTransferredResources(RodaUser user, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Date startDate = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
-    // delegate
-    IndexResult<TransferredResource> resources = BrowserHelper.findTransferredResources(filter, sorter, sublist,
-      facets);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findTransferredResources", null, duration,
-      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
-      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
-
-    return resources;
-  }
-
-  public static TransferredResource retrieveTransferredResource(RodaUser user, String transferredResourceId)
-    throws GenericException, AuthorizationDeniedException, NotFoundException {
-    Date startDate = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
-    // delegate
-    TransferredResource resource = BrowserHelper.retrieveTransferredResource(transferredResourceId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveTransferredResource", null, duration,
-      TRANSFERRED_RESOURCE_ID_PARAM, transferredResourceId);
-
-    return resource;
   }
 
   public static String createTransferredResourcesFolder(RodaUser user, String parent, String folderName,
@@ -846,46 +807,6 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.isTransferFullyInitialized();
   }
 
-  public static IndexResult<IndexedFile> findFiles(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException {
-    Date startDate = new Date();
-
-    // TODO
-    // check user permissions
-    // UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // delegate
-    IndexResult<IndexedFile> files = BrowserHelper.findFiles(filter, sorter, sublist, facets);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findFiles", null, duration, RodaConstants.CONTROLLER_FILTER_PARAM, filter,
-      RodaConstants.CONTROLLER_SORTER_PARAM, sorter, RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
-
-    return files;
-  }
-
-  public static IndexedFile retrieveFile(RodaUser user, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId)
-      throws GenericException, RequestNotValidException, NotFoundException {
-    Date startDate = new Date();
-
-    // TODO
-    // check user permissions
-    // UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // delegate
-    IndexedFile file = BrowserHelper.retrieveFile(aipId, representationId, fileDirectoryPath, fileId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveFile", null, duration, RodaConstants.FILE_AIPID, aipId,
-      RodaConstants.FILE_REPRESENTATIONID, representationId, RodaConstants.FILE_PATH, fileDirectoryPath,
-      RodaConstants.FILE_FILEID, fileId);
-
-    return file;
-  }
-
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
     throws AuthorizationDeniedException, GenericException {
     Date startDate = new Date();
@@ -899,53 +820,10 @@ public class Browser extends RodaCoreService {
     return supportedMetadata;
   }
 
-  public static IndexResult<IndexedPreservationEvent> findIndexedPreservationEvents(RodaUser user, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date startDate = new Date();
-
-    // TODO maybe update permissions...
-    // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
-    // delegate
-    IndexResult<IndexedPreservationEvent> resources = BrowserHelper.findIndexedPreservationEvents(filter, sorter,
-      sublist, facets);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "findIndexedPreservationEvents", null, duration,
-      RodaConstants.CONTROLLER_FILTER_PARAM, filter, RodaConstants.CONTROLLER_SORTER_PARAM, sorter,
-      RodaConstants.CONTROLLER_SUBLIST_PARAM, sublist);
-
-    return resources;
-  }
-
-  public static IndexedPreservationEvent retrieveIndexedPreservationEvent(RodaUser user,
-    String indexedPreservationEventId) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    Date startDate = new Date();
-
-    // TODO maybe update permissions...
-    // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
-    // delegate
-    IndexedPreservationEvent resource = BrowserHelper.retrieveIndexedPreservationEvent(indexedPreservationEventId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveIndexedPreservationEvent", null, duration,
-      INDEX_PRESERVATION_EVENT_ID, indexedPreservationEventId);
-
-    return resource;
-  }
-
+  /**
+   * @deprecated this method should be moved to the api
+   */
+  @Deprecated
   public static StreamResponse getTransferredResource(RodaUser user, String resourceId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
     Date startDate = new Date();
@@ -954,35 +832,13 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
     StreamResponse response = BrowserHelper
-      .getTransferredResource(BrowserHelper.retrieveTransferredResource(resourceId));
+      .getTransferredResource(BrowserHelper.retrieve(TransferredResource.class, resourceId));
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "getTransferredResource", null, duration, "resourceId", resourceId);
 
     return response;
-  }
-
-  public static IndexedPreservationAgent retrieveIndexedPreservationAgent(RodaUser user,
-    String indexedPreservationAgentId) throws NotFoundException, GenericException, AuthorizationDeniedException {
-    Date startDate = new Date();
-
-    // TODO maybe update permissions...
-    // check user permissions
-    UserUtility.checkRoles(user, BROWSE_ROLE);
-
-    // TODO if not admin, add to filter a constraint for the resource to belong
-    // to this user
-
-    // delegate
-    IndexedPreservationAgent resource = BrowserHelper.retrieveIndexedPreservationAgent(indexedPreservationAgentId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveIndexedPreservationAgent", null, duration,
-      INDEX_PRESERVATION_AGENT_ID, indexedPreservationAgentId);
-
-    return resource;
   }
 
   public static PreservationEventViewBundle retrievePreservationEventViewBundle(RodaUser user, String eventId)

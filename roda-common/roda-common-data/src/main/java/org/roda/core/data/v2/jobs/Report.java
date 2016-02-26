@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class Report implements Serializable {
+import org.roda.core.data.v2.index.IsIndexed;
+
+public class Report implements Serializable, IsIndexed {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public enum PluginState {

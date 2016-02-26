@@ -19,11 +19,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -67,48 +64,11 @@ public interface BrowserService extends RemoteService {
     }
   }
 
-  /**
-   * Get simple descriptive metadata count
-   *
-   * @param filter
-   *
-   * @return the number of simple descriptive metadata that fit the filter
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  Long countDescriptiveMetadata(Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  /**
-   * Get imple descriptive metadata
-   *
-   *
-   * @return
-   * @throws RequestNotValidException
-   * @throws AuthorizationDeniedException
-   * @throws GenericException
-   */
-  IndexResult<IndexedAIP> findDescriptiveMetadata(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    String locale) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
-
   BrowseItemBundle getItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  /**
-   * Get simple description object
-   *
-   * @param pid
-   *          the object id
-   * @return {@link SimpleDescriptionObject}
-   * @throws NotFoundException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  IndexedAIP getIndexedAIP(String pid) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
@@ -132,12 +92,6 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
-  IndexResult<TransferredResource> findTransferredResources(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  TransferredResource retrieveTransferredResource(String transferredResourceId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
   String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException;
 
@@ -145,17 +99,6 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
-
-  IndexResult<IndexedFile> findFiles(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  IndexedFile retrieveFile(String aipId, String representationId, List<String> fileDirectoryPath, String fileId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  IndexResult<Job> findJobs(Filter filter, Sorter sorter, Sublist sublist, Facets facets, String localeString)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  Job retrieveJob(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   Job createJob(Job job)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
@@ -166,21 +109,10 @@ public interface BrowserService extends RemoteService {
 
   JobBundle retrieveJobBundle(String jobId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  IndexResult<Report> findJobReports(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException;
-
   Viewers getViewersProperties() throws GenericException;
 
   List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
     throws AuthorizationDeniedException, GenericException;
-
-  Report retrieveJobReport(String jobReportId) throws NotFoundException, GenericException;
-
-  IndexResult<IndexedPreservationEvent> findIndexedPreservationEvent(Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  IndexedPreservationEvent retrieveIndexedPreservationEvent(String indexedPreservationEventId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Get Google Analytics account id
@@ -194,9 +126,6 @@ public interface BrowserService extends RemoteService {
 
   boolean isRegisterActive();
 
-  IndexedPreservationAgent retrieveIndexedPreservationAgent(String indexedPreservationAgentId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
-
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
@@ -209,5 +138,14 @@ public interface BrowserService extends RemoteService {
 
   void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
+
+  <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, String localeString) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
+
+  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
 }

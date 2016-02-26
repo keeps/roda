@@ -7,12 +7,12 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
 import java.util.List;
 
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 
-public class IndexedFile implements Serializable {
+public class IndexedFile implements IsIndexed {
 
   private static final long serialVersionUID = 3303019735787641534L;
 

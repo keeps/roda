@@ -7,11 +7,12 @@
  */
 package org.roda.core.data.v2.ip;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-public class TransferredResource implements Serializable {
+import org.roda.core.data.v2.index.IsIndexed;
+
+public class TransferredResource implements IsIndexed {
 
   private static final long serialVersionUID = 1L;
   private String id;

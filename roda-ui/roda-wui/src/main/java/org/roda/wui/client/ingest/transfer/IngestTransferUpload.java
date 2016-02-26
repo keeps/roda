@@ -174,7 +174,7 @@ public class IngestTransferUpload extends Composite {
       // Upload to directory
       String transferredResourceId = IngestTransfer.getTransferredResourceIdFromPath(historyTokens);
       if (transferredResourceId != null) {
-        BrowserService.Util.getInstance().retrieveTransferredResource(transferredResourceId,
+        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceId,
           new AsyncCallback<TransferredResource>() {
 
             @Override
