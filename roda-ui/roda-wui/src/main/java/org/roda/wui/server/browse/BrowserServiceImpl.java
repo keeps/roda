@@ -27,9 +27,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -121,7 +118,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @SuppressWarnings("unchecked")
-  private <T extends Serializable> Class<T> parseClass(String classNameToReturn) throws GenericException {
+  private <T extends IsIndexed> Class<T> parseClass(String classNameToReturn) throws GenericException {
     Class<T> classToReturn;
     try {
       classToReturn = (Class<T>) Class.forName(classNameToReturn);

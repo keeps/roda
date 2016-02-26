@@ -205,7 +205,7 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().find(JobReport.class.getName(), filter, sorter, sublist, getFacets(),
+    BrowserService.Util.getInstance().find(Report.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 
