@@ -239,6 +239,7 @@ public final class PluginHelper {
     String id = UUID.randomUUID().toString();
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
+    // FIXME to be replaced by method parameter
     if (plugin.getToolOutput() != null) {
       outcomeDetailNote += "\n" + plugin.getToolOutput();
     }

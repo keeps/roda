@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -96,11 +97,11 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     try {
-      List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model,
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
+      List<LinkingIdentifier> sources = Arrays
+        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
       boolean notify = true;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, outcomeDetail, notify);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

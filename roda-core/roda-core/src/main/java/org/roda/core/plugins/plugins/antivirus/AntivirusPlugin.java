@@ -94,10 +94,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
     Report report = PluginHelper.createPluginReport(this);
-
-    PluginState state;
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
@@ -112,16 +109,13 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         directAccess = storage.getDirectAccess(aipPath);
         virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
-        state = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
-
-        reportItem.setPluginState(state).setPluginDetails(virusCheckResult.getReport());
+        reportItem.setPluginState(virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE)
+          .setPluginDetails(virusCheckResult.getReport());
 
         LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
           + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
-      } catch (RuntimeException | RequestNotValidException | GenericException | NotFoundException
-        | AuthorizationDeniedException e) {
-        state = PluginState.FAILURE;
-        reportItem.setPluginState(state).setPluginDetails(e.getMessage());
+      } catch (Exception e) {
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
         exception = e;
         LOGGER.error("Error processing AIP " + aip.getId(), e);
@@ -135,7 +129,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       try {
         LOGGER.info("Creating event");
         boolean notify = true;
-        createEvent(virusCheckResult, exception, state, aip, model, notify);
+        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, notify);
         report.addReport(reportItem);
 
         LOGGER.info("Updating job report");
@@ -154,16 +148,19 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     ModelService model, boolean notify) throws PluginException {
 
     try {
-      boolean success = (virusCheckResult != null) && virusCheckResult.isClean();
-
-      String outcomeDetailExtension = success ? virusCheckResult.getReport()
-        : virusCheckResult.getReport() + "\n" + exception.getClass().getName() + ": " + exception.getMessage();
+      StringBuilder outcomeDetailExtension = new StringBuilder(virusCheckResult.getReport());
+      if (state != PluginState.SUCCESS) {
+        outcomeDetailExtension.append("\n").append(exception.getClass().getName());
+        if (exception != null) {
+          outcomeDetailExtension.append(": ").append(exception.getMessage());
+        }
+      }
 
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes,
-        success ? PluginState.SUCCESS : PluginState.FAILURE, outcomeDetailExtension, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state,
+        outcomeDetailExtension.toString(), notify);
 
       if (notify) {
         model.notifyAIPUpdated(aip.getId());

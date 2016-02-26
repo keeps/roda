@@ -287,6 +287,8 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
+    searchPanel.setVisible(true);
+    transferredResourceList.setVisible(true);
     download.setVisible(false);
 
     transferredResourceList.setFilter(DEFAULT_FILTER);

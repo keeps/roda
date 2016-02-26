@@ -65,6 +65,7 @@ public class TikaFullTextPluginUtils {
 
         Metadata metadata = new Metadata();
         InputStream inputStream = null;
+        InputStream inputStream2 = null;
         try {
           inputStream = binary.getContent().createInputStream();
           final Reader reader = tika.parse(inputStream, metadata);
@@ -82,12 +83,14 @@ public class TikaFullTextPluginUtils {
           model.updateFile(file);
           Binary b = model.retrieveOtherMetadataBinary(aip.getId(), representation.getId(), file.getPath(),
             file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
-          outputs.add(IOUtils.toString(b.getContent().createInputStream(), "UTF-8"));
+          inputStream2 = b.getContent().createInputStream();
+          outputs.add(IOUtils.toString(inputStream2, "UTF-8"));
 
         } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);
+          IOUtils.closeQuietly(inputStream2);
         }
 
         // update PREMIS

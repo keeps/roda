@@ -355,16 +355,13 @@ public class PremisUtils {
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
     outcomeInformation.setEventOutcome(outcome);
+    StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
+    if (detailExtension != null) {
+      outcomeDetailNote.append("\n").append(detailExtension);
+    }
     EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();
-    eodct.setEventOutcomeDetailNote(detailNote);
+    eodct.setEventOutcomeDetailNote(outcomeDetailNote.toString());
 
-    // TODO handle...
-    /*
-     * if(detailExtension!=null){ ExtensionComplexType extension =
-     * eodct.addNewEventOutcomeDetailExtension();
-     * extension.set(XmlObject.Factory.newValue("<p>"+detailExtension+"</p>"));
-     * }
-     */
     return new StringContentPayload(MetadataUtils.saveToString(event, true));
 
   }
@@ -752,15 +749,14 @@ public class PremisUtils {
     EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
     if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
       for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
-          LinkingIdentifier li = new LinkingIdentifier();
-          li.setType(loict.getLinkingObjectIdentifierType());
-          li.setValue(loict.getLinkingObjectIdentifierValue());
-          li.setRoles(loict.getLinkingObjectRoleList());
-          identifiers.add(li);
+        LinkingIdentifier li = new LinkingIdentifier();
+        li.setType(loict.getLinkingObjectIdentifierType());
+        li.setValue(loict.getLinkingObjectIdentifierValue());
+        li.setRoles(loict.getLinkingObjectRoleList());
+        identifiers.add(li);
       }
     }
     return identifiers;
   }
 
-  
 }

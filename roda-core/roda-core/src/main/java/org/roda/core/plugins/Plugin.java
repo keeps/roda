@@ -105,6 +105,8 @@ public interface Plugin<T extends Serializable> {
    * Returns the tool output of the execution preservation event linked to this {@link Plugin}.
    * 
    * @return a {@link String} with the tool output of the execution event of this {@link Plugin}.
+   * 
+   * @deprecated 20160226 hsilva: this must/will be removed 
    */
   public String getToolOutput();
   
