@@ -1444,14 +1444,13 @@ public class SolrUtils {
     String creatingApplicationName = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_NAME));
     String creatingApplicationVersion = objectToString(doc.get(RodaConstants.FILE_CREATING_APPLICATION_VERSION));
     String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
-    String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
+    // String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
 
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
 
     file = new IndexedFile(uuid, aipId, representationId, path, fileId, false, fileFormat, originalName, size,
-      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, fullText,
-      storagePath);
+      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, storagePath);
     return file;
   }
 

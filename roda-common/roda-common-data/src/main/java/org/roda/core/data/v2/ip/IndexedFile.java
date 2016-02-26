@@ -31,7 +31,6 @@ public class IndexedFile implements IsIndexed {
   private String creatingApplicationVersion;
   private String dateCreatedByApplication;
   private List<String> hash;
-  private String fulltext;
   private String storagePath;
 
   public IndexedFile() {
@@ -41,7 +40,7 @@ public class IndexedFile implements IsIndexed {
   public IndexedFile(String uuid, String aipId, String representationId, List<String> path, String id,
     boolean entryPoint, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
     String creatingApplicationName, String creatingApplicationVersion, String dateCreatedByApplication,
-    List<String> hash, String fulltext, String storagePath) {
+    List<String> hash, String storagePath) {
     this.uuid = uuid;
 
     this.aipId = aipId;
@@ -57,7 +56,6 @@ public class IndexedFile implements IsIndexed {
     this.creatingApplicationVersion = creatingApplicationVersion;
     this.dateCreatedByApplication = dateCreatedByApplication;
     this.hash = hash;
-    this.fulltext = fulltext;
     this.storagePath = storagePath;
   }
 
@@ -165,14 +163,6 @@ public class IndexedFile implements IsIndexed {
     this.hash = hash;
   }
 
-  public String getFulltext() {
-    return fulltext;
-  }
-
-  public void setFulltext(String fulltext) {
-    this.fulltext = fulltext;
-  }
-
   public String getStoragePath() {
     return storagePath;
   }
@@ -190,7 +180,6 @@ public class IndexedFile implements IsIndexed {
     result = prime * result + ((creatingApplicationVersion == null) ? 0 : creatingApplicationVersion.hashCode());
     result = prime * result + ((dateCreatedByApplication == null) ? 0 : dateCreatedByApplication.hashCode());
     result = prime * result + ((fileFormat == null) ? 0 : fileFormat.hashCode());
-    result = prime * result + ((fulltext == null) ? 0 : fulltext.hashCode());
     result = prime * result + ((hash == null) ? 0 : hash.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (isDirectory ? 1231 : 1237);
@@ -236,11 +225,6 @@ public class IndexedFile implements IsIndexed {
       if (other.fileFormat != null)
         return false;
     } else if (!fileFormat.equals(other.fileFormat))
-      return false;
-    if (fulltext == null) {
-      if (other.fulltext != null)
-        return false;
-    } else if (!fulltext.equals(other.fulltext))
       return false;
     if (hash == null) {
       if (other.hash != null)
@@ -290,7 +274,7 @@ public class IndexedFile implements IsIndexed {
       + path + ", id=" + id + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
       + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
-      + dateCreatedByApplication + ", hash=" + hash + ", fulltext=" + fulltext + ", storagePath=" + storagePath + "]";
+      + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + "]";
   }
 
 }

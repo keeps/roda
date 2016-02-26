@@ -17,7 +17,9 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
@@ -44,7 +46,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
   private Column<IndexedFile, SafeHtml> iconColumn;
   private TextColumn<IndexedFile> pathColumn;
   private TextColumn<IndexedFile> filenameColumn;
-  private TextColumn<IndexedFile> mimetypeColumn;
+  private TextColumn<IndexedFile> formatColumn;
   private TextColumn<IndexedFile> lengthColumn;
 
   public SearchFileList() {
@@ -104,12 +106,30 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
       }
     };
 
-    mimetypeColumn = new TextColumn<IndexedFile>() {
+    formatColumn = new TextColumn<IndexedFile>() {
 
       @Override
       public String getValue(IndexedFile file) {
-        return (file != null && file.getFileFormat() != null && file.getFileFormat().getMimeType() != null
-          && !file.getFileFormat().getMimeType().isEmpty()) ? file.getFileFormat().getMimeType() : "";
+        if (file != null && file.getFileFormat() != null) {
+          FileFormat format = file.getFileFormat();
+          String ret;
+          if (StringUtils.isNotBlank(format.getFormatDesignationName())) {
+            ret = format.getFormatDesignationName();
+            if (StringUtils.isNotBlank(format.getFormatDesignationVersion())) {
+              ret = ret + " " + format.getFormatDesignationVersion();
+            }
+          } else if (StringUtils.isNotBlank(format.getPronom())) {
+            ret = format.getPronom();
+          } else if (StringUtils.isNotBlank(format.getMimeType())) {
+            ret = format.getMimeType();
+          } else {
+            ret = null;
+          }
+          return ret;
+
+        } else {
+          return null;
+        }
       }
     };
 
@@ -123,22 +143,19 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
     /* add sortable */
     filenameColumn.setSortable(true);
-    mimetypeColumn.setSortable(true);
+    formatColumn.setSortable(true);
     lengthColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
     display.addColumn(filenameColumn, "Name");
     display.addColumn(pathColumn, "Path");
-    display.addColumn(mimetypeColumn, "Mimetype");
+    display.addColumn(formatColumn, "Format");
     display.addColumn(lengthColumn, "Length");
     display.setColumnWidth(iconColumn, "35px");
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(pathColumn, "100%");
 
-    filenameColumn.setCellStyleNames("nowrap");
-    mimetypeColumn.setCellStyleNames("nowrap");
     lengthColumn.setCellStyleNames("nowrap");
 
     // define default sorting
@@ -161,7 +178,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
       Map<Column<IndexedFile, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, String>();
       columnSortingKeyMap.put(filenameColumn, RodaConstants.FILE_ORIGINALNAME);
       columnSortingKeyMap.put(lengthColumn, RodaConstants.FILE_SIZE);
-      columnSortingKeyMap.put(mimetypeColumn, RodaConstants.FILE_FORMAT_MIMETYPE);
+      columnSortingKeyMap.put(formatColumn, RodaConstants.FILE_FORMAT_MIMETYPE);
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
