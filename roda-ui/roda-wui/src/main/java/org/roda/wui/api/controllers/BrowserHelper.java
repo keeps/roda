@@ -781,7 +781,13 @@ public class BrowserHelper {
     stream = new StreamingOutput() {
       @Override
       public void write(OutputStream os) throws IOException, WebApplicationException {
-        IOUtils.copy(representationFileBinary.getContent().createInputStream(), os);
+        InputStream fileInputStream = null;
+        try {
+          fileInputStream = representationFileBinary.getContent().createInputStream();
+          IOUtils.copy(fileInputStream, os);
+        } finally {
+          IOUtils.closeQuietly(fileInputStream);
+        }
       }
     };
 
