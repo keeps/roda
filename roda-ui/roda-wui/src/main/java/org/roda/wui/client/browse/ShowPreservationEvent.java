@@ -201,81 +201,40 @@ public class ShowPreservationEvent extends Composite {
     // TODO missing agent role
 
     for (IndexedPreservationAgent agent : agents) {
-      FlowPanel layout = new FlowPanel();
-      layout.addStyleName("list-panel");
-
-      Label idLabel = new Label(messages.preservationEventAgentId());
-      idLabel.addStyleName("label");
-      Label idValue = new Label(agent.getId());
-      layout.add(idLabel);
-      layout.add(idValue);
-
-      if (StringUtils.isNotBlank(agent.getName())) {
-        Label nameLabel = new Label("Name");
-        nameLabel.addStyleName("label");
-        Label nameValue = new Label(agent.getName());
-        layout.add(nameLabel);
-        layout.add(nameValue);
-      }
-
-      if (StringUtils.isNotBlank(agent.getType())) {
-        Label typeLabel = new Label("Type");
-        typeLabel.addStyleName("label");
-        Label typeValue = new Label(agent.getType());
-        layout.add(typeLabel);
-        layout.add(typeValue);
-      }
-
-      if (StringUtils.isNotBlank(agent.getNote())) {
-        Label noteLabel = new Label("Note");
-        noteLabel.addStyleName("label");
-        Label noteValue = new Label(agent.getNote());
-        layout.add(noteLabel);
-        layout.add(noteValue);
-      }
-
-      if (StringUtils.isNotBlank(agent.getExtension())) {
-        Label extensionLabel = new Label("Extension");
-        extensionLabel.addStyleName("label");
-        Label extensionValue = new Label(agent.getExtension());
-        layout.add(extensionLabel);
-        layout.add(extensionValue);
-      }
-
+      FlowPanel layout = createAgentPanel(agent);
       agentsPanel.add(layout);
     }
 
     // Source objects
-    if (event.getSourcesObjectIds().size() > 0) {
-      for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
-        if (sourceObjectId.getRoles() != null
-          && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)) {
-          GWT.log("Event source id: " + sourceObjectId);
-          addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
-        }
+    boolean showSourceObjects = false;
+    for (LinkingIdentifier sourceObjectId : event.getSourcesObjectIds()) {
+      if (sourceObjectId.getRoles() != null
+        && sourceObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)) {
+        GWT.log("Event source id: " + sourceObjectId);
+        addObjectPanel(sourceObjectId, bundle, sourceObjectsPanel);
+        showSourceObjects = true;
       }
-    } else {
-      sourceObjectsHeader.setVisible(false);
-      sourceObjectsPanel.setVisible(false);
     }
+    sourceObjectsHeader.setVisible(showSourceObjects);
+    sourceObjectsPanel.setVisible(showSourceObjects);
 
     // Outcome objects
-    if (event.getOutcomeObjectIds().size() > 0) {
-      for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
-        if (outcomeObjectId.getRoles() != null
-          && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)) {
-          addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
-        }
+    boolean showOutcomeObjects = false;
+    for (LinkingIdentifier outcomeObjectId : event.getOutcomeObjectIds()) {
+      if (outcomeObjectId.getRoles() != null
+        && outcomeObjectId.getRoles().contains(RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME)) {
+        addObjectPanel(outcomeObjectId, bundle, outcomeObjectsPanel);
+        showOutcomeObjects = true;
       }
-    } else {
-      outcomeObjectsHeader.setVisible(false);
-      outcomeObjectsPanel.setVisible(false);
     }
+
+    outcomeObjectsHeader.setVisible(showOutcomeObjects);
+    outcomeObjectsPanel.setVisible(showOutcomeObjects);
 
     // OUTCOME DETAIL
 
     outcomeDetailHeader.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailNote())
-      && StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
+      || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
 
     eventOutcomeLabel.setText(event.getEventOutcome());
 
@@ -295,10 +254,59 @@ public class ShowPreservationEvent extends Composite {
 
   }
 
+  private FlowPanel createAgentPanel(IndexedPreservationAgent agent) {
+    FlowPanel layout = new FlowPanel();
+    layout.addStyleName("panel");
+
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
+    if (StringUtils.isNotBlank(agent.getName())) {
+      Label nameValue = new Label(agent.getName());
+      nameValue.addStyleName("panel-title");
+      heading.add(nameValue);
+    } else {
+      Label idValue = new Label(agent.getId());
+      idValue.addStyleName("panel-title");
+      heading.add(idValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getType())) {
+      Label typeLabel = new Label("Type");
+      typeLabel.addStyleName("label");
+      Label typeValue = new Label(agent.getType());
+      body.add(typeLabel);
+      body.add(typeValue);
+    }
+    
+    // TODO add agent version
+
+    if (StringUtils.isNotBlank(agent.getNote())) {
+      Label noteLabel = new Label("Note");
+      noteLabel.addStyleName("label");
+      Label noteValue = new Label(agent.getNote());
+      body.add(noteLabel);
+      body.add(noteValue);
+    }
+
+    if (StringUtils.isNotBlank(agent.getExtension())) {
+      Label extensionLabel = new Label("Extension");
+      extensionLabel.addStyleName("label");
+      Label extensionValue = new Label(agent.getExtension());
+      body.add(extensionLabel);
+      body.add(extensionValue);
+    }
+    return layout;
+  }
+
   private void addObjectPanel(LinkingIdentifier object, PreservationEventViewBundle bundle, FlowPanel objectsPanel) {
 
     FlowPanel layout = new FlowPanel();
-    layout.addStyleName("list-panel");
+    layout.addStyleName("panel");
 
     if (object.getType().equalsIgnoreCase("URN")) {
       String idValue = object.getValue();
@@ -321,11 +329,18 @@ public class ShowPreservationEvent extends Composite {
   }
 
   private void addAipPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
-    // TODO add AIP level (icon) and title
+
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
 
     Label header = new Label("Intellectual entity");
+    header.addStyleName("panel-title");
     header.addStyleName("h5");
-    layout.add(header);
+    heading.add(header);
 
     IndexedAIP iAIP = bundle.getAips().get(idValue);
 
@@ -335,11 +350,15 @@ public class ShowPreservationEvent extends Composite {
       titleLabel.addStyleName("label");
       Label titleValue = new Label(iAIP.getTitle());
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+      body.add(titleLabel);
+      body.add(titleValue);
 
-      layout.add(titleLabel);
-      layout.add(titleValue);
-      layout.add(link);
+      FlowPanel footer = new FlowPanel();
+      footer.addStyleName("panel-footer");
+      layout.add(footer);
+
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+      footer.add(link);
 
     } else {
       Label idLabel = new Label("Identifier (not found)");
@@ -347,44 +366,67 @@ public class ShowPreservationEvent extends Composite {
       String path = IdUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
-      layout.add(idLabel);
-      layout.add(id_Value);
+      body.add(idLabel);
+      body.add(id_Value);
     }
   }
 
   private void addRepresentationPanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
     Label header = new Label("Representation");
+    header.addStyleName("panel-title");
     header.addStyleName("h5");
-    layout.add(header);
+    heading.add(header);
 
     IndexedRepresentation irep = bundle.getRepresentations().get(idValue);
 
     if (irep != null) {
 
-      Label originalLabel = new Label("Original");
+      Label originalLabel = new Label("Status");
       originalLabel.addStyleName("label");
       Label originalValue = new Label(irep.isOriginal() ? "original" : "alternative");
+
+      body.add(originalLabel);
+      body.add(originalValue);
 
       Anchor link = new Anchor("open",
         Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getId(), irep.getId()));
 
-      layout.add(originalLabel);
-      layout.add(originalValue);
-      layout.add(link);
+      FlowPanel footer = new FlowPanel();
+      footer.addStyleName("panel-footer");
+      layout.add(footer);
+
+      footer.add(link);
     } else {
       Label idLabel = new Label("Identifier (not found)");
       idLabel.addStyleName("label");
       Label id_Value = new Label(idValue);
 
-      layout.add(idLabel);
-      layout.add(id_Value);
+      body.add(idLabel);
+      body.add(id_Value);
     }
   }
 
   private void addFilePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
     Label header = new Label("File");
+    header.addStyleName("panel-title");
     header.addStyleName("h5");
-    layout.add(header);
+    heading.add(header);
 
     IndexedFile ifile = bundle.getFiles().get(idValue);
 
@@ -415,27 +457,29 @@ public class ShowPreservationEvent extends Composite {
       sizeLabel.addStyleName("label");
       Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
 
-      // TODO set anchor
-      // Label idValue = new Label(outcomeObjectId);
-
       List<String> history = new ArrayList<>();
       history.add(ifile.getAipId());
       history.add(ifile.getRepresentationId());
       history.addAll(ifile.getPath());
       history.add(ifile.getId());
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
 
-      layout.add(nameLabel);
-      layout.add(nameValue);
+      body.add(nameLabel);
+      body.add(nameValue);
       if (pathValue != null) {
-        layout.add(pathLabel);
-        layout.add(pathValue);
+        body.add(pathLabel);
+        body.add(pathValue);
       }
-      layout.add(formatLabel);
-      layout.add(formatValue);
-      layout.add(sizeLabel);
-      layout.add(sizeValue);
-      layout.add(link);
+      body.add(formatLabel);
+      body.add(formatValue);
+      body.add(sizeLabel);
+      body.add(sizeValue);
+
+      FlowPanel footer = new FlowPanel();
+      footer.addStyleName("panel-footer");
+      layout.add(footer);
+
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
+      footer.add(link);
 
     } else {
       Label idLabel = new Label("Identifier (not found)");
@@ -443,15 +487,23 @@ public class ShowPreservationEvent extends Composite {
       String path = IdUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
-      layout.add(idLabel);
-      layout.add(id_Value);
+      body.add(idLabel);
+      body.add(id_Value);
     }
   }
 
   private void addTransferredResourcePanel(PreservationEventViewBundle bundle, FlowPanel layout, String idValue) {
+    FlowPanel heading = new FlowPanel();
+    heading.addStyleName("panel-heading");
+    layout.add(heading);
+    FlowPanel body = new FlowPanel();
+    body.addStyleName("panel-body");
+    layout.add(body);
+
     Label header = new Label("Transferred resource");
+    header.addStyleName("panel-title");
     header.addStyleName("h5");
-    layout.add(header);
+    heading.add(header);
 
     TransferredResource tr = bundle.getTransferredResources().get(idValue);
 
@@ -464,13 +516,17 @@ public class ShowPreservationEvent extends Composite {
       pathLabel.addStyleName("label");
       Label pathValue = new Label(tr.getFullPath());
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getId()));
+      body.add(nameLabel);
+      body.add(nameValue);
+      body.add(pathLabel);
+      body.add(pathValue);
 
-      layout.add(nameLabel);
-      layout.add(nameValue);
-      layout.add(pathLabel);
-      layout.add(pathValue);
-      layout.add(link);
+      FlowPanel footer = new FlowPanel();
+      footer.addStyleName("panel-footer");
+      layout.add(footer);
+
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getId()));
+      footer.add(link);
 
     } else {
       Label idLabel = new Label("Identifier (not found)");
@@ -478,8 +534,8 @@ public class ShowPreservationEvent extends Composite {
       String path = IdUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
-      layout.add(idLabel);
-      layout.add(id_Value);
+      body.add(idLabel);
+      body.add(id_Value);
     }
   }
 

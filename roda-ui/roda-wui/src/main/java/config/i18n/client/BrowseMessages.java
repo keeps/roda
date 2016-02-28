@@ -501,9 +501,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Agents")
   String preservationEventAgentsHeader();
 
-  @DefaultMessage("Identifier")
-  String preservationEventAgentId();
-
   @DefaultMessage("Role")
   String preservationEventAgentRole();
 
