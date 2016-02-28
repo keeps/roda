@@ -12,6 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -25,6 +26,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.common.utils.StringUtils;
@@ -38,6 +40,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -197,11 +200,11 @@ public class ShowPreservationEvent extends Composite {
       .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(event.getEventDateTime()));
 
     // AGENTS
-    List<IndexedPreservationAgent> agents = bundle.getAgents();
-    // TODO missing agent role
+    Map<String, IndexedPreservationAgent> agents = bundle.getAgents();
 
-    for (IndexedPreservationAgent agent : agents) {
-      FlowPanel layout = createAgentPanel(agent);
+    for (LinkingIdentifier agentId : event.getLinkingAgentIds()) {
+      IndexedPreservationAgent agent = agents.get(agentId.getValue());
+      FlowPanel layout = createAgentPanel(agentId, agent);
       agentsPanel.add(layout);
     }
 
@@ -236,7 +239,13 @@ public class ShowPreservationEvent extends Composite {
     outcomeDetailHeader.setVisible(StringUtils.isNotBlank(event.getEventOutcomeDetailNote())
       || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
 
-    eventOutcomeLabel.setText(event.getEventOutcome());
+    String eventOutcome = event.getEventOutcome();
+    eventOutcomeLabel.setText(eventOutcome);
+    if (PluginState.SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
+      eventOutcomeLabel.setStyleName("label-success");
+    } else if (PluginState.FAILURE.toString().equalsIgnoreCase(eventOutcome)) {
+      eventOutcomeLabel.setStyleName("label-danger");
+    }
 
     if (StringUtils.isNotBlank(event.getEventOutcomeDetailNote())) {
       eventOutcomeDetailNoteValue.setText(event.getEventOutcomeDetailNote());
@@ -254,7 +263,7 @@ public class ShowPreservationEvent extends Composite {
 
   }
 
-  private FlowPanel createAgentPanel(IndexedPreservationAgent agent) {
+  private FlowPanel createAgentPanel(LinkingIdentifier agentId, IndexedPreservationAgent agent) {
     FlowPanel layout = new FlowPanel();
     layout.addStyleName("panel");
 
@@ -275,6 +284,15 @@ public class ShowPreservationEvent extends Composite {
       heading.add(idValue);
     }
 
+    if (!agentId.getRoles().isEmpty()) {
+      Label typeLabel = new Label("Roles");
+      typeLabel.addStyleName("label");
+      // TODO humanize list
+      Label typeValue = new Label(Tools.join(agentId.getRoles(), ", "));
+      body.add(typeLabel);
+      body.add(typeValue);
+    }
+
     if (StringUtils.isNotBlank(agent.getType())) {
       Label typeLabel = new Label("Type");
       typeLabel.addStyleName("label");
@@ -282,7 +300,7 @@ public class ShowPreservationEvent extends Composite {
       body.add(typeLabel);
       body.add(typeValue);
     }
-    
+
     // TODO add agent version
 
     if (StringUtils.isNotBlank(agent.getNote())) {

@@ -8,7 +8,6 @@
 package org.roda.wui.client.browse;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -22,7 +21,7 @@ public class PreservationEventViewBundle implements Serializable {
 
   private static final long serialVersionUID = -8540304346599230183L;
   private IndexedPreservationEvent event;
-  private List<IndexedPreservationAgent> agents;
+  private Map<String, IndexedPreservationAgent> agents;
   private Map<String, IndexedAIP> aips;
   private Map<String, IndexedRepresentation> representations;
   private Map<String, IndexedFile> files;
@@ -32,7 +31,7 @@ public class PreservationEventViewBundle implements Serializable {
     super();
   }
 
-  public PreservationEventViewBundle(IndexedPreservationEvent event, List<IndexedPreservationAgent> agents,
+  public PreservationEventViewBundle(IndexedPreservationEvent event, Map<String, IndexedPreservationAgent> agents,
     Map<String, IndexedAIP> aips, Map<String, IndexedRepresentation> representations, Map<String, IndexedFile> files,
     Map<String, TransferredResource> transferredResources) {
     super();
@@ -52,11 +51,11 @@ public class PreservationEventViewBundle implements Serializable {
     this.event = event;
   }
 
-  public List<IndexedPreservationAgent> getAgents() {
+  public Map<String, IndexedPreservationAgent> getAgents() {
     return agents;
   }
 
-  public void setAgents(List<IndexedPreservationAgent> agents) {
+  public void setAgents(Map<String, IndexedPreservationAgent> agents) {
     this.agents = agents;
   }
 

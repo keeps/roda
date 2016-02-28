@@ -18,13 +18,17 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -49,12 +53,10 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private Column<IndexedPreservationEvent, Date> eventDateTimeColumn;
-  // private TextColumn<IndexedPreservationEvent> eventAgentColumn;
   private TextColumn<IndexedPreservationEvent> eventTypeColumn;
   private TextColumn<IndexedPreservationEvent> eventDetailColumn;
-  // private TextColumn<IndexedPreservationEvent> eventSourceObjectColumn;
-  // private TextColumn<IndexedPreservationEvent> eventOutcomeObjectColumn;
-  private TextColumn<IndexedPreservationEvent> eventOutcomeColumn;
+
+  private Column<IndexedPreservationEvent, SafeHtml> eventOutcomeColumn;
 
   public PreservationEventList() {
     this(null, null, null);
@@ -91,70 +93,23 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
       }
     };
 
-    eventOutcomeColumn = new TextColumn<IndexedPreservationEvent>() {
-
+    eventOutcomeColumn = new Column<IndexedPreservationEvent, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(IndexedPreservationEvent event) {
-        return event != null ? event.getEventOutcome() : null;
+      public SafeHtml getValue(IndexedPreservationEvent event) {
+        SafeHtml ret = null;
+        if (event != null) {
+          String outcome = event.getEventOutcome();
+          if (PluginState.SUCCESS.toString().equalsIgnoreCase(outcome)) {
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + outcome + "</span>");
+          } else if (PluginState.FAILURE.toString().equalsIgnoreCase(outcome)) {
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + outcome + "</span>");
+          } else {
+            ret = SafeHtmlUtils.fromString(outcome);
+          }
+        }
+        return ret;
       }
     };
-
-    // eventAgentColumn = new TextColumn<IndexedPreservationEvent>() {
-    //
-    // @Override
-    // public String getValue(IndexedPreservationEvent event) {
-    // String ret = null;
-    // if (event != null) {
-    // if(event.getLinkingAgentIds()!=null){
-    // ret = event.getLinkingAgentIds().size()+ " agents";
-    // } else {
-    // ret = "none";
-    // }
-    // }
-    // return ret;
-    // }
-    // };
-    //
-    // eventSourceObjectColumn = new TextColumn<IndexedPreservationEvent>() {
-    //
-    // @Override
-    // public String getValue(IndexedPreservationEvent event) {
-    // String ret = null;
-    // // TODO define link
-    // //TODO handle outcome objects
-    // if (event != null) {
-    // if(event.getSourcesObjectIds()!=null){
-    // ret = event.getSourcesObjectIds().size()+ " objects";
-    // } else {
-    // ret = "none";
-    // }
-    //
-    // }
-    //
-    // return ret;
-    // }
-    //
-    // };
-    //
-    // eventOutcomeObjectColumn = new TextColumn<IndexedPreservationEvent>() {
-    //
-    // @Override
-    // public String getValue(IndexedPreservationEvent event) {
-    // String ret = null;
-    // // TODO define link
-    // if (event != null) {
-    // if(event.getOutcomeObjectIds()!=null){
-    // ret = event.getOutcomeObjectIds().size()+ " objects";
-    // } else {
-    // ret = "none";
-    // }
-    //
-    // }
-    //
-    // return ret;
-    // }
-    //
-    // };
 
     eventDateTimeColumn.setSortable(true);
     eventTypeColumn.setSortable(true);

@@ -983,12 +983,12 @@ public class BrowserHelper {
     IndexedPreservationEvent ipe = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationEvent.class, eventId);
     eventBundle.setEvent(ipe);
     if (ipe.getLinkingAgentIds() != null && !ipe.getLinkingAgentIds().isEmpty()) {
-      List<IndexedPreservationAgent> agents = new ArrayList<IndexedPreservationAgent>();
+      Map<String, IndexedPreservationAgent> agents = new HashMap<String, IndexedPreservationAgent>();
       for (LinkingIdentifier agentID : ipe.getLinkingAgentIds()) {
         try {
           IndexedPreservationAgent agent = RodaCoreFactory.getIndexService().retrieve(IndexedPreservationAgent.class,
             agentID.getValue());
-          agents.add(agent);
+          agents.put(agentID.getValue(), agent);
         } catch (NotFoundException | GenericException e) {
           LOGGER.error("Error getting agent " + agentID + ": " + e.getMessage());
         }
