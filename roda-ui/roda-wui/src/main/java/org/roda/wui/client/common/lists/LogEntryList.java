@@ -18,13 +18,9 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.management.UserManagementService;
-import org.roda.wui.common.client.tools.Tools;
 
-import com.google.gwt.cell.client.ClickableTextCell;
 import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -45,7 +41,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;
   private TextColumn<LogEntry> actionMethodColumn;
-  private Column<LogEntry, String> relatedObjectColumn;
+  // private Column<LogEntry, String> relatedObjectColumn;
   private TextColumn<LogEntry> usernameColumn;
   private TextColumn<LogEntry> durationColumn;
   private TextColumn<LogEntry> addressColumn;
@@ -83,23 +79,25 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
       }
     };
 
-    relatedObjectColumn = new Column<LogEntry, String>(new ClickableTextCell()) {
-
-      @Override
-      public String getValue(LogEntry logEntry) {
-        return logEntry != null ? logEntry.getRelatedObjectID() : null;
-      }
-    };
-
-    relatedObjectColumn.setFieldUpdater(new FieldUpdater<LogEntry, String>() {
-
-      @Override
-      public void update(int index, LogEntry logEntry, String value) {
-        if (logEntry != null && logEntry.getRelatedObjectID() != null) {
-          Tools.newHistory(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
-        }
-      }
-    });
+    // relatedObjectColumn = new Column<LogEntry, String>(new
+    // ClickableTextCell()) {
+    //
+    // @Override
+    // public String getValue(LogEntry logEntry) {
+    // return logEntry != null ? logEntry.getRelatedObjectID() : null;
+    // }
+    // };
+    //
+    // relatedObjectColumn.setFieldUpdater(new FieldUpdater<LogEntry, String>()
+    // {
+    //
+    // @Override
+    // public void update(int index, LogEntry logEntry, String value) {
+    // if (logEntry != null && logEntry.getRelatedObjectID() != null) {
+    // Tools.newHistory(Browse.getViewItemHistoryToken(logEntry.getRelatedObjectID()));
+    // }
+    // }
+    // });
 
     usernameColumn = new TextColumn<LogEntry>() {
 
@@ -129,7 +127,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     dateColumn.setSortable(true);
     actionComponentColumn.setSortable(true);
     actionMethodColumn.setSortable(true);
-    relatedObjectColumn.setSortable(true);
+    // relatedObjectColumn.setSortable(true);
     usernameColumn.setSortable(true);
     durationColumn.setSortable(true);
     addressColumn.setSortable(true);
@@ -140,7 +138,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
     display.addColumn(dateColumn, "Date and time");
     display.addColumn(actionComponentColumn, "Component");
     display.addColumn(actionMethodColumn, "Method");
-    display.addColumn(relatedObjectColumn, "Related object");
+    // display.addColumn(relatedObjectColumn, "Related object");
     display.addColumn(usernameColumn, "User");
     display.addColumn(durationColumn, "Duration");
     display.addColumn(addressColumn, "Address");
@@ -153,7 +151,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
-    relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
+    // relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
   }
 
   @Override
@@ -191,7 +189,7 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   protected int getInitialPageSize() {
     return PAGE_SIZE;
   }
-  
+
   @Override
   protected CellPreviewEvent.Handler<LogEntry> getSelectionEventManager() {
     return DefaultSelectionEventManager.<LogEntry> createBlacklistManager(3);
