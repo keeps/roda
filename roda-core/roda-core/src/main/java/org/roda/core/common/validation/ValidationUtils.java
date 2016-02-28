@@ -54,7 +54,7 @@ public class ValidationUtils {
     String aipId) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
       ValidationException {
     ValidationReport report = new ValidationReport();
-    report.setValid(false);
+    report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
     for (DescriptiveMetadata dm : descriptiveMetadata) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataStoragePath(dm);

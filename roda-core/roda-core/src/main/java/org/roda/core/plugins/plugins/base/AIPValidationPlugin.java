@@ -91,15 +91,12 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    boolean validateDescriptiveMetadata = Boolean.parseBoolean(getParameterValues().getOrDefault(
-      PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getId(), PARAMETER_VALIDATE_DESCRIPTIVE_METADATA.getDefaultValue()));
-    boolean validatePremis = Boolean.parseBoolean(getParameterValues().getOrDefault(PARAMETER_VALIDATE_PREMIS.getId(),
-      PARAMETER_VALIDATE_PREMIS.getDefaultValue()));
-    boolean forceDescriptiveMetadataType = Boolean.parseBoolean(getParameterValues().getOrDefault(
-      PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getId(), PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE.getDefaultValue()));
-    String metadataType = getParameterValues().getOrDefault(PARAMETER_METADATA_TYPE.getId(),
-      PARAMETER_METADATA_TYPE.getDefaultValue());
+    boolean validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
+    boolean validatePremis = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_PREMIS);
+    boolean forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this, PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
+    String metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
 
+    Report pluginReport = PluginHelper.createPluginReport(this);
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
@@ -116,6 +113,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
         boolean notify = true;
         createEvent(aip, model, reportItem.getPluginState(), notify);
+        pluginReport.addReport(reportItem);
       } catch (RODAException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
       }
@@ -126,7 +124,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
         LOGGER.error("Error updating job report", e);
       }
     }
-    return null;
+    return pluginReport;
   }
 
   private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {

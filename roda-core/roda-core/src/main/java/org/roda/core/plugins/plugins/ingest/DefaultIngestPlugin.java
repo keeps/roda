@@ -158,6 +158,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+    totalSteps = calculateEfectiveTotalSteps();
   }
 
   @Override
@@ -197,6 +198,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 2.1) do pdftopdfa conversion
@@ -206,6 +208,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 2.2) do verapdf check
@@ -217,29 +220,34 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 3) create premis skeleton
     pluginReport = createPremisSkeleton(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
 
     // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
 
     // 6) do file format identification (sieg)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 7) do metadata and full text extraction (tika)
@@ -247,6 +255,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 8) do auto accept
@@ -260,6 +269,28 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     PluginHelper.updateJobStatus(this, index, model, 100);
 
     return report;
+  }
+
+  private List<AIP> recalculateAIPsList(List<AIP> aips, Map<String, Report> reports,
+    Map<String, String> aipIdToObjectId) {
+    for (int i = 0; i < aips.size(); i++) {
+      AIP aip = aips.get(i);
+      if (reports.get(aipIdToObjectId.get(aip.getId())).getPluginState() == PluginState.FAILURE) {
+        aips.remove(i);
+      }
+    }
+    return aips;
+  }
+
+  private int calculateEfectiveTotalSteps() {
+    int effectiveTotalSteps = totalSteps;
+    for (PluginParameter pluginParameter : getParameters()) {
+      if (pluginParameter.getType() == PluginParameterType.BOOLEAN && pluginParameter != PARAMETER_FORCE_PARENT_ID
+        && !PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
+        effectiveTotalSteps--;
+      }
+    }
+    return effectiveTotalSteps;
   }
 
   private void createIngestStartedEvent(ModelService model, List<AIP> aips) {
