@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -211,6 +212,7 @@ public class DescriptiveMetadataHistory extends Composite {
           preview.removeStyleName("code-pre");
         } else {
           preview.addStyleName("code-pre");
+          JavascriptUtils.runHighlighterOn(preview.getElement());
         }
       }
     });

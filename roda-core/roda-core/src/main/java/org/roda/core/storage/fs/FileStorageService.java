@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -652,15 +653,15 @@ public class FileStorageService implements StorageService {
         final String baseName = resourceHistoryDataPath.getFileName().toString();
 
         if (Files.exists(parent)) {
+          DirectoryStream<Path> directoryStream = null;
           try {
-            final DirectoryStream<Path> directoryStream = Files.newDirectoryStream(parent,
-              new DirectoryStream.Filter<Path>() {
+            directoryStream = Files.newDirectoryStream(parent, new DirectoryStream.Filter<Path>() {
 
-                @Override
-                public boolean accept(Path entry) throws IOException {
-                  return entry.getFileName().toString().startsWith(baseName);
-                }
-              });
+              @Override
+              public boolean accept(Path entry) throws IOException {
+                return entry.getFileName().toString().startsWith(baseName);
+              }
+            });
 
             for (Path p : directoryStream) {
               Files.delete(p);
@@ -672,6 +673,8 @@ public class FileStorageService implements StorageService {
             }
           } catch (IOException e) {
             LOGGER.warn("Could not delete history under " + resourceHistoryDataPath, e);
+          } finally {
+            IOUtils.closeQuietly(directoryStream);
           }
         }
       }

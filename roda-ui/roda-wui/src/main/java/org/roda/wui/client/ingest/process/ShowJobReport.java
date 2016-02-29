@@ -134,46 +134,54 @@ public class ShowJobReport extends Composite {
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
 
     for (Report reportItem : jobReport.getReports()) {
-      Label reportItemTitleLabel = new Label(reportItem.getTitle());
-      reportItemTitleLabel.setStyleName("report-item-title");
-      reportItems.add(reportItemTitleLabel);
+      FlowPanel panel = new FlowPanel();
+      panel.setStyleName("panel");
+      panel.addStyleName("panel-counter");
+      reportItems.add(panel);
 
-      FlowPanel reportItemAttributes = new FlowPanel();
-      reportItemAttributes.addStyleName("report-item-attributes");
-      reportItems.add(reportItemAttributes);
+      FlowPanel panelHeading = new FlowPanel();
+      panelHeading.setStyleName("panel-heading");
+      Label panelTitle = new Label(reportItem.getTitle());
+      panelTitle.setStyleName("panel-title");
+      panelHeading.add(panelTitle);
+      panel.add(panelHeading);
+
+      FlowPanel panelBody = new FlowPanel();
+      panelBody.addStyleName("panel-body");
+      panel.add(panelBody);
 
       // FIXME
       Label attributeLabel = new Label("Plugin");
       attributeLabel.setStyleName("label");
-      reportItemAttributes.add(attributeLabel);
+      panelBody.add(attributeLabel);
       Label attributeValue = new Label(reportItem.getPlugin());
-      reportItemAttributes.add(attributeValue);
+      panelBody.add(attributeValue);
 
       attributeLabel = new Label("Start datetime");
       attributeLabel.setStyleName("label");
-      reportItemAttributes.add(attributeLabel);
+      panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateCreated()));
-      reportItemAttributes.add(attributeValue);
+      panelBody.add(attributeValue);
 
       attributeLabel = new Label("End datetime");
       attributeLabel.setStyleName("label");
-      reportItemAttributes.add(attributeLabel);
+      panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateUpdated()));
-      reportItemAttributes.add(attributeValue);
+      panelBody.add(attributeValue);
 
       attributeLabel = new Label("Outcome");
       attributeLabel.setStyleName("label");
-      reportItemAttributes.add(attributeLabel);
+      panelBody.add(attributeLabel);
       attributeValue = new Label(reportItem.getPluginState().toString());
-      reportItemAttributes.add(attributeValue);
+      panelBody.add(attributeValue);
 
       if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
         attributeLabel = new Label("Outcome details");
         attributeLabel.setStyleName("label");
-        reportItemAttributes.add(attributeLabel);
+        panelBody.add(attributeLabel);
         attributeValue = new Label(reportItem.getPluginDetails());
         attributeValue.addStyleName("code-pre");
-        reportItemAttributes.add(attributeValue);
+        panelBody.add(attributeValue);
       }
     }
   }

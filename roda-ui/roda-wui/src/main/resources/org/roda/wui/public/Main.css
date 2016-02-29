@@ -117,6 +117,24 @@ h6, .h6 {
 	font-size: 75%;
 }
 
+.fade-out {
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.fade-out:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2em;
+    height: 100%;
+    background: -webkit-linear-gradient(right,#fff 30%,rgba(255,255,255,0) 100%);
+    background: linear-gradient(-90deg,#fff 30%,rgba(255,255,255,0) 100%);
+}
+
 /**********************************************
 				SKELETON
 ************************************************/
@@ -437,37 +455,50 @@ pre>code {
 }
 
 .panel {
-  margin-bottom: 20px;
-  background-color: #fff;
-  border: 1px solid #089de3;
-  border-radius: 4px;
-  -webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-          box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
+	margin-bottom: 20px;
+	border: 1px solid #ddd;
+	background-color: #089de3;
+	padding-left: 5px;
 }
-.panel-body {
-  padding: 15px;
-}
+
 .panel-heading {
-  padding: 10px 15px;
-  border-bottom: 1px solid #089de3;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  color: #fff;
-  background-color: #089de3;
+	padding: 10px 15px;
+	color: #089de3;
+	background-color: white;
 }
+
 .panel-title {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 16px;
-  color: inherit;
+	margin-top: 0;
+	margin-bottom: 0;
+	font-size: 16px;
+	color: inherit;
 }
+
+.panel-body {
+	padding: 15px;
+	background-color: white;
+}
+
+.panel-heading + .panel-body {
+	padding-top: 0;
+}
+
 .panel-footer {
-  padding: 10px 15px;
-  background-color: #f5f5f5;
-  border-top: 1px solid #ddd;
-  border-bottom-right-radius: 3px;
-  border-bottom-left-radius: 3px;
+    padding: 10px 15px;
+    background-color: #fafafa;
+    border-top: 1px solid #eee;
 }
+
+.panel-counter {
+	counter-increment: panel-counter;
+}
+
+.panel-counter .panel-title:before {
+	content: counter(panel-counter) ".";
+	margin-right: 10px;
+	font-weight: 600;
+}
+
 
 .my-collections-empty-info {
 	padding: 10px;
@@ -3454,13 +3485,6 @@ td.datePickerMonth, td.datePickerYear {
 	display: inline;
 }
 
-.wui-plugin-options {
-	background-color: #eee;
-	padding: 10px 20px;
-	border-radius: 2px;
-	margin-bottom: 10px;
-}
-
 /**********************************************
 				INGEST PROCESS VIEW
 ************************************************/
@@ -3489,33 +3513,6 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 1.1rem;
     line-height: 1.1rem;
     color: #089de3;
-}
-
-/**********************************************
-				SHOW JOB REPORT
-************************************************/
-.report-item-title {
-	background-color: #089de3;
-	padding: 5px 10px;
-	color: white;
-	counter-increment: report-item-counter;
-	border-top-right-radius: 2px;
-	border-top-left-radius: 2px;
-}
-
-.report-item-title:before {
-	content: counter(report-item-counter) ".";
-	margin-right: 10px;
-	font-weight: 600;
-}
-
-.report-item-attributes {
-	border: 1px solid #089de3;
-	border-top: none;
-	border-bottom-right-radius: 2px;
-	border-bottom-left-radius: 2px;
-	padding: 20px;
-	margin-bottom: 20px;
 }
 
 /**********************************************

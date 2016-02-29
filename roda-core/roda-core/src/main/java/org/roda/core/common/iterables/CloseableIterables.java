@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.core.storage.BinaryVersion;
 
 import com.google.common.base.Predicate;
 import com.google.common.collect.Iterables;
@@ -102,6 +103,12 @@ public final class CloseableIterables {
         return Iterators.filter(unfiltered.iterator(), predicate);
       }
     };
+  }
+
+  public static <T> boolean isEmpty(CloseableIterable<T> it) {
+    boolean empty = Iterables.isEmpty(it);
+    IOUtils.closeQuietly(it);
+    return empty;
   }
 
 }

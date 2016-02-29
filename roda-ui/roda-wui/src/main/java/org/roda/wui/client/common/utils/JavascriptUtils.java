@@ -23,6 +23,12 @@ public class JavascriptUtils {
 		});
   }-*/;
 
+  public static native void runHighlighterOn(JavaScriptObject parent) /*-{
+  $wnd.jQuery(parent).each(function(i, block) {
+          $wnd.hljs.highlightBlock(block);
+  });
+}-*/;
+
   public static native void slideToggle(String selector) /*-{
 		$wnd.jQuery(selector).click(function() {
 			$wnd.jQuery(this).next().slideToggle(300, function() {

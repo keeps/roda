@@ -15,6 +15,7 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateIntervalFilterParameter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
@@ -208,7 +209,7 @@ public class SearchFieldPanel extends Composite {
       String field = searchFields.get(0);
 
       if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && inputDateBox.getValue() != null) {
-        filterParameter = new BasicSearchFilterParameter(field, inputDateBox.getValue().toString());
+        filterParameter = new SimpleFilterParameter(field, inputDateBox.getValue().toString());
       } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
         && inputDateBoxTo.getValue() != null && searchFields.size() >= 2) {
         // TODO validate inputs!

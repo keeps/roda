@@ -42,6 +42,7 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -202,7 +203,8 @@ public class BrowserHelper {
         bundle.setLabel(descriptiveMetadata.getId());
       }
     }
-    bundle.setHasHistory(!Iterables.isEmpty(model.getStorage()
+
+    bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
       .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
     return bundle;
   }
@@ -1059,9 +1061,11 @@ public class BrowserHelper {
 
     List<BinaryVersionBundle> versionBundles = new ArrayList<>();
 
-    for (BinaryVersion v : listDescriptiveMetadataVersions(aipId, metadataId)) {
+    CloseableIterable<BinaryVersion> it = listDescriptiveMetadataVersions(aipId, metadataId);
+    for (BinaryVersion v : it) {
       versionBundles.add(new BinaryVersionBundle(v.getId(), v.getMessage(), v.getCreatedDate()));
     }
+    IOUtils.closeQuietly(it);
 
     bundle.setAip(aip);
     bundle.setDescriptiveMetadata(descriptiveMetadataBundle);

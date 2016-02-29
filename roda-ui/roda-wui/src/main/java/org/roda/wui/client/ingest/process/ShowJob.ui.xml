@@ -37,8 +37,9 @@
 					Plugin
 				</g:Label>
 				<g:Label ui:field="plugin" />
-				<g:FlowPanel addStyleNames="wui-plugin-options"
-					ui:field="pluginOptions" />
+				<g:FlowPanel styleName="panel">
+					<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
+				</g:FlowPanel>
 
 				<g:Label addStyleNames="h3 {style.reportTitle}">
 					Processed

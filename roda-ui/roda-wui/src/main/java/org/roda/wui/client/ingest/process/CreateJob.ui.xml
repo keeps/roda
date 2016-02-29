@@ -6,7 +6,7 @@
 	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.ingest.process">
 
 	<ui:style>
-
+	
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -30,8 +30,10 @@
 				</g:Label>
 				<g:ListBox addStyleNames="form-listbox" ui:field="ingestWorkflowList" />
 				<g:Label addStyleNames="form-help" ui:field="ingestWorkflowListDescription" />
-				<p:PluginOptionsPanel addStyleNames="wui-plugin-options"
-					ui:field="ingestWorkflowOptions" />
+				<g:FlowPanel styleName="panel">
+					<p:PluginOptionsPanel styleName="panel-body"
+						ui:field="ingestWorkflowOptions" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
