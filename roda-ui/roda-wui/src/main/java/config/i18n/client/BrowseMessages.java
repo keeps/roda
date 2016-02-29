@@ -407,10 +407,10 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Search results")
   String searchResults();
   
-  @DefaultMessage("2008-05-12")
+  @DefaultMessage("2008-04-01")
   String searchFieldDatePlaceHolder();
   
-  @DefaultMessage("2008-05-12")
+  @DefaultMessage("2008-04-01")
   String searchFieldDateFromPlaceHolder();
   
   @DefaultMessage("2016-06-20")
