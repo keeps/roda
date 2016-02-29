@@ -16,15 +16,15 @@ import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.SolrUtilsTest;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.EARKSIPPluginsTest;
-import org.roda.core.plugins.InternalConvertPluginsTestForTravis;
+import org.roda.core.plugins.InternalConvertPluginsTest;
 import org.roda.core.plugins.InternalPluginsTest;
 import org.roda.core.storage.fedora.FedoraStorageServiceTest;
 import org.roda.core.storage.fs.FileStorageServiceTest;
 
 @RunWith(Suite.class)
 @SuiteClasses({JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
-  FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTestForTravis.class,
+  FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
   EARKSIPPluginsTest.class, MonitorIndexTest.class})
-public class AllTests {
+public class AllTestsPlusExtra {
 
 }
