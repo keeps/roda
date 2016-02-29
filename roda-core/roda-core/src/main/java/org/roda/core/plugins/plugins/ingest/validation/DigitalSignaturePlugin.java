@@ -220,6 +220,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
                 verification = DigitalSignaturePluginUtils
                   .runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
+                System.err.println("TEST: " + file.getId() + " - " + verification);
                 verifiedFiles.put(file.getId(), verification);
                 if (verification != null && verificationAffectsOnOutcome)
                   pluginResultState = 0;

@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -35,6 +33,7 @@ import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.TrustAnchor;
+import java.security.cert.X509CRL;
 import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
@@ -43,6 +42,7 @@ import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,13 +51,12 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.MarshalException;
-import javax.xml.crypto.URIDereferencer;
-import javax.xml.crypto.dsig.DigestMethod;
-import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
+import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.X509Data;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -72,7 +71,6 @@ import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
-import org.apache.poi.poifs.crypt.dsig.facets.XAdESXLSignatureFacet;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -89,7 +87,6 @@ import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -125,8 +122,7 @@ public class DigitalSignaturePluginUtils {
         return DigitalSignaturePluginUtils.runDigitalSignatureVerifyOOXML(input);
       } else if (fileFormat.equals("odt")) {
         // FIXME ODF verification has problems
-        // return
-        // DigitalSignaturePluginUtils.runDigitalSignatureVerifyODF(input);
+        return DigitalSignaturePluginUtils.runDigitalSignatureVerifyODF(input);
       }
     } catch (IOException | GeneralSecurityException e) {
       LOGGER.warn("Problems running digital signature verification");
@@ -228,7 +224,7 @@ public class DigitalSignaturePluginUtils {
   }
 
   private static String runDigitalSignatureVerifyODF(Path input) throws IOException, GeneralSecurityException {
-    boolean isValid = true;
+    String result = "Passed";
     ZipFile zipFile = new ZipFile(input.toString());
     Enumeration<?> enumeration;
     for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
@@ -246,18 +242,22 @@ public class DigitalSignaturePluginUtils {
           NodeList signatureNodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
           for (int i = 0; i < signatureNodeList.getLength(); i++) {
             Node signatureNode = signatureNodeList.item(i);
-            isValid = isValid && verifySignatureODF(signatureNode);
+            verifyCertificatesODF(signatureNode);
           }
         } catch (ParserConfigurationException | SAXException e) {
-          return "Signatures document can not be parsed";
-        } catch (MarshalException | XMLSignatureException | URISyntaxException e) {
-          return "Signatures are not valid";
+          result = "Signatures document can not be parsed";
+        } catch (CertificateExpiredException expiredEx) {
+          result = "There are expired or revoked certificates";
+        } catch (CertificateNotYetValidException notYetValidEx) {
+          result = "There are certificates not yet valid";
+        } catch (MarshalException e) {
+          result = "Signatures are not valid";
         }
       }
     }
 
     zipFile.close();
-    return isValid ? "Passed" : "Not passed";
+    return result;
   }
 
   /*** EXTRACT FUNCTIONS ***/
@@ -570,23 +570,42 @@ public class DigitalSignaturePluginUtils {
     }
   }
 
-  private static boolean verifySignatureODF(Node signatureNode) throws MarshalException, XMLSignatureException,
-    MalformedURLException, URISyntaxException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
-
-    Element signedPropertiesElement = (Element) ((Element) signatureNode).getElementsByTagNameNS(
-      XAdESXLSignatureFacet.MS_DIGSIG_NS, "SignedProperties").item(0);
-    if (signedPropertiesElement != null) {
-      signedPropertiesElement.setIdAttribute("Id", true);
-    }
+  private static void verifyCertificatesODF(Node signatureNode) throws CertificateExpiredException,
+    CertificateNotYetValidException, MarshalException {
 
     DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
     XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
-    DigestMethod dm = xmlSignatureFactory.newDigestMethod(DigestMethod.SHA1, null);
-    Reference r = xmlSignatureFactory.newReference(signatureNode.getBaseURI(), dm);
-    // FIXME URIDereferencer needs fix
-    domValidateContext.setURIDereferencer((URIDereferencer) r);
     XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
-    return xmlSignature.validate(domValidateContext);
+    KeyInfo keyInfo = xmlSignature.getKeyInfo();
+    Iterator<?> it = keyInfo.getContent().iterator();
+    List<X509Certificate> certs = new ArrayList<X509Certificate>();
+    List<CRL> crls = new ArrayList<CRL>();
+
+    while (it.hasNext()) {
+      XMLStructure content = (XMLStructure) it.next();
+      if (content instanceof X509Data) {
+        X509Data certdata = (X509Data) content;
+        Object[] entries = certdata.getContent().toArray();
+        for (int i = 0; i < entries.length; i++) {
+          if (entries[i] instanceof X509CRL) {
+            X509CRL crl = (X509CRL) entries[i];
+            crls.add(crl);
+          }
+          if (entries[i] instanceof X509Certificate) {
+            X509Certificate cert = (X509Certificate) entries[i];
+            cert.checkValidity();
+            certs.add(cert);
+          }
+        }
+      }
+    }
+
+    for (CRL c : crls) {
+      for (X509Certificate cert : certs) {
+        if (c.isRevoked(cert))
+          throw new CertificateExpiredException();
+      }
+    }
   }
 
   public static int countSignatures(Path base, StoragePath input, String intermediatePath) {
@@ -602,7 +621,6 @@ public class DigitalSignaturePluginUtils {
     return counter;
   }
 
-  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
   /*************************** FILLING FILE FORMAT STRUCTURES FUNCTIONS ***************************/
 
   public static Map<String, List<String>> getPronomToExtension() {
