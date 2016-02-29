@@ -208,7 +208,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 2.2) do verapdf check
@@ -220,7 +220,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 3) create premis skeleton
@@ -247,7 +247,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 7) do metadata and full text extraction (tika)
@@ -255,7 +255,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 8) do auto accept
