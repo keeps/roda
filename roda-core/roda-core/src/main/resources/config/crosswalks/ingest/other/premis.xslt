@@ -37,6 +37,11 @@
 				<xsl:value-of select="prem:agentExtension/text()" />
 			</field>
 		</xsl:if>
+		<xsl:if test="prem:agentVersion">
+			<field name="version">
+				<xsl:value-of select="prem:agentVersion/text()" />
+			</field>
+		</xsl:if>
 	<xsl:if test="prem:agentNote">
 			<field name="note">
 				<xsl:value-of select="prem:agentNote/text()" />

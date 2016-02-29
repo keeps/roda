@@ -14,6 +14,7 @@ public class IndexedPreservationAgent implements Serializable {
   private static final long serialVersionUID = 7864328669898523851L;
   private String id;
   private String name;
+  private String version;
   private String type;
   private String note;
   private String extension;
@@ -69,6 +70,14 @@ public class IndexedPreservationAgent implements Serializable {
 
   public void setRoles(List<String> roles) {
     this.roles = roles;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @Override

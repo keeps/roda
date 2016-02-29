@@ -1186,6 +1186,7 @@ public class SolrUtils {
     final String name = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NAME));
     final String type = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_TYPE));
     final String extension = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_EXTENSION));
+    final String version = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_VERSION));
     final String note = objectToString(doc.get(RodaConstants.PRESERVATION_AGENT_NOTE));
     final List<String> roles = objectToListString(doc.get(RodaConstants.PRESERVATION_AGENT_ROLES));
     IndexedPreservationAgent ipa = new IndexedPreservationAgent();
@@ -1193,6 +1194,7 @@ public class SolrUtils {
     ipa.setName(name);
     ipa.setType(type);
     ipa.setExtension(extension);
+    ipa.setVersion(version);
     ipa.setNote(note);
     ipa.setRoles(roles);
     return ipa;
