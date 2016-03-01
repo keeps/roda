@@ -78,9 +78,9 @@
 				<xsl:value-of select="prem:eventDateTime/text()" />
 			</field>
 		</xsl:if>
-		<xsl:if test="prem:eventDetail">
+		<xsl:if test="prem:eventDetailInformation/prem:eventDetail">
 			<field name="eventDetail">
-				<xsl:value-of select="prem:eventDetail/text()" />
+				<xsl:value-of select="prem:eventDetailInformation/prem:eventDetail/text()" />
 			</field>
 		</xsl:if>
 		<xsl:if test="prem:eventType">

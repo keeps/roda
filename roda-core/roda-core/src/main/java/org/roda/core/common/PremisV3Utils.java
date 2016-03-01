@@ -767,7 +767,9 @@ public class PremisV3Utils {
   private static StringPlusAuthority getStringPlusAuthority(String value, String authority) {
     StringPlusAuthority spa = StringPlusAuthority.Factory.newInstance();
     spa.setStringValue(value);
-    spa.setAuthority(authority);
+    if(StringUtils.isNotBlank(authority)){
+      spa.setAuthority(authority);
+    }
     return spa;
   }
 
