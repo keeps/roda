@@ -71,35 +71,39 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import lc.xmlns.premisV2.AgentComplexType;
-import lc.xmlns.premisV2.AgentDocument;
-import lc.xmlns.premisV2.AgentIdentifierComplexType;
-import lc.xmlns.premisV2.ContentLocationComplexType;
-import lc.xmlns.premisV2.CreatingApplicationComplexType;
-import lc.xmlns.premisV2.EventComplexType;
-import lc.xmlns.premisV2.EventDocument;
-import lc.xmlns.premisV2.EventIdentifierComplexType;
-import lc.xmlns.premisV2.EventOutcomeDetailComplexType;
-import lc.xmlns.premisV2.EventOutcomeInformationComplexType;
-import lc.xmlns.premisV2.FixityComplexType;
-import lc.xmlns.premisV2.FormatComplexType;
-import lc.xmlns.premisV2.FormatDesignationComplexType;
-import lc.xmlns.premisV2.FormatRegistryComplexType;
-import lc.xmlns.premisV2.LinkingAgentIdentifierComplexType;
-import lc.xmlns.premisV2.LinkingObjectIdentifierComplexType;
-import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
-import lc.xmlns.premisV2.ObjectComplexType;
-import lc.xmlns.premisV2.ObjectDocument;
-import lc.xmlns.premisV2.ObjectIdentifierComplexType;
+import gov.loc.premis.v3.AgentComplexType;
+import gov.loc.premis.v3.AgentDocument;
+import gov.loc.premis.v3.AgentIdentifierComplexType;
+import gov.loc.premis.v3.CompositionLevelComplexType;
+import gov.loc.premis.v3.ContentLocationComplexType;
+import gov.loc.premis.v3.CreatingApplicationComplexType;
+import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.EventDetailInformationComplexType;
+import gov.loc.premis.v3.EventDocument;
+import gov.loc.premis.v3.EventIdentifierComplexType;
+import gov.loc.premis.v3.EventOutcomeDetailComplexType;
+import gov.loc.premis.v3.EventOutcomeInformationComplexType;
+import gov.loc.premis.v3.ExtensionComplexType;
+import gov.loc.premis.v3.FixityComplexType;
+import gov.loc.premis.v3.FormatComplexType;
+import gov.loc.premis.v3.FormatDesignationComplexType;
+import gov.loc.premis.v3.FormatRegistryComplexType;
+import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
+import gov.loc.premis.v3.LinkingObjectIdentifierComplexType;
+import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
+import gov.loc.premis.v3.ObjectComplexType;
+import gov.loc.premis.v3.ObjectDocument;
+import gov.loc.premis.v3.ObjectIdentifierComplexType;
+import gov.loc.premis.v3.RelatedObjectIdentifierComplexType;
+import gov.loc.premis.v3.RelationshipComplexType;
+import gov.loc.premis.v3.Representation;
+import gov.loc.premis.v3.StorageComplexType;
+import gov.loc.premis.v3.StringPlusAuthority;
 import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
-import lc.xmlns.premisV2.RelationshipComplexType;
-import lc.xmlns.premisV2.Representation;
-import lc.xmlns.premisV2.StorageComplexType;
 
-public class PremisUtils {
-  /*
+public class PremisV3Utils {
   private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
-  private final static Logger LOGGER = LoggerFactory.getLogger(PremisUtils.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(PremisV3Utils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator)
@@ -203,12 +207,12 @@ public class PremisUtils {
 
   }
 
-  public static void updateFileFormat(lc.xmlns.premisV2.File file, String formatDesignationName,
+  public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
     String formatDesignationVersion, String pronom, String mimeType) {
 
     if (!StringUtils.isBlank(formatDesignationName)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
-      fdct.setFormatName(formatDesignationName);
+      fdct.setFormatName(getStringPlusAuthority(formatDesignationName, ""));
     }
 
     if (!StringUtils.isBlank(formatDesignationVersion)) {
@@ -218,20 +222,20 @@ public class PremisUtils {
 
     if (!StringUtils.isBlank(pronom)) {
       FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-      frct.setFormatRegistryKey(pronom);
+      frct.setFormatRegistryKey(getStringPlusAuthority(pronom, ""));
     }
     if (!StringUtils.isBlank(mimeType)) {
       FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_MIME);
-      frct.setFormatRegistryKey(mimeType);
+      frct.setFormatRegistryKey(getStringPlusAuthority(mimeType, ""));
     }
 
   }
 
-  public static void updateCreatingApplication(lc.xmlns.premisV2.File file, String creatingApplicationName,
+  public static void updateCreatingApplication(gov.loc.premis.v3.File file, String creatingApplicationName,
     String creatingApplicationVersion, String dateCreatedByApplication) {
     if (!StringUtils.isBlank(creatingApplicationName)) {
       CreatingApplicationComplexType cact = getCreatingApplication(file);
-      cact.setCreatingApplicationName(creatingApplicationName);
+      cact.setCreatingApplicationName(getStringPlusAuthority(creatingApplicationName, ""));
     }
 
     if (!StringUtils.isBlank(creatingApplicationVersion)) {
@@ -245,15 +249,15 @@ public class PremisUtils {
     }
   }
 
-  private static CreatingApplicationComplexType getCreatingApplication(lc.xmlns.premisV2.File f) {
+  private static CreatingApplicationComplexType getCreatingApplication(gov.loc.premis.v3.File f) {
     ObjectCharacteristicsComplexType occt;
     CreatingApplicationComplexType cact;
-    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
-      occt = f.getObjectCharacteristicsList().get(0);
+    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length>0) {
+      occt = f.getObjectCharacteristicsArray(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getCreatingApplicationList() != null && !occt.getCreatingApplicationList().isEmpty()) {
+    if (occt.getCreatingApplicationArray() != null && occt.getCreatingApplicationArray().length>0) {
       cact = occt.getCreatingApplicationArray(0);
     } else {
       cact = occt.addNewCreatingApplication();
@@ -261,18 +265,18 @@ public class PremisUtils {
     return cact;
   }
 
-  public static FormatRegistryComplexType getFormatRegistry(lc.xmlns.premisV2.File f, String registryName) {
+  public static FormatRegistryComplexType getFormatRegistry(gov.loc.premis.v3.File f, String registryName) {
     ObjectCharacteristicsComplexType occt;
     FormatRegistryComplexType frct = null;
-    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
-      occt = f.getObjectCharacteristicsList().get(0);
+    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length>0) {
+      occt = f.getObjectCharacteristicsArray(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
-      for (FormatComplexType fct : occt.getFormatList()) {
+    if (occt.getFormatArray() != null && occt.getFormatArray().length>0) {
+      for (FormatComplexType fct : occt.getFormatArray()) {
         if (fct.getFormatRegistry() != null) {
-          if (fct.getFormatRegistry().getFormatRegistryName().equalsIgnoreCase(registryName)) {
+          if (fct.getFormatRegistry().getFormatRegistryName().getStringValue().equalsIgnoreCase(registryName)) {
             frct = fct.getFormatRegistry();
             break;
           }
@@ -281,27 +285,27 @@ public class PremisUtils {
       if (frct == null) {
         FormatComplexType fct = occt.addNewFormat();
         frct = fct.addNewFormatRegistry();
-        frct.setFormatRegistryName(registryName);
+        frct.setFormatRegistryName(getStringPlusAuthority(registryName, ""));
       }
     } else {
       FormatComplexType fct = occt.addNewFormat();
       frct = fct.addNewFormatRegistry();
-      frct.setFormatRegistryName(registryName);
+      frct.setFormatRegistryName(getStringPlusAuthority(registryName, ""));
     }
     return frct;
   }
 
-  private static FormatDesignationComplexType getFormatDesignation(lc.xmlns.premisV2.File f) {
+  private static FormatDesignationComplexType getFormatDesignation(gov.loc.premis.v3.File f) {
     ObjectCharacteristicsComplexType occt;
     FormatComplexType fct;
     FormatDesignationComplexType fdct;
-    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
-      occt = f.getObjectCharacteristicsList().get(0);
+    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length>0) {
+      occt = f.getObjectCharacteristicsArray(0);
     } else {
       occt = f.addNewObjectCharacteristics();
     }
-    if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
-      fct = occt.getFormatList().get(0);
+    if (occt.getFormatArray() != null && occt.getFormatArray().length>0) {
+      fct = occt.getFormatArray(0);
     } else {
       fct = occt.addNewFormat();
     }
@@ -315,22 +319,24 @@ public class PremisUtils {
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, String outcome, String detailNote,
-    String detailExtension, List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
+    String detailExtension, List<IndexedPreservationAgent> agents) throws GenericException, ValidationException, XmlException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
     eict.setEventIdentifierValue(eventID);
-    eict.setEventIdentifierType("local");
+    eict.setEventIdentifierType(getStringPlusAuthority("local", ""));
     ect.setEventDateTime(DateParser.getIsoDate(date));
-    ect.setEventType(type);
-    ect.setEventDetail(details);
+    ect.setEventType(getStringPlusAuthority(type, ""));
+    EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
+    ExtensionComplexType extension = edict.addNewEventDetailExtension();
+    extension.set(XmlObject.Factory.parse(details));
     if (sources != null) {
       for (LinkingIdentifier source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(source.getValue());
-        loict.setLinkingObjectIdentifierType(source.getType());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(source.getType(), ""));
         if (source.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(source.getRoles().toArray(new String[source.getRoles().size()]));
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(source.getRoles()));
         }
       }
     }
@@ -339,9 +345,9 @@ public class PremisUtils {
       for (LinkingIdentifier target : targets) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(target.getValue());
-        loict.setLinkingObjectIdentifierType(target.getType());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(target.getType(), ""));
         if (target.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(target.getRoles().toArray(new String[target.getRoles().size()]));
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(target.getRoles()));
         }
       }
     }
@@ -349,13 +355,13 @@ public class PremisUtils {
     if (agents != null) {
       for (IndexedPreservationAgent agent : agents) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
-        agentIdentifier.setLinkingAgentIdentifierType("local");
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("local", ""));
         agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
-        agentIdentifier.setType("simple");
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("simple", ""));
       }
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
-    outcomeInformation.setEventOutcome(outcome);
+    outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome, ""));
     StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
     if (detailExtension != null) {
       outcomeDetailNote.append("\n").append(detailExtension);
@@ -367,19 +373,21 @@ public class PremisUtils {
 
   }
 
+  
+
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
     String extension, String note) throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
     AgentComplexType act = agent.addNewAgent();
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
-    agentIdentifier.setAgentIdentifierType("local");
+    agentIdentifier.setAgentIdentifierType(getStringPlusAuthority("local", ""));
     agentIdentifier.setAgentIdentifierValue(id);
-
-    act.setAgentType(type.toString());
+    
+    act.setAgentType(getStringPlusAuthority(type.toString(), ""));
 
     if (StringUtils.isNotBlank(name)) {
-      act.addAgentName(name);
+      act.addNewAgentName().setStringValue(name);
     }
 
     if (StringUtils.isNotBlank(note)) {
@@ -404,30 +412,30 @@ public class PremisUtils {
 
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
-    oict.setObjectIdentifierType("local");
+    oict.setObjectIdentifierType(getStringPlusAuthority("local", ""));
     String identifier = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_REPRESENTATION, aipID,
       representationId, null, null);
     oict.setObjectIdentifierValue(identifier);
-    representation.addNewPreservationLevel().setPreservationLevelValue("");
+    representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority("", ""));
 
     return representation;
   }
 
   public static ContentPayload createBaseFile(File originalFile, ModelService model) throws GenericException,
-    RequestNotValidException, NotFoundException, AuthorizationDeniedException, ValidationException {
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException, ValidationException, XmlException {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
-    lc.xmlns.premisV2.File file = lc.xmlns.premisV2.File.Factory.newInstance();
-    file.addNewPreservationLevel().setPreservationLevelValue(RodaConstants.PRESERVATION_LEVEL_FULL);
+    gov.loc.premis.v3.File file = gov.loc.premis.v3.File.Factory.newInstance();
+    file.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(RodaConstants.PRESERVATION_LEVEL_FULL, ""));
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
     String identifier = IdUtils.getFileId(originalFile.getAipId(), originalFile.getRepresentationId(),
       originalFile.getPath(), originalFile.getId());
     oict.setObjectIdentifierValue(identifier);
-    oict.setObjectIdentifierType("local");
+    oict.setObjectIdentifierType(getStringPlusAuthority("local", ""));
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
-    occt.setCompositionLevel(BigInteger.valueOf(0));
+    occt.setCompositionLevel(CompositionLevelComplexType.Factory.parse("0"));
     FormatComplexType fct = occt.addNewFormat();
     FormatDesignationComplexType fdct = fct.addNewFormatDesignation();
-    fdct.setFormatName("");
+    fdct.setFormatName(getStringPlusAuthority("", ""));
     fdct.setFormatVersion("");
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
 
@@ -441,8 +449,8 @@ public class PremisUtils {
           Fixity fixity = calculateFixity(binary, algorithm, "RODA");
           FixityComplexType premis_fixity = occt.addNewFixity();
           premis_fixity.setMessageDigest(fixity.getMessageDigest());
-          premis_fixity.setMessageDigestAlgorithm(fixity.getMessageDigestAlgorithm());
-          premis_fixity.setMessageDigestOriginator(fixity.getMessageDigestOriginator());
+          premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm(), ""));
+          premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(fixity.getMessageDigestOriginator(), ""));
         }
       } catch (IOException | NoSuchAlgorithmException e) {
         LOGGER.warn("Could not calculate fixity for file " + originalFile);
@@ -454,7 +462,7 @@ public class PremisUtils {
     file.addNewOriginalName().setStringValue(originalFile.getId());
     StorageComplexType sct = file.addNewStorage();
     ContentLocationComplexType clct = sct.addNewContentLocation();
-    clct.setContentLocationType("");
+    clct.setContentLocationType(getStringPlusAuthority("", ""));
     clct.setContentLocationValue("");
 
     document.setObject(file);
@@ -465,15 +473,15 @@ public class PremisUtils {
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
     List<Fixity> fixities = new ArrayList<Fixity>();
     InputStream inputStream = premisFile.getContent().createInputStream();
-    lc.xmlns.premisV2.File f = binaryToFile(inputStream);
-    if (f.getObjectCharacteristicsList() != null && !f.getObjectCharacteristicsList().isEmpty()) {
-      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsList().get(0);
-      if (occt.getFixityList() != null && !occt.getFixityList().isEmpty()) {
-        for (FixityComplexType fct : occt.getFixityList()) {
+    gov.loc.premis.v3.File f = binaryToFile(inputStream);
+    if (f.getObjectCharacteristicsArray() != null && f.getObjectCharacteristicsArray().length>0) {
+      ObjectCharacteristicsComplexType occt = f.getObjectCharacteristicsArray(0);
+      if (occt.getFixityArray() != null && occt.getFixityArray().length>0) {
+        for (FixityComplexType fct : occt.getFixityArray()) {
           Fixity fix = new Fixity();
           fix.setMessageDigest(fct.getMessageDigest());
-          fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm());
-          fix.setMessageDigestOriginator(fct.getMessageDigestOriginator());
+          fix.setMessageDigestAlgorithm(fct.getMessageDigestAlgorithm().getStringValue());
+          fix.setMessageDigestOriginator(fct.getMessageDigestOriginator().getStringValue());
           fixities.add(fix);
         }
       }
@@ -482,7 +490,7 @@ public class PremisUtils {
     return fixities;
   }
 
-  public static lc.xmlns.premisV2.Representation binaryToRepresentation(InputStream binaryInputStream)
+  public static gov.loc.premis.v3.Representation binaryToRepresentation(InputStream binaryInputStream)
     throws XmlException, IOException, GenericException {
     ObjectDocument objectDocument = ObjectDocument.Factory.parse(binaryInputStream);
 
@@ -494,13 +502,13 @@ public class PremisUtils {
     }
   }
 
-  public static lc.xmlns.premisV2.File binaryToFile(InputStream binaryInputStream)
+  public static gov.loc.premis.v3.File binaryToFile(InputStream binaryInputStream)
     throws XmlException, IOException, GenericException {
     ObjectDocument objectDocument = ObjectDocument.Factory.parse(binaryInputStream);
 
     ObjectComplexType object = objectDocument.getObject();
-    if (object instanceof lc.xmlns.premisV2.File) {
-      return (lc.xmlns.premisV2.File) object;
+    if (object instanceof gov.loc.premis.v3.File) {
+      return (gov.loc.premis.v3.File) object;
     } else {
       throw new GenericException("Trying to load a file but was a " + object.getClass().getSimpleName());
     }
@@ -514,7 +522,7 @@ public class PremisUtils {
     return AgentDocument.Factory.parse(binaryInputStream).getAgent();
   }
 
-  public static lc.xmlns.premisV2.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
+  public static gov.loc.premis.v3.Representation binaryToRepresentation(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
     Representation representation;
     InputStream inputStream = null;
@@ -538,9 +546,9 @@ public class PremisUtils {
     return representation;
   }
 
-  public static lc.xmlns.premisV2.File binaryToFile(ContentPayload payload, boolean validate)
+  public static gov.loc.premis.v3.File binaryToFile(ContentPayload payload, boolean validate)
     throws ValidationException, GenericException {
-    lc.xmlns.premisV2.File file;
+    gov.loc.premis.v3.File file;
     List<XmlValidationError> validationErrors = new ArrayList<>();
     InputStream inputStream = null;
     try {
@@ -566,7 +574,7 @@ public class PremisUtils {
     return file;
   }
 
-  public static ContentPayload fileToBinary(lc.xmlns.premisV2.File file) throws GenericException, ValidationException {
+  public static ContentPayload fileToBinary(gov.loc.premis.v3.File file) throws GenericException, ValidationException {
     ObjectDocument d = ObjectDocument.Factory.newInstance();
     d.setObject(file);
     return new StringContentPayload(MetadataUtils.saveToString(d, true));
@@ -633,23 +641,23 @@ public class PremisUtils {
     InputStream inputStream = null;
     try {
       inputStream = premisBinary.getContent().createInputStream();
-      lc.xmlns.premisV2.File premisFile = binaryToFile(inputStream);
+      gov.loc.premis.v3.File premisFile = binaryToFile(inputStream);
       if (premisFile.getOriginalName() != null) {
         doc.setField(RodaConstants.FILE_ORIGINALNAME, premisFile.getOriginalName().getStringValue());
 
         // TODO extension
       }
-      if (premisFile.getObjectCharacteristicsList() != null && !premisFile.getObjectCharacteristicsList().isEmpty()) {
-        ObjectCharacteristicsComplexType occt = premisFile.getObjectCharacteristicsList().get(0);
+      if (premisFile.getObjectCharacteristicsArray() != null && premisFile.getObjectCharacteristicsArray().length>0) {
+        ObjectCharacteristicsComplexType occt = premisFile.getObjectCharacteristicsArray(0);
         doc.setField(RodaConstants.FILE_SIZE, occt.getSize());
-        if (occt.getFixityList() != null && !occt.getFixityList().isEmpty()) {
+        if (occt.getFixityArray() != null && occt.getFixityArray().length>0) {
           List<String> hashes = new ArrayList<>();
-          for (FixityComplexType fct : occt.getFixityList()) {
+          for (FixityComplexType fct : occt.getFixityArray()) {
             StringBuilder fixityPrint = new StringBuilder();
             fixityPrint.append(fct.getMessageDigest());
             fixityPrint.append(" (");
             fixityPrint.append(fct.getMessageDigestAlgorithm());
-            if (StringUtils.isNotBlank(fct.getMessageDigestOriginator())) {
+            if (StringUtils.isNotBlank(fct.getMessageDigestOriginator().getStringValue())) {
               fixityPrint.append(", "); //
               fixityPrint.append(fct.getMessageDigestOriginator());
             }
@@ -658,8 +666,8 @@ public class PremisUtils {
           }
           doc.addField(RodaConstants.FILE_HASH, hashes);
         }
-        if (occt.getFormatList() != null && !occt.getFormatList().isEmpty()) {
-          FormatComplexType fct = occt.getFormatList().get(0);
+        if (occt.getFormatArray() != null && occt.getFormatArray().length>0) {
+          FormatComplexType fct = occt.getFormatArray(0);
           if (fct.getFormatDesignation() != null) {
             doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName());
             doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
@@ -677,8 +685,8 @@ public class PremisUtils {
           }
           // TODO extension
         }
-        if (occt.getCreatingApplicationList() != null && !occt.getCreatingApplicationList().isEmpty()) {
-          CreatingApplicationComplexType cact = occt.getCreatingApplicationList().get(0);
+        if (occt.getCreatingApplicationArray() != null && occt.getCreatingApplicationArray().length>0) {
+          CreatingApplicationComplexType cact = occt.getCreatingApplicationArray(0);
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, cact.getCreatingApplicationName());
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
           doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, cact.getDateCreatedByApplication());
@@ -700,7 +708,7 @@ public class PremisUtils {
     ContentPayload agentPayload;
 
     // TODO set agent extension
-    agentPayload = PremisUtils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
+    agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
       plugin.getDescription());
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
@@ -720,10 +728,10 @@ public class PremisUtils {
       AuthorizationDeniedException, XmlException, IOException, ValidationException {
 
     RelationshipComplexType relationship = r.addNewRelationship();
-    relationship.setRelationshipType(relationshipType);
-    relationship.setRelationshipSubType(relationshipSubType);
-    RelatedObjectIdentificationComplexType roict = relationship.addNewRelatedObjectIdentification();
-    roict.setRelatedObjectIdentifierType(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL);
+    relationship.setRelationshipType(getStringPlusAuthority(relationshipType, ""));
+    relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType, ""));
+    RelatedObjectIdentifierComplexType roict = relationship.addNewRelatedObjectIdentifier();
+    roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, ""));
     String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, file.getAipId(),
       file.getRepresentationId(), file.getPath(), file.getId());
     roict.setRelatedObjectIdentifierValue(id);
@@ -731,33 +739,60 @@ public class PremisUtils {
 
   public static List<LinkingIdentifier> extractAgentsFromEvent(Binary b) throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
-    EventComplexType event = PremisUtils.binaryToEvent(b.getContent(), true);
-    if (event.getLinkingAgentIdentifierList() != null && !event.getLinkingAgentIdentifierList().isEmpty()) {
-      for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierList()) {
+    EventComplexType event = PremisV3Utils.binaryToEvent(b.getContent(), true);
+    if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length>0) {
+      for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
         LinkingIdentifier li = new LinkingIdentifier();
-        li.setType(laict.getLinkingAgentIdentifierType());
+        li.setType(laict.getLinkingAgentIdentifierType().getStringValue());
         li.setValue(laict.getLinkingAgentIdentifierValue());
-        li.setRoles(laict.getLinkingAgentRoleList());
+        li.setRoles(stringplusArrayToStringList(laict.getLinkingAgentRoleArray()));
         identifiers.add(li);
       }
     }
     return identifiers;
   }
 
+  
+
   public static List<LinkingIdentifier> extractObjectFromEvent(Binary binary)
     throws ValidationException, GenericException {
     List<LinkingIdentifier> identifiers = new ArrayList<LinkingIdentifier>();
-    EventComplexType event = PremisUtils.binaryToEvent(binary.getContent(), true);
-    if (event.getLinkingObjectIdentifierList() != null && !event.getLinkingObjectIdentifierList().isEmpty()) {
-      for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierList()) {
+    EventComplexType event = PremisV3Utils.binaryToEvent(binary.getContent(), true);
+    if (event.getLinkingObjectIdentifierArray() != null && event.getLinkingObjectIdentifierArray().length>0) {
+      for (LinkingObjectIdentifierComplexType loict : event.getLinkingObjectIdentifierArray()) {
         LinkingIdentifier li = new LinkingIdentifier();
-        li.setType(loict.getLinkingObjectIdentifierType());
+        li.setType(loict.getLinkingObjectIdentifierType().getStringValue());
         li.setValue(loict.getLinkingObjectIdentifierValue());
-        li.setRoles(loict.getLinkingObjectRoleList());
+        li.setRoles(stringplusArrayToStringList(loict.getLinkingObjectRoleArray()));
         identifiers.add(li);
       }
     }
     return identifiers;
   }
-*/
+
+  private static StringPlusAuthority getStringPlusAuthority(String value, String authority) {
+    StringPlusAuthority spa = StringPlusAuthority.Factory.newInstance();
+    spa.setStringValue(value);
+    spa.setAuthority(authority);
+    return spa;
+  }
+  
+  private static StringPlusAuthority[] getStringPlusAuthorityArray(List<String> values) {
+    List<StringPlusAuthority> l = new ArrayList<StringPlusAuthority>();
+    if(values!=null && values.size()>0){
+      for(String value : values){
+        l.add(getStringPlusAuthority(value, ""));
+      }      
+    }
+    return l.toArray(new StringPlusAuthority[l.size()]);
+  }
+  private static List<String> stringplusArrayToStringList(StringPlusAuthority[] source) {
+    List<String> dst = new ArrayList<String>();
+    if(source!=null && source.length>0){
+      for(StringPlusAuthority spa : source){
+        dst.add(spa.getStringValue());
+      }
+    }
+    return dst;
+  }
 }
