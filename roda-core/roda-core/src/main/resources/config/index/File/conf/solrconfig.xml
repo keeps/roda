@@ -564,6 +564,38 @@
     </arr>
   </requestHandler>
 
+	<!-- SUGGESTER -->
+
+	<searchComponent name="suggest" class="solr.SuggestComponent">
+		<lst name="suggester">
+			<str name="name">fileFormatSuggester</str>
+			<str name="lookupImpl">FuzzyLookupFactory</str>
+			<str name="dictionaryImpl">DocumentDictionaryFactory</str>
+			<str name="field">fileFormat</str>
+			<str name="suggestAnalyzerFieldType">string</str>
+			<str name="buildOnStartup">false</str>
+		</lst>
+		<lst name="suggester">
+			<str name="name">formatMimetypeSuggester</str>
+			<str name="lookupImpl">FuzzyLookupFactory</str>
+			<str name="dictionaryImpl">DocumentDictionaryFactory</str>
+			<str name="field">formatMimetype</str>
+			<str name="suggestAnalyzerFieldType">string</str>
+			<str name="buildOnStartup">false</str>
+		</lst>
+	</searchComponent>
+
+	<requestHandler name="/suggest" class="solr.SearchHandler"
+		startup="lazy">
+		<lst name="defaults">
+			<str name="suggest">true</str>
+			<str name="suggest.count">10</str>
+		</lst>
+		<arr name="components">
+			<str>suggest</str>
+		</arr>
+	</requestHandler>
+
   <!-- Legacy config for the admin interface -->
   <admin>
     <defaultQuery>*:*</defaultQuery>

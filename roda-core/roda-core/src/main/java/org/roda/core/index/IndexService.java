@@ -235,4 +235,9 @@ public class IndexService {
     }
   }
 
+  public <T extends Serializable> List<String> suggest(Class<T> returnClass, String field, String query)
+    throws GenericException {
+    return SolrUtils.suggest(index, returnClass, field, query);
+  }
+
 }

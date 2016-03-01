@@ -110,7 +110,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
-import com.google.common.collect.Iterables;
 
 /**
  * 
@@ -255,6 +254,11 @@ public class BrowserHelper {
   protected static <T extends Serializable> T retrieve(Class<T> returnClass, String id)
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
+  }
+
+  protected static <T extends Serializable> List<String> suggest(Class<T> returnClass, String field, String query)
+    throws GenericException, NotFoundException {
+    return RodaCoreFactory.getIndexService().suggest(returnClass, field, query);
   }
 
   private static IndexResult<Representation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
@@ -497,8 +501,9 @@ public class BrowserHelper {
           StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
           Binary binary = storage.getBinary(storagePath);
           if (preservationFile.getRepresentationId() != null) {
-            ZipEntryInfo info = new ZipEntryInfo(
-              preservationFile.getRepresentationId() + File.separator + StringUtils.join(storagePath.getDirectoryPath(),File.separator)+File.separator+ storagePath.getName(), binary.getContent());
+            ZipEntryInfo info = new ZipEntryInfo(preservationFile.getRepresentationId() + File.separator
+              + StringUtils.join(storagePath.getDirectoryPath(), File.separator) + File.separator
+              + storagePath.getName(), binary.getContent());
             zipEntries.add(info);
           }
         } else {

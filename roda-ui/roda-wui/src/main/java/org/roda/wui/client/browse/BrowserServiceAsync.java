@@ -96,4 +96,6 @@ public interface BrowserServiceAsync {
 
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
+  void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
+
 }

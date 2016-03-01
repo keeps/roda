@@ -59,7 +59,6 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
@@ -1512,4 +1511,31 @@ public class SolrUtils {
     doc.addField(RodaConstants.LINKING_IDENTIFIER_ROLES, i.getRoles());
     return doc;
   }
+
+  public static <T extends Serializable> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
+    String queryString) throws GenericException {
+
+    String dictionaryName = field + "Suggester";
+
+    SolrQuery query = new SolrQuery();
+    query.setRequestHandler("/suggest");
+    query.setParam("suggest", "true");
+    // TODO remove suggest.build=true in production
+    // This is likely useful only for initial requests; you would probably not
+    // want to build the dictionary on every request, particularly in a
+    // production system. If you would like to keep your dictionary up to date,
+    // you should use the buildOnCommit or buildOnOptimize parameter for the
+    // search component.
+    query.setParam("suggest.build", "true");
+    query.setParam("suggest.dictionary", dictionaryName);
+    query.setParam("suggest.q", queryString);
+
+    try {
+      QueryResponse response = index.query(getIndexName(classToRetrieve), query);
+      return response.getSuggesterResponse().getSuggestedTerms().get(dictionaryName);
+    } catch (SolrServerException | IOException e) {
+      throw new GenericException("Could not get suggestions", e);
+    }
+  }
+
 }

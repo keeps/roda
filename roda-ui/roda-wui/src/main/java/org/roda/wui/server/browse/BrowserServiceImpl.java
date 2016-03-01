@@ -154,6 +154,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.retrieve(user, classToReturn, id);
   }
 
+  @Override
+  public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Class<T> classToReturn = parseClass(classNameToReturn);
+    return Browser.suggest(user, classToReturn, field, query);
+  }
+
   public List<IndexedAIP> getAncestors(IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());

@@ -195,6 +195,23 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static <T extends Serializable> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
+    String query) throws AuthorizationDeniedException, GenericException, NotFoundException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // delegate
+    List<String> ret = BrowserHelper.suggest(classToReturn, field, query);
+
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "suggest", null, duration, "class", classToReturn.getSimpleName(), "field",
+      field, "query", query);
+
+    return ret;
+  }
+
   public static List<IndexedAIP> getAncestors(RodaUser user, IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
