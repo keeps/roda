@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
@@ -127,7 +128,7 @@ public final class PluginHelper {
     // last check: see if parent exist in the index
     if (StringUtils.isNotBlank(parentId)) {
       try {
-        index.retrieve(AIP.class, parentId);
+        index.retrieve(IndexedAIP.class, parentId);
       } catch (NotFoundException | GenericException e) {
         // could not find parent id
         parentId = null;
@@ -172,6 +173,8 @@ public final class PluginHelper {
         jobReport = model.retrieveJobReport(jobId, reportItem.getItemId());
       } catch (NotFoundException e) {
         jobReport = createPluginReportItem(plugin, reportItem.getItemId(), reportItem.getOtherId());
+        // XXX check this
+        jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
         jobReport.addReport(reportItem);
       }
 
