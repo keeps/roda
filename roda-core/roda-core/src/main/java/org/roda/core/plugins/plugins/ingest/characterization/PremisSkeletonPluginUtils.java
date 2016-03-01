@@ -11,7 +11,7 @@ import java.io.IOException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -29,7 +29,6 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import lc.xmlns.premisV2.Representation;
 
 public class PremisSkeletonPluginUtils {
 
@@ -39,7 +38,7 @@ public class PremisSkeletonPluginUtils {
     String representationId) throws IOException, RequestNotValidException, GenericException,
       NotFoundException, AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
 
-    Representation representation = PremisUtils.createBaseRepresentation(aip.getId(), representationId);
+    gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aip.getId(), representationId);
     boolean notifyInSteps = false;
 
     boolean recursive = true;
@@ -47,16 +46,16 @@ public class PremisSkeletonPluginUtils {
     for (File file : allFiles) {
       if (!file.isDirectory()) {
         LOGGER.debug("Processing " + file);
-        ContentPayload filePreservation = PremisUtils.createBaseFile(file, model);
+        ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model);
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
           file.getPath(), file.getId(), filePreservation, notifyInSteps);
-        PremisUtils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
+        PremisV3Utils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
           RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
       }
     }
     IOUtils.closeQuietly(allFiles);
 
-    ContentPayload representationPayload = PremisUtils.representationToBinary(representation);
+    ContentPayload representationPayload = PremisV3Utils.representationToBinary(representation);
     model.createPreservationMetadata(PreservationMetadataType.OBJECT_REPRESENTATION, representationId, aip.getId(),
       representationId, representationPayload, notifyInSteps);
   }

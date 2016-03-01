@@ -15,6 +15,7 @@ import java.util.List;
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
@@ -83,13 +84,13 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
             StoragePath storagePath = ModelUtils.getFileStoragePath(currentFile);
             Binary currentFileBinary = storage.getBinary(storagePath);
             Binary premisFile = model.retrievePreservationFile(currentFile);
-            List<Fixity> fixities = PremisUtils.extractFixities(premisFile);
+            List<Fixity> fixities = PremisV3Utils.extractFixities(premisFile);
 
             if (fixities != null) {
               boolean fixityOK = true;
               for (Fixity f : fixities) {
                 try {
-                  Fixity currentFixity = PremisUtils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
+                  Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
                     "FixityCheck action");
 
                   if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {

@@ -16,6 +16,7 @@ import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -231,9 +232,9 @@ public final class PluginHelper {
     IndexedPreservationAgent agent = null;
     try {
       boolean notifyAgent = true;
-      agent = PremisUtils.createPremisAgentBinary(plugin, model, notifyAgent);
+      agent = PremisV3Utils.createPremisAgentBinary(plugin, model, notifyAgent);
     } catch (AlreadyExistsException e) {
-      agent = PremisUtils.getPreservationAgent(plugin, model);
+      agent = PremisV3Utils.getPreservationAgent(plugin, model);
     } catch (RODAException e) {
       // FIXME what??? Siegfried???
       LOGGER.error("Error running adding Siegfried plugin: " + e.getMessage(), e);
@@ -246,7 +247,7 @@ public final class PluginHelper {
     if (plugin.getToolOutput() != null) {
       outcomeDetailNote += "\n" + plugin.getToolOutput();
     }
-    ContentPayload premisEvent = PremisUtils.createPremisEventBinary(id, startDate,
+    ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, targets,
       outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,

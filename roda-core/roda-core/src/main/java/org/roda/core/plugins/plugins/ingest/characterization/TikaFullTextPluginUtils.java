@@ -17,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
-import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -100,15 +100,15 @@ public class TikaFullTextPluginUtils {
 
         Binary premis_bin = model.retrievePreservationFile(file);
 
-        lc.xmlns.premisV2.File premis_file = PremisUtils.binaryToFile(premis_bin.getContent(), false);
-        PremisUtils.updateCreatingApplication(premis_file, creatingApplicationName, creatingApplicationVersion,
+        gov.loc.premis.v3.File premis_file = PremisV3Utils.binaryToFile(premis_bin.getContent(), false);
+        PremisV3Utils.updateCreatingApplication(premis_file, creatingApplicationName, creatingApplicationVersion,
           dateCreatedByApplication);
 
         PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
         String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
           file.getId());
 
-        ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
+        ContentPayload premis_file_payload = PremisV3Utils.fileToBinary(premis_file);
 
         model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(), file.getId(),
           premis_file_payload, inotify);

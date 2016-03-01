@@ -41,6 +41,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -67,11 +68,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.Iterables;
 
+import gov.loc.premis.v3.AgentComplexType;
+import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
+import gov.loc.premis.v3.ObjectIdentifierComplexType;
 import jersey.repackaged.com.google.common.collect.Lists;
-import lc.xmlns.premisV2.AgentComplexType;
-import lc.xmlns.premisV2.EventComplexType;
-import lc.xmlns.premisV2.ObjectCharacteristicsComplexType;
-import lc.xmlns.premisV2.ObjectIdentifierComplexType;
 
 /**
  * Unit tests for ModelService
@@ -240,30 +241,30 @@ public class ModelServiceTest {
     // test preservation metadata
 
     Binary preservationObject = model.retrievePreservationRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
-    lc.xmlns.premisV2.Representation rpo = PremisUtils.binaryToRepresentation(preservationObject.getContent(), true);
+    gov.loc.premis.v3.Representation rpo = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), true);
 
-    List<ObjectIdentifierComplexType> objectIdentifierList = rpo.getObjectIdentifierList();
-    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierList.get(0).getObjectIdentifierType());
-    assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierList().get(0).getObjectIdentifierValue());
+    ObjectIdentifierComplexType[] objectIdentifierArray = rpo.getObjectIdentifierArray();
+    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierArray[0].getObjectIdentifierType());
+    assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierArray()[0].getObjectIdentifierValue());
     assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
-      rpo.getPreservationLevelList().get(0).getPreservationLevelValue());
+      rpo.getPreservationLevelArray(0).getPreservationLevelValue());
 
     Binary f0_premis_bin = model.retrievePreservationFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
-    lc.xmlns.premisV2.File f0_premis_file = PremisUtils.binaryToFile(f0_premis_bin.getContent(), true);
+    gov.loc.premis.v3.File f0_premis_file = PremisV3Utils.binaryToFile(f0_premis_bin.getContent(), true);
 
-    ObjectCharacteristicsComplexType f0_characteristics = f0_premis_file.getObjectCharacteristicsList().get(0);
-    assertEquals(0, f0_characteristics.getCompositionLevel().intValue());
-    assertEquals(0, f0_characteristics.getCompositionLevel().intValue());
+    ObjectCharacteristicsComplexType f0_characteristics = f0_premis_file.getObjectCharacteristicsArray(0);
+    assertEquals(0, f0_characteristics.getCompositionLevel().getBigIntegerValue().intValue());
+    assertEquals(0, f0_characteristics.getCompositionLevel().getBigIntegerValue().intValue());
 
-    assertEquals(f0_characteristics.getFormatList().get(0).getFormatDesignation().getFormatName(),
+    assertEquals(f0_characteristics.getFormatArray(0).getFormatDesignation().getFormatName(),
       CorporaConstants.TEXT_XML);
 
     Binary event_premis_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
-    EventComplexType event_premis = PremisUtils.binaryToEvent(event_premis_bin.getContent(), true);
+    EventComplexType event_premis = PremisV3Utils.binaryToEvent(event_premis_bin.getContent(), true);
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType());
-    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationList().get(0).getEventOutcome());
+    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationArray(0).getEventOutcome());
   }
 
   @Test
@@ -678,7 +679,7 @@ public class ModelServiceTest {
 
     Binary event_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
-    EventComplexType event = PremisUtils.binaryToEvent(event_bin.getContent(), true);
+    EventComplexType event = PremisV3Utils.binaryToEvent(event_bin.getContent(), true);
 
     assertEquals(CorporaConstants.AGENT_RODA_8,
       event.getLinkingAgentIdentifierArray(0).getLinkingAgentIdentifierValue());
@@ -694,10 +695,10 @@ public class ModelServiceTest {
 
     Binary file_bin = model.retrievePreservationFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
-    lc.xmlns.premisV2.File file = PremisUtils.binaryToFile(file_bin.getContent(), true);
+    gov.loc.premis.v3.File file = PremisV3Utils.binaryToFile(file_bin.getContent(), true);
 
     ObjectCharacteristicsComplexType file_characteristics = file.getObjectCharacteristicsArray(0);
-    assertEquals(2, file_characteristics.getFixityList().size());
+    assertEquals(2, file_characteristics.getFixityArray().length);
     assertEquals(CorporaConstants.METS_XML, file.getOriginalName().getStringValue());
   }
 
@@ -711,7 +712,7 @@ public class ModelServiceTest {
 
     Binary representation_bin = model.retrievePreservationRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
 
-    lc.xmlns.premisV2.Representation representation = PremisUtils
+   gov.loc.premis.v3.Representation representation = PremisV3Utils
       .binaryToRepresentation(representation_bin.getContent(), true);
 
     assertEquals(representation.getPreservationLevelArray(0).getPreservationLevelValue(),
@@ -729,7 +730,7 @@ public class ModelServiceTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_PRESERVATION_CONTAINER));
 
     Binary agent_bin = model.retrievePreservationAgent(CorporaConstants.AGENT_RODA_8);
-    AgentComplexType agent = PremisUtils.binaryToAgent(agent_bin.getContent(), true);
+    AgentComplexType agent = PremisV3Utils.binaryToAgent(agent_bin.getContent(), true);
 
     assertEquals(CorporaConstants.AGENT_RODA_8, agent.getAgentIdentifierArray(0).getAgentIdentifierValue());
     assertEquals(CorporaConstants.SOFTWARE_INGEST_TASK, agent.getAgentType());

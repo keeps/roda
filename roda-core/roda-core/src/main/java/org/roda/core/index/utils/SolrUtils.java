@@ -60,6 +60,7 @@ import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
 import org.roda.core.data.adapter.facet.Facets;
@@ -1402,7 +1403,7 @@ public class SolrUtils {
       // TODO get entry point from PREMIS or remove it
       // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
       try {
-        doc = PremisUtils.updateSolrDocument(doc, premisFile);
+        doc = PremisV3Utils.updateSolrDocument(doc, premisFile);
       } catch (GenericException e) {
         LOGGER.warn("Could not index file PREMIS information", e);
       }

@@ -70,7 +70,7 @@ import org.w3c.util.DateParser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
-
+/*
 import lc.xmlns.premisV2.AgentComplexType;
 import lc.xmlns.premisV2.AgentDocument;
 import lc.xmlns.premisV2.AgentIdentifierComplexType;
@@ -95,7 +95,7 @@ import lc.xmlns.premisV2.RelatedObjectIdentificationComplexType;
 import lc.xmlns.premisV2.RelationshipComplexType;
 import lc.xmlns.premisV2.Representation;
 import lc.xmlns.premisV2.StorageComplexType;
-
+*/
 public class PremisUtils {
   /*
   private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));

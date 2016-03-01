@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="2.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:prem="info:lc/xmlns/premis-v2"
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:prem="http://www.loc.gov/premis/v3"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	exclude-result-prefixes="prem">
 	<!-- <xsl:strip-space elements="*" /> -->

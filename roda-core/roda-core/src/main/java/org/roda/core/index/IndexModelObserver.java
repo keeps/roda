@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -93,7 +94,7 @@ public class IndexModelObserver implements ModelObserver {
               pm.getId(), binary);
             LOGGER.trace(premisEventDocument.toString());
             try {
-              List<LinkingIdentifier> agents = PremisUtils.extractAgentsFromEvent(binary);
+              List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
               for (LinkingIdentifier id : agents) {
                 premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER,
                   JsonUtils.getJsonFromObject(id));
@@ -102,7 +103,7 @@ public class IndexModelObserver implements ModelObserver {
               LOGGER.warn("Error setting linking agent field: " + e.getMessage());
             }
             try {
-              List<LinkingIdentifier> sources = PremisUtils.extractObjectFromEvent(binary);
+              List<LinkingIdentifier> sources = PremisV3Utils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : sources) {
                 premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
                   JsonUtils.getJsonFromObject(id));
@@ -111,7 +112,7 @@ public class IndexModelObserver implements ModelObserver {
               LOGGER.warn("Error setting linking source field: " + e.getMessage());
             }
             try {
-              List<LinkingIdentifier> outcomes = PremisUtils.extractObjectFromEvent(binary);
+              List<LinkingIdentifier> outcomes = PremisV3Utils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : outcomes) {
                 premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
                   JsonUtils.getJsonFromObject(id));
@@ -414,7 +415,7 @@ public class IndexModelObserver implements ModelObserver {
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
         try {
-          List<LinkingIdentifier> agents = PremisUtils.extractAgentsFromEvent(binary);
+          List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
           for (LinkingIdentifier id : agents) {
             premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER,
               JsonUtils.getJsonFromObject(id));
@@ -423,7 +424,7 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.warn("Error setting linking agent field: " + e.getMessage());
         }
         try {
-          List<LinkingIdentifier> sources = PremisUtils.extractObjectFromEvent(binary);
+          List<LinkingIdentifier> sources = PremisV3Utils.extractObjectFromEvent(binary);
           for (LinkingIdentifier id : sources) {
             premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
               JsonUtils.getJsonFromObject(id));
@@ -432,7 +433,7 @@ public class IndexModelObserver implements ModelObserver {
           LOGGER.warn("Error setting linking source field: " + e.getMessage());
         }
         try {
-          List<LinkingIdentifier> outcomes = PremisUtils.extractObjectFromEvent(binary);
+          List<LinkingIdentifier> outcomes = PremisV3Utils.extractObjectFromEvent(binary);
           for (LinkingIdentifier id : outcomes) {
             premisFileDocument.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
               JsonUtils.getJsonFromObject(id));

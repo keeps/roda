@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.PremisUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -43,6 +44,8 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import gov.loc.premis.v3.File;
 
 public class SiegfriedPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SiegfriedPluginUtils.class);
@@ -129,14 +132,14 @@ public class SiegfriedPluginUtils {
               Binary premis_bin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
                 fileId);
 
-              lc.xmlns.premisV2.File premis_file = PremisUtils.binaryToFile(premis_bin.getContent(), false);
-              PremisUtils.updateFileFormat(premis_file, format, version, pronom, mime);
+              File premis_file = PremisV3Utils.binaryToFile(premis_bin.getContent(), false);
+              PremisV3Utils.updateFileFormat(premis_file, format, version, pronom, mime);
 
               PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
               String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(),
                 fileDirectoryPath, fileId);
 
-              ContentPayload premis_file_payload = PremisUtils.fileToBinary(premis_file);
+              ContentPayload premis_file_payload = PremisV3Utils.fileToBinary(premis_file);
               model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
                 premis_file_payload, inotify);
             } catch (NotFoundException e) {
