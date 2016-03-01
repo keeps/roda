@@ -98,6 +98,12 @@
 					</g:FlowPanel>
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
+							PRONOM IDs
+						</g:Label>
+						<g:FlowPanel ui:field="facetPronoms" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
 							Mimetypes
 						</g:Label>
 						<g:FlowPanel ui:field="facetMimetypes" />

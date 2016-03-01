@@ -165,6 +165,8 @@ public class BasicSearch extends Composite {
   @UiField
   FlowPanel facetFormats;
   @UiField
+  FlowPanel facetPronoms;
+  @UiField
   FlowPanel facetMimetypes;
 
   AIPList itemsSearchResultPanel;
@@ -499,11 +501,13 @@ public class BasicSearch extends Composite {
 
   private void createFilesSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT),
+      new SimpleFacetParameter(RodaConstants.FILE_PRONOM),
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
     filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults());
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);
+    facetPanels.put(RodaConstants.FILE_PRONOM, facetPronoms);
     facetPanels.put(RodaConstants.FILE_FORMAT_MIMETYPE, facetMimetypes);
     FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
 

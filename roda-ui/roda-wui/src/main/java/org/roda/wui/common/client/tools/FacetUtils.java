@@ -70,7 +70,9 @@ public class FacetUtils {
           }
 
           CheckBox facetValuePanel = new CheckBox(checkboxLabel.toString());
+          facetValuePanel.setTitle(checkboxLabel.toString());
           facetValuePanel.addStyleName("sidebar-facet-label");
+          facetValuePanel.addStyleName("fade-out");
 
           boolean enabled = count > 0 || facetResult.getSelectedValues().size() > 0;
           facetValuePanel.setEnabled(enabled);

@@ -672,14 +672,14 @@ public class PremisV3Utils {
           FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_PRONOM);
           if (pronomRegistry != null) {
-            if(pronomRegistry.getFormatRegistryKey()!=null){
+            if (pronomRegistry.getFormatRegistryKey() != null) {
               doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey().getStringValue());
             }
           }
           FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_MIME);
           if (mimeRegistry != null) {
-            if(mimeRegistry.getFormatRegistryKey()!=null){
+            if (mimeRegistry.getFormatRegistryKey() != null) {
               doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey().getStringValue());
             }
           }
@@ -687,7 +687,10 @@ public class PremisV3Utils {
         }
         if (occt.getCreatingApplicationArray() != null && occt.getCreatingApplicationArray().length > 0) {
           CreatingApplicationComplexType cact = occt.getCreatingApplicationArray(0);
-          doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, cact.getCreatingApplicationName().getStringValue());
+          if (cact.getCreatingApplicationName() != null) {
+            doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME,
+              cact.getCreatingApplicationName().getStringValue());
+          }
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
           doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, cact.getDateCreatedByApplication());
         }
@@ -771,7 +774,7 @@ public class PremisV3Utils {
   private static StringPlusAuthority getStringPlusAuthority(String value, String authority) {
     StringPlusAuthority spa = StringPlusAuthority.Factory.newInstance();
     spa.setStringValue(value);
-    if(StringUtils.isNotBlank(authority)){
+    if (StringUtils.isNotBlank(authority)) {
       spa.setAuthority(authority);
     }
     return spa;

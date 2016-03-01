@@ -1520,13 +1520,6 @@ public class SolrUtils {
     SolrQuery query = new SolrQuery();
     query.setRequestHandler("/suggest");
     query.setParam("suggest", "true");
-    // TODO remove suggest.build=true in production
-    // This is likely useful only for initial requests; you would probably not
-    // want to build the dictionary on every request, particularly in a
-    // production system. If you would like to keep your dictionary up to date,
-    // you should use the buildOnCommit or buildOnOptimize parameter for the
-    // search component.
-    query.setParam("suggest.build", "true");
     query.setParam("suggest.dictionary", dictionaryName);
     query.setParam("suggest.q", queryString);
 
