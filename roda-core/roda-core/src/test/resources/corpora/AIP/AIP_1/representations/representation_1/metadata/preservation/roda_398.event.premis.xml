@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<event xmlns="info:lc/xmlns/premis-v2">
+<event xmlns="http://www.loc.gov/premis/v3">
   <eventIdentifier>
     <eventIdentifierType>RODAObjectPID</eventIdentifierType>
     <eventIdentifierValue>roda:398</eventIdentifierValue>
   </eventIdentifier>
   <eventType>ingestion</eventType>
   <eventDateTime>2013-09-17T10:53:58.29Z</eventDateTime>
+  <eventDetailInformation>
   <eventDetail>The objects inside the SIP were added to the preservation repository</eventDetail>
+  </eventDetailInformation>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
     <eventOutcomeDetail>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<event xmlns="info:lc/xmlns/premis-v2">
+<event xmlns="http://www.loc.gov/premis/v3">
   <eventIdentifier>
     <eventIdentifierType>RODAObjectPID</eventIdentifierType>
     <eventIdentifierValue>roda_400</eventIdentifierValue>

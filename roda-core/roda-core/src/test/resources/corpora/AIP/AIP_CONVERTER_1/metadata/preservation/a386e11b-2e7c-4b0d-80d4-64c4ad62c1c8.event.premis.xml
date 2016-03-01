@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<event xmlns="info:lc/xmlns/premis-v2" xmlns:xlin="http://www.w3.org/1999/xlink">
+<event xmlns="http://www.loc.gov/premis/v3" xmlns:xlin="http://www.w3.org/1999/xlink">
   <eventIdentifier>
     <eventIdentifierType>local</eventIdentifierType>
     <eventIdentifierValue>a386e11b-2e7c-4b0d-80d4-64c4ad62c1c8</eventIdentifierValue>

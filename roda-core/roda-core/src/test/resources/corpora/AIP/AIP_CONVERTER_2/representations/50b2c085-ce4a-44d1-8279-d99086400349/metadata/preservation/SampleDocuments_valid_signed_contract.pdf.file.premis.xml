@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<prem:object xsi:type="prem:file" xmlns:prem="info:lc/xmlns/premis-v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<prem:object xsi:type="prem:file" xmlns:prem="http://www.loc.gov/premis/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <prem:objectIdentifier>
     <prem:objectIdentifierType>local</prem:objectIdentifierType>
     <prem:objectIdentifierValue>bb5260c6-b249-48b9-bf79-a6e24f74245a/50b2c085-ce4a-44d1-8279-d99086400349/SampleDocuments_valid_signed_contract.pdf</prem:objectIdentifierValue>

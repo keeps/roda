@@ -244,10 +244,10 @@ public class ModelServiceTest {
     gov.loc.premis.v3.Representation rpo = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), true);
 
     ObjectIdentifierComplexType[] objectIdentifierArray = rpo.getObjectIdentifierArray();
-    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierArray[0].getObjectIdentifierType());
+    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierArray[0].getObjectIdentifierType().getStringValue());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierArray()[0].getObjectIdentifierValue());
     assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
-      rpo.getPreservationLevelArray(0).getPreservationLevelValue());
+      rpo.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue());
 
     Binary f0_premis_bin = model.retrievePreservationFile(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_FILE_1_PATH, CorporaConstants.REPRESENTATION_1_FILE_1_ID);
@@ -257,14 +257,14 @@ public class ModelServiceTest {
     assertEquals(0, f0_characteristics.getCompositionLevel().getBigIntegerValue().intValue());
     assertEquals(0, f0_characteristics.getCompositionLevel().getBigIntegerValue().intValue());
 
-    assertEquals(f0_characteristics.getFormatArray(0).getFormatDesignation().getFormatName(),
+    assertEquals(f0_characteristics.getFormatArray(0).getFormatDesignation().getFormatName().getStringValue(),
       CorporaConstants.TEXT_XML);
 
     Binary event_premis_bin = model.retrievePreservationEvent(aipId, CorporaConstants.REPRESENTATION_1_ID,
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event_premis = PremisV3Utils.binaryToEvent(event_premis_bin.getContent(), true);
-    assertEquals(CorporaConstants.INGESTION, event_premis.getEventType());
-    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationArray(0).getEventOutcome());
+    assertEquals(CorporaConstants.INGESTION, event_premis.getEventType().getStringValue());
+    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
   }
 
   @Test
@@ -683,7 +683,7 @@ public class ModelServiceTest {
 
     assertEquals(CorporaConstants.AGENT_RODA_8,
       event.getLinkingAgentIdentifierArray(0).getLinkingAgentIdentifierValue());
-    assertEquals(CorporaConstants.INGESTION, event.getEventType());
+    assertEquals(CorporaConstants.INGESTION, event.getEventType().getStringValue());
   }
 
   @Test
@@ -715,7 +715,7 @@ public class ModelServiceTest {
    gov.loc.premis.v3.Representation representation = PremisV3Utils
       .binaryToRepresentation(representation_bin.getContent(), true);
 
-    assertEquals(representation.getPreservationLevelArray(0).getPreservationLevelValue(),
+    assertEquals(representation.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue(),
       CorporaConstants.PRESERVATION_LEVEL_FULL);
   }
 
@@ -733,8 +733,8 @@ public class ModelServiceTest {
     AgentComplexType agent = PremisV3Utils.binaryToAgent(agent_bin.getContent(), true);
 
     assertEquals(CorporaConstants.AGENT_RODA_8, agent.getAgentIdentifierArray(0).getAgentIdentifierValue());
-    assertEquals(CorporaConstants.SOFTWARE_INGEST_TASK, agent.getAgentType());
-    assertEquals(CorporaConstants.INGEST_CREATE_AIP, agent.getAgentNameArray(0));
+    assertEquals(CorporaConstants.SOFTWARE_INGEST_TASK, agent.getAgentType().getStringValue());
+    assertEquals(CorporaConstants.INGEST_CREATE_AIP, agent.getAgentNameArray(0).getStringValue());
 
   }
 
