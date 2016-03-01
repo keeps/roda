@@ -655,7 +655,7 @@ public class PremisV3Utils {
             fixityPrint.append(fct.getMessageDigestAlgorithm());
             if (StringUtils.isNotBlank(fct.getMessageDigestOriginator().getStringValue())) {
               fixityPrint.append(", "); //
-              fixityPrint.append(fct.getMessageDigestOriginator());
+              fixityPrint.append(fct.getMessageDigestOriginator().getStringValue());
             }
             fixityPrint.append(")");
             hashes.add(fixityPrint.toString());
@@ -665,25 +665,29 @@ public class PremisV3Utils {
         if (occt.getFormatArray() != null && occt.getFormatArray().length > 0) {
           FormatComplexType fct = occt.getFormatArray(0);
           if (fct.getFormatDesignation() != null) {
-            doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName());
+            doc.addField(RodaConstants.FILE_FILEFORMAT, fct.getFormatDesignation().getFormatName().getStringValue());
             doc.addField(RodaConstants.FILE_FORMAT_VERSION, fct.getFormatDesignation().getFormatVersion());
           }
 
           FormatRegistryComplexType pronomRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_PRONOM);
           if (pronomRegistry != null) {
-            doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey());
+            if(pronomRegistry.getFormatRegistryKey()!=null){
+              doc.addField(RodaConstants.FILE_PRONOM, pronomRegistry.getFormatRegistryKey().getStringValue());
+            }
           }
           FormatRegistryComplexType mimeRegistry = getFormatRegistry(premisFile,
             RodaConstants.PRESERVATION_REGISTRY_MIME);
           if (mimeRegistry != null) {
-            doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey());
+            if(mimeRegistry.getFormatRegistryKey()!=null){
+              doc.addField(RodaConstants.FILE_FORMAT_MIMETYPE, mimeRegistry.getFormatRegistryKey().getStringValue());
+            }
           }
           // TODO extension
         }
         if (occt.getCreatingApplicationArray() != null && occt.getCreatingApplicationArray().length > 0) {
           CreatingApplicationComplexType cact = occt.getCreatingApplicationArray(0);
-          doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, cact.getCreatingApplicationName());
+          doc.addField(RodaConstants.FILE_CREATING_APPLICATION_NAME, cact.getCreatingApplicationName().getStringValue());
           doc.addField(RodaConstants.FILE_CREATING_APPLICATION_VERSION, cact.getCreatingApplicationVersion());
           doc.addField(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION, cact.getDateCreatedByApplication());
         }

@@ -399,12 +399,12 @@ public class InternalPluginsTest {
     Assert.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, pronomRegistry.getFormatRegistryName());
-    Assert.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey());
+    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, pronomRegistry.getFormatRegistryName().getStringValue());
+    Assert.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_MIME);
-    Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey());
+    Assert.assertEquals("text/plain", mimeRegistry.getFormatRegistryKey().getStringValue());
 
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
       aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
