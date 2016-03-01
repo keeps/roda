@@ -498,7 +498,7 @@ public class BrowserHelper {
           Binary binary = storage.getBinary(storagePath);
           if (preservationFile.getRepresentationId() != null) {
             ZipEntryInfo info = new ZipEntryInfo(
-              preservationFile.getRepresentationId() + File.separator + storagePath.getName(), binary.getContent());
+              preservationFile.getRepresentationId() + File.separator + StringUtils.join(storagePath.getDirectoryPath(),File.separator)+File.separator+ storagePath.getName(), binary.getContent());
             zipEntries.add(info);
           }
         } else {

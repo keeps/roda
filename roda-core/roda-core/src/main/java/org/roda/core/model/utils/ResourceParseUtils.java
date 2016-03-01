@@ -103,7 +103,7 @@ public class ResourceParseUtils {
       fileId = filename.substring(0, filename.length() - RodaConstants.PREMIS_FILE_SUFFIX.length());
       id = fileId;
     } else if (filename.endsWith(RodaConstants.PREMIS_REPRESENTATION_SUFFIX)) {
-      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_EVENT_SUFFIX.length());
+      id = filename.substring(0, filename.length() - RodaConstants.PREMIS_REPRESENTATION_SUFFIX.length());
       type = PreservationMetadataType.OBJECT_REPRESENTATION;
     } else {
       throw new RequestNotValidException("Unsupported PREMIS extension type in file: " + filename);

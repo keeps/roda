@@ -221,7 +221,7 @@ public final class ModelUtils {
     if (container.equals(RodaConstants.STORAGE_CONTAINER_AIP) && directoryPath.size() > 4
       && directoryPath.get(1).equals(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS)
       && directoryPath.get(3).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)
-      && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_METADATA)) {
+      && directoryPath.get(4).equals(RodaConstants.STORAGE_DIRECTORY_PRESERVATION)) {
       return directoryPath.subList(5, directoryPath.size());
     } else {
       return null;
