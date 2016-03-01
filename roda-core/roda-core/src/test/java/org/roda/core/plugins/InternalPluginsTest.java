@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -28,7 +29,6 @@ import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.RodaCoreFactory;
@@ -186,9 +186,32 @@ public class InternalPluginsTest {
     return transferredResource;
   }
 
-  private void assertReports(List<Report> reports) {
+  private void assertReports(List<Report> reports, List<String> itemIds) {
+    assertReports(reports, itemIds, null);
+  }
+
+  private void assertReports(List<Report> reports, List<String> itemIds, List<String> otherItemIds) {
+    if (itemIds != null) {
+      Assert.assertEquals(itemIds.size(), reports.size());
+    } else if (otherItemIds != null) {
+      Assert.assertEquals(otherItemIds.size(), reports.size());
+    }
+
     for (Report report : reports) {
-      Assert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
+      Assert.assertThat(report.getPluginState(), Matchers.is(PluginState.SUCCESS));
+
+      if (itemIds != null && report.getItemId() != null) {
+        Assert.assertThat(report.getItemId(), Matchers.isIn(itemIds));
+      }
+
+      if (otherItemIds != null && report.getOtherId() != null) {
+        Assert.assertThat(report.getOtherId(), Matchers.isIn(otherItemIds));
+      }
+
+      // assert sub-reports
+      if (report.getReports().size() > 0) {
+        assertReports(report.getReports(), itemIds, otherItemIds);
+      }
     }
   }
 
@@ -205,9 +228,9 @@ public class InternalPluginsTest {
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-      Arrays.asList(transferredResource));
-    assertReports(reports);
+    List<TransferredResource> items = Arrays.asList(transferredResource);
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, items);
+    assertReports(reports, null, items.stream().map(tr -> tr.getId()).collect(Collectors.toList()));
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -241,8 +264,9 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     plugin.setParameterValues(parameters);
 
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
-    assertReports(reports);
+    List<String> aipIdList = Arrays.asList(aip.getId());
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -294,8 +318,9 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     plugin.setParameterValues(parameters);
 
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
-    assertReports(reports);
+    List<String> aipIdList = Arrays.asList(aip.getId());
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -341,15 +366,16 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     premisSkeletonPlugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, Arrays.asList(aip.getId()));
+    List<String> aipIdList = Arrays.asList(aip.getId());
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList);
 
     Plugin<AIP> plugin = new SiegfriedPlugin();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     plugin.setParameterValues(parameters2);
 
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
-    assertReports(reports);
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -436,15 +462,16 @@ public class InternalPluginsTest {
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     premisSkeletonPlugin.setParameterValues(parameters);
 
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, Arrays.asList(aip.getId()));
+    List<String> aipIdList = Arrays.asList(aip.getId());
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(premisSkeletonPlugin, aipIdList);
 
     Plugin<AIP> plugin = new TikaFullTextPlugin();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
     plugin.setParameterValues(parameters2);
 
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aip.getId()));
-    assertReports(reports);
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
+    assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -481,7 +508,7 @@ public class InternalPluginsTest {
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());
   }
-  
+
   @Test
   public void testAutoAccept()
     throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, InvalidDateException {
@@ -496,7 +523,7 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    Assert.assertTrue(aip.isActive());    
+    Assert.assertTrue(aip.isActive());
   }
 
 }

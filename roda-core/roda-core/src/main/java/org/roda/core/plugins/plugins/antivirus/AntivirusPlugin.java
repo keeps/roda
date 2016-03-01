@@ -149,11 +149,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
     try {
       StringBuilder outcomeDetailExtension = new StringBuilder(virusCheckResult.getReport());
-      if (state != PluginState.SUCCESS) {
-        outcomeDetailExtension.append("\n").append(exception.getClass().getName());
-        if (exception != null) {
-          outcomeDetailExtension.append(": ").append(exception.getMessage());
-        }
+      if (state != PluginState.SUCCESS && exception != null) {
+        outcomeDetailExtension.append("\n").append(exception.getClass().getName()).append(": ")
+          .append(exception.getMessage());
       }
 
       List<LinkingIdentifier> sources = Arrays
