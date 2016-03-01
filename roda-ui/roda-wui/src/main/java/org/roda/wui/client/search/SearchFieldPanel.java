@@ -19,6 +19,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -124,11 +125,9 @@ public class SearchFieldPanel extends Composite {
     inputStorageSizeTo.getElement().setPropertyString("placeholder", messages.searchFieldNumericToPlaceHolder());
     inputStorageSizeTo.getElement().setAttribute("type", "number");
     inputStorageSizeList = new ListBox();
-    // TODO
-    inputStorageSizeList.addItem("B", "bytes");
-    inputStorageSizeList.addItem("KB", "kbytes");
-    inputStorageSizeList.addItem("MB", "megabytes");
-    inputStorageSizeList.addItem("GB", "gigabytes");
+    for (String unit : Humanize.UNITS) {
+      inputStorageSizeList.addItem(unit, unit);
+    }
 
     inputCheckBox = new CheckBox();
 
@@ -208,31 +207,33 @@ public class SearchFieldPanel extends Composite {
     if (searchFields != null && searchFields.size() >= 1) {
       String field = searchFields.get(0);
 
-      if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && inputDateBox.getValue() != null) {
+      if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE) && dateValid(inputDateBox)) {
         filterParameter = new SimpleFilterParameter(field, inputDateBox.getValue().toString());
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
-        && inputDateBoxTo.getValue() != null && searchFields.size() >= 2) {
-        // TODO validate inputs!
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)
+        && dateIntervalValid(inputDateBoxFrom, inputDateBoxTo) && searchFields.size() >= 2) {
         String fieldTo = searchField.getSearchFields().get(1);
         filterParameter = new DateIntervalFilterParameter(field, fieldTo, inputDateBoxFrom.getValue(),
           inputDateBoxTo.getValue());
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL) && inputDateBoxFrom.getValue() != null
-        && inputDateBoxTo.getValue() != null) {
-        // TODO validate inputs!
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_DATE_INTERVAL)
+        && dateIntervalValid(inputDateBoxFrom, inputDateBoxTo)) {
         filterParameter = new DateIntervalFilterParameter(field, field, inputDateBoxFrom.getValue(),
           inputDateBoxTo.getValue());
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC) && !inputNumeric.getValue().isEmpty()) {
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC) && valid(inputNumeric)) {
         filterParameter = new BasicSearchFilterParameter(field, inputNumeric.getValue());
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)) {
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL)
+        && intervalValid(inputNumericFrom, inputNumericTo)) {
         filterParameter = new LongRangeFilterParameter(field, Long.valueOf(inputNumericFrom.getValue()),
           Long.valueOf(inputNumericTo.getValue()));
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)) {
-        // TODO validate inputs!
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN)) {
-        // TODO validate inputs!
-      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST)) {
-        filterParameter = new BasicSearchFilterParameter(field, inputSearchSuggestBox.getValue());
-      } else if (!inputText.getValue().isEmpty()) {
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_STORAGE)
+        && intervalValid(inputStorageSizeFrom, inputStorageSizeTo)) {
+        filterParameter = new LongRangeFilterParameter(field,
+          Humanize.parseFileSize(inputStorageSizeFrom.getValue(), inputStorageSizeList.getSelectedValue()),
+          Humanize.parseFileSize(inputStorageSizeTo.getValue(), inputStorageSizeList.getSelectedValue()));
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN) && valid(inputCheckBox)) {
+        filterParameter = new SimpleFilterParameter(field, Boolean.toString(inputCheckBox.getValue()));
+      } else if (type.equals(RodaConstants.SEARCH_FIELD_TYPE_SUGGEST) && valid(inputSearchSuggestBox)) {
+        filterParameter = new SimpleFilterParameter(field, inputSearchSuggestBox.getValue());
+      } else if (valid(inputText)) {
         filterParameter = new BasicSearchFilterParameter(field, inputText.getValue());
       }
     }
@@ -297,5 +298,57 @@ public class SearchFieldPanel extends Composite {
     inputPanel.add(searchSuggestBox);
     inputSearchSuggestBox.addStyleName("form-textbox");
     inputPanel.addStyleName("full_width");
+  }
+
+  private boolean dateIntervalValid(DateBox inputFrom, DateBox inputTo) {
+    boolean valid = false;
+
+    if (inputFrom.getValue() != null && inputTo.getValue() != null) {
+      valid = true;
+    } else if (inputFrom.getValue() != null && inputTo.getTextBox().getText().isEmpty()) {
+      valid = true;
+    } else if (inputFrom.getTextBox().getText().isEmpty() && inputTo.getValue() != null) {
+      valid = true;
+    }
+
+    return valid;
+  }
+
+  private boolean dateValid(DateBox input) {
+    return (input.getValue() != null);
+  }
+
+  private boolean valid(TextBox input) {
+    return (!input.getValue().isEmpty());
+  }
+
+  private boolean valid(SearchSuggestBox<?> input) {
+    return (!input.getValue().isEmpty());
+  }
+  
+  private boolean valid(CheckBox input) {
+    return input.getValue();
+  }
+
+  private boolean intervalValid(TextBox inputFrom, TextBox inputTo) {
+    boolean valid = false;
+
+    try {
+      if (!inputFrom.getValue().isEmpty() && !inputTo.getValue().isEmpty()) {
+        Double.parseDouble(inputFrom.getValue());
+        Double.parseDouble(inputTo.getValue());
+        valid = true;
+      } else if (!inputFrom.getValue().isEmpty()) {
+        Double.parseDouble(inputFrom.getValue());
+        valid = true;
+      } else if (!inputTo.getValue().isEmpty()) {
+        Double.parseDouble(inputTo.getValue());
+        valid = true;
+      }
+    } catch (Exception e) {
+      valid = false;
+    }
+
+    return valid;
   }
 }

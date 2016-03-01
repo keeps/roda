@@ -2,7 +2,7 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
-	xmlns:i="urn:import:config.i18n.client" xmlns:lists="urn:import:org.roda.wui.client.common.lists"
+	xmlns:i="urn:import:config.i18n.client" xmlns:search="urn:import:org.roda.wui.client.search"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
 	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
@@ -31,7 +31,8 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="searchPanel">
 					<g:FlowPanel styleName="searchPanelLeft">
-						<g:ListBox ui:field="searchInputListBox" addStyleNames="searchListBox" />
+						<search:Dropdown ui:field="searchInputListBox"
+							addStyleNames="searchInputListBox" />
 						<g:FlowPanel styleName="searchPanelLeftInput">
 							<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
 						</g:FlowPanel>
@@ -71,13 +72,10 @@
 							ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel">
-<!-- 					<lists:AIPList addStyleNames="searchResults" ui:field="searchResultPanel" /> -->
-<!-- 					<lists:FileList addStyleNames="searchResults" ui:field="filesSearchResultPanel" /> -->
-				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
-				<g:FlowPanel styleName="sidebar-group" ui:field="sidebarGroupDownloads">
+				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
 							Description levels
@@ -89,6 +87,20 @@
 							Representations
 						</g:Label>
 						<g:FlowPanel ui:field="facetHasRepresentations" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Formats
+						</g:Label>
+						<g:FlowPanel ui:field="facetFormats" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Mimetypes
+						</g:Label>
+						<g:FlowPanel ui:field="facetMimetypes" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>

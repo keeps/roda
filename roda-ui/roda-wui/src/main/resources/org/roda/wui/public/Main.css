@@ -641,6 +641,55 @@ pre>code {
 }
 
 /**********************************************
+				CUSTOM DROPDOWN
+************************************************/
+.dropdown {
+	white-space: nowrap;
+}
+.dropdown-label {
+	border: 1px solid #eee;
+	-webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* IE/Edge */
+  user-select: none;  
+}
+.dropdown-popup {
+	border: 1px solid #eee;
+	position: absolute;
+	z-index: 1;
+}
+.dropdown-label,
+.dropdown-item {
+	padding: 5px;
+	background-color: white;
+	min-width: 150px;
+	cursor: pointer;
+	cursor: hand;
+}
+.dropdown-item:hover {
+	color: white;
+	background-color: black;
+}
+.dropdown-label:after {
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: inherit;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	float: right;
+	line-height: 2.5rem;
+	padding-left: 5px;
+	padding-right: 5px;
+	content: "\f107";
+}
+.open .dropdown-label:after {
+	content: "\f106";
+}
+
+/**********************************************
 				DATE PICKER
 ************************************************/
 .gwt-DateBox input {
@@ -2531,17 +2580,34 @@ td.datePickerMonth, td.datePickerYear {
 	display: table;
 }
 
-.searchPanelLeft select {
-	display: table-cell;
-	vertical-align: top;
+.searchInputListBox,
+.searchInputListBoxPopup {
+	border: none;
+}
+
+.searchInputListBoxPopup {
+	border-top: 2px solid white;
+}
+
+.searchInputListBox .dropdown-label,
+.searchInputListBoxPopup .dropdown-item {
+	line-height: 3rem;
 	background-color: #089de3;
 	color: white;
-	height: 4rem;
-    line-height: 4rem;
-    font-size: 1.5rem;
 	border: none;
 	padding-left: 20px;
-	padding-right: 20px;
+    padding-right: 10px;
+    min-width: 160px;
+}
+
+.searchInputListBox .dropdown-label:after {
+	line-height: 3rem;
+	font-size: 20px;
+}
+
+.searchInputListBoxPopup .dropdown-item:hover {
+	background-color: #3998d0;
+	color: white;
 }
 
 .searchPanelLeft .searchPanelLeftInput {
@@ -2702,6 +2768,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .search-field-left-panel .form-textbox-small {
 	max-width: 85px;
+	vertical-align: top;
 }
 
 .searchAdvancedFieldsPanel+.searchAdvancedFieldAdd {
@@ -4338,3 +4405,22 @@ td.datePickerMonth, td.datePickerYear {
 	margin-top: 5px;
 }
 
+/**********************************************
+				RECAPTCHA
+************************************************/
+.gwt-SuggestBoxPopup {
+	border: 1px solid #ccc;
+	background-color: white;
+	border-radius: 1px;
+}
+
+.gwt-SuggestBoxPopup .item {
+	color: #58595b;
+	padding: 5px 10px 5px 10px;
+}
+
+.gwt-SuggestBoxPopup .item:hover,
+.gwt-SuggestBoxPopup .item-selected {
+	color: white;
+	background-color: #089de3;
+}

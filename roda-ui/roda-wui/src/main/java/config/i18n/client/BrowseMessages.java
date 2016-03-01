@@ -434,6 +434,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Format")
   String searchFileFieldFormat();
   
+  @DefaultMessage("Pronom")
+  String searchFileFieldPronom();
+  
   @DefaultMessage("Mimetype")
   String searchFileFieldMimetype();
   

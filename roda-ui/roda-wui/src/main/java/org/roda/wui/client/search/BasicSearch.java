@@ -41,8 +41,6 @@ import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ChangeEvent;
-import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -122,7 +120,7 @@ public class BasicSearch extends Composite {
   FlowPanel searchDescription;
 
   @UiField
-  ListBox searchInputListBox;
+  Dropdown searchInputListBox;
 
   @UiField
   TextBox searchInputBox;
@@ -155,10 +153,19 @@ public class BasicSearch extends Composite {
   Button searchAdvancedGo;
 
   // FILTERS
+  @UiField
+  FlowPanel itemsFacets;
   @UiField(provided = true)
   FlowPanel facetDescriptionLevels;
   @UiField(provided = true)
   FlowPanel facetHasRepresentations;
+
+  @UiField
+  FlowPanel filesFacets;
+  @UiField
+  FlowPanel facetFormats;
+  @UiField
+  FlowPanel facetMimetypes;
 
   AIPList itemsSearchResultPanel;
   RepresentationList representationsSearchResultPanel;
@@ -172,20 +179,22 @@ public class BasicSearch extends Composite {
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
+    searchInputListBox = new Dropdown();
     searchAdvancedFieldOptions = new ListBox();
 
     initWidget(uiBinder.createAndBindUi(this));
 
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
 
+    searchInputListBox.setLabel(messages.searchListBoxItems());
     searchInputListBox.addItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
     searchInputListBox.addItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
     searchInputListBox.addItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
 
-    searchInputListBox.addChangeHandler(new ChangeHandler() {
+    searchInputListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
       @Override
-      public void onChange(ChangeEvent event) {
+      public void onValueChange(ValueChangeEvent<String> event) {
         if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
           showSearchAdvancedFieldsPanel();
         } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
@@ -193,8 +202,11 @@ public class BasicSearch extends Composite {
         } else {
           showFilesSearchAdvancedFieldsPanel();
         }
+        doSearch();
       }
     });
+
+    searchInputListBox.addPopupStyleName("searchInputListBoxPopup");
 
     searchInputBox.getElement().setPropertyString("placeholder", messages.searchPlaceHolder());
     searchAdvancedPanel.setVisible(false);
@@ -267,6 +279,7 @@ public class BasicSearch extends Composite {
   private void createFilesSearchAdvancedFieldsPanel() {
     SearchFieldPanel filenameField = new SearchFieldPanel();
     SearchFieldPanel formatField = new SearchFieldPanel();
+    SearchFieldPanel pronomField = new SearchFieldPanel();
     SearchFieldPanel mimetypeField = new SearchFieldPanel();
     SearchFieldPanel sizeField = new SearchFieldPanel();
     SearchFieldPanel fulltextField = new SearchFieldPanel();
@@ -275,20 +288,25 @@ public class BasicSearch extends Composite {
       RodaConstants.SEARCH_FIELD_TYPE_TEXT);
     formatField.simpleSearchField(RodaConstants.FILE_FILEFORMAT, messages.searchFileFieldFormat(),
       RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
+    pronomField.simpleSearchField(RodaConstants.FILE_PRONOM, messages.searchFileFieldPronom(),
+      RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
     mimetypeField.simpleSearchField(RodaConstants.FILE_FORMAT_MIMETYPE, messages.searchFileFieldMimetype(),
       RodaConstants.SEARCH_FIELD_TYPE_SUGGEST);
-    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, messages.searchFileFieldMimetype(),
+    sizeField.simpleSearchField(RodaConstants.FILE_SIZE, messages.searchFileFieldFilesize(),
       RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
     fulltextField.simpleSearchField(RodaConstants.FILE_FULLTEXT, messages.searchFileFieldFulltext(),
       RodaConstants.SEARCH_FIELD_TYPE_TEXT);
 
     formatField
       .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FILEFORMAT));
+    pronomField
+      .addInputSearchSuggestBox(new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_PRONOM));
     mimetypeField.addInputSearchSuggestBox(
       new SearchSuggestBox<IndexedFile>(IndexedFile.class, RodaConstants.FILE_FORMAT_MIMETYPE));
 
     filesSearchAdvancedFieldsPanel.add(filenameField);
     filesSearchAdvancedFieldsPanel.add(formatField);
+    filesSearchAdvancedFieldsPanel.add(pronomField);
     filesSearchAdvancedFieldsPanel.add(mimetypeField);
     filesSearchAdvancedFieldsPanel.add(sizeField);
     filesSearchAdvancedFieldsPanel.add(fulltextField);
@@ -403,6 +421,9 @@ public class BasicSearch extends Composite {
     itemsSearchAdvancedFieldsPanel.setVisible(true);
     filesSearchAdvancedFieldsPanel.setVisible(false);
     representationsSearchAdvancedFieldsPanel.setVisible(false);
+
+    itemsFacets.setVisible(true);
+    filesFacets.setVisible(false);
   }
 
   public void showRepresentationsSearchAdvancedFieldsPanel() {
@@ -416,6 +437,9 @@ public class BasicSearch extends Composite {
     itemsSearchAdvancedFieldsPanel.setVisible(false);
     filesSearchAdvancedFieldsPanel.setVisible(false);
     representationsSearchAdvancedFieldsPanel.setVisible(true);
+
+    itemsFacets.setVisible(false);
+    filesFacets.setVisible(false);
   }
 
   public void showFilesSearchAdvancedFieldsPanel() {
@@ -429,6 +453,9 @@ public class BasicSearch extends Composite {
     itemsSearchAdvancedFieldsPanel.setVisible(false);
     filesSearchAdvancedFieldsPanel.setVisible(true);
     representationsSearchAdvancedFieldsPanel.setVisible(false);
+
+    itemsFacets.setVisible(false);
+    filesFacets.setVisible(true);
   }
 
   private void createItemsSearchResultPanel() {
@@ -458,8 +485,6 @@ public class BasicSearch extends Composite {
     representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, null,
       messages.searchResults());
 
-    // TODO facets
-
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -473,9 +498,14 @@ public class BasicSearch extends Composite {
   }
 
   private void createFilesSearchResultPanel() {
-    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, null, messages.searchResults());
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT),
+      new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
+    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults());
 
-    // TODO facets
+    Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
+    facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);
+    facetPanels.put(RodaConstants.FILE_FORMAT_MIMETYPE, facetMimetypes);
+    FacetUtils.bindFacets(filesSearchResultPanel, facetPanels);
 
     filesSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
