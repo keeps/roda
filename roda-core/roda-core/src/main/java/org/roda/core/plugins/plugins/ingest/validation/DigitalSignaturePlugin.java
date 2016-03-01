@@ -7,8 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +58,7 @@ import org.slf4j.LoggerFactory;
 public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
+  private static final String OTHER_METADATA_TYPE = "DigitalSignature";
   private boolean doVerify;
   private boolean doExtract;
   private boolean doStrip;
@@ -209,31 +212,27 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                 .contains(fileFormat)))) {
 
               fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
-
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-
-              // FIXME file that doesn't get deleted afterwards
               LOGGER.debug("Running DigitalSignaturePlugin on " + file.getId());
 
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
+
                 verification = DigitalSignaturePluginUtils
                   .runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
-                System.err.println("TEST: " + file.getId() + " - " + verification);
                 verifiedFiles.put(file.getId(), verification);
-                if (verification != null && verificationAffectsOnOutcome)
+
+                if (!verification.equals("Passed") && verificationAffectsOnOutcome)
                   pluginResultState = 0;
               }
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                List<Path> extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtract(model, file,
-                  directAccess.getPath(), fileFormat);
+                int extractResultSize = runExtraction(model, file, directAccess.getPath(), fileFormat);
 
-                if (extractResult.size() > 0) {
+                if (extractResultSize > 0)
                   extractedFiles.add(file);
-                }
               }
 
               if (doStrip) {
@@ -257,12 +256,14 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                   alteredFiles.add(file);
                   newFiles.add(f);
                   IOUtils.closeQuietly(directAccess);
-                  reportItem.setPluginState(PluginState.SUCCESS);
+
+                  if (pluginResultState == 1)
+                    reportItem.setPluginState(PluginState.SUCCESS);
 
                 } else {
                   LOGGER.debug("Process failed on file " + file.getId() + " of representation "
                     + representation.getId() + " from AIP " + aipId);
-                  pluginResultState = 2;
+                  pluginResultState = 0;
 
                   reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
                     "Convert process failed on file " + file.getId() + " of representation " + representation.getId()
@@ -308,7 +309,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     try {
       model.notifyAIPUpdated(aipId);
     } catch (RODAException e) {
-      LOGGER.error("Error running creating agent for DigitalSignaturePlugin ", e);
+      LOGGER.error("Error notifying update of AIP on DigitalSignaturePlugin ", e);
     }
 
     return report;
@@ -361,9 +362,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     }
 
     // Digital Signature plugin did not run correctly
-    if (pluginResultState == 0) {
+    if (pluginResultState == 0)
       state = PluginState.FAILURE;
-    }
 
     // FIXME revise PREMIS generation
     try {
@@ -386,6 +386,55 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       }
     }
     return fileFormat;
+  }
+
+  private int runExtraction(ModelService model, File file, Path input, String fileFormat) {
+    List<Path> extractResult = new ArrayList<Path>();
+
+    try {
+      if (fileFormat.equals("pdf")) {
+        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
+
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
+            mainPayload, true);
+
+          if (extractResult.get(1) != null) {
+            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
+              contentsPayload, true);
+          }
+        }
+      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+        Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
+        extractResult = new ArrayList<Path>(extractMap.keySet());
+
+        for (Path p : extractResult) {
+          ContentPayload mainPayload = new FSPathContentPayload(p);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+            DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
+        }
+      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
+        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODF(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
+            mainPayload, true);
+        }
+      }
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException | SignatureException e) {
+      LOGGER.warn("Problems running a document digital signature extraction");
+    }
+
+    return extractResult.size();
   }
 
   @Override
@@ -420,17 +469,17 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Checked if digital signatures were valid.";
+    return "Checked if digital signatures were valid and/or stripped them.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "Digital signatures were valid.";
+    return "Digital signatures were valid and/or they were stripped with success.";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to validate the digital signature or invalid signature.";
+    return "Failed to validate and/or strip digital signatures.";
   }
 
 }

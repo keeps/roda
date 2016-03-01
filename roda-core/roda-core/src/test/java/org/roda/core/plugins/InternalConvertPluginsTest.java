@@ -624,7 +624,8 @@ public class InternalConvertPluginsTest {
 
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
       String intermediatePath = "/data/storage/";
-      Assert.assertEquals(0, DigitalSignaturePluginUtils.countSignatures(basePath, fileStoragePath, intermediatePath));
+      Assert.assertEquals(0,
+        DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
     }
   }
 }

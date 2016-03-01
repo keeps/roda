@@ -30,6 +30,7 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateRevokedException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.PKIXBuilderParameters;
 import java.security.cert.TrustAnchor;
@@ -53,6 +54,7 @@ import java.util.zip.ZipOutputStream;
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.XMLSignature;
+import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
@@ -74,15 +76,8 @@ import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.AlreadyExistsException;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.model.ModelService;
-import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,9 +104,8 @@ public class DigitalSignaturePluginUtils {
   private static final String PDF_STRING = "String";
   private static final String PDF_OBJECT = "Object";
   private static final String PDF_BOOLEAN = "Boolean";
-  private static final String OTHER_METADATA_TYPE = "DigitalSignature";
 
-  /*** VERIFY FUNCTIONS ***/
+  /*************************** VERIFY FUNCTIONS ***************************/
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat) {
 
@@ -120,8 +114,7 @@ public class DigitalSignaturePluginUtils {
         return DigitalSignaturePluginUtils.runDigitalSignatureVerifyPDF(input);
       } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
         return DigitalSignaturePluginUtils.runDigitalSignatureVerifyOOXML(input);
-      } else if (fileFormat.equals("odt")) {
-        // FIXME ODF verification has problems
+      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
         return DigitalSignaturePluginUtils.runDigitalSignatureVerifyODF(input);
       }
     } catch (IOException | GeneralSecurityException e) {
@@ -212,6 +205,7 @@ public class DigitalSignaturePluginUtils {
         verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
       }
 
+      pkg.close();
     } catch (InvalidFormatException e) {
       return "Error opening a document file";
     } catch (CertificateExpiredException | CertificateNotYetValidException e) {
@@ -242,16 +236,16 @@ public class DigitalSignaturePluginUtils {
           NodeList signatureNodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
           for (int i = 0; i < signatureNodeList.getLength(); i++) {
             Node signatureNode = signatureNodeList.item(i);
-            verifyCertificatesODF(signatureNode);
+            verifyCertificatesODF(input, signatureNode);
           }
         } catch (ParserConfigurationException | SAXException e) {
           result = "Signatures document can not be parsed";
-        } catch (CertificateExpiredException expiredEx) {
+        } catch (CertificateExpiredException | CertificateRevokedException e) {
           result = "There are expired or revoked certificates";
         } catch (CertificateNotYetValidException notYetValidEx) {
           result = "There are certificates not yet valid";
-        } catch (MarshalException e) {
-          result = "Signatures are not valid";
+        } catch (MarshalException | XMLSignatureException e) {
+          result = "Signatures are not valid.";
         }
       }
     }
@@ -260,59 +254,9 @@ public class DigitalSignaturePluginUtils {
     return result;
   }
 
-  /*** EXTRACT FUNCTIONS ***/
+  /*************************** EXTRACT FUNCTIONS ***************************/
 
-  public static List<Path> runDigitalSignatureExtract(ModelService model, File file, Path input, String fileFormat) {
-
-    List<Path> extractResult = new ArrayList<Path>();
-
-    try {
-      if (fileFormat.equals("pdf")) {
-        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
-
-        if (extractResult.size() > 0) {
-          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-          ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
-
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-            mainPayload, true);
-
-          if (extractResult.get(1) != null) {
-            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-              contentsPayload, true);
-          }
-        }
-      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
-        extractResult = new ArrayList<Path>(extractMap.keySet());
-
-        for (Path p : extractResult) {
-          ContentPayload mainPayload = new FSPathContentPayload(p);
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
-            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
-        }
-      } else if (fileFormat.equals("odt")) {
-        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODF(input);
-
-        if (extractResult.size() > 0) {
-          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-            mainPayload, true);
-        }
-      }
-    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException | SignatureException e) {
-      LOGGER.warn("Problems running a document digital signature extraction");
-    }
-
-    return extractResult;
-  }
-
-  private static List<Path> runDigitalSignatureExtractPDF(Path input) throws SignatureException, IOException {
+  public static List<Path> runDigitalSignatureExtractPDF(Path input) throws SignatureException, IOException {
     Security.addProvider(new BouncyCastleProvider());
 
     List<Path> paths = new ArrayList<Path>();
@@ -388,7 +332,7 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  private static Map<Path, String> runDigitalSignatureExtractOOXML(Path input) throws SignatureException, IOException {
+  public static Map<Path, String> runDigitalSignatureExtractOOXML(Path input) throws SignatureException, IOException {
     Map<Path, String> paths = new HashMap<Path, String>();
 
     ZipFile zipFile = new ZipFile(input.toString());
@@ -409,7 +353,7 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  private static List<Path> runDigitalSignatureExtractODF(Path input) throws SignatureException, IOException {
+  public static List<Path> runDigitalSignatureExtractODF(Path input) throws SignatureException, IOException {
     List<Path> paths = new ArrayList<Path>();
 
     ZipFile zipFile = new ZipFile(input.toString());
@@ -430,7 +374,7 @@ public class DigitalSignaturePluginUtils {
     return paths;
   }
 
-  /*** STRIP FUNCTIONS ***/
+  /*************************** STRIP FUNCTIONS ***************************/
 
   public static Path runDigitalSignatureStrip(Path input, String fileFormat) {
     try {
@@ -440,7 +384,7 @@ public class DigitalSignaturePluginUtils {
         DigitalSignaturePluginUtils.runDigitalSignatureStripPDF(input, output);
       } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
         DigitalSignaturePluginUtils.runDigitalSignatureStripOOXML(input, output);
-      } else if (fileFormat.equals("odt")) {
+      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
         DigitalSignaturePluginUtils.runDigitalSignatureStripODF(input, output);
       }
 
@@ -508,7 +452,7 @@ public class DigitalSignaturePluginUtils {
     zipFile.close();
   }
 
-  /*** SUB FUNCTIONS ***/
+  /*************************** SUB FUNCTIONS ***************************/
 
   private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
     String result = "";
@@ -543,39 +487,30 @@ public class DigitalSignaturePluginUtils {
     NoSuchProviderException, InvalidAlgorithmParameterException {
 
     if (trustedRootCerts.size() > 0) {
-      // Create the selector that specifies the starting certificate
       X509CertSelector selector = new X509CertSelector();
       selector.setCertificate(cert);
-
-      // Create the trust anchors (set of root CA certificates)
       Set<TrustAnchor> trustAnchors = new HashSet<TrustAnchor>();
       for (Certificate trustedRootCert : trustedRootCerts) {
         trustAnchors.add(new TrustAnchor((X509Certificate) trustedRootCert, null));
       }
 
-      // Configure the PKIX certificate builder algorithm parameters
       PKIXBuilderParameters pkixParams = new PKIXBuilderParameters(trustAnchors, selector);
-
-      // Disable CRL checks (this is done manually as additional step)
       pkixParams.setRevocationEnabled(false);
-
-      // Specify a list of intermediate certificates
       CertStore intermediateCertStore = CertStore.getInstance("Collection", new CollectionCertStoreParameters(
         intermediateCerts), "BC");
       pkixParams.addCertStore(intermediateCertStore);
-
-      // Build and verify the certification chain
       CertPathBuilder builder = CertPathBuilder.getInstance("PKIX", "BC");
       builder.build(pkixParams);
     }
   }
 
-  private static void verifyCertificatesODF(Node signatureNode) throws CertificateExpiredException,
-    CertificateNotYetValidException, MarshalException {
+  private static void verifyCertificatesODF(Path input, Node signatureNode) throws CertificateExpiredException,
+    CertificateNotYetValidException, MarshalException, XMLSignatureException, CertificateRevokedException {
 
+    XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance("DOM");
     DOMValidateContext domValidateContext = new DOMValidateContext(new KeyInfoKeySelector(), signatureNode);
-    XMLSignatureFactory xmlSignatureFactory = XMLSignatureFactory.getInstance();
     XMLSignature xmlSignature = xmlSignatureFactory.unmarshalXMLSignature(domValidateContext);
+
     KeyInfo keyInfo = xmlSignature.getKeyInfo();
     Iterator<?> it = keyInfo.getContent().iterator();
     List<X509Certificate> certs = new ArrayList<X509Certificate>();
@@ -603,12 +538,12 @@ public class DigitalSignaturePluginUtils {
     for (CRL c : crls) {
       for (X509Certificate cert : certs) {
         if (c.isRevoked(cert))
-          throw new CertificateExpiredException();
+          throw new CertificateRevokedException(null, null, null, null);
       }
     }
   }
 
-  public static int countSignatures(Path base, StoragePath input, String intermediatePath) {
+  public static int countSignaturesPDF(Path base, StoragePath input, String intermediatePath) {
     int counter = -1;
     try {
       PdfReader reader = new PdfReader(base.toString() + intermediatePath + input.toString());
@@ -621,7 +556,7 @@ public class DigitalSignaturePluginUtils {
     return counter;
   }
 
-  /*************************** FILLING FILE FORMAT STRUCTURES FUNCTIONS ***************************/
+  /*********************** FILLING FILE FORMAT STRUCTURES FUNCTIONS ***********************/
 
   public static Map<String, List<String>> getPronomToExtension() {
     Map<String, List<String>> map = new HashMap<>();
