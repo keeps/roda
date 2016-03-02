@@ -291,7 +291,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectModifyPermissions(user, aip);
+    UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
     StreamResponse aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadata(aipId, metadataId, acceptFormat,
@@ -316,7 +316,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectModifyPermissions(user, aip);
+    UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
     StreamResponse aipDescritiveMetadata = BrowserHelper.getAipDescritiveMetadataVersion(aipId, metadataId, versionId,
@@ -607,9 +607,9 @@ public class Browser extends RodaCoreService {
     Date start = new Date();
 
     // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    UserUtility.checkRoles(user, BROWSE_ROLE);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectModifyPermissions(user, aip);
+    UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
     DescriptiveMetadata dm = BrowserHelper.retrieveMetadataFile(aipId, metadataId);
@@ -671,7 +671,7 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectModifyPermissions(user, aip);
+    UserUtility.checkObjectReadPermissions(user, aip);
 
     // delegate
     StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId, fileUuid,

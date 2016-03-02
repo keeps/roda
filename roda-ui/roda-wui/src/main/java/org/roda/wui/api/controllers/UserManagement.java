@@ -212,7 +212,7 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "registerUser", null, duration, "user", user);
   }
 
-  public static void addUser(RodaUser user, User newUser, String password)
+  public static User addUser(RodaUser user, User newUser, String password)
     throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException {
     Date start = new Date();
@@ -221,11 +221,13 @@ public class UserManagement extends RodaCoreService {
     UserUtility.checkRoles(user, ROLE);
 
     // delegate
-    UserManagementHelper.addUser(newUser, password);
+    User ret = UserManagementHelper.addUser(newUser, password);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "addUser", null, duration, "user", newUser);
+
+    return ret;
   }
 
   public static void modifyMyUser(RodaUser user, User modifiedUser, String password)

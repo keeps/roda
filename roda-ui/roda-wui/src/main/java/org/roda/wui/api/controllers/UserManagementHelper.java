@@ -96,9 +96,9 @@ public class UserManagementHelper {
     RodaCoreFactory.getModelService().registerUser(user, password, true, true);
   }
 
-  public static void addUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
+  public static User addUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    RodaCoreFactory.getModelService().addUser(user, password, true, true);
+    return RodaCoreFactory.getModelService().addUser(user, password, true, true);
   }
 
   public static void modifyUser(User user, String password)

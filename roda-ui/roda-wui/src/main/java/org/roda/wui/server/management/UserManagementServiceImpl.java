@@ -112,10 +112,10 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void addUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
+  public User addUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
     GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    UserManagement.addUser(user, newUser, password);
+    return UserManagement.addUser(user, newUser, password);
   }
 
   @Override

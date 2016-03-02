@@ -891,21 +891,24 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  public void addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
+  public User addUser(User user, boolean useModel, boolean notify) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    addUser(user, null, useModel, notify);
+    return addUser(user, null, useModel, notify);
   }
 
-  public void addUser(User user, String password, boolean useModel, boolean notify) throws GenericException,
+  public User addUser(User user, String password, boolean useModel, boolean notify) throws GenericException,
     EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException, NotFoundException {
     boolean success = true;
+    User createdUser;
     try {
       if (useModel) {
-        UserUtility.getLdapUtility().addUser(user);
+        createdUser = UserUtility.getLdapUtility().addUser(user);
 
         if (password != null) {
           UserUtility.getLdapUtility().setUserPassword(user.getId(), password);
         }
+      } else {
+        createdUser = user;
       }
     } catch (LdapUtilityException e) {
       success = false;
@@ -918,8 +921,9 @@ public class ModelService extends ModelObservable {
       throw new EmailAlreadyExistsException("Email already exists", e);
     }
     if (success && notify) {
-      notifyUserCreated(user);
+      notifyUserCreated(createdUser);
     }
+    return createdUser;
   }
 
   public void modifyUser(User user, boolean useModel, boolean notify)

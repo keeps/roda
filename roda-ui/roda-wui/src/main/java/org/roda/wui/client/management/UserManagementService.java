@@ -121,13 +121,14 @@ public interface UserManagementService extends RemoteService {
    *          the user
    * @param password
    *          the user password
+   * @return
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    * @throws EmailAlreadyExistsException
    * @throws UserAlreadyExistsException
    * @throws GenericException
    */
-  public void addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+  public User addUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
     EmailAlreadyExistsException, UserAlreadyExistsException, GenericException, IllegalOperationException;
 
   /**

@@ -86,20 +86,7 @@ public interface UserManagementServiceAsync {
    */
   public void registerUser(User user, String password, String captcha, AsyncCallback<Void> callback);
 
-  /**
-   * Create a new user
-   *
-   * @param user
-   *          the user
-   * @param password
-   *          the user password
-   * @throws AuthorizationDeniedException
-   * @throws NotFoundException
-   * @throws EmailAlreadyExistsException
-   * @throws UserAlreadyExistsException
-   * @throws GenericException
-   */
-  public void addUser(User user, String password, AsyncCallback<Void> callback);
+  void addUser(User user, String password, AsyncCallback<User> callback);
 
   /**
    * Modify a user

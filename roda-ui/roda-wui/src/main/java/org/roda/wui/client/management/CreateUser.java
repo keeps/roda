@@ -100,13 +100,13 @@ public class CreateUser extends Composite {
       user = userDataPanel.getUser();
       final String password = userDataPanel.getPassword();
 
-      UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<Void>() {
+      UserManagementService.Util.getInstance().addUser(user, password, new AsyncCallback<User>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);
         }
 
-        public void onSuccess(Void result) {
+        public void onSuccess(User createdUser) {
           Tools.newHistory(MemberManagement.RESOLVER);
         }
 
