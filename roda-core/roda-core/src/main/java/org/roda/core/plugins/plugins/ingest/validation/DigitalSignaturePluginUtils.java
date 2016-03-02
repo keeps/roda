@@ -69,6 +69,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.openxml4j.opc.PackageAccess;
 import org.apache.poi.openxml4j.opc.PackagePart;
+import org.apache.poi.openxml4j.opc.PackageRelationship;
 import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
@@ -104,6 +105,9 @@ public class DigitalSignaturePluginUtils {
   private static final String PDF_STRING = "String";
   private static final String PDF_OBJECT = "Object";
   private static final String PDF_BOOLEAN = "Boolean";
+
+  private static final String SIGN_CONTENT_TYPE_OOXML = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
+  private static final String SIGN_REL_TYPE_OOXML = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
 
   /*************************** VERIFY FUNCTIONS ***************************/
 
@@ -186,23 +190,26 @@ public class DigitalSignaturePluginUtils {
 
       SignatureInfo si = new SignatureInfo();
       si.setSignatureConfig(sic);
-      for (SignaturePart sp : si.getSignatureParts()) {
-        isValid = isValid && sp.validate();
+      Iterable<SignaturePart> it = si.getSignatureParts();
+      if (it != null) {
+        for (SignaturePart sp : it) {
+          isValid = isValid && sp.validate();
 
-        Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
-        Set<Certificate> intermediateCerts = new HashSet<Certificate>();
-        List<X509Certificate> certChain = sp.getCertChain();
+          Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
+          Set<Certificate> intermediateCerts = new HashSet<Certificate>();
+          List<X509Certificate> certChain = sp.getCertChain();
 
-        for (X509Certificate c : certChain) {
-          c.checkValidity();
+          for (X509Certificate c : certChain) {
+            c.checkValidity();
 
-          if (DigitalSignaturePluginUtils.isCertificateSelfSigned(c))
-            trustedRootCerts.add(c);
-          else
-            intermediateCerts.add(c);
+            if (DigitalSignaturePluginUtils.isCertificateSelfSigned(c))
+              trustedRootCerts.add(c);
+            else
+              intermediateCerts.add(c);
+          }
+
+          verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
         }
-
-        verifyCertificateChain(trustedRootCerts, intermediateCerts, certChain.get(0));
       }
 
       pkg.close();
@@ -408,17 +415,21 @@ public class DigitalSignaturePluginUtils {
 
     FSUtils.copy(input, output, true);
     OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE);
-    String signatureContentType = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
-    String signatureRelType = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
 
-    ArrayList<PackagePart> pps = pkg.getPartsByContentType(signatureContentType);
+    ArrayList<PackagePart> pps = pkg.getPartsByContentType(SIGN_CONTENT_TYPE_OOXML);
     for (PackagePart pp : pps) {
       pkg.removePart(pp);
     }
 
-    ArrayList<PackagePart> ppct = pkg.getPartsByRelationshipType(signatureRelType);
+    ArrayList<PackagePart> ppct = pkg.getPartsByRelationshipType(SIGN_REL_TYPE_OOXML);
     for (PackagePart pp : ppct) {
       pkg.removePart(pp);
+    }
+
+    for (PackageRelationship r : pkg.getRelationships()) {
+      if (r.getRelationshipType().equals(SIGN_REL_TYPE_OOXML)) {
+        pkg.removeRelationship(r.getId());
+      }
     }
 
     pkg.close();
