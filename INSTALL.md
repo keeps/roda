@@ -2,6 +2,16 @@
 
 ## Dependencies
 
+### Java 8
+
+* Ubuntu
+```bash
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java8-installer
+sudo apt-get install oracle-java8-set-default
+```
+
 ### Application Server (required)
 Recommended application server is Apache Tomcat 8, but other Java EE application servers might work.
 
