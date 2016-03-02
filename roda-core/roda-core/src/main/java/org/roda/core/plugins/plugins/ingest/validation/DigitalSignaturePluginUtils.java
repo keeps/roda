@@ -11,6 +11,7 @@ import java.io.BufferedOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.file.Files;
@@ -436,7 +437,9 @@ public class DigitalSignaturePluginUtils {
   }
 
   private static void runDigitalSignatureStripODF(Path input, Path output) throws IOException, DocumentException {
-    ZipOutputStream zout = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(output.toFile())));
+    OutputStream os = new FileOutputStream(output.toFile());
+    BufferedOutputStream bos = new BufferedOutputStream(os);
+    ZipOutputStream zout = new ZipOutputStream(bos);
     ZipFile zipFile = new ZipFile(input.toString());
     Enumeration<?> enumeration;
 
@@ -460,6 +463,8 @@ public class DigitalSignaturePluginUtils {
     }
 
     IOUtils.closeQuietly(zout);
+    IOUtils.closeQuietly(bos);
+    IOUtils.closeQuietly(os);
     zipFile.close();
   }
 

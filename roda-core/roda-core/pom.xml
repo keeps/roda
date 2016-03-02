@@ -189,6 +189,10 @@
 			<artifactId>roda-common-utils</artifactId>
 		</dependency>
 		<dependency>
+			<groupId>org.roda-project</groupId>
+			<artifactId>roda-common-certification</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>net.sf.saxon</groupId>
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
