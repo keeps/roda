@@ -895,6 +895,15 @@ td.datePickerMonth, td.datePickerYear {
 	width: 32px;
 }
 
+.static-page .feature-img {
+	font-size: 30px;
+}
+
+.static-page .feature-img > .fa-stack {
+	font-size: 0.5em;
+}
+
+
 .static-page .feature-img img {
 	width: 100% !important;
 }
@@ -915,6 +924,7 @@ td.datePickerMonth, td.datePickerYear {
 	.static-page .feature-img {
 		float: left;
 		width: 64px;
+		font-size: 60px;
 	}
 
 	.static-page .feature-text {
