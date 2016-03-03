@@ -62,6 +62,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   private Facets facets;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
+  
+  private static int PAGE_SIZE_PAGER_INCREMENT = 100;
 
   public AsyncTableCell() {
     this(null, null, null);
@@ -104,7 +106,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
     resultsPager.setDisplay(display);
 
-    pageSizePager = new PageSizePager(getInitialPageSize());
+    pageSizePager = new PageSizePager(getPageSizePagerIncrement());
     pageSizePager.setDisplay(display);
 
     add(resultsPager);
@@ -143,6 +145,10 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected abstract void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
 
+  protected int getPageSizePagerIncrement() {
+    return PAGE_SIZE_PAGER_INCREMENT;
+  }
+  
   protected CellPreviewEvent.Handler<T> getSelectionEventManager() {
     // none by default
     return null;
