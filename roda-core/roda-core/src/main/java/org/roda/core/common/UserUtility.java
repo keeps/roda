@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -27,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.AIPPermissions.PermissionType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
@@ -194,83 +196,23 @@ public class UserUtility {
     return session.getId();
   }
 
-  public static void checkObjectReadPermissions(RodaUser user, IndexedAIP aip) throws AuthorizationDeniedException {
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has permissions to read object " + aip.getId()
-      + " (object read permissions: " + aip.getPermissions().getReadUsers() + " & "
-      + aip.getPermissions().getReadGroups() + ")");
+  public static void checkObjectPermissions(RodaUser user, IndexedAIP aip, PermissionType permissionType)
+    throws AuthorizationDeniedException {
+
+    Set<String> users = aip.getPermissions().getUsers().get(permissionType);
+    Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
+
+    LOGGER.debug("Checking if user \"" + user.getId() + "\" has permissions to " + permissionType + " object "
+      + aip.getId() + " (object read permissions: " + users + " & " + groups + ")");
 
     // FIXME
     if ("admin".equalsIgnoreCase(user.getId())) {
       return;
     }
 
-    if (!aip.getPermissions().getReadUsers().contains(user.getId())
-      && iterativeDisjoint(aip.getPermissions().getReadGroups(), user.getAllGroups())) {
-      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to access!");
-    }
-  }
-
-  public static void checkObjectGrantPermissions(RodaUser user, IndexedAIP aip) throws AuthorizationDeniedException {
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has grant permissions to object " + aip.getId()
-      + " (object grant permissions: " + aip.getPermissions().getGrantUsers() + " & "
-      + aip.getPermissions().getGrantGroups() + ")");
-
-    // FIXME
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    }
-
-    if (!aip.getPermissions().getGrantUsers().contains(user.getId())
-      && iterativeDisjoint(aip.getPermissions().getGrantGroups(), user.getAllGroups())) {
-      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to grant!");
-    }
-  }
-
-  public static void checkObjectInsertPermissions(RodaUser user, IndexedAIP aip) throws AuthorizationDeniedException {
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has insert permissions to object " + aip.getId()
-      + " (object insert permissions: " + aip.getPermissions().getInsertUsers() + " & "
-      + aip.getPermissions().getInsertGroups() + ")");
-
-    // FIXME
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    }
-
-    if (!aip.getPermissions().getInsertUsers().contains(user.getId())
-      && iterativeDisjoint(aip.getPermissions().getInsertGroups(), user.getAllGroups())) {
-      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to insert!");
-    }
-  }
-
-  public static void checkObjectModifyPermissions(RodaUser user, IndexedAIP aip) throws AuthorizationDeniedException {
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has modify permissions to object " + aip.getId()
-      + " (object modify permissions: " + aip.getPermissions().getModifyUsers() + " & "
-      + aip.getPermissions().getModifyGroups() + ")");
-
-    // FIXME
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    }
-
-    if (!aip.getPermissions().getModifyUsers().contains(user.getId())
-      && iterativeDisjoint(aip.getPermissions().getModifyGroups(), user.getAllGroups())) {
-      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to modify!");
-    }
-  }
-
-  public static void checkObjectRemovePermissions(RodaUser user, IndexedAIP aip) throws AuthorizationDeniedException {
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has remove permissions to object " + aip.getId()
-      + " (object modify permissions: " + aip.getPermissions().getRemoveUsers() + " & "
-      + aip.getPermissions().getRemoveGroups() + ")");
-
-    // FIXME
-    if ("admin".equalsIgnoreCase(user.getId())) {
-      return;
-    }
-
-    if (!aip.getPermissions().getRemoveUsers().contains(user.getId())
-      && iterativeDisjoint(aip.getPermissions().getRemoveGroups(), user.getAllGroups())) {
-      throw new AuthorizationDeniedException("The user '" + user.getId() + "' does not have permissions to remove!");
+    if (!users.contains(user.getId()) && iterativeDisjoint(groups, user.getAllGroups())) {
+      throw new AuthorizationDeniedException(
+        "The user '" + user.getId() + "' does not have permissions to " + permissionType);
     }
   }
 
@@ -301,6 +243,11 @@ public class UserUtility {
         }
       }
     }
+  }
+
+  public static void checkRoles(Function<?, ?> function) {
+    // TODO Auto-generated method stub
+
   }
 
 }

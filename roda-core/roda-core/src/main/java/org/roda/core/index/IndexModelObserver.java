@@ -16,7 +16,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -74,7 +73,8 @@ public class IndexModelObserver implements ModelObserver {
     indexRepresentations(aip);
     // indexPreservationFileObjects(aip);
     indexPreservationsEvents(aip);
-    indexOtherMetadata(aip);
+    // indexOtherMetadata(aip);
+
   }
 
   private void indexPreservationsEvents(final AIP aip) {
@@ -127,11 +127,6 @@ public class IndexModelObserver implements ModelObserver {
             | AuthorizationDeniedException e) {
             LOGGER.error("Could not index premis event", e);
           }
-          try {
-            index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
-          } catch (SolrServerException | IOException e) {
-            LOGGER.error("Could not commit indexed preservation events", e);
-          }
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
@@ -139,9 +134,11 @@ public class IndexModelObserver implements ModelObserver {
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }
+    
+    commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
   }
 
-  private void indexOtherMetadata(final AIP aip) {
+  private void indexOtherMetadata(final AIP aip, boolean commit) {
     // TODO index other metadata
   }
 
@@ -154,9 +151,9 @@ public class IndexModelObserver implements ModelObserver {
         final boolean recursive = true;
         CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
         for (File file : allFiles) {
-          boolean commit = false;
+          boolean icommit = false;
           boolean recursiveIndexFile = false;
-          indexFile(file, commit, recursiveIndexFile);
+          indexFile(file, icommit, recursiveIndexFile);
         }
         allFiles.close();
 
@@ -165,16 +162,8 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Could not index representation", e);
       }
     }
-    try {
-      index.commit(RodaConstants.INDEX_REPRESENTATION);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commit indexed representations", e);
-    }
-    try {
-      index.commit(RodaConstants.INDEX_FILE);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not commit indexed files", e);
-    }
+
+    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
   }
 
   private void indexFile(File file, boolean commit, boolean recursive) {
@@ -233,20 +222,23 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexAIP(final AIP aip) {
-    indexAIP(aip, false);
+    boolean safemode = false;
+    indexAIP(aip, safemode);
   }
 
   private void indexAIP(final AIP aip, boolean safemode) {
     try {
       SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
-      index.commit(RodaConstants.INDEX_AIP);
+      commit(RodaConstants.INDEX_AIP);
+
       LOGGER.trace("Adding AIP: " + aipDoc);
     } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
       | NotFoundException | AuthorizationDeniedException e) {
       if (!safemode) {
         LOGGER.error("Error indexing AIP, trying safe mode", e);
-        indexAIP(aip, true);
+        safemode = true;
+        indexAIP(aip, safemode);
       } else {
         LOGGER.error("Could not index created AIP", e);
       }
@@ -480,7 +472,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
     try {
-      indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()));
+      indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()), true);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
     }
@@ -533,6 +525,22 @@ public class IndexModelObserver implements ModelObserver {
     boolean forceCommit = false;
     deleteDocumentFromIndex(RodaConstants.INDEX_JOB_REPORT, jobReportId,
       "Error deleting Job Report(id=" + jobReportId + ")", forceCommit);
+  }
+
+  private void commit(String... collections) {
+
+    boolean waitFlush = false;
+    boolean waitSearcher = true;
+    boolean softCommit = true;
+
+    for (String collection : collections) {
+      try {
+        index.commit(collection, waitFlush, waitSearcher, softCommit);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Error commiting into collection: " + collection, e);
+      }
+    }
+
   }
 
 }

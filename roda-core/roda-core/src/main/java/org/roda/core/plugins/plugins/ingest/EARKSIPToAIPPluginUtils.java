@@ -39,8 +39,6 @@ public class EARKSIPToAIPPluginUtils {
     throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
 
-    // TODO check if parent exists
-
     boolean active = false;
     AIPPermissions permissions = new AIPPermissions();
     boolean notify = true;
