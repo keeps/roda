@@ -18,7 +18,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -41,7 +41,7 @@ public interface BrowserServiceAsync {
 
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveInHierarchy(String aipId, String parentId, AsyncCallback<IndexedAIP> callback);
+  void moveInHierarchy(String aipId, String parentId, AsyncCallback<AIP> callback);
 
   void createAIP(String parentId, AsyncCallback<String> callback);
 

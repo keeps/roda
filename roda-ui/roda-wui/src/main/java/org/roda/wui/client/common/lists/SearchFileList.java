@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -175,10 +177,10 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
       callback.onSuccess(null);
     } else {
 
-      Map<Column<IndexedFile, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, String>();
-      columnSortingKeyMap.put(filenameColumn, RodaConstants.FILE_ORIGINALNAME);
-      columnSortingKeyMap.put(lengthColumn, RodaConstants.FILE_SIZE);
-      columnSortingKeyMap.put(formatColumn, RodaConstants.FILE_FORMAT_MIMETYPE);
+      Map<Column<IndexedFile, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedFile, ?>, List<String>>();
+      columnSortingKeyMap.put(filenameColumn, Arrays.asList(RodaConstants.FILE_ORIGINALNAME));
+      columnSortingKeyMap.put(lengthColumn, Arrays.asList(RodaConstants.FILE_SIZE));
+      columnSortingKeyMap.put(formatColumn, Arrays.asList(RodaConstants.FILE_FORMAT_MIMETYPE));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

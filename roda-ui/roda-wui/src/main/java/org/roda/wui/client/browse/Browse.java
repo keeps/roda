@@ -12,7 +12,6 @@ package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -221,7 +220,6 @@ public class Browse extends Composite {
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
     /* TODO set this pages enabled after developed */
-    moveItem.setEnabled(false);
     editPermissions.setEnabled(false);
 
     fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
@@ -713,22 +711,7 @@ public class Browse extends Composite {
   }
 
   private String getDatesText(IndexedAIP aip) {
-    String ret;
-
-    Date dateInitial = aip.getDateInitial();
-    Date dateFinal = aip.getDateFinal();
-
-    if (dateInitial == null && dateFinal == null) {
-      ret = messages.titleDatesEmpty();
-    } else if (dateInitial != null && dateFinal == null) {
-      ret = messages.titleDatesNoFinal(dateInitial);
-    } else if (dateInitial == null && dateFinal != null) {
-      ret = messages.titleDatesNoInitial(dateFinal);
-    } else {
-      ret = messages.titleDates(dateInitial, dateFinal);
-    }
-
-    return ret;
+    return Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true);
   }
 
   private boolean updateHistory(String id) {
@@ -814,10 +797,33 @@ public class Browse extends Composite {
   void buttonNewDescriptiveMetadataHandler(ClickEvent e) {
     newDescriptiveMetadataRedirect();
   }
-  
+
   private void newDescriptiveMetadataRedirect() {
     if (aipId != null) {
       Tools.newHistory(RESOLVER, CreateDescriptiveMetadata.RESOLVER.getHistoryToken(), aipId);
+    }
+  }
+
+  @UiHandler("moveItem")
+  void buttonMoveItemHandler(ClickEvent e) {
+    if (aipId != null) {
+      final MoveItemDialog moveItemDialog = new MoveItemDialog(aipId);
+      moveItemDialog.show(new AsyncCallback<Boolean>() {
+        
+        @Override
+        public void onSuccess(Boolean result) {
+          if (result) {
+            clear();
+            viewAction(aipId);
+          }
+          moveItemDialog.hide();
+        }
+        
+        @Override
+        public void onFailure(Throwable caught) {
+          
+        }
+      });
     }
   }
 }

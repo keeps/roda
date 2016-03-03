@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.lists;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -244,11 +245,11 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
     Filter filter = getFilter();
 
-    Map<Column<TransferredResource, ?>, String> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, String>();
-    columnSortingKeyMap.put(isFileColumn, RodaConstants.TRANSFERRED_RESOURCE_ISFILE);
-    columnSortingKeyMap.put(nameColumn, RodaConstants.TRANSFERRED_RESOURCE_NAME);
-    columnSortingKeyMap.put(sizeColumn, RodaConstants.TRANSFERRED_RESOURCE_SIZE);
-    columnSortingKeyMap.put(creationDateColumn, RodaConstants.TRANSFERRED_RESOURCE_DATE);
+    Map<Column<TransferredResource, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<TransferredResource, ?>, List<String>>();
+    columnSortingKeyMap.put(isFileColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_NAME));
+    columnSortingKeyMap.put(sizeColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
+    columnSortingKeyMap.put(creationDateColumn, Arrays.asList(RodaConstants.TRANSFERRED_RESOURCE_DATE));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -201,7 +202,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
+  public AIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
     GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);

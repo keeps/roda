@@ -176,6 +176,18 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
   String titleDates(Date dateInitial, Date dateFinal);
+  
+  @DefaultMessage("")
+  String simpleDatesEmpty();
+  
+  @DefaultMessage("{0,date,yyyy-MM-dd}")
+  String simpleDatesNoFinal(Date dateInitial);
+
+  @DefaultMessage("To {0,date,yyyy-MM-dd}")
+  String simpleDatesNoInitial(Date dateFinal);
+
+  @DefaultMessage("{0,date,yyyy-MM-dd} to {1,date,yyyy-MM-dd}")
+  String simpleDates(Date dateInitial, Date dateFinal);
 
   /****** INGEST TRANSFER **********/
 

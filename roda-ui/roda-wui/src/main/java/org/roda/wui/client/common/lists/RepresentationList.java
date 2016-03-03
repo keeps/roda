@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -36,6 +38,7 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
 
   private static final int PAGE_SIZE = 20;
 
+  @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private TextColumn<IndexedRepresentation> idColumn;
@@ -123,11 +126,11 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
       callback.onSuccess(null);
     } else {
 
-      Map<Column<IndexedRepresentation, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, String>();
-      columnSortingKeyMap.put(idColumn, RodaConstants.SRO_ID);
-      columnSortingKeyMap.put(originalColumn, RodaConstants.SRO_ORIGINAL);
-      columnSortingKeyMap.put(sizeInBytesColumn, RodaConstants.SRO_SIZE_IN_BYTES);
-      columnSortingKeyMap.put(totalNumberOfFilesColumn, RodaConstants.SRO_TOTAL_NUMBER_OF_FILES);
+      Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
+      columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.SRO_ID));
+      columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.SRO_ORIGINAL));
+      columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.SRO_SIZE_IN_BYTES));
+      columnSortingKeyMap.put(totalNumberOfFilesColumn, Arrays.asList(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

@@ -7,8 +7,10 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -24,13 +26,13 @@ import org.roda.wui.client.browse.BrowserService;
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
-import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
+import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
@@ -140,11 +142,11 @@ public class JobList extends AsyncTableCell<Job> {
 
     Filter filter = getFilter();
 
-    Map<Column<Job, ?>, String> columnSortingKeyMap = new HashMap<Column<Job, ?>, String>();
-    columnSortingKeyMap.put(nameColumn, RodaConstants.JOB_NAME);
-    columnSortingKeyMap.put(startDateColumn, RodaConstants.JOB_START_DATE);
-    columnSortingKeyMap.put(statusColumn, RodaConstants.JOB_COMPLETION_PERCENTAGE);
-    columnSortingKeyMap.put(usernameColumn, RodaConstants.JOB_USERNAME);
+    Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Job, ?>, List<String>>();
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
+    columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
+    columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
+    columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

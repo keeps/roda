@@ -7,8 +7,10 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -25,8 +27,8 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -197,11 +199,11 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     Filter filter = getFilter();
 
-    Map<Column<Report, ?>, String> columnSortingKeyMap = new HashMap<Column<Report, ?>, String>();
-    columnSortingKeyMap.put(objectIdColumn, RodaConstants.JOB_REPORT_OTHER_ID);
-    columnSortingKeyMap.put(updatedDateColumn, RodaConstants.JOB_REPORT_DATE_UPDATE);
-    columnSortingKeyMap.put(lastPluginRunColumn, RodaConstants.JOB_REPORT_PLUGIN);
-    columnSortingKeyMap.put(lastPluginRunStateColumn, RodaConstants.JOB_REPORT_PLUGIN_STATE);
+    Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
+    columnSortingKeyMap.put(objectIdColumn, Arrays.asList(RodaConstants.JOB_REPORT_OTHER_ID));
+    columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
+    columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
+    columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

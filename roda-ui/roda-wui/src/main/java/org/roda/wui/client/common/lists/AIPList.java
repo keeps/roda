@@ -7,8 +7,9 @@
  */
 package org.roda.wui.client.common.lists;
 
-import java.util.Date;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -21,11 +22,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
+import org.roda.wui.common.client.tools.Humanize;
 
-import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -45,10 +45,8 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<IndexedAIP, SafeHtml> levelColumn;
-  // private TextColumn<SimpleDescriptionObject> idColumn;
   private TextColumn<IndexedAIP> titleColumn;
-  private Column<IndexedAIP, Date> dateInitialColumn;
-  private Column<IndexedAIP, Date> dateFinalColumn;
+  private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
     this(null, null, null);
@@ -74,14 +72,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
       }
     };
 
-    // idColumn = new TextColumn<IndexAIP>() {
-    //
-    // @Override
-    // public String getValue(IndexAIP aip) {
-    // return aip != null ? aip.getId() : null;
-    // }
-    // };
-
     titleColumn = new TextColumn<IndexedAIP>() {
 
       @Override
@@ -90,43 +80,31 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
       }
     };
 
-    dateInitialColumn = new Column<IndexedAIP, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
-      @Override
-      public Date getValue(IndexedAIP aip) {
-        return aip != null ? aip.getDateInitial() : null;
-      }
-    };
+    datesColumn = new TextColumn<IndexedAIP>() {
 
-    dateFinalColumn = new Column<IndexedAIP, Date>(new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd"))) {
       @Override
-      public Date getValue(IndexedAIP aip) {
-        return aip != null ? aip.getDateFinal() : null;
+      public String getValue(IndexedAIP aip) {
+        return Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), false);
       }
     };
 
     levelColumn.setSortable(true);
-    // idColumn.setSortable(true);
     titleColumn.setSortable(true);
-    dateFinalColumn.setSortable(true);
-    dateInitialColumn.setSortable(true);
+    datesColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
-    // display.addColumn(idColumn, "Id");
     display.addColumn(titleColumn, "Title");
-    display.addColumn(dateInitialColumn, "Date initial");
-    display.addColumn(dateFinalColumn, "Date final");
+    display.addColumn(datesColumn, "Dates");
     display.setColumnWidth(levelColumn, "35px");
-    // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(titleColumn, "100%");
 
     // define default sorting
-    display.getColumnSortList().push(new ColumnSortInfo(dateInitialColumn, false));
+    display.getColumnSortList().push(new ColumnSortInfo(datesColumn, false));
 
-    dateInitialColumn.setCellStyleNames("nowrap");
-    dateFinalColumn.setCellStyleNames("nowrap");
+    datesColumn.setCellStyleNames("nowrap");
 
     addStyleName("my-collections-table");
     emptyInfo.addStyleName("my-collections-empty-info");
@@ -142,11 +120,10 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
       callback.onSuccess(null);
     } else {
 
-      Map<Column<IndexedAIP, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, String>();
-      columnSortingKeyMap.put(levelColumn, RodaConstants.AIP_LEVEL);
-      columnSortingKeyMap.put(titleColumn, RodaConstants.AIP_TITLE_SORT);
-      columnSortingKeyMap.put(dateInitialColumn, RodaConstants.AIP_DATE_INITIAL);
-      columnSortingKeyMap.put(dateFinalColumn, RodaConstants.AIP_DATE_FINAL);
+      Map<Column<IndexedAIP, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedAIP, ?>, List<String>>();
+      columnSortingKeyMap.put(levelColumn, Arrays.asList(RodaConstants.AIP_LEVEL));
+      columnSortingKeyMap.put(titleColumn, Arrays.asList(RodaConstants.AIP_TITLE_SORT));
+      columnSortingKeyMap.put(datesColumn, Arrays.asList(RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

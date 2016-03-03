@@ -20,7 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -71,7 +71,7 @@ public interface BrowserService extends RemoteService {
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
-  IndexedAIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
+  AIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
 
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,

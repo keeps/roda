@@ -7,8 +7,10 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -153,15 +155,15 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     Filter filter = getFilter();
 
-    Map<Column<IndexedPreservationEvent, ?>, String> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, String>();
-    columnSortingKeyMap.put(eventDateTimeColumn, RodaConstants.PRESERVATION_EVENT_DATETIME);
+    Map<Column<IndexedPreservationEvent, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedPreservationEvent, ?>, List<String>>();
+    columnSortingKeyMap.put(eventDateTimeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DATETIME));
     // TODO an event can now have multiple agents... sort by agent id should
     // maybe be removed...
     // columnSortingKeyMap.put(eventAgentColumn,
     // RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER);
-    columnSortingKeyMap.put(eventTypeColumn, RodaConstants.PRESERVATION_EVENT_TYPE);
-    columnSortingKeyMap.put(eventDetailColumn, RodaConstants.PRESERVATION_EVENT_DETAIL);
-    columnSortingKeyMap.put(eventOutcomeColumn, RodaConstants.PRESERVATION_EVENT_OUTCOME);
+    columnSortingKeyMap.put(eventTypeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_TYPE));
+    columnSortingKeyMap.put(eventDetailColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_DETAIL));
+    columnSortingKeyMap.put(eventOutcomeColumn, Arrays.asList(RodaConstants.PRESERVATION_EVENT_OUTCOME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

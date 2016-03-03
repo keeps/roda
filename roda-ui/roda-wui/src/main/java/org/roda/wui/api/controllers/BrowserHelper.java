@@ -694,29 +694,14 @@ public class BrowserHelper {
       representationId, preservationId, notify);
   }
 
-  public static IndexedAIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,
+  public static AIP moveInHierarchy(String aipId, String parentId) throws GenericException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
-    StorageService storage = RodaCoreFactory.getStorageService();
     ModelService model = RodaCoreFactory.getModelService();
-    StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
-    // TODO update setting AIP parent
-    // Map<String, Set<String>> metadata = storage.getMetadata(aipPath);
 
-    if (StringUtils.isBlank(parentId)) {
-      StoragePath parentPath = ModelUtils.getAIPStoragePath(parentId);
-      storage.getDirectory(parentPath);
+    AIP aip = model.retrieveAIP(aipId);
+    aip.setParentId(parentId);
 
-      // metadata.remove(RodaConstants.STORAGE_META_PARENT_ID);
-    } else {
-      // metadata.put(RodaConstants.STORAGE_META_PARENT_ID, new
-      // HashSet<String>(Arrays.asList(parentId)));
-    }
-
-    // storage.updateMetadata(aipPath, metadata, true);
-    model.updateAIP(aipId, storage, aipPath);
-
-    return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, aipId);
-
+    return model.updateAIP(aip);
   }
 
   public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException,

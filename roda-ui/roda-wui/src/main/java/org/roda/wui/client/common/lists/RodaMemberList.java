@@ -7,7 +7,9 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -72,7 +74,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
         return member != null ? member.getId() : null;
       }
     };
-    
+
     nameColumn = new TextColumn<RODAMember>() {
 
       @Override
@@ -80,7 +82,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
         return member != null ? member.getName() : null;
       }
     };
-    
+
     groupsColumn = new TextColumn<RODAMember>() {
 
       @Override
@@ -88,7 +90,7 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
         return member != null ? StringUtility.prettyPrint(member.getAllGroups()) : null;
       }
     };
-    
+
     activeColumn = new Column<RODAMember, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(RODAMember member) {
@@ -128,11 +130,11 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
     Filter filter = getFilter();
 
-    Map<Column<RODAMember, ?>, String> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, String>();
-    columnSortingKeyMap.put(activeColumn, RodaConstants.MEMBERS_IS_ACTIVE);
-    columnSortingKeyMap.put(typeColumn, RodaConstants.MEMBERS_IS_USER);
-    columnSortingKeyMap.put(idColumn, RodaConstants.MEMBERS_ID);
-    columnSortingKeyMap.put(nameColumn, RodaConstants.MEMBERS_NAME);
+    Map<Column<RODAMember, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RODAMember, ?>, List<String>>();
+    columnSortingKeyMap.put(activeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_ACTIVE));
+    columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.MEMBERS_IS_USER));
+    columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.MEMBERS_ID));
+    columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.MEMBERS_NAME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

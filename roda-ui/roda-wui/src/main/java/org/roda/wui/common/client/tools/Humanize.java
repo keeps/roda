@@ -7,9 +7,16 @@
  */
 package org.roda.wui.common.client.tools;
 
+import java.util.Date;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.NumberFormat;
 
+import config.i18n.client.BrowseMessages;
+
 public class Humanize {
+
+  private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   public static final String BYTES = "B";
   public static final String KILOBYTES = "KB";
@@ -51,7 +58,7 @@ public class Humanize {
       } else {
         throw new IllegalArgumentException(size);
       }
-    } 
+    }
     return ret;
   }
 
@@ -61,5 +68,21 @@ public class Humanize {
     }
     int digitGroups = (int) (Math.log10(size) / Math.log10(1024));
     return NumberFormat.getFormat("#,##0.#").format(size / Math.pow(1024, digitGroups)) + " " + UNITS[digitGroups];
+  }
+
+  public static String getDatesText(Date dateInitial, Date dateFinal, boolean extendedDate) {
+    String ret;
+
+    if (dateInitial == null && dateFinal == null) {
+      ret = extendedDate ? messages.titleDatesEmpty() : messages.simpleDatesEmpty();
+    } else if (dateInitial != null && dateFinal == null) {
+      ret = extendedDate ? messages.titleDatesNoFinal(dateInitial) : messages.simpleDatesNoFinal(dateInitial);
+    } else if (dateInitial == null && dateFinal != null) {
+      ret = extendedDate ? messages.titleDatesNoInitial(dateFinal) : messages.simpleDatesNoInitial(dateFinal);
+    } else {
+      ret = extendedDate ? messages.titleDates(dateInitial, dateFinal) : messages.simpleDates(dateInitial, dateFinal);
+    }
+
+    return ret;
   }
 }

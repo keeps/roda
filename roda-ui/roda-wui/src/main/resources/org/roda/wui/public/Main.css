@@ -4423,7 +4423,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-				RECAPTCHA
+				SUGGEST BOX
 ************************************************/
 .gwt-SuggestBoxPopup {
 	border: 1px solid #ccc;
@@ -4440,4 +4440,24 @@ td.datePickerMonth, td.datePickerYear {
 .gwt-SuggestBoxPopup .item-selected {
 	color: white;
 	background-color: #089de3;
+}
+
+/**********************************************
+				MOVE ITEM
+************************************************/
+.moveItem .searchPanel {
+	margin-right: 40px;
+}
+
+.moveItem .moveItemResultsPanel {
+	width: 800px;
+	height: 400px;
+	overflow-x: scroll;
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+
+.moveItem .moveItemResultsPanel .my-asyncdatagrid-pager-results,
+.moveItem .moveItemResultsPanel thead {
+	display: none;
 }

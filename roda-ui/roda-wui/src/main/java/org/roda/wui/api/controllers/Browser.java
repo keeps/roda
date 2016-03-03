@@ -494,9 +494,8 @@ public class Browser extends RodaCoreService {
    * ---------------------------------------------------------------------------
    */
 
-  public static IndexedAIP moveInHierarchy(RodaUser user, String aipId, String parentId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException {
+  public static AIP moveInHierarchy(RodaUser user, String aipId, String parentId) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -508,15 +507,14 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, parentAip, PermissionType.CREATE);
 
     // delegate
-    aip = BrowserHelper.moveInHierarchy(aipId, parentId);
+    AIP returnAIP = BrowserHelper.moveInHierarchy(aipId, parentId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", aip.getId(), duration,
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "toParent", parentId);
 
-    return aip;
-
+    return returnAIP;
   }
 
   public static AIP createAIP(RodaUser user, String parentId) throws AuthorizationDeniedException, GenericException,

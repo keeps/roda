@@ -7,8 +7,10 @@
  */
 package org.roda.wui.client.common.lists;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -160,13 +162,13 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
     Filter filter = getFilter();
 
-    Map<Column<LogEntry, ?>, String> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, String>();
-    columnSortingKeyMap.put(dateColumn, RodaConstants.LOG_DATETIME);
-    columnSortingKeyMap.put(actionComponentColumn, RodaConstants.LOG_ACTION_COMPONENT);
-    columnSortingKeyMap.put(actionMethodColumn, RodaConstants.LOG_ACTION_METHOD);
-    columnSortingKeyMap.put(usernameColumn, RodaConstants.LOG_USERNAME);
-    columnSortingKeyMap.put(durationColumn, RodaConstants.LOG_DURATION);
-    columnSortingKeyMap.put(addressColumn, RodaConstants.LOG_ADDRESS);
+    Map<Column<LogEntry, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<LogEntry, ?>, List<String>>();
+    columnSortingKeyMap.put(dateColumn, Arrays.asList(RodaConstants.LOG_DATETIME));
+    columnSortingKeyMap.put(actionComponentColumn, Arrays.asList(RodaConstants.LOG_ACTION_COMPONENT));
+    columnSortingKeyMap.put(actionMethodColumn, Arrays.asList(RodaConstants.LOG_ACTION_METHOD));
+    columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.LOG_USERNAME));
+    columnSortingKeyMap.put(durationColumn, Arrays.asList(RodaConstants.LOG_DURATION));
+    columnSortingKeyMap.put(addressColumn, Arrays.asList(RodaConstants.LOG_ADDRESS));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

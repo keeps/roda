@@ -243,14 +243,17 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     return display.getVisibleItems();
   }
 
-  protected Sorter createSorter(ColumnSortList columnSortList, Map<Column<T, ?>, String> columnSortingKeyMap) {
+  protected Sorter createSorter(ColumnSortList columnSortList, Map<Column<T, ?>, List<String>> columnSortingKeyMap) {
     Sorter sorter = new Sorter();
     for (int i = 0; i < columnSortList.size(); i++) {
       ColumnSortInfo columnSortInfo = columnSortList.get(i);
 
-      String sortParameterKey = columnSortingKeyMap.get(columnSortInfo.getColumn());
-      if (sortParameterKey != null) {
-        sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+      List<String> sortParameterKeys = columnSortingKeyMap.get(columnSortInfo.getColumn());
+
+      if (sortParameterKeys != null) {
+        for (String sortParameterKey : sortParameterKeys) {
+          sorter.add(new SortParameter(sortParameterKey, !columnSortInfo.isAscending()));
+        }
       } else {
         logger.warn("Selecting a sorter that is not mapped");
       }
