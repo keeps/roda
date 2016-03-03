@@ -823,7 +823,11 @@ public class Browse extends Composite {
         
         @Override
         public void onFailure(Throwable caught) {
-          
+          if (caught instanceof NotFoundException) {
+            Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+          } else {
+            Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+          }
         }
       });
     }

@@ -558,4 +558,7 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("Search records...")
   String moveItemSearchPlaceHolder();
+  
+  @DefaultMessage("Error moving item!")
+  String moveItemFailed();
 }
