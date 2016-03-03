@@ -7,11 +7,14 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -43,7 +46,6 @@ import org.slf4j.LoggerFactory;
 public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPlugin.class);
-  private static final String OTHER_METADATA_TYPE = "DigitalSignatureDIP";
 
   @Override
   public void init() throws PluginException {
@@ -57,7 +59,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
   @Override
   public String getName() {
-    return "Validation of digital signature";
+    return "Digital sign files on a DIP.";
   }
 
   @Override
@@ -88,9 +90,11 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         boolean recursive = true;
         CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
           recursive);
-        Path representationZipFile = Files.createTempFile("rep", ".zip");
 
-        LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
+        Path representationZipFile = Files.createTempFile("rep", ".zip");
+        OutputStream os = new FileOutputStream(representationZipFile.toString());
+        ZipOutputStream zout = new ZipOutputStream(os);
+
         newRepresentations.add(newRepresentationID);
         model.createRepresentation(aipId, newRepresentationID, false, notify);
         List<String> filePath = null;
@@ -104,8 +108,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
             DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
             LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
-            DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(representationZipFile, directAccess.getPath(),
-              (int) ifile.getSize());
+            DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
 
             IOUtils.closeQuietly(directAccess);
 
@@ -114,13 +117,18 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           }
         }
 
+        zout.finish();
+        IOUtils.closeQuietly(zout);
+        IOUtils.closeQuietly(os);
+        IOUtils.closeQuietly(allFiles);
+
         // add zip file on a new representation
+        LOGGER.debug("Running digital signer on representation zip file");
         Path resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(representationZipFile);
         ContentPayload payload = new FSPathContentPayload(resultZipFile);
-        String newFileId = representation.getId().replaceFirst("[.][^.]+$", ".zip");
+        String newFileId = representation.getId() + ".zip";
         model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
 
-        IOUtils.closeQuietly(allFiles);
         AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
           newRepresentationID, false);
 
@@ -137,7 +145,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
     try {
       model.notifyAIPUpdated(aipId);
     } catch (RODAException e) {
-      LOGGER.error("Error notifying update of AIP on DigitalSignaturePlugin ", e);
+      LOGGER.error("Error notifying update of AIP on DigitalSignatureDIPPlugin ", e);
     }
 
     return report;
