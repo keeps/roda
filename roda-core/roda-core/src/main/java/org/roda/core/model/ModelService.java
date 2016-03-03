@@ -438,13 +438,13 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload payload, String descriptiveMetadataType) throws RequestNotValidException, GenericException,
+    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion) throws RequestNotValidException, GenericException,
       AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType, true);
+    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType, descriptiveMetadataVersion, true);
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload payload, String descriptiveMetadataType, boolean notify) throws RequestNotValidException,
+    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, boolean notify) throws RequestNotValidException,
       GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
     DescriptiveMetadata descriptiveMetadataBinary = null;
 
@@ -453,7 +453,7 @@ public class ModelService extends ModelObservable {
     boolean asReference = false;
 
     storage.createBinary(binaryPath, payload, asReference);
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
+    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,descriptiveMetadataVersion);
 
     AIP aip = getAIPMetadata(aipId);
     aip.getDescriptiveMetadata().add(descriptiveMetadataBinary);
@@ -467,7 +467,7 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String message)
+    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion, String message)
       throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
       ValidationException {
     DescriptiveMetadata ret = null;
@@ -491,7 +491,7 @@ public class ModelService extends ModelObservable {
       ret = odm.get();
       ret.setType(descriptiveMetadataType);
     } else {
-      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType);
+      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,descriptiveMetadataVersion);
       descriptiveMetadata.add(ret);
     }
     updateAIP(aip);

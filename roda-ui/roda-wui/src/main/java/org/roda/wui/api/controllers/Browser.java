@@ -559,8 +559,8 @@ public class Browser extends RodaCoreService {
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
-    String metadataType, ContentPayload metadataPayload) throws AuthorizationDeniedException, GenericException,
-      ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
+    String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
+      GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     Date start = new Date();
 
     // check user permissions
@@ -570,7 +570,7 @@ public class Browser extends RodaCoreService {
 
     // delegate
     DescriptiveMetadata ret = BrowserHelper.createDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataPayload);
+      metadataVersion, metadataPayload);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -581,8 +581,8 @@ public class Browser extends RodaCoreService {
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
-    String metadataType, ContentPayload metadataPayload) throws AuthorizationDeniedException, GenericException,
-      ValidationException, NotFoundException, RequestNotValidException {
+    String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
+      GenericException, ValidationException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -593,7 +593,7 @@ public class Browser extends RodaCoreService {
     // delegate
     String message = "Updated by " + user.getName();
     DescriptiveMetadata ret = BrowserHelper.updateDescriptiveMetadataFile(aipId, metadataId, metadataType,
-      metadataPayload, message);
+      metadataVersion, metadataPayload, message);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -707,8 +707,9 @@ public class Browser extends RodaCoreService {
   }
 
   public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
-    InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException,
-      NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
+    String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
+      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+      AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -718,8 +719,8 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Updated by " + user.getName();
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, message, is, fileDetail,
-      true);
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, metadataVersion, message,
+      is, fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -729,8 +730,9 @@ public class Browser extends RodaCoreService {
   }
 
   public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
-    InputStream is, FormDataContentDisposition fileDetail) throws GenericException, AuthorizationDeniedException,
-      NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
+    String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
+      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+      AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -740,8 +742,8 @@ public class Browser extends RodaCoreService {
 
     // delegate
     String message = "Updated by " + user.getName();
-    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, message, is, fileDetail,
-      true);
+    BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, metadataVersion, message,
+      is, fileDetail, true);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

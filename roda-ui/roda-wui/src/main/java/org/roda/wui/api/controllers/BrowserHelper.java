@@ -228,7 +228,7 @@ public class BrowserHelper {
       Binary binary = RodaCoreFactory.getModelService().retrieveDescriptiveMetadataBinary(aipId, descriptiveMetadataId);
       inputStream = binary.getContent().createInputStream();
       String xml = IOUtils.toString(inputStream);
-      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), xml);
+      ret = new DescriptiveMetadataEditBundle(descriptiveMetadataId, metadata.getType(), metadata.getVersion(), xml);
     } catch (IOException e) {
       throw new GenericException("Error getting descriptive metadata edit bundle: " + e.getMessage());
     } finally {
@@ -404,7 +404,7 @@ public class BrowserHelper {
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
       mediaType = MediaType.TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(descriptiveMetadataBinary,
-        descriptiveMetadata.getType(), ServerTools.parseLocale(language));
+        descriptiveMetadata.getType(), descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
       stream = new StreamingOutput() {
 
         @Override
@@ -454,7 +454,7 @@ public class BrowserHelper {
       DescriptiveMetadata descriptiveMetadata = model.retrieveDescriptiveMetadata(aipId, metadataId);
       mediaType = MediaType.TEXT_HTML;
       String htmlDescriptive = HTMLUtils.descriptiveMetadataToHtml(binary, descriptiveMetadata.getType(),
-        ServerTools.parseLocale(language));
+        descriptiveMetadata.getVersion(), ServerTools.parseLocale(language));
       stream = new StreamingOutput() {
 
         @Override
@@ -720,24 +720,25 @@ public class BrowserHelper {
   }
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, ContentPayload descriptiveMetadataPayload)
+    String descriptiveMetadataType, String descriptiveMetadataVersion, ContentPayload descriptiveMetadataPayload)
       throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
       AlreadyExistsException, NotFoundException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType, false);
 
     return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType);
+      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
   }
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(String aipId, String descriptiveMetadataId,
-    String descriptiveMetadataType, ContentPayload descriptiveMetadataPayload, String message) throws GenericException,
-      AuthorizationDeniedException, ValidationException, RequestNotValidException, NotFoundException {
+    String descriptiveMetadataType, String descriptiveMetadataVersion, ContentPayload descriptiveMetadataPayload,
+    String message) throws GenericException, AuthorizationDeniedException, ValidationException,
+      RequestNotValidException, NotFoundException {
 
     ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType, false);
 
     return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
-      descriptiveMetadataPayload, descriptiveMetadataType, message);
+      descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, message);
 
   }
 
@@ -823,7 +824,7 @@ public class BrowserHelper {
   }
 
   public static void createOrUpdateAipDescriptiveMetadataFile(String aipId, String metadataId, String metadataType,
-    String updateMessage, InputStream is, FormDataContentDisposition fileDetail, boolean create)
+    String metadataVersion, String updateMessage, InputStream is, FormDataContentDisposition fileDetail, boolean create)
       throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException,
       AlreadyExistsException, ValidationException {
     Path file = null;
@@ -834,9 +835,9 @@ public class BrowserHelper {
       ContentPayload payload = new FSPathContentPayload(file);
 
       if (create) {
-        model.createDescriptiveMetadata(aipId, metadataId, payload, metadataType);
+        model.createDescriptiveMetadata(aipId, metadataId, payload, metadataType, metadataVersion);
       } else {
-        model.updateDescriptiveMetadata(aipId, metadataId, payload, metadataType, updateMessage);
+        model.updateDescriptiveMetadata(aipId, metadataId, payload, metadataType, metadataVersion, updateMessage);
       }
     } catch (IOException e) {
       throw new GenericException("Error creating or updating AIP descriptive metadata file", e);
@@ -952,10 +953,19 @@ public class BrowserHelper {
 
     if (types != null) {
       for (String type : types) {
-        String label = messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type,
-          type);
+        String version = null;
+        if (type.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+          version = type.substring(type.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, type.length());
+          type = type.substring(0, type.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+        }
+
+        String key = RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + type;
+        if (version != null) {
+          key += "." + version;
+        }
+        String label = messages.getTranslation(key, type);
         String template = null;
-        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + type + ".xml");
+        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + ((version!=null)?type+RodaConstants.METADATA_VERSION_SEPARATOR+version:type) + ".xml");
 
         //
         Map<String, Object> scopes = new HashMap<String, Object>();
@@ -972,7 +982,7 @@ public class BrowserHelper {
         template = writer.toString();
         IOUtils.closeQuietly(templateStream);
 
-        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, label, template);
+        SupportedMetadataTypeBundle b = new SupportedMetadataTypeBundle(type, version, label, template);
         supportedMetadata.add(b);
       }
     }

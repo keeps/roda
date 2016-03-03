@@ -42,45 +42,48 @@ public final class HTMLUtils {
 
   }
 
-  public static String descriptiveMetadataToHtml(Binary binary, String descriptiveMetadataType, final Locale locale)
-    throws GenericException {
+  public static String descriptiveMetadataToHtml(Binary binary, String descriptiveMetadataType,
+    String descriptiveMetadataVersion, final Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
     Map<String, Object> translations;
     if (descriptiveMetadataType != null) {
       String lowerCaseDescriptiveMetadataType = descriptiveMetadataType.toLowerCase();
+      if (descriptiveMetadataVersion != null) {
+        lowerCaseDescriptiveMetadataType += RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion;
+      }
       translations = messages.getTranslations(
         RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + lowerCaseDescriptiveMetadataType, Object.class, true);
     } else {
       translations = new HashMap<>();
     }
 
-    return binaryToHtml(binary, descriptiveMetadataType, translations);
+    return binaryToHtml(binary, descriptiveMetadataType, descriptiveMetadataVersion, translations);
   }
 
   public static String preservationObjectToHtml(Binary binary, final Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
     Map<String, Object> stylesheetOpt = messages.getTranslations(
       RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + binary.getStoragePath().getName(), Object.class, true);
-    return binaryToHtml(binary, "premis", stylesheetOpt);
+    return binaryToHtml(binary, "premis", null, stylesheetOpt);
   }
 
-  private static String binaryToHtml(Binary binary, String metadataType, Map<String, Object> stylesheetOpt)
-    throws GenericException {
+  private static String binaryToHtml(Binary binary, String metadataType, String metadataVersion,
+    Map<String, Object> stylesheetOpt) throws GenericException {
     try {
       Reader reader = new InputStreamReader(binary.getContent().createInputStream());
-      return fileToHtml(reader, metadataType, stylesheetOpt);
+      return fileToHtml(reader, metadataType, metadataVersion, stylesheetOpt);
     } catch (TransformerException | IOException e) {
       LOGGER.error("Error transforming binary into HTML (type=" + metadataType + ")", e);
       throw new GenericException("Error transforming binary into HTML (type=" + metadataType + ")", e);
     }
   }
 
-  private static String fileToHtml(Reader reader, String metadataType, Map<String, Object> stylesheetOpt)
-    throws GenericException, IOException, TransformerException {
+  private static String fileToHtml(Reader reader, String metadataType, String metadataVersion,
+    Map<String, Object> stylesheetOpt) throws GenericException, IOException, TransformerException {
 
     InputStream transformerStream = getStylesheetInputStream(RodaConstants.CROSSWALKS_DISSEMINATION_HTML_PATH,
-      metadataType);
+      metadataType, metadataVersion);
     // TODO support the use of scripts for non-xml transformers
     Reader xsltReader = new InputStreamReader(transformerStream);
     CharArrayWriter transformerResult = new CharArrayWriter();
@@ -90,12 +93,19 @@ public final class HTMLUtils {
     return transformerResult.toString();
   }
 
-  private static InputStream getStylesheetInputStream(String xsltFolder, String metadataType) {
+  private static InputStream getStylesheetInputStream(String xsltFolder, String metadataType, String metadataVersion) {
     InputStream transformerStream = null;
     if (metadataType != null) {
       String lowerCaseMetadataType = metadataType.toLowerCase();
-      transformerStream = RodaCoreFactory
-        .getConfigurationFileAsStream(xsltFolder + "/" + lowerCaseMetadataType + ".xslt");
+      if (metadataVersion != null) {
+        String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR + metadataVersion;
+        transformerStream = RodaCoreFactory
+          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
+      }
+      if (transformerStream == null) {
+        transformerStream = RodaCoreFactory
+          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+      }
     }
 
     if (transformerStream == null) {

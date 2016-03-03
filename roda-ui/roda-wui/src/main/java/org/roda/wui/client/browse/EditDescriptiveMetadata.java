@@ -12,6 +12,7 @@ package org.roda.wui.client.browse;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.UserLogin;
@@ -178,9 +179,16 @@ public class EditDescriptiveMetadata extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     String typeText = type.getSelectedValue();
+    String version = null;
+
+    if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+      version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, typeText.length());
+      typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+    }
     String xmlText = xml.getText();
 
-    DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, xmlText);
+    DescriptiveMetadataEditBundle updatedBundle = new DescriptiveMetadataEditBundle(bundle.getId(), typeText, version,
+      xmlText);
 
     BrowserService.Util.getInstance().updateDescriptiveMetadataFile(aipId, updatedBundle, new AsyncCallback<Void>() {
 

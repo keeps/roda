@@ -16,16 +16,18 @@ public class DescriptiveMetadataEditBundle implements Serializable {
   private String id;
   private String type;
   private String xml;
+  private String version;
 
   public DescriptiveMetadataEditBundle() {
     super();
   }
 
-  public DescriptiveMetadataEditBundle(String id, String type, String xml) {
+  public DescriptiveMetadataEditBundle(String id, String type, String version,String xml) {
     super();
     this.id = id;
     this.type = type;
     this.xml = xml;
+    this.version = version;
   }
 
   public String getId() {
@@ -52,5 +54,12 @@ public class DescriptiveMetadataEditBundle implements Serializable {
     this.xml = xml;
   }
 
-  
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
+  }
+
 }

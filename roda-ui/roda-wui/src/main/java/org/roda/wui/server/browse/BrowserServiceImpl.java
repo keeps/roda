@@ -231,9 +231,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     String metadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
+    String descriptiveMetadataVersion = bundle.getVersion();
     ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType, payload);
+    Browser.createDescriptiveMetadataFile(user, aipId, metadataId, descriptiveMetadataType, descriptiveMetadataVersion,
+      payload);
   }
 
   @Override
@@ -243,9 +245,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     String metadataId = bundle.getId();
     String metadataType = bundle.getType();
+    String metadataVersion = bundle.getVersion();
     ContentPayload payload = new StringContentPayload(bundle.getXml());
 
-    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, payload);
+    Browser.updateDescriptiveMetadataFile(user, aipId, metadataId, metadataType, metadataVersion, payload);
 
   }
 

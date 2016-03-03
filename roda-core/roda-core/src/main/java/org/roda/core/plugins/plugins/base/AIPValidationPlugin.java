@@ -45,6 +45,10 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     "Descriptive metadata type", PluginParameterType.METADATA_TYPE, null, false, false,
     "Descriptive metadata type to be used as fallback or if metadata type is forced.");
 
+  public static final PluginParameter PARAMETER_METADATA_VERSION = new PluginParameter("parameter.metadata_version",
+    "Descriptive metadata version", PluginParameterType.STRING, null, false, false,
+    "Descriptive metadata version to be used as fallback or if metadata type is forced.");
+
   public static final PluginParameter PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE = new PluginParameter(
     "parameter.force_type",
     "Force metadata type in all",
@@ -87,6 +91,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     ArrayList<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
     pluginParameters.add(PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
     pluginParameters.add(PARAMETER_METADATA_TYPE);
+    pluginParameters.add(PARAMETER_METADATA_VERSION);
     pluginParameters.add(PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
     pluginParameters.add(PARAMETER_VALIDATE_PREMIS);
     return pluginParameters;
@@ -102,6 +107,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     boolean forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this,
       PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
     String metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
+    String metadataVersion = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_VERSION);
 
     Report pluginReport = PluginHelper.createPluginReport(this);
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
@@ -110,7 +116,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
       try {
         LOGGER.debug("VALIDATING AIP " + aip.getId());
         ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
-          validateDescriptiveMetadata, metadataType, validatePremis, model, aip.getId());
+          validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
         reports.add(report);
         if (report.isValid()) {
           reportItem.setPluginState(PluginState.SUCCESS);

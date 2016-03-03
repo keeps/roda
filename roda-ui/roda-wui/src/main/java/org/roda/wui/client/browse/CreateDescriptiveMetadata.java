@@ -13,6 +13,7 @@ package org.roda.wui.client.browse;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.UserLogin;
@@ -168,7 +169,7 @@ public class CreateDescriptiveMetadata extends Composite {
           CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
 
           for (SupportedMetadataTypeBundle b : metadataTypes) {
-            type.addItem(b.getLabel(), b.getType());
+            type.addItem(b.getLabel(), b.getType()+RodaConstants.METADATA_VERSION_SEPARATOR+b.getVersion());
           }
 
           type.addItem("Other", "");
@@ -185,11 +186,17 @@ public class CreateDescriptiveMetadata extends Composite {
     buttonApply.setEnabled(false);
     String idText = id.getText();
     String typeText = type.getSelectedValue();
+    String typeVersion = null;
     String xmlText = xml.getText();
+
+    if(typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)){
+      typeVersion = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR)+1,typeText.length());
+      typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+    }
 
     if (idText.length() > 0) {
 
-      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, xmlText);
+      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion, xmlText);
 
       BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
 

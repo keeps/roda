@@ -40,7 +40,6 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -244,7 +243,8 @@ public class ModelServiceTest {
     gov.loc.premis.v3.Representation rpo = PremisV3Utils.binaryToRepresentation(preservationObject.getContent(), true);
 
     ObjectIdentifierComplexType[] objectIdentifierArray = rpo.getObjectIdentifierArray();
-    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, objectIdentifierArray[0].getObjectIdentifierType().getStringValue());
+    assertEquals(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL,
+      objectIdentifierArray[0].getObjectIdentifierType().getStringValue());
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, rpo.getObjectIdentifierArray()[0].getObjectIdentifierValue());
     assertEquals(CorporaConstants.PRESERVATION_LEVEL_FULL,
       rpo.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue());
@@ -264,7 +264,8 @@ public class ModelServiceTest {
       CorporaConstants.REPRESENTATION_1_PREMIS_EVENT_ID);
     EventComplexType event_premis = PremisV3Utils.binaryToEvent(event_premis_bin.getContent(), true);
     assertEquals(CorporaConstants.INGESTION, event_premis.getEventType().getStringValue());
-    assertEquals(CorporaConstants.SUCCESS, event_premis.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
+    assertEquals(CorporaConstants.SUCCESS,
+      event_premis.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
   }
 
   @Test
@@ -437,7 +438,8 @@ public class ModelServiceTest {
       .getBinary(DefaultStoragePath.parse(CorporaConstants.OTHER_DESCRIPTIVE_METADATA_STORAGEPATH));
 
     final DescriptiveMetadata newDescriptiveMetadata = model.createDescriptiveMetadata(aipId, newDescriptiveMetadataId,
-      binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE);
+      binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -465,7 +467,7 @@ public class ModelServiceTest {
     String message = "message with spaces on it";
     final DescriptiveMetadata updatedDescriptiveMetadata = model.updateDescriptiveMetadata(aipId,
       CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(), CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE,
-      message);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, message);
 
     // check if it is connected
     DescriptiveMetadata retrievedDescriptiveMetadata = model.retrieveDescriptiveMetadata(aipId,
@@ -483,11 +485,11 @@ public class ModelServiceTest {
 
     // check if binary version message collisions are well treated
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, message);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, message);
     model.updateDescriptiveMetadata(aipId, CorporaConstants.DESCRIPTIVE_METADATA_ID, binary.getContent(),
-      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, message);
+      CorporaConstants.OTHER_DESCRIPTIVE_METADATA_TYPE, CorporaConstants.OTHER_DESCRIPTIVE_METADATA_VERSION, message);
 
     assertEquals(4, Iterables.size(storage.listBinaryVersions(storagePath)));
   }
@@ -712,7 +714,7 @@ public class ModelServiceTest {
 
     Binary representation_bin = model.retrievePreservationRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID);
 
-   gov.loc.premis.v3.Representation representation = PremisV3Utils
+    gov.loc.premis.v3.Representation representation = PremisV3Utils
       .binaryToRepresentation(representation_bin.getContent(), true);
 
     assertEquals(representation.getPreservationLevelArray(0).getPreservationLevelValue().getStringValue(),

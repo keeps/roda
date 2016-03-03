@@ -48,7 +48,9 @@ import org.slf4j.LoggerFactory;
 
 public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
-
+  private static final String METADATA_TYPE = "keyvalue";
+  private static final String METADATA_VERSION = null;
+  
   @Override
   public void init() throws PluginException {
   }
@@ -114,7 +116,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         boolean notifyDescriptiveMetadataCreated = false;
 
         // TODO make the following strings constants
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, "key-value",
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE,METADATA_VERSION,
           notifyDescriptiveMetadataCreated);
 
         model.notifyAIPCreated(aip.getId());

@@ -67,8 +67,8 @@ public class EARKSIPToAIPPluginUtils {
         String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
         ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
         String metadataType = getMetadataType(dm);
-
-        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, false);
+        String metadataVersion = dm.getMetadataVersion();
+        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType,metadataVersion, false);
       }
     }
 

@@ -50,9 +50,9 @@ public class ValidationUtils {
   }
 
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
-    boolean validateDescriptiveMetadata, String fallbackMetadataType, boolean validatePremis, ModelService model,
-    String aipId) throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException,
-      ValidationException {
+    boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
+    boolean validatePremis, ModelService model, String aipId) throws GenericException, RequestNotValidException,
+      AuthorizationDeniedException, NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -67,7 +67,8 @@ public class ValidationUtils {
         }
         // XXX review why should a validation method update data
         String message = "Forcing metadata type to " + fallbackMetadataType;
-        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType, message);
+        model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType,
+          fallbackMetadataVersion, message);
         report.setValid(true);
         LOGGER.debug(storagePath + " valid for metadata type " + fallbackMetadataType);
 

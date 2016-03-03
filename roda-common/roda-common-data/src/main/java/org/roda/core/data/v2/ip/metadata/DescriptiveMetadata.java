@@ -18,49 +18,50 @@ public class DescriptiveMetadata implements Serializable {
   @JsonIgnore
   private String aipId;
   private String type;
+  private String version;
 
   public DescriptiveMetadata() {
     super();
   }
 
-  public DescriptiveMetadata(String id, String aipId, String type) {
+  public DescriptiveMetadata(String id, String aipId, String type, String version) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.type = type;
+    this.version = version;
   }
 
-  /**
-   * @return the id
-   */
   public String getId() {
     return id;
-  }
-
-  /**
-   * @return the aipId
-   */
-  public String getAipId() {
-    return aipId;
-  }
-
-  /**
-   * @return the type
-   */
-  public String getType() {
-    return type;
   }
 
   public void setId(String id) {
     this.id = id;
   }
 
+  public String getAipId() {
+    return aipId;
+  }
+
   public void setAipId(String aipId) {
     this.aipId = aipId;
   }
 
+  public String getType() {
+    return type;
+  }
+
   public void setType(String type) {
     this.type = type;
+  }
+
+  public String getVersion() {
+    return version;
+  }
+
+  public void setVersion(String version) {
+    this.version = version;
   }
 
   @Override
@@ -70,6 +71,7 @@ public class DescriptiveMetadata implements Serializable {
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
+    result = prime * result + ((version == null) ? 0 : version.hashCode());
     return result;
   }
 
@@ -97,12 +99,17 @@ public class DescriptiveMetadata implements Serializable {
         return false;
     } else if (!type.equals(other.type))
       return false;
+    if (version == null) {
+      if (other.version != null)
+        return false;
+    } else if (!version.equals(other.version))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "DescriptiveMetadata [id=" + id + ", aipId=" + aipId + ", type=" + type + "]";
+    return "DescriptiveMetadata [id=" + id + ", aipId=" + aipId + ", type=" + type + ", version=" + version + "]";
   }
 
 }

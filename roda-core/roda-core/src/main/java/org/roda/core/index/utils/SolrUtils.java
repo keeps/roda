@@ -175,7 +175,7 @@ public class SolrUtils {
 
   }
 
-  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, String metadataType)
+  public static SolrInputDocument getDescriptiveMetataFields(Binary binary, String metadataType, String metadataVersion)
     throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
@@ -184,11 +184,18 @@ public class SolrUtils {
 
     try {
 
-      // get xslt from metadata type if defined
+      // get xslt from metadata type and version if defined
       if (metadataType != null) {
         String lowerCaseMetadataType = metadataType.toLowerCase();
-        transformerStream = RodaCoreFactory
-          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+        if(metadataVersion!=null){
+          String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType+RodaConstants.METADATA_VERSION_SEPARATOR+metadataVersion;
+          transformerStream = RodaCoreFactory
+            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
+        }
+        if(transformerStream==null){
+          transformerStream = RodaCoreFactory
+            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+        }
       }
 
       // get xslt from filename
@@ -869,7 +876,7 @@ public class SolrUtils {
         StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aip.getId(), metadata.getId());
         Binary binary = model.getStorage().getBinary(storagePath);
         try {
-          SolrInputDocument fields = getDescriptiveMetataFields(binary, metadata.getType());
+          SolrInputDocument fields = getDescriptiveMetataFields(binary, metadata.getType(), metadata.getVersion());
           for (SolrInputField field : fields) {
             if (NON_REPEATABLE_FIELDS.contains(field.getName())) {
               boolean added = usedNonRepeatableFields.add(field.getName());

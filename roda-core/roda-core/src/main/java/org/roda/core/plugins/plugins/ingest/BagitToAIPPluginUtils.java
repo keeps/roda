@@ -34,7 +34,8 @@ import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
   private static final String DATA_FOLDER = "data";
-  private static final String METADATA_TYPE = "key-value";
+  private static final String METADATA_TYPE = "keyvalue";
+  private static final String METADATA_VERSION = null;
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
@@ -53,7 +54,7 @@ public class BagitToAIPPluginUtils {
 
     AIP aip = model.createAIP(active, parentId, permissions, notifyInSteps);
 
-    model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE);
+    model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION);
 
     String representationId = UUID.randomUUID().toString();
     boolean original = true;

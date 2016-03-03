@@ -595,5 +595,9 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_BOOLEAN = "boolean";
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
   
+  
+  
+  public static final String METADATA_VERSION_SEPARATOR = "_";
+  
 
 }
