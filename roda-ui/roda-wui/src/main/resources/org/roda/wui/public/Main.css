@@ -873,9 +873,11 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .static-page p {
-	margin-bottom: 1em;
-	font-size: 12px;
-	line-height: 18px;
+
+        margin-bottom: 1em;
+        font-size: 1.3rem;
+        line-height: 1.5em;
+
 }
 
 .static-page h2 {
