@@ -181,8 +181,8 @@ h6, .h6 {
 
 .page-description p {
 	margin-bottom: 1em;
-	font-size: 12px;
-	line-height: 18px;
+	font-size: 1.3rem;
+	line-height: 1.5em;
 }
 
 .roda-logo {
@@ -873,11 +873,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .static-page p {
-
-        margin-bottom: 1em;
-        font-size: 1.3rem;
-        line-height: 1.5em;
-
+	margin-bottom: 1em;
+	font-size: 1.3rem;
+	line-height: 1.5em;
 }
 
 .static-page h2 {
