@@ -16,13 +16,12 @@ import java.util.List;
 import java.util.UUID;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -63,7 +62,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -91,48 +90,59 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
           recursive);
 
-        Path representationZipFile = Files.createTempFile("rep", ".zip");
-        OutputStream os = new FileOutputStream(representationZipFile.toString());
-        ZipOutputStream zout = new ZipOutputStream(os);
-
         newRepresentations.add(newRepresentationID);
         model.createRepresentation(aipId, newRepresentationID, false, notify);
         List<String> filePath = null;
+        Path resultZipFile = null;
+        List<File> fileList = IteratorUtils.toList(allFiles.iterator());
+        int countFiles = fileList.size();
 
-        for (File file : allFiles) {
-          LOGGER.debug("Processing file: " + file);
+        if (countFiles > 1) {
+          Path representationZipFile = Files.createTempFile("rep", ".zip");
+          OutputStream os = new FileOutputStream(representationZipFile.toString());
+          ZipOutputStream zout = new ZipOutputStream(os);
 
-          if (!file.isDirectory()) {
-            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-            StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-            DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+          for (File file : fileList) {
+            LOGGER.debug("Processing file: " + file);
 
-            LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
-            DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
+            if (!file.isDirectory()) {
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-            IOUtils.closeQuietly(directAccess);
+              LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
+              DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
 
-            if (filePath == null)
-              filePath = file.getPath();
+              IOUtils.closeQuietly(directAccess);
+
+              if (filePath == null)
+                filePath = file.getPath();
+            }
           }
+
+          zout.finish();
+          IOUtils.closeQuietly(zout);
+          IOUtils.closeQuietly(os);
+          resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(representationZipFile);
+
+        } else if (countFiles == 1) {
+          File file = fileList.get(0);
+          StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+          DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+          resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(directAccess.getPath());
+          IOUtils.closeQuietly(directAccess);
+          filePath = file.getPath();
         }
 
-        zout.finish();
-        IOUtils.closeQuietly(zout);
-        IOUtils.closeQuietly(os);
-        IOUtils.closeQuietly(allFiles);
-
         // add zip file on a new representation
-        LOGGER.debug("Running digital signer on representation zip file");
-        Path resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(representationZipFile);
+        LOGGER.debug("Running digital signer on representation");
         ContentPayload payload = new FSPathContentPayload(resultZipFile);
         String newFileId = representation.getId() + ".zip";
         model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
 
+        IOUtils.closeQuietly(allFiles);
+        reportItem.setPluginState(PluginState.SUCCESS);
         AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
           newRepresentationID, false);
-
-        reportItem.setPluginState(PluginState.SUCCESS);
 
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);

@@ -87,7 +87,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -154,8 +154,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
+        RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state,
         outcomeDetailExtension.toString(), notify);

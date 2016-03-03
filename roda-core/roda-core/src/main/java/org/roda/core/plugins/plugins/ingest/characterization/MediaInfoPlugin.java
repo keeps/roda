@@ -85,7 +85,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -117,8 +117,7 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
               payload, inotify);
           }
         } catch (RODAException | IOException | CommandException | XPathExpressionException
-          | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
-          | TransformerException sse) {
+          | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError | TransformerException sse) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);

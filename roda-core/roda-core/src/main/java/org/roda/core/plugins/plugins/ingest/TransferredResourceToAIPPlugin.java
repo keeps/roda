@@ -69,7 +69,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -121,10 +121,10 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
         reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-        List<LinkingIdentifier> sources = Arrays.asList(
-          PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays
-          .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
           notify);

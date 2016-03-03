@@ -48,7 +48,7 @@ public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertP
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     try {
       return AvconvConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
@@ -73,8 +73,8 @@ public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertP
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     return AvconvConvertPluginUtils.executeAvconv(inputPath, outputPath, super.getCommandArguments(),
       getOutputArguments());

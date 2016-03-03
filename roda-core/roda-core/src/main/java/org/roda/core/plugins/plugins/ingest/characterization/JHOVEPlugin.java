@@ -59,7 +59,7 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 

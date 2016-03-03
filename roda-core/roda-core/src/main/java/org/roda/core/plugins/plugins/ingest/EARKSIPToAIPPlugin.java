@@ -56,7 +56,7 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -86,10 +86,10 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getParentID()));
         }
 
-        List<LinkingIdentifier> sources = Arrays.asList(
-          PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(
-          PluginHelper.getLinkingIdentifier(aipCreated.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(aipCreated.getId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aipCreated.getId(), model, sources, outcomes, PluginState.SUCCESS, "",
           notify);

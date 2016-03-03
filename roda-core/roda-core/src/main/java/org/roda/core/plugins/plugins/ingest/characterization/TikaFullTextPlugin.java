@@ -68,7 +68,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -115,8 +115,8 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+          "Error running Tika " + aip.getId() + ": " + e.getMessage());
       }
 
       report.addReport(reportItem);

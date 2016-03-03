@@ -46,7 +46,12 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     "Descriptive metadata type to be used as fallback or if metadata type is forced.");
 
   public static final PluginParameter PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE = new PluginParameter(
-    "parameter.force_type", "Force metadata type in all", PluginParameterType.BOOLEAN, "false", true, false,
+    "parameter.force_type",
+    "Force metadata type in all",
+    PluginParameterType.BOOLEAN,
+    "false",
+    true,
+    false,
     "If true, bypass current metadata type with metadata type passed as parameter. If false, if metadata type passed as parameter is defined use as fallback, else no fallback");
 
   public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
@@ -73,7 +78,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -91,9 +96,11 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    boolean validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
+    boolean validateDescriptiveMetadata = PluginHelper.getBooleanFromParameters(this,
+      PARAMETER_VALIDATE_DESCRIPTIVE_METADATA);
     boolean validatePremis = PluginHelper.getBooleanFromParameters(this, PARAMETER_VALIDATE_PREMIS);
-    boolean forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this, PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
+    boolean forceDescriptiveMetadataType = PluginHelper.getBooleanFromParameters(this,
+      PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE);
     String metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
 
     Report pluginReport = PluginHelper.createPluginReport(this);
@@ -129,8 +136,8 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
     try {
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
+        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, "", notify);
       if (notify) {

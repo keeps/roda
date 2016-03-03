@@ -32,7 +32,7 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     try {
       return ImageMagickConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
@@ -46,8 +46,8 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
     return new ImageMagickConvertPlugin<T>();
   }
 
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());

@@ -138,7 +138,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 

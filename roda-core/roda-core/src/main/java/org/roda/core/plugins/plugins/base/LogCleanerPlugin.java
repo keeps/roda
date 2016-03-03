@@ -51,7 +51,7 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 

@@ -53,7 +53,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -93,12 +93,11 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
-    throws PluginException {
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model) throws PluginException {
 
     try {
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
+        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
       List<LinkingIdentifier> outcomes = null;
       boolean notify = true;
       PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, outcomeDetail, notify);

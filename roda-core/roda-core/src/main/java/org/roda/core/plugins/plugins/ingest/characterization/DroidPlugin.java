@@ -59,7 +59,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -140,25 +140,25 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-//TODO FIX
- @Override
- public PreservationEventType getPreservationEventType() {
-   return null;
- }
+  // TODO FIX
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return null;
+  }
 
- @Override
- public String getPreservationEventDescription() {
-   return "XXXXXXXXXX";
- }
+  @Override
+  public String getPreservationEventDescription() {
+    return "XXXXXXXXXX";
+  }
 
- @Override
- public String getPreservationEventSuccessMessage() {
-   return "XXXXXXXXXXXXXXXXXXXXXXXX";
- }
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+  }
 
- @Override
- public String getPreservationEventFailureMessage() {
-   return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
- }
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+  }
 
 }

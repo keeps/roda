@@ -7,6 +7,10 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import gov.loc.repository.bagit.Bag;
+import gov.loc.repository.bagit.BagFactory;
+import gov.loc.repository.bagit.utilities.SimpleResult;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -14,7 +18,6 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -30,10 +33,6 @@ import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.loc.repository.bagit.Bag;
-import gov.loc.repository.bagit.BagFactory;
-import gov.loc.repository.bagit.utilities.SimpleResult;
 
 public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
@@ -58,7 +57,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -91,10 +90,10 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));
         }
 
-        List<LinkingIdentifier> sources = Arrays.asList(
-          PluginHelper.getLinkingIdentifier(transferredResource, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(
-          PluginHelper.getLinkingIdentifier(aipCreated.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,
+          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(aipCreated.getId(),
+          RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aipCreated.getId(), model, sources, outcomes, reportItem.getPluginState(),
           "", notify);

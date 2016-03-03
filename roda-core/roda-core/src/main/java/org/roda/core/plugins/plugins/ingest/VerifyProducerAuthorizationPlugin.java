@@ -46,7 +46,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -66,8 +66,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Checking producer authorization for AIP " + aip.getId());
 
       // FIXME implement producer authorization logic
-      reportItem.setPluginState(PluginState.SUCCESS)
-        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+      reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(
+        String.format("Done with checking producer authorization for AIP %s", aip.getId()));
       LOGGER.debug("Done with checking producer authorization for AIP " + aip.getId());
 
       report.addReport(reportItem);

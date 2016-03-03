@@ -33,7 +33,7 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -43,8 +43,8 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     try {
       return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath);

@@ -31,7 +31,7 @@ public class GeneralCommandConvertPlugin<T extends Serializable> extends Command
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 

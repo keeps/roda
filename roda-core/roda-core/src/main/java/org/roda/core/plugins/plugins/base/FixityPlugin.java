@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -61,7 +60,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -90,8 +89,8 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
               boolean fixityOK = true;
               for (Fixity f : fixities) {
                 try {
-                  Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
-                    "FixityCheck action");
+                  Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary,
+                    f.getMessageDigestAlgorithm(), "FixityCheck action");
 
                   if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
                     fixityOK = false;
@@ -159,8 +158,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     return null;
   }
 
-  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
-    String message) {
+  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event, String message) {
     // TODO Auto-generated method stub
 
   }

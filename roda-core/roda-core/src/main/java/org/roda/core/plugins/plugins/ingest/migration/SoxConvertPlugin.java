@@ -32,7 +32,7 @@ public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlug
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     try {
       return SoxConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
@@ -47,8 +47,8 @@ public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlug
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     return SoxConvertPluginUtils.executeSox(inputPath, outputPath, super.getCommandArguments());
   }

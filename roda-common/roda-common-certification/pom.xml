@@ -20,5 +20,9 @@
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcmail-jdk15on</artifactId>
     </dependency>
+    <dependency>
+		<groupId>com.itextpdf</groupId>
+		<artifactId>itextpdf</artifactId>
+	</dependency>
   </dependencies>
 </project>

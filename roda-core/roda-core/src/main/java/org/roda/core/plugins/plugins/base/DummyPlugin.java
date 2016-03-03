@@ -47,7 +47,7 @@ public class DummyPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -87,8 +87,7 @@ public class DummyPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  
-  //TODO FIX
+  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return null;

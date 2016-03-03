@@ -63,7 +63,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -93,8 +93,8 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
             ContentPayload payload = new FSPathContentPayload(p);
             LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
               + ", FILE: " + file.getId() + ")");
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
-              payload, inotify);
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+              "FITS", payload, inotify);
           }
 
           FSUtils.deletePath(output);

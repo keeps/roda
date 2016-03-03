@@ -31,7 +31,7 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     try {
       return UnoconvConvertPluginUtils.getVersion();
     } catch (UnsupportedOperationException | CommandException | IOException e) {

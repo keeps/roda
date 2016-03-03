@@ -33,7 +33,7 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     try {
       return GhostScriptConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
@@ -48,8 +48,8 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
-    throws UnsupportedOperationException, IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
+    IOException, CommandException {
 
     try {
       return GhostScriptConvertPluginUtils.executeGS(inputPath, outputPath, super.getCommandArguments());

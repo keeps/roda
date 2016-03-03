@@ -84,7 +84,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
@@ -235,9 +235,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
     try {
       // TODO fix linking identifiers
-      PluginHelper.createPluginEvent(this, aip.getId(), model, Arrays.asList(PluginHelper
-        .getLinkingIdentifier(aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null,
-        pluginState, outcomeDetails, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, Arrays.asList(PluginHelper.getLinkingIdentifier(
+        aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, pluginState,
+        outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       logger.error("Error creating event: " + e.getMessage(), e);

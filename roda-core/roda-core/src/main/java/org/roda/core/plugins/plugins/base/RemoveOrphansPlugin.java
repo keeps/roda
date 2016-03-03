@@ -49,7 +49,7 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
   }
 
   @Override
-  public String getVersion() {
+  public String getVersionImpl() {
     return "1.0";
   }
 
