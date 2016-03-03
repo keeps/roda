@@ -101,6 +101,7 @@ public class ShowPreservationEvent extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  @SuppressWarnings("unused")
   private static BrowseMessages messages = (BrowseMessages) GWT.create(BrowseMessages.class);
 
   @UiField

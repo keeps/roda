@@ -156,7 +156,7 @@ public class IngestProcess extends Composite {
 
     };
 
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDate());
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
     inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
 
     inputDateInitial.setFormat(dateFormat);

@@ -93,12 +93,6 @@ public interface BrowseMessages extends Messages {
   String sidebarFilterDates();
 
   @DefaultMessage("From date")
-  String sidebarFilterFromDate();
-
-  @DefaultMessage("To date")
-  String sidebarFilterToDate();
-
-  @DefaultMessage("From date")
   String sidebarFilterFromDatePlaceHolder();
 
   @DefaultMessage("To date")

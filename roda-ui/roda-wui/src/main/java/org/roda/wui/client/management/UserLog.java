@@ -44,6 +44,8 @@ import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * @author Luis Faria
  *
@@ -92,7 +94,9 @@ public class UserLog extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
-  
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+
   @UiField
   FlowPanel userLogDescription;
 
@@ -146,7 +150,7 @@ public class UserLog extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-    
+
     userLogDescription.add(new HTMLWidgetWrapper("UserLogDescription.html"));
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -169,6 +173,8 @@ public class UserLog extends Composite {
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
+    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
+    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
   }
 
   private void updateDateFilter() {
