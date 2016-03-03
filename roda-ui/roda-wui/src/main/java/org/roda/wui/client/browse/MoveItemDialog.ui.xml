@@ -37,10 +37,10 @@
 				<lists:AIPList ui:field="searchResultsPanel" />
 			</g:ScrollPanel>
 			<g:Button addStyleNames="btn btn-ban" ui:field="cancel">
-				<ui:msg>Cancel</ui:msg>
+				<ui:text from='{messages.moveItemCancel}' />
 			</g:Button>
 			<g:Button addStyleNames="pull-right btn btn-edit" ui:field="moveItem">
-				<ui:msg>Move</ui:msg>
+				<ui:text from='{messages.moveItemMove}' />
 			</g:Button>
 		</g:FlowPanel>
 	</g:FlowPanel>

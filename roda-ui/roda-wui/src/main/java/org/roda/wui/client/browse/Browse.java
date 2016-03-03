@@ -213,6 +213,8 @@ public class Browse extends Composite {
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
+    
+    
 
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));

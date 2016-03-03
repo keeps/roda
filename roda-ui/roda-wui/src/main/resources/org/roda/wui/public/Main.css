@@ -4445,12 +4445,22 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				MOVE ITEM
 ************************************************/
+.moveItem {
+/* 	width: 100%; */
+}
+
 .moveItem .searchPanel {
 	margin-right: 40px;
 }
 
+.moveItem .searchPanelRight {
+	width: 40px;
+	margin-right: -40px;
+}
+
 .moveItem .moveItemResultsPanel {
 	width: 800px;
+/* 	max-width: 100%; */
 	height: 400px;
 	overflow-x: scroll;
 	margin-top: 20px;
@@ -4460,4 +4470,10 @@ td.datePickerMonth, td.datePickerYear {
 .moveItem .moveItemResultsPanel .my-asyncdatagrid-pager-results,
 .moveItem .moveItemResultsPanel thead {
 	display: none;
+}
+
+@media (max-width: 800px) {
+	.moveItem .moveItemResultsPanel {
+		width: 100%;
+	}
 }

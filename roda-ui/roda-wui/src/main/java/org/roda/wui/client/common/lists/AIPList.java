@@ -132,7 +132,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-
   }
 
   @Override

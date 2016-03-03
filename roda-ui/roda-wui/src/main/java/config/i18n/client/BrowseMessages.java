@@ -506,7 +506,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Outcome")
   String preservationEventOutcome();
 
-
   @DefaultMessage("Type")
   String preservationEventType();
 
@@ -534,7 +533,6 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Outcome detail")
   String preservationEventOutcomeDetailHeader();
   
-  
   @DefaultMessage("Note")
   String preservationEventOutcomeDetailNote();
 
@@ -544,6 +542,20 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
+  /************* Move item ****************/
 
-
+  @DefaultMessage("Move item")
+  String moveItemTitle();
+  
+  @DefaultMessage("Cancel")
+  String moveItemCancel();
+  
+  @DefaultMessage("Move")
+  String moveItemMove();
+  
+  @DefaultMessage("Search results")
+  String moveItemSearchResults();
+  
+  @DefaultMessage("Search records...")
+  String moveItemSearchPlaceHolder();
 }
