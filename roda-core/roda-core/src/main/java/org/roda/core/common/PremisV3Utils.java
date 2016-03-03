@@ -370,7 +370,7 @@ public class PremisV3Utils {
   }
 
   public static ContentPayload createPremisAgentBinary(String id, String name, PreservationAgentType type,
-    String extension, String note) throws GenericException, ValidationException {
+    String extension, String note, String version) throws GenericException, ValidationException {
     AgentDocument agent = AgentDocument.Factory.newInstance();
 
     AgentComplexType act = agent.addNewAgent();
@@ -387,6 +387,10 @@ public class PremisV3Utils {
     if (StringUtils.isNotBlank(note)) {
       act.addAgentNote(note);
     }
+    
+    if (StringUtils.isNotBlank(version)) {
+        act.setAgentVersion(version);
+      }
     if (StringUtils.isNotBlank(extension)) {
       try {
         act.addNewAgentExtension().set(XmlObject.Factory.parse(extension));
@@ -712,7 +716,7 @@ public class PremisV3Utils {
 
     // TODO set agent extension
     agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
-      plugin.getDescription());
+      plugin.getDescription(), plugin.getVersion());
     model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
     return agent;

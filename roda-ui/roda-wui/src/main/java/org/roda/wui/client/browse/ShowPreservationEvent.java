@@ -300,7 +300,13 @@ public class ShowPreservationEvent extends Composite {
       body.add(typeValue);
     }
 
-    // TODO add agent version
+    if (StringUtils.isNotBlank(agent.getVersion())) {
+        Label versionLabel = new Label("Version");
+        versionLabel.addStyleName("label");
+        Label versionValue = new Label(agent.getVersion());
+        body.add(versionLabel);
+        body.add(versionValue);
+      }
 
     if (StringUtils.isNotBlank(agent.getNote())) {
       Label noteLabel = new Label("Note");
