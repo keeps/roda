@@ -134,8 +134,8 @@ public class ClamAntiVirus implements AntiVirus {
 
       // clamscan -r -i bin/ 2> /dev/null
       String clamavBin = RodaCoreFactory.getRodaConfiguration()
-        .getString("core.plugins.internal.virus_check.clamav.bin", "clamscan");
-      ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, "-ri", path.toString());
+        .getString("core.plugins.internal.virus_check.clamav.bin", "clamdscan");
+      ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, "-m", path.toString());
 
       // processBuilder.redirectErrorStream();
       Process process = processBuilder.start();
@@ -159,9 +159,6 @@ public class ClamAntiVirus implements AntiVirus {
           result.setClean(false);
           break;
       }
-
-      LOGGER.debug("Virus checker exit value: " + exitValue);
-      LOGGER.debug("Virus checker output:\n" + outputWriter.toString());
 
     } catch (IOException e) {
       LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);

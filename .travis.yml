@@ -9,7 +9,7 @@ before_script:
   - sudo apt-get update -qq
   - sudo apt-get install siegfried -y
   # Install Clam Anti Virus
-  - sudo apt-get install clamav -y
+  - sudo apt-get install clamav clamav-daemon -y
   # Install Avconv
   - sudo apt-get install libav-tools -y
   # Install ImageMagick

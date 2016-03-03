@@ -32,7 +32,7 @@ The following dependencies are only needed if the following ingest tasks are req
 Install ClamAV (anti-virus)
 * Ubuntu
 ```bash
-sudo apt-get install clamav -y
+sudo apt-get install clamav clamav-daemon -y
 ```
 * CentOS 7
 ```bash

@@ -14,9 +14,12 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -108,7 +111,10 @@ public class InternalPluginsTest {
   @Before
   public void setUp() throws Exception {
 
-    basePath = Files.createTempDirectory("indexTests");
+    basePath = Files.createTempDirectory("indexTests",
+      PosixFilePermissions
+        .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+          PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
     System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = true;

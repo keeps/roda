@@ -112,8 +112,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE)
           .setPluginDetails(virusCheckResult.getReport());
 
-        LOGGER.debug("Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: "
-          + virusCheckResult.isClean() + ". Virus check report: " + virusCheckResult.getReport());
+        LOGGER.debug(
+          "Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: " + virusCheckResult.isClean());
       } catch (Exception e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
@@ -154,8 +154,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+      List<LinkingIdentifier> sources = Arrays
+        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
       PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state,
         outcomeDetailExtension.toString(), notify);
