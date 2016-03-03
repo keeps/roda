@@ -376,7 +376,8 @@ public class ModelService extends ModelObservable {
     if (validationReport.isValid()) {
       StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);
 
-      // XXX possible optimization only creating new files, updating changed and
+      // XXX possible optimization only creating new files, updating
+      // changed and
       // removing deleted ones.
       storage.deleteResource(aipPath);
 
@@ -614,7 +615,8 @@ public class ModelService extends ModelObservable {
     ValidationReport validationReport = isRepresentationValid(sourceDirectory);
 
     if (validationReport.isValid()) {
-      // XXX possible optimization only creating new files, updating changed and
+      // XXX possible optimization only creating new files, updating
+      // changed and
       // removing deleted
 
       StoragePath representationPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);

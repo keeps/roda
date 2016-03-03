@@ -81,7 +81,6 @@ import gov.loc.premis.v3.EventDocument;
 import gov.loc.premis.v3.EventIdentifierComplexType;
 import gov.loc.premis.v3.EventOutcomeDetailComplexType;
 import gov.loc.premis.v3.EventOutcomeInformationComplexType;
-import gov.loc.premis.v3.ExtensionComplexType;
 import gov.loc.premis.v3.FixityComplexType;
 import gov.loc.premis.v3.FormatComplexType;
 import gov.loc.premis.v3.FormatDesignationComplexType;
@@ -387,16 +386,17 @@ public class PremisV3Utils {
     if (StringUtils.isNotBlank(note)) {
       act.addAgentNote(note);
     }
-    
+
     if (StringUtils.isNotBlank(version)) {
-        act.setAgentVersion(version);
-      }
+      act.setAgentVersion(version);
+    }
     if (StringUtils.isNotBlank(extension)) {
       try {
         act.addNewAgentExtension().set(XmlObject.Factory.parse(extension));
       } catch (XmlException e) {
         // e.getError()
-        // TODO convert XmlException to a Valiation Exception in MetadataUtils
+        // TODO convert XmlException to a Valiation Exception in
+        // MetadataUtils
         throw new ValidationException(e.getMessage());
       }
     }

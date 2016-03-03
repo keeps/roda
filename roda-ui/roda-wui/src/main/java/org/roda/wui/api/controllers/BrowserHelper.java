@@ -41,6 +41,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.validation.ValidationUtils;
@@ -496,21 +497,56 @@ public class BrowserHelper {
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
       boolean includeRepresentations = true;
       preservationFiles = model.listPreservationMetadata(aipId, includeRepresentations);
+      Map<String, ZipEntryInfo> agents = new HashMap<String, ZipEntryInfo>();
       for (PreservationMetadata preservationFile : preservationFiles) {
         if (counter >= startInt && (counter <= limitInt || limitInt == -1)) {
           StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
+
           Binary binary = storage.getBinary(storagePath);
           if (preservationFile.getRepresentationId() != null) {
-            ZipEntryInfo info = new ZipEntryInfo(preservationFile.getRepresentationId() + File.separator
-              + StringUtils.join(storagePath.getDirectoryPath(), File.separator) + File.separator
-              + storagePath.getName(), binary.getContent());
+            ZipEntryInfo info = new ZipEntryInfo(
+              StringUtils.join(storagePath.getDirectoryPath(), File.separator) + File.separator + storagePath.getName(),
+              binary.getContent());
             zipEntries.add(info);
+          } else {
+            ZipEntryInfo info = new ZipEntryInfo(
+              StringUtils.join(storagePath.getDirectoryPath(), File.separator) + File.separator + storagePath.getName(),
+              binary.getContent());
+            zipEntries.add(info);
+          }
+
+          if (preservationFile.getType() == PreservationMetadataType.EVENT) {
+            try {
+              List<LinkingIdentifier> agentIDS = PremisV3Utils.extractAgentsFromEvent(binary);
+              if (agentIDS != null && agentIDS.size() > 0) {
+                for (LinkingIdentifier li : agentIDS) {
+                  String agentID = li.getValue();
+                  if (!agents.containsKey(agentID)) {
+                    StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
+                      PreservationMetadataType.AGENT);
+                    Binary agentBinary = storage.getBinary(agentPath);
+                    ZipEntryInfo info = new ZipEntryInfo(StringUtils
+                      .join(preservationFile.getAipId() + File.separator
+                        + StringUtils.join(agentPath.getDirectoryPath(), File.separator), File.separator)
+                      + File.separator + agentPath.getName(), agentBinary.getContent());
+                    agents.put(agentID, info);
+                  }
+                }
+              }
+            } catch (ValidationException | GenericException e) {
+
+            }
           }
         } else {
           break;
         }
 
         counter++;
+      }
+      if (agents.size() > 0) {
+        for (Map.Entry<String, ZipEntryInfo> entry : agents.entrySet()) {
+          zipEntries.add(entry.getValue());
+        }
       }
 
       return createZipStreamResponse(zipEntries, aipId);

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
