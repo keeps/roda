@@ -155,7 +155,7 @@ public class ShowJob extends Composite {
 
     // TODO get better name for job report list
     jobReports = new JobReportList(new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())),
-      null, "Job report list", pluginsInfo);
+      null, "Job report list", pluginsInfo, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 

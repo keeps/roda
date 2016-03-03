@@ -29,7 +29,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.client.common.lists.TransferredResourceList.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.CreateJob;
@@ -185,7 +185,7 @@ public class IngestTransfer extends Composite {
   private IngestTransfer() {
     Facets facets = null;
 
-    transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList());
+    transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList(), true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -222,7 +222,7 @@ public class IngestTransfer extends Composite {
       }
     });
 
-    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
 
       @Override
       public void onSelectionChange(Set<TransferredResource> selected) {
@@ -232,7 +232,23 @@ public class IngestTransfer extends Composite {
           : messages.ingestTransferButtonIngestSelectedItems());
         updateVisibles();
       }
+
     });
+
+    // transferredResourceList.addCheckboxSelectionListener(new
+    // CheckboxSelectionListener() {
+    //
+    // @Override
+    // public void onSelectionChange(Set<TransferredResource> selected) {
+    // remove.setText(selected.isEmpty() ?
+    // messages.ingestTransferButtonRemoveWholeFolder()
+    // : messages.ingestTransferButtonRemoveSelectedItems());
+    // startIngest.setText(selected.isEmpty() ?
+    // messages.ingestTransferButtonIngestWholeFolder()
+    // : messages.ingestTransferButtonIngestSelectedItems());
+    // updateVisibles();
+    // }
+    // });
 
   }
 

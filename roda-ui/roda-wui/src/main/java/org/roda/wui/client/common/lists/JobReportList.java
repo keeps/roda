@@ -68,11 +68,12 @@ public class JobReportList extends AsyncTableCell<Report> {
   private final Map<String, PluginInfo> pluginsInfo;
 
   public JobReportList() {
-    this(null, null, null, null);
+    this(null, null, null, null, false);
   }
 
-  public JobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo) {
-    super(filter, facets, summary);
+  public JobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
+    boolean selectable) {
+    super(filter, facets, summary, selectable);
     this.pluginsInfo = pluginsInfo;
   }
 

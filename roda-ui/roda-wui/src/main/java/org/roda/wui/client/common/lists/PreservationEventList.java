@@ -61,11 +61,11 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   private Column<IndexedPreservationEvent, SafeHtml> eventOutcomeColumn;
 
   public PreservationEventList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public PreservationEventList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override

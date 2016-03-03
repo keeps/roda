@@ -47,11 +47,11 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
   private TextColumn<IndexedRepresentation> totalNumberOfFilesColumn;
 
   public RepresentationList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public RepresentationList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override

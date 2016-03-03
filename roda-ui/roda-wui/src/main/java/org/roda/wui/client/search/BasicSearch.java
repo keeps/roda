@@ -463,7 +463,7 @@ public class BasicSearch extends Composite {
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults());
+    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults(), false);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
@@ -485,7 +485,7 @@ public class BasicSearch extends Composite {
 
   private void createRepresentationsSearchResultPanel() {
     representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, null,
-      messages.searchResults());
+      messages.searchResults(), false);
 
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -503,7 +503,7 @@ public class BasicSearch extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT),
       new SimpleFacetParameter(RodaConstants.FILE_PRONOM),
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
-    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults());
+    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults(), false);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);

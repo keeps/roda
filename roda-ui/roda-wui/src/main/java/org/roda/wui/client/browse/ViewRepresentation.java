@@ -318,7 +318,7 @@ public class ViewRepresentation extends Composite {
     }
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
-    filesList = new SimpleFileList(defaultFilter, null, null);
+    filesList = new SimpleFileList(defaultFilter, null, null, false);
 
     initWidget(uiBinder.createAndBindUi(this));
 

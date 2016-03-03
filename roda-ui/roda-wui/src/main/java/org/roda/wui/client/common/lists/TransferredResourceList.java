@@ -7,14 +7,11 @@
  */
 package org.roda.wui.client.common.lists;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -27,14 +24,9 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.Humanize;
 
-import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.ValueUpdater;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -47,8 +39,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.CellPreviewEvent;
-import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 
 /**
@@ -60,53 +50,23 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
   private static final int PAGE_SIZE = 20;
 
-  // private static IngestListConstants constants =
-  // GWT.create(IngestListConstants.class);
-
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private Column<TransferredResource, Boolean> selectColumn;
-  private final Set<TransferredResource> selected = new HashSet<TransferredResource>();
-  private final List<CheckboxSelectionListener> listeners = new ArrayList<TransferredResourceList.CheckboxSelectionListener>();
-
   private Column<TransferredResource, SafeHtml> isFileColumn;
-  // private TextColumn<TransferredResource> idColumn;
   private TextColumn<TransferredResource> nameColumn;
   private TextColumn<TransferredResource> sizeColumn;
   private Column<TransferredResource, Date> creationDateColumn;
 
   public TransferredResourceList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public TransferredResourceList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override
   protected void configureDisplay(final CellTable<TransferredResource> display) {
-
-    selectColumn = new Column<TransferredResource, Boolean>(new CheckboxCell(true, false)) {
-      @Override
-      public Boolean getValue(TransferredResource resource) {
-        return getSelected().contains(resource);
-      }
-    };
-
-    selectColumn.setFieldUpdater(new FieldUpdater<TransferredResource, Boolean>() {
-      @Override
-      public void update(int index, TransferredResource resource, Boolean isSelected) {
-        if (isSelected) {
-          getSelected().add(resource);
-        } else {
-          getSelected().remove(resource);
-        }
-
-        // update header
-        display.redrawHeaders();
-        fireOnCheckboxSelectionChanged();
-      }
-    });
 
     isFileColumn = new Column<TransferredResource, SafeHtml>(new SafeHtmlCell()) {
       @Override
@@ -149,58 +109,12 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     };
 
     isFileColumn.setSortable(true);
-    // idColumn.setSortable(true);
     nameColumn.setSortable(true);
     sizeColumn.setSortable(true);
     creationDateColumn.setSortable(true);
 
-    Header<Boolean> selectHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
-
-      @Override
-      public Boolean getValue() {
-        Boolean ret;
-
-        if (selected.isEmpty()) {
-          ret = false;
-        } else if (selected.containsAll(getVisibleItems())) {
-          ret = true;
-        } else {
-          // some are selected
-          ret = false;
-        }
-
-        return ret;
-      }
-    };
-
-    selectHeader.setUpdater(new ValueUpdater<Boolean>() {
-
-      @Override
-      public void update(Boolean value) {
-        if (value) {
-          selected.addAll(getVisibleItems());
-
-        } else {
-          selected.clear();
-        }
-        redraw();
-        fireOnCheckboxSelectionChanged();
-      }
-    });
-
-    addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
-        selected.clear();
-        fireOnCheckboxSelectionChanged();
-      }
-    });
-
     // TODO externalize strings into constants
-    display.addColumn(selectColumn, selectHeader);
     display.addColumn(isFileColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
-    // display.addColumn(idColumn, "Id");
     display.addColumn(nameColumn, "Name");
 
     Header<String> sizeHeader = new TextHeader("Size");
@@ -224,7 +138,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     display.addColumn(sizeColumn, sizeHeader, sizeFooter);
     display.addColumn(creationDateColumn, "Date created");
 
-    // display.setAutoHeaderRefreshDisabled(true);
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(nameColumn, "100%");
@@ -273,41 +186,4 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
   protected int getInitialPageSize() {
     return PAGE_SIZE;
   }
-
-  public Set<TransferredResource> getSelected() {
-    return selected;
-  }
-
-  public void setSelected(Set<TransferredResource> newSelected) {
-    selected.clear();
-    selected.addAll(newSelected);
-    redraw();
-    fireOnCheckboxSelectionChanged();
-  }
-
-  @Override
-  protected CellPreviewEvent.Handler<TransferredResource> getSelectionEventManager() {
-    return DefaultSelectionEventManager.<TransferredResource> createBlacklistManager(0);
-  }
-
-  // LISTENER
-
-  public interface CheckboxSelectionListener {
-    public void onSelectionChange(Set<TransferredResource> selected);
-  }
-
-  public void addCheckboxSelectionListener(CheckboxSelectionListener listener) {
-    listeners.add(listener);
-  }
-
-  public void removeCheckboxSelectionListener(CheckboxSelectionListener listener) {
-    listeners.remove(listener);
-  }
-
-  public void fireOnCheckboxSelectionChanged() {
-    for (CheckboxSelectionListener listener : listeners) {
-      listener.onSelectionChange(getSelected());
-    }
-  }
-
 }

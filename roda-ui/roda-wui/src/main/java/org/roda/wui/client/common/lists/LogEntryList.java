@@ -49,11 +49,11 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
   private TextColumn<LogEntry> addressColumn;
 
   public LogEntryList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public LogEntryList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override

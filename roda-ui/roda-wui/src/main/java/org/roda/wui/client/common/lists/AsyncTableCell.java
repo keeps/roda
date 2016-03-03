@@ -8,8 +8,11 @@
 package org.roda.wui.client.common.lists;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -22,6 +25,9 @@ import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
 import org.roda.wui.common.client.widgets.wcag.AccessibleSimplePager;
 
+import com.google.gwt.cell.client.CheckboxCell;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -34,6 +40,7 @@ import com.google.gwt.user.cellview.client.ColumnSortEvent.AsyncHandler;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
+import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
@@ -42,6 +49,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
+import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SingleSelectionModel;
@@ -57,19 +65,23 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   private final PageSizePager pageSizePager;
   private final CellTable<T> display;
 
-  private Filter filter;
+  private Column<T, Boolean> selectColumn;
+  private final Set<T> selected = new HashSet<T>();
+  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
 
+  private Filter filter;
   private Facets facets;
+  private boolean selectable;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
-  
+
   private static int PAGE_SIZE_PAGER_INCREMENT = 100;
 
   public AsyncTableCell() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public AsyncTableCell(Filter filter, Facets facets, String summary) {
+  public AsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable) {
     super();
 
     if (summary == null) {
@@ -78,6 +90,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
     this.filter = filter;
     this.facets = facets;
+    this.selectable = selectable;
 
     display = new AccessibleCellTable<T>(getInitialPageSize(),
       (MyCellTableResources) GWT.create(MyCellTableResources.class), getKeyProvider(), summary);
@@ -85,7 +98,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     display.setLoadingIndicator(new HTML(SafeHtmlUtils.fromSafeConstant(
       "<div class='spinner'><div class='double-bounce1'></div><div class='double-bounce2'></div></div>")));
 
-    configureDisplay(display);
+    configure(display);
 
     this.dataProvider = new MyAsyncDataProvider<T>(display, new IndexResultDataProvider<T>() {
 
@@ -136,6 +149,69 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   }
 
+  private void configure(final CellTable<T> display) {
+    if (selectable) {
+      selectColumn = new Column<T, Boolean>(new CheckboxCell(true, false)) {
+        @Override
+        public Boolean getValue(T object) {
+          return getSelected().contains(object);
+        }
+      };
+
+      selectColumn.setFieldUpdater(new FieldUpdater<T, Boolean>() {
+        @Override
+        public void update(int index, T object, Boolean isSelected) {
+          if (isSelected) {
+            getSelected().add(object);
+          } else {
+            getSelected().remove(object);
+          }
+
+          // update header
+          display.redrawHeaders();
+          fireOnCheckboxSelectionChanged();
+        }
+      });
+
+      Header<Boolean> selectHeader = new Header<Boolean>(new CheckboxCell(true, true)) {
+
+        @Override
+        public Boolean getValue() {
+          Boolean ret;
+
+          if (selected.isEmpty()) {
+            ret = false;
+          } else if (selected.containsAll(getVisibleItems())) {
+            ret = true;
+          } else {
+            // some are selected
+            ret = false;
+          }
+
+          return ret;
+        }
+      };
+
+      selectHeader.setUpdater(new ValueUpdater<Boolean>() {
+
+        @Override
+        public void update(Boolean value) {
+          if (value) {
+            selected.addAll(getVisibleItems());
+
+          } else {
+            selected.clear();
+          }
+          redraw();
+          fireOnCheckboxSelectionChanged();
+        }
+      });
+
+      display.addColumn(selectColumn, selectHeader);
+    }
+    configureDisplay(display);
+  }
+
   protected abstract void configureDisplay(CellTable<T> display);
 
   protected abstract int getInitialPageSize();
@@ -148,10 +224,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   protected int getPageSizePagerIncrement() {
     return PAGE_SIZE_PAGER_INCREMENT;
   }
-  
+
   protected CellPreviewEvent.Handler<T> getSelectionEventManager() {
-    // none by default
-    return null;
+    if (selectable) {
+      return DefaultSelectionEventManager.<T> createBlacklistManager(0);
+    } else {
+      return null;
+    }
   }
 
   public SingleSelectionModel<T> getSelectionModel() {
@@ -326,4 +405,44 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   public void prevousPage() {
     resultsPager.previousPage();
   }
+
+  public boolean isSelectable() {
+    return selectable;
+  }
+
+  public void setSelectable(boolean selectable) {
+    this.selectable = selectable;
+  }
+
+  public Set<T> getSelected() {
+    return selected;
+  }
+
+  public void setSelected(Set<T> newSelected) {
+    selected.clear();
+    selected.addAll(newSelected);
+    redraw();
+    fireOnCheckboxSelectionChanged();
+  }
+
+  // LISTENER
+
+  public interface CheckboxSelectionListener<T> {
+    public void onSelectionChange(Set<T> selected);
+  }
+
+  public void addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
+    listeners.add(checkboxSelectionListener);
+  }
+
+  public void removeCheckboxSelectionListener(CheckboxSelectionListener<T> listener) {
+    listeners.remove(listener);
+  }
+
+  public void fireOnCheckboxSelectionChanged() {
+    for (CheckboxSelectionListener<T> listener : listeners) {
+      listener.onSelectionChange(getSelected());
+    }
+  }
+
 }

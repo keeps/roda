@@ -102,7 +102,7 @@ public class IngestProcess extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
-  
+
   @UiField
   FlowPanel ingestProcessDescription;
 
@@ -134,7 +134,7 @@ public class IngestProcess extends Composite {
       new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
 
     // TODO externalise strings
-    jobList = new JobList(filter, facets, "Ingest job list");
+    jobList = new JobList(filter, facets, "Ingest job list", false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
@@ -145,7 +145,7 @@ public class IngestProcess extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestProcessDescription.add(new HTMLWidgetWrapper("IngestProcessDescription.html"));
-    
+
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     ValueChangeHandler<Date> valueChangeHandler = new ValueChangeHandler<Date>() {
 

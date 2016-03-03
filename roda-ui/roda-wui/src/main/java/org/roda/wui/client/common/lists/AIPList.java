@@ -49,11 +49,11 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public AIPList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public AIPList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override
@@ -149,5 +149,4 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
   protected int getInitialPageSize() {
     return PAGE_SIZE;
   }
-
 }

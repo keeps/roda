@@ -134,7 +134,7 @@ public class PreservationEvents extends Composite {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId));
     Facets facets = null;
 
-    eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle());
+    eventList = new PreservationEventList(filter, facets, messages.preservationEventsTitle(), false);
 
     initWidget(uiBinder.createAndBindUi(this));
 

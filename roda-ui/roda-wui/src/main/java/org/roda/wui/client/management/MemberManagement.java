@@ -84,7 +84,7 @@ public class MemberManagement extends Composite {
 
   // private UserManagementMessages messages = (UserManagementMessages)
   // GWT.create(UserManagementMessages.class);
-  
+
   @UiField
   FlowPanel memberManagementDescription;
 
@@ -111,7 +111,8 @@ public class MemberManagement extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MEMBERS_IS_ACTIVE),
       new SimpleFacetParameter(RodaConstants.MEMBERS_IS_USER),
       new SimpleFacetParameter(RodaConstants.MEMBERS_GROUPS_ALL));
-    list = new RodaMemberList(filter, facets, "Users and groups");
+    // TODO externalize string
+    list = new RodaMemberList(filter, facets, "Users and groups", false);
     facetIsActive = new FlowPanel();
     facetIsUser = new FlowPanel();
     facetGroups = new FlowPanel();
@@ -126,7 +127,7 @@ public class MemberManagement extends Composite {
     initWidget(uiBinder.createAndBindUi(this));
 
     memberManagementDescription.add(new HTMLWidgetWrapper("MemberManagementDescription.html"));
-    
+
     list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override

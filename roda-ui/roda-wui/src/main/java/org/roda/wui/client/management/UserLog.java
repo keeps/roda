@@ -127,7 +127,7 @@ public class UserLog extends Composite {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
-    logList = new LogEntryList(filter, facets, "Logs");
+    logList = new LogEntryList(filter, facets, "Logs", false);
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
     facetUsers = new FlowPanel();

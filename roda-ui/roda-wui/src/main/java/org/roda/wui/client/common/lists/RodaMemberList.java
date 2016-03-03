@@ -49,11 +49,11 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
   private TextColumn<RODAMember> groupsColumn;
 
   public RodaMemberList() {
-    this(null, null, null);
+    this(null, null, null, false);
   }
 
-  public RodaMemberList(Filter filter, Facets facets, String summary) {
-    super(filter, facets, summary);
+  public RodaMemberList(Filter filter, Facets facets, String summary, boolean selectable) {
+    super(filter, facets, summary, selectable);
   }
 
   @Override

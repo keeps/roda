@@ -66,7 +66,7 @@ public class MoveItemDialog extends DialogBox {
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultsPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.moveItemSearchResults());
+    searchResultsPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.moveItemSearchResults(), false);
 
     setWidget(binder.createAndBindUi(this));
 
