@@ -1089,16 +1089,8 @@ public class RodaCoreFactory {
   }
 
   private static void runPDFtoPDFAPlugin() {
-    try {
-      Plugin<AIP> plugin = new PdfToPdfaPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "pdf");
-      params.put("outputFormat", "pdf");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
+    Plugin<AIP> plugin = new PdfToPdfaPlugin<AIP>();
+    getPluginOrchestrator().runPluginOnAllAIPs(plugin);
   }
 
   private static void runImageMagickConvertPlugin(String inputFormat, String outputFormat) {

@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,7 +18,6 @@ import java.nio.file.Path;
 import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.core.storage.ContentPayload;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.features.pb.PBFeatureParser;
 import org.verapdf.features.tools.FeaturesCollection;
@@ -32,16 +32,16 @@ import org.verapdf.report.MachineReadableReport;
 
 public class VeraPDFPluginUtils {
 
-  public static Path runVeraPDF(ContentPayload payload, String filename, String profile, boolean hasFeatures)
-    throws IOException, JAXBException, IllegalArgumentException, VeraPDFException {
+  public static Path runVeraPDF(Path input, String profile, boolean hasFeatures) throws IOException, JAXBException,
+    IllegalArgumentException, VeraPDFException {
     Path p = null;
 
     PDFAFlavour flavour = getFlavourFromProfileString(profile);
     boolean reportPassedChecks = false;
     long startTime = System.currentTimeMillis();
 
-    InputStream isPDF = payload.createInputStream();
-    ModelParser loader = new ModelParser(isPDF);
+    InputStream streamPDF = new FileInputStream(input.toString());
+    ModelParser loader = new ModelParser(streamPDF);
 
     // validation code
     ValidationProfile validationProfile = Profiles.getVeraProfileDirectory().getValidationProfileByFlavour(flavour);
@@ -58,19 +58,18 @@ public class VeraPDFPluginUtils {
     OutputStream os = new FileOutputStream(p.toFile());
 
     // create XML report
-    MachineReadableReport mrr = MachineReadableReport.fromValues(filename, validationProfile, result,
+    MachineReadableReport mrr = MachineReadableReport.fromValues(input.toFile().getName(), validationProfile, result,
       reportPassedChecks, null, featuresCollection, System.currentTimeMillis() - startTime);
     MachineReadableReport.toXml(mrr, os, Boolean.TRUE);
 
     IOUtils.closeQuietly(os);
     IOUtils.closeQuietly(loader);
-    IOUtils.closeQuietly(isPDF);
+    IOUtils.closeQuietly(streamPDF);
 
     return p;
   }
 
-  // function responsible to transform profile argument string in a PDFA profile
-  // flavour
+  // function to transform profile arg string in a PDFA profile flavour
   private static PDFAFlavour getFlavourFromProfileString(String profile) {
     switch (profile) {
       case "1a":

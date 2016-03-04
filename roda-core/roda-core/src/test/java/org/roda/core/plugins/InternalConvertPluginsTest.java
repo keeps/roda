@@ -24,6 +24,7 @@ import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
@@ -51,6 +52,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -64,6 +66,7 @@ import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePluginUtils;
+import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -127,8 +130,11 @@ public class InternalConvertPluginsTest {
 
     List<TransferredResource> resources = new ArrayList<TransferredResource>();
 
-    String[] aips = {CorporaConstants.SOURCE_AIP_CONVERTER_1, CorporaConstants.SOURCE_AIP_CONVERTER_2};
-    String[] reps = {CorporaConstants.REPRESENTATION_CONVERTER_ID_1, CorporaConstants.REPRESENTATION_CONVERTER_ID_2};
+    String[] aips = {CorporaConstants.SOURCE_AIP_CONVERTER_1, CorporaConstants.SOURCE_AIP_CONVERTER_2,
+      CorporaConstants.SOURCE_AIP_CONVERTER_3};
+
+    String[] reps = {CorporaConstants.REPRESENTATION_CONVERTER_ID_1, CorporaConstants.REPRESENTATION_CONVERTER_ID_2,
+      CorporaConstants.REPRESENTATION_CONVERTER_ID_3};
 
     Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aips[corporaId])
       .resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS).resolve(reps[corporaId])
@@ -627,5 +633,30 @@ public class InternalConvertPluginsTest {
       Assert.assertEquals(0,
         DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
     }
+  }
+
+  @Ignore
+  @Test
+  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+    ingestCorpora(2);
+
+    Plugin<AIP> plugin = new VeraPDFPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put("profile", "1b");
+    parameters.put("hasFeatures", "False");
+    plugin.setParameterValues(parameters);
+
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
+    Assert.assertEquals("PARTIAL_SUCCESS", reports.get(0).getPluginState().toString());
+
+    Plugin<AIP> plugin2 = new PdfToPdfaPlugin<AIP>();
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin2);
+
+    Plugin<AIP> plugin3 = new VeraPDFPlugin();
+    plugin3.setParameterValues(parameters);
+    reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
+    Assert.assertEquals("SUCCESS", reports.get(0).getPluginState().toString());
+
   }
 }

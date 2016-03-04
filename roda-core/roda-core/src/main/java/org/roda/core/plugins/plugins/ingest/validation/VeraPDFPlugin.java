@@ -10,14 +10,12 @@ package org.roda.core.plugins.plugins.ingest.validation;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -47,16 +45,15 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.storage.Binary;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.fs.FSUtils;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 
 public class VeraPDFPlugin extends AbstractPlugin<AIP> {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
   private String profile;
   private boolean hasFeatures = false;
   private boolean hasPartialSuccessOnOutcome;
@@ -115,21 +112,22 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
 
     for (AIP aip : list) {
-      logger.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP " + aip.getId());
 
       for (Representation representation : aip.getRepresentations()) {
-        Map<String, Path> resourceList = new HashMap<>();
+        List<String> resourceList = new ArrayList<String>();
         Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
-        int pluginResultState = 1; // success
+        PluginState pluginResultState = PluginState.SUCCESS;
+        StringBuilder details = new StringBuilder();
 
         try {
-          logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+          LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
 
           boolean recursive = true;
           CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
           for (File file : allFiles) {
-            logger.debug("Processing file: " + file);
+            LOGGER.debug("Processing file: " + file);
 
             if (!file.isDirectory()) {
               IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -137,104 +135,90 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
               if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
-
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-                Binary binary = storage.getBinary(fileStoragePath);
+                DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
                 // FIXME file that doesn't get deleted afterwards
-                logger.debug("Running veraPDF validator on " + file.getId());
-                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(binary.getContent(), file.getId(), profile,
-                  hasFeatures);
+                LOGGER.debug("Running veraPDF validator on " + file.getId());
+                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
 
                 if (veraPDFResult != null) {
-                  reportItem.setPluginState(PluginState.SUCCESS);
-                  resourceList.put(file.getId(), veraPDFResult);
-                } else {
-                  reportItem.setPluginState(PluginState.PARTIAL_SUCCESS);
-                  pluginResultState = 2; // partial success or failure
-                }
-              }
-            } else {
+                  ContentPayload payload = new FSPathContentPayload(veraPDFResult);
+                  InputStream inputStream = payload.createInputStream();
+                  String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                  IOUtils.closeQuietly(inputStream);
 
-              logger.debug("veraPDF validation did not run on file: " + file);
+                  Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
+                  Matcher matcher = pattern.matcher(xmlReport);
+
+                  if (matcher.find()) {
+                    resourceList.add(file.getId());
+                    pluginResultState = PluginState.PARTIAL_SUCCESS;
+                    details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
+                  }
+
+                } else {
+                  pluginResultState = PluginState.PARTIAL_SUCCESS;
+                }
+
+                IOUtils.closeQuietly(directAccess);
+              }
             }
           }
+
+          reportItem.setPluginState(pluginResultState);
           IOUtils.closeQuietly(allFiles);
         } catch (Throwable e) {
-          logger.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
-          reportItem.setPluginState(PluginState.FAILURE);
-          pluginResultState = 0; // failure
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+          pluginResultState = PluginState.FAILURE;
+          reportItem.setPluginState(pluginResultState);
         }
 
-        logger.debug("Creating veraPDF event for the representation " + representation.getId());
-        createEvent(resourceList, aip, representation.getId(), model, pluginResultState);
+        LOGGER.debug("Creating veraPDF event for the representation " + representation.getId());
         report.addReport(reportItem);
+        createEvent(resourceList, aip, representation.getId(), model, pluginResultState, details);
       }
     }
 
     return report;
   }
 
-  private void createEvent(Map<String, Path> resourceList, AIP aip, String representationId, ModelService model,
-    int state) throws PluginException {
-    PluginState pluginState = PluginState.SUCCESS;
+  private void createEvent(List<String> resourceList, AIP aip, String representationId, ModelService model,
+    PluginState pluginState, StringBuilder details) throws PluginException {
     String outcomeDetails = null;
     try {
       // building the detail extension for the plugin event
-
       StringBuilder noteStringBuilder = new StringBuilder();
       StringBuilder detailsStringBuilder = new StringBuilder();
       noteStringBuilder.append("The following files did not pass veraPDF's validation with success: ");
-      detailsStringBuilder.append("<reportWrapper>");
+      detailsStringBuilder.append("\n\n<reportWrapper>");
 
-      for (String fileID : resourceList.keySet()) {
-        Path veraPDFResult = resourceList.get(fileID);
-        Binary b = (Binary) FSUtils.convertPathToResource(veraPDFResult.getParent(), veraPDFResult);
-
-        // using XPath to discover if the validation was successful or not
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        InputStream inputStream = b.getContent().createInputStream();
-        String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-        InputSource inputSource = new InputSource(xmlReport);
-        NodeList nodes = (NodeList) xpath.evaluate("//*[@compliant='false']", inputSource, XPathConstants.NODESET);
-
-        if (nodes.getLength() > 0) {
-          noteStringBuilder.append(fileID + ", ");
-          detailsStringBuilder.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
-          state = 2;
-        }
-
-        IOUtils.closeQuietly(inputStream);
+      for (String fileID : resourceList) {
+        noteStringBuilder.append(fileID + ", ");
       }
 
       noteStringBuilder.setLength(noteStringBuilder.length() - 2);
+      detailsStringBuilder.append(details);
       detailsStringBuilder.append("</reportWrapper>");
+      noteStringBuilder.append(detailsStringBuilder);
 
       // all file have passed the validation
-      if (state == 1) {
-        pluginState = PluginState.SUCCESS;
+      if (pluginState == PluginState.SUCCESS)
         noteStringBuilder.setLength(0);
-        detailsStringBuilder.setLength(0);
-      }
+
       // veraPDF plugin did not run correctly
-      if (state == 0 || (state == 2 && hasPartialSuccessOnOutcome == false)) {
+      if (pluginState == PluginState.FAILURE
+        || (pluginState == PluginState.PARTIAL_SUCCESS && hasPartialSuccessOnOutcome == false)) {
         pluginState = PluginState.FAILURE;
         noteStringBuilder.setLength(0);
-        detailsStringBuilder.setLength(0);
       }
-      // some files did not pass the verification
-      if (state == 2 && hasPartialSuccessOnOutcome == true) {
-        pluginState = PluginState.PARTIAL_SUCCESS;
-      }
-
-      logger.debug("The veraPDF validation on the representation " + representationId + " of AIP " + aip.getId()
-        + " finished with a status: " + pluginState.name() + ".");
 
       outcomeDetails = noteStringBuilder.toString();
+
     } catch (Throwable e) {
       pluginState = PluginState.FAILURE;
       outcomeDetails = e.getMessage();
-      logger.error("Error executing VeraPDF plugin: " + e.getMessage(), e);
+      LOGGER.error("Error executing VeraPDF plugin: " + e.getMessage(), e);
     }
     boolean notify = false;
 
@@ -245,7 +229,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
-      logger.error("Error creating event: " + e.getMessage(), e);
+      LOGGER.error("Error creating event: " + e.getMessage(), e);
     }
 
   }

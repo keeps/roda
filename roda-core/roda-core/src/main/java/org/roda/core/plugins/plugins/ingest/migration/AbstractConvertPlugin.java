@@ -188,7 +188,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         List<File> newFiles = new ArrayList<File>();
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
-        int pluginResultState = 1;
+        PluginState pluginResultState = PluginState.SUCCESS;
         Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
         try {
@@ -245,7 +245,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
                 } catch (CommandException e) {
                   detailExtension += file.getId() + ": " + e.getOutput();
-                  pluginResultState = 2;
+                  pluginResultState = PluginState.PARTIAL_SUCCESS;
 
                   reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
@@ -268,8 +268,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
           | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
-          pluginResultState = 0;
-
+          pluginResultState = PluginState.FAILURE;
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         }
 
@@ -311,7 +310,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       List<File> alteredFiles = new ArrayList<File>();
       List<File> newFiles = new ArrayList<File>();
       aipId = representation.getAipId();
-      int pluginResultState = 1;
+      PluginState pluginResultState = PluginState.SUCCESS;
       boolean notify = true;
       Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
@@ -368,7 +367,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
               } catch (CommandException e) {
                 detailExtension += file.getId() + ": " + e.getOutput();
-                pluginResultState = 2;
+                pluginResultState = PluginState.PARTIAL_SUCCESS;
 
                 reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
@@ -396,7 +395,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         | AuthorizationDeniedException | IOException | AlreadyExistsException | ValidationException
         | InvalidParameterException | SAXException | TikaException | XmlException e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-        pluginResultState = 0;
+        pluginResultState = PluginState.FAILURE;
 
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         report.addReport(reportItem);
@@ -420,7 +419,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   private Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
     throws PluginException {
 
-    int pluginResultState = 1;
+    PluginState pluginResultState = PluginState.SUCCESS;
     Set<String> aipSet = new HashSet<String>();
     boolean notify = true;
     String newRepresentationID = null;
@@ -484,7 +483,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
             } catch (CommandException e) {
               detailExtension += file.getId() + ": " + e.getOutput();
-              pluginResultState = 2;
+              pluginResultState = PluginState.PARTIAL_SUCCESS;
 
               reportItem.setPluginState(PluginState.PARTIAL_SUCCESS).setPluginDetails(e.getMessage());
 
@@ -497,7 +496,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | ValidationException | IOException | AlreadyExistsException e) {
         LOGGER.error("Error processing File " + file.getId() + ": " + e.getMessage(), e);
-        pluginResultState = 0;
+        pluginResultState = PluginState.FAILURE;
 
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
       }
@@ -522,14 +521,13 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   throws UnsupportedOperationException, IOException, CommandException;
 
   private void createEvent(List<File> alteredFiles, List<File> newFiles, String aipId, String newRepresentationID,
-    ModelService model, String outputFormat, int pluginResultState, String detailExtension, boolean notify)
+    ModelService model, String outputFormat, PluginState outcome, String detailExtension, boolean notify)
     throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
-    PluginState outcome = PluginState.SUCCESS;
     StringBuilder stringBuilder = new StringBuilder();
 
     if (alteredFiles.size() == 0) {
@@ -550,14 +548,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     }
 
     // Conversion plugin did not run correctly
-    if (pluginResultState == 0 || (pluginResultState == 2 && hasPartialSuccessOnOutcome() == false)) {
+    if (outcome == PluginState.FAILURE
+      || (outcome == PluginState.PARTIAL_SUCCESS && hasPartialSuccessOnOutcome() == false)) {
       outcome = PluginState.FAILURE;
       stringBuilder.setLength(0);
-    }
-
-    // some files were not converted
-    if (pluginResultState == 2 && hasPartialSuccessOnOutcome() == true) {
-      outcome = PluginState.PARTIAL_SUCCESS;
     }
 
     try {

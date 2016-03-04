@@ -22,6 +22,11 @@ import org.verapdf.core.VeraPDFException;
 
 public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
 
+  public PdfToPdfaPlugin() {
+    super.setInputFormat("pdf");
+    super.setOutputFormat("pdf");
+  }
+
   @Override
   public String getName() {
     return "PDF to PDFA conversion";
