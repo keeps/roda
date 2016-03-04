@@ -128,7 +128,9 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
         } else {
           long totalSize = 0;
           for (TransferredResource item : items) {
-            totalSize += item.getSize();
+            if (item != null) {
+              totalSize += item.getSize();
+            }
           }
           return totalSize > 0 ? Humanize.readableFileSize(totalSize) : "";
         }

@@ -550,6 +550,22 @@ pre>code {
 	width: 100%;
 }
 
+.my-asyncdatagrid .panel {
+	margin-bottom: 10px;
+}
+
+.my-asyncdatagrid .panel .panel-body {
+	padding: 5px 15px 5px 10px;
+}
+
+.my-asyncdatagrid .panel .gwt-CheckBox {
+	padding-right: 10px;
+}
+
+.my-asyncdatagrid .panel .gwt-Label {
+	display: inline-block;
+}
+
 .description-level {
 	display: inline-block;
 	font: normal normal normal 14px/1 FontAwesome;

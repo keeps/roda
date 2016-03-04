@@ -45,8 +45,10 @@ import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
@@ -65,8 +67,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   private final PageSizePager pageSizePager;
   private final CellTable<T> display;
 
+  private FlowPanel selectAllPanel;
+  private FlowPanel selectAllPanelBody;
+  private Label selectAllLabel;
+  private CheckBox selectAllCheckBox;
+
   private Column<T, Boolean> selectColumn;
-  private final Set<T> selected = new HashSet<T>();
+  private Set<T> selected = new HashSet<T>();
   private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
 
   private Filter filter;
@@ -122,20 +129,19 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     pageSizePager = new PageSizePager(getPageSizePagerIncrement());
     pageSizePager.setDisplay(display);
 
+    createSelectAllPanel();
+
     add(resultsPager);
+    add(selectAllPanel);
     add(display);
     add(pageSizePager);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());
 
     Handler<T> selectionEventManager = getSelectionEventManager();
-    if (selectionEventManager != null)
-
-    {
+    if (selectionEventManager != null) {
       display.setSelectionModel(selectionModel, selectionEventManager);
-    } else
-
-    {
+    } else {
       display.setSelectionModel(selectionModel);
     }
 
@@ -146,7 +152,13 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
     pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
     display.addStyleName("my-asyncdatagrid-display");
-
+    
+    addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
+        hideSelectAllPanel();
+      }   
+    });
   }
 
   private void configure(final CellTable<T> display) {
@@ -183,9 +195,11 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
             ret = false;
           } else if (selected.containsAll(getVisibleItems())) {
             ret = true;
+            showSelectAllPanel();
           } else {
             // some are selected
             ret = false;
+            hideSelectAllPanel();
           }
 
           return ret;
@@ -198,9 +212,10 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         public void update(Boolean value) {
           if (value) {
             selected.addAll(getVisibleItems());
-
+            showSelectAllPanel();
           } else {
             selected.clear();
+            hideSelectAllPanel();
           }
           redraw();
           fireOnCheckboxSelectionChanged();
@@ -238,6 +253,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   public void refresh() {
+    selected = new HashSet<T>();
+    hideSelectAllPanel();
     display.setVisibleRangeAndClearData(new Range(0, getInitialPageSize()), true);
     getSelectionModel().clear();
   }
@@ -445,4 +462,33 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     }
   }
 
+  // SELECT ALL PANEL
+
+  public void createSelectAllPanel() {
+    selectAllPanel = new FlowPanel();
+    selectAllPanelBody = new FlowPanel();
+    selectAllCheckBox = new CheckBox();
+    selectAllLabel = new Label("Select all");
+
+    selectAllPanelBody.add(selectAllCheckBox);
+    selectAllPanelBody.add(selectAllLabel);
+    selectAllPanel.add(selectAllPanelBody);
+    selectAllPanel.setVisible(false);
+
+    selectAllPanel.addStyleName("panel");
+    selectAllPanelBody.addStyleName("panel-body");
+  }
+
+  public void showSelectAllPanel() {
+    if (resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
+      selectAllLabel.setText("Select all " + display.getRowCount() + " items in all pages");
+      selectAllCheckBox.setValue(false);
+      selectAllPanel.setVisible(true);
+    }
+  }
+
+  public void hideSelectAllPanel() {
+    selectAllCheckBox.setValue(false);
+    selectAllPanel.setVisible(false);
+  }
 }
