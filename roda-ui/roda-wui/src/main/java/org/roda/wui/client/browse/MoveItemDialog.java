@@ -10,6 +10,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
@@ -55,8 +56,8 @@ public class MoveItemDialog extends DialogBox {
   @UiField(provided = true)
   AIPList searchResultsPanel;
 
-  String aipId;
-  AsyncCallback<Boolean> callback;
+  private String aipId;
+  private AsyncCallback<Boolean> callback;
 
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
@@ -103,7 +104,8 @@ public class MoveItemDialog extends DialogBox {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        if (searchResultsPanel.getSelectionModel().getSelectedObject() != null) {
+        IndexedAIP aip = searchResultsPanel.getSelectionModel().getSelectedObject();
+        if (aip != null && !aip.getId().equals(MoveItemDialog.this.aipId)) {
           moveItem.setEnabled(true);
         } else {
           moveItem.setEnabled(false);
