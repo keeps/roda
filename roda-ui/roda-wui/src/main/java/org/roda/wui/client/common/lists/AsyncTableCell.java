@@ -152,12 +152,12 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     resultsPager.addStyleName("my-asyncdatagrid-pager-results");
     pageSizePager.addStyleName("my-asyncdatagrid-pager-pagesize");
     display.addStyleName("my-asyncdatagrid-display");
-    
+
     addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
         hideSelectAllPanel();
-      }   
+      }
     });
   }
 
@@ -480,8 +480,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   public void showSelectAllPanel() {
-    if (resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
-      selectAllLabel.setText("Select all " + display.getRowCount() + " items in all pages");
+    if (!selectAllPanel.isVisible() && resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
+      selectAllLabel.setText("Select all pages of this search");
       selectAllCheckBox.setValue(false);
       selectAllPanel.setVisible(true);
     }
