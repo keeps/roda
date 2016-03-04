@@ -1075,13 +1075,12 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(fulltextPlugin);
   }
 
-  private static void runVeraPDFPlugin(String profile, String hasFeatures, String maxKbytes) {
+  private static void runVeraPDFPlugin(String profile, String hasFeatures) {
     try {
       Plugin<AIP> veraPDFPlugin = new VeraPDFPlugin();
       Map<String, String> params = new HashMap<String, String>();
       params.put("profile", profile);
       params.put("hasFeatures", hasFeatures);
-      params.put("maxKbytes", maxKbytes);
       veraPDFPlugin.setParameterValues(params);
       getPluginOrchestrator().runPluginOnAllAIPs(veraPDFPlugin);
     } catch (InvalidParameterException e) {
@@ -1569,7 +1568,7 @@ public class RodaCoreFactory {
     } else if ("fulltext".equals(args.get(0))) {
       runFulltextPlugin();
     } else if ("verapdf".equals(args.get(0))) {
-      runVeraPDFPlugin(args.get(1), args.get(2), args.get(3));
+      runVeraPDFPlugin(args.get(1), args.get(2));
     } else if ("pdftopdfa".equals(args.get(0))) {
       runPDFtoPDFAPlugin();
     } else if ("imagemagickconvert".equals(args.get(0))) {

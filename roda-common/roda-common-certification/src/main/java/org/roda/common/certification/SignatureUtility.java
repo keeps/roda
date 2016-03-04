@@ -15,13 +15,10 @@ import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.UnrecoverableKeyException;
-import java.security.cert.CertSelector;
 import java.security.cert.CertStore;
 import java.security.cert.CertStoreException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
 import java.security.cert.CollectionCertStoreParameters;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
@@ -30,6 +27,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bouncycastle.cert.X509CertificateHolder;
+import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.CMSProcessableFile;
 import org.bouncycastle.cms.CMSSignedData;
@@ -37,6 +36,7 @@ import org.bouncycastle.cms.CMSSignedDataGenerator;
 import org.bouncycastle.cms.SignerInformation;
 import org.bouncycastle.cms.SignerInformationStore;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.Store;
 
 /**
  * Utility class to help create and validate digital signatures
@@ -171,18 +171,16 @@ public class SignatureUtility {
    * @param file
    * @param signature
    * @return true if valid
-   * @throws CertificateExpiredException
-   * @throws CertificateNotYetValidException
    * @throws NoSuchAlgorithmException
    * @throws NoSuchProviderException
    * @throws CertStoreException
    * @throws CMSException
    * @throws FileNotFoundException
    * @throws IOException
+   * @throws CertificateException
    */
-  public boolean verify(File file, File signature) throws CertificateExpiredException, CertificateNotYetValidException,
-    NoSuchAlgorithmException, NoSuchProviderException, CertStoreException, CMSException, FileNotFoundException,
-    IOException {
+  public boolean verify(File file, File signature) throws NoSuchAlgorithmException, NoSuchProviderException,
+    CertStoreException, CMSException, FileNotFoundException, IOException, CertificateException {
     CMSProcessableFile cmsFile = new CMSProcessableFile(file);
     CMSSignedData signedData = new CMSSignedData(cmsFile, new FileInputStream(signature));
 
@@ -191,11 +189,11 @@ public class SignatureUtility {
 
   @SuppressWarnings("unchecked")
   private boolean verifySignatures(CMSSignedData s, byte[] contentDigest) throws NoSuchAlgorithmException,
-    NoSuchProviderException, CMSException, CertStoreException, CertificateExpiredException,
-    CertificateNotYetValidException {
+    NoSuchProviderException, CMSException, CertStoreException, CertificateException {
     boolean valid = true;
 
-    CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);
+    // CertStore certStore = s.getCertificatesAndCRLs("Collection", provider);
+    Store certStore = s.getCertificates();
     SignerInformationStore signers = s.getSignerInfos();
 
     Collection<SignerInformation> c = signers.getSigners();
@@ -203,10 +201,11 @@ public class SignatureUtility {
 
     while (it.hasNext()) {
       SignerInformation signer = it.next();
-      Collection certCollection = certStore.getCertificates((CertSelector) signer.getSID());
+      Collection certCollection = certStore.getMatches(signer.getSID());
 
       Iterator certIt = certCollection.iterator();
-      X509Certificate cert = (X509Certificate) certIt.next();
+      X509CertificateHolder certHolder = (X509CertificateHolder) certIt.next();
+      X509Certificate cert = new JcaX509CertificateConverter().setProvider(provider).getCertificate(certHolder);
 
       boolean certValid = signer.verify(cert, provider);
 

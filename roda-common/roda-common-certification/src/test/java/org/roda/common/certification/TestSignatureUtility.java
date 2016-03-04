@@ -10,6 +10,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 
@@ -57,6 +58,8 @@ public class TestSignatureUtility {
         } catch (CertStoreException e) {
           e.printStackTrace();
         } catch (CMSException e) {
+          e.printStackTrace();
+        } catch (CertificateException e) {
           e.printStackTrace();
         }
       } else {

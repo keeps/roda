@@ -47,8 +47,7 @@ public class SoxConvertPluginUtils {
       version = version.replace(" ", "");
       version = version.substring(0, version.indexOf('\n'));
     }
-    version = version.replaceAll("sox:SoXv([0-9.])", "SoX_v$1");
-    version = version.replace(" ", "_");
+    version = version.replaceAll("/usr/bin/sox:SoXv([0-9.])", "$1");
     return version.trim();
   }
 

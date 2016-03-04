@@ -54,9 +54,8 @@ public class GhostScriptConvertPluginUtils {
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));
-      version = version.replace(" ", "_");
     }
-    return "GhostScript_" + version.trim();
+    return version.trim();
   }
 
   /*************************** FILLING FILE FORMAT STRUCTURES ***************************/

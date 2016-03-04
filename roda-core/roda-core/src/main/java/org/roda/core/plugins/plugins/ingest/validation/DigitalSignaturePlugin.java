@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
+import org.roda.common.certification.SignatureUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -393,7 +394,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
     try {
       if (fileFormat.equals("pdf")) {
-        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractPDF(input);
+        extractResult = SignatureUtils.runDigitalSignatureExtractPDF(input);
 
         if (extractResult.size() > 0) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
@@ -410,7 +411,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
           }
         }
       } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        Map<Path, String> extractMap = DigitalSignaturePluginUtils.runDigitalSignatureExtractOOXML(input);
+        Map<Path, String> extractMap = SignatureUtils.runDigitalSignatureExtractOOXML(input);
         extractResult = new ArrayList<Path>(extractMap.keySet());
 
         for (Path p : extractResult) {
@@ -420,7 +421,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
         }
       } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        extractResult = DigitalSignaturePluginUtils.runDigitalSignatureExtractODF(input);
+        extractResult = SignatureUtils.runDigitalSignatureExtractODF(input);
 
         if (extractResult.size() > 0) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));

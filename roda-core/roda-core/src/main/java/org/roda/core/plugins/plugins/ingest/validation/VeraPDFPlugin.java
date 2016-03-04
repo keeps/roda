@@ -57,11 +57,16 @@ import org.xml.sax.InputSource;
 
 public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private final Logger logger = LoggerFactory.getLogger(getClass());
-  private String profile = "1b";
+  private String profile;
   private boolean hasFeatures = false;
-  private long maxKbytes = 20000; // default 20000 kb
-  private boolean hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString(
-    "tools", "allplugins", "hasPartialSuccessOnOutcome"));
+  private boolean hasPartialSuccessOnOutcome;
+
+  public VeraPDFPlugin() {
+    profile = "1b";
+    hasFeatures = false;
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
+      "allplugins", "hasPartialSuccessOnOutcome"));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -101,23 +106,21 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
       hasFeatures = Boolean.parseBoolean(parameters.get("hasFeatures"));
     }
 
-    // indicates the maximum kbytes the files that will be processed must have
-    if (parameters.containsKey("maxKbytes")) {
-      maxKbytes = Long.parseLong(parameters.get("maxKbytes"));
-    }
-
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
+    Report report = PluginHelper.createPluginReport(this);
+
     for (AIP aip : list) {
       logger.debug("Processing AIP " + aip.getId());
 
       for (Representation representation : aip.getRepresentations()) {
         Map<String, Path> resourceList = new HashMap<>();
-        int state = 1; // success
+        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+        int pluginResultState = 1; // success
 
         try {
           logger.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
@@ -131,11 +134,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
             if (!file.isDirectory()) {
               IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
               String fileMimetype = ifile.getFileFormat().getMimeType();
-              String filePronom = ifile.getFileFormat().getPronom();
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
-              if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))
-                && ifile.getSize() < (maxKbytes * 1024)) {
+              if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
 
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(fileStoragePath);
@@ -146,9 +147,11 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
                   hasFeatures);
 
                 if (veraPDFResult != null) {
+                  reportItem.setPluginState(PluginState.SUCCESS);
                   resourceList.put(file.getId(), veraPDFResult);
                 } else {
-                  state = 2; // partial success or failure
+                  reportItem.setPluginState(PluginState.PARTIAL_SUCCESS);
+                  pluginResultState = 2; // partial success or failure
                 }
               }
             } else {
@@ -159,15 +162,17 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
           IOUtils.closeQuietly(allFiles);
         } catch (Throwable e) {
           logger.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
-          state = 0; // failure
+          reportItem.setPluginState(PluginState.FAILURE);
+          pluginResultState = 0; // failure
         }
 
         logger.debug("Creating veraPDF event for the representation " + representation.getId());
-        createEvent(resourceList, aip, representation.getId(), model, state);
+        createEvent(resourceList, aip, representation.getId(), model, pluginResultState);
+        report.addReport(reportItem);
       }
     }
 
-    return null;
+    return report;
   }
 
   private void createEvent(Map<String, Path> resourceList, AIP aip, String representationId, ModelService model,

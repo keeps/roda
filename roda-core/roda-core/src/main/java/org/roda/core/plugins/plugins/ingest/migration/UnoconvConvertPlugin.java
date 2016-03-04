@@ -35,6 +35,7 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
     try {
       return UnoconvConvertPluginUtils.getVersion();
     } catch (UnsupportedOperationException | CommandException | IOException e) {
+      e.printStackTrace();
       return "1.0";
     }
   }

@@ -10,6 +10,7 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertStoreException;
+import java.security.cert.CertificateException;
 import java.security.cert.CertificateExpiredException;
 import java.security.cert.CertificateNotYetValidException;
 
@@ -211,6 +212,8 @@ public class SignatureVerifyPanel extends JPanel {
       } catch (CMSException e) {
         resultLabel.setText("NOT VALID, internal error: " + e.getMessage());
       } catch (IOException e) {
+        resultLabel.setText("NOT VALID, internal error: " + e.getMessage());
+      } catch (CertificateException e) {
         resultLabel.setText("NOT VALID, internal error: " + e.getMessage());
       }
     }
