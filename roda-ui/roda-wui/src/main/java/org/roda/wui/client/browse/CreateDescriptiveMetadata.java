@@ -169,7 +169,11 @@ public class CreateDescriptiveMetadata extends Composite {
           CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
 
           for (SupportedMetadataTypeBundle b : metadataTypes) {
-            type.addItem(b.getLabel(), b.getType()+RodaConstants.METADATA_VERSION_SEPARATOR+b.getVersion());
+            if(b.getVersion()!=null){
+              type.addItem(b.getLabel(), b.getType()+RodaConstants.METADATA_VERSION_SEPARATOR+b.getVersion());
+            }else{
+              type.addItem(b.getLabel(), b.getType());
+            }
           }
 
           type.addItem("Other", "");
