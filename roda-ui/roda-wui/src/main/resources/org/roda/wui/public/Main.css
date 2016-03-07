@@ -310,6 +310,24 @@ pre>code {
 	margin-left: 5px;
 }
 
+.form-button {
+	margin-bottom: 10px;
+}
+
+.itemPanel {
+	padding-top:5px;
+	padding-bottom: 5px;
+}
+
+.itemPanel .itemIcon,
+.itemPanel .itemText {
+	display: inline-block;
+}
+
+.itemPanel .itemText {
+	margin-left: 5px;
+}
+
 .row>.content {
 	padding: 40px !important;
 	min-height: 600px;
@@ -326,8 +344,6 @@ pre>code {
 	margin-right: 10px;
 	margin-bottom: 7px;
 }
-
-
 
 .sidebar .h1, .sidebar .h2, .sidebar .h3, .sidebar .h4, .sidebar .h5,
 	.sidebar .h6 {
@@ -4459,37 +4475,36 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 /**********************************************
-				MOVE ITEM
+				SELECT AIP
 ************************************************/
-.moveItem {
+.selectAip {
 /* 	width: 100%; */
 }
 
-.moveItem .searchPanel {
+.selectAip .searchPanel {
 	margin-right: 40px;
 }
 
-.moveItem .searchPanelRight {
+.selectAip .searchPanelRight {
 	width: 40px;
 	margin-right: -40px;
 }
 
-.moveItem .moveItemResultsPanel {
+.selectAip .selectAipResultsPanel {
 	width: 800px;
-/* 	max-width: 100%; */
 	height: 400px;
 	overflow-x: scroll;
 	margin-top: 20px;
 	margin-bottom: 20px;
 }
 
-.moveItem .moveItemResultsPanel .my-asyncdatagrid-pager-results,
-.moveItem .moveItemResultsPanel thead {
+.selectAip .selectAipResultsPanel .my-asyncdatagrid-pager-results,
+.selectAip .selectAipResultsPanel thead {
 	display: none;
 }
 
 @media (max-width: 800px) {
-	.moveItem .moveItemResultsPanel {
+	.selectAip .selectAipResultsPanel {
 		width: 100%;
 	}
 }

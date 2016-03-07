@@ -367,6 +367,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
+  
+  @DefaultMessage("Select")
+  String pluginAipIdButton();
 
   @DefaultMessage("Missing mandatory information")
   String ingestProcessNewMissingMandatoryInfoDialogTitle();
@@ -536,23 +539,30 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
-  /************* Move item ****************/
-
+  /************* Select AIP Dialog ****************/
+  
+  @DefaultMessage("Cancel")
+  String selectAipCancelButton();
+  
+  @DefaultMessage("Select")
+  String selectAipSelectButton();
+  
+  @DefaultMessage("Search results")
+  String selectAipSearchResults();
+  
+  @DefaultMessage("Search records...")
+  String selectAipSearchPlaceHolder();
+  
+  /************* Move Item ****************/
+  
   @DefaultMessage("Move item")
   String moveItemTitle();
   
-  @DefaultMessage("Cancel")
-  String moveItemCancel();
-  
-  @DefaultMessage("Move")
-  String moveItemMove();
-  
-  @DefaultMessage("Search results")
-  String moveItemSearchResults();
-  
-  @DefaultMessage("Search records...")
-  String moveItemSearchPlaceHolder();
-  
   @DefaultMessage("Error moving item!")
   String moveItemFailed();
+  
+  /************* Select Parent ****************/
+  
+  @DefaultMessage("Select parent")
+  String selectParentTitle();
 }

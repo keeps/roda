@@ -14,7 +14,7 @@
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
-	<g:FlowPanel addStyleNames="moveItem wui-dialog-confirm wrapper skip_padding">
+	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
 			<g:FlowPanel styleName="searchPanel">
 				<g:FlowPanel styleName="searchPanelLeft">
@@ -33,14 +33,14 @@
 					</wcag:AccessibleFocusPanel>
 				</g:FlowPanel>
 			</g:FlowPanel>
-			<g:ScrollPanel addStyleNames="moveItemResultsPanel">
+			<g:ScrollPanel addStyleNames="selectAipResultsPanel">
 				<lists:AIPList ui:field="searchResultsPanel" />
 			</g:ScrollPanel>
-			<g:Button addStyleNames="btn btn-ban" ui:field="cancel">
-				<ui:text from='{messages.moveItemCancel}' />
+			<g:Button addStyleNames="btn btn-ban" ui:field="cancelButton">
+				<ui:text from='{messages.selectAipCancelButton}' />
 			</g:Button>
-			<g:Button addStyleNames="pull-right btn btn-edit" ui:field="moveItem">
-				<ui:text from='{messages.moveItemMove}' />
+			<g:Button addStyleNames="pull-right btn btn-edit" ui:field="selectButton">
+				<ui:text from='{messages.selectAipSelectButton}' />
 			</g:Button>
 		</g:FlowPanel>
 	</g:FlowPanel>

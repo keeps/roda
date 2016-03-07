@@ -9,20 +9,28 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.BrowseMessages;
@@ -57,11 +65,61 @@ public class PluginParameterPanel extends Composite {
       createStringLayout();
     } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
       createPluginSipToAipLayout();
+    } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
+      createSelectAipLayout();
     } else {
       logger
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
+  }
+  
+  private void createSelectAipLayout() {
+    Label parameterName = new Label(parameter.getName());
+    final FlowPanel aipPanel = new FlowPanel();
+    Button button = new Button(messages.pluginAipIdButton());
+    
+    aipPanel.setVisible(false);
+    
+    button.addClickHandler(new ClickHandler() {
+      
+      @Override
+      public void onClick(ClickEvent event) {
+       SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
+       selectAipDialog.showAndCenter();
+       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
+         @Override
+         public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+           IndexedAIP aip = event.getValue();
+           
+           SimplePanel itemIcon = new SimplePanel();
+           Label itemTitle = new Label();
+           
+           HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+           itemIcon.setWidget(itemIconHtmlPanel);
+           itemIcon.addStyleName("itemIcon");
+           itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+           itemTitle.addStyleName("itemText");
+           
+           aipPanel.clear();
+           aipPanel.add(itemIcon);
+           aipPanel.add(itemTitle);
+           aipPanel.setVisible(true);
+           
+           value = aip.getId();
+         }
+       });
+      }
+    });
+    
+    layout.add(parameterName);
+    layout.add(aipPanel);
+    layout.add(button);
+    
+    parameterName.addStyleName("form-label");
+    aipPanel.addStyleName("itemPanel");
+    button.addStyleName("form-button btn btn-plus");
   }
 
   private void createPluginSipToAipLayout() {

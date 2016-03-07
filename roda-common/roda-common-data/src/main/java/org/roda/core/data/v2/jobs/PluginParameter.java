@@ -40,10 +40,15 @@ public class PluginParameter implements Serializable {
      */
     PLUGIN_SIP_TO_AIP, 
     
-    /*
+    /**
      * Metadata type select box
      */
-    METADATA_TYPE;
+    METADATA_TYPE,
+    
+    /**
+     * Interface to select an AIP Id
+     */
+    AIP_ID;
   }
 
   /**

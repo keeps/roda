@@ -796,8 +796,6 @@ public class ViewRepresentation extends Composite {
             filePreview.add(frame);
             frame.setStyleName("viewRepresentationTextFilePreview");
             JavascriptUtils.runHighlighter(html.getElement());
-            JavascriptUtils.slideToggle(html.getElement(), ".toggle-next");
-            JavascriptUtils.smoothScroll(html.getElement());
           } else {
             errorPreview();
           }

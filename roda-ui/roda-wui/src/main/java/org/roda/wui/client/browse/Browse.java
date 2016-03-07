@@ -23,11 +23,13 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
@@ -213,8 +215,6 @@ public class Browse extends Composite {
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
-    
-    
 
     fondsPanel = new AIPList();
     initWidget(uiBinder.createAndBindUi(this));
@@ -809,25 +809,32 @@ public class Browse extends Composite {
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
     if (aipId != null) {
-      final MoveItemDialog moveItemDialog = new MoveItemDialog(aipId);
-      moveItemDialog.show(new AsyncCallback<Boolean>() {
-        
+      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), aipId);
+      selectAipDialog.showAndCenter();
+      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
         @Override
-        public void onSuccess(Boolean result) {
-          if (result) {
-            clear();
-            viewAction(aipId);
-          }
-          moveItemDialog.hide();
-        }
-        
-        @Override
-        public void onFailure(Throwable caught) {
-          if (caught instanceof NotFoundException) {
-            Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-          } else {
-            Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
-          }
+        public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+          final IndexedAIP parentAIP = event.getValue();
+          BrowserService.Util.getInstance().moveInHierarchy(aipId, parentAIP.getId(), new AsyncCallback<AIP>() {
+
+            @Override
+            public void onSuccess(AIP result) {
+              if (result != null) {
+                clear();
+                viewAction(result.getId());
+              }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              if (caught instanceof NotFoundException) {
+                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+              } else {
+                Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+              }
+            }
+          });
         }
       });
     }

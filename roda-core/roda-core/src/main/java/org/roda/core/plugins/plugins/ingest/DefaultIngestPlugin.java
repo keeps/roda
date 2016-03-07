@@ -56,11 +56,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Known format of SIP to be ingest into the repository.");
   public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
-    "Parent Description Object ID", PluginParameterType.STRING, "", false, false,
-    "Use the provided parent Description Object ID if the SIPs does not provide one.");
+    "Parent Object", PluginParameterType.AIP_ID, "", false, false,
+    "Use the provided parent object if the SIPs does not provide one.");
   public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter(
-    RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent Description Object ID", PluginParameterType.BOOLEAN,
-    "false", false, false, "Use the provided parent Description Object ID even if the SIPs provide one.");
+    RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object", PluginParameterType.BOOLEAN,
+    "false", false, false, "Use the provided parent object even if the SIPs provide one.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
 
