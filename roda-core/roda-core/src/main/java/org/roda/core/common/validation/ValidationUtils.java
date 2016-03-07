@@ -62,7 +62,8 @@ public class ValidationUtils {
       Binary binary = model.getStorage().getBinary(storagePath);
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
-          ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType,fallbackMetadataVersion, true);
+          ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType,
+            fallbackMetadataVersion, true);
           report.setValid(report.isValid() && dmReport.isValid());
           report.getIssues().addAll(dmReport.getIssues());
         }
@@ -76,7 +77,7 @@ public class ValidationUtils {
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;
         String metadataVersion = dm.getType() != null ? dm.getVersion() : fallbackMetadataVersion;
-        ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType,metadataVersion, true);
+        ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType, metadataVersion, true);
         report.setValid(report.isValid() && dmReport.isValid());
         report.getIssues().addAll(dmReport.getIssues());
       }
@@ -206,16 +207,16 @@ public class ValidationUtils {
       inputStream = descriptiveMetadataPayload.createInputStream();
 
       if (descriptiveMetadataType != null) {
-        if(descriptiveMetadataVersion!=null){
+        if (descriptiveMetadataVersion != null) {
+          schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase()
+            + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion.toLowerCase() + ".xsd");
+        }
+
+        if (schemaStream == null) {
           schemaStream = RodaCoreFactory
-            .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase()+RodaConstants.METADATA_VERSION_SEPARATOR+descriptiveMetadataVersion.toLowerCase()+ ".xsd");
+            .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase() + ".xsd");
         }
-        
-        if(schemaStream==null){
-            schemaStream = RodaCoreFactory
-              .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase() + ".xsd");
-        }
-       
+
       }
 
       if (schemaStream != null) {

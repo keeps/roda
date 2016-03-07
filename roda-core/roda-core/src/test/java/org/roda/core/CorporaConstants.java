@@ -7,11 +7,8 @@
  */
 package org.roda.core;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-
-import org.hamcrest.Matcher;
 
 /**
  * 
@@ -121,7 +118,6 @@ public class CorporaConstants {
   public static final int YEAR_2003 = 2003;
   public static final String DESCRIPTIVE_METADATA_TYPE_EAD = "ead";
   public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSION = "3";
-  
 
   public static String SIP_FOLDER = "SIPs";
   public static String EARK_SIP = "eark_sip.zip";

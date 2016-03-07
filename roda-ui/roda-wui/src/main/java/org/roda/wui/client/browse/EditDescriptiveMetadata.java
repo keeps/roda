@@ -151,10 +151,22 @@ public class EditDescriptiveMetadata extends Composite {
           int selected = -1;
           int index = 0;
           for (SupportedMetadataTypeBundle b : metadataTypes) {
-            type.addItem(b.getLabel(), b.getType());
+            if (b.getVersion() != null) {
+              type.addItem(b.getLabel(), b.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + b.getVersion());
+            } else {
+              type.addItem(b.getLabel(), b.getType());
+            }
+
             String lowerCaseType = bundle.getType() != null ? bundle.getType().toLowerCase() : null;
             if (b.getType().equals(lowerCaseType)) {
-              selected = index;
+              String lowerCaseVersion = bundle.getVersion() != null ? bundle.getVersion().toLowerCase() : null;
+              if (b.getVersion() != null && lowerCaseVersion != null) {
+                if (lowerCaseVersion != null && b.getVersion().equals(lowerCaseVersion)) {
+                  selected = index;
+                }
+              } else if (b.getVersion() == null && lowerCaseVersion == null) {
+                selected = index;
+              }
             }
 
             index++;
@@ -182,7 +194,8 @@ public class EditDescriptiveMetadata extends Composite {
     String version = null;
 
     if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
-      version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1, typeText.length());
+      version = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
+        typeText.length());
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
     String xmlText = xml.getText();

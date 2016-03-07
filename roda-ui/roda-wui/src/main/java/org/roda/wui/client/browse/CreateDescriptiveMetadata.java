@@ -136,7 +136,15 @@ public class CreateDescriptiveMetadata extends Composite {
         if (value != null && value.length() > 0) {
           SupportedMetadataTypeBundle selectedBundle = null;
           for (SupportedMetadataTypeBundle bundle : metadataTypes) {
-            if (bundle.getType().equals(value)) {
+            if (value.contains(RodaConstants.METADATA_VERSION_SEPARATOR) && bundle.getVersion() != null) {
+              String type = value.substring(0, value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
+              String version = value.substring(value.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
+                value.length());
+              if (bundle.getType().equals(type) && bundle.getVersion().equals(version)) {
+                selectedBundle = bundle;
+                break;
+              }
+            } else if (bundle.getType().equals(value)) {
               selectedBundle = bundle;
               break;
             }
@@ -169,9 +177,9 @@ public class CreateDescriptiveMetadata extends Composite {
           CreateDescriptiveMetadata.this.metadataTypes = metadataTypes;
 
           for (SupportedMetadataTypeBundle b : metadataTypes) {
-            if(b.getVersion()!=null){
-              type.addItem(b.getLabel(), b.getType()+RodaConstants.METADATA_VERSION_SEPARATOR+b.getVersion());
-            }else{
+            if (b.getVersion() != null) {
+              type.addItem(b.getLabel(), b.getType() + RodaConstants.METADATA_VERSION_SEPARATOR + b.getVersion());
+            } else {
               type.addItem(b.getLabel(), b.getType());
             }
           }
@@ -193,14 +201,16 @@ public class CreateDescriptiveMetadata extends Composite {
     String typeVersion = null;
     String xmlText = xml.getText();
 
-    if(typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)){
-      typeVersion = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR)+1,typeText.length());
+    if (typeText.contains(RodaConstants.METADATA_VERSION_SEPARATOR)) {
+      typeVersion = typeText.substring(typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR) + 1,
+        typeText.length());
       typeText = typeText.substring(0, typeText.lastIndexOf(RodaConstants.METADATA_VERSION_SEPARATOR));
     }
 
     if (idText.length() > 0) {
 
-      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion, xmlText);
+      DescriptiveMetadataEditBundle newBundle = new DescriptiveMetadataEditBundle(idText, typeText, typeVersion,
+        xmlText);
 
       BrowserService.Util.getInstance().createDescriptiveMetadataFile(aipId, newBundle, new AsyncCallback<Void>() {
 

@@ -195,9 +195,13 @@ public class BrowserHelper {
     bundle.setId(descriptiveMetadata.getId());
     if (descriptiveMetadata.getType() != null) {
       try {
-
-        bundle.setLabel(messages.getTranslation(
-          RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX + descriptiveMetadata.getType().toLowerCase()));
+        if (descriptiveMetadata.getVersion() != null) {
+          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
+            + descriptiveMetadata.getType().toLowerCase() + "." + descriptiveMetadata.getVersion().toLowerCase()));
+        } else {
+          bundle.setLabel(messages.getTranslation(RodaConstants.I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX
+            + descriptiveMetadata.getType().toLowerCase()));
+        }
 
       } catch (MissingResourceException e) {
         bundle.setLabel(descriptiveMetadata.getId());
@@ -724,7 +728,8 @@ public class BrowserHelper {
       throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
       AlreadyExistsException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,descriptiveMetadataVersion, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
+      descriptiveMetadataVersion, false);
 
     return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
@@ -735,7 +740,8 @@ public class BrowserHelper {
     String message) throws GenericException, AuthorizationDeniedException, ValidationException,
       RequestNotValidException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,descriptiveMetadataVersion, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,
+      descriptiveMetadataVersion, false);
 
     return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, message);
@@ -965,7 +971,8 @@ public class BrowserHelper {
         }
         String label = messages.getTranslation(key, type);
         String template = null;
-        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + ((version!=null)?type+RodaConstants.METADATA_VERSION_SEPARATOR+version:type) + ".xml");
+        InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/"
+          + ((version != null) ? type + RodaConstants.METADATA_VERSION_SEPARATOR + version : type) + ".xml");
 
         //
         Map<String, Object> scopes = new HashMap<String, Object>();
