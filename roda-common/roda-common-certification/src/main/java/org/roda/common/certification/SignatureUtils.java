@@ -1,6 +1,8 @@
 package org.roda.common.certification;
 
 import java.io.BufferedOutputStream;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.charset.Charset;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,11 +19,14 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.Security;
 import java.security.SignatureException;
+import java.security.UnrecoverableKeyException;
 import java.security.cert.CRL;
 import java.security.cert.CertPathBuilder;
 import java.security.cert.CertPathBuilderException;
@@ -38,6 +44,8 @@ import java.security.cert.X509CertSelector;
 import java.security.cert.X509Certificate;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -45,24 +53,45 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import javax.xml.crypto.MarshalException;
 import javax.xml.crypto.XMLStructure;
+import javax.xml.crypto.dom.DOMStructure;
+import javax.xml.crypto.dsig.CanonicalizationMethod;
+import javax.xml.crypto.dsig.DigestMethod;
+import javax.xml.crypto.dsig.Reference;
+import javax.xml.crypto.dsig.SignatureMethod;
+import javax.xml.crypto.dsig.SignatureProperties;
+import javax.xml.crypto.dsig.SignatureProperty;
+import javax.xml.crypto.dsig.SignedInfo;
+import javax.xml.crypto.dsig.Transform;
+import javax.xml.crypto.dsig.XMLObject;
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureException;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
+import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
+import javax.xml.crypto.dsig.keyinfo.KeyInfoFactory;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
+import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
+import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -73,8 +102,13 @@ import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
 import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
+import org.apache.xml.security.Init;
+import org.apache.xml.security.c14n.CanonicalizationException;
+import org.apache.xml.security.c14n.Canonicalizer;
+import org.apache.xml.security.c14n.InvalidCanonicalizerException;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
@@ -109,6 +143,10 @@ public class SignatureUtils {
 
   private static final String SIGN_CONTENT_TYPE_OOXML = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
   private static final String SIGN_REL_TYPE_OOXML = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
+
+  private static final String SIGNATURE_REASON = "test reason";
+  private static final String SIGNATURE_LOCATION = "test location";
+  private static final String OPENOFFICE = "urn:oasis:names:tc:opendocument:xmlns:digitalsignature:1.0";
 
   /*************************** VERIFY FUNCTIONS ***************************/
 
@@ -435,43 +473,256 @@ public class SignatureUtils {
   /*************************** SIGN FUNCTIONS ***************************/
 
   public static Path runDigitalSignatureSignPDF(Path input, String keystore, String alias, String password)
-    throws IOException, COSVisitorException, org.apache.pdfbox.exceptions.SignatureException, DocumentException,
-    GeneralSecurityException {
+    throws IOException, GeneralSecurityException, DocumentException {
 
     Security.addProvider(new BouncyCastleProvider());
     Path signedPDF = Files.createTempFile("signed", ".pdf");
 
     KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
-    ks.load(new FileInputStream(keystore), password.toCharArray());
+    InputStream is = new FileInputStream(keystore);
+    ks.load(is, password.toCharArray());
     String alias1 = (String) ks.aliases().nextElement();
     PrivateKey pk = (PrivateKey) ks.getKey(alias1, password.toCharArray());
     Certificate[] chain = ks.getCertificateChain(alias);
+    IOUtils.closeQuietly(is);
 
     PdfReader reader = new PdfReader(input.toString());
     FileOutputStream os = new FileOutputStream(signedPDF.toFile());
     PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');
-    // Creating the appearance
     PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
-    appearance.setReason("test reason");
-    appearance.setLocation("test location");
-    appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "sig");
-    // Creating the signature
+    appearance.setReason(SIGNATURE_REASON);
+    appearance.setLocation(SIGNATURE_LOCATION);
+    appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "RODASignature");
     ExternalDigest digest = new BouncyCastleDigest();
     ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, "BC");
     MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null, 0, null);
+    IOUtils.closeQuietly(os);
+    reader.close();
 
     return signedPDF;
   }
 
-  public static Path runDigitalSignatureSignOOXML(Path input) {
-    return null;
+  public static Path runDigitalSignatureSignOOXML(Path input, String keystore, String alias, String password,
+    String fileFormat) throws InvalidFormatException, KeyStoreException, NoSuchAlgorithmException,
+    CertificateException, IOException, UnrecoverableKeyException, XMLSignatureException, MarshalException {
+
+    Path output = Files.createTempFile("signed", "." + fileFormat);
+    CopyOption[] copyOptions = new CopyOption[] {StandardCopyOption.REPLACE_EXISTING};
+    Files.copy(input, output, copyOptions);
+
+    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    InputStream is = new FileInputStream(keystore);
+    ks.load(is, password.toCharArray());
+
+    PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
+    X509Certificate x509 = (X509Certificate) ks.getCertificate(alias);
+
+    SignatureConfig signatureConfig = new SignatureConfig();
+    signatureConfig.setKey(pk);
+    signatureConfig.setSigningCertificateChain(Collections.singletonList(x509));
+    OPCPackage pkg = OPCPackage.open(output.toString(), PackageAccess.READ_WRITE);
+    signatureConfig.setOpcPackage(pkg);
+
+    SignatureInfo si = new SignatureInfo();
+    si.setSignatureConfig(signatureConfig);
+    si.confirmSignature();
+
+    // boolean b = si.verifySignature();
+    pkg.close();
+    IOUtils.closeQuietly(is);
+
+    return output;
   }
 
-  public static Path runDigitalSignatureSignODF(Path input) {
-    return null;
+  public static Path runDigitalSignatureSignODF(Path input, String keystore, String alias, String password,
+    String fileFormat) throws IOException, KeyStoreException, NoSuchAlgorithmException, CertificateException,
+    UnrecoverableKeyException, ParserConfigurationException, InvalidAlgorithmParameterException, SAXException,
+    InvalidCanonicalizerException, CanonicalizationException, MarshalException, XMLSignatureException,
+    TransformerFactoryConfigurationError, TransformerException {
+
+    Security.addProvider(new BouncyCastleProvider());
+    Path output = Files.createTempFile("signed", "." + fileFormat);
+
+    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    InputStream is = new FileInputStream(keystore);
+    ks.load(is, password.toCharArray());
+    IOUtils.closeQuietly(is);
+
+    X509Certificate certificate = (X509Certificate) ks.getCertificate(alias);
+    PrivateKey pk = (PrivateKey) ks.getKey(alias, password.toCharArray());
+
+    ZipFile zipFile = new ZipFile(input.toString());
+    DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+    documentBuilderFactory.setNamespaceAware(true);
+    DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
+    Init.init();
+
+    MessageDigest md = MessageDigest.getInstance("SHA1");
+    XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
+    DigestMethod dm = fac.newDigestMethod(DigestMethod.SHA1, null);
+    List<Transform> transformList = new ArrayList<Transform>();
+    transformList.add(fac.newTransform(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS, (TransformParameterSpec) null));
+
+    CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+      (C14NMethodParameterSpec) null);
+    SignatureMethod sm = fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+
+    List<Reference> referenceList = new ArrayList<Reference>();
+    InputStream manifest = zipFile.getInputStream(zipFile.getEntry("META-INF/manifest.xml"));
+    Document docManifest = documentBuilder.parse(manifest);
+    Element rootManifest = docManifest.getDocumentElement();
+    NodeList listFileEntry = rootManifest.getElementsByTagName("manifest:file-entry");
+    IOUtils.closeQuietly(manifest);
+
+    for (int i = 0; i < listFileEntry.getLength(); i++) {
+      String fullPath = ((Element) listFileEntry.item(i)).getAttribute("manifest:full-path");
+      Reference reference;
+
+      if (!fullPath.endsWith("/") && !fullPath.equals("META-INF/documentsignatures.xml")) {
+        if (fullPath.equals("content.xml") || fullPath.equals("meta.xml") || fullPath.equals("styles.xml")
+          || fullPath.equals("settings.xml")) {
+
+          InputStream xmlFile = zipFile.getInputStream(zipFile.getEntry(fullPath));
+          Element root = documentBuilder.parse(xmlFile).getDocumentElement();
+          IOUtils.closeQuietly(xmlFile);
+
+          Canonicalizer canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
+          byte[] docCanonicalize = canonicalizer.canonicalizeSubtree(root);
+          byte[] digestValue = md.digest(docCanonicalize);
+
+          reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, transformList, null, null, digestValue);
+        } else {
+          is = zipFile.getInputStream(zipFile.getEntry(fullPath));
+          byte[] data = IOUtils.toByteArray(is);
+          byte[] digestValue = md.digest(data);
+          reference = fac.newReference(fullPath.replaceAll(" ", "%20"), dm, null, null, null, digestValue);
+          IOUtils.closeQuietly(is);
+        }
+
+        referenceList.add(reference);
+      }
+    }
+
+    Document docSignatures;
+    Element rootSignatures;
+
+    if (zipFile.getEntry("META-INF/documentsignatures.xml") != null) {
+      InputStream xmlFile = zipFile.getInputStream(zipFile.getEntry("META-INF/documentsignatures.xml"));
+      docSignatures = documentBuilder.parse(xmlFile);
+      rootSignatures = docSignatures.getDocumentElement();
+      IOUtils.closeQuietly(xmlFile);
+    } else {
+      docSignatures = documentBuilder.newDocument();
+      rootSignatures = docSignatures.createElement("document-signatures");
+      rootSignatures.setAttribute("xmlns", OPENOFFICE);
+      docSignatures.appendChild(rootSignatures);
+
+      Element nodeDocumentSignatures = docManifest.createElement("manifest:file-entry");
+      nodeDocumentSignatures.setAttribute("manifest:media-type", "");
+      nodeDocumentSignatures.setAttribute("manifest:full-path", "META-INF/documentsignatures.xml");
+      rootManifest.appendChild(nodeDocumentSignatures);
+
+      Element nodeMetaInf = docManifest.createElement("manifest:file-entry");
+      nodeMetaInf.setAttribute("manifest:media-type", "");
+      nodeMetaInf.setAttribute("manifest:full-path", "META-INF/");
+      rootManifest.appendChild(nodeMetaInf);
+    }
+
+    String signatureId = UUID.randomUUID().toString();
+    String signaturePropertyId = UUID.randomUUID().toString();
+
+    Reference signaturePropertyReference = fac.newReference("#" + signaturePropertyId, dm);
+    referenceList.add(signaturePropertyReference);
+    SignedInfo si = fac.newSignedInfo(cm, sm, referenceList);
+
+    KeyInfoFactory kif = fac.getKeyInfoFactory();
+    List<Object> x509Content = new ArrayList<Object>();
+    x509Content.add(certificate.getSubjectX500Principal().getName());
+    x509Content.add(certificate);
+    X509Data cerData = kif.newX509Data(x509Content);
+    KeyInfo ki = kif.newKeyInfo(Collections.singletonList(cerData), null);
+
+    Element content = docSignatures.createElement("dc:date");
+    content.setAttribute("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SS");
+    content.setTextContent(sdf.format(new Date()));
+    XMLStructure str = new DOMStructure(content);
+    List<XMLStructure> contentList = new ArrayList<XMLStructure>();
+    contentList.add(str);
+
+    SignatureProperty sp = fac.newSignatureProperty(contentList, "#" + signatureId, signaturePropertyId);
+    List<SignatureProperty> spList = new ArrayList<SignatureProperty>();
+    spList.add(sp);
+
+    SignatureProperties sps = fac.newSignatureProperties(spList, null);
+    List<SignatureProperties> spsList = new ArrayList<SignatureProperties>();
+    spsList.add(sps);
+
+    XMLObject object = fac.newXMLObject(spsList, null, null, null);
+    List<XMLObject> objectList = new ArrayList<XMLObject>();
+    objectList.add(object);
+
+    XMLSignature signature = fac.newXMLSignature(si, ki, objectList, signatureId, null);
+    DOMSignContext signContext = new DOMSignContext(pk, rootSignatures);
+    signature.sign(signContext);
+
+    OutputStream os = new FileOutputStream(output.toString());
+    ZipOutputStream zos = new ZipOutputStream(os);
+
+    Enumeration<?> enumeration;
+    for (enumeration = zipFile.entries(); enumeration.hasMoreElements();) {
+      ZipEntry entry = (ZipEntry) enumeration.nextElement();
+      if (!entry.getName().equals("META-INF/documentsignatures.xml")
+        && !entry.getName().equals("META-INF/manifest.xml")) {
+
+        zos.putNextEntry(entry);
+        is = zipFile.getInputStream(entry);
+        byte[] data = IOUtils.toByteArray(is);
+        zos.write(data);
+        IOUtils.closeQuietly(is);
+      }
+    }
+
+    ZipEntry zeDocumentSignatures = new ZipEntry("META-INF/documentsignatures.xml");
+    zos.putNextEntry(zeDocumentSignatures);
+    ByteArrayOutputStream baosXML = new ByteArrayOutputStream();
+    writeXML(baosXML, rootSignatures, false);
+    zos.write(baosXML.toByteArray());
+    zos.closeEntry();
+    IOUtils.closeQuietly(baosXML);
+
+    ZipEntry zeManifest = new ZipEntry("META-INF/manifest.xml");
+    zos.putNextEntry(zeManifest);
+    ByteArrayOutputStream baosManifest = new ByteArrayOutputStream();
+    writeXML(baosManifest, rootManifest, false);
+    zos.write(baosManifest.toByteArray());
+    zos.closeEntry();
+    IOUtils.closeQuietly(baosManifest);
+
+    IOUtils.closeQuietly(zos);
+    IOUtils.closeQuietly(os);
+    zipFile.close();
+    return output;
   }
 
   /*************************** SUB FUNCTIONS ***************************/
+
+  private static void writeXML(OutputStream outStream, Node node, boolean indent)
+    throws TransformerFactoryConfigurationError, TransformerException {
+
+    OutputStreamWriter osw = new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
+    BufferedWriter bw = new BufferedWriter(osw);
+    Transformer serializer = TransformerFactory.newInstance().newTransformer();
+    serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+
+    if (indent) {
+      serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+    }
+
+    serializer.transform(new DOMSource(node), new StreamResult(bw));
+    IOUtils.closeQuietly(bw);
+    IOUtils.closeQuietly(osw);
+  }
 
   private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
     String result = "";

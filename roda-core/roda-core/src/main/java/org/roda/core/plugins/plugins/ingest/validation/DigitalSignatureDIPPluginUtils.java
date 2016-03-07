@@ -120,12 +120,14 @@ public class DigitalSignatureDIPPluginUtils {
       if (fileFormat.equals("pdf")) {
         return SignatureUtils.runDigitalSignatureSignPDF(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD);
       } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        return SignatureUtils.runDigitalSignatureSignOOXML(input);
+        return SignatureUtils.runDigitalSignatureSignOOXML(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+          fileFormat);
       } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        return SignatureUtils.runDigitalSignatureSignODF(input);
+        return SignatureUtils.runDigitalSignatureSignODF(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+          fileFormat);
       }
     } catch (Exception e) {
-      LOGGER.warn("Problems running digital signature embedded signature");
+      LOGGER.warn("Problems running digital signature embedded signature: " + e.getMessage());
     }
 
     return null;
