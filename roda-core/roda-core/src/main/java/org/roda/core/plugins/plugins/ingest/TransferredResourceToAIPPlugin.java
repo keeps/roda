@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 
 public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
-  private static final String METADATA_TYPE = "keyvalue";
+  private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
   
   @Override

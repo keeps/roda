@@ -1,0 +1,17 @@
+{
+  "parentId": null,
+  "active": true,
+  "permissions": {},
+  "descriptiveMetadata": [{
+    "id": "ead_3.xml",
+    "type": "ead",
+    "version": "3"
+  }],
+  "representations": [{
+    "id": "representation_1",
+    "original": true
+  }, {
+    "id": "representation_2",
+    "original": false
+  }]
+}

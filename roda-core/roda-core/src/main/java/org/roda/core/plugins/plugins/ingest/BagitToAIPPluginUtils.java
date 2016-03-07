@@ -34,7 +34,7 @@ import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
   private static final String DATA_FOLDER = "data";
-  private static final String METADATA_TYPE = "keyvalue";
+  private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);

@@ -724,7 +724,7 @@ public class BrowserHelper {
       throws GenericException, ValidationException, AuthorizationDeniedException, RequestNotValidException,
       AlreadyExistsException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,descriptiveMetadataVersion, false);
 
     return RodaCoreFactory.getModelService().createDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion);
@@ -735,7 +735,7 @@ public class BrowserHelper {
     String message) throws GenericException, AuthorizationDeniedException, ValidationException,
       RequestNotValidException, NotFoundException {
 
-    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType, false);
+    ValidationUtils.validateDescriptiveBinary(descriptiveMetadataPayload, descriptiveMetadataType,descriptiveMetadataVersion, false);
 
     return RodaCoreFactory.getModelService().updateDescriptiveMetadata(aipId, descriptiveMetadataId,
       descriptiveMetadataPayload, descriptiveMetadataType, descriptiveMetadataVersion, message);
