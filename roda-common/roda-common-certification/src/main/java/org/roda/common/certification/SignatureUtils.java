@@ -1,6 +1,7 @@
 package org.roda.common.certification;
 
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +15,10 @@ import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
+import java.security.PrivateKey;
 import java.security.Security;
 import java.security.SignatureException;
 import java.security.cert.CRL;
@@ -59,6 +62,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.pdfbox.exceptions.COSVisitorException;
 import org.apache.pdfbox.io.IOUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -77,6 +81,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.log.Logger;
 import com.itextpdf.text.log.LoggerFactory;
 import com.itextpdf.text.pdf.AcroFields;
@@ -85,9 +90,16 @@ import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
 import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
 import com.itextpdf.text.pdf.PdfString;
+import com.itextpdf.text.pdf.security.BouncyCastleDigest;
+import com.itextpdf.text.pdf.security.DigestAlgorithms;
+import com.itextpdf.text.pdf.security.ExternalDigest;
+import com.itextpdf.text.pdf.security.ExternalSignature;
+import com.itextpdf.text.pdf.security.MakeSignature;
 import com.itextpdf.text.pdf.security.PdfPKCS7;
+import com.itextpdf.text.pdf.security.PrivateKeySignature;
 
 public class SignatureUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SignatureUtils.class);
@@ -418,6 +430,45 @@ public class SignatureUtils {
     IOUtils.closeQuietly(bos);
     IOUtils.closeQuietly(os);
     zipFile.close();
+  }
+
+  /*************************** SIGN FUNCTIONS ***************************/
+
+  public static Path runDigitalSignatureSignPDF(Path input, String keystore, String alias, String password)
+    throws IOException, COSVisitorException, org.apache.pdfbox.exceptions.SignatureException, DocumentException,
+    GeneralSecurityException {
+
+    Security.addProvider(new BouncyCastleProvider());
+    Path signedPDF = Files.createTempFile("signed", ".pdf");
+
+    KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
+    ks.load(new FileInputStream(keystore), password.toCharArray());
+    String alias1 = (String) ks.aliases().nextElement();
+    PrivateKey pk = (PrivateKey) ks.getKey(alias1, password.toCharArray());
+    Certificate[] chain = ks.getCertificateChain(alias);
+
+    PdfReader reader = new PdfReader(input.toString());
+    FileOutputStream os = new FileOutputStream(signedPDF.toFile());
+    PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');
+    // Creating the appearance
+    PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
+    appearance.setReason("test reason");
+    appearance.setLocation("test location");
+    appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "sig");
+    // Creating the signature
+    ExternalDigest digest = new BouncyCastleDigest();
+    ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, "BC");
+    MakeSignature.signDetached(appearance, digest, signature, chain, null, null, null, 0, null);
+
+    return signedPDF;
+  }
+
+  public static Path runDigitalSignatureSignOOXML(Path input) {
+    return null;
+  }
+
+  public static Path runDigitalSignatureSignODF(Path input) {
+    return null;
   }
 
   /*************************** SUB FUNCTIONS ***************************/

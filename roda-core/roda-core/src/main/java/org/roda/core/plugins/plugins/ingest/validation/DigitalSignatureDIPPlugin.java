@@ -18,10 +18,13 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -45,6 +48,20 @@ import org.slf4j.LoggerFactory;
 public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPlugin.class);
+  private boolean doEmbeddedSignature;
+
+  public DigitalSignatureDIPPlugin() {
+    doEmbeddedSignature = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
+      "doEmbeddedSignature"));
+  }
+
+  public boolean getDoEmbeddedSignature() {
+    return doEmbeddedSignature;
+  }
+
+  public void setDoEmbeddedSignature(boolean doEmbedded) {
+    doEmbeddedSignature = doEmbedded;
+  }
 
   @Override
   public void init() throws PluginException {
@@ -104,13 +121,22 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
           for (File file : fileList) {
             LOGGER.debug("Processing file: " + file);
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (!file.isDirectory()) {
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
               LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
-              DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
+
+              if (doEmbeddedSignature == true) {
+                Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
+                  fileFormat);
+                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile);
+              } else {
+                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
+              }
 
               IOUtils.closeQuietly(directAccess);
 
@@ -126,9 +152,18 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
         } else if (countFiles == 1) {
           File file = fileList.get(0);
+          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+          String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
           StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
           DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-          resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(directAccess.getPath());
+
+          if (doEmbeddedSignature == true) {
+            Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat);
+            resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(embeddedFile);
+          } else {
+            resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(directAccess.getPath());
+          }
+
           IOUtils.closeQuietly(directAccess);
           filePath = file.getPath();
         }

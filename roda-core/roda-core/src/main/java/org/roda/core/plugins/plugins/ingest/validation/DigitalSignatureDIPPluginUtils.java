@@ -27,6 +27,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.pdfbox.io.IOUtils;
 import org.bouncycastle.cms.CMSException;
 import org.roda.common.certification.SignatureUtility;
+import org.roda.common.certification.SignatureUtils;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,4 +115,19 @@ public class DigitalSignatureDIPPluginUtils {
     return null;
   }
 
+  public static Path addEmbeddedSignature(Path input, String fileFormat) {
+    try {
+      if (fileFormat.equals("pdf")) {
+        return SignatureUtils.runDigitalSignatureSignPDF(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD);
+      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
+        return SignatureUtils.runDigitalSignatureSignOOXML(input);
+      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
+        return SignatureUtils.runDigitalSignatureSignODF(input);
+      }
+    } catch (Exception e) {
+      LOGGER.warn("Problems running digital signature embedded signature");
+    }
+
+    return null;
+  }
 }
