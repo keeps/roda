@@ -234,22 +234,6 @@ public class IngestTransfer extends Composite {
       }
 
     });
-
-    // transferredResourceList.addCheckboxSelectionListener(new
-    // CheckboxSelectionListener() {
-    //
-    // @Override
-    // public void onSelectionChange(Set<TransferredResource> selected) {
-    // remove.setText(selected.isEmpty() ?
-    // messages.ingestTransferButtonRemoveWholeFolder()
-    // : messages.ingestTransferButtonRemoveSelectedItems());
-    // startIngest.setText(selected.isEmpty() ?
-    // messages.ingestTransferButtonIngestWholeFolder()
-    // : messages.ingestTransferButtonIngestSelectedItems());
-    // updateVisibles();
-    // }
-    // });
-
   }
 
   protected void view(TransferredResource r) {

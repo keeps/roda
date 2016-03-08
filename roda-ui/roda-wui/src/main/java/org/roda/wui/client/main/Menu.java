@@ -27,6 +27,7 @@ import org.roda.wui.client.management.Preferences;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.search.BasicSearch;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
@@ -140,7 +141,7 @@ public class Menu extends Composite {
     planning_monitoring = planningMenu.addItem(constants.title_planning_monitoring(),
       createCommand(Planning.RESOLVER.getHistoryPath()));
     planning_risk = planningMenu.addItem(constants.title_planning_risk(),
-      createCommand(Planning.RESOLVER.getHistoryPath()));
+      createCommand(RiskRegister.RESOLVER.getHistoryPath()));
     planning_agents = planningMenu.addItem(constants.title_planning_agents(),
       createCommand(Planning.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(constants.title_planning_format(),

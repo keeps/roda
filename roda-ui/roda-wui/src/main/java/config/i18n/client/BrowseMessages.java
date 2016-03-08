@@ -112,6 +112,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Preservation")
   String sidebarPreservationTitle();
+  
+  @DefaultMessage("Risks")
+  String sidebarRisksTitle();
 
   @DefaultMessage("Error in line {0}, column {1}: {2}")
   SafeHtml metadataParseError(int line, int column, String message);
@@ -170,10 +173,10 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
   String titleDates(Date dateInitial, Date dateFinal);
-  
+
   @DefaultMessage("")
   String simpleDatesEmpty();
-  
+
   @DefaultMessage("{0,date,yyyy-MM-dd}")
   String simpleDatesNoFinal(Date dateInitial);
 
@@ -187,13 +190,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Ingest transfer")
   String ingestTransferTitle();
-  
+
   @DefaultMessage("Transferred resources list")
   String ingestTransferList();
 
   @DefaultMessage("Search transferred resources...")
   String ingestTransferSearchPlaceHolder();
-  
+
   @DefaultMessage("Created at {0,localdatetime,predef:DATE_TIME_MEDIUM}, with {1}")
   String ingestTransferItemInfo(Date creationDate, String readableFileSize);
 
@@ -220,7 +223,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();
-  
+
   @DefaultMessage("Download")
   String ingestTransferButtonDownload();
 
@@ -367,7 +370,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
-  
+
   @DefaultMessage("Select")
   String pluginAipIdButton();
 
@@ -403,55 +406,55 @@ public interface BrowseMessages extends Messages {
   /************* Search ****************/
   @DefaultMessage("Intelectual entities")
   String searchListBoxItems();
-  
+
   @DefaultMessage("Representations")
   String searchListBoxRepresentations();
-  
+
   @DefaultMessage("Files")
   String searchListBoxFiles();
-  
+
   @DefaultMessage("Search...")
   String searchPlaceHolder();
-  
+
   @DefaultMessage("Search results")
   String searchResults();
-  
+
   @DefaultMessage("2008-04-01")
   String searchFieldDatePlaceHolder();
-  
+
   @DefaultMessage("2008-04-01")
   String searchFieldDateFromPlaceHolder();
-  
+
   @DefaultMessage("2016-06-20")
   String searchFieldDateToPlaceHolder();
-  
+
   @DefaultMessage("42")
   String searchFieldNumericPlaceHolder();
-  
+
   @DefaultMessage("42")
   String searchFieldNumericFromPlaceHolder();
-  
+
   @DefaultMessage("108")
   String searchFieldNumericToPlaceHolder();
-  
+
   @DefaultMessage("Original")
   String searchRepresentationFieldOriginal();
-  
+
   @DefaultMessage("Filename")
   String searchFileFieldFilename();
-  
+
   @DefaultMessage("Format")
   String searchFileFieldFormat();
-  
+
   @DefaultMessage("Pronom")
   String searchFileFieldPronom();
-  
+
   @DefaultMessage("Mimetype")
   String searchFileFieldMimetype();
-  
+
   @DefaultMessage("Filesize")
   String searchFileFieldFilesize();
-  
+
   @DefaultMessage("Fulltext")
   String searchFileFieldFulltext();
 
@@ -471,7 +474,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Source objects")
   String preservationEventListHeaderSourceObject();
-  
+
   @DefaultMessage("Outcome objects")
   String preservationEventListHeaderOutcomeObject();
 
@@ -499,7 +502,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Date")
   String preservationEventDatetime();
-  
+
   @DefaultMessage("Outcome")
   String preservationEventOutcome();
 
@@ -517,7 +520,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Source objects")
   String preservationEventSourceObjectsHeader();
-  
+
   @DefaultMessage("Outcome objects")
   String preservationEventOutcomeObjectsHeader();
 
@@ -529,7 +532,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Outcome detail")
   String preservationEventOutcomeDetailHeader();
-  
+
   @DefaultMessage("Note")
   String preservationEventOutcomeDetailNote();
 
@@ -540,34 +543,57 @@ public interface BrowseMessages extends Messages {
   String descriptiveMetadataHistoryLabel(String versionKey, Date createdDate);
 
   /************* Select AIP Dialog ****************/
-  
+
   @DefaultMessage("Cancel")
   String selectAipCancelButton();
-  
+
   @DefaultMessage("Select")
   String selectAipSelectButton();
-  
+
   @DefaultMessage("Search results")
   String selectAipSearchResults();
-  
+
   @DefaultMessage("Search records...")
   String selectAipSearchPlaceHolder();
-  
+
   /************* Move Item ****************/
-  
+
   @DefaultMessage("Move item")
   String moveItemTitle();
-  
+
   @DefaultMessage("Error moving item!")
   String moveItemFailed();
-  
+
   /************* Select Parent ****************/
-  
+
   @DefaultMessage("Select parent")
   String selectParentTitle();
-  
+
   /************* Lists ****************/
-  
+
   @DefaultMessage("Select all pages of this search")
-  String listSelectAllMessage(); 
+  String listSelectAllMessage();
+
+  /************* Risk register ****************/
+
+  @DefaultMessage("Risk register")
+  String riskRegisterTitle();
+
+  @DefaultMessage("Category")
+  String riskRegisterCategory();
+
+  @DefaultMessage("Severity")
+  String riskRegisterSeverity();
+  
+  @DefaultMessage("New")
+  String riskRegisterNewButton();
+  
+  @DefaultMessage("Edit")
+  String riskRegisterEditButton();
+  
+  @DefaultMessage("Remove")
+  String riskRegisterRemoveButton();
+  
+  @DefaultMessage("Start new process")
+  String riskRegisterProcessButton();
 }
