@@ -565,4 +565,9 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("Select parent")
   String selectParentTitle();
+  
+  /************* Lists ****************/
+  
+  @DefaultMessage("Select all pages of this search")
+  String listSelectAllMessage(); 
 }

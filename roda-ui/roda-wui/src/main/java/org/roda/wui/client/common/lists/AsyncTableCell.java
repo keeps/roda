@@ -51,6 +51,9 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
+
+import config.i18n.client.BrowseMessages;
+
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
@@ -59,6 +62,8 @@ import com.google.gwt.view.client.SingleSelectionModel;
 public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  
   private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
   private final AsyncHandler columnSortHandler;
@@ -223,6 +228,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
       });
 
       display.addColumn(selectColumn, selectHeader);
+      display.setColumnWidth(selectColumn, "35px");
     }
     configureDisplay(display);
   }
@@ -481,7 +487,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   public void showSelectAllPanel() {
     if (!selectAllPanel.isVisible() && resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
-      selectAllLabel.setText("Select all pages of this search");
+      selectAllLabel.setText(messages.listSelectAllMessage());
       selectAllCheckBox.setValue(false);
       selectAllPanel.setVisible(true);
     }
