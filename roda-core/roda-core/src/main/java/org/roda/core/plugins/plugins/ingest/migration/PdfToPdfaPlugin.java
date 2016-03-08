@@ -22,6 +22,8 @@ import org.verapdf.core.VeraPDFException;
 
 public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
 
+  private static final String TOOLNAME = "pdftopdfa";
+
   public PdfToPdfaPlugin() {
     super.setInputFormat("pdf");
     super.setOutputFormat("pdf");
@@ -71,14 +73,14 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    Map<String, List<String>> map = new HashMap<String, List<String>>();
-    map.put("application/pdf", Arrays.asList("pdf"));
-    return map;
+    return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return PdfToPdfaPluginUtils.getPronomToExtension();
+    Map<String, List<String>> map = new HashMap<String, List<String>>();
+    map.put("application/pdf", Arrays.asList("pdf"));
+    return map;
   }
 
 }

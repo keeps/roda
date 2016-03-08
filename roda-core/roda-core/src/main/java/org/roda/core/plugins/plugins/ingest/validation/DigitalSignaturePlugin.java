@@ -18,7 +18,9 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.roda.common.certification.SignatureUtils;
+import org.roda.common.certification.ODFSignatureUtils;
+import org.roda.common.certification.OOXMLSignatureUtils;
+import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -48,6 +50,7 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.ingest.migration.AbstractConvertPluginUtils;
+import org.roda.core.plugins.plugins.ingest.migration.FileFormatUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -74,9 +77,9 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     doStrip = true;
     verificationAffectsOnOutcome = true;
 
-    applicableTo = DigitalSignaturePluginUtils.getInputExtensions();
-    pronomToExtension = DigitalSignaturePluginUtils.getPronomToExtension();
-    mimetypeToExtension = DigitalSignaturePluginUtils.getMimetypeToExtension();
+    applicableTo = FileFormatUtils.getInputExtensions("digitalsignature");
+    pronomToExtension = FileFormatUtils.getPronomToExtension("digitalsignature");
+    mimetypeToExtension = FileFormatUtils.getMimetypeToExtension("digitalsignature");
   }
 
   @Override
@@ -220,8 +223,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
 
-                verification = DigitalSignaturePluginUtils
-                  .runDigitalSignatureVerify(directAccess.getPath(), fileFormat);
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
+                  fileFormat, fileMimetype);
                 verifiedFiles.put(file.getId(), verification);
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome)
@@ -230,7 +233,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
               if (doExtract) {
                 LOGGER.debug("Extracting digital signatures information of " + file.getId());
-                int extractResultSize = runExtraction(model, file, directAccess.getPath(), fileFormat);
+                int extractResultSize = runExtraction(model, file, directAccess.getPath(), fileFormat, fileMimetype);
 
                 if (extractResultSize > 0)
                   extractedFiles.add(file);
@@ -239,7 +242,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               if (doStrip) {
                 LOGGER.debug("Stripping digital signatures from " + file.getId());
                 Path pluginResult = DigitalSignaturePluginUtils.runDigitalSignatureStrip(directAccess.getPath(),
-                  fileFormat);
+                  fileFormat, fileMimetype);
 
                 if (pluginResult != null) {
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
@@ -389,12 +392,13 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     return fileFormat;
   }
 
-  private int runExtraction(ModelService model, File file, Path input, String fileFormat) {
+  private int runExtraction(ModelService model, File file, Path input, String fileFormat, String mimetype) {
     List<Path> extractResult = new ArrayList<Path>();
 
     try {
-      if (fileFormat.equals("pdf")) {
-        extractResult = SignatureUtils.runDigitalSignatureExtractPDF(input);
+      String generalFileFormat = DigitalSignaturePluginUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+      if (generalFileFormat.equals("pdf")) {
+        extractResult = PDFSignatureUtils.runDigitalSignatureExtract(input);
 
         if (extractResult.size() > 0) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
@@ -410,8 +414,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               contentsPayload, true);
           }
         }
-      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        Map<Path, String> extractMap = SignatureUtils.runDigitalSignatureExtractOOXML(input);
+      } else if (generalFileFormat.equals("ooxml")) {
+        Map<Path, String> extractMap = OOXMLSignatureUtils.runDigitalSignatureExtract(input);
         extractResult = new ArrayList<Path>(extractMap.keySet());
 
         for (Path p : extractResult) {
@@ -420,8 +424,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
             DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
         }
-      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        extractResult = SignatureUtils.runDigitalSignatureExtractODF(input);
+      } else if (generalFileFormat.equals("odf")) {
+        extractResult = ODFSignatureUtils.runDigitalSignatureExtract(input);
 
         if (extractResult.size() > 0) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));

@@ -21,6 +21,6 @@ before_script:
   # Install Unoconv
   - sudo add-apt-repository ppa:libreoffice/ppa -y
   - sudo apt-get update
-  - sudo apt-get install libreoffice -y
+  - sudo apt-get install libreoffice libreoffice-script-provider-python -y
   - sudo apt-get install unoconv -y
-  - sudo apt-get --only-upgrade install cpio fonts-opensymbol initscripts libc6 libgcrypt11 libgraphite2-3 libnss3 libreoffice-avmedia-backend-gstreamer libreoffice-pdfimport multiarch-support sysv-rc sysvinit-utils -y
+  - sudo apt-get --only-upgrade install cpio libgcrypt11 libnss3 libreoffice-pdfimport multiarch-support -y

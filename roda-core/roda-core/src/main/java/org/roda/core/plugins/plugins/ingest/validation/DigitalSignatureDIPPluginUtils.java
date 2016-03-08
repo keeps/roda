@@ -26,8 +26,10 @@ import java.util.zip.ZipOutputStream;
 
 import org.apache.pdfbox.io.IOUtils;
 import org.bouncycastle.cms.CMSException;
+import org.roda.common.certification.ODFSignatureUtils;
+import org.roda.common.certification.OOXMLSignatureUtils;
+import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.common.certification.SignatureUtility;
-import org.roda.common.certification.SignatureUtils;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,9 +45,9 @@ public class DigitalSignatureDIPPluginUtils {
   private static final String KEYSTORE_ALIAS = RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
     "keystore", "alias");
 
-  public static void addElementToRepresentationZip(ZipOutputStream zout, Path file) {
+  public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) {
     try {
-      ZipEntry entry = new ZipEntry(file.toFile().getName());
+      ZipEntry entry = new ZipEntry(name);
       InputStream in = new FileInputStream(file.toString());
       zout.putNextEntry(entry);
       byte[] data = IOUtils.toByteArray(in);
@@ -54,11 +56,11 @@ public class DigitalSignatureDIPPluginUtils {
       IOUtils.closeQuietly(in);
 
     } catch (IOException e) {
-      LOGGER.debug("Problems create the representation zip");
+      LOGGER.debug("Problems adding element to the representation zip");
     }
   }
 
-  public static Path runDigitalSigner(Path input) {
+  public static Path runZipDigitalSigner(Path input) {
 
     try {
       SignatureUtility signatureUtility = new SignatureUtility();
@@ -68,9 +70,8 @@ public class DigitalSignatureDIPPluginUtils {
       }
       signatureUtility.initSign(KEYSTORE_ALIAS, KEYSTORE_PASSWORD.toCharArray());
 
-      Path zipResult = Files.createTempFile("sign", ".zip");
-      Path signatureTempFile = Files.createTempFile("sign", ".p7s");
-
+      Path zipResult = Files.createTempFile("signed_", ".zip");
+      Path signatureTempFile = Files.createTempFile("signature_", ".p7s");
       signatureUtility.sign(input.toFile(), signatureTempFile.toFile());
 
       OutputStream os = new FileOutputStream(zipResult.toString());
@@ -81,7 +82,6 @@ public class DigitalSignatureDIPPluginUtils {
       InputStream in = new FileInputStream(input.toString());
       zout.putNextEntry(zipEntry);
       byte[] data = IOUtils.toByteArray(in);
-
       zout.write(data);
       zout.closeEntry();
       IOUtils.closeQuietly(in);
@@ -91,7 +91,6 @@ public class DigitalSignatureDIPPluginUtils {
       InputStream in2 = new FileInputStream(signatureTempFile.toString());
       zout.putNextEntry(zipEntry2);
       byte[] data2 = IOUtils.toByteArray(in2);
-
       zout.write(data2);
       zout.closeEntry();
       IOUtils.closeQuietly(in2);
@@ -115,19 +114,21 @@ public class DigitalSignatureDIPPluginUtils {
     return null;
   }
 
-  public static Path addEmbeddedSignature(Path input, String fileFormat) {
+  public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) {
     try {
-      if (fileFormat.equals("pdf")) {
-        return SignatureUtils.runDigitalSignatureSignPDF(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD);
-      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        return SignatureUtils.runDigitalSignatureSignOOXML(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+      String generalFileFormat = DigitalSignaturePluginUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+      if (generalFileFormat.equals("pdf")) {
+        return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD);
+      } else if (generalFileFormat.equals("ooxml")) {
+        return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
           fileFormat);
-      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        return SignatureUtils.runDigitalSignatureSignODF(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+      } else if (generalFileFormat.equals("odf")) {
+        return ODFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
           fileFormat);
       }
     } catch (Exception e) {
-      LOGGER.warn("Problems running digital signature embedded signature: " + e.getMessage());
+      LOGGER.warn("Problems running digital signature embedded signature");
+      e.printStackTrace();
     }
 
     return null;

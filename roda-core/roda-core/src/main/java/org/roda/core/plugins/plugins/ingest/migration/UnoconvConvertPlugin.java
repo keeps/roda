@@ -20,6 +20,8 @@ import org.roda.core.util.CommandException;
 
 public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
+  private static final String TOOLNAME = "unoconvconvert";
+
   @Override
   public String getName() {
     return "Document conversion";
@@ -55,23 +57,26 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
 
   @Override
   public List<String> getApplicableTo() {
-    return UnoconvConvertPluginUtils.getInputExtensions();
+    // TODO add missing extensions
+    return FileFormatUtils.getInputExtensions(TOOLNAME);
   }
 
   @Override
   public List<String> getConvertableTo() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", TOOLNAME, "outputFormats");
     return Arrays.asList(outputFormats.split("\\s+"));
   }
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    return UnoconvConvertPluginUtils.getPronomToExtension();
+    // TODO add missing pronoms
+    return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return UnoconvConvertPluginUtils.getMimetypeToExtension();
+    // TODO add missing mimetypes
+    return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
   }
 
 }

@@ -52,6 +52,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -65,24 +66,21 @@ import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePluginUtils;
+import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.Binary;
-import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InternalConvertPluginsTestForTravis {
-  private static final Logger LOGGER = LoggerFactory.getLogger(InternalConvertPluginsTest.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(InternalConvertPluginsTestForTravis.class);
 
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
-  private static Path logPath;
   private static ModelService model;
   private static IndexService index;
-  private static int numberOfFiles = 17;
+  private static int numberOfConvertableFiles = 17;
   private static Path corporaPath;
-  private static StorageService corporaService;
 
   @Before
   public void setUp() throws Exception {
@@ -95,13 +93,11 @@ public class InternalConvertPluginsTestForTravis {
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
     RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
-    logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
     URL corporaURL = InternalConvertPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
-    corporaService = new FileStorageService(corporaPath);
 
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
   }
@@ -128,8 +124,11 @@ public class InternalConvertPluginsTestForTravis {
 
     List<TransferredResource> resources = new ArrayList<TransferredResource>();
 
-    String[] aips = {CorporaConstants.SOURCE_AIP_CONVERTER_1, CorporaConstants.SOURCE_AIP_CONVERTER_2};
-    String[] reps = {CorporaConstants.REPRESENTATION_CONVERTER_ID_1, CorporaConstants.REPRESENTATION_CONVERTER_ID_2};
+    String[] aips = {CorporaConstants.SOURCE_AIP_CONVERTER_1, CorporaConstants.SOURCE_AIP_CONVERTER_2,
+      CorporaConstants.SOURCE_AIP_CONVERTER_3};
+
+    String[] reps = {CorporaConstants.REPRESENTATION_CONVERTER_ID_1, CorporaConstants.REPRESENTATION_CONVERTER_ID_2,
+      CorporaConstants.REPRESENTATION_CONVERTER_ID_3};
 
     Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP).resolve(aips[corporaId])
       .resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS).resolve(reps[corporaId])
@@ -179,7 +178,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> reusableAllFiles = new ArrayList<>();
     Iterables.addAll(reusableAllFiles, allFiles);
 
-    Assert.assertEquals(numberOfFiles, reusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, reusableAllFiles.size());
   }
 
   @Test
@@ -207,7 +206,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -256,7 +255,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -306,7 +305,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -331,7 +330,6 @@ public class InternalConvertPluginsTestForTravis {
     }
   }
 
-  @Ignore
   @Test
   public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
@@ -356,7 +354,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -406,7 +404,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -453,14 +451,10 @@ public class InternalConvertPluginsTestForTravis {
       true);
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
-
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
-
-    int changedCounter = 0;
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     for (File f : reusableAllFiles) {
       if (f.getId().matches(".*[.](pdf)$")) {
-        changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         Assert.assertEquals(1, newReusableAllFiles.stream().filter(o -> o.getId().equals(filename + ".pdf")).count());
       }
@@ -517,7 +511,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -563,7 +557,7 @@ public class InternalConvertPluginsTestForTravis {
     List<File> newReusableAllFiles = new ArrayList<>();
     Iterables.addAll(newReusableAllFiles, newAllFiles);
 
-    Assert.assertEquals(numberOfFiles, newReusableAllFiles.size());
+    Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     int changedCounter = 0;
 
@@ -629,5 +623,30 @@ public class InternalConvertPluginsTestForTravis {
       Assert.assertEquals(0,
         DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
     }
+  }
+
+  @Ignore
+  @Test
+  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+    ingestCorpora(2);
+
+    Plugin<AIP> plugin = new VeraPDFPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put("profile", "1b");
+    parameters.put("hasFeatures", "False");
+    plugin.setParameterValues(parameters);
+
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
+    Assert.assertEquals("PARTIAL_SUCCESS", reports.get(0).getReports().get(0).getPluginState().toString());
+
+    Plugin<AIP> plugin2 = new PdfToPdfaPlugin<AIP>();
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin2);
+
+    Plugin<AIP> plugin3 = new VeraPDFPlugin();
+    plugin3.setParameterValues(parameters);
+    reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
+    Assert.assertEquals("SUCCESS", reports.get(0).getReports().get(1).getPluginState().toString());
+
   }
 }

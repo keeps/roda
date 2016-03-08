@@ -113,6 +113,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         Path resultZipFile = null;
         List<File> fileList = IteratorUtils.toList(allFiles.iterator());
         int countFiles = fileList.size();
+        String newFileId = representation.getId() + ".zip";
 
         if (countFiles > 1) {
           Path representationZipFile = Files.createTempFile("rep", ".zip");
@@ -122,6 +123,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           for (File file : fileList) {
             LOGGER.debug("Processing file: " + file);
             IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String fileMimetype = ifile.getFileFormat().getMimeType();
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (!file.isDirectory()) {
@@ -132,14 +134,15 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
               if (doEmbeddedSignature == true) {
                 Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
-                  fileFormat);
-                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile);
+                  fileFormat, fileMimetype);
+                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile,
+                  ifile.getOriginalName());
               } else {
-                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath());
+                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath(),
+                  ifile.getOriginalName());
               }
 
               IOUtils.closeQuietly(directAccess);
-
               if (filePath == null)
                 filePath = file.getPath();
             }
@@ -148,30 +151,31 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           zout.finish();
           IOUtils.closeQuietly(zout);
           IOUtils.closeQuietly(os);
-          resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(representationZipFile);
+          resultZipFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
 
         } else if (countFiles == 1) {
           File file = fileList.get(0);
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+          String fileMimetype = ifile.getFileFormat().getMimeType();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
           StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
           DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+          filePath = file.getPath();
 
           if (doEmbeddedSignature == true) {
-            Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat);
-            resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(embeddedFile);
+            resultZipFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
+              fileMimetype);
+            IOUtils.closeQuietly(directAccess);
+            newFileId = file.getId();
           } else {
-            resultZipFile = DigitalSignatureDIPPluginUtils.runDigitalSigner(directAccess.getPath());
+            resultZipFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
+            IOUtils.closeQuietly(directAccess);
           }
-
-          IOUtils.closeQuietly(directAccess);
-          filePath = file.getPath();
         }
 
         // add zip file on a new representation
         LOGGER.debug("Running digital signer on representation");
         ContentPayload payload = new FSPathContentPayload(resultZipFile);
-        String newFileId = representation.getId() + ".zip";
         model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
 
         IOUtils.closeQuietly(allFiles);

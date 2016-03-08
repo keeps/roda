@@ -22,6 +22,8 @@ import org.slf4j.LoggerFactory;
 
 public class GhostScriptConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
+  private static final String TOOLNAME = "ghostscriptconvert";
+
   @Override
   public String getName() {
     return "GhostScript conversion";
@@ -60,23 +62,26 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
 
   @Override
   public List<String> getApplicableTo() {
-    return GhostScriptConvertPluginUtils.getInputExtensions();
+    // TODO add missing extensions
+    return FileFormatUtils.getInputExtensions(TOOLNAME);
   }
 
   @Override
   public List<String> getConvertableTo() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", TOOLNAME, "outputFormats");
     return Arrays.asList(outputFormats.split("\\s+"));
   }
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    return GhostScriptConvertPluginUtils.getPronomToExtension();
+    // TODO add missing pronoms
+    return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return GhostScriptConvertPluginUtils.getMimetypeToExtension();
+    // TODO add missing mimetypes
+    return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
   }
 
 }

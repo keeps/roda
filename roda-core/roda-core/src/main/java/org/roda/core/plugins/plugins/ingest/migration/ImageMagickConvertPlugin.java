@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 public class ImageMagickConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
+  private static final String TOOLNAME = "imagemagickconvert";
+
   @Override
   public String getName() {
     return "Image conversion";
@@ -55,23 +57,26 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
 
   @Override
   public List<String> getApplicableTo() {
-    return ImageMagickConvertPluginUtils.getInputExtensions();
+    // TODO add missing extensions
+    return FileFormatUtils.getInputExtensions(TOOLNAME);
   }
 
   @Override
   public List<String> getConvertableTo() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", TOOLNAME, "outputFormats");
     return Arrays.asList(outputFormats.split("\\s+"));
   }
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    return ImageMagickConvertPluginUtils.getPronomToExtension();
+    // TODO add missing pronoms
+    return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return ImageMagickConvertPluginUtils.getMimetypeToExtension();
+    // TODO add missing mimetypes
+    return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
   }
 
 }

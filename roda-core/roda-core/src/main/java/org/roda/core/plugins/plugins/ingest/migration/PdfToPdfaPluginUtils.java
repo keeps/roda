@@ -15,14 +15,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
-import org.roda.core.RodaCoreFactory;
 import org.verapdf.core.ValidationException;
 import org.verapdf.core.VeraPDFException;
 import org.verapdf.metadata.fixer.impl.MetadataFixerImpl;
@@ -89,22 +84,6 @@ public class PdfToPdfaPluginUtils {
     }
 
     return "";
-  }
-
-  /*************************** FILLING FILE FORMAT STRUCTURES ***************************/
-
-  public static Map<String, List<String>> getPronomToExtension() {
-    Map<String, List<String>> map = new HashMap<>();
-    String inputFormatPronoms = RodaCoreFactory
-      .getRodaConfigurationAsString("tools", "pdftopdfa", "inputFormatPronoms");
-
-    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
-      // TODO add missing pronoms
-      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
-      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
-    }
-
-    return map;
   }
 
 }

@@ -12,14 +12,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.roda.common.certification.SignatureUtils;
-import org.roda.core.RodaCoreFactory;
+import org.roda.common.certification.ODFSignatureUtils;
+import org.roda.common.certification.OOXMLSignatureUtils;
+import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,15 +29,16 @@ public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
 
-  public static String runDigitalSignatureVerify(Path input, String fileFormat) {
+  public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
 
     try {
-      if (fileFormat.equals("pdf")) {
-        return SignatureUtils.runDigitalSignatureVerifyPDF(input);
-      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        return SignatureUtils.runDigitalSignatureVerifyOOXML(input);
-      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        return SignatureUtils.runDigitalSignatureVerifyODF(input);
+      String generalFileFormat = canHaveEmbeddedSignature(fileFormat, mimetype);
+      if (generalFileFormat.equals("pdf")) {
+        return PDFSignatureUtils.runDigitalSignatureVerify(input);
+      } else if (generalFileFormat.equals("ooxml")) {
+        return OOXMLSignatureUtils.runDigitalSignatureVerify(input);
+      } else if (generalFileFormat.equals("odf")) {
+        return ODFSignatureUtils.runDigitalSignatureVerify(input);
       }
     } catch (IOException | GeneralSecurityException e) {
       LOGGER.warn("Problems running digital signature verification");
@@ -49,16 +47,17 @@ public class DigitalSignaturePluginUtils {
     return "Not a supported format";
   }
 
-  public static Path runDigitalSignatureStrip(Path input, String fileFormat) {
+  public static Path runDigitalSignatureStrip(Path input, String fileFormat, String mimetype) {
     try {
       Path output = Files.createTempFile("stripped", "." + fileFormat);
 
-      if (fileFormat.equals("pdf")) {
-        SignatureUtils.runDigitalSignatureStripPDF(input, output);
-      } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")) {
-        SignatureUtils.runDigitalSignatureStripOOXML(input, output);
-      } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")) {
-        SignatureUtils.runDigitalSignatureStripODF(input, output);
+      String generalFileFormat = canHaveEmbeddedSignature(fileFormat, mimetype);
+      if (generalFileFormat.equals("pdf")) {
+        PDFSignatureUtils.runDigitalSignatureStrip(input, output);
+      } else if (generalFileFormat.equals("ooxml")) {
+        OOXMLSignatureUtils.runDigitalSignatureStrip(input, output);
+      } else if (generalFileFormat.equals("odf")) {
+        ODFSignatureUtils.runDigitalSignatureStrip(input, output);
       }
 
       return output;
@@ -66,6 +65,24 @@ public class DigitalSignaturePluginUtils {
       LOGGER.warn("Problems running a document stripping");
       return null;
     }
+  }
+
+  public static String canHaveEmbeddedSignature(String fileFormat, String mimetype) {
+    if (fileFormat.equals("pdf") || mimetype.equals("application/pdf")) {
+      return "pdf";
+    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")
+      || mimetype.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
+      || mimetype.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+      || mimetype.equals("application/vnd.openxmlformats-officedocument.presentationml.presentation")) {
+      return "ooxml";
+    } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")
+      || mimetype.equals("application/vnd.oasis.opendocument.text")
+      || mimetype.equals("application/vnd.oasis.opendocument.spreadsheet")
+      || mimetype.equals("application/vnd.oasis.opendocument.presentation")) {
+      return "odf";
+    }
+
+    return "";
   }
 
   public static int countSignaturesPDF(Path base, StoragePath input, String intermediatePath) {
@@ -79,43 +96,6 @@ public class DigitalSignaturePluginUtils {
       LOGGER.error("Error getting path of file " + e.getMessage());
     }
     return counter;
-  }
-
-  /*********************** FILLING FILE FORMAT STRUCTURES FUNCTIONS ***********************/
-
-  public static Map<String, List<String>> getPronomToExtension() {
-    Map<String, List<String>> map = new HashMap<>();
-    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
-      "inputFormatPronoms");
-
-    for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
-      // TODO add missing pronoms
-      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
-      map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
-    }
-
-    return map;
-  }
-
-  public static Map<String, List<String>> getMimetypeToExtension() {
-    Map<String, List<String>> map = new HashMap<>();
-    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
-      "inputFormatMimetypes");
-
-    for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
-      // TODO add missing mimetypes
-      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
-      map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
-    }
-
-    return map;
-  }
-
-  public static List<String> getInputExtensions() {
-    // TODO add missing extensions
-    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "digitalsignature",
-      "inputFormatExtensions");
-    return Arrays.asList(inputFormatExtensions.split(" "));
   }
 
 }

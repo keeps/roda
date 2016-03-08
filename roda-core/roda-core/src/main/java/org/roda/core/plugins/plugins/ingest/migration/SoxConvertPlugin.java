@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
+  private static final String TOOLNAME = "soxconvert";
+
   @Override
   public String getName() {
     return "Sound conversion";
@@ -55,23 +57,26 @@ public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlug
 
   @Override
   public List<String> getApplicableTo() {
-    return SoxConvertPluginUtils.getInputExtensions();
+    // TODO add missing extensions
+    return FileFormatUtils.getInputExtensions(TOOLNAME);
   }
 
   @Override
   public List<String> getConvertableTo() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", TOOLNAME, "outputFormats");
     return Arrays.asList(outputFormats.split("\\s+"));
   }
 
   @Override
   public Map<String, List<String>> getPronomToExtension() {
-    return SoxConvertPluginUtils.getPronomToExtension();
+    // TODO add missing pronoms
+    return FileFormatUtils.getPronomToExtension(TOOLNAME);
   }
 
   @Override
   public Map<String, List<String>> getMimetypeToExtension() {
-    return SoxConvertPluginUtils.getMimetypeToExtension();
+    // TODO add missing mimetypes
+    return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
   }
 
 }
