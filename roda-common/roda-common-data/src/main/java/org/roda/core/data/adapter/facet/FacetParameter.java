@@ -13,7 +13,7 @@ import java.util.List;
 
 public abstract class FacetParameter implements Serializable {
   private static final long serialVersionUID = 4927529408810091855L;
-  public static final int DEFAULT_MIN_COUNT = 0;
+  public static final int DEFAULT_MIN_COUNT = 1;
 
   private String name;
   private List<String> values;
