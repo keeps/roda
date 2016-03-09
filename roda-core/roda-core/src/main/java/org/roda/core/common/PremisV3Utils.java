@@ -98,8 +98,9 @@ import gov.loc.premis.v3.StorageComplexType;
 import gov.loc.premis.v3.StringPlusAuthority;
 
 public class PremisV3Utils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(PremisV3Utils.class);
+
   private static final Set<String> MANDATORY_CHECKSUM_ALGORITHMS = new HashSet<>(Arrays.asList("SHA-256"));
-  private final static Logger LOGGER = LoggerFactory.getLogger(PremisV3Utils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   public static Fixity calculateFixity(Binary binary, String digestAlgorithm, String originator)
@@ -138,7 +139,7 @@ public class PremisV3Utils {
   public static Binary updatePremisToV3IfNeeded(Binary binary) throws IOException, SAXException, TransformerException,
     RequestNotValidException, NotFoundException, GenericException {
     if (isPremisV2(binary)) {
-      LOGGER.debug("Binary " + binary.getStoragePath().asString() + " is Premis V2... Needs updated...");
+      LOGGER.debug("Binary {} is Premis V2... Needs updated...", binary.getStoragePath().asString());
       return updatePremisV2toV3(binary);
     } else {
       return binary;
@@ -206,40 +207,40 @@ public class PremisV3Utils {
   public static void updateFileFormat(gov.loc.premis.v3.File file, String formatDesignationName,
     String formatDesignationVersion, String pronom, String mimeType) {
 
-    if (!StringUtils.isBlank(formatDesignationName)) {
+    if (StringUtils.isNotBlank(formatDesignationName)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
-      fdct.setFormatName(getStringPlusAuthority(formatDesignationName, ""));
+      fdct.setFormatName(getStringPlusAuthority(formatDesignationName));
     }
 
-    if (!StringUtils.isBlank(formatDesignationVersion)) {
+    if (StringUtils.isNotBlank(formatDesignationVersion)) {
       FormatDesignationComplexType fdct = getFormatDesignation(file);
       fdct.setFormatVersion(formatDesignationVersion);
     }
 
-    if (!StringUtils.isBlank(pronom)) {
+    if (StringUtils.isNotBlank(pronom)) {
       FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-      frct.setFormatRegistryKey(getStringPlusAuthority(pronom, ""));
+      frct.setFormatRegistryKey(getStringPlusAuthority(pronom));
     }
-    if (!StringUtils.isBlank(mimeType)) {
+    if (StringUtils.isNotBlank(mimeType)) {
       FormatRegistryComplexType frct = getFormatRegistry(file, RodaConstants.PRESERVATION_REGISTRY_MIME);
-      frct.setFormatRegistryKey(getStringPlusAuthority(mimeType, ""));
+      frct.setFormatRegistryKey(getStringPlusAuthority(mimeType));
     }
 
   }
 
   public static void updateCreatingApplication(gov.loc.premis.v3.File file, String creatingApplicationName,
     String creatingApplicationVersion, String dateCreatedByApplication) {
-    if (!StringUtils.isBlank(creatingApplicationName)) {
+    if (StringUtils.isNotBlank(creatingApplicationName)) {
       CreatingApplicationComplexType cact = getCreatingApplication(file);
-      cact.setCreatingApplicationName(getStringPlusAuthority(creatingApplicationName, ""));
+      cact.setCreatingApplicationName(getStringPlusAuthority(creatingApplicationName));
     }
 
-    if (!StringUtils.isBlank(creatingApplicationVersion)) {
+    if (StringUtils.isNotBlank(creatingApplicationVersion)) {
       CreatingApplicationComplexType cact = getCreatingApplication(file);
       cact.setCreatingApplicationVersion(creatingApplicationVersion);
     }
 
-    if (!StringUtils.isBlank(dateCreatedByApplication)) {
+    if (StringUtils.isNotBlank(dateCreatedByApplication)) {
       CreatingApplicationComplexType cact = getCreatingApplication(file);
       cact.setDateCreatedByApplication(dateCreatedByApplication);
     }
@@ -271,22 +272,21 @@ public class PremisV3Utils {
     }
     if (occt.getFormatArray() != null && occt.getFormatArray().length > 0) {
       for (FormatComplexType fct : occt.getFormatArray()) {
-        if (fct.getFormatRegistry() != null) {
-          if (fct.getFormatRegistry().getFormatRegistryName().getStringValue().equalsIgnoreCase(registryName)) {
-            frct = fct.getFormatRegistry();
-            break;
-          }
+        if (fct.getFormatRegistry() != null
+          && fct.getFormatRegistry().getFormatRegistryName().getStringValue().equalsIgnoreCase(registryName)) {
+          frct = fct.getFormatRegistry();
+          break;
         }
       }
       if (frct == null) {
         FormatComplexType fct = occt.addNewFormat();
         frct = fct.addNewFormatRegistry();
-        frct.setFormatRegistryName(getStringPlusAuthority(registryName, ""));
+        frct.setFormatRegistryName(getStringPlusAuthority(registryName));
       }
     } else {
       FormatComplexType fct = occt.addNewFormat();
       frct = fct.addNewFormatRegistry();
-      frct.setFormatRegistryName(getStringPlusAuthority(registryName, ""));
+      frct.setFormatRegistryName(getStringPlusAuthority(registryName));
     }
     return frct;
   }
@@ -320,16 +320,16 @@ public class PremisV3Utils {
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
     eict.setEventIdentifierValue(eventID);
-    eict.setEventIdentifierType(getStringPlusAuthority("local", ""));
+    eict.setEventIdentifierType(getStringPlusAuthority("local"));
     ect.setEventDateTime(DateParser.getIsoDate(date));
-    ect.setEventType(getStringPlusAuthority(type, ""));
+    ect.setEventType(getStringPlusAuthority(type));
     EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
     edict.setEventDetail(details);
     if (sources != null) {
       for (LinkingIdentifier source : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(source.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(source.getType(), ""));
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(source.getType()));
         if (source.getRoles() != null) {
           loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(source.getRoles()));
         }
@@ -340,7 +340,7 @@ public class PremisV3Utils {
       for (LinkingIdentifier target : targets) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
         loict.setLinkingObjectIdentifierValue(target.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(target.getType(), ""));
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(target.getType()));
         if (target.getRoles() != null) {
           loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(target.getRoles()));
         }
@@ -350,13 +350,13 @@ public class PremisV3Utils {
     if (agents != null) {
       for (IndexedPreservationAgent agent : agents) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
-        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("local", ""));
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("local"));
         agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
-        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("simple", ""));
+        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("simple"));
       }
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
-    outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome, ""));
+    outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome));
     StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
     if (detailExtension != null) {
       outcomeDetailNote.append("\n").append(detailExtension);
@@ -374,10 +374,10 @@ public class PremisV3Utils {
 
     AgentComplexType act = agent.addNewAgent();
     AgentIdentifierComplexType agentIdentifier = act.addNewAgentIdentifier();
-    agentIdentifier.setAgentIdentifierType(getStringPlusAuthority("local", ""));
+    agentIdentifier.setAgentIdentifierType(getStringPlusAuthority("local"));
     agentIdentifier.setAgentIdentifierValue(id);
 
-    act.setAgentType(getStringPlusAuthority(type.toString(), ""));
+    act.setAgentType(getStringPlusAuthority(type.toString()));
 
     if (StringUtils.isNotBlank(name)) {
       act.addNewAgentName().setStringValue(name);
@@ -410,11 +410,11 @@ public class PremisV3Utils {
 
     Representation representation = Representation.Factory.newInstance();
     ObjectIdentifierComplexType oict = representation.addNewObjectIdentifier();
-    oict.setObjectIdentifierType(getStringPlusAuthority("local", ""));
+    oict.setObjectIdentifierType(getStringPlusAuthority("local"));
     String identifier = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_REPRESENTATION, aipID,
-      representationId, null, null);
+      representationId);
     oict.setObjectIdentifierValue(identifier);
-    representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority("", ""));
+    representation.addNewPreservationLevel().setPreservationLevelValue(getStringPlusAuthority(""));
 
     return representation;
   }
@@ -424,18 +424,18 @@ public class PremisV3Utils {
     ObjectDocument document = ObjectDocument.Factory.newInstance();
     gov.loc.premis.v3.File file = gov.loc.premis.v3.File.Factory.newInstance();
     file.addNewPreservationLevel()
-      .setPreservationLevelValue(getStringPlusAuthority(RodaConstants.PRESERVATION_LEVEL_FULL, ""));
+      .setPreservationLevelValue(getStringPlusAuthority(RodaConstants.PRESERVATION_LEVEL_FULL));
     ObjectIdentifierComplexType oict = file.addNewObjectIdentifier();
     String identifier = IdUtils.getFileId(originalFile.getAipId(), originalFile.getRepresentationId(),
       originalFile.getPath(), originalFile.getId());
     oict.setObjectIdentifierValue(identifier);
-    oict.setObjectIdentifierType(getStringPlusAuthority("local", ""));
+    oict.setObjectIdentifierType(getStringPlusAuthority("local"));
     ObjectCharacteristicsComplexType occt = file.addNewObjectCharacteristics();
     // TODO
     // occt.setCompositionLevel(CompositionLevelComplexType.Factory.parse("0"));
     FormatComplexType fct = occt.addNewFormat();
     FormatDesignationComplexType fdct = fct.addNewFormatDesignation();
-    fdct.setFormatName(getStringPlusAuthority("", ""));
+    fdct.setFormatName(getStringPlusAuthority(""));
     fdct.setFormatVersion("");
     Binary binary = model.getStorage().getBinary(ModelUtils.getFileStoragePath(originalFile));
 
@@ -449,8 +449,8 @@ public class PremisV3Utils {
           Fixity fixity = calculateFixity(binary, algorithm, "RODA");
           FixityComplexType premis_fixity = occt.addNewFixity();
           premis_fixity.setMessageDigest(fixity.getMessageDigest());
-          premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm(), ""));
-          premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(fixity.getMessageDigestOriginator(), ""));
+          premis_fixity.setMessageDigestAlgorithm(getStringPlusAuthority(fixity.getMessageDigestAlgorithm()));
+          premis_fixity.setMessageDigestOriginator(getStringPlusAuthority(fixity.getMessageDigestOriginator()));
         }
       } catch (IOException | NoSuchAlgorithmException e) {
         LOGGER.warn("Could not calculate fixity for file " + originalFile);
@@ -462,7 +462,7 @@ public class PremisV3Utils {
     file.addNewOriginalName().setStringValue(originalFile.getId());
     StorageComplexType sct = file.addNewStorage();
     ContentLocationComplexType clct = sct.addNewContentLocation();
-    clct.setContentLocationType(getStringPlusAuthority("", ""));
+    clct.setContentLocationType(getStringPlusAuthority(""));
     clct.setContentLocationValue("");
 
     document.setObject(file);
@@ -735,10 +735,10 @@ public class PremisV3Utils {
       AuthorizationDeniedException, XmlException, IOException, ValidationException {
 
     RelationshipComplexType relationship = r.addNewRelationship();
-    relationship.setRelationshipType(getStringPlusAuthority(relationshipType, ""));
-    relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType, ""));
+    relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
+    relationship.setRelationshipSubType(getStringPlusAuthority(relationshipSubType));
     RelatedObjectIdentifierComplexType roict = relationship.addNewRelatedObjectIdentifier();
-    roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL, ""));
+    roict.setRelatedObjectIdentifierType(getStringPlusAuthority(RodaConstants.PREMIS_IDENTIFIER_TYPE_LOCAL));
     String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, file.getAipId(),
       file.getRepresentationId(), file.getPath(), file.getId());
     roict.setRelatedObjectIdentifierValue(id);
@@ -775,6 +775,10 @@ public class PremisV3Utils {
     return identifiers;
   }
 
+  private static StringPlusAuthority getStringPlusAuthority(String value) {
+    return getStringPlusAuthority(value, "");
+  }
+
   private static StringPlusAuthority getStringPlusAuthority(String value, String authority) {
     StringPlusAuthority spa = StringPlusAuthority.Factory.newInstance();
     spa.setStringValue(value);
@@ -786,9 +790,9 @@ public class PremisV3Utils {
 
   private static StringPlusAuthority[] getStringPlusAuthorityArray(List<String> values) {
     List<StringPlusAuthority> l = new ArrayList<StringPlusAuthority>();
-    if (values != null && values.size() > 0) {
+    if (values != null && !values.isEmpty()) {
       for (String value : values) {
-        l.add(getStringPlusAuthority(value, ""));
+        l.add(getStringPlusAuthority(value));
       }
     }
     return l.toArray(new StringPlusAuthority[l.size()]);

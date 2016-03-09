@@ -77,6 +77,31 @@ public class IndexModelObserver implements ModelObserver {
 
   }
 
+  private void indexAIP(final AIP aip) {
+    boolean safemode = false;
+    indexAIP(aip, safemode);
+  }
+
+  private void indexAIP(final AIP aip, boolean safemode) {
+    try {
+      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
+      index.add(RodaConstants.INDEX_AIP, aipDoc);
+      commit(RodaConstants.INDEX_AIP);
+
+      LOGGER.trace("Adding AIP: {}", aipDoc);
+    } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
+      | NotFoundException | AuthorizationDeniedException e) {
+      if (!safemode) {
+        LOGGER.error("Error indexing AIP, trying safe mode", e);
+        safemode = true;
+        indexAIP(aip, safemode);
+      } else {
+        LOGGER.error("Could not index created AIP", e);
+      }
+
+    }
+  }
+
   private void indexPreservationsEvents(final AIP aip) {
 
     CloseableIterable<PreservationMetadata> preservationMetadata = null;
@@ -92,7 +117,8 @@ public class IndexModelObserver implements ModelObserver {
 
             SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(aip.getId(), pm.getRepresentationId(),
               pm.getId(), binary);
-            LOGGER.trace(premisEventDocument.toString());
+            LOGGER.trace("{}", premisEventDocument);
+
             try {
               List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
               for (LinkingIdentifier id : agents) {
@@ -100,8 +126,9 @@ public class IndexModelObserver implements ModelObserver {
                   JsonUtils.getJsonFromObject(id));
               }
             } catch (org.roda.core.data.v2.validation.ValidationException e) {
-              LOGGER.warn("Error setting linking agent field: " + e.getMessage());
+              LOGGER.warn("Error setting linking agent field: {}", e.getMessage());
             }
+
             try {
               List<LinkingIdentifier> sources = PremisV3Utils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : sources) {
@@ -109,8 +136,9 @@ public class IndexModelObserver implements ModelObserver {
                   JsonUtils.getJsonFromObject(id));
               }
             } catch (org.roda.core.data.v2.validation.ValidationException e) {
-              LOGGER.warn("Error setting linking source field: " + e.getMessage());
+              LOGGER.warn("Error setting linking source field: {}", e.getMessage());
             }
+
             try {
               List<LinkingIdentifier> outcomes = PremisV3Utils.extractObjectFromEvent(binary);
               for (LinkingIdentifier id : outcomes) {
@@ -118,7 +146,7 @@ public class IndexModelObserver implements ModelObserver {
                   JsonUtils.getJsonFromObject(id));
               }
             } catch (org.roda.core.data.v2.validation.ValidationException e) {
-              LOGGER.warn("Error setting linking outcome field: " + e.getMessage());
+              LOGGER.warn("Error setting linking outcome field: {}", e.getMessage());
             }
 
             index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
@@ -134,7 +162,7 @@ public class IndexModelObserver implements ModelObserver {
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }
-    
+
     commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
   }
 
@@ -145,21 +173,24 @@ public class IndexModelObserver implements ModelObserver {
   private void indexRepresentations(final AIP aip) {
 
     for (Representation representation : aip.getRepresentations()) {
+      CloseableIterable<File> allFiles = null;
       try {
         SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
         index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
         final boolean recursive = true;
-        CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
+        allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
         for (File file : allFiles) {
-          boolean icommit = false;
+          boolean commit = false;
           boolean recursiveIndexFile = false;
-          indexFile(file, icommit, recursiveIndexFile);
+          indexFile(file, commit, recursiveIndexFile);
         }
         allFiles.close();
 
       } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
         | AuthorizationDeniedException e) {
         LOGGER.error("Could not index representation", e);
+      } finally {
+        IOUtils.closeQuietly(allFiles);
       }
     }
 
@@ -167,29 +198,8 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexFile(File file, boolean commit, boolean recursive) {
-    Binary premisFile = null;
-    try {
-      premisFile = model.retrievePreservationFile(file);
-    } catch (NotFoundException e) {
-      LOGGER.trace("On indexing representations, did not find PREMIS for file: " + file);
-    } catch (RODAException e) {
-      LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
-    }
-
-    String fulltext = null;
-    InputStream inputStream = null;
-    try {
-      Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
-      inputStream = fulltextBinary.getContent().createInputStream();
-      fulltext = IOUtils.toString(inputStream);
-    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
-      LOGGER.warn("Error getting fulltext for file: " + file, e);
-    } catch (NotFoundException e) {
-      LOGGER.trace("Fulltext not found for file: " + file);
-    } finally {
-      IOUtils.closeQuietly(inputStream);
-    }
+    Binary premisFile = getFilePremisFile(file);
+    String fulltext = getFileFulltext(file);
 
     SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile, fulltext);
     try {
@@ -221,29 +231,34 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexAIP(final AIP aip) {
-    boolean safemode = false;
-    indexAIP(aip, safemode);
+  private Binary getFilePremisFile(File file) {
+    Binary premisFile = null;
+    try {
+      premisFile = model.retrievePreservationFile(file);
+    } catch (NotFoundException e) {
+      LOGGER.trace("On indexing representations, did not find PREMIS for file: {}", file);
+    } catch (RODAException e) {
+      LOGGER.warn("On indexing representations, error loading PREMIS for file: " + file, e);
+    }
+    return premisFile;
   }
 
-  private void indexAIP(final AIP aip, boolean safemode) {
+  private String getFileFulltext(File file) {
+    String fulltext = null;
+    InputStream inputStream = null;
     try {
-      SolrInputDocument aipDoc = SolrUtils.aipToSolrInputDocument(aip, model, safemode);
-      index.add(RodaConstants.INDEX_AIP, aipDoc);
-      commit(RodaConstants.INDEX_AIP);
-
-      LOGGER.trace("Adding AIP: " + aipDoc);
-    } catch (SolrException | SolrServerException | IOException | RequestNotValidException | GenericException
-      | NotFoundException | AuthorizationDeniedException e) {
-      if (!safemode) {
-        LOGGER.error("Error indexing AIP, trying safe mode", e);
-        safemode = true;
-        indexAIP(aip, safemode);
-      } else {
-        LOGGER.error("Could not index created AIP", e);
-      }
-
+      Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
+        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
+      inputStream = fulltextBinary.getContent().createInputStream();
+      fulltext = IOUtils.toString(inputStream);
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
+      LOGGER.warn("Error getting fulltext for file: " + file, e);
+    } catch (NotFoundException e) {
+      LOGGER.trace("Fulltext not found for file: {}", file);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
+    return fulltext;
   }
 
   @Override
@@ -395,11 +410,6 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
     try {
-      if (preservationMetadata.getAipId() != null) {
-        AIP aip = model.retrieveAIP(preservationMetadata.getAipId());
-        indexAIP(aip);
-      }
-      LOGGER.debug("preservationMetadataCreated");
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationMetadata);
       Binary binary = model.getStorage().getBinary(storagePath);
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getAipId(),
@@ -440,8 +450,6 @@ public class IndexModelObserver implements ModelObserver {
         index.add(RodaConstants.INDEX_PRESERVATION_AGENTS, premisFileDocument);
         index.commit(RodaConstants.INDEX_PRESERVATION_AGENTS);
       }
-
-      // aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
     } catch (IOException | SolrServerException | GenericException | RequestNotValidException | NotFoundException
       | AuthorizationDeniedException e) {
       LOGGER.error("Error when preservation metadata created on retrieving the full AIP", e);

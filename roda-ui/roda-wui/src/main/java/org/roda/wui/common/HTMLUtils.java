@@ -98,13 +98,14 @@ public final class HTMLUtils {
     if (metadataType != null) {
       String lowerCaseMetadataType = metadataType.toLowerCase();
       if (metadataVersion != null) {
-        String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR + metadataVersion;
+        String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR
+          + metadataVersion;
         transformerStream = RodaCoreFactory
-          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
+          .getConfigurationFileAsStream(xsltFolder + "/" + lowerCaseMetadataTypeWithVersion + ".xslt");
       }
       if (transformerStream == null) {
         transformerStream = RodaCoreFactory
-          .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+          .getConfigurationFileAsStream(xsltFolder + "/" + lowerCaseMetadataType + ".xslt");
       }
     }
 

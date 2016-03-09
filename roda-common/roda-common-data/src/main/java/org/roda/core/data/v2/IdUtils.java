@@ -63,6 +63,10 @@ public final class IdUtils {
     return idBuilder.toString();
   }
 
+  public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId) {
+    return type + ":" + getFileId(aipId, representationId, null, null, type.toString(), ID_SEPARATOR);
+  }
+  
   public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);

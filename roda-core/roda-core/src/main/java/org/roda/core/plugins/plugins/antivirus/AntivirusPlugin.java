@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -157,11 +158,11 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       List<LinkingIdentifier> sources = Arrays
         .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
       List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state,
-        outcomeDetailExtension.toString(), notify);
+      PreservationMetadata preservationMetadata = PluginHelper.createPluginEvent(this, aip.getId(), model, sources,
+        outcomes, state, outcomeDetailExtension.toString(), notify);
 
       if (notify) {
-        model.notifyAIPUpdated(aip.getId());
+        model.notifyPreservationMetadataCreated(preservationMetadata);
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {

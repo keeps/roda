@@ -45,13 +45,13 @@ public class EARKSIPToAIPPluginUtils {
 
     AIP aip = model.createAIP(active, parentId, permissions, notify);
 
-    if (sip.getRepresentations() != null && sip.getRepresentations().size() > 0) {
+    if (sip.getRepresentations() != null && !sip.getRepresentations().isEmpty()) {
 
       for (IPRepresentation sr : sip.getRepresentations()) {
         boolean original = true;
         model.createRepresentation(aip.getId(), sr.getObjectID(), original, false);
 
-        if (sr.getData() != null && sr.getData().size() > 0) {
+        if (sr.getData() != null && !sr.getData().isEmpty()) {
           for (IPFile file : sr.getData()) {
             List<String> directoryPath = file.getRelativeFolders();
             String fileId = file.getFileName();
@@ -62,13 +62,14 @@ public class EARKSIPToAIPPluginUtils {
       }
     }
 
-    if (sip.getDescriptiveMetadata() != null && sip.getDescriptiveMetadata().size() > 0) {
+    if (sip.getDescriptiveMetadata() != null && !sip.getDescriptiveMetadata().isEmpty()) {
       for (IPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
         String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
         ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
         String metadataType = getMetadataType(dm);
         String metadataVersion = dm.getMetadataVersion();
-        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType,metadataVersion, false);
+        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, metadataVersion,
+          false);
       }
     }
 

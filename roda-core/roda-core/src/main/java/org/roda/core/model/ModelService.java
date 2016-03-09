@@ -82,10 +82,9 @@ import org.slf4j.LoggerFactory;
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class ModelService extends ModelObservable {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
   private static final String AIP_METADATA_FILENAME = "aip.json";
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(ModelService.class);
 
   private final StorageService storage;
   private Path logFile;
@@ -362,6 +361,10 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public void notifyPreservationMetadataCreated(PreservationMetadata preservationMetadata) {
+    super.notifyPreservationMetadataCreated(preservationMetadata);
+  }
+
   // TODO support asReference
   public AIP updateAIP(String aipId, StorageService sourceStorage, StoragePath sourcePath)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
@@ -438,14 +441,17 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion) throws RequestNotValidException, GenericException,
-      AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
-    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType, descriptiveMetadataVersion, true);
+    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion)
+      throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+      NotFoundException {
+    return createDescriptiveMetadata(aipId, descriptiveMetadataId, payload, descriptiveMetadataType,
+      descriptiveMetadataVersion, true);
   }
 
   public DescriptiveMetadata createDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, boolean notify) throws RequestNotValidException,
-      GenericException, AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    ContentPayload payload, String descriptiveMetadataType, String descriptiveMetadataVersion, boolean notify)
+      throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+      NotFoundException {
     DescriptiveMetadata descriptiveMetadataBinary = null;
 
     // StoragePath binaryPath = binary.getStoragePath();
@@ -453,7 +459,8 @@ public class ModelService extends ModelObservable {
     boolean asReference = false;
 
     storage.createBinary(binaryPath, payload, asReference);
-    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,descriptiveMetadataVersion);
+    descriptiveMetadataBinary = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,
+      descriptiveMetadataVersion);
 
     AIP aip = getAIPMetadata(aipId);
     aip.getDescriptiveMetadata().add(descriptiveMetadataBinary);
@@ -467,8 +474,8 @@ public class ModelService extends ModelObservable {
   }
 
   public DescriptiveMetadata updateDescriptiveMetadata(String aipId, String descriptiveMetadataId,
-    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion, String message)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    ContentPayload descriptiveMetadataPayload, String descriptiveMetadataType, String descriptiveMetadataVersion,
+    String message) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
       ValidationException {
     DescriptiveMetadata ret = null;
 
@@ -491,7 +498,7 @@ public class ModelService extends ModelObservable {
       ret = odm.get();
       ret.setType(descriptiveMetadataType);
     } else {
-      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType,descriptiveMetadataVersion);
+      ret = new DescriptiveMetadata(descriptiveMetadataId, aipId, descriptiveMetadataType, descriptiveMetadataVersion);
       descriptiveMetadata.add(ret);
     }
     updateAIP(aip);
