@@ -16,9 +16,11 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  */
 public interface MainConstants extends Constants, ConstantsWithLookup {
 
+  // Locale
+  @DefaultStringValue("en")
+  public String locale();
+  
   // Content titles
-
-
   @Key("title.help.supportsoftware")
   @DefaultStringValue("Support Software")
   public String title_help_supportsoftware();

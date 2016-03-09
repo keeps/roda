@@ -44,6 +44,7 @@ public class ThemeResource {
   public Response getResource(
     @ApiParam(value = "The resource id", required = true) @QueryParam("resourceId") String resourceId,
     @ApiParam(value = "The default resource id", required = false) @QueryParam("defaultResourceId") String defaultResourceId,
+    @ApiParam(value = "If the resource is served inline", required = false) @QueryParam("inline") boolean inline,
     @Context Request req) throws IOException, NotFoundException {
 
     if (!Theme.exists(resourceId) && defaultResourceId != null) {
@@ -63,7 +64,7 @@ public class ThemeResource {
       ResponseBuilder builder = req.evaluatePreconditions(etag);
 
       if (builder == null) {
-        return ApiUtils.okResponse(Theme.getResource(resourceId), cc, etag);
+        return ApiUtils.okResponse(Theme.getResource(resourceId), cc, etag, inline);
       } else {
         return builder.cacheControl(cc).tag(etag).build();
       }

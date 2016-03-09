@@ -32,6 +32,10 @@ import org.roda.core.data.v2.common.Pair;
  */
 public class ApiUtils {
 
+  private static final String CONTENT_DISPOSITION_FILENAME_ARGUMENT = "filename=";
+  private static final String CONTENT_DISPOSITION_INLINE = "inline; ";
+  private static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment; ";
+
   /**
    * Get media type
    * 
@@ -106,20 +110,42 @@ public class ApiUtils {
   }
 
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate) {
+    return okResponse(streamResponse, cacheControl, lastModifiedDate, false);
+  }
+
+  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, Date lastModifiedDate,
+    boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename())
+      .header(HttpHeaders.CONTENT_DISPOSITION,
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
       .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
   }
-  
+
   public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag) {
+    return okResponse(streamResponse, cacheControl, tag, false);
+  }
+
+  public static Response okResponse(StreamResponse streamResponse, CacheControl cacheControl, EntityTag tag,
+    boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename())
+      .header(HttpHeaders.CONTENT_DISPOSITION,
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
       .cacheControl(cacheControl).tag(tag).build();
   }
 
   public static Response okResponse(StreamResponse streamResponse) {
+    return okResponse(streamResponse, false);
+  }
+
+  public static Response okResponse(StreamResponse streamResponse, boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
-      .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename = " + streamResponse.getFilename()).build();
+      .header(HttpHeaders.CONTENT_DISPOSITION,
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
+      .build();
+  }
+
+  private static String contentDisposition(boolean inline) {
+    return inline ? CONTENT_DISPOSITION_INLINE : CONTENT_DISPOSITION_ATTACHMENT;
   }
 
   public static Response errorResponse(TransformerException e) {
