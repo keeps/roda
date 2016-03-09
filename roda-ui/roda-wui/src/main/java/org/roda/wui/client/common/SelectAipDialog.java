@@ -24,7 +24,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -58,7 +57,6 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   AIPList searchResultsPanel;
 
   private String aipId;
-  private AsyncCallback<Boolean> callback;
 
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
@@ -130,7 +128,6 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
 
   @UiHandler("cancelButton")
   void buttonCancelHandler(ClickEvent e) {
-    callback.onSuccess(false);
     hide();
   }
 
