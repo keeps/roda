@@ -29,9 +29,11 @@ import org.apache.commons.io.IOUtils;
 public class Messages {
   private static final String MESSAGES_BUNDLE = "Messages";
   private ResourceBundle resourceBundle;
+  private Map<String, Map<String, Object>> translationsCache;
 
   public Messages(Locale locale, Path folder) {
     this.resourceBundle = ResourceBundle.getBundle(MESSAGES_BUNDLE, locale, new FolderBasedUTF8Control(folder));
+    this.translationsCache = new HashMap<String, Map<String, Object>>();
   }
 
   /**
@@ -59,6 +61,11 @@ public class Messages {
    * prefix will be replaced by "i18n." for simplicity purposes
    */
   public <T> Map<String, T> getTranslations(String prefix, Class<T> valueClass, boolean replacePrefixFromKey) {
+    // try cache first
+    if (translationsCache.get(prefix) != null) {
+      return (Map<String, T>) translationsCache.get(prefix);
+    }
+    
     Map<String, T> map = new HashMap<String, T>();
     Enumeration<String> keys = resourceBundle.getKeys();
     String fullPrefix = prefix + ".";
@@ -69,6 +76,9 @@ public class Messages {
           valueClass.cast(resourceBundle.getString(key)));
       }
     }
+
+    // cache it
+    translationsCache.put(prefix, (Map<String, Object>) map);
     return map;
   }
 

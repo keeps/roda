@@ -187,12 +187,13 @@ public class SolrUtils {
       // get xslt from metadata type and version if defined
       if (metadataType != null) {
         String lowerCaseMetadataType = metadataType.toLowerCase();
-        if(metadataVersion!=null){
-          String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType+RodaConstants.METADATA_VERSION_SEPARATOR+metadataVersion;
+        if (metadataVersion != null) {
+          String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR
+            + metadataVersion;
           transformerStream = RodaCoreFactory
             .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
         }
-        if(transformerStream==null){
+        if (transformerStream == null) {
           transformerStream = RodaCoreFactory
             .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
         }

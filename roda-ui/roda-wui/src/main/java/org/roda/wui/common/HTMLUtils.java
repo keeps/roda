@@ -46,14 +46,23 @@ public final class HTMLUtils {
     String descriptiveMetadataVersion, final Locale locale) throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
 
-    Map<String, Object> translations;
+    Map<String, Object> translations = null;
     if (descriptiveMetadataType != null) {
       String lowerCaseDescriptiveMetadataType = descriptiveMetadataType.toLowerCase();
       if (descriptiveMetadataVersion != null) {
-        lowerCaseDescriptiveMetadataType += RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion;
+        String lowerCaseDescriptiveMetadataTypeWithVersion = lowerCaseDescriptiveMetadataType
+          + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion;
+        translations = messages.getTranslations(
+          RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + lowerCaseDescriptiveMetadataTypeWithVersion, Object.class,
+          true);
       }
-      translations = messages.getTranslations(
-        RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + lowerCaseDescriptiveMetadataType, Object.class, true);
+
+      if (translations == null || translations.isEmpty()) {
+        translations = messages.getTranslations(
+          RodaConstants.I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX + lowerCaseDescriptiveMetadataType, Object.class,
+          true);
+      }
+
     } else {
       translations = new HashMap<>();
     }
