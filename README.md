@@ -1,17 +1,19 @@
-RODA - Repository of Authentic Digital Objects
+RODA 2.0 - Repository of Authentic Digital Objects
 ==============================================
 
 ## What is RODA?
+
 RODA is a complete digital repository that delivers functionality for all the main units of the OAIS reference model. RODA is capable of ingesting, managing and providing access to the various types of digital objects produced by large corporations or public bodies. RODA is based on open-source technologies and is supported by existing standards such as the OAIS, METS, EAD and PREMIS.
 
 ## Some technical information about RODA
 
-* Uses Fedora Commons for digital object storage
-* Uses EAD as descriptive metadata schema
-* Uses PREMIS as preservation metadata schema
-* Has a multi-step ingestion workflow
-* Supports LDAP for authentication & authorization
+* Uses Fedora Commons or native file system for digital object storage
+* Uses any XML format as descriptive metadata
+* Uses PREMIS for preservation metadata 
+* Has a configurable multi-step ingestion workflow
+* Supports LDAP and CAS for authentication & authorization
 * Supports pluggable preservation actions
+* Has a user friendly graphical user interface based on GWT
 
 
 For more information, please fell free to visit RODA website:
