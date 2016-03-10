@@ -15,9 +15,8 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
-
-import akka.actor.ActorRef;
 
 public interface PluginOrchestrator {
 
@@ -42,5 +41,6 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public ActorRef getCoordinator();
+  public void executeJob(Job job);
+
 }

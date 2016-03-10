@@ -32,6 +32,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -43,8 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import akka.actor.ActorRef;
 
 public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
@@ -82,11 +81,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void shutdown() {
     // do nothing
-  }
-
-  @Override
-  public ActorRef getCoordinator() {
-    return null;
   }
 
   @Override
@@ -344,6 +338,11 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
     // TODO Auto-generated method stub
 
+  }
+
+  @Override
+  public void executeJob(Job job) {
+    // TODO
   }
 
 }

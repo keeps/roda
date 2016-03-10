@@ -47,11 +47,6 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
   }
 
   @Override
-  public String getToolOutput() {
-    return "";
-  }
-
-  @Override
   public String getVersion() {
     if (version == null) {
       version = getVersionImpl();

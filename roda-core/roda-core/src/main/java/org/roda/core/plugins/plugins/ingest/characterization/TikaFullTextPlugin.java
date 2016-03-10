@@ -7,11 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -22,7 +20,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -45,8 +42,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
-
-  private String output;
 
   @Override
   public void init() throws PluginException {
@@ -73,15 +68,6 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public String getToolOutput() {
-    return output;
-  }
-
-  public void setToolOutput(String o) {
-    this.output = o;
-  }
-
-  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -102,21 +88,18 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
       LOGGER.debug("Processing AIP " + aip.getId());
       try {
-        List<String> outputs = new ArrayList<String>();
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
           boolean inotify = false;
-          outputs.addAll(TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip,
-            representation, inotify));
+          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
         }
         model.notifyAIPUpdated(aip.getId());
-        setToolOutput(String.join("\n", outputs));
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
 
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-          "Error running Tika " + aip.getId() + ": " + e.getMessage());
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
       }
 
       report.addReport(reportItem);
@@ -125,12 +108,8 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
       if (createsPluginEvent) {
         try {
-          List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model,
-            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
-          List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
-            notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

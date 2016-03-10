@@ -314,7 +314,7 @@ public class PremisV3Utils {
   }
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
-    List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, String outcome, String detailNote,
+    List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
     String detailExtension, List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
@@ -326,23 +326,23 @@ public class PremisV3Utils {
     EventDetailInformationComplexType edict = ect.addNewEventDetailInformation();
     edict.setEventDetail(details);
     if (sources != null) {
-      for (LinkingIdentifier source : sources) {
+      for (LinkingIdentifier identifier : sources) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(source.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(source.getType()));
-        if (source.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(source.getRoles()));
+        loict.setLinkingObjectIdentifierValue(identifier.getValue());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
         }
       }
     }
 
-    if (targets != null) {
-      for (LinkingIdentifier target : targets) {
+    if (outcomes != null) {
+      for (LinkingIdentifier identifier : outcomes) {
         LinkingObjectIdentifierComplexType loict = ect.addNewLinkingObjectIdentifier();
-        loict.setLinkingObjectIdentifierValue(target.getValue());
-        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(target.getType()));
-        if (target.getRoles() != null) {
-          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(target.getRoles()));
+        loict.setLinkingObjectIdentifierValue(identifier.getValue());
+        loict.setLinkingObjectIdentifierType(getStringPlusAuthority(identifier.getType()));
+        if (identifier.getRoles() != null) {
+          loict.setLinkingObjectRoleArray(getStringPlusAuthorityArray(identifier.getRoles()));
         }
       }
     }
@@ -358,7 +358,7 @@ public class PremisV3Utils {
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
     outcomeInformation.setEventOutcome(getStringPlusAuthority(outcome));
     StringBuilder outcomeDetailNote = new StringBuilder(detailNote);
-    if (detailExtension != null) {
+    if (StringUtils.isNotBlank(detailExtension)) {
       outcomeDetailNote.append("\n").append(detailExtension);
     }
     EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();

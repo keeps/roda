@@ -41,27 +41,29 @@ public class EARKSIPToAIPPluginUtils {
 
     boolean active = false;
     AIPPermissions permissions = new AIPPermissions();
-    boolean notify = true;
+    boolean notify = false;
 
     AIP aip = model.createAIP(active, parentId, permissions, notify);
 
+    // process representations
     if (sip.getRepresentations() != null && !sip.getRepresentations().isEmpty()) {
 
       for (IPRepresentation sr : sip.getRepresentations()) {
         boolean original = true;
-        model.createRepresentation(aip.getId(), sr.getObjectID(), original, false);
+        model.createRepresentation(aip.getId(), sr.getObjectID(), original, notify);
 
         if (sr.getData() != null && !sr.getData().isEmpty()) {
           for (IPFile file : sr.getData()) {
             List<String> directoryPath = file.getRelativeFolders();
             String fileId = file.getFileName();
             ContentPayload payload = new FSPathContentPayload(file.getPath());
-            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload, true);
+            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload, notify);
           }
         }
       }
     }
 
+    // process descriptive metadata
     if (sip.getDescriptiveMetadata() != null && !sip.getDescriptiveMetadata().isEmpty()) {
       for (IPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
         String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
@@ -69,11 +71,13 @@ public class EARKSIPToAIPPluginUtils {
         String metadataType = getMetadataType(dm);
         String metadataVersion = dm.getMetadataVersion();
         model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, metadataVersion,
-          false);
+          notify);
       }
     }
 
     // TODO add preservation metadata
+
+    model.notifyAIPCreated(aip.getId());
 
     return model.retrieveAIP(aip.getId());
 

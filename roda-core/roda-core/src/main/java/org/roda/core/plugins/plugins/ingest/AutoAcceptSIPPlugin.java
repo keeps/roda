@@ -7,10 +7,8 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -19,7 +17,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -93,14 +90,12 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model) throws PluginException {
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
+    throws PluginException {
 
     try {
-      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-      List<LinkingIdentifier> outcomes = null;
       boolean notify = true;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, outcomeDetail, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, state, outcomeDetail, notify);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

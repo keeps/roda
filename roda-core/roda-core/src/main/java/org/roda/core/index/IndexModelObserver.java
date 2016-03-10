@@ -130,7 +130,6 @@ public class IndexModelObserver implements ModelObserver {
     Binary binary = model.getStorage().getBinary(filePath);
     SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), pm.getAipId(),
       pm.getRepresentationId(), pm.getId(), binary);
-    premisEventDocument.addField("content_type", "parentDocument");
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
     index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
   }
@@ -140,30 +139,33 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexRepresentations(final AIP aip) {
-
     for (Representation representation : aip.getRepresentations()) {
-      CloseableIterable<File> allFiles = null;
-      try {
-        SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
-        index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
-        final boolean recursive = true;
-        allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
-        for (File file : allFiles) {
-          boolean commit = false;
-          boolean recursiveIndexFile = false;
-          indexFile(file, commit, recursiveIndexFile);
-        }
-        allFiles.close();
-
-      } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-        | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index representation", e);
-      } finally {
-        IOUtils.closeQuietly(allFiles);
-      }
+      indexRepresentation(representation);
     }
 
     commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
+  }
+
+  private void indexRepresentation(final Representation representation) {
+    CloseableIterable<File> allFiles = null;
+    try {
+      SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
+      index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
+      final boolean recursive = true;
+      allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
+      for (File file : allFiles) {
+        boolean commit = false;
+        boolean recursiveIndexFile = false;
+        indexFile(file, commit, recursiveIndexFile);
+      }
+      allFiles.close();
+
+    } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      LOGGER.error("Could not index representation", e);
+    } finally {
+      IOUtils.closeQuietly(allFiles);
+    }
   }
 
   private void indexFile(File file, boolean commit, boolean recursive) {
@@ -250,9 +252,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadata) {
-    // re-index whole AIP
     try {
-      aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
+      indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
     }
@@ -260,32 +261,27 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void descriptiveMetadataUpdated(DescriptiveMetadata descriptiveMetadata) {
-    // re-index whole AIP
     try {
-      aipUpdated(model.retrieveAIP(descriptiveMetadata.getAipId()));
+      indexAIP((model.retrieveAIP(descriptiveMetadata.getAipId())));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
+      LOGGER.error("Error when descriptive metadata updated on retrieving the full AIP", e);
     }
-
   }
 
   @Override
   public void descriptiveMetadataDeleted(String aipId, String descriptiveMetadataBinaryId) {
-    // re-index whole AIP
     try {
-      aipUpdated(model.retrieveAIP(aipId));
+      indexAIP((model.retrieveAIP(aipId)));
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata created on retrieving the full AIP", e);
+      LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
     }
-
   }
 
   @Override
   public void representationCreated(Representation representation) {
+    indexRepresentation(representation);
     // XXX check if forcing auto commit is necessary
-    boolean forceCommit = true;
-    addDocumentToIndex(RodaConstants.INDEX_REPRESENTATION, SolrUtils.representationToSolrDocument(representation),
-      "Error creating Representation", forceCommit);
+    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
   }
 
   @Override
@@ -296,10 +292,15 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationDeleted(String aipId, String representationId) {
-    // XXX check if forcing auto commit is necessary
-    boolean forceCommit = true;
+    boolean forceCommit = false;
     deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, IdUtils.getRepresentationId(aipId, representationId),
       "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
+
+    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATIONID, representationId,
+      "Error deleting Representation files (aipId=" + aipId + "; representationId=" + representationId + ")",
+      forceCommit);
+
+    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
   }
 
   @Override
@@ -386,7 +387,6 @@ public class IndexModelObserver implements ModelObserver {
         binary);
       PreservationMetadataType type = preservationMetadata.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
-        premisFileDocument.addField("content_type", "parentDocument");
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
         index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
       } else if (type.equals(PreservationMetadataType.AGENT)) {
@@ -402,21 +402,21 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void preservationMetadataUpdated(PreservationMetadata preservationMetadata) {
-    try {
-      aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when preservation metadata updated on retrieving the full AIP", e);
-    }
+    preservationMetadataCreated(preservationMetadata);
   }
 
   @Override
   public void preservationMetadataDeleted(PreservationMetadata preservationMetadata) {
-    try {
-      if (preservationMetadata.getAipId() != null) {
-        aipUpdated(model.retrieveAIP(preservationMetadata.getAipId()));
-      }
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when descriptive metadata deleted on retrieving the full AIP", e);
+    PreservationMetadataType type = preservationMetadata.getType();
+    // XXX check if forcing auto commit is necessary
+    boolean forceCommit = true;
+    String preservationMetadataId = preservationMetadata.getId();
+    if (type.equals(PreservationMetadataType.EVENT)) {
+      deleteDocumentFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, preservationMetadataId,
+        "Error deleting PreservationMetadata event (id=" + preservationMetadataId + ")", forceCommit);
+    } else if (type.equals(PreservationMetadataType.AGENT)) {
+      deleteDocumentFromIndex(RodaConstants.INDEX_PRESERVATION_AGENTS, preservationMetadataId,
+        "Error deleting PreservationMetadata agent (id=" + preservationMetadataId + ")", forceCommit);
     }
   }
 
@@ -456,6 +456,18 @@ public class IndexModelObserver implements ModelObserver {
   private void deleteDocumentFromIndex(String indexName, String documentId, String errorLogMessage, boolean commit) {
     try {
       index.deleteById(indexName, documentId);
+      if (commit) {
+        index.commit(indexName);
+      }
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error(errorLogMessage, e);
+    }
+  }
+
+  private void deleteDocumentsFromIndex(String indexName, String fieldName, String fieldValue, String errorLogMessage,
+    boolean commit) {
+    try {
+      index.deleteByQuery(indexName, fieldName + ":" + fieldValue);
       if (commit) {
         index.commit(indexName);
       }

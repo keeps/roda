@@ -7,12 +7,10 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -21,7 +19,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -104,7 +101,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       Exception exception = null;
       DirectResourceAccess directAccess = null;
       try {
-        LOGGER.debug("Checking if AIP " + aip.getId() + " is clean of virus");
+        LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
         StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
 
         directAccess = storage.getDirectAccess(aipPath);
@@ -113,8 +110,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE)
           .setPluginDetails(virusCheckResult.getReport());
 
-        LOGGER.debug(
-          "Done with checking if AIP " + aip.getId() + " has virus. Is clean of virus: " + virusCheckResult.isClean());
+        LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
+          virusCheckResult.isClean());
       } catch (Exception e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 
@@ -127,16 +124,16 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         IOUtils.closeQuietly(directAccess);
       }
 
+      // FIXME 20160314 hsilva: perhaps the following code should be put inside
+      // the above finally block, because if an error occurs the event creation
+      // will never happen
       try {
-        LOGGER.info("Creating event");
         boolean notify = true;
         createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, notify);
         report.addReport(reportItem);
 
-        LOGGER.info("Updating job report");
         PluginHelper.updateJobReport(this, model, index, reportItem);
 
-        LOGGER.info("Done job report");
       } catch (Throwable e) {
         LOGGER.error("Error updating event and job", e);
       }
@@ -155,11 +152,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      List<LinkingIdentifier> sources = Arrays
-        .asList(PluginHelper.getLinkingIdentifier(aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
-      List<LinkingIdentifier> outcomes = null;
-      PreservationMetadata preservationMetadata = PluginHelper.createPluginEvent(this, aip.getId(), model, sources,
-        outcomes, state, outcomeDetailExtension.toString(), notify);
+      PreservationMetadata preservationMetadata = PluginHelper.createPluginEvent(this, aip.getId(), model, state,
+        outcomeDetailExtension.toString(), notify);
 
       if (notify) {
         model.notifyPreservationMetadataCreated(preservationMetadata);

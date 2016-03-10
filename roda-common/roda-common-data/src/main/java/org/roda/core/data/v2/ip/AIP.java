@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -30,6 +31,10 @@ public class AIP implements Serializable {
 
   public AIP() {
     super();
+  }
+
+  public AIP(String id, String parentId, boolean active, AIPPermissions permissions) {
+    this(id, parentId, active, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>());
   }
 
   public AIP(String id, String parentId, boolean active, AIPPermissions permissions,

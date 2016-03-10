@@ -69,47 +69,47 @@ public interface Plugin<T extends Serializable> {
   /**
    * Returns the type of the agent linked to this {@link Plugin}.
    * 
-   * @return a {@link PreservationAgentType} with the type of the agent of this {@link Plugin}.
+   * @return a {@link PreservationAgentType} with the type of the agent of this
+   *         {@link Plugin}.
    */
   public PreservationAgentType getAgentType();
-  
+
   /**
-   * Returns the type of the execution preservation event linked to this {@link Plugin}.
+   * Returns the type of the execution preservation event linked to this
+   * {@link Plugin}.
    * 
-   * @return a {@link PreservationEventType} with the type of the execution event of this {@link Plugin}.
+   * @return a {@link PreservationEventType} with the type of the execution
+   *         event of this {@link Plugin}.
    */
   public PreservationEventType getPreservationEventType();
-  
+
   /**
-   * Returns the description of the execution preservation event linked to this {@link Plugin}.
+   * Returns the description of the execution preservation event linked to this
+   * {@link Plugin}.
    * 
-   * @return a {@link String} with the description of the execution event of this {@link Plugin}.
+   * @return a {@link String} with the description of the execution event of
+   *         this {@link Plugin}.
    */
   public String getPreservationEventDescription();
-  
+
   /**
-   * Returns the success message of the execution preservation event linked to this {@link Plugin}.
+   * Returns the success message of the execution preservation event linked to
+   * this {@link Plugin}.
    * 
-   * @return a {@link String} with the success message of the execution event of this {@link Plugin}.
+   * @return a {@link String} with the success message of the execution event of
+   *         this {@link Plugin}.
    */
   public String getPreservationEventSuccessMessage();
-  
+
   /**
-   * Returns the failure message of the execution preservation event linked to this {@link Plugin}.
+   * Returns the failure message of the execution preservation event linked to
+   * this {@link Plugin}.
    * 
-   * @return a {@link String} with the failure message of the execution event of this {@link Plugin}.
+   * @return a {@link String} with the failure message of the execution event of
+   *         this {@link Plugin}.
    */
   public String getPreservationEventFailureMessage();
-  
-  /**
-   * Returns the tool output of the execution preservation event linked to this {@link Plugin}.
-   * 
-   * @return a {@link String} with the tool output of the execution event of this {@link Plugin}.
-   * 
-   * @deprecated 20160226 hsilva: this must/will be removed 
-   */
-  public String getToolOutput();
-  
+
   /**
    * Returns the {@link List} of {@link PluginParameter}s necessary to run this
    * {@link Plugin}.

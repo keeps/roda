@@ -10,8 +10,6 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -47,15 +45,14 @@ public class TikaFullTextPluginUtils {
 
   private static final Tika tika = new Tika();
 
-  public static List<String> runTikaFullTextOnRepresentation(IndexService index, ModelService model,
-    StorageService storage, AIP aip, Representation representation, boolean notify) throws NotFoundException,
-      GenericException, RequestNotValidException, AuthorizationDeniedException, ValidationException {
+  public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    AIP aip, Representation representation, boolean notify) throws NotFoundException, GenericException,
+      RequestNotValidException, AuthorizationDeniedException, ValidationException {
 
     boolean recursive = true;
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
     boolean inotify = false;
-    List<String> outputs = new ArrayList<String>();
 
     for (File file : allFiles) {
 
@@ -65,7 +62,6 @@ public class TikaFullTextPluginUtils {
 
         Metadata metadata = new Metadata();
         InputStream inputStream = null;
-        InputStream inputStream2 = null;
         try {
           inputStream = binary.getContent().createInputStream();
           final Reader reader = tika.parse(inputStream, metadata);
@@ -81,16 +77,11 @@ public class TikaFullTextPluginUtils {
           model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
             TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, inotify);
           model.updateFile(file);
-          Binary b = model.retrieveOtherMetadataBinary(aip.getId(), representation.getId(), file.getPath(),
-            file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
-          inputStream2 = b.getContent().createInputStream();
-          outputs.add(IOUtils.toString(inputStream2, "UTF-8"));
 
         } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);
-          IOUtils.closeQuietly(inputStream2);
         }
 
         // update PREMIS
@@ -119,6 +110,5 @@ public class TikaFullTextPluginUtils {
     if (notify) {
       model.notifyAIPUpdated(aip.getId());
     }
-    return outputs;
   }
 }

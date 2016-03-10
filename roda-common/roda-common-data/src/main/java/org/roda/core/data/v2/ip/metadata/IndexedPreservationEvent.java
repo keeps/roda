@@ -7,7 +7,6 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 

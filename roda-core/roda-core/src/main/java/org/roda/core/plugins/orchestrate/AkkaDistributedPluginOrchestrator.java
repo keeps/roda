@@ -16,6 +16,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -130,11 +131,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public ActorRef getCoordinator() {
-    return frontend;
-  }
-
-  @Override
   public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
 
   }
@@ -183,6 +179,12 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void executeJob(Job job) {
     // TODO Auto-generated method stub
 
   }

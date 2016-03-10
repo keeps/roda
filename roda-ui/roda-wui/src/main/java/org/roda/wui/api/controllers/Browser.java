@@ -722,7 +722,7 @@ public class Browser extends RodaCoreService {
     // delegate
     String message = "Updated by " + user.getName();
     BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, metadataVersion, message,
-      is, fileDetail, true);
+      is, fileDetail, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -743,7 +743,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
     // delegate
-    String message = "Updated by " + user.getName();
+    String message = "Created by " + user.getName();
     BrowserHelper.createOrUpdateAipDescriptiveMetadataFile(aipId, metadataId, metadataType, metadataVersion, message,
       is, fileDetail, true);
 

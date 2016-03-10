@@ -73,10 +73,8 @@ public class JobsHelper {
     // serialize job to file & index it
     RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
 
-    // FIXME should we verify if the job was created with success???
-    // FIXME correctly handle future returned by Patterns.ask
-    // FIXME actually one is assuming we are using akka
-    Patterns.ask(RodaCoreFactory.getPluginOrchestrator().getCoordinator(), updatedJob, 5);
+    // ask plugin orchestrator to execute the job
+    RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob);
 
     return updatedJob;
   }
@@ -89,6 +87,26 @@ public class JobsHelper {
     }
 
     return jobs;
+  }
+
+  public static void pauseJob(String jobId) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public static void resumeJob(String jobId) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public static void stopJob(String jobId) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  public static void deleteJob(String jobId) {
+    // TODO Auto-generated method stub
+    
   }
 
 }

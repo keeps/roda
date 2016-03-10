@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -23,7 +22,6 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -105,12 +103,8 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
 
       if (createsPluginEvent) {
         try {
-          List<LinkingIdentifier> sources = PluginHelper.getLinkingRepresentations(aip, model,
-            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE);
-          List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
-            notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

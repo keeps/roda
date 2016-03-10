@@ -8,15 +8,12 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.common.validation.ValidationUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -50,12 +47,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     "Descriptive metadata version to be used as fallback or if metadata type is forced.");
 
   public static final PluginParameter PARAMETER_FORCE_DESCRIPTIVE_METADATA_TYPE = new PluginParameter(
-    "parameter.force_type",
-    "Force metadata type in all",
-    PluginParameterType.BOOLEAN,
-    "false",
-    true,
-    false,
+    "parameter.force_type", "Force metadata type in all", PluginParameterType.BOOLEAN, "false", true, false,
     "If true, bypass current metadata type with metadata type passed as parameter. If false, if metadata type passed as parameter is defined use as fallback, else no fallback");
 
   public static final PluginParameter PARAMETER_VALIDATE_PREMIS = new PluginParameter("parameter.validate_premis",
@@ -142,10 +134,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
   private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
     try {
-      List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-        RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-      List<LinkingIdentifier> outcomes = null;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, state, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, state, "", notify);
       if (notify) {
         model.notifyAIPUpdated(aip.getId());
       }

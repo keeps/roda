@@ -33,11 +33,12 @@ import gov.loc.repository.bagit.BagFile;
 import gov.loc.repository.bagit.BagInfoTxt;
 
 public class BagitToAIPPluginUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
+
   private static final String DATA_FOLDER = "data";
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
-  private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPluginUtils.class);
 
   public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String parentId)
     throws BagitNotValidException, IOException, RequestNotValidException, NotFoundException, GenericException,
@@ -50,27 +51,28 @@ public class BagitToAIPPluginUtils {
     boolean active = false;
     AIPPermissions permissions = new AIPPermissions();
 
-    boolean notifyInSteps = false;
+    boolean notify = false;
 
-    AIP aip = model.createAIP(active, parentId, permissions, notifyInSteps);
+    AIP aip = model.createAIP(active, parentId, permissions, notify);
 
-    model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION);
+    model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
+      notify);
 
     String representationId = UUID.randomUUID().toString();
     boolean original = true;
 
-    model.createRepresentation(aip.getId(), representationId, original, notifyInSteps);
+    model.createRepresentation(aip.getId(), representationId, original, notify);
 
     if (bag.getPayload() != null) {
       for (BagFile bagFile : bag.getPayload()) {
         List<String> split = Arrays.asList(bagFile.getFilepath().split(BAGIT_FILE_PATH_SEPARATOR));
-        if (split.size() > 0 && split.get(0).equals(DATA_FOLDER)) {
+        if (!split.isEmpty() && split.get(0).equals(DATA_FOLDER)) {
           // skip 'data' folder
           List<String> directoryPath = split.subList(1, split.size() - 1);
           String fileId = split.get(split.size() - 1);
 
           ContentPayload payload = new BagFileContentPayload(bagFile);
-          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyInSteps);
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notify);
         }
       }
     }

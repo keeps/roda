@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -59,8 +58,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "Parent Object", PluginParameterType.AIP_ID, "", false, false,
     "Use the provided parent object if the SIPs does not provide one.");
   public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter(
-    RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object", PluginParameterType.BOOLEAN,
-    "false", false, false, "Use the provided parent object even if the SIPs provide one.");
+    RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object", PluginParameterType.BOOLEAN, "false", false,
+    false, "Use the provided parent object even if the SIPs provide one.");
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
 
@@ -78,12 +77,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "parameter.do_sip_syntax_check", "SIP syntax check", PluginParameterType.BOOLEAN, "true", true, true,
     "Check SIP coherence. Verifies the validity and completeness of a SIP.");
   public static final PluginParameter PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK = new PluginParameter(
-    "parameter.do_producer_authorization_check",
-    "Producer authorization check",
-    PluginParameterType.BOOLEAN,
-    "true",
-    true,
-    true,
+    "parameter.do_producer_authorization_check", "Producer authorization check", PluginParameterType.BOOLEAN, "true",
+    true, true,
     "Check SIP producer authorization. Verifies that the producer of the SIP has permissions to ingest to the specified Fonds.");
   public static final PluginParameter PARAMETER_DO_FILE_FORMAT_IDENTIFICATION = new PluginParameter(
     "parameter.do_file_format_identification", "File format identification", PluginParameterType.BOOLEAN, "true", true,
@@ -163,6 +158,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
     totalSteps = calculateEfectiveTotalSteps();
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, totalSteps + "");
   }
 
   @Override
@@ -175,17 +171,12 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
 
-    PluginHelper.updateJobStatus(this, index, model, 0);
-
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
     String parentId = PluginHelper.getStringFromParameters(this, PARAMETER_PARENT_ID);
     boolean forceParentId = PluginHelper.getBooleanFromParameters(this, PARAMETER_FORCE_PARENT_ID);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
-
-    // 0.1) set total number of steps (sent to each plugin via parameters)
-    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, totalSteps + "");
 
     // 1) transform TransferredResource into an AIP
     // 1.1) obtain list of AIPs that were successfully transformed from
@@ -251,7 +242,6 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 7) do metadata and full text extraction (tika)
@@ -259,7 +249,6 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
     }
 
     // 8) do auto accept
@@ -270,12 +259,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
     createIngestEndedEvent(model, aips, reports, aipIdToObjectId);
 
-    PluginHelper.updateJobStatus(this, index, model, 100);
-
     return report;
   }
 
-  private List<AIP> recalculateAIPsList(List<AIP> aips, Map<String, Report> reports, Map<String, String> aipIdToObjectId) {
+  private List<AIP> recalculateAIPsList(List<AIP> aips, Map<String, Report> reports,
+    Map<String, String> aipIdToObjectId) {
     for (int i = 0; i < aips.size(); i++) {
       AIP aip = aips.get(i);
       if (reports.get(aipIdToObjectId.get(aip.getId())).getPluginState() == PluginState.FAILURE) {
@@ -304,8 +292,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     for (AIP aip : aips) {
       try {
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, Arrays.asList(PluginHelper.getLinkingIdentifier(
-          aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, PluginState.SUCCESS, "", notify);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
@@ -324,8 +311,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
         boolean notify = true;
 
         // FIXME create event based on report (outcome & outcomeDetails)
-        PluginHelper.createPluginEvent(this, aip.getId(), model, Arrays.asList(PluginHelper.getLinkingIdentifier(
-          aip.getId(), RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, PluginState.SUCCESS, "", notify);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest end event: " + e.getMessage(), e);
@@ -389,8 +375,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     String pluginClassName = getParameterValues().getOrDefault(PARAMETER_SIP_TO_AIP_CLASS.getId(),
       PARAMETER_SIP_TO_AIP_CLASS.getDefaultValue());
 
-    Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager().getPlugin(
-      pluginClassName);
+    Plugin<TransferredResource> plugin = (Plugin<TransferredResource>) RodaCoreFactory.getPluginManager()
+      .getPlugin(pluginClassName);
     try {
       plugin.setParameterValues(getParameterValues());
       report = plugin.execute(index, model, storage, transferredResources);
@@ -420,7 +406,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return executePlugin(index, model, storage, aips, VeraPDFPlugin.class.getName(), params);
   }
 
-  private Report verifyIfAipIsWellFormed(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+  private Report verifyIfAipIsWellFormed(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
   }
 

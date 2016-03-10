@@ -7,22 +7,19 @@
  */
 package org.roda.core.plugins.orchestrate.akka;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,30 +35,27 @@ public class AkkaJobWorkerActor extends UntypedActor {
   @Override
   public void onReceive(Object msg) throws Exception {
     if (msg instanceof Job) {
+      List<Report> reports = new ArrayList<>();
       Job job = (Job) msg;
       Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
-      setPluginParameters(job, plugin);
+      PluginHelper.setPluginParameters(plugin, job);
+
+      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(), 0);
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
-        RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources((Plugin<TransferredResource>) plugin,
-          getTransferredResourcesFromObjectIds(job.getObjectIds()));
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
+          (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjectIds()));
       } else if (ORCHESTRATOR_METHOD.ON_ALL_AIPS == job.getOrchestratorMethod()) {
-        RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
       } else if (ORCHESTRATOR_METHOD.ON_AIPS == job.getOrchestratorMethod()) {
-        RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, job.getObjectIds());
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, job.getObjectIds());
       } else if (ORCHESTRATOR_METHOD.RUN_PLUGIN == job.getOrchestratorMethod()) {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
-    }
-  }
 
-  private <T extends Serializable> void setPluginParameters(Job job, Plugin<T> plugin) {
-    Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
-    try {
-      plugin.setParameterValues(parameters);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error setting plug-in parameters", e);
+      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(), 100);
+
+      getSender().tell(reports, getSelf());
     }
   }
 

@@ -16,20 +16,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -50,7 +47,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
   private static final Logger LOGGER = LoggerFactory.getLogger(TransferredResourceToAIPPlugin.class);
   private static final String METADATA_TYPE = "key-value";
   private static final String METADATA_VERSION = null;
-  
+
   @Override
   public void init() throws PluginException {
   }
@@ -116,19 +113,15 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         boolean notifyDescriptiveMetadataCreated = false;
 
         // TODO make the following strings constants
-        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE,METADATA_VERSION,
+        model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE, METADATA_VERSION,
           notifyDescriptiveMetadataCreated);
 
         model.notifyAIPCreated(aip.getId());
 
         reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
-        List<LinkingIdentifier> sources = Arrays.asList(PluginHelper.getLinkingIdentifier(transferredResource,
-          RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-        List<LinkingIdentifier> outcomes = Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-          RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
+        PluginHelper.createPluginEvent(this, aip.getId(), model, transferredResource, reportItem.getPluginState(), "",
           notify);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);

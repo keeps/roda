@@ -191,6 +191,8 @@ public class SolrUtils {
         if (metadataVersion != null) {
           String lowerCaseMetadataTypeWithVersion = lowerCaseMetadataType + RodaConstants.METADATA_VERSION_SEPARATOR
             + metadataVersion;
+          // FIXME 20160314 hsilva: replace hardcoded path by constant or method
+          // (to support both filesystem in win/linux and classpath)
           transformerStream = RodaCoreFactory
             .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
         }
@@ -1209,8 +1211,8 @@ public class SolrUtils {
     return ipa;
   }
 
-  public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, String aipID, String representationID, String fileID, Binary binary)
-    throws GenericException {
+  public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, String aipID,
+    String representationID, String fileID, Binary binary) throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
     try {
@@ -1218,6 +1220,8 @@ public class SolrUtils {
 
       Reader descMetadataReader = new InputStreamReader(inputStream);
 
+      // FIXME 20160314 hsilva: replace hardcoded path by constant or method (to
+      // support both filesystem in win/linux and classpath)
       InputStream transformerStream = RodaCoreFactory
         .getConfigurationFileAsStream("crosswalks/ingest/other/premis.xslt");
       // TODO support the use of scripts for non-xml transformers
@@ -1263,13 +1267,12 @@ public class SolrUtils {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " using xslt " + "crosswalks/ingest/other/premis.xslt", e);
     }
-    
-    if(preservationMetadataType==PreservationMetadataType.EVENT){
+
+    if (preservationMetadataType == PreservationMetadataType.EVENT) {
       try {
         List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
         for (LinkingIdentifier id : agents) {
-          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER,
-            JsonUtils.getJsonFromObject(id));
+          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, JsonUtils.getJsonFromObject(id));
         }
       } catch (org.roda.core.data.v2.validation.ValidationException e) {
         LOGGER.warn("Error setting linking agent field: " + e.getMessage());
