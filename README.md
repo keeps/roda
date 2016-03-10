@@ -19,14 +19,6 @@ RODA is a complete digital repository that delivers functionality for all the ma
 For more information, please fell free to visit RODA website:
 **<http://www.roda-community.org>**
 
-## Getting started
-
-To try without installing checkout the demo at: <http://demo.roda-community.org>
-
-To install RODA checkout the binary installation packages at: http://www.roda-community.org/download/
-
-Also, you can checkout the [features](http://www.roda-community.org/what-is-roda/) and [screenshots](http://www.roda-community.org/screenshots/) at the [RODA Community website](http://www.roda-community.org).
-
 ## How to build and run
 
 The prerequisites to build RODA are:
