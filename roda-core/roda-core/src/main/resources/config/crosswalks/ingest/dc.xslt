@@ -11,34 +11,59 @@
 		</doc>
 	</xsl:template>
 	<xsl:template match="simpledc">
-		<xsl:if test="title/text()">
-			<field name="title">
-				<xsl:value-of select="title/text()" />
-			</field>
+	 	<xsl:if test="count(title)  &gt; 0">
+			<xsl:if test="title[1]/text()">
+				<field name="title">
+					<xsl:value-of select="title/text()" />
+				</field>
+			</xsl:if>
+			<xsl:for-each select="title">
+				<xsl:if test="normalize-space(text())!=''">
+					<field name="title_txt">
+						<xsl:value-of select="text()" />
+					</field>
+				</xsl:if>
+			</xsl:for-each>
 		</xsl:if>
-		<xsl:if test="description/text()">
-			<field name="description">
-				<xsl:value-of select="description/text()" />
-			</field>
+		<xsl:if test="count(description)  &gt; 0">
+			<xsl:if test="description[1]/text()">
+				<field name="description">
+					<xsl:value-of select="description/text()" />
+				</field>
+			</xsl:if>
+			<xsl:for-each select="description">
+				<xsl:if test="normalize-space(text())!=''">
+					<field name="description_txt">
+						<xsl:value-of select="text()" />
+					</field>
+				</xsl:if>
+			</xsl:for-each>
 		</xsl:if>
-		<xsl:if test="contributor/text()">
-			<field name="dc.contributor_txt">
-				<xsl:value-of select="contributor/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="coverage/text()">
-			<field name="dc.coverage_txt">
-				<xsl:value-of select="coverage/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="creator/text()">
-			<field name="dc.creator_txt">
-				<xsl:value-of select="creator/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="date/text()">
-			<xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
-				select="date/text()">
+		<xsl:for-each select="contributor">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="contributor_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="coverage">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="coverage_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="creator">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="creator_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:if test="count(date)  &gt; 0">
+			<xsl:if test="count(date)  &lt; 2">
+				<xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$"
+				select="date[1]/text()">
 				<xsl:matching-substring>
 					<xsl:variable name="date">
 						<xsl:value-of select="regex-group(0)" />
@@ -55,52 +80,101 @@
 					</xsl:if>
 				</xsl:matching-substring>
 			</xsl:analyze-string>
+			</xsl:if>
+			<xsl:if test="count(date)  &gt; 1">
+				<xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[1]/text()">
+					<xsl:matching-substring>
+						<xsl:variable name="date">
+							<xsl:value-of select="regex-group(0)" />
+						</xsl:variable>
+						<xsl:if test="not(normalize-space($date)='')">
+							<field name="dateInitial">
+								<xsl:value-of select="$date" />
+								T00:00:00Z
+							</field>
+						</xsl:if>
+					</xsl:matching-substring>
+				</xsl:analyze-string>
+				<xsl:analyze-string regex="^\d{{4}}-\d{{2}}-\d{{2}}$" select="date[2]/text()">
+					<xsl:matching-substring>
+						<xsl:variable name="date">
+							<xsl:value-of select="regex-group(0)" />
+						</xsl:variable>
+						<xsl:if test="not(normalize-space($date)='')">
+							<field name="dateFinal">
+								<xsl:value-of select="$date" />
+								T00:00:00Z
+							</field>
+						</xsl:if>
+					</xsl:matching-substring>
+				</xsl:analyze-string>
+			</xsl:if>
 		</xsl:if>
-		<xsl:if test="format/text()">
-			<field name="dc.format_txt">
-				<xsl:value-of select="format/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="identifier/text()">
-			<field name="dc.identifier_txt">
-				<xsl:value-of select="identifier/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="language/text()">
-			<field name="dc.language_txt">
-				<xsl:value-of select="language/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="publisher/text()">
-			<field name="dc.publisher_txt">
-				<xsl:value-of select="publisher/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="relation/text()">
-			<field name="dc.relation_txt">
-				<xsl:value-of select="relation/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="rights/text()">
-			<field name="dc.rights_txt">
-				<xsl:value-of select="rights/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="source/text()">
-			<field name="dc.source_txt">
-				<xsl:value-of select="source/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="subject/text()">
-			<field name="dc.subject_txt">
-				<xsl:value-of select="subject/text()" />
-			</field>
-		</xsl:if>
-		<xsl:if test="type/text()">
-			<field name="dc.type_txt">
-				<xsl:value-of select="type/text()" />
-			</field>
-		</xsl:if>
+			
+			
+		<xsl:for-each select="format">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="format_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="identifier">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="identifier_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="language">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="language_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="publisher">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="publisher_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="relation">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="relation_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="rights">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="rights_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="source">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="source_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="subject">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="subject_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
+		<xsl:for-each select="type">
+			<xsl:if test="normalize-space(text())!=''">
+				<field name="type_txt">
+					<xsl:value-of select="text()" />
+				</field>
+			</xsl:if>
+		</xsl:for-each>
 		<field name="level">item</field>
 	</xsl:template>
 </xsl:stylesheet>

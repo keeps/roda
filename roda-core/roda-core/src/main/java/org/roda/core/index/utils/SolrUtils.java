@@ -101,6 +101,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -1208,7 +1209,7 @@ public class SolrUtils {
     return ipa;
   }
 
-  public static SolrInputDocument premisToSolr(String aipID, String representationID, String fileID, Binary binary)
+  public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, String aipID, String representationID, String fileID, Binary binary)
     throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
@@ -1261,6 +1262,36 @@ public class SolrUtils {
     } catch (IOException | TransformerException | XMLStreamException | FactoryConfigurationError e) {
       throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
         + " using xslt " + "crosswalks/ingest/other/premis.xslt", e);
+    }
+    
+    if(preservationMetadataType==PreservationMetadataType.EVENT){
+      try {
+        List<LinkingIdentifier> agents = PremisV3Utils.extractAgentsFromEvent(binary);
+        for (LinkingIdentifier id : agents) {
+          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER,
+            JsonUtils.getJsonFromObject(id));
+        }
+      } catch (org.roda.core.data.v2.validation.ValidationException e) {
+        LOGGER.warn("Error setting linking agent field: " + e.getMessage());
+      }
+      try {
+        List<LinkingIdentifier> sources = PremisV3Utils.extractObjectFromEvent(binary);
+        for (LinkingIdentifier id : sources) {
+          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER,
+            JsonUtils.getJsonFromObject(id));
+        }
+      } catch (org.roda.core.data.v2.validation.ValidationException e) {
+        LOGGER.warn("Error setting linking source field: " + e.getMessage());
+      }
+      try {
+        List<LinkingIdentifier> outcomes = PremisV3Utils.extractObjectFromEvent(binary);
+        for (LinkingIdentifier id : outcomes) {
+          doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER,
+            JsonUtils.getJsonFromObject(id));
+        }
+      } catch (org.roda.core.data.v2.validation.ValidationException e) {
+        LOGGER.warn("Error setting linking outcome field: " + e.getMessage());
+      }
     }
     return doc;
   }
