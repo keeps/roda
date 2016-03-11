@@ -12,6 +12,8 @@ package org.roda.wui.client.main;
 
 import java.util.List;
 
+import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.welcome.CookiesPolicy;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -80,6 +82,9 @@ public class Main extends Composite implements EntryPoint {
         });
       }
     });
+    
+    JavascriptUtils.setCookieOptions(constants.cookiesMessage(), constants.cookiesDismisse(),
+      constants.cookiesLearnMore(), "#" + CookiesPolicy.RESOLVER.getHistoryToken());
   }
 
   interface Binder extends UiBinder<Widget, Main> {
@@ -87,7 +92,7 @@ public class Main extends Composite implements EntryPoint {
 
   @UiField
   AccessibleFocusPanel homeLinkArea;
-  
+
   @UiField
   FlowPanel bannerLogo;
 
@@ -125,7 +130,7 @@ public class Main extends Composite implements EntryPoint {
         onHistoryChanged(event.getValue());
       }
     });
-    
+
     bannerLogo.add(new HTMLWidgetWrapper("Banner.html"));
 
     homeLinkArea.addClickHandler(new ClickHandler() {
@@ -136,7 +141,6 @@ public class Main extends Composite implements EntryPoint {
     });
 
     homeLinkArea.setTitle(constants.homeTitle());
-
   }
 
   private void onHistoryChanged(String historyToken) {
@@ -144,7 +148,6 @@ public class Main extends Composite implements EntryPoint {
       contentPanel.update(Welcome.RESOLVER.getHistoryPath());
       Tools.newHistory(Welcome.RESOLVER);
     } else {
-
       List<String> currentHistoryPath = Tools.getCurrentHistoryPath();
       contentPanel.update(currentHistoryPath);
       GAnalyticsTracker.track(historyToken);

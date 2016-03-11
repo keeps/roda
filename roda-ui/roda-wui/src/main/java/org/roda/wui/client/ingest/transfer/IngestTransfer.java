@@ -24,6 +24,7 @@ import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
@@ -208,6 +209,14 @@ public class IngestTransfer extends Composite {
         doSearch();
       }
 
+    });
+
+    transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<IndexResult<TransferredResource>> event) {
+        updateVisibles();
+      }
     });
 
     transferredResourceList.getSelectionModel().addSelectionChangeHandler(new Handler() {

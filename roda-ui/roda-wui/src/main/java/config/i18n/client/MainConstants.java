@@ -262,6 +262,13 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @DefaultStringValue("You need to be authenticated to access this page. Do you want to authenticate?")
   public String casForwardWarning();
 
-
-
+  // Cookies
+  @DefaultStringValue("This Website uses cookies (small text files) to make this site as useful as possible.")
+  public String cookiesMessage();
+  
+  @DefaultStringValue("Got it!")
+  public String cookiesDismisse();
+  
+  @DefaultStringValue("Learn more")
+  public String cookiesLearnMore();
 }

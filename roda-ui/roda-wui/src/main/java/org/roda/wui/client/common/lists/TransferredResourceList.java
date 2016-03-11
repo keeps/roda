@@ -170,7 +170,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
     BrowserService.Util.getInstance().find(TransferredResource.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-
   }
 
   @Override

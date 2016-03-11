@@ -189,7 +189,7 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId) {
+  public static SafeUri createThemeResourceUri(String resourceId, String defaultResourceId, boolean inline) {
     // api/v1/theme/?resourceId={resourceId}&defaultResourceId={defaultResourceId}
     StringBuilder b = new StringBuilder();
 
@@ -199,6 +199,11 @@ public class RestUtils {
     if (defaultResourceId != null) {
       b.append(RodaConstants.API_QUERY_SEP).append("defaultResourceId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
         .append(defaultResourceId);
+    }
+
+    if (inline) {
+      b.append(RodaConstants.API_QUERY_SEP).append("inline").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
+        .append(inline);
     }
 
     return UriUtils.fromSafeConstant(b.toString());

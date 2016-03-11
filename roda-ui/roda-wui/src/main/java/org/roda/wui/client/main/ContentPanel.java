@@ -24,6 +24,7 @@ import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.search.BasicSearch;
+import org.roda.wui.client.welcome.CookiesPolicy;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.ClientLogger;
@@ -84,6 +85,8 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(Login.RESOLVER);
     // Home
     resolvers.add(Welcome.RESOLVER);
+    // Cookies Policy
+    resolvers.add(CookiesPolicy.RESOLVER);
     // Browse
     resolvers.add(Browse.RESOLVER);
     // Search
@@ -101,7 +104,7 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(ResetPassword.RESOLVER);
     resolvers.add(VerifyEmail.RESOLVER);
   }
-  
+
   /**
    * Update the content panel with the new history
    * 

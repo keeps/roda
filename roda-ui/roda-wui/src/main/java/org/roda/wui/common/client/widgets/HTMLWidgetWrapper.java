@@ -41,7 +41,7 @@ public class HTMLWidgetWrapper extends HTML {
     String defaultResourceId = resourceId + ".html";
 
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId).asString());
+      RestUtils.createThemeResourceUri(localizedResourceId, defaultResourceId, false).asString());
 
     try {
       request.sendRequest(null, new RequestCallback() {

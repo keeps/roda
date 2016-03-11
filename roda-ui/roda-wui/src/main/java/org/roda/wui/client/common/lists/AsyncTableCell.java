@@ -63,7 +63,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
-  
+
   private final MyAsyncDataProvider<T> dataProvider;
   private final SingleSelectionModel<T> selectionModel;
   private final AsyncHandler columnSortHandler;
@@ -161,6 +161,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<T>> event) {
+        selected = new HashSet<T>();
         hideSelectAllPanel();
       }
     });
