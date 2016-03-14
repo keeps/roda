@@ -40,6 +40,8 @@ sudo yum install clamav-server clamav-data clamav-update clamav-filesystem \
 clamav clamav-scanner-systemd clamav-devel clamav-lib clamav-server-systemd
 ```
 
+Note: The user `clamav` must have permissions to access the storage. For some folders you might need to add permissions in apparmor file  at `/etc/apparmor.d/local/usr.sbin.clamd`, see [instructions for Ubuntu](https://help.ubuntu.com/community/AppArmor#Profile_customization).
+
 Install Siegfried (format identification)
 * Ubuntu
 ```bash
