@@ -413,6 +413,10 @@ pre>code {
 	content: "\f14b";;
 }
 
+.btn-edit+.btn-edit {
+	margin-right: 5px;
+}
+
 .btn-play:after {
 	content: "\f144";
 }

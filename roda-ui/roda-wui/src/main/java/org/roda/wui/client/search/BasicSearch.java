@@ -272,10 +272,24 @@ public class BasicSearch extends Composite {
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
+    SearchFieldPanel idField = new SearchFieldPanel();
+    SearchFieldPanel sizeField = new SearchFieldPanel();
+    SearchFieldPanel numberOfFilesField = new SearchFieldPanel();
     SearchFieldPanel typeField = new SearchFieldPanel();
+
+    idField.simpleSearchField(RodaConstants.SRO_ID, messages.searchRepresentationFieldIdentifier(),
+      RodaConstants.SEARCH_FIELD_TYPE_TEXT);
     typeField.simpleSearchField(RodaConstants.SRO_ORIGINAL, messages.searchRepresentationFieldOriginal(),
       RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN);
+    sizeField.simpleSearchField(RodaConstants.SRO_SIZE_IN_BYTES, messages.searchRepresentationFieldSize(),
+      RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
+    numberOfFilesField.simpleSearchField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES,
+      messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL);
+    
+    representationsSearchAdvancedFieldsPanel.add(idField);
     representationsSearchAdvancedFieldsPanel.add(typeField);
+    representationsSearchAdvancedFieldsPanel.add(sizeField);
+    representationsSearchAdvancedFieldsPanel.add(numberOfFilesField);
   }
 
   private void createFilesSearchAdvancedFieldsPanel() {

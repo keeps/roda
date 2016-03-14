@@ -53,6 +53,9 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   @UiField
   Button selectButton;
 
+  @UiField
+  Button emptyParentButton;
+
   @UiField(provided = true)
   AIPList searchResultsPanel;
 
@@ -64,7 +67,7 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   public SelectAipDialog(String title) {
     this(title, null);
   }
-  
+
   public SelectAipDialog(String title, String aipId) {
     this.aipId = aipId;
 
@@ -86,6 +89,7 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
     center();
 
     selectButton.setEnabled(false);
+    emptyParentButton.setVisible(false);
 
     searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
 
@@ -132,7 +136,14 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   }
 
   @UiHandler("selectButton")
-  void buttonSelectButtonHandler(ClickEvent e) {
+  void buttonSelectHandler(ClickEvent e) {
+    onChange();
+    hide();
+  }
+
+  @UiHandler("emptyParentButton")
+  void buttonEmptyParentHandler(ClickEvent e) {
+    searchResultsPanel.getSelectionModel().clear();
     onChange();
     hide();
   }
@@ -159,12 +170,16 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexedAIP> handler) {
     return addHandler(handler, ValueChangeEvent.getType());
   }
-  
+
   protected void onChange() {
-   ValueChangeEvent.fire(this, getValue());
+    ValueChangeEvent.fire(this, getValue());
   }
 
   public IndexedAIP getValue() {
     return searchResultsPanel.getSelectionModel().getSelectedObject();
+  }
+
+  public void setEmptyParentButtonVisible() {
+    emptyParentButton.setVisible(true);
   }
 }

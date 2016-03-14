@@ -503,8 +503,10 @@ public class Browser extends RodaCoreService {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
-    IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId);
-    UserUtility.checkObjectPermissions(user, parentAip, PermissionType.CREATE);
+    if (parentId != null) {
+      IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId);
+      UserUtility.checkObjectPermissions(user, parentAip, PermissionType.CREATE);
+    }
 
     // delegate
     AIP returnAIP = BrowserHelper.moveInHierarchy(aipId, parentId);

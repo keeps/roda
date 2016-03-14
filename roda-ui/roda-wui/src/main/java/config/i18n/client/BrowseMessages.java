@@ -371,7 +371,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
 
-  @DefaultMessage("Select")
+  @DefaultMessage("Browse")
   String pluginAipIdButton();
 
   @DefaultMessage("Missing mandatory information")
@@ -436,6 +436,15 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("108")
   String searchFieldNumericToPlaceHolder();
+  
+  @DefaultMessage("Identifier")
+  String searchRepresentationFieldIdentifier();
+  
+  @DefaultMessage("Size")
+  String searchRepresentationFieldSize();
+  
+  @DefaultMessage("Number of files")
+  String searchRepresentationFieldNumberOfFiles();
 
   @DefaultMessage("Original")
   String searchRepresentationFieldOriginal();
@@ -546,6 +555,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Cancel")
   String selectAipCancelButton();
+  
+  @DefaultMessage("Move to root")
+  String selectAipEmptyParentButton();
 
   @DefaultMessage("Select")
   String selectAipSelectButton();

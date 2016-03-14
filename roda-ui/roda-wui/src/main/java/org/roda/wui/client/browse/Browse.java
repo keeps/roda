@@ -148,6 +148,8 @@ public class Browse extends Composite {
 
   private String aipId;
 
+  private BrowseItemBundle itemBundle;
+
   @UiField
   Label browseTitle;
 
@@ -385,6 +387,7 @@ public class Browse extends Composite {
 
   protected void viewAction(BrowseItemBundle itemBundle) {
     if (itemBundle != null) {
+      this.itemBundle = itemBundle;
       viewingTop = false;
 
       IndexedAIP aip = itemBundle.getAip();
@@ -808,15 +811,20 @@ public class Browse extends Composite {
 
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
-    if (aipId != null) {
+    if (aipId != null && itemBundle != null) {
       SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), aipId);
+      if (itemBundle.getAip().getParentID() != null) {
+        selectAipDialog.setEmptyParentButtonVisible();
+      }
       selectAipDialog.showAndCenter();
       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
         @Override
         public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
           final IndexedAIP parentAIP = event.getValue();
-          BrowserService.Util.getInstance().moveInHierarchy(aipId, parentAIP.getId(), new AsyncCallback<AIP>() {
+          final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+
+          BrowserService.Util.getInstance().moveInHierarchy(aipId, parentId, new AsyncCallback<AIP>() {
 
             @Override
             public void onSuccess(AIP result) {
