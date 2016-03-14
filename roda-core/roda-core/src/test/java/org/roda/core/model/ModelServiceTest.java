@@ -300,7 +300,49 @@ public class ModelServiceTest {
     assertEquals(aipId, descMetadata.getAipId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_ID_EAD3, descMetadata.getId());
     assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD, descMetadata.getType());
-    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD_VERSION, descMetadata.getVersion());
+    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD_VERSION3, descMetadata.getVersion());
+
+    StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
+      descMetadata.getId());
+    final Binary descMetadataBinary = storage.getBinary(descriptiveMetadataPath);
+    assertTrue(descMetadataBinary.getSizeInBytes() > 0);
+    assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
+      IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
+  }
+  
+  @Test
+  public void testCreateAIPVersionUnknown() throws RODAException, ParseException, IOException, XmlException {
+
+    // generate AIP ID
+    final String aipId = UUID.randomUUID().toString();
+
+    // testing AIP
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_VERSION_EAD_UNKNOWN));
+
+    assertNotNull(aip);
+    assertEquals(aipId, aip.getId());
+    assertNull("AIP_1 should not have a parent", aip.getParentId());
+    assertTrue(aip.isActive());
+
+    List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
+      .collect(Collectors.toList());
+    assertThat(descriptiveMetadataIds, containsInAnyOrder(CorporaConstants.DESCRIPTIVE_METADATA_ID_EADUNKNOWN));
+
+    List<String> representationIds = aip.getRepresentations().stream().map(rep -> rep.getId())
+      .collect(Collectors.toList());
+
+    assertThat(representationIds,
+      containsInAnyOrder(CorporaConstants.REPRESENTATION_1_ID, CorporaConstants.REPRESENTATION_2_ID));
+
+    // testing descriptive metadata
+    final DescriptiveMetadata descMetadata = model.retrieveDescriptiveMetadata(aipId,
+      CorporaConstants.DESCRIPTIVE_METADATA_ID_EADUNKNOWN);
+
+    assertEquals(aipId, descMetadata.getAipId());
+    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_ID_EADUNKNOWN, descMetadata.getId());
+    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD, descMetadata.getType());
+    assertEquals(CorporaConstants.DESCRIPTIVE_METADATA_TYPE_EAD_VERSIONUNKNOWN, descMetadata.getVersion());
 
     StoragePath descriptiveMetadataPath = ModelUtils.getDescriptiveMetadataPath(descMetadata.getAipId(),
       descMetadata.getId());

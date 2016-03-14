@@ -23,6 +23,7 @@ public class CorporaConstants {
   public static final String SOURCE_AIP_ID = "AIP_1";
   public static final String SOURCE_AIP_ID_3 = "AIP_3";
   public static final String SOURCE_AIP_VERSION_EAD_3 = "AIP_VERSION_EAD_3";
+  public static final String SOURCE_AIP_VERSION_EAD_UNKNOWN = "AIP_VERSION_EAD_UNKNOWN";
   public static final String SOURCE_AIP_BUGGY_ID = "AIP_BUGGY";
   public static final String SOURCE_AIP_ID_REAL = "REAL";
   public static final String SOURCE_AIP_REP_WITH_SUBFOLDERS = "AIP_REP_WITH_SUBFOLDERS";
@@ -35,6 +36,7 @@ public class CorporaConstants {
   public static final String DESCRIPTIVE_METADATA_ID = "ead-c.xml";
   public static final String DESCRIPTIVE_METADATA_TYPE = "ead-c";
   public static final String DESCRIPTIVE_METADATA_ID_EAD3 = "ead_3.xml";
+  public static final String DESCRIPTIVE_METADATA_ID_EADUNKNOWN = "ead_unknown.xml";
 
   public static final String REPRESENTATION_1_ID = "representation_1";
   public static final String REPRESENTATION_1_TYPE = "digitalized_work";
@@ -119,7 +121,8 @@ public class CorporaConstants {
   public static final int YEAR_1213 = 1213;
   public static final int YEAR_2003 = 2003;
   public static final String DESCRIPTIVE_METADATA_TYPE_EAD = "ead";
-  public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSION = "3";
+  public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSION3 = "3";
+  public static final String DESCRIPTIVE_METADATA_TYPE_EAD_VERSIONUNKNOWN = "unknown";
 
   public static String SIP_FOLDER = "SIPs";
   public static String EARK_SIP = "eark_sip.zip";
