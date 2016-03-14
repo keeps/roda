@@ -14,7 +14,7 @@
 	 	<xsl:if test="count(title)  &gt; 0">
 			<xsl:if test="title[1]/text()">
 				<field name="title">
-					<xsl:value-of select="title/text()" />
+					<xsl:value-of select="title[1]/text()" />
 				</field>
 			</xsl:if>
 			<xsl:for-each select="title">
@@ -28,7 +28,7 @@
 		<xsl:if test="count(description)  &gt; 0">
 			<xsl:if test="description[1]/text()">
 				<field name="description">
-					<xsl:value-of select="description/text()" />
+					<xsl:value-of select="description[1]/text()" />
 				</field>
 			</xsl:if>
 			<xsl:for-each select="description">
@@ -109,9 +109,15 @@
 					</xsl:matching-substring>
 				</xsl:analyze-string>
 			</xsl:if>
+			<xsl:for-each select="date">
+				<xsl:if test="normalize-space(text())!=''">
+					<field name="date_txt">
+						<xsl:value-of select="text()" />
+					</field>
+				</xsl:if>
+			</xsl:for-each>
 		</xsl:if>
-			
-			
+
 		<xsl:for-each select="format">
 			<xsl:if test="normalize-space(text())!=''">
 				<field name="format_txt">
