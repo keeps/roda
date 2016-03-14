@@ -71,11 +71,11 @@
 					<xsl:if test="not(normalize-space($date)='')">
 						<field name="dateInitial">
 							<xsl:value-of select="$date" />
-							T00:00:00Z
+							<xsl:text>T00:00:00Z</xsl:text>
 						</field>
 						<field name="dateFinal">
 							<xsl:value-of select="$date" />
-							T00:00:00Z
+							<xsl:text>T00:00:00Z</xsl:text>
 						</field>
 					</xsl:if>
 				</xsl:matching-substring>
@@ -89,8 +89,7 @@
 						</xsl:variable>
 						<xsl:if test="not(normalize-space($date)='')">
 							<field name="dateInitial">
-								<xsl:value-of select="$date" />
-								T00:00:00Z
+								<xsl:value-of select="$date" /><xsl:text>T00:00:00Z</xsl:text>
 							</field>
 						</xsl:if>
 					</xsl:matching-substring>
@@ -103,7 +102,7 @@
 						<xsl:if test="not(normalize-space($date)='')">
 							<field name="dateFinal">
 								<xsl:value-of select="$date" />
-								T00:00:00Z
+								<xsl:text>T00:00:00Z</xsl:text>
 							</field>
 						</xsl:if>
 					</xsl:matching-substring>

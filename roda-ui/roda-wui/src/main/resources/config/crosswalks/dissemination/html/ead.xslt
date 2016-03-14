@@ -331,14 +331,18 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="ead:did/ead:origination/text()">
+		<xsl:if test="normalize-space(string-join(ead:did/ead:origination/text(),''))!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="$i18n.origination" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
-					<xsl:value-of select="ead:did/ead:origination/text()" />
-				</div>
+				<xsl:for-each select="ead:did/ead:origination">
+					<xsl:if test="normalize-space(text())!=''">
+						<div class="descriptiveMetadata-field-value">
+							<xsl:value-of select="text()" />
+						</div>
+					</xsl:if>
+				</xsl:for-each>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:acqinfo/ead:num/text()">
@@ -480,15 +484,17 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="ead:did/ead:langmaterial">
+		<xsl:if test="normalize-space(string-join(ead:did/ead:langmaterial/text(),''))!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="$i18n.languages" />
 				</div>
 				<xsl:for-each select="ead:did/ead:langmaterial/ead:language">
-					<div class="descriptiveMetadata-field-value">
-						<xsl:value-of select="text()" />
-					</div>
+					<xsl:if test="normalize-space(text())!=''">
+						<div class="descriptiveMetadata-field-value">
+							<xsl:value-of select="text()" />
+						</div>
+					</xsl:if>
 				</xsl:for-each>
 			</div>
 		</xsl:if>
@@ -571,7 +577,7 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="ead:scopecontent/ead:p/text()">
+		<xsl:if test="normalize-space(string-join(ead:scopecontent/ead:p/text(),''))!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="$i18n.description" />

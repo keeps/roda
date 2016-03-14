@@ -10,7 +10,7 @@
 		</div>
 	</xsl:template>
 	<xsl:template match="field">
-		<xsl:if test="text()">
+		<xsl:if test="normalize-space(text())!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="@name" />
