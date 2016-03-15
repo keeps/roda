@@ -113,6 +113,10 @@ public interface BrowserService extends RemoteService {
   List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
     throws AuthorizationDeniedException, GenericException;
 
+  boolean isCookiesMessageActive();
+
+  boolean isRegisterActive();
+
   /**
    * Get Google Analytics account id
    */
@@ -122,8 +126,6 @@ public interface BrowserService extends RemoteService {
    * Get Google reCAPTCHA account id
    */
   String getGoogleReCAPTCHAAccount();
-
-  boolean isRegisterActive();
 
   PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -149,5 +151,4 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
-
 }

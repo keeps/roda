@@ -69,13 +69,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserServiceImpl.class);
 
+  private static String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
+  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
+  
   private static String GANALYTICS_ACCOUNT_CODE = null;
   private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
   private static String GANALYTICS_CODE_PROPERTY = "ui.google.analytics.code";
   private static String GRECAPTCHA_CODE_PROPERTY = "ui.google.recaptcha.code";
-
-  private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
 
   /**
    * Create a new BrowserService Implementation instance
@@ -83,6 +84,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
    */
   public BrowserServiceImpl() {
 
+  }
+  
+  @Override
+  public boolean isCookiesMessageActive() {
+    return RodaCoreFactory.getRodaConfiguration().getBoolean(COOKIES_ACTIVE_PROPERTY, false);
+  }
+  
+  @Override
+  public boolean isRegisterActive() {
+    return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
   }
 
   @Override
@@ -367,11 +378,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getSupportedMetadata(user, locale);
-  }
-
-  @Override
-  public boolean isRegisterActive() {
-    return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
   }
 
   @Override

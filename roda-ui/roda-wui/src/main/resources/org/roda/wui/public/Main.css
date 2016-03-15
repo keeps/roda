@@ -4528,3 +4528,134 @@ td.datePickerMonth, td.datePickerYear {
 		width: 100%;
 	}
 }
+
+/**********************************************
+				COOKIES MESSAGE
+************************************************/
+.cc_banner-wrapper {
+	z-index: 9001;
+	position: relative;
+}
+
+.cc_container .cc_message {
+	font-size: 0.6em;
+	transition: font-size 200ms;
+	margin: 0;
+	padding: 0;
+	line-height: 1.5em;
+}
+
+.cc_container .cc_logo {
+	display: none;
+}
+
+@media screen and (min-width: 500px) {
+	.cc_container .cc_message {
+		font-size: 0.8em;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.cc_container .cc_message {
+		font-size: 1em;
+		line-height: 1em;
+	}
+}
+
+@media screen and (min-width: 992px) {
+	.cc_container .cc_message {
+		font-size: 0.9em;
+	}
+}
+
+@media print {
+	.cc_banner-wrapper, 
+	.cc_container {
+		display: none;
+	}
+}
+
+.cc_banner-wrapper {
+	height: 66px;
+}
+
+.cc_container {
+	padding: 15px 15px 15px;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+}
+
+.cc_container .cc_btn {
+	margin-left: 10px;
+	float: right;
+}
+
+.cc_container .cc_message {
+	display: block;
+}
+
+@media screen and (min-width: 500px) {
+	.cc_container .cc_message {
+		margin-top: 0.5em;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.cc_container {
+		padding: 15px 30px 15px;
+	}
+}
+
+.cc_container {
+	background: #222;
+	color: #fff;
+	font-size: 17px;
+	font-family: "Helvetica Neue Light", "HelveticaNeue-Light",
+		"Helvetica Neue", Calibri, Helvetica, Arial;
+	box-sizing: border-box;
+}
+
+.cc_container ::-moz-selection {
+	background: #ff5e99;
+	color: #fff;
+	text-shadow: none;
+}
+
+@-webkit-keyframes slideDown {
+	0% { margin-top:-66px } 
+	100% { margin-top:0 }
+}
+@keyframes slideDown {
+	0% { margin-top:-66px }
+	100% { margin-top:0px }
+}
+
+@-webkit-keyframes growDown {
+	0% { height:0 }
+	100% { height:66px }
+}
+@keyframes growDown{
+	0% { height:0 }
+	100% { height:66px }
+}
+
+.cc_container {
+	-webkit-animation-duration: 0.8s;
+	-moz-animation-duration: 0.8s;
+	-o-animation-duration: 0.8s;
+	animation-duration: 0.8s;
+	-webkit-animation-name: slideDown;
+	animation-name: slideDown;
+}
+
+.cc_banner-wrapper {
+	-webkit-animation-duration: 0.8s;
+	-moz-animation-duration: 0.8s;
+	-o-animation-duration: 0.8s;
+	animation-duration: 0.8s;
+	-webkit-animation-name: growDown;
+	animation-name: growDown;
+}

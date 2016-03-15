@@ -72,11 +72,13 @@ public interface BrowserServiceAsync {
 
   void getSupportedMetadata(String locale, AsyncCallback<List<SupportedMetadataTypeBundle>> callback);
 
+  void isCookiesMessageActive(AsyncCallback<Boolean> callback);
+
+  void isRegisterActive(AsyncCallback<Boolean> callback);
+
   void getGoogleAnalyticsAccount(AsyncCallback<String> callback);
 
   void getGoogleReCAPTCHAAccount(AsyncCallback<String> callback);
-
-  void isRegisterActive(AsyncCallback<Boolean> callback);
 
   void retrievePreservationEventViewBundle(String eventId, AsyncCallback<PreservationEventViewBundle> asyncCallback);
 

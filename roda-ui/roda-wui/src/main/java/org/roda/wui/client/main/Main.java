@@ -12,6 +12,7 @@ package org.roda.wui.client.main;
 
 import java.util.List;
 
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.welcome.CookiesPolicy;
 import org.roda.wui.client.welcome.Welcome;
@@ -82,9 +83,23 @@ public class Main extends Composite implements EntryPoint {
         });
       }
     });
-    
-    JavascriptUtils.setCookieOptions(constants.cookiesMessage(), constants.cookiesDismisse(),
-      constants.cookiesLearnMore(), "#" + CookiesPolicy.RESOLVER.getHistoryToken());
+
+    BrowserService.Util.getInstance().isCookiesMessageActive(new AsyncCallback<Boolean>() {
+
+      @Override
+      public void onSuccess(Boolean result) {
+        if (result) {
+          JavascriptUtils.setCookieOptions(constants.cookiesMessage(), constants.cookiesDismisse(),
+            constants.cookiesLearnMore(), "#" + CookiesPolicy.RESOLVER.getHistoryToken());
+        }
+      }
+
+      @Override
+      public void onFailure(Throwable caught) {
+        logger.error("Error checking if cookies message is active!!", caught);
+      }
+    });
+
   }
 
   interface Binder extends UiBinder<Widget, Main> {

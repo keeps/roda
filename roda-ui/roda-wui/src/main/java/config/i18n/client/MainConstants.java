@@ -263,7 +263,7 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String casForwardWarning();
 
   // Cookies
-  @DefaultStringValue("This Website uses cookies (small text files) to make this site as useful as possible.")
+  @DefaultStringValue("This website uses cookies to ensure you get the best experience on our website. ")
   public String cookiesMessage();
   
   @DefaultStringValue("Got it!")
