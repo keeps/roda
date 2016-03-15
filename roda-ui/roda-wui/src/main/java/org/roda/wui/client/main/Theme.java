@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.welcome;
+package org.roda.wui.client.main;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
  * @author Luis Faria
  * 
  */
-public class CookiesPolicy {
+public class Theme {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -40,7 +40,7 @@ public class CookiesPolicy {
 
     @Override
     public String getHistoryToken() {
-      return "cookiespolicy";
+      return "theme";
     }
 
     @Override
@@ -49,16 +49,16 @@ public class CookiesPolicy {
     }
   };
 
-  private static CookiesPolicy instance = null;
+  private static Theme instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static CookiesPolicy getInstance() {
+  public static Theme getInstance() {
     if (instance == null) {
-      instance = new CookiesPolicy();
+      instance = new Theme();
     }
     return instance;
   }
@@ -67,24 +67,24 @@ public class CookiesPolicy {
 
   private HTMLWidgetWrapper layout;
 
-  private CookiesPolicy() {
+  private Theme() {
     initialized = false;
   }
 
-  private void init() {
+  private void init(String htmlPage) {
     if (!initialized) {
       initialized = true;
-      layout = new HTMLWidgetWrapper("CookiesPolicy.html");
+      layout = new HTMLWidgetWrapper(htmlPage);
       layout.addStyleName("wui-home");
     }
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
-      init();
+    if (historyTokens.size() == 1) {
+      init(historyTokens.get(0));
       callback.onSuccess(layout);
     } else {
-      Tools.newHistory(CookiesPolicy.RESOLVER);
+      Tools.newHistory(Theme.RESOLVER);
       callback.onSuccess(null);
     }
   }

@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.JavascriptUtils;
-import org.roda.wui.client.welcome.CookiesPolicy;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -90,7 +89,7 @@ public class Main extends Composite implements EntryPoint {
       public void onSuccess(Boolean result) {
         if (result) {
           JavascriptUtils.setCookieOptions(constants.cookiesMessage(), constants.cookiesDismisse(),
-            constants.cookiesLearnMore(), "#" + CookiesPolicy.RESOLVER.getHistoryToken());
+            constants.cookiesLearnMore(), "#" + Theme.RESOLVER.getHistoryToken() + "/CookiesPolicy.html");
         }
       }
 
