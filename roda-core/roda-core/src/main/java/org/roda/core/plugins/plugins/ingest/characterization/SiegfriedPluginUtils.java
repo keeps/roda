@@ -98,7 +98,7 @@ public class SiegfriedPluginUtils {
     return version;
   }
 
-  public static String runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
+  public static void runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
     AIP aip, Representation representation) throws GenericException, RequestNotValidException, AlreadyExistsException,
       NotFoundException, AuthorizationDeniedException, PluginException {
 
@@ -110,7 +110,7 @@ public class SiegfriedPluginUtils {
     String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
     IOUtils.closeQuietly(directAccess);
 
-    boolean inotify = false;
+    boolean notify = false;
     final JSONObject obj = new JSONObject(siegfriedOutput);
     JSONArray files = (JSONArray) obj.get("files");
 
@@ -129,7 +129,7 @@ public class SiegfriedPluginUtils {
       ContentPayload payload = new StringContentPayload(fileObject.toString());
 
       model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-        SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, inotify);
+        SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, notify);
 
       // Update PREMIS files
       JSONArray matches = (JSONArray) fileObject.get("matches");
@@ -140,7 +140,7 @@ public class SiegfriedPluginUtils {
           String version = null;
           String pronom = null;
           String mime = null;
-          
+
           if (getVersion().startsWith("1.5")) {
             if (match.getString("ns").equalsIgnoreCase("pronom")) {
               format = match.getString("format");
@@ -157,19 +157,19 @@ public class SiegfriedPluginUtils {
             }
           }
           try {
-            Binary premis_bin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
+            Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
               fileId);
 
-            File premis_file = PremisV3Utils.binaryToFile(premis_bin.getContent(), false);
-            PremisV3Utils.updateFileFormat(premis_file, format, version, pronom, mime);
+            File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
+            PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
 
             PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
             String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), fileDirectoryPath,
               fileId);
 
-            ContentPayload premis_file_payload = PremisV3Utils.fileToBinary(premis_file);
+            ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
             model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-              premis_file_payload, inotify);
+              premisFilePayload, notify);
           } catch (NotFoundException e) {
             LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
           } catch (RODAException e) {
@@ -178,7 +178,6 @@ public class SiegfriedPluginUtils {
         }
       }
     }
-    return siegfriedOutput;
   }
 
 }

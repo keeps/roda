@@ -8,7 +8,6 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.List;
-import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.ip.AIP;
@@ -27,8 +26,6 @@ import org.slf4j.LoggerFactory;
 
 public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VerifyProducerAuthorizationPlugin.class);
-
-  private Map<String, String> parameters;
 
   @Override
   public void init() throws PluginException {
@@ -63,12 +60,12 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
-      LOGGER.debug("Checking producer authorization for AIP " + aip.getId());
+      LOGGER.debug("Checking producer authorization for AIP {}", aip.getId());
 
       // FIXME implement producer authorization logic
-      reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(
-        String.format("Done with checking producer authorization for AIP %s", aip.getId()));
-      LOGGER.debug("Done with checking producer authorization for AIP " + aip.getId());
+      reportItem.setPluginState(PluginState.SUCCESS)
+        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+      LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
       report.addReport(reportItem);
 

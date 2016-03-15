@@ -69,12 +69,13 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
       String outcomeDetail = "";
       try {
-        LOGGER.debug("Auto accepting AIP " + aip.getId());
+        LOGGER.debug("Auto accepting AIP {}", aip.getId());
 
         aip.setActive(true);
+        // FIXME
         aip = model.updateAIP(aip);
         reportItem.setPluginState(PluginState.SUCCESS);
-        LOGGER.debug("Done with auto accepting AIP " + aip.getId());
+        LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
       } catch (RODAException e) {
         LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
         outcomeDetail = "Error updating AIP (metadata attribute active=true): " + e.getMessage();

@@ -89,24 +89,22 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-      List<String> siegfriedOutputs = new ArrayList<String>();
       try {
 
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-          siegfriedOutputs.add(SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip,
-            representation));
+          SiegfriedPluginUtils.runSiegfriedOnRepresentation(index, model, storage, aip, representation);
           sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
             RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+          model.notifyRepresentationUpdated(representation);
         }
-        model.notifyAIPUpdated(aip.getId());
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
         | AuthorizationDeniedException | AlreadyExistsException e) {
         LOGGER.error("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage(), e);
 
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-          "Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage());
+        reportItem.setPluginState(PluginState.FAILURE)
+          .setPluginDetails("Error running SIEGFRIED " + aip.getId() + ": " + e.getMessage());
       }
 
       report.addReport(reportItem);

@@ -29,23 +29,23 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class PremisSkeletonPluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PremisSkeletonPlugin.class);
 
   public static void createPremisSkeletonOnRepresentation(ModelService model, StorageService storage, AIP aip,
-    String representationId) throws IOException, RequestNotValidException, GenericException,
-      NotFoundException, AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
+    String representationId) throws IOException, RequestNotValidException, GenericException, NotFoundException,
+      AuthorizationDeniedException, XmlException, ValidationException, AlreadyExistsException {
 
-    gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aip.getId(), representationId);
+    gov.loc.premis.v3.Representation representation = PremisV3Utils.createBaseRepresentation(aip.getId(),
+      representationId);
     boolean notifyInSteps = false;
 
     boolean recursive = true;
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representationId, recursive);
     for (File file : allFiles) {
       if (!file.isDirectory()) {
-        LOGGER.debug("Processing " + file);
+        LOGGER.debug("Processing {}", file);
         ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model);
         model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
           file.getPath(), file.getId(), filePreservation, notifyInSteps);

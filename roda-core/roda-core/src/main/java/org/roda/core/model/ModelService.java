@@ -655,12 +655,16 @@ public class ModelService extends ModelObservable {
       // build return object
       representation = new Representation(representationId, aipId, original);
 
-      notifyRepresentationUpdated(representation);
+      super.notifyRepresentationUpdated(representation);
     } else {
       throw new ValidationException(validationReport);
     }
 
     return representation;
+  }
+
+  public void notifyRepresentationUpdated(Representation representation) {
+    super.notifyRepresentationUpdated(representation);
   }
 
   public void deleteRepresentation(String aipId, String representationId)

@@ -48,22 +48,22 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       "core.plugins.internal.virus_check.antiVirusClassname", "org.roda.core.plugins.plugins.antivirus.ClamAntiVirus");
 
     try {
-      LOGGER.info("Loading antivirus class " + antiVirusClassName);
+      LOGGER.info("Loading antivirus class {}", antiVirusClassName);
       setAntiVirus((AntiVirus) Class.forName(antiVirusClassName).newInstance());
-      LOGGER.info("Using antivirus " + getAntiVirus().getClass().getName());
+      LOGGER.info("Using antivirus {}", getAntiVirus().getClass().getName());
     } catch (ClassNotFoundException e) {
-      LOGGER.warn("Antivirus class " + antiVirusClassName + " not found - " + e.getMessage());
+      LOGGER.warn("Antivirus class {} not found - {}", antiVirusClassName, e.getMessage());
     } catch (InstantiationException e) {
       // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class " + antiVirusClassName + " instantiation exception - " + e.getMessage());
+      LOGGER.warn("Antivirus class {} instantiation exception - {}", antiVirusClassName, e.getMessage());
     } catch (IllegalAccessException e) {
       // not possible to create a new instance of the class
-      LOGGER.warn("Antivirus class " + antiVirusClassName + " illegal access exception - " + e.getMessage());
+      LOGGER.warn("Antivirus class {} illegal access exception - {}", antiVirusClassName, e.getMessage());
     }
 
     if (getAntiVirus() == null) {
       setAntiVirus(new AVGAntiVirus());
-      LOGGER.info("Using default antivirus " + getAntiVirus().getClass().getName());
+      LOGGER.info("Using default antivirus {}", getAntiVirus().getClass().getName());
     }
 
     LOGGER.info("init OK");
@@ -152,12 +152,8 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      PreservationMetadata preservationMetadata = PluginHelper.createPluginEvent(this, aip.getId(), model, state,
-        outcomeDetailExtension.toString(), notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, state, outcomeDetailExtension.toString(), notify);
 
-      if (notify) {
-        model.notifyPreservationMetadataCreated(preservationMetadata);
-      }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException("Error while creating the event", e);

@@ -9,14 +9,11 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -72,7 +69,7 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
       SIP sip = null;
       try {
-        LOGGER.debug("Converting " + earkSIPPath + " to AIP");
+        LOGGER.debug("Converting {} to AIP", earkSIPPath);
         sip = EARKSIP.parse(earkSIPPath);
 
         String parentId = PluginHelper.getParentId(this, index, sip.getParentID());
@@ -82,14 +79,13 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
         reportItem.setItemId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
         if (sip.getParentID() != null && aipCreated.getParentId() == null) {
-          LOGGER.error("PARENT NOT FOUND!");
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getParentID()));
         }
 
         boolean notify = true;
         PluginHelper.createPluginEvent(this, aipCreated.getId(), model, transferredResource, PluginState.SUCCESS, "",
           notify);
-        LOGGER.debug("Done with converting " + earkSIPPath + " to AIP " + aipCreated.getId());
+        LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aipCreated.getId());
       } catch (Throwable e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
         LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);

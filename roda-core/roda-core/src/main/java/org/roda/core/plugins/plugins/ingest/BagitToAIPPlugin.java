@@ -69,7 +69,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
       Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
 
       try {
-        LOGGER.debug("Converting " + bagitPath + " to AIP");
+        LOGGER.debug("Converting {} to AIP", bagitPath);
         BagFactory bagFactory = new BagFactory();
         Bag bag = bagFactory.createBag(bagitPath.toFile());
         SimpleResult result = bag.verifyPayloadManifests();
@@ -91,7 +91,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
         PluginHelper.createPluginEvent(this, aipCreated.getId(), model, transferredResource,
           reportItem.getPluginState(), "", notify);
 
-        LOGGER.debug("Done with converting " + bagitPath + " to AIP " + aipCreated.getId());
+        LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());
       } catch (Throwable e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
 

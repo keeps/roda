@@ -90,10 +90,9 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
       try {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
-          boolean inotify = false;
-          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, inotify);
+          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
+          model.notifyRepresentationUpdated(representation);
         }
-        model.notifyAIPUpdated(aip.getId());
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (RODAException e) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);

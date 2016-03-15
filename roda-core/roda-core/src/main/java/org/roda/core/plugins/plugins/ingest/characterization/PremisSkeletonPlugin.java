@@ -81,18 +81,15 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
 
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
       try {
         for (Representation representation : aip.getRepresentations()) {
-
-          LOGGER.debug("createPremisForRepresentation  " + representation.getId());
-          LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
-
+          LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
           PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representation.getId());
+          model.notifyRepresentationUpdated(representation);
         }
-        model.notifyAIPUpdated(aip.getId());
 
         reportItem.setPluginState(PluginState.SUCCESS);
       } catch (RODAException | XmlException | IOException e) {

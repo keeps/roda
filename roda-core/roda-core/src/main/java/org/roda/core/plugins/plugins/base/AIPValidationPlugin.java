@@ -106,7 +106,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
       try {
-        LOGGER.debug("VALIDATING AIP " + aip.getId());
+        LOGGER.debug("Validating AIP {}", aip.getId());
         ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
           validateDescriptiveMetadata, metadataType, metadataVersion, validatePremis, model, aip.getId());
         reports.add(report);
@@ -135,9 +135,6 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
     try {
       PluginHelper.createPluginEvent(this, aip.getId(), model, state, "", notify);
-      if (notify) {
-        model.notifyAIPUpdated(aip.getId());
-      }
     } catch (RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }

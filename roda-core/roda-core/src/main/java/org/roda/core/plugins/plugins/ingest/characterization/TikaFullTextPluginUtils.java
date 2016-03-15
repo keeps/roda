@@ -46,13 +46,13 @@ public class TikaFullTextPluginUtils {
   private static final Tika tika = new Tika();
 
   public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, boolean notify) throws NotFoundException, GenericException,
-      RequestNotValidException, AuthorizationDeniedException, ValidationException {
+    AIP aip, Representation representation) throws NotFoundException, GenericException, RequestNotValidException,
+      AuthorizationDeniedException, ValidationException {
 
     boolean recursive = true;
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
-    boolean inotify = false;
+    boolean notify = false;
 
     for (File file : allFiles) {
 
@@ -75,8 +75,7 @@ public class TikaFullTextPluginUtils {
           });
 
           model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-            TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, inotify);
-          model.updateFile(file);
+            TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, notify);
 
         } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
@@ -89,26 +88,23 @@ public class TikaFullTextPluginUtils {
         String creatingApplicationVersion = metadata.get("Application-Version");
         String dateCreatedByApplication = metadata.get("Creation-Date");
 
-        Binary premis_bin = model.retrievePreservationFile(file);
+        Binary premisBin = model.retrievePreservationFile(file);
 
-        gov.loc.premis.v3.File premis_file = PremisV3Utils.binaryToFile(premis_bin.getContent(), false);
-        PremisV3Utils.updateCreatingApplication(premis_file, creatingApplicationName, creatingApplicationVersion,
+        gov.loc.premis.v3.File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
+        PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
           dateCreatedByApplication);
 
         PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
         String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
           file.getId());
 
-        ContentPayload premis_file_payload = PremisV3Utils.fileToBinary(premis_file);
+        ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
 
         model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(), file.getId(),
-          premis_file_payload, inotify);
+          premisFilePayload, notify);
 
       }
     }
     IOUtils.closeQuietly(allFiles);
-    if (notify) {
-      model.notifyAIPUpdated(aip.getId());
-    }
   }
 }
