@@ -18,19 +18,36 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
  * 
  */
-public class Theme {
+public class Theme extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+      if (historyTokens.size() >= 1) {
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (String token : historyTokens) {
+          if (first) {
+            first = false;
+          } else {
+            sb.append("/");
+          }
+          sb.append(token);
+        }
+        Theme theme = new Theme(sb.toString());
+        callback.onSuccess(theme);
+      } else {
+        Tools.newHistory(Theme.RESOLVER);
+        callback.onSuccess(null);
+      }
     }
 
     @Override
@@ -49,44 +66,11 @@ public class Theme {
     }
   };
 
-  private static Theme instance = null;
-
-  /**
-   * Get the singleton instance
-   * 
-   * @return the instance
-   */
-  public static Theme getInstance() {
-    if (instance == null) {
-      instance = new Theme();
-    }
-    return instance;
-  }
-
-  private boolean initialized;
-
   private HTMLWidgetWrapper layout;
 
-  private Theme() {
-    initialized = false;
+  private Theme(String htmlPage) {
+    layout = new HTMLWidgetWrapper(htmlPage);
+    layout.addStyleName("wui-home");
+    initWidget(layout);
   }
-
-  private void init(String htmlPage) {
-    if (!initialized) {
-      initialized = true;
-      layout = new HTMLWidgetWrapper(htmlPage);
-      layout.addStyleName("wui-home");
-    }
-  }
-
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 1) {
-      init(historyTokens.get(0));
-      callback.onSuccess(layout);
-    } else {
-      Tools.newHistory(Theme.RESOLVER);
-      callback.onSuccess(null);
-    }
-  }
-
 }

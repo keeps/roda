@@ -174,9 +174,16 @@ h6, .h6 {
 	color: white;
 }
 
-.footer p {
+.footer p,
+.footer ul li,
+.footer ul li a {
 	font-size: 1.2rem;
 	color: rgba(255, 255, 255, 0.8);
+}
+
+.footer ul li:hover,
+.footer ul li a:hover {
+	color: white;
 }
 
 .page-description p {
@@ -414,6 +421,10 @@ pre>code {
 
 .btn-plus:after {
 	content: "\f055";
+}
+
+.btn-envelope:after {
+	content: "\f0e0";
 }
 
 .btn-edit:after {
@@ -915,6 +926,11 @@ td.datePickerMonth, td.datePickerYear {
 	color: #222;
 }
 
+.static-page .license ul li {
+	padding-left: 1.5em;
+	padding-top: 0.8em;
+}
+	
 .static-page p,
 .static-page .cookie {
 	margin-bottom: 1em;
@@ -943,10 +959,15 @@ td.datePickerMonth, td.datePickerYear {
 	font-size: 30px;
 }
 
+	
+.static-page .feature-img-vertical i {
+	float: right;
+	margin-right: 5px;
+}
+
 .static-page .feature-img > .fa-stack {
 	font-size: 0.5em;
 }
-
 
 .static-page .feature-img img {
 	width: 100% !important;
