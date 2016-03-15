@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -38,8 +39,10 @@ import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
+import org.roda.core.util.Base64;
 import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
+import org.roda.core.util.HTTPUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,13 +58,27 @@ public class SiegfriedPluginUtils {
       Arrays.asList(siegfriedPath.toString(), "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
+  
+  private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
+    String siegfriedServer = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "server");
+    String endpoint = siegfriedServer+"/identify/"+new String(Base64.encode(sourceDirectory.toString().getBytes()));
+    return endpoint;
+  }
 
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
-      List<String> command = getBatchCommand(sourceDirectory);
-      return CommandUtility.execute(command, false);
-    } catch (CommandException e) {
-      throw new PluginException("Error while executing Siegfried command");
+      String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "mode");
+      if(siegfriedMode!=null && siegfriedMode.equalsIgnoreCase("server")){
+        LOGGER.debug("Running siegfried on server mode");
+        String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
+        return HTTPUtility.doGet(endpoint);
+      }else{
+        LOGGER.debug("Running siegfried on standalone mode");
+        List<String> command = getBatchCommand(sourceDirectory);
+        return CommandUtility.execute(command, false);
+      }
+    } catch (CommandException | IOException | GenericException e) {
+      throw new PluginException("Error while executing Siegfried: "+e.getMessage());
     }
   }
 
