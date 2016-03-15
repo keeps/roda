@@ -40,11 +40,19 @@
 				<artifactId>bcprov-jdk15on</artifactId>
 				<groupId>org.bouncycastle</groupId>
 			</exclusion>
+			<exclusion>
+				<artifactId>slf4j-api</artifactId>
+				<groupId>org.slf4j</groupId>
+			</exclusion>
 		</exclusions>
 	</dependency>
 	<dependency>
 		<groupId>org.apache.santuario</groupId>
 		<artifactId>xmlsec</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>xalan</groupId>
+		<artifactId>xalan</artifactId>
 	</dependency>
   </dependencies>
 </project>

@@ -51,12 +51,8 @@ import org.apache.poi.poifs.crypt.dsig.SignatureConfig;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo;
 import org.apache.poi.poifs.crypt.dsig.SignatureInfo.SignaturePart;
 
-import com.itextpdf.text.log.Logger;
-import com.itextpdf.text.log.LoggerFactory;
-
 public class OOXMLSignatureUtils {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(OOXMLSignatureUtils.class);
   private static final String SIGN_CONTENT_TYPE_OOXML = "application/vnd.openxmlformats-package.digital-signature-xmlsignature+xml";
   private static final String SIGN_REL_TYPE_OOXML = "http://schemas.openxmlformats.org/package/2006/relationships/digital-signature/origin";
 
@@ -94,8 +90,10 @@ public class OOXMLSignatureUtils {
       pkg.close();
     } catch (InvalidFormatException e) {
       return "Error opening a document file";
-    } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-      return "Signing certificate does not pass the validity check";
+    } catch (CertificateExpiredException e) {
+      return "There are expired certificates";
+    } catch (CertificateNotYetValidException e) {
+      return "There are certificates not yet valid";
     }
 
     return isValid ? "Passed" : "Not passed";

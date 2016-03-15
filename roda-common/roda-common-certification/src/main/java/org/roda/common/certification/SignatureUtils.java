@@ -68,4 +68,21 @@ public class SignatureUtils {
     }
   }
 
+  public static String canHaveEmbeddedSignature(String fileFormat, String mimetype) {
+    if ("pdf".equals(fileFormat) || "application/pdf".equals(mimetype)) {
+      return "pdf";
+    } else if ("docx".equals(fileFormat) || "xlsx".equals(fileFormat) || "pptx".equals(fileFormat)
+      || "application/vnd.openxmlformats-officedocument.wordprocessingml.document".equals(mimetype)
+      || "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet".equals(mimetype)
+      || "application/vnd.openxmlformats-officedocument.presentationml.presentation".equals(mimetype)) {
+      return "ooxml";
+    } else if ("odt".equals(fileFormat) || "ods".equals(fileFormat) || "odp".equals(fileFormat)
+      || "application/vnd.oasis.opendocument.text".equals(mimetype)
+      || "application/vnd.oasis.opendocument.spreadsheet".equals(mimetype)
+      || "application/vnd.oasis.opendocument.presentation".equals(mimetype)) {
+      return "odf";
+    }
+
+    return "";
+  }
 }

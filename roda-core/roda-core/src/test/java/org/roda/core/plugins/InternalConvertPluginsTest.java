@@ -24,6 +24,7 @@ import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
@@ -63,6 +64,8 @@ import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPluginUtils;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePluginUtils;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
@@ -622,6 +625,36 @@ public class InternalConvertPluginsTest {
       Assert.assertEquals(0,
         DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
     }
+  }
+
+  @Ignore
+  @Test
+  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
+    IOException {
+    AIP aip = ingestCorpora(2);
+    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    File file = allFiles.iterator().next();
+
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+    String intermediatePath = "/data/storage/";
+    Assert.assertEquals(0, DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
+
+    Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    plugin.setParameterValues(parameters);
+
+    DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+
+    aip = model.retrieveAIP(aip.getId());
+    CloseableIterable<File> allNewFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
+      true);
+    File newFile = allNewFiles.iterator().next();
+
+    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile);
+    Assert.assertEquals(1,
+      DigitalSignaturePluginUtils.countSignaturesPDF(basePath, newFileStoragePath, intermediatePath));
   }
 
   @Test

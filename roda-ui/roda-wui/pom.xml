@@ -231,10 +231,6 @@
 			<artifactId>commons-codec</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>xml-security</groupId>
-			<artifactId>xmlsec</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.roda-project</groupId>
 			<artifactId>roda-core</artifactId>
 			<exclusions>
@@ -267,6 +263,10 @@
 				<exclusion>
 					<artifactId>javax.servlet-api</artifactId>
 					<groupId>javax.servlet</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>itext</artifactId>
+					<groupId>com.lowagie</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>

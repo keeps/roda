@@ -110,7 +110,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         newRepresentations.add(newRepresentationID);
         model.createRepresentation(aipId, newRepresentationID, false, notify);
         List<String> filePath = null;
-        Path resultZipFile = null;
+        Path resultFile = null;
         List<File> fileList = IteratorUtils.toList(allFiles.iterator());
         int countFiles = fileList.size();
         String newFileId = representation.getId() + ".zip";
@@ -129,7 +129,6 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
             if (!file.isDirectory()) {
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-
               LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
 
               if (doEmbeddedSignature == true) {
@@ -151,7 +150,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           zout.finish();
           IOUtils.closeQuietly(zout);
           IOUtils.closeQuietly(os);
-          resultZipFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
+          resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
 
         } else if (countFiles == 1) {
           File file = fileList.get(0);
@@ -163,19 +162,19 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           filePath = file.getPath();
 
           if (doEmbeddedSignature == true) {
-            resultZipFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
-              fileMimetype);
-            IOUtils.closeQuietly(directAccess);
             newFileId = file.getId();
+            resultFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
+              fileMimetype);
           } else {
-            resultZipFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
-            IOUtils.closeQuietly(directAccess);
+            resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
           }
+
+          IOUtils.closeQuietly(directAccess);
         }
 
-        // add zip file on a new representation
+        // add zip file (or single file) on a new representation
         LOGGER.debug("Running digital signer on representation");
-        ContentPayload payload = new FSPathContentPayload(resultZipFile);
+        ContentPayload payload = new FSPathContentPayload(resultFile);
         model.createFile(aipId, newRepresentationID, filePath, newFileId, payload, notify);
 
         IOUtils.closeQuietly(allFiles);

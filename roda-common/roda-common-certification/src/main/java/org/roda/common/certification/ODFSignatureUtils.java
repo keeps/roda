@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -83,8 +84,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.pdfbox.io.IOUtils;
 import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
+import org.apache.poi.util.IOUtils;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -95,7 +96,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.log.Logger;
 import com.itextpdf.text.log.LoggerFactory;
 
@@ -127,12 +127,14 @@ public class ODFSignatureUtils {
           }
         } catch (ParserConfigurationException | SAXException e) {
           result = "Signatures document can not be parsed";
-        } catch (CertificateExpiredException | CertificateRevokedException e) {
-          result = "There are expired or revoked certificates";
+        } catch (CertificateExpiredException e) {
+          result = "There are expired certificates";
+        } catch (CertificateRevokedException e) {
+          result = "There are revoked certificates";
         } catch (CertificateNotYetValidException e) {
           result = "There are certificates not yet valid";
         } catch (MarshalException | XMLSignatureException e) {
-          result = "Signatures are not valid";
+          result = "Digital signatures are not valid";
         }
       }
     }
@@ -162,7 +164,7 @@ public class ODFSignatureUtils {
     return paths;
   }
 
-  public static void runDigitalSignatureStrip(Path input, Path output) throws IOException, DocumentException {
+  public static void runDigitalSignatureStrip(Path input, Path output) throws IOException {
     OutputStream os = new FileOutputStream(output.toFile());
     BufferedOutputStream bos = new BufferedOutputStream(os);
     ZipOutputStream zout = new ZipOutputStream(bos);
@@ -197,33 +199,32 @@ public class ODFSignatureUtils {
   public static Path runDigitalSignatureSign(Path input, String ks, String alias, String password, String fileFormat)
     throws Exception {
 
-    Path output = Files.createTempFile("odfsigned", "." + fileFormat);
     Security.addProvider(new BouncyCastleProvider());
+    Path output = Files.createTempFile("odfsigned", "." + fileFormat);
 
     KeyStore keystore = KeyStore.getInstance(KeyStore.getDefaultType());
-    keystore.load(new FileInputStream(ks), password.toCharArray());
+    InputStream storeStream = new FileInputStream(ks);
+    keystore.load(storeStream, password.toCharArray());
     X509Certificate certificate = (X509Certificate) keystore.getCertificate(keystore.aliases().nextElement());
     Key key = keystore.getKey(alias, password.toCharArray());
-    ByteArrayInputStream bais = ODFSignatureUtils.createSignature(input.toString(), certificate, key);
+    IOUtils.closeQuietly(storeStream);
 
+    ByteArrayInputStream bais = createSignature(input.toString(), certificate, key);
     File file = output.toFile();
     if (file != null) {
       byte[] buffer = new byte[2048];
       int length = 0;
       FileOutputStream fos = new FileOutputStream(file);
-
       while ((length = bais.read(buffer)) >= 0) {
         fos.write(buffer, 0, length);
       }
-
-      fos.close();
+      IOUtils.closeQuietly(fos);
     }
 
     return output;
   }
 
   public static ByteArrayInputStream createSignature(String inputPath, X509Certificate certificate, Key key) {
-
     try {
       ZipFile zipFile = new ZipFile(new File(inputPath));
 
@@ -232,25 +233,13 @@ public class ODFSignatureUtils {
       DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
       Init.init();
 
-      XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM");
-      DigestMethod digestMethod = fac.newDigestMethod(DigestMethod.SHA1, null);
-
-      Transform transform = fac.newTransform(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS, (TransformParameterSpec) null);
-      List<Transform> transformList = new ArrayList<Transform>();
-      transformList.add(transform);
-
-      CanonicalizationMethod cm = fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
-        (C14NMethodParameterSpec) null);
-
-      SignatureMethod sm = fac.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+      XMLSignatureFactory factory = XMLSignatureFactory.getInstance("DOM");
+      DigestMethod digestMethod = factory.newDigestMethod(DigestMethod.SHA1, null);
 
       InputStream manifest = zipFile.getInputStream(zipFile.getEntry("META-INF/manifest.xml"));
       Document docManifest = documentBuilder.parse(manifest);
       Element rootManifest = docManifest.getDocumentElement();
       NodeList listFileEntry = rootManifest.getElementsByTagName("manifest:file-entry");
-      List<Reference> referenceList = getReferences(zipFile, documentBuilder, fac, listFileEntry, digestMethod,
-        transformList);
-
       Document docSignatures;
       Element rootSignatures;
 
@@ -265,29 +254,19 @@ public class ODFSignatureUtils {
         rootSignatures.setAttribute("xmlns", OPENOFFICE);
         docSignatures.appendChild(rootSignatures);
 
-        Element nodeMetaInf = docManifest.createElement("manifest:file-entry");
-        nodeMetaInf.setAttribute("manifest:media-type", "");
-        nodeMetaInf.setAttribute("manifest:full-path", "META-INF/");
-        rootManifest.appendChild(nodeMetaInf);
-
         Element nodeDocumentSignatures = docManifest.createElement("manifest:file-entry");
         nodeDocumentSignatures.setAttribute("manifest:media-type", "");
         nodeDocumentSignatures.setAttribute("manifest:full-path", "META-INF/documentsignatures.xml");
         rootManifest.appendChild(nodeDocumentSignatures);
+
+        Element nodeMetaInf = docManifest.createElement("manifest:file-entry");
+        nodeMetaInf.setAttribute("manifest:media-type", "");
+        nodeMetaInf.setAttribute("manifest:full-path", "META-INF/");
+        rootManifest.appendChild(nodeMetaInf);
       }
 
-      String signatureId = UUID.randomUUID().toString();
-      String signaturePropertyId = UUID.randomUUID().toString();
-
-      Reference signaturePropertyReference = fac.newReference("#" + signaturePropertyId, digestMethod);
-      referenceList.add(signaturePropertyReference);
-      SignedInfo si = fac.newSignedInfo(cm, sm, referenceList);
-
-      KeyInfo ki = getKeyInfo(fac, certificate);
-      List<XMLObject> objectList = getXMLObjectList(fac, docSignatures, signatureId, signaturePropertyId);
-      XMLSignature signature = fac.newXMLSignature(si, ki, objectList, signatureId, null);
-      DOMSignContext signContext = new DOMSignContext(key, rootSignatures);
-      signature.sign(signContext);
+      List<Reference> referenceList = getReferenceList(zipFile, documentBuilder, factory, listFileEntry, digestMethod);
+      digitalSign(factory, referenceList, digestMethod, certificate, docSignatures, rootSignatures, key);
 
       ByteArrayOutputStream baos = addSignatureToStream(zipFile, rootManifest, rootSignatures);
       ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
@@ -306,7 +285,8 @@ public class ODFSignatureUtils {
 
     OutputStreamWriter osw = new OutputStreamWriter(outStream, Charset.forName("UTF-8"));
     BufferedWriter bw = new BufferedWriter(osw);
-    Transformer serializer = TransformerFactory.newInstance().newTransformer();
+    TransformerFactory transformerFactory = new org.apache.xalan.processor.TransformerFactoryImpl();
+    Transformer serializer = transformerFactory.newTransformer();
     serializer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 
     if (indent) {
@@ -363,34 +343,35 @@ public class ODFSignatureUtils {
     }
   }
 
-  private static List<XMLObject> getXMLObjectList(XMLSignatureFactory fac, Document docSignatures, String signatureId,
-    String signaturePropertyId) {
+  private static List<XMLObject> getXMLObjectList(XMLSignatureFactory factory, Document docSignatures,
+    String signatureId, String signaturePropertyId) {
 
     Element content = docSignatures.createElement("dc:date");
-    content.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:dc", "http://purl.org/dc/elements/1.1/");
+    content.setAttribute("xmlns:dc", "http://purl.org/dc/elements/1.1/");
+
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss,SS");
     content.setTextContent(sdf.format(new Date()));
     XMLStructure str = new DOMStructure(content);
     List<XMLStructure> contentList = new ArrayList<XMLStructure>();
     contentList.add(str);
 
-    SignatureProperty sp = fac.newSignatureProperty(contentList, "#" + signatureId, signaturePropertyId);
+    SignatureProperty sp = factory.newSignatureProperty(contentList, "#" + signatureId, signaturePropertyId);
     List<SignatureProperty> spList = new ArrayList<SignatureProperty>();
     spList.add(sp);
 
-    SignatureProperties sps = fac.newSignatureProperties(spList, null);
+    SignatureProperties sps = factory.newSignatureProperties(spList, null);
     List<SignatureProperties> spsList = new ArrayList<SignatureProperties>();
     spsList.add(sps);
 
-    XMLObject object = fac.newXMLObject(spsList, null, null, null);
+    XMLObject object = factory.newXMLObject(spsList, null, null, null);
     List<XMLObject> objectList = new ArrayList<XMLObject>();
     objectList.add(object);
 
     return objectList;
   }
 
-  private static KeyInfo getKeyInfo(XMLSignatureFactory fac, X509Certificate certificate) {
-    KeyInfoFactory kif = fac.getKeyInfoFactory();
+  private static KeyInfo getKeyInfo(XMLSignatureFactory factory, X509Certificate certificate) {
+    KeyInfoFactory kif = factory.getKeyInfoFactory();
     List<Object> x509Content = new ArrayList<Object>();
     x509Content.add(certificate.getSubjectX500Principal().getName());
     x509Content.add(certificate);
@@ -419,14 +400,6 @@ public class ODFSignatureUtils {
       }
     }
 
-    ZipEntry zeManifest = new ZipEntry("META-INF/manifest.xml");
-    zos.putNextEntry(zeManifest);
-    ByteArrayOutputStream baosManifest = new ByteArrayOutputStream();
-    writeXML(baosManifest, rootManifest, false);
-    zos.write(baosManifest.toByteArray());
-    zos.closeEntry();
-    baosManifest.close();
-
     ZipEntry zeDocumentSignatures = new ZipEntry("META-INF/documentsignatures.xml");
     zos.putNextEntry(zeDocumentSignatures);
     ByteArrayOutputStream baosXML = new ByteArrayOutputStream();
@@ -435,15 +408,26 @@ public class ODFSignatureUtils {
     zos.closeEntry();
     baosXML.close();
 
+    ZipEntry zeManifest = new ZipEntry("META-INF/manifest.xml");
+    zos.putNextEntry(zeManifest);
+    ByteArrayOutputStream baosManifest = new ByteArrayOutputStream();
+    writeXML(baosManifest, rootManifest, false);
+    zos.write(baosManifest.toByteArray());
+    zos.closeEntry();
+    baosManifest.close();
+
     zos.close();
     zipFile.close();
 
     return baos;
   }
 
-  private static List<Reference> getReferences(ZipFile zipFile, DocumentBuilder documentBuilder,
-    XMLSignatureFactory fac, NodeList listFileEntry, DigestMethod digestMethod, List<Transform> transformList)
-    throws Exception {
+  private static List<Reference> getReferenceList(ZipFile zipFile, DocumentBuilder documentBuilder,
+    XMLSignatureFactory factory, NodeList listFileEntry, DigestMethod digestMethod) throws Exception {
+
+    Transform transform = factory.newTransform(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS, (TransformParameterSpec) null);
+    List<Transform> transformList = new ArrayList<Transform>();
+    transformList.add(transform);
 
     MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
     List<Reference> referenceList = new ArrayList<Reference>();
@@ -463,14 +447,15 @@ public class ODFSignatureUtils {
           Canonicalizer canonicalizer = Canonicalizer.getInstance(Canonicalizer.ALGO_ID_C14N_OMIT_COMMENTS);
           byte[] docCanonicalize = canonicalizer.canonicalizeSubtree(root);
           byte[] digestValue = messageDigest.digest(docCanonicalize);
-          reference = fac.newReference(fullPath.replaceAll(" ", "%20"), digestMethod, transformList, null, null,
+          reference = factory.newReference(fullPath.replaceAll(" ", "%20"), digestMethod, transformList, null, null,
             digestValue);
 
         } else {
           InputStream is = zipFile.getInputStream(zipFile.getEntry(fullPath));
           byte[] digestValue = messageDigest.digest(IOUtils.toByteArray(is));
           IOUtils.closeQuietly(is);
-          reference = fac.newReference(fullPath.replaceAll(" ", "%20"), digestMethod, null, null, null, digestValue);
+          reference = factory
+            .newReference(fullPath.replaceAll(" ", "%20"), digestMethod, null, null, null, digestValue);
         }
 
         referenceList.add(reference);
@@ -478,5 +463,26 @@ public class ODFSignatureUtils {
     }
 
     return referenceList;
+  }
+
+  private static void digitalSign(XMLSignatureFactory factory, List<Reference> referenceList,
+    DigestMethod digestMethod, X509Certificate certificate, Document docSignatures, Element rootSignatures, Key key)
+    throws MarshalException, XMLSignatureException, NoSuchAlgorithmException, InvalidAlgorithmParameterException {
+
+    String signatureId = UUID.randomUUID().toString();
+    String signaturePropertyId = UUID.randomUUID().toString();
+    CanonicalizationMethod canMethod = factory.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+      (C14NMethodParameterSpec) null);
+    SignatureMethod signMethod = factory.newSignatureMethod(SignatureMethod.RSA_SHA1, null);
+
+    Reference signaturePropertyReference = factory.newReference("#" + signaturePropertyId, digestMethod);
+    referenceList.add(signaturePropertyReference);
+    SignedInfo si = factory.newSignedInfo(canMethod, signMethod, referenceList);
+
+    KeyInfo ki = getKeyInfo(factory, certificate);
+    List<XMLObject> objectList = getXMLObjectList(factory, docSignatures, signatureId, signaturePropertyId);
+    XMLSignature signature = factory.newXMLSignature(si, ki, objectList, signatureId, null);
+    DOMSignContext signContext = new DOMSignContext(key, rootSignatures);
+    signature.sign(signContext);
   }
 }

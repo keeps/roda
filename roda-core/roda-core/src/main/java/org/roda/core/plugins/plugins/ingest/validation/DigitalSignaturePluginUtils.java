@@ -11,13 +11,25 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.roda.common.certification.ODFSignatureUtils;
 import org.roda.common.certification.OOXMLSignatureUtils;
 import org.roda.common.certification.PDFSignatureUtils;
+import org.roda.common.certification.SignatureUtils;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,11 +40,13 @@ import com.itextpdf.text.pdf.PdfReader;
 public class DigitalSignaturePluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePluginUtils.class);
+  private static final String OTHER_METADATA_TYPE = "DigitalSignature";
 
   public static String runDigitalSignatureVerify(Path input, String fileFormat, String mimetype) {
 
+    String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+
     try {
-      String generalFileFormat = canHaveEmbeddedSignature(fileFormat, mimetype);
       if (generalFileFormat.equals("pdf")) {
         return PDFSignatureUtils.runDigitalSignatureVerify(input);
       } else if (generalFileFormat.equals("ooxml")) {
@@ -47,11 +61,62 @@ public class DigitalSignaturePluginUtils {
     return "Not a supported format";
   }
 
+  public static int runDigitalSignatureExtraction(ModelService model, File file, Path input, String fileFormat,
+    String mimetype) {
+    List<Path> extractResult = new ArrayList<Path>();
+
+    try {
+      String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+      if (generalFileFormat.equals("pdf")) {
+        extractResult = PDFSignatureUtils.runDigitalSignatureExtract(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
+
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            mainPayload, true);
+
+          if (extractResult.get(1).toFile().length() > 0) {
+            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+              contentsPayload, true);
+          }
+        }
+      } else if (generalFileFormat.equals("ooxml")) {
+        Map<Path, String> extractMap = OOXMLSignatureUtils.runDigitalSignatureExtract(input);
+        extractResult = new ArrayList<Path>(extractMap.keySet());
+
+        for (Path p : extractResult) {
+          ContentPayload mainPayload = new FSPathContentPayload(p);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
+        }
+      } else if (generalFileFormat.equals("odf")) {
+        extractResult = ODFSignatureUtils.runDigitalSignatureExtract(input);
+
+        if (extractResult.size() > 0) {
+          ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
+            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            mainPayload, true);
+        }
+      }
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException | SignatureException e) {
+      LOGGER.warn("Problems running a document digital signature extraction");
+    }
+
+    return extractResult.size();
+  }
+
   public static Path runDigitalSignatureStrip(Path input, String fileFormat, String mimetype) {
     try {
       Path output = Files.createTempFile("stripped", "." + fileFormat);
 
-      String generalFileFormat = canHaveEmbeddedSignature(fileFormat, mimetype);
+      String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
       if (generalFileFormat.equals("pdf")) {
         PDFSignatureUtils.runDigitalSignatureStrip(input, output);
       } else if (generalFileFormat.equals("ooxml")) {
@@ -62,27 +127,9 @@ public class DigitalSignaturePluginUtils {
 
       return output;
     } catch (IOException | InvalidFormatException | DocumentException e) {
-      LOGGER.warn("Problems running a document stripping");
+      LOGGER.warn("Problems running a document signature stripping");
       return null;
     }
-  }
-
-  public static String canHaveEmbeddedSignature(String fileFormat, String mimetype) {
-    if (fileFormat.equals("pdf") || mimetype.equals("application/pdf")) {
-      return "pdf";
-    } else if (fileFormat.equals("docx") || fileFormat.equals("xlsx") || fileFormat.equals("pptx")
-      || mimetype.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document")
-      || mimetype.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-      || mimetype.equals("application/vnd.openxmlformats-officedocument.presentationml.presentation")) {
-      return "ooxml";
-    } else if (fileFormat.equals("odt") || fileFormat.equals("ods") || fileFormat.equals("odp")
-      || mimetype.equals("application/vnd.oasis.opendocument.text")
-      || mimetype.equals("application/vnd.oasis.opendocument.spreadsheet")
-      || mimetype.equals("application/vnd.oasis.opendocument.presentation")) {
-      return "odf";
-    }
-
-    return "";
   }
 
   public static int countSignaturesPDF(Path base, StoragePath input, String intermediatePath) {

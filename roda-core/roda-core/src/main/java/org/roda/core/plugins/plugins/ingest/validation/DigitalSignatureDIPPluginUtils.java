@@ -30,6 +30,7 @@ import org.roda.common.certification.ODFSignatureUtils;
 import org.roda.common.certification.OOXMLSignatureUtils;
 import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.common.certification.SignatureUtility;
+import org.roda.common.certification.SignatureUtils;
 import org.roda.core.RodaCoreFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,16 @@ public class DigitalSignatureDIPPluginUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(DigitalSignatureDIPPluginUtils.class);
 
-  private static final String KEYSTORE_PATH = RodaCoreFactory.getRodaHomePath()
+  private static String KEYSTORE_PATH = RodaCoreFactory.getRodaHomePath()
     .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "keystore", "path")).toString();
   private static final String KEYSTORE_PASSWORD = RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
     "keystore", "password");
   private static final String KEYSTORE_ALIAS = RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
     "keystore", "alias");
+
+  public static void setKeystorePath(String path) {
+    KEYSTORE_PATH = path;
+  }
 
   public static void addElementToRepresentationZip(ZipOutputStream zout, Path file, String name) {
     try {
@@ -116,9 +121,14 @@ public class DigitalSignatureDIPPluginUtils {
 
   public static Path addEmbeddedSignature(Path input, String fileFormat, String mimetype) {
     try {
-      String generalFileFormat = DigitalSignaturePluginUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
+      String generalFileFormat = SignatureUtils.canHaveEmbeddedSignature(fileFormat, mimetype);
       if (generalFileFormat.equals("pdf")) {
-        return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD);
+        String reason = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "reason");
+        String location = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "location");
+        String contact = RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "contact");
+
+        return PDFSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
+          reason, location, contact);
       } else if (generalFileFormat.equals("ooxml")) {
         return OOXMLSignatureUtils.runDigitalSignatureSign(input, KEYSTORE_PATH, KEYSTORE_ALIAS, KEYSTORE_PASSWORD,
           fileFormat);

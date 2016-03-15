@@ -42,7 +42,6 @@ import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.AcroFields.Item;
 import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfName;
-import com.itextpdf.text.pdf.PdfObject;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSignatureAppearance;
 import com.itextpdf.text.pdf.PdfStamper;
@@ -58,11 +57,6 @@ import com.itextpdf.text.pdf.security.PrivateKeySignature;
 public class PDFSignatureUtils {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(PDFSignatureUtils.class);
-  private static final String PDF_STRING = "String";
-  private static final String PDF_OBJECT = "Object";
-  private static final String PDF_BOOLEAN = "Boolean";
-  private static final String SIGNATURE_REASON = "test reason";
-  private static final String SIGNATURE_LOCATION = "test location";
 
   public static String runDigitalSignatureVerify(Path input) throws IOException, GeneralSecurityException {
     Security.addProvider(new BouncyCastleProvider());
@@ -77,17 +71,17 @@ public class PDFSignatureUtils {
 
       try {
         PdfPKCS7 pk = fields.verifySignature(name);
-        X509Certificate cert = pk.getSigningCertificate();
-        cert.checkValidity();
+        X509Certificate certificate = pk.getSigningCertificate();
+        certificate.checkValidity();
 
-        if (!SignatureUtils.isCertificateSelfSigned(cert)) {
+        if (!SignatureUtils.isCertificateSelfSigned(certificate)) {
 
           Set<Certificate> trustedRootCerts = new HashSet<Certificate>();
           Set<Certificate> intermediateCerts = new HashSet<Certificate>();
 
           for (Certificate c : pk.getSignCertificateChain()) {
-            X509Certificate x509c = (X509Certificate) c;
-            x509c.checkValidity();
+            X509Certificate cert = (X509Certificate) c;
+            cert.checkValidity();
 
             if (SignatureUtils.isCertificateSelfSigned(c))
               trustedRootCerts.add(c);
@@ -95,19 +89,21 @@ public class PDFSignatureUtils {
               intermediateCerts.add(c);
           }
 
-          SignatureUtils.verifyCertificateChain(trustedRootCerts, intermediateCerts, cert);
+          SignatureUtils.verifyCertificateChain(trustedRootCerts, intermediateCerts, certificate);
           if (pk.getCRLs() != null) {
             for (CRL crl : pk.getCRLs()) {
-              if (crl.isRevoked(cert)) {
-                result = "Signing certificate is included on a Certificate Revocation List (CRL)";
+              if (crl.isRevoked(certificate)) {
+                result = "Signing certificate is included on a Certificate Revocation List";
               }
             }
           }
         }
       } catch (NoSuchFieldError e) {
         result = "Missing signature timestamp field";
-      } catch (CertificateExpiredException | CertificateNotYetValidException e) {
-        result = "Signing certificate does not pass the validity check";
+      } catch (CertificateExpiredException e) {
+        result = "There are expired certificates";
+      } catch (CertificateNotYetValidException e) {
+        result = "There are certificates not yet valid";
       }
     }
 
@@ -120,7 +116,7 @@ public class PDFSignatureUtils {
 
     List<Path> paths = new ArrayList<Path>();
     Path output = Files.createTempFile("extraction", ".txt");
-    Path outputContents = null;
+    Path outputContents = Files.createTempFile("contents", ".pkcs7");
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
     ArrayList<?> names = fields.getSignatureNames();
@@ -130,57 +126,15 @@ public class PDFSignatureUtils {
     if (names.size() == 0)
       return paths;
 
+    StringBuilder sb = getExtractionInformation(fields, names, outputContents, filename);
+
     FileOutputStream fos = new FileOutputStream(output.toString());
     OutputStreamWriter osw = new OutputStreamWriter(fos);
     PrintWriter out = new PrintWriter(osw, true);
 
-    for (int i = 0; i < names.size(); i++) {
-      String name = (String) names.get(i);
-      Item item = fields.getFieldItem(name);
-      String extractionResult = "";
-
-      PdfDictionary widget = item.getWidget(0);
-      PdfDictionary infoDictionary = widget.getAsDict(PdfName.V);
-
-      try {
-        PdfPKCS7 pk = fields.verifySignature(name);
-        extractionResult += "Name: " + name + "\n";
-        extractionResult += "Sign Name: " + pk.getSignName() + "\n";
-        extractionResult += "Version: " + pk.getVersion() + "\n";
-        extractionResult += "Reason: " + pk.getReason() + "\n";
-        extractionResult += "Location: " + pk.getLocation() + "\n";
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
-
-        if (pk.getTimeStampDate() != null)
-          extractionResult += "Timestamp Time: " + formatter.format(pk.getTimeStampDate().getTime()) + "\n";
-
-        if (pk.getSignDate() != null)
-          extractionResult += "Sign Time: " + formatter.format(pk.getSignDate().getTime()) + "\n";
-
-        extractionResult += "Digest Algorithm: " + pk.getDigestAlgorithm() + "\n";
-        extractionResult += "Hash Algorithm: " + pk.getHashAlgorithm() + "\n";
-        extractionResult += "CoversWholeDocument: " + fields.signatureCoversWholeDocument(name) + "\n";
-        extractionResult += addElementToExtractionResult(infoDictionary, PdfName.CONTACTINFO, PDF_STRING);
-        extractionResult += addElementToExtractionResult(infoDictionary, PdfName.FILTER, PDF_OBJECT);
-        extractionResult += addElementToExtractionResult(infoDictionary, PdfName.SUBFILTER, PDF_OBJECT);
-        extractionResult += addElementToExtractionResult(widget, PdfName.FT, PDF_OBJECT);
-        extractionResult += addElementToExtractionResult(widget, PdfName.LOCK, PDF_BOOLEAN);
-
-        if (infoDictionary.contains(PdfName.CONTENTS)) {
-          PdfString elementName = infoDictionary.getAsString(PdfName.CONTENTS);
-          outputContents = Files.createTempFile("contents", ".pkcs7");
-          Files.write(outputContents, elementName.toUnicodeString().getBytes());
-          extractionResult += PdfName.CONTENTS.toString() + ": " + filename + ".pkcs7 \n";
-        }
-
-      } catch (NoSuchFieldError e) {
-        LOGGER.warn("DS information extraction did not execute properly");
-      }
-
-      out.println("- Signature " + name + ":\n");
-      out.println(extractionResult);
-    }
+    out.println("<signatures>");
+    out.println(sb.toString());
+    out.println("</signatures>");
 
     IOUtils.closeQuietly(out);
     IOUtils.closeQuietly(osw);
@@ -200,8 +154,8 @@ public class PDFSignatureUtils {
     reader.close();
   }
 
-  public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password)
-    throws IOException, GeneralSecurityException, DocumentException {
+  public static Path runDigitalSignatureSign(Path input, String keystore, String alias, String password, String reason,
+    String location, String contact) throws IOException, GeneralSecurityException, DocumentException {
 
     Security.addProvider(new BouncyCastleProvider());
     Path signedPDF = Files.createTempFile("signed", ".pdf");
@@ -217,8 +171,9 @@ public class PDFSignatureUtils {
     FileOutputStream os = new FileOutputStream(signedPDF.toFile());
     PdfStamper stamper = PdfStamper.createSignature(reader, os, '\0');
     PdfSignatureAppearance appearance = stamper.getSignatureAppearance();
-    appearance.setReason(SIGNATURE_REASON);
-    appearance.setLocation(SIGNATURE_LOCATION);
+    appearance.setReason(reason);
+    appearance.setLocation(location);
+    appearance.setContact(contact);
     appearance.setVisibleSignature(new Rectangle(36, 748, 144, 780), 1, "RODASignature");
     ExternalDigest digest = new BouncyCastleDigest();
     ExternalSignature signature = new PrivateKeySignature(pk, DigestAlgorithms.SHA256, "BC");
@@ -229,21 +184,82 @@ public class PDFSignatureUtils {
     return signedPDF;
   }
 
-  private static String addElementToExtractionResult(PdfDictionary parent, PdfName element, String type) {
-    String result = "";
-    if (parent.contains(element)) {
-      if (type.equals(PDF_STRING)) {
-        PdfString elementName = parent.getAsString(element);
-        if (elementName.toString().matches("[0-9a-zA-Z'\\.\\/\\-\\_\\: ]+"))
-          result += element.toString() + ": " + elementName.toString() + "\n";
-      } else if (type.equals(PDF_OBJECT)) {
-        PdfObject elementObject = parent.get(element);
-        result += element.toString() + ": " + elementObject.toString() + "\n";
-      } else if (type.equals(PDF_BOOLEAN)) {
-        result += element.toString() + ": true\n";
+  private static StringBuilder getExtractionInformation(AcroFields fields, ArrayList<?> names, Path outputContents,
+    String filename) throws IOException {
+
+    StringBuilder sb = new StringBuilder();
+
+    for (int i = 0; i < names.size(); i++) {
+      String name = (String) names.get(i);
+      Item item = fields.getFieldItem(name);
+
+      PdfDictionary widget = item.getWidget(0);
+      PdfDictionary infoDictionary = widget.getAsDict(PdfName.V);
+      sb.append("<signature>\n");
+
+      try {
+        PdfPKCS7 pk = fields.verifySignature(name);
+        sb = addElementToExtractionResult(sb, "name", name);
+        sb = addElementToExtractionResult(sb, "sign-name", pk.getSignName());
+        sb = addElementToExtractionResult(sb, "version", Integer.toString(pk.getVersion()));
+        sb = addElementToExtractionResult(sb, "reason", pk.getReason());
+        sb = addElementToExtractionResult(sb, "location", pk.getLocation());
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+
+        if (pk.getTimeStampDate() != null) {
+          String timestamp = formatter.format(pk.getTimeStampDate().getTime());
+          sb = addElementToExtractionResult(sb, "timestamp-time", timestamp);
+        }
+
+        if (pk.getSignDate() != null) {
+          String sign = formatter.format(pk.getSignDate().getTime());
+          sb = addElementToExtractionResult(sb, "sign-time", sign);
+        }
+
+        sb = addElementToExtractionResult(sb, "digest-algorithm", pk.getDigestAlgorithm());
+        sb = addElementToExtractionResult(sb, "hash-algorithm", pk.getHashAlgorithm());
+        sb = addElementToExtractionResult(sb, "covers-whole-document",
+          Boolean.toString(fields.signatureCoversWholeDocument(name)));
+        sb = addElementToExtractionResult(sb, "ft", widget.get(PdfName.FT).toString());
+
+        if (infoDictionary.contains(PdfName.CONTACTINFO))
+          sb = addElementToExtractionResult(sb, "contact-info", infoDictionary.getAsString(PdfName.CONTACTINFO)
+            .toString());
+
+        if (infoDictionary.contains(PdfName.FILTER))
+          sb = addElementToExtractionResult(sb, "filter", infoDictionary.get(PdfName.FILTER).toString());
+
+        if (infoDictionary.contains(PdfName.SUBFILTER))
+          sb = addElementToExtractionResult(sb, "subfilter", infoDictionary.get(PdfName.SUBFILTER).toString());
+
+        if (infoDictionary.contains(PdfName.LOCK))
+          sb = addElementToExtractionResult(sb, "lock", "true");
+
+        if (infoDictionary.contains(PdfName.CONTENTS)) {
+          PdfString elementName = infoDictionary.getAsString(PdfName.CONTENTS);
+          Files.write(outputContents, elementName.toUnicodeString().getBytes());
+          sb = addElementToExtractionResult(sb, "contents", filename + ".pkcs7");
+        }
+
+      } catch (NoSuchFieldError e) {
+        LOGGER.warn("DS information extraction did not execute properly");
       }
+
+      sb.append("<signature>");
     }
-    return result;
+
+    return sb;
   }
 
+  private static StringBuilder addElementToExtractionResult(StringBuilder sb, String tagName, String value) {
+    sb.append("<");
+    sb.append(tagName);
+    sb.append(">");
+    sb.append(value);
+    sb.append("</");
+    sb.append(tagName);
+    sb.append(">\n");
+    return sb;
+  }
 }
