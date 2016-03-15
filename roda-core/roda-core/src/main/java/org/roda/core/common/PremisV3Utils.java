@@ -656,7 +656,7 @@ public class PremisV3Utils {
             StringBuilder fixityPrint = new StringBuilder();
             fixityPrint.append(fct.getMessageDigest());
             fixityPrint.append(" (");
-            fixityPrint.append(fct.getMessageDigestAlgorithm());
+            fixityPrint.append(fct.getMessageDigestAlgorithm().getStringValue());
             if (StringUtils.isNotBlank(fct.getMessageDigestOriginator().getStringValue())) {
               fixityPrint.append(", "); //
               fixityPrint.append(fct.getMessageDigestOriginator().getStringValue());
