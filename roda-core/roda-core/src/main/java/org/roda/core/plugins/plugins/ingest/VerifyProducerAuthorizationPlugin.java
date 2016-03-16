@@ -19,8 +19,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPPermissions;
-import org.roda.core.data.v2.ip.AIPPermissions.PermissionType;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -162,7 +162,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   private void grantPermissionToUser(String username, AIP aip, ModelService model) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    AIPPermissions aipPermissions = aip.getPermissions();
+    Permissions aipPermissions = aip.getPermissions();
     Set<PermissionType> allPermissions = Stream.of(PermissionType.CREATE, PermissionType.DELETE,
       PermissionType.GRANT, PermissionType.READ, PermissionType.UPDATE).collect(Collectors.toSet());
     aipPermissions.setUserPermissions(username, allPermissions);
