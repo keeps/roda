@@ -781,6 +781,12 @@ public class SolrUtils {
     return indexName;
   }
 
+  private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
+    return resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)
+      || resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)
+      || resultClass.equals(IndexedFile.class) || resultClass.equals(IndexedPreservationEvent.class);
+  }
+
   private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
     if (resultClass.equals(IndexedAIP.class)) {
@@ -863,7 +869,9 @@ public class SolrUtils {
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
     parseAndConfigureFacets(facets, query);
-    query.setFilterQueries(getFilterQueries(user, showInactive));
+    if (hasPermissionFilters(classToRetrieve)) {
+      query.setFilterQueries(getFilterQueries(user, showInactive));
+    }
 
     try {
       QueryResponse response = index.query(getIndexName(classToRetrieve), query);

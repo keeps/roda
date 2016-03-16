@@ -107,6 +107,11 @@ public class IndexService {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
+  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean showInactive)
+    throws GenericException, RequestNotValidException {
+    return SolrUtils.count(index, returnClass, filter, user, showInactive);
+  }
+
   public <T extends Serializable> T retrieve(Class<T> returnClass, String id)
     throws NotFoundException, GenericException {
     return SolrUtils.retrieve(index, returnClass, id);

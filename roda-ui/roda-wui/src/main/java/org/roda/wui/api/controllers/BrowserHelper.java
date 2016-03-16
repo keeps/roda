@@ -247,13 +247,15 @@ public class BrowserHelper {
   }
 
   protected static <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets);
+    Sublist sublist, Facets facets, RodaUser user) throws GenericException, RequestNotValidException {
+    boolean showInactive = true;
+    return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
-  protected static <T extends Serializable> Long count(Class<T> returnClass, Filter filter)
+  protected static <T extends Serializable> Long count(Class<T> returnClass, Filter filter, RodaUser user)
     throws GenericException, RequestNotValidException {
-    return RodaCoreFactory.getIndexService().count(returnClass, filter);
+    boolean showInactive = true;
+    return RodaCoreFactory.getIndexService().count(returnClass, filter, user, showInactive);
   }
 
   protected static <T extends Serializable> T retrieve(Class<T> returnClass, String id)

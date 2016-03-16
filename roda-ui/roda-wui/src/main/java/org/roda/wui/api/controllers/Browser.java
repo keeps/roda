@@ -150,7 +150,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets);
+    IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -170,7 +170,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    Long count = BrowserHelper.count(classToReturn, filter);
+    Long count = BrowserHelper.count(classToReturn, filter, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
