@@ -56,7 +56,8 @@ public class UserUtility {
     LDAP_UTILITY = ldapUtility;
   }
 
-  // FIXME this method should be more auth scheme agnostic (basic auth vs. cas)
+  // FIXME 20151002 hsilva: this method should be more auth scheme agnostic
+  // (basic auth vs. cas)
   public static RodaUser getApiUser(HttpServletRequest request, IndexService indexService)
     throws AuthorizationDeniedException {
 
@@ -110,7 +111,7 @@ public class UserUtility {
           user = (RodaUser) indexUsers.getResults().get(0);
           user.setGuest(rsu.isGuest());
           user.setIpAddress(request.getRemoteAddr());
-          LOGGER.trace("User obtained from index: " + user + "\n" + "user in session: " + rsu);
+          LOGGER.trace("User obtained from index: {}\n" + "user in session: {}", user, rsu);
         } else {
           LOGGER.error("The number of users obtained from the index is different from 1");
         }
@@ -129,7 +130,7 @@ public class UserUtility {
 
   public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException {
     if (!rsu.getAllRoles().containsAll(rolesToCheck)) {
-      LOGGER.debug("User \"" + rsu.getId() + "\" roles: " + rsu.getAllRoles() + " vs. roles to check: " + rolesToCheck);
+      LOGGER.debug("User \"{}\" roles: {} vs. roles to check: {}", rsu.getId(), rsu.getAllRoles(), rolesToCheck);
       throw new AuthorizationDeniedException(
         "The user '" + rsu.getId() + "' does not have all needed permissions: " + rolesToCheck);
     }
@@ -202,8 +203,8 @@ public class UserUtility {
     Set<String> users = aip.getPermissions().getUsers().get(permissionType);
     Set<String> groups = aip.getPermissions().getGroups().get(permissionType);
 
-    LOGGER.debug("Checking if user \"" + user.getId() + "\" has permissions to " + permissionType + " object "
-      + aip.getId() + " (object read permissions: " + users + " & " + groups + ")");
+    LOGGER.debug("Checking if user \"{}\" has permissions to {} object {} (object read permissions: {} & {})",
+      user.getId(), permissionType, aip.getId(), users, groups);
 
     // FIXME
     if ("admin".equalsIgnoreCase(user.getId())) {

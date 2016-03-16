@@ -32,13 +32,12 @@ public class RodaInternalAuthenticationFilter implements Filter {
 
   @Override
   public void init(FilterConfig arg0) throws ServletException {
-    LOGGER.info(getClass().getSimpleName() + " initialized ok");
+    LOGGER.info("{} initialized ok", getClass().getSimpleName());
   }
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
     throws IOException, ServletException {
-    LOGGER.debug("executing doFilter");
 
     final HttpServletRequest httpRequest = (HttpServletRequest) request;
     final HttpServletResponse httpResponse = (HttpServletResponse) response;
@@ -48,10 +47,7 @@ public class RodaInternalAuthenticationFilter implements Filter {
     String service = httpRequest.getParameter("service");
     String hash = httpRequest.getParameter("hash");
 
-    LOGGER.debug("URL: " + url);
-    LOGGER.debug("Request URI: " + requestURI);
-    LOGGER.debug("Service: " + service);
-    LOGGER.debug("hash: " + hash);
+    LOGGER.debug("URL: {} ; Request URI: {} ; Service: {} ; Hash: {}", url, requestURI, service, hash);
 
     if (requestURI.equals("/login")) {
       String redirect = "/#login";

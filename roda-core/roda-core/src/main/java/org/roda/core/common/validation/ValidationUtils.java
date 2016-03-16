@@ -41,6 +41,20 @@ import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 import org.xml.sax.helpers.DefaultHandler;
 
+/**
+ * 
+ * Set of validation methods (XML, etc)
+ * 
+ * <p>
+ * 1) When the following error appears (or something very similar), it means
+ * that there is one or more xml schemas/dtds mentioned in the main xml schema
+ * (the one being used to validate some xml) that are not accessible. This may
+ * be due to lack of internet connection or local files that actually don't
+ * exist.
+ * </p>
+ * <code>org.xml.sax.SAXParseException: src-resolve: Cannot resolve the name 'xml:lang' to a(n) 'attribute declaration' component.</code>
+ * 
+ */
 public class ValidationUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtils.class);
   private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
@@ -72,7 +86,7 @@ public class ValidationUtils {
         model.updateDescriptiveMetadata(aipId, dm.getId(), binary.getContent(), fallbackMetadataType,
           fallbackMetadataVersion, message);
         report.setValid(true);
-        LOGGER.debug(storagePath + " valid for metadata type " + fallbackMetadataType);
+        LOGGER.debug("{} valid for metadata type {}", storagePath, fallbackMetadataType);
 
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;
@@ -208,13 +222,14 @@ public class ValidationUtils {
 
       if (descriptiveMetadataType != null) {
         if (descriptiveMetadataVersion != null) {
-          schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase()
-            + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion.toLowerCase() + ".xsd");
+          schemaStream = RodaCoreFactory.getConfigurationFileAsStream(
+            RodaConstants.CORE_SCHEMAS_FOLDER + "/" + descriptiveMetadataType.toLowerCase()
+              + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion.toLowerCase() + ".xsd");
         }
 
         if (schemaStream == null) {
-          schemaStream = RodaCoreFactory
-            .getConfigurationFileAsStream("schemas/" + descriptiveMetadataType.toLowerCase() + ".xsd");
+          schemaStream = RodaCoreFactory.getConfigurationFileAsStream(
+            RodaConstants.CORE_SCHEMAS_FOLDER + "/" + descriptiveMetadataType.toLowerCase() + ".xsd");
         }
 
       }
@@ -222,6 +237,7 @@ public class ValidationUtils {
       if (schemaStream != null) {
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
+        schemaFactory.setResourceResolver(new ResourceResolver());
         Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
         Validator validator = schema.newValidator();
         RodaErrorHandler errorHandler = new RodaErrorHandler();
@@ -273,7 +289,8 @@ public class ValidationUtils {
     ValidationReport report = new ValidationReport();
     try {
       InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaCoreFactory.getConfigurationFileAsStream("schemas/premis-v2-0.xsd");
+      InputStream schemaStream = RodaCoreFactory
+        .getConfigurationFileAsStream(RodaConstants.CORE_SCHEMAS_FOLDER + "/premis-v2-0.xsd");
       if (schemaStream != null) {
         Source xmlFile = new StreamSource(inputStream);
         SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
