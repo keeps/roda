@@ -3,6 +3,105 @@
 /**********************************************
 				COMMON
 ************************************************/
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 300;
+  src: local('Ubuntu Light'), local('Ubuntu-Light'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 300;
+  src: local('Ubuntu Light Italic'), local('Ubuntu-LightItalic'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-LightItalic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ubuntu'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 400;
+  src: local('Ubuntu Italic'), local('Ubuntu-Italic'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Italic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 500;
+  src: local('Ubuntu Medium'), local('Ubuntu-Medium'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Medium.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 500;
+  src: local('Ubuntu Medium Italic'), local('Ubuntu-MediumItalic'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-MediumItalic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: normal;
+  font-weight: 700;
+  src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Bold.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "Ubuntu";
+  font-style: italic;
+  font-weight: 700;
+  src: local('Ubuntu Bold Italic'), local('Ubuntu-BoldItalic'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-BoldItalic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "UbuntuCondensed";
+  font-style: normal;
+  font-weight: 400;
+  src: local('UbuntuCondensed'), url(/api/v1/theme?resourceId=fonts/Ubuntu_Condensed/UbuntuCondensed-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "UbuntuMono";
+  font-style: normal;
+  font-weight: 400;
+  src: local('UbuntuMono'), url(/api/v1/theme?resourceId=fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "UbuntuMono";
+  font-style: italic;
+  font-weight: 400;
+  src: local('UbuntuMono Italic'), local('UbuntuMono-Italic'), url(/api/v1/theme?resourceId=fonts/Ubuntu_Mono/UbuntuMono-Italic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "UbuntuMono";
+  font-style: normal;
+  font-weight: 700;
+  src: local('UbuntuMono Bold'), local('UbuntuMono-Bold'), url(/api/v1/theme?resourceId=fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "UbuntuMono";
+  font-style: italic;
+  font-weight: 700;
+  src: local('UbuntuMono Bold Italic'), local('UbuntuMono-BoldItalic'), url(/api/v1/theme?resourceId=fonts/Ubuntu_Mono/UbuntuMono-BoldItalic.ttf) format("truetype");
+}
+
+@font-face {
+  font-family: "RODALogo";
+  font-style: normal;
+  font-weight: 300;
+  src: url(/api/v1/theme?resourceId=fonts/RODA_logo/RODA_logo.ttf) format("truetype");
+}
+
 html {
 	font-size: 62.5%;
 }
@@ -138,6 +237,55 @@ h6, .h6 {
 .sidebar .fade-out:after {
 	background: -webkit-linear-gradient(right,#eee 30%,rgba(255,255,255,0) 100%);
     background: linear-gradient(-90deg,#eee 30%,rgba(255,255,255,0) 100%);
+}
+
+/**********************************************
+				SPINNER
+************************************************/
+.spinner {
+  width: 40px;
+  height: 40px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-left: -20px;
+  margin-top: -20px;
+}
+
+.double-bounce1, .double-bounce2 {
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  background-color: #089DE3;
+  opacity: 0.6;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
+  animation: sk-bounce 2.0s infinite ease-in-out;
+}
+
+.double-bounce2 {
+  -webkit-animation-delay: -1.0s;
+  animation-delay: -1.0s;
+}
+
+@-webkit-keyframes sk-bounce {
+  0%, 100% { -webkit-transform: scale(0.0) }
+  50% { -webkit-transform: scale(1.0) }
+}
+
+@keyframes sk-bounce {
+  0%, 100% {
+    transform: scale(0.0);
+    -webkit-transform: scale(0.0);
+  } 50% {
+    transform: scale(1.0);
+    -webkit-transform: scale(1.0);
+  }
 }
 
 /**********************************************
@@ -4560,98 +4708,6 @@ td.datePickerMonth, td.datePickerYear {
 /**********************************************
 				COOKIES MESSAGE
 ************************************************/
-.cc_banner-wrapper {
-	z-index: 9001;
-	position: relative;
-}
-
-.cc_container .cc_message {
-	font-size: 0.6em;
-	transition: font-size 200ms;
-	margin: 0;
-	padding: 0;
-	line-height: 1.5em;
-}
-
-.cc_container .cc_logo {
-	display: none;
-}
-
-@media screen and (min-width: 500px) {
-	.cc_container .cc_message {
-		font-size: 0.8em;
-	}
-}
-
-@media screen and (min-width: 768px) {
-	.cc_container .cc_message {
-		font-size: 1em;
-		line-height: 1em;
-	}
-}
-
-@media screen and (min-width: 992px) {
-	.cc_container .cc_message {
-		font-size: 0.9em;
-	}
-}
-
-@media print {
-	.cc_banner-wrapper, 
-	.cc_container {
-		display: none;
-	}
-}
-
-.cc_banner-wrapper {
-	height: 66px;
-}
-
-.cc_container {
-	padding: 15px 15px 15px;
-	overflow: hidden;
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-}
-
-.cc_container .cc_btn {
-	margin-left: 10px;
-	float: right;
-}
-
-.cc_container .cc_message {
-	display: block;
-}
-
-@media screen and (min-width: 500px) {
-	.cc_container .cc_message {
-		margin-top: 0.5em;
-	}
-}
-
-@media screen and (min-width: 768px) {
-	.cc_container {
-		padding: 15px 30px 15px;
-	}
-}
-
-.cc_container {
-	background: #222;
-	color: #fff;
-	font-size: 17px;
-	font-family: "Helvetica Neue Light", "HelveticaNeue-Light",
-		"Helvetica Neue", Calibri, Helvetica, Arial;
-	box-sizing: border-box;
-}
-
-.cc_container ::-moz-selection {
-	background: #ff5e99;
-	color: #fff;
-	text-shadow: none;
-}
-
 @-webkit-keyframes slideDown {
 	0% { margin-top:-66px } 
 	100% { margin-top:0 }
@@ -4670,7 +4726,34 @@ td.datePickerMonth, td.datePickerYear {
 	100% { height:66px }
 }
 
+.cc_banner-wrapper {
+	z-index: 9001;
+	position: relative;
+	height: 66px;
+	
+	-webkit-animation-duration: 0.8s;
+	-moz-animation-duration: 0.8s;
+	-o-animation-duration: 0.8s;
+	animation-duration: 0.8s;
+	-webkit-animation-name: growDown;
+	animation-name: growDown;
+}
+
 .cc_container {
+	padding: 15px 15px 15px;
+	overflow: hidden;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	
+	background: #222;
+	color: #fff;
+	font-size: 17px;
+	font-family: "Helvetica Neue Light", "HelveticaNeue-Light",
+		"Helvetica Neue", Calibri, Helvetica, Arial;
+	box-sizing: border-box;
+	
 	-webkit-animation-duration: 0.8s;
 	-moz-animation-duration: 0.8s;
 	-o-animation-duration: 0.8s;
@@ -4679,11 +4762,61 @@ td.datePickerMonth, td.datePickerYear {
 	animation-name: slideDown;
 }
 
-.cc_banner-wrapper {
-	-webkit-animation-duration: 0.8s;
-	-moz-animation-duration: 0.8s;
-	-o-animation-duration: 0.8s;
-	animation-duration: 0.8s;
-	-webkit-animation-name: growDown;
-	animation-name: growDown;
+.cc_container ::-moz-selection {
+	background: #ff5e99;
+	color: #fff;
+	text-shadow: none;
+}
+
+.cc_container .cc_btn {
+	margin-left: 10px;
+	float: right;
+}
+
+.cc_container .cc_message {
+	font-size: 0.6em;
+	transition: font-size 200ms;
+	margin: 0;
+	padding: 0;
+	line-height: 1.5em;
+	
+	display: block;
+}
+
+.cc_container .cc_logo {
+	display: none;
+}
+
+@media screen and (min-width: 500px) {
+	.cc_container .cc_message {
+		font-size: 0.8em;
+	}
+	
+	.cc_container .cc_message {
+		margin-top: 0.5em;
+	}
+}
+
+@media screen and (min-width: 768px) {
+	.cc_container .cc_message {
+		font-size: 1em;
+		line-height: 1em;
+	}
+	
+	.cc_container {
+		padding: 15px 30px 15px;
+	}
+}
+
+@media screen and (min-width: 992px) {
+	.cc_container .cc_message {
+		font-size: 0.9em;
+	}
+}
+
+@media print {
+	.cc_banner-wrapper, 
+	.cc_container {
+		display: none;
+	}
 }

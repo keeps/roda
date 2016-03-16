@@ -13,159 +13,6 @@
 <meta name="msapplication-TileColor" content="#FFFFFF">
 <meta name="msapplication-TileImage" content="/api/v1/theme?resourceId=favicon.png">
 
-<style>
-body {
-	background-color: white;
-}
-
-.spinner {
-  width: 40px;
-  height: 40px;
-
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  margin-left: -20px;
-  margin-top: -20px;
-}
-
-.double-bounce1, .double-bounce2 {
-  width: 100%;
-  height: 100%;
-  border: 1px solid transparent;
-  border-radius: 50%;
-  background-color: #089DE3;
-  opacity: 0.6;
-  position: absolute;
-  top: 0;
-  left: 0;
-
-  -webkit-animation: sk-bounce 2.0s infinite ease-in-out;
-  animation: sk-bounce 2.0s infinite ease-in-out;
-}
-
-.double-bounce2 {
-  -webkit-animation-delay: -1.0s;
-  animation-delay: -1.0s;
-}
-
-@-webkit-keyframes sk-bounce {
-  0%, 100% { -webkit-transform: scale(0.0) }
-  50% { -webkit-transform: scale(1.0) }
-}
-
-@keyframes sk-bounce {
-  0%, 100% {
-    transform: scale(0.0);
-    -webkit-transform: scale(0.0);
-  } 50% {
-    transform: scale(1.0);
-    -webkit-transform: scale(1.0);
-  }
-}
-
-/********** FONTS *******************/
-@font-face {
-  font-family: "Ubuntu";
-  font-style: normal;
-  font-weight: 300;
-  src: local('Ubuntu Light'), local('Ubuntu-Light'), url(fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: italic;
-  font-weight: 300;
-  src: local('Ubuntu Light Italic'), local('Ubuntu-LightItalic'), url(fonts/Ubuntu/Ubuntu-LightItalic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: normal;
-  font-weight: 400;
-  src: local('Ubuntu'), url(fonts/Ubuntu/Ubuntu-Regular.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: italic;
-  font-weight: 400;
-  src: local('Ubuntu Italic'), local('Ubuntu-Italic'), url(fonts/Ubuntu/Ubuntu-Italic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: normal;
-  font-weight: 500;
-  src: local('Ubuntu Medium'), local('Ubuntu-Medium'), url(fonts/Ubuntu/Ubuntu-Medium.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: italic;
-  font-weight: 500;
-  src: local('Ubuntu Medium Italic'), local('Ubuntu-MediumItalic'), url(fonts/Ubuntu/Ubuntu-MediumItalic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: normal;
-  font-weight: 700;
-  src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(fonts/Ubuntu/Ubuntu-Bold.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "Ubuntu";
-  font-style: italic;
-  font-weight: 700;
-  src: local('Ubuntu Bold Italic'), local('Ubuntu-BoldItalic'), url(fonts/Ubuntu/Ubuntu-BoldItalic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "UbuntuCondensed";
-  font-style: normal;
-  font-weight: 400;
-  src: local('UbuntuCondensed'), url(fonts/Ubuntu_Condensed/UbuntuCondensed-Regular.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "UbuntuMono";
-  font-style: normal;
-  font-weight: 400;
-  src: local('UbuntuMono'), url(fonts/Ubuntu_Mono/UbuntuMono-Regular.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "UbuntuMono";
-  font-style: italic;
-  font-weight: 400;
-  src: local('UbuntuMono Italic'), local('UbuntuMono-Italic'), url(fonts/Ubuntu_Mono/UbuntuMono-Italic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "UbuntuMono";
-  font-style: normal;
-  font-weight: 700;
-  src: local('UbuntuMono Bold'), local('UbuntuMono-Bold'), url(fonts/Ubuntu_Mono/UbuntuMono-Bold.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "UbuntuMono";
-  font-style: italic;
-  font-weight: 700;
-  src: local('UbuntuMono Bold Italic'), local('UbuntuMono-BoldItalic'), url(fonts/Ubuntu_Mono/UbuntuMono-BoldItalic.ttf) format("truetype");
-}
-
-@font-face {
-  font-family: "RODALogo";
-  font-style: normal;
-  font-weight: 300;
-  src: url(fonts/RODA_logo/RODA_logo.ttf) format("truetype");
-}
-
-/************************************/
-</style>
-
 <!-- FlexGrid and its compatibility to support IE8+ -->
 <link href='flexgrid/flexgrid.css' rel='stylesheet' type='text/css'>
 <script type="text/javascript" src="js/jquery-1.11.3.min.js"></script>
@@ -180,8 +27,9 @@ body {
 <!-- If you add any GWT meta tags, they must   -->
 <!-- be added before this line.                -->
 <!--                                           -->
-<script language='javascript'
+<script type='text/javascript'
 	src='org.roda.wui.RodaWUI/org.roda.wui.RodaWUI.nocache.js'></script>
+	
 <!-- Specifying default locale as Portuguese from Portugal -->
 <!-- <meta name="gwt:property" content="locale=pt_PT" /> -->
 <meta name="gwt:property" content="locale=en" />
@@ -194,8 +42,7 @@ body {
 
 <script src='https://www.google.com/recaptcha/api.js?hl=en'></script>
 
-<script type="text/javascript" src="cookies/cookieconsent.js"></script>
-
+<script src="/api/v1/theme?resourceId=cookies/cookieconsent.js"></script>
 <script src="/api/v1/theme?resourceId=theme.js"></script>
 
 </head>
