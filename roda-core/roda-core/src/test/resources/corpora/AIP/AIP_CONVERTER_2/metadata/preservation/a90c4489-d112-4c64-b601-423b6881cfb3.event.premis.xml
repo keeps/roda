@@ -6,7 +6,9 @@
   </eventIdentifier>
   <eventType>virus check</eventType>
   <eventDateTime>2016-02-19T16:22:04.66Z</eventDateTime>
+  <eventDetailInformation>
   <eventDetail>All the files from the SIP were verified against an antivirus.</eventDetail>
+  </eventDetailInformation>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
     <eventOutcomeDetail>

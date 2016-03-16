@@ -6,7 +6,9 @@
   </eventIdentifier>
   <eventType>normalization</eventType>
   <eventDateTime>2013-09-17T10:56:02.74Z</eventDateTime>
+  <eventDetailInformation>
   <eventDetail>The representation roda:399 derived from representation roda:396</eventDetail>
+  </eventDetailInformation>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
     <eventOutcomeDetail>

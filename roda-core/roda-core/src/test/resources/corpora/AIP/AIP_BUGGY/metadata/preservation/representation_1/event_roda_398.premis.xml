@@ -6,7 +6,9 @@
   </eventIdentifier>
   <eventType>ingestion</eventType>
   <eventDateTime>2013-09-17T10:53:58.29Z</eventDateTime>
+  <eventDetailInformation>
   <eventDetail>The objects inside the SIP were added to the preservation repository</eventDetail>
+  </eventDetailInformation>
   <eventOutcomeInformation>
     <eventOutcome>success</eventOutcome>
     <eventOutcomeDetail>
