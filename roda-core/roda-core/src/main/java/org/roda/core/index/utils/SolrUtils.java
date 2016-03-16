@@ -88,6 +88,7 @@ import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.AIPPermissions.PermissionType;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -523,9 +524,15 @@ public class SolrUtils {
   private static void appendExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
     boolean prefixWithANDOperatorIfBuilderNotEmpty) {
     appendANDOperator(ret, prefixWithANDOperatorIfBuilderNotEmpty);
-
-    ret.append("(").append(key).append(": ").append(appendDoubleQuotes ? "\"" : "")
-      .append(value.replaceAll("(\")", "\\\\$1")).append(appendDoubleQuotes ? "\"" : "").append(")");
+    ret.append("(").append(key).append(": ");
+    if (appendDoubleQuotes) {
+      ret.append("\"");
+    }
+    ret.append(value.replaceAll("(\")", "\\\\$1"));
+    if (appendDoubleQuotes) {
+      ret.append("\"");
+    }
+    ret.append(")");
   }
 
   private static void appendBasicSearch(StringBuilder ret, String key, String value, String operator,
@@ -812,6 +819,47 @@ public class SolrUtils {
     }
 
     return ret;
+  }
+
+  public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
+    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
+      throws GenericException, RequestNotValidException {
+    IndexResult<T> ret;
+    SolrQuery query = new SolrQuery();
+    String queryString = parseFilter(filter);
+    query.setQuery(queryString);
+    query.setSorts(parseSorter(sorter));
+    query.setStart(sublist.getFirstElementIndex());
+    query.setRows(sublist.getMaximumElementCount());
+    parseAndConfigureFacets(facets, query);
+    query.setFilterQueries(getFilterQueries(user, showInactive));
+
+    try {
+      QueryResponse response = index.query(getIndexName(classToRetrieve), query);
+      ret = queryResponseToIndexResult(response, classToRetrieve, facets);
+    } catch (SolrServerException | IOException e) {
+      throw new GenericException("Could not query index", e);
+    }
+
+    return ret;
+  }
+
+  private static String[] getFilterQueries(RodaUser user, boolean showInactive) {
+    List<String> ret = new ArrayList<>();
+
+    if (user != null) {
+      StringBuilder filterQuery = new StringBuilder();
+      appendExactMatch(filterQuery, PermissionType.READ.toString(), Boolean.TRUE.toString(), true, false);
+      ret.add(filterQuery.toString());
+    }
+
+    if (!showInactive) {
+      StringBuilder filterQuery = new StringBuilder();
+      appendExactMatch(filterQuery, RodaConstants.AIP_ACTIVE, Boolean.TRUE.toString(), true, false);
+      ret.add(filterQuery.toString());
+    }
+
+    return ret.toArray(new String[] {});
   }
 
   public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)

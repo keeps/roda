@@ -39,6 +39,7 @@ sudo apt-get install clamav clamav-daemon -y
 sudo yum install clamav-server clamav-data clamav-update clamav-filesystem \
 clamav clamav-scanner-systemd clamav-devel clamav-lib clamav-server-systemd
 ```
+Check these instructions: http://linux-audit.com/install-clamav-on-centos-7-using-freshclam/
 
 Note: The user `clamav` must have permissions to access the storage. For some folders you might need to add permissions in apparmor file  at `/etc/apparmor.d/local/usr.sbin.clamd`, see [instructions for Ubuntu](https://help.ubuntu.com/community/AppArmor#Profile_customization).
 
@@ -52,8 +53,14 @@ sudo apt-get install siegfried -y
 ```
 * CentOS 7
 ```bash
-TBD
+sudo yum install golang git
+go get github.com/richardlehane/siegfried/cmd/sf
+echo "export GOPATH=\$HOME/gocode" >> ~/.bash_profile
+echo "export PATH=\$PATH:\$GOPATH/bin" >> ~/.bash_profile
+source ~/.bash_profile
+sf -update
 ```
+
 
 ### Format migration tools (optional)
 The following dependencies are only needed if support for file formation migration for the following format families are required.
