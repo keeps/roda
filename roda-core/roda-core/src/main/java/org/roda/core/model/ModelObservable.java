@@ -200,4 +200,10 @@ public abstract class ModelObservable {
       observer.jobReportDeleted(jobReportId);
     }
   }
+  
+  protected void notifyAipPermissionsUpdated(AIP aip){
+    for (ModelObserver observer : observers) {
+      observer.aipPermissionsUpdated(aip);
+    }
+  }
 }

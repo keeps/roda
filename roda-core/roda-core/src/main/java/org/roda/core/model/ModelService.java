@@ -1428,7 +1428,7 @@ public class ModelService extends ModelObservable {
   
   public void updateAIPPermissions(AIP aip) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     updateAIPMetadata(aip);
-    
+    notifyAipPermissionsUpdated(aip);
   }
 
 }

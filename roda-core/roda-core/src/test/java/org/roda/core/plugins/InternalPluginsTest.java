@@ -490,11 +490,11 @@ public class InternalPluginsTest {
 
     // Files with Apache Tika output
     Assert.assertEquals(CORPORA_FILES_COUNT,
-      Iterables.size(model.listOtherMetadata(aip.getId(), TikaFullTextPlugin.OTHER_METADATA_TYPE, true)));
+      Iterables.size(model.listOtherMetadata(aip.getId(), TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
       Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX,
-      TikaFullTextPlugin.OTHER_METADATA_TYPE);
+      TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT);
 
     Assert.assertNotNull(om);
 

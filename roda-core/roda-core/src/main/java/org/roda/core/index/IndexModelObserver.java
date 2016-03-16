@@ -219,7 +219,7 @@ public class IndexModelObserver implements ModelObserver {
     InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE);
+        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT);
       inputStream = fulltextBinary.getContent().createInputStream();
       fulltext = IOUtils.toString(inputStream);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
@@ -422,11 +422,14 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    try {
-      indexOtherMetadata(model.retrieveAIP(otherMetadataBinary.getAipId()), true);
+    /*try {
+      if(otherMetadataBinary.getType().equalsIgnoreCase(TikaFullTextPlugin.OTHER_METADATA_TYPE_METADATA)){       //index tika properties...
+        
+      }
+      
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
-    }
+    }*/
   }
 
   @Override
@@ -504,6 +507,11 @@ public class IndexModelObserver implements ModelObserver {
       }
     }
 
+  }
+
+  @Override
+  public void aipPermissionsUpdated(AIP aip) {
+    indexAIP(aip);
   }
 
 }

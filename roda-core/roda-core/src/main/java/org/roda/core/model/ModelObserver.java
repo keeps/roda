@@ -77,4 +77,6 @@ public interface ModelObserver {
 
   public void jobReportDeleted(String jobReportId);
 
+  public void aipPermissionsUpdated(AIP aip);
+
 }
