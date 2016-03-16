@@ -207,31 +207,12 @@
 		<servlet-class>
 			org.roda.wui.management.statistics.server.Munin</servlet-class>
 	</servlet>
-	<servlet>
-		<description>
-		</description>
-		<display-name>GwtCacheServer</display-name>
-		<servlet-name>GwtCacheServer</servlet-name>
-		<servlet-class>org.roda.wui.common.server.GwtCacheServer</servlet-class>
-	</servlet>
 
 	<servlet-mapping>
 		<servlet-name>Munin</servlet-name>
 		<url-pattern>/org.roda.wui.RodaWUI/Munin/*</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>GwtCacheServer</servlet-name>
-		<url-pattern>*.png</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>GwtCacheServer</servlet-name>
-		<url-pattern>*.html</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>GwtCacheServer</servlet-name>
-		<url-pattern>/clear.cache.gif</url-pattern>
-	</servlet-mapping>
-
+	
 	<!-- Welcome file -->
 
 	<welcome-file-list>
