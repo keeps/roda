@@ -108,7 +108,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
       if (createsPluginEvent) {
         try {
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, reportItem.getPluginState(), "", notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

@@ -175,3 +175,9 @@ objectClass: top
 objectClass: organizationalRole
 cn: ingest.submit
 roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org
+
+dn: cn=create.top.level.aip,ou=roles,dc=roda,dc=org
+objectClass: top
+objectClass: organizationalRole
+cn: create.top.level.aip
+roleOccupant: cn=administrators,ou=groups,dc=roda,dc=org

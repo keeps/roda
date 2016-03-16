@@ -1425,4 +1425,10 @@ public class ModelService extends ModelObservable {
     notifyJobReportCreatedOrUpdated(jobReport);
   }
 
+  
+  public void updateAIPPermissions(AIP aip) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    updateAIPMetadata(aip);
+    
+  }
+
 }

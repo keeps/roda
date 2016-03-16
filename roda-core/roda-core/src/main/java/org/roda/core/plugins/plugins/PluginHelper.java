@@ -205,7 +205,7 @@ public final class PluginHelper {
    * For SIP > AIP
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    ModelService model, TransferredResource source, PluginState outcome, String outcomeDetailExtension, boolean notify)
+    ModelService model, IndexService index, TransferredResource source, PluginState outcome, String outcomeDetailExtension, boolean notify)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
@@ -213,7 +213,7 @@ public final class PluginHelper {
     List<LinkingIdentifier> outcomes = Arrays
       .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
 
-    return createPluginEvent(plugin, aipID, null, null, null, model, sources, outcomes, outcome, outcomeDetailExtension,
+    return createPluginEvent(plugin, aipID, null, null, null, model,index, sources, outcomes, outcome, outcomeDetailExtension,
       notify, new Date());
   }
 
@@ -221,13 +221,13 @@ public final class PluginHelper {
    * For AIP as source only
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    ModelService model, PluginState outcome, String outcomeDetailExtension, boolean notify)
+    ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
       .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     List<LinkingIdentifier> outcomes = null;
-    return createPluginEvent(plugin, aipID, null, null, null, model, sources, outcomes, outcome, outcomeDetailExtension,
+    return createPluginEvent(plugin, aipID, null, null, null, model,index, sources, outcomes, outcome, outcomeDetailExtension,
       notify, new Date());
   }
 
@@ -235,10 +235,10 @@ public final class PluginHelper {
    * For AIP
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    ModelService model, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcome,
+    ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
       AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, null, null, null, model, sources, targets, outcome, outcomeDetailExtension,
+    return createPluginEvent(plugin, aipID, null, null, null, model,index, sources, targets, outcome, outcomeDetailExtension,
       notify, new Date());
   }
 
@@ -246,10 +246,10 @@ public final class PluginHelper {
    * For REPRESENTATION
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, ModelService model, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
+    String representationID, ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
     PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
       NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, representationID, null, null, model, sources, targets, outcome,
+    return createPluginEvent(plugin, aipID, representationID, null, null, model,index, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
@@ -257,16 +257,16 @@ public final class PluginHelper {
    * For FILE
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
+    String representationID, List<String> filePath, String fileID, ModelService model, IndexService index, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> outcomes, PluginState outcome, String outcomeDetailExtension, boolean notify)
       throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
-    return createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, sources, outcomes, outcome,
+    return createPluginEvent(plugin, aipID, representationID, filePath, fileID, model,index, sources, outcomes, outcome,
       outcomeDetailExtension, notify, new Date());
   }
 
   private static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
-    String representationID, List<String> filePath, String fileID, ModelService model, List<LinkingIdentifier> sources,
+    String representationID, List<String> filePath, String fileID, ModelService model, IndexService index, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> outcomes, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date startDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
       ValidationException, AlreadyExistsException {
@@ -280,13 +280,23 @@ public final class PluginHelper {
     } catch (RODAException e) {
       LOGGER.error("Error creating PREMIS agent", e);
     }
+    
+    IndexedPreservationAgent userAgent = null;
+    try {
+      boolean notifyAgent = true;
+      userAgent = PremisV3Utils.createPremisUserAgentBinary(plugin, model, index, notifyAgent);
+    } catch (AlreadyExistsException e) {
+      userAgent = PremisV3Utils.getPreservationUserAgent(plugin, model,index);
+    } catch (RODAException e) {
+      LOGGER.error("Error creating PREMIS agent", e);
+    }
 
     String id = UUID.randomUUID().toString();
     String outcomeDetailNote = (outcome == PluginState.SUCCESS) ? plugin.getPreservationEventSuccessMessage()
       : plugin.getPreservationEventFailureMessage();
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
-      outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent));
+      outcome.name(), outcomeDetailNote, outcomeDetailExtension, Arrays.asList(agent,userAgent));
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
       premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();

@@ -121,8 +121,8 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, transferredResource, reportItem.getPluginState(), "",
-          notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, transferredResource,
+          reportItem.getPluginState(), "", notify);
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());

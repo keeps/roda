@@ -186,7 +186,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
-    createIngestStartedEvent(model, aips);
+    createIngestStartedEvent(model, index, aips);
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
@@ -257,7 +257,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       reports = mergeReports(reports, pluginReport);
     }
 
-    createIngestEndedEvent(model, aips, reports, aipIdToObjectId);
+    createIngestEndedEvent(model, index, aips, reports, aipIdToObjectId);
 
     return report;
   }
@@ -284,7 +284,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return effectiveTotalSteps;
   }
 
-  private void createIngestStartedEvent(ModelService model, List<AIP> aips) {
+  private void createIngestStartedEvent(ModelService model, IndexService index, List<AIP> aips) {
     setPreservationEventType(START_TYPE);
     setPreservationSuccessMessage(START_SUCCESS);
     setPreservationFailureMessage(START_FAILURE);
@@ -292,7 +292,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     for (AIP aip : aips) {
       try {
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
@@ -300,8 +300,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     }
   }
 
-  private void createIngestEndedEvent(ModelService model, List<AIP> aips, Map<String, Report> reports,
-    Map<String, String> aipIdToObjectId) {
+  private void createIngestEndedEvent(ModelService model, IndexService index, List<AIP> aips,
+    Map<String, Report> reports, Map<String, String> aipIdToObjectId) {
     setPreservationEventType(END_TYPE);
     setPreservationSuccessMessage(END_SUCCESS);
     setPreservationFailureMessage(END_FAILURE);
@@ -311,7 +311,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
         boolean notify = true;
 
         // FIXME create event based on report (outcome & outcomeDetails)
-        PluginHelper.createPluginEvent(this, aip.getId(), model, PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest end event: " + e.getMessage(), e);
@@ -358,8 +358,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
           report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
-        } else if (StringUtils.isNotBlank(reportItem.getItemId())
-          && aipIdToObjectId.get(reportItem.getItemId()) != null) {
+        } else
+          if (StringUtils.isNotBlank(reportItem.getItemId()) && aipIdToObjectId.get(reportItem.getItemId()) != null) {
           reports.get(aipIdToObjectId.get(reportItem.getItemId())).addReport(reportItem);
         }
       }

@@ -82,7 +82,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail);
       }
 
-      createEvent(outcomeDetail, reportItem.getPluginState(), aip, model);
+      createEvent(outcomeDetail, reportItem.getPluginState(), aip, model, index);
       report.addReport(reportItem);
 
       PluginHelper.updateJobReport(this, model, index, reportItem);
@@ -91,12 +91,12 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model)
+  private void createEvent(String outcomeDetail, PluginState state, AIP aip, ModelService model, IndexService index)
     throws PluginException {
 
     try {
       boolean notify = true;
-      PluginHelper.createPluginEvent(this, aip.getId(), model, state, outcomeDetail, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetail, notify);
     } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

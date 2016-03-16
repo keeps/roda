@@ -113,8 +113,8 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         try {
           List<LinkingIdentifier> outcomes = null;
           boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, sources, outcomes, reportItem.getPluginState(), "",
-            notify);
+          PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
+            reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
           LOGGER.error("Error creating event: " + e.getMessage(), e);

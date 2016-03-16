@@ -83,8 +83,8 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
         }
 
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, transferredResource, PluginState.SUCCESS, "",
-          notify);
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, index, transferredResource, PluginState.SUCCESS,
+          "", notify);
         LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aipCreated.getId());
       } catch (Throwable e) {
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());

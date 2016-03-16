@@ -212,8 +212,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))) {
 
               fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
@@ -223,8 +223,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
 
-                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
-                  fileFormat, fileMimetype);
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
+                  fileMimetype);
                 verifiedFiles.put(file.getId(), verification);
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome)
@@ -265,13 +265,12 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     reportItem.setPluginState(PluginState.SUCCESS);
 
                 } else {
-                  LOGGER.debug("Process failed on file " + file.getId() + " of representation "
-                    + representation.getId() + " from AIP " + aipId);
+                  LOGGER.debug("Process failed on file " + file.getId() + " of representation " + representation.getId()
+                    + " from AIP " + aipId);
                   pluginResultState = 0;
 
-                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-                    "Convert process failed on file " + file.getId() + " of representation " + representation.getId()
-                      + " from AIP " + aipId);
+                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Convert process failed on file "
+                    + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
                 }
               }
             } else {
@@ -299,7 +298,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
         LOGGER.debug("Creating digital signature plugin event for the representation " + representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
-          newRepresentationID, model, pluginResultState, notifyEvent);
+          newRepresentationID, model, index, pluginResultState, notifyEvent);
 
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
@@ -320,8 +319,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   private void createEvent(List<File> alteredFiles, List<File> extractedFiles, List<File> newFiles,
-    Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, int pluginResultState,
-    boolean notify) throws PluginException {
+    Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, IndexService index,
+    int pluginResultState, boolean notify) throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
@@ -371,7 +370,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
     // FIXME revise PREMIS generation
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), model, premisSourceFilesIdentifiers,
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, premisSourceFilesIdentifiers,
         premisTargetFilesIdentifiers, state, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
@@ -404,14 +403,14 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
           ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
-            mainPayload, true);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')), ".txt",
+            DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
 
           if (extractResult.get(1) != null) {
-            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
-              contentsPayload, true);
+            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+              file.getId().substring(0, file.getId().lastIndexOf('.')), ".pkcs7",
+              DigitalSignaturePlugin.OTHER_METADATA_TYPE, contentsPayload, true);
           }
         }
       } else if (generalFileFormat.equals("ooxml")) {
@@ -420,8 +419,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
         for (Path p : extractResult) {
           ContentPayload mainPayload = new FSPathContentPayload(p);
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
             DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
         }
       } else if (generalFileFormat.equals("odf")) {
@@ -429,9 +428,9 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
         if (extractResult.size() > 0) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePlugin.OTHER_METADATA_TYPE,
-            mainPayload, true);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
+            DigitalSignaturePlugin.OTHER_METADATA_TYPE, mainPayload, true);
         }
       }
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException

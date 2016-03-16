@@ -19,7 +19,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -129,7 +128,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
       // will never happen
       try {
         boolean notify = true;
-        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, notify);
+        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
         report.addReport(reportItem);
 
         PluginHelper.updateJobReport(this, model, index, reportItem);
@@ -143,7 +142,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   }
 
   private void createEvent(VirusCheckResult virusCheckResult, Exception exception, PluginState state, AIP aip,
-    ModelService model, boolean notify) throws PluginException {
+    ModelService model, IndexService index, boolean notify) throws PluginException {
 
     try {
       StringBuilder outcomeDetailExtension = new StringBuilder(virusCheckResult.getReport());
@@ -152,7 +151,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
           .append(exception.getMessage());
       }
 
-      PluginHelper.createPluginEvent(this, aip.getId(), model, state, outcomeDetailExtension.toString(), notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, outcomeDetailExtension.toString(), notify);
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {

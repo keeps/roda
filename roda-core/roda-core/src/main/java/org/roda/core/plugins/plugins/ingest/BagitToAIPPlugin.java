@@ -88,7 +88,7 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
         }
 
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, transferredResource,
+        PluginHelper.createPluginEvent(this, aipCreated.getId(), model, index, transferredResource,
           reportItem.getPluginState(), "", notify);
 
         LOGGER.debug("Done with converting {} to AIP {}", bagitPath, aipCreated.getId());

@@ -117,7 +117,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
         }
 
         boolean notify = true;
-        createEvent(aip, model, reportItem.getPluginState(), notify);
+        createEvent(aip, model, index, reportItem.getPluginState(), notify);
         pluginReport.addReport(reportItem);
       } catch (RODAException mse) {
         LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage(), mse);
@@ -132,9 +132,10 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     return pluginReport;
   }
 
-  private void createEvent(AIP aip, ModelService model, PluginState state, boolean notify) throws PluginException {
+  private void createEvent(AIP aip, ModelService model, IndexService index, PluginState state, boolean notify)
+    throws PluginException {
     try {
-      PluginHelper.createPluginEvent(this, aip.getId(), model, state, "", notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, "", notify);
     } catch (RODAException e) {
       throw new PluginException(e.getMessage(), e);
     }

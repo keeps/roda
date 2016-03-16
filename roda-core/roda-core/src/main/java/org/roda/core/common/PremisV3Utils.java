@@ -54,10 +54,14 @@ import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -806,5 +810,29 @@ public class PremisV3Utils {
       }
     }
     return dst;
+  }
+
+  public static IndexedPreservationAgent createPremisUserAgentBinary(Plugin<?> plugin, ModelService model,
+    IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    Job job = PluginHelper.getJobFromIndex(plugin, index);
+    RODAMember member = index.retrieve(RODAMember.class, job.getUsername());
+    String id = job.getUsername();
+    ContentPayload agentPayload;
+
+    // TODO set agent extension
+    agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON, "",
+      "", "");
+    model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
+    IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
+    return agent;
+  }
+
+  public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?> plugin, ModelService model, IndexService index) throws NotFoundException, GenericException {
+    Job job = PluginHelper.getJobFromIndex(plugin, index);
+    String id = job.getUsername();
+    IndexedPreservationAgent agent = new IndexedPreservationAgent();
+    agent.setId(id);
+    agent.setName(plugin.getName());
+    return agent;
   }
 }
