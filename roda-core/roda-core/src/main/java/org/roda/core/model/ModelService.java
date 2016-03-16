@@ -39,7 +39,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -312,18 +312,19 @@ public class ModelService extends ModelObservable {
   public AIP createAIP(String parentId) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
     boolean active = true;
-    AIPPermissions permissions = new AIPPermissions();
+    // TODO set default permissions
+    Permissions permissions = new Permissions();
     boolean notify = true;
     return createAIP(active, parentId, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, AIPPermissions permissions) throws RequestNotValidException,
+  public AIP createAIP(boolean active, String parentId, Permissions permissions) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     boolean notify = true;
     return createAIP(active, parentId, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, AIPPermissions permissions, boolean notify)
+  public AIP createAIP(boolean active, String parentId, Permissions permissions, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 

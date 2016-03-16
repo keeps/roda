@@ -28,7 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.AIPPermissions.PermissionType;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;

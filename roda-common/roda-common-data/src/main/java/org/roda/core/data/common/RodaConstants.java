@@ -188,10 +188,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
   public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
-  // FIXME not in use. are the following to remove?
-  // public static final String STORAGE_CONTAINER_NOTIFICATIONS =
-  // "Notifications";
-  // public static final String STORAGE_CONTAINER_USERLOG = "User log";
+
 
   /*
    * STORAGE DIRECTORIES
@@ -204,44 +201,16 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";
-  // FIXME not in use. are the following to remove?
-  // public static final String STORAGE_DIRECTORY_REPRESENTATION_PREFIX =
-  // "representation_";
 
   /*
    * STORAGE METADATA
    */
   public static final String STORAGE_META_PARENT_ID = "parentId";
   public static final String STORAGE_META_TYPE = "type";
-  // public static final String STORAGE_META_ACTIVE = "active";
-  // public static final String STORAGE_META_SIZE_IN_BYTES = "sizeInBytes";
-  // public static final String STORAGE_META_ENTRYPOINT = "entryPoint";
-  // public static final String STORAGE_META_FORMAT_MIME = "format.mimetype";
-  // public static final String STORAGE_META_FORMAT_VERSION = "format.version";
-  // public static final String STORAGE_META_DATE_CREATED = "date.created";
-  // public static final String STORAGE_META_DATE_MODIFIED = "date.modified";
-  // public static final String STORAGE_META_AIP_ID = "aip.id";
-  // public static final String STORAGE_META_REPRESENTATION_ID =
-  // "representation.id";
-  // public static final String STORAGE_META_REPRESENTATION_STATUSES =
-  // "representation.statuses";
-  // public static final String STORAGE_META_DIGEST_SHA1 = "digest.sha1";
-  // public static final String STORAGE_META_PERMISSION_GRANT_USERS =
-  // "permission.grant.users";
-  // public static final String STORAGE_META_PERMISSION_GRANT_GROUPS =
-  // "permission.grant.groups";
-  // public static final String STORAGE_META_PERMISSION_READ_USERS =
-  // "permission.read.users";
-  // public static final String STORAGE_META_PERMISSION_READ_GROUPS =
-  // "permission.read.groups";
-  // XXX the following two constants formerly were known as producers
-  // permissions
-  public static final String STORAGE_META_PERMISSION_INSERT_USERS = "permission.insert.users";
-  public static final String STORAGE_META_PERMISSION_INSERT_GROUPS = "permission.insert.groups";
-  public static final String STORAGE_META_PERMISSION_MODIFY_USERS = "permission.modify.users";
-  public static final String STORAGE_META_PERMISSION_MODIFY_GROUPS = "permission.modify.groups";
-  public static final String STORAGE_META_PERMISSION_REMOVE_USERS = "permission.remove.users";
-  public static final String STORAGE_META_PERMISSION_REMOVE_GROUPS = "permission.remove.groups";
+
+  public static final String INDEX_PERMISSION_USERS_PREFIX = "permission_users_";
+  public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
+  
 
   /*
    * AIP FIELDS
@@ -256,29 +225,7 @@ public final class RodaConstants {
   public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
   public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
 
-  // TODO remove
-  // public static final String AIP_PERMISSION_GRANT_USERS =
-  // STORAGE_META_PERMISSION_GRANT_USERS;
-  // public static final String AIP_PERMISSION_GRANT_GROUPS =
-  // STORAGE_META_PERMISSION_GRANT_GROUPS;
-  // public static final String AIP_PERMISSION_READ_USERS =
-  // STORAGE_META_PERMISSION_READ_USERS;
-  // public static final String AIP_PERMISSION_READ_GROUPS =
-  // STORAGE_META_PERMISSION_READ_GROUPS;
-  // XXX the following two constants formerly were known as producers
-  // permissions
-  // public static final String AIP_PERMISSION_INSERT_USERS =
-  // STORAGE_META_PERMISSION_INSERT_USERS;
-  // public static final String AIP_PERMISSION_INSERT_GROUPS =
-  // STORAGE_META_PERMISSION_INSERT_GROUPS;
-  // public static final String AIP_PERMISSION_MODIFY_USERS =
-  // STORAGE_META_PERMISSION_MODIFY_USERS;
-  // public static final String AIP_PERMISSION_MODIFY_GROUPS =
-  // STORAGE_META_PERMISSION_MODIFY_GROUPS;
-  // public static final String AIP_PERMISSION_REMOVE_USERS =
-  // STORAGE_META_PERMISSION_REMOVE_USERS;
-  // public static final String AIP_PERMISSION_REMOVE_GROUPS =
-  // STORAGE_META_PERMISSION_REMOVE_GROUPS;
+
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
   public static final String AIP_TITLE_SORT = "title_sort";
@@ -594,9 +541,7 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_STORAGE = "storage";
   public static final String SEARCH_FIELD_TYPE_BOOLEAN = "boolean";
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
-  
-  
-  
+
   public static final String METADATA_VERSION_SEPARATOR = "_";
   
 }

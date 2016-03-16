@@ -38,7 +38,7 @@ public class IndexedAIP implements IsIndexed {
   private String parentID = null;
   private int subElementsCount = 0;
 
-  private AIPPermissions permissions = new AIPPermissions();
+  private Permissions permissions = new Permissions();
 
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
@@ -76,7 +76,7 @@ public class IndexedAIP implements IsIndexed {
    * @param subElementsCount
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
-    String description, String parentID, int subElementsCount, AIPPermissions permissions) {
+    String description, String parentID, int subElementsCount, Permissions permissions) {
 
     setId(id);
     setState(state);
@@ -223,11 +223,11 @@ public class IndexedAIP implements IsIndexed {
     this.parentID = parentID;
   }
 
-  public AIPPermissions getPermissions() {
+  public Permissions getPermissions() {
     return permissions;
   }
 
-  public void setPermissions(AIPPermissions permissions) {
+  public void setPermissions(Permissions permissions) {
     this.permissions = permissions;
   }
 

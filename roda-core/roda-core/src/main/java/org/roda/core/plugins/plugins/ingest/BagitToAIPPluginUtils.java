@@ -21,7 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
@@ -49,7 +49,7 @@ public class BagitToAIPPluginUtils {
     ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
     boolean active = false;
-    AIPPermissions permissions = new AIPPermissions();
+    Permissions permissions = new Permissions();
 
     boolean notify = false;
 

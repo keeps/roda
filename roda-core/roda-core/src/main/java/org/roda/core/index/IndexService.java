@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
@@ -98,6 +99,12 @@ public class IndexService {
   public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
+  }
+
+  public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
+    Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
+      throws GenericException, RequestNotValidException {
+    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
   public <T extends Serializable> T retrieve(Class<T> returnClass, String id)

@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPPermissions;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -86,7 +86,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
 
         boolean active = false;
-        AIPPermissions permissions = new AIPPermissions();
+        Permissions permissions = new Permissions();
         boolean notifyCreatedAIP = false;
 
         final AIP aip = model.createAIP(active, parentId, permissions, notifyCreatedAIP);

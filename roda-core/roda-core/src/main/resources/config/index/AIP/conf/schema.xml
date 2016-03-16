@@ -112,16 +112,6 @@
    <field name="descriptiveMetadataId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="hasRepresentations" type="boolean" default="false" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="permission.grant.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.grant.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.read.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.read.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.insert.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.insert.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.modify.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.modify.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.remove.users" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="permission.remove.groups" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="level" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="title" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
@@ -139,6 +129,9 @@
        EXAMPLE:  name="*_i" will match any field ending in _i (like myid_i, z_i)
        RESTRICTION: the glob-like pattern in the name attribute must have
        a "*" only at the start or the end.  -->
+       
+   <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <dynamicField name="*_i"  type="int"    indexed="true"  stored="true"/>
    <dynamicField name="*_is" type="int"    indexed="true"  stored="true"  multiValued="true"/>

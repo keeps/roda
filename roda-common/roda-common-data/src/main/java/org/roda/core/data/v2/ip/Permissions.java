@@ -18,7 +18,7 @@ import java.util.Set;
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
  */
-public class AIPPermissions implements Serializable {
+public class Permissions implements Serializable {
   private static final long serialVersionUID = -3534275853026959624L;
 
   public enum PermissionType {
@@ -29,9 +29,9 @@ public class AIPPermissions implements Serializable {
   private Map<PermissionType, Set<String>> groups;
 
   /**
-   * Constructs an empty {@link AIPPermissions}.
+   * Constructs an empty {@link Permissions}.
    */
-  public AIPPermissions() {
+  public Permissions() {
     users = new HashMap<>();
     groups = new HashMap<>();
   }
@@ -124,7 +124,7 @@ public class AIPPermissions implements Serializable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    AIPPermissions other = (AIPPermissions) obj;
+    Permissions other = (Permissions) obj;
     if (groups == null) {
       if (other.groups != null)
         return false;

@@ -30,6 +30,7 @@ public class CorporaConstants {
   public static final String SOURCE_AIP_CONVERTER_1 = "AIP_CONVERTER_1";
   public static final String SOURCE_AIP_CONVERTER_2 = "AIP_CONVERTER_2";
   public static final String SOURCE_AIP_CONVERTER_3 = "AIP_CONVERTER_3";
+  public static final String SOURCE_AIP_PERMISSIONS = "AIP_PERMISSIONS";
   public static final String DATE_CREATED = "2015-06-06T15:30:00.000+0000";
   public static final String DATE_MODIFIED = "2015-06-06T16:30:00.000+0000";
 

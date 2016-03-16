@@ -1,0 +1,23 @@
+{
+  "parentId": null,
+  "active": false,
+  "permissions": {
+    "users": {
+      "READ": ["testuser"]
+    },
+    "groups": {
+      "READ": ["testgroup"]
+    }
+  },
+  "descriptiveMetadata": [{
+    "id": "ead-c.xml",
+    "type": "ead-c"
+  }],
+  "representations": [{
+    "id": "representation_1",
+    "original": true
+  }, {
+    "id": "representation_2",
+    "original": false
+  }]
+}

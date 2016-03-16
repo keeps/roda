@@ -1,0 +1,218 @@
+
+<ead-c xmlns="http://roda.dgarq.gov.pt/2008/EADCSchema" level="fonds">
+	<did>
+		<langmaterial>
+			<language>Thai</language>
+		</langmaterial>
+		<physdesc>
+			<dimensions>525 mç. (83.212 doc.); perg., papel</dimensions>
+			<extent unit="description_extents_types_megabyte">0,87</extent>
+		</physdesc>
+		<unitdate normal="1213/2003-06-14"></unitdate>
+		<unitid repositorycode="PT-KEEPS">CC4</unitid>
+		<unittitle>ui 1</unittitle>
+		<origination>KEEPS</origination>
+	</did>
+	<accessrestrict>
+		<p>Comunicável sem restrições legais. Existem, no entanto, restrições
+			de acesso e de horário para os documentos que se encontram na Casa
+			Forte, sem reprodução em suporte alternativo.</p>
+	</accessrestrict>
+	<acqinfo>
+		<p>Unidade arquivística transferida para &lt;DESTINATÁRIO&gt; em
+			2013-03-03, de acordo com o auto de entrega n.º &lt;Nº AUTO DE
+			ENTREGA&gt;, sob a responsabilidade de Administrator SuperUser e
+			&lt;PESSOA RESPONSÁVEL INSTITUIÇÃO DESTINATÁRIA&gt;.</p>
+	</acqinfo>
+	<appraisal>
+		<p>Unidade arquivística selecionada para conservação permanente em
+			&lt;DATA&gt;, de acordo com a classificação 2391.1 e n.º referência
+			de série 2391.1 da tabela de seleção da Portaria n.º DL 2000/13.</p>
+	</appraisal>
+	<arrangement>
+		<table>
+			<tgroup cols="2">
+				<thead>
+					<row>
+						<entry>A</entry>
+						<entry>B</entry>
+					</row>
+				</thead>
+				<tbody>
+					<row>
+						<entry>C</entry>
+						<entry>D</entry>
+					</row>
+				</tbody>
+			</tgroup>
+		</table>
+	</arrangement>
+	<bioghist>
+		<chronlist>
+			<chronitem>
+				<date normal="1990-01-01/1998-12-31"></date>
+				<event>sdaasdasdasd</event>
+			</chronitem>
+			<chronitem>
+				<date normal="1991-01-01/1993-12-31"></date>
+				<event>dfasdfasdfasdasd</event>
+			</chronitem>
+		</chronlist>
+		<p>Coleção formada sob a iniciativa do Guarda-Mor da Torre do Tombo,
+			Manuel da Maia, durante o período de 1756 a 1764, pelos documentos
+			originais - de 1161 a 1696 -, provenientes da Secretaria de Estado
+			dos Negócios do Reino e Tribunais Régios, incorporados no Arquivo
+			Real da Torre do Tombo, desde 1569 até meados do século XVIII. Do
+			critério da ordenação dos documentos - ordem cronológica - decorreu o
+			próprio nome atribuído ao conjunto assim formado e constituído por
+			três partes.</p>
+	</bioghist>
+	<custodhist>
+		<p>Inicialmente, esta coleção integrou apenas os documentos relativos
+			aos negócios do Reino, entregues, em 1569, ao Guarda-Mor da Torre do
+			Tombo, Damião de Góis, pelo Secretário de Estado e diplomata, Pêro de
+			Alcáçova Carneiro, aquando do seu cessar de funções, constituindo
+			este primeiro conjunto a grande maioria dos documentos da coleção,
+			respeitantes, grosso modo, a finais do século XV e primeira metade do
+			século XVI. Aquando desta primeira incorporação, as cartas régias de
+			26 de Julho e de 22 de Novembro de 1569, testemunhando o acto
+			referenciado, dão-nos igualmente conta do volume e importância da
+			documentação em causa, a avaliar pela explicitação das ordens
+			referentes a procedimentos, critério a seguir no exame dos papéis e
+			prontidão da sua execução.
+			Assim, e de acordo com as fontes mencionadas, foram, então, incorporadas,
+			cerca de 60 caixas cofres, ordenando-se a Damião de Góis, para
+			conveniência de serviço do Secretário de Estado sucedâneo, Miguel
+			Moura, o exame, a breve prazo, dos documentos entregues, tendo em
+			vista constituição de maços de acordo com separação por matérias e
+			grau de confidencialidade, conforme se depreende dos respectivos
+			textos das cartas régias. Em meados do século XVII, em virtude da
+			provisão de 14 de Julho de 1667, existe uma informação do Guarda-Mor,
+			João Duarte Resende da qual consta que por morte do Procurador da
+			Coroa, Tomé Pinheiro da Veiga, se mandaram recolher ao Real Arquivo
+			vários maços de papéis das suas memórias e assuntos jurídicos, que os
+			seus testamenteiros entregaram. Dada a importância das matérias neles
+			contidas, estes documentos foram agregados ao primitivo conjunto
+			documental, incorporado no século anterior. Já no reinado de D. José,
+			e por Decreto de 18 de Dezembro de 1754 , é possível inferir, de
+			acordo com João Pedro Ribeiro, que tenha ocorrido nova reunião de
+			documentos ao fundo até então criado, dado o decreto mencionado
+			ordenar a recolha de documentos dispersos - ainda que privilegiando
+			documentos eclesiásticos como Bulas e Breves -, por vários serviços,
+			entre os quais, as Secretarias de Estado. Em consequência do
+			terramoto de 1755, os documentos deste fundo sofreram alguma
+			dispersão. Após a mudança de instalações do Real Arquivo do sítio do
+			Castelo de S. Jorge para o Mosteiro de S. Bento da Saúde, Manuel da
+			Maia, à época, Guarda-Mor da Torre do Tombo, fundamentando-se no
+			princípio de que todos os documentos conservados no Real Arquivo têm
+			crédito "ratione loci", e pressionado pelas circunstâncias, optou por
+			ordenar os documentos pela cronologia dos tempos e reinados,
+			constituindo, assim, uma coleção com três partes distintas, designada
+			de Corpo Cronológico. No final do século XVIII, o guarda-mor, João
+			Pereira Ramos de Azevedo Coutinho, mandou elaborar um inventário do
+			Real Arquivo para facilitar as pesquisas, por um lado, para tomar
+			conhecimento dos seus fundos, por outro. Este inventário foi dividido
+			em seis partes distintas, abarcando todas as coleções e fundos que
+			integravam o Arquivo da Casa da Coroa, cabendo ao Corpo Cronológico a
+			parte IV do dito inventário. Com o advento do Liberalismo, e a
+			consequente transformação do Arquivo Real em Nacional, esta coleção
+			passou a fazer parte do património arquivístico do Arquivo Nacional
+			da Torre do Tombo, sendo transferida para as atuais instalações no
+			ano de 1990.
+		</p>
+	</custodhist>
+	<note>
+		<p>Nota ao campo dos Instrumentos de Descrição: Catálogo de autoria de
+			Manuel da Maia está incompleto; Catálogo manuscrito, em caderneta, é
+			insuficiente, excepto para os maços 134 a 136 da Parte II. A Parte
+			III não é abrangida; Catálogo eletrónico está sujeito a revisão. Nota
+			ao campo das Unidades Relacionadas: Identificado como parte do
+			arquivo pessoal de Alcáçova Carneiro, o códice nº 1758 da Biblioteca
+			Nacional, encadernado em pergaminho, é descrito com o título
+			atribuído de "Várias cartas sobre os Lugares de África". Trata-se de
+			uma compilação, com cerca de 620 fls, em papel, na sua maioria, de
+			minutas e cópias de cartas enviadas por D. João III, escritas pelo
+			secretário Pêro de Alcáçova Carneiro, referentes a questões de
+			engenharia militar, relacionadas, entre outras, com a construção de
+			fortalezas e aspetos de defesa das praças de África.</p>
+	</note>
+	<otherfindaid>
+		<p>Guias e roteiros: AZEVEDO, Pedro A. de; BAIÃO, António -
+			"Documentos e livros da antiga Casa da Coroa". in O Arquivo da Torre
+			do Tombo: sua história, corpos que o compõem e organização. Lisboa:
+			ANTT; Livros Horizonte, 1989. (Fac-Símile). p. 23-30. Reprodução
+			fac-similada da edição de 1905. PORTUGAL.Instituto Português de
+			Arquivos. "Corpo Cronológico". in Guia de Fontes Portuguesas para a
+			História de África. Lisboa: Comissão Nacional para as Comemorações
+			Portuguesas; Fundação Oriente; Imprensa Nacional-Casa da Moeda, 1993.
+			2º vol..ISBN 972-27-0402-8. p. 58-59. Publicado sob os auspícios da
+			Unesco e Conselho Internacional de Arquivos. PORTUGAL.Instituto dos
+			Arquivos Nacionais / Torre do Tombo. "Corpo Cronológico". in Guia de
+			Fontes Portuguesas para a História da América Latina. Elaborado por
+			Fernanda Olival; Filomena Borja de Melo; Isabel Castro Pina [et al.].
+			Lisboa: Comissão Nacional para as Comemorações Portuguesas; Fundação
+			Oriente; Imprensa Nacional-Casa da Moeda, 1997. 1º vol.. ISBN
+			972-27-0871-6. p.65. Publicado sob os auspícios da Unesco e Conselho
+			Internacional de Arquivos. PORTUGAL.Instituto dos Arquivos Nacionais
+			/ Torre do Tombo. "Corpo Cronológico". in Guia de Fontes Portuguesas
+			para a História da Ásia. Elaborado por Fernanda Olival; Isabel Castro
+			Pina; Maria Cecília Henriques; Maria João Violante Branco. Lisboa:
+			Comissão Nacional para as Comemorações Portuguesas; Fundação Oriente;
+			Imprensa Nacional-Casa da Moeda, 1998. 1º vol.. ISBN 972-27-0903-8.
+			p. 95-96. Publicado sob os auspícios da Unesco e Conselho
+			Internacional de Arquivos. PORTUGAL. Instituto dos Arquivos Nacionais
+			/ Torre do Tombo. Direcção de Serviços de Arquivística - "Corpo
+			Cronológico". in Guia Geral dos Fundos da Torre do Tombo:
+			Instituições do Antigo Regime, Administração Central (1). Coord. José
+			Mattoso [et al.]; elab. Maria do Carmo Dias Farinha; fot. José
+			António Silva.Lisboa: IAN/TT, 1998. vol. 1. (Instrumentos de
+			Descrição Documental). ISBN 972-8107-42-0..p. 84-86. Acessível no
+			IAN/TT, IDD (L.602). Inventários: COUTINHO, João Pereira de Azeredo
+			-"Inventario dos livros, maços e documentos que se guardam no Real
+			Archivo da Torre do Tombo [...] no anno de 1776". [Manuscrito]. 1776.
+			Acessível no Instituto dos Arquivos Nacionais / Torre do Tombo,
+			Lisboa, Portugal. (L. 299A). Parte IV. Catálogos: MAIA, Manuel da -
+			Corpo Cronológico: catálogo. [Manuscrito]. 1756-1764. Acessível no
+			Instituto dos Arquivos Nacionais / Torre do Tombo, Lisboa, Portugal.
+			(L. 224-229). PORTUGAL.Instituto dos Arquivos Nacionais / Torre do
+			Tombo - Corpo Cronológico: Catálogo. [Manuscrito]. [18? - 1841?].
+			Acessível no Instituto dos Arquivos Nacionais / Torre do Tombo,
+			Lisboa, Portugal. (C. 79 - 169 A1-4). PORTUGAL. Instituto dos
+			Arquivos Nacionais / Torre do Tombo - TTOnline [em linha]. Lisboa:
+			IAN/TT, 2005- . [consult. 2 Out. 2006]. Actualização diária. Corpo
+			Cronológico. Disponível em http://ttonline.iantt.pt/cc.htm . Índices:
+			MAIA, Manuel da - Corpo Cronológico: índice cronológico.
+			[Manuscrito]. 1756-1764. Acessível no Instituto dos Arquivos
+			Nacionais / Torre do Tombo, Lisboa, Portugal. (L. 223). MAIA, Manuel
+			da - Corpo Cronológico: índice onomástico. [Manuscrito]. 1756-1764.
+			Acessível no Instituto dos Arquivos Nacionais / Torre do Tombo,
+			Lisboa, Portugal. (L. 230-234). Próprios e Comuns. PORTUGAL.
+			Instituto dos Arquivos Nacionais / Torre do Tombo - Índice geral dos
+			documentos conteudos no Corpo Chronologico existente no Real Archivo
+			da Torre do Tombo. Lisboa: [s.n], 1845. 185 p..Até à Letra C.</p>
+	</otherfindaid>
+	<scopecontent>
+		<p>Documentos de natureza diversa, desde o século XII, embora a
+			maioria pertença aos séculos XV e XVI. A coleção é constituída,
+			maioritariamente, por cartas de funcionários do reino, das ilhas
+			atlânticas, das praças de Marrocos, das feitorias e fortalezas
+			ultramarinas, nomeadamente do Estado da Índia, de embaixadores e
+			outros agentes diplomáticos dirigidas ao rei, assim como regimentos e
+			instruções régias aos referidos funcionários. Encontram-se, também,
+			numerosos conhecimentos e quitações, ordens de pagamento, livros de
+			receita e despesa reconstituídos após o terramoto de 1755, de acordo
+			com a numeração das suas folhas e anotações indiciadoras da sua
+			proveniência. É de consulta fundamental para o estudo dos
+			descobrimentos e da expansão portuguesa.</p>
+	</scopecontent>
+	<userestrict>
+		<p>Constantes no regulamento interno que prevê algumas restrições
+			tendo em conta o tipo dos documentos, o seu estado de conservação ou
+			o fim a que se destina a reprodução de documentos, analisado, caso a
+			caso, pelo serviço de reprografia, de acordo com as normas que
+			regulam os direitos de propriedade do IAN/TT e a legislação sobre
+			direitos de autor e direitos conexos.Documentação de origem e
+			natureza pública.</p>
+	</userestrict>
+</ead-c>
+            

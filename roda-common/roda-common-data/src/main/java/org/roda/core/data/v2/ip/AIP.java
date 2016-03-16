@@ -23,7 +23,7 @@ public class AIP implements Serializable {
   private String id;
   private String parentId;
   private boolean active;
-  private AIPPermissions permissions;
+  private Permissions permissions;
 
   private List<DescriptiveMetadata> descriptiveMetadata;
 
@@ -33,11 +33,11 @@ public class AIP implements Serializable {
     super();
   }
 
-  public AIP(String id, String parentId, boolean active, AIPPermissions permissions) {
+  public AIP(String id, String parentId, boolean active, Permissions permissions) {
     this(id, parentId, active, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>());
   }
 
-  public AIP(String id, String parentId, boolean active, AIPPermissions permissions,
+  public AIP(String id, String parentId, boolean active, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations) {
     super();
     this.id = id;
@@ -101,11 +101,11 @@ public class AIP implements Serializable {
     this.active = active;
   }
 
-  public AIPPermissions getPermissions() {
+  public Permissions getPermissions() {
     return permissions;
   }
 
-  public void setPermissions(AIPPermissions permissions) {
+  public void setPermissions(Permissions permissions) {
     this.permissions = permissions;
   }
 

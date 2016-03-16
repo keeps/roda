@@ -87,8 +87,8 @@ import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPPermissions;
-import org.roda.core.data.v2.ip.AIPPermissions.PermissionType;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -506,9 +506,35 @@ public class SolrUtils {
     }
   }
 
+  private static void appendOROperator(StringBuilder ret, boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    if (prefixWithANDOperatorIfBuilderNotEmpty && ret.length() > 0) {
+      ret.append(" OR ");
+    }
+  }
+
   private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values) {
     if (!values.isEmpty()) {
       appendANDOperator(ret, true);
+
+      ret.append("(");
+      for (int i = 0; i < values.size(); i++) {
+        if (i != 0) {
+          ret.append(" OR ");
+        }
+        appendExactMatch(ret, key, values.get(i), true, false);
+      }
+      ret.append(")");
+    }
+  }
+
+  private static void appendValuesUsingOROperator(StringBuilder ret, String key, List<String> values,
+    boolean prependWithOrIfNeeded) {
+    if (!values.isEmpty()) {
+      if (prependWithOrIfNeeded) {
+        appendOROperator(ret, true);
+      } else {
+        appendANDOperator(ret, true);
+      }
 
       ret.append("(");
       for (int i = 0; i < values.size(); i++) {
@@ -844,27 +870,33 @@ public class SolrUtils {
     return ret;
   }
 
-  private static String[] getFilterQueries(RodaUser user, boolean showInactive) {
-    List<String> ret = new ArrayList<>();
+  private static String getFilterQueries(RodaUser user, boolean showInactive) {
+
+    StringBuilder fq = new StringBuilder();
 
     if (user != null) {
-      StringBuilder filterQuery = new StringBuilder();
-      appendExactMatch(filterQuery, PermissionType.READ.toString(), Boolean.TRUE.toString(), true, false);
-      ret.add(filterQuery.toString());
+      String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
+      appendExactMatch(fq, usersKey, user.getId(), true, false);
+
+      String groupsKey = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + PermissionType.READ;
+      appendValuesUsingOROperator(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
     }
 
     if (!showInactive) {
-      StringBuilder filterQuery = new StringBuilder();
-      appendExactMatch(filterQuery, RodaConstants.AIP_ACTIVE, Boolean.TRUE.toString(), true, false);
-      ret.add(filterQuery.toString());
+      appendExactMatch(fq, RodaConstants.AIP_ACTIVE, Boolean.TRUE.toString(), true, true);
     }
 
-    return ret.toArray(new String[] {});
+    return fq.toString();
   }
 
   public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
+  }
+
+  public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
+    RodaUser user, boolean showInactive) throws GenericException, RequestNotValidException {
+    return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, showInactive).getTotalCount();
   }
 
   // FIXME see how to handle active and all the other that are not being put in
@@ -878,7 +910,7 @@ public class SolrUtils {
       doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
     final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
 
-    AIPPermissions permissions = getPermissions(doc);
+    Permissions permissions = getPermissions(doc);
 
     // FIXME this information is not being recorded. passing by empty
     // collections for easier processing
@@ -918,7 +950,7 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_REPRESENTATION_ID, representationIds);
     ret.addField(RodaConstants.AIP_HAS_REPRESENTATIONS, !representationIds.isEmpty());
 
-    setPermissions(aip, ret);
+    setPermissions(aip.getPermissions(), ret);
 
     if (!safemode) {
       // guarding against repeated fields
@@ -951,67 +983,45 @@ public class SolrUtils {
     return ret;
   }
 
-  private static AIPPermissions getPermissions(SolrDocument doc) {
-    AIPPermissions permissions = new AIPPermissions();
-    // TODO get information from aip.json or METS.xml
+  private static Permissions getPermissions(SolrDocument doc) {
 
-    // List<String> list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_USERS));
-    // permissions.setGrantUsers(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_GRANT_GROUPS));
-    // permissions.setGrantGroups(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_USERS));
-    // permissions.setReadUsers(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_READ_GROUPS));
-    // permissions.setReadGroups(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_USERS));
-    // permissions.setInsertUsers(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_INSERT_GROUPS));
-    // permissions.setInsertGroups(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_USERS));
-    // permissions.setModifyUsers(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS));
-    // permissions.setModifyGroups(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_USERS));
-    // permissions.setRemoveUsers(list);
-    // list =
-    // objectToListString(doc.get(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS));
-    // permissions.setRemoveGroups(list);
+    Permissions permissions = new Permissions();
+
+    Map<PermissionType, Set<String>> userPermissions = new HashMap<>();
+
+    for (PermissionType type : PermissionType.values()) {
+      String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + type;
+      Set<String> users = new HashSet<>();
+      users.addAll(objectToListString(doc.get(key)));
+      userPermissions.put(type, users);
+    }
+
+    Map<PermissionType, Set<String>> groupPermissions = new HashMap<>();
+
+    for (PermissionType type : PermissionType.values()) {
+      String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + type;
+      Set<String> groups = new HashSet<>();
+      groups.addAll(objectToListString(doc.get(key)));
+      groupPermissions.put(type, groups);
+    }
 
     return permissions;
   }
 
-  private static void setPermissions(AIP aip, final SolrInputDocument ret) {
-    AIPPermissions permissions = aip.getPermissions();
-    // TODO set this information into aip.json or METS.xml
-    // ret.addField(RodaConstants.AIP_PERMISSION_GRANT_USERS,
-    // permissions.getGrantUsers());
-    // ret.addField(RodaConstants.AIP_PERMISSION_GRANT_GROUPS,
-    // permissions.getGrantGroups());
-    // ret.addField(RodaConstants.AIP_PERMISSION_READ_USERS,
-    // permissions.getReadUsers());
-    // ret.addField(RodaConstants.AIP_PERMISSION_READ_GROUPS,
-    // permissions.getReadGroups());
-    // ret.addField(RodaConstants.AIP_PERMISSION_INSERT_USERS,
-    // permissions.getInsertUsers());
-    // ret.addField(RodaConstants.AIP_PERMISSION_INSERT_GROUPS,
-    // permissions.getInsertGroups());
-    // ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_USERS,
-    // permissions.getModifyUsers());
-    // ret.addField(RodaConstants.AIP_PERMISSION_MODIFY_GROUPS,
-    // permissions.getModifyGroups());
-    // ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_USERS,
-    // permissions.getRemoveUsers());
-    // ret.addField(RodaConstants.AIP_PERMISSION_REMOVE_GROUPS,
-    // permissions.getRemoveGroups());
+  private static void setPermissions(Permissions permissions, final SolrInputDocument ret) {
+
+    for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
+      String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
+      List<String> value = new ArrayList<>(entry.getValue());
+
+      ret.addField(key, value);
+    }
+    for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
+      String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
+      List<String> value = new ArrayList<>(entry.getValue());
+
+      ret.addField(key, value);
+    }
   }
 
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {

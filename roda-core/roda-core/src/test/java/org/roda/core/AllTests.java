@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.roda.core.common.JsonUtilsTest;
 import org.roda.core.common.monitor.MonitorIndexTest;
 import org.roda.core.index.IndexServiceTest;
+import org.roda.core.index.PermissionsTest;
 import org.roda.core.index.SolrUtilsTest;
 import org.roda.core.model.ModelServiceTest;
 import org.roda.core.plugins.EARKSIPPluginsTest;
@@ -24,7 +25,7 @@ import org.roda.core.storage.fs.FileStorageServiceTest;
 @RunWith(Suite.class)
 @SuiteClasses({JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
   FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTestForTravis.class,
-  EARKSIPPluginsTest.class, MonitorIndexTest.class})
+  EARKSIPPluginsTest.class, MonitorIndexTest.class, PermissionsTest.class})
 public class AllTests {
 
 }
