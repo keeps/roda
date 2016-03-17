@@ -11,10 +11,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -85,5 +83,4 @@ public class BagitToAIPPluginUtils {
 
   }
 
-  
 }

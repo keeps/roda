@@ -53,7 +53,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -91,13 +90,13 @@ import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -792,8 +791,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else
-      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -1662,8 +1661,16 @@ public class SolrUtils {
     for (Map.Entry<String, List<String>> entry : otherProperties.entrySet()) {
       solrDocument.setField(prefix + entry.getKey(), entry.getValue());
     }
-    return ClientUtils.toSolrInputDocument(solrDocument);
+    return solrDocumentToSolrInputDocument(solrDocument);
 
+  }
+
+  private static SolrInputDocument solrDocumentToSolrInputDocument(SolrDocument d) {
+    SolrInputDocument doc = new SolrInputDocument();
+    for (String name : d.getFieldNames()) {
+      doc.addField(name, d.getFieldValue(name));
+    }
+    return doc;
   }
 
 }

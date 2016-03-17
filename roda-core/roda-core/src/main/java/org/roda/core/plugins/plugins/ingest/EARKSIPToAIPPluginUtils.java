@@ -76,6 +76,8 @@ public class EARKSIPToAIPPluginUtils {
     }
 
     // TODO add preservation metadata
+    // TODO add documentation
+    // TODO add schemas
 
     model.notifyAIPCreated(aip.getId());
 

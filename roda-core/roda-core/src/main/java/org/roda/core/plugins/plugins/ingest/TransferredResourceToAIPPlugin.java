@@ -25,7 +25,6 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -151,8 +150,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         try {
           ContentPayload payload = new FSPathContentPayload(file);
           boolean notifyFileCreated = false;
-          File createdFile = model.createFile(aip.getId(), representationId, directoryPath, fileId, payload,
-            notifyFileCreated);
+          model.createFile(aip.getId(), representationId, directoryPath, fileId, payload, notifyFileCreated);
         } catch (RODAException e) {
           // TODO log or mark nothing to do
         }

@@ -37,7 +37,8 @@ public class MetadataFileUtils {
       String[] values = metadata.getValues(name);
       if (values != null && values.length > 0) {
         for (String value : values) {
-          b.append("<field name='" + name + "'>" + StringEscapeUtils.escapeXml(value) + "</field>");
+          b.append("<field name='").append(name).append("'>").append(StringEscapeUtils.escapeXml11(value))
+            .append("</field>");
         }
       }
 
@@ -51,7 +52,8 @@ public class MetadataFileUtils {
     b.append("<metadata>");
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
       if (!entry.getKey().equalsIgnoreCase("parent")) {
-        b.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
+        b.append("<field name='").append(entry.getKey()).append("'>")
+          .append(StringEscapeUtils.escapeXml11(entry.getValue())).append("</field>");
       }
     }
     b.append("</metadata>");
@@ -60,9 +62,8 @@ public class MetadataFileUtils {
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
     StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
-    b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
-    b.append("</metadata>");
+    b.append("<metadata>").append("<field name='title'>")
+      .append(StringEscapeUtils.escapeXml11(transferredResource.getName())).append("</field>").append("</metadata>");
 
     return new StringContentPayload(b.toString());
   }

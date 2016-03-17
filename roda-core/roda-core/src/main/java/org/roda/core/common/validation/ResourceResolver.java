@@ -23,7 +23,7 @@ public class ResourceResolver implements LSResourceResolver {
   public LSInput resolveResource(String type, String namespaceURI, String publicId, String systemId, String baseURI) {
     InputStream resourceAsStream = null;
     try {
-      if (StringUtils.isNotBlank(systemId) && systemId.startsWith("http:")) {
+      if (StringUtils.isNotBlank(systemId) && systemId.startsWith("http")) {
         URL url = new URL(systemId);
         resourceAsStream = url.openStream();
       }

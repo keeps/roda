@@ -71,7 +71,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   private static String COOKIES_ACTIVE_PROPERTY = "ui.cookies.active";
   private static String REGISTER_ACTIVE_PROPERTY = "ui.register.active";
-  
+
   private static String GANALYTICS_ACCOUNT_CODE = null;
   private static String GRECAPTCHA_ACCOUNT_CODE = null;
 
@@ -85,12 +85,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public BrowserServiceImpl() {
 
   }
-  
+
   @Override
   public boolean isCookiesMessageActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(COOKIES_ACTIVE_PROPERTY, false);
   }
-  
+
   @Override
   public boolean isRegisterActive() {
     return RodaCoreFactory.getRodaConfiguration().getBoolean(REGISTER_ACTIVE_PROPERTY, false);
@@ -213,8 +213,8 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public AIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
+  public AIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.moveInHierarchy(user, aipId, parentId);
   }
@@ -279,7 +279,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void removeTransferredResources(List<String> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Browser.removeTransferredResources(user, ids, false);
+    Browser.removeTransferredResources(user, ids, true);
   }
 
   @Override

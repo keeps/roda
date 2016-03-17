@@ -431,7 +431,6 @@ public class IndexModelObserver implements ModelObserver {
       try {
         SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
           index);
-        LOGGER.error("SOLR after adding other properties:\n" + solrFile.toString());
         index.add(RodaConstants.INDEX_FILE, solrFile);
         index.commit(RodaConstants.INDEX_FILE);
       } catch (SolrServerException | RequestNotValidException | GenericException | NotFoundException

@@ -48,6 +48,12 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/***
+ * https://docs.google.com/spreadsheets/d/
+ * 1Ncu0My6tf19umSClIA6iXeYlJ4_FP6MygRwFCe0EzyM
+ * 
+ * @author Hélder Silva <hsilva@keep.pt>
+ */
 public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 
@@ -358,8 +364,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
           report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
-        } else
-          if (StringUtils.isNotBlank(reportItem.getItemId()) && aipIdToObjectId.get(reportItem.getItemId()) != null) {
+        } else if (StringUtils.isNotBlank(reportItem.getItemId())
+          && aipIdToObjectId.get(reportItem.getItemId()) != null) {
           reports.get(aipIdToObjectId.get(reportItem.getItemId())).addReport(reportItem);
         }
       }
