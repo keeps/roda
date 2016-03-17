@@ -16,59 +16,61 @@
 
 	<g:FlowPanel styleName="viewRepresentation" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
-			<g:HorizontalPanel ui:field="previewPanel">
-				<!-- LEFT PANEL -->
-				<g:FlowPanel ui:field="filesPanel">
-					<g:FlowPanel styleName="searchPanel">
-						<wcag:AccessibleFocusPanel styleName="searchButton"
-							ui:field="searchInputButton">
-							<g:HTML addStyleNames="searchButton-html">
-								<span class="fa-stack fa-lg">
-									<i class="fa fa-circle fa-stack-2x"></i>
-									<i class="fa fa-search fa-stack-1x"></i>
-								</span>
-							</g:HTML>
-						</wcag:AccessibleFocusPanel>
-						<g:FlowPanel styleName="searchPanelLeft">
-							<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
-						</g:FlowPanel>
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="fileListScroll">
-						<lists:SimpleFileList ui:field="filesList" />
-					</g:FlowPanel>
-				</g:FlowPanel>
-				<!-- RIGHT PANEL -->
-				<g:FlowPanel ui:field="filePreviewPanel">
-					<g:FlowPanel addStyleNames="filePreviewToolbar">
-						<m:BreadcrumbPanel ui:field="breadcrumb"
-							addStyleNames="viewRepresentationBreadcrumb" />
-						<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-							<g:FocusPanel ui:field="infoFileButton"
-								addStyleNames="filePreviewToolbarIcon filePreviewToolbarInfoIcon">
-								<g:HTML>
-									<i class="fa fa-info-circle"></i>
+			<g:FocusPanel ui:field="focusPanel" addStyleNames="focusPreviewPanel">
+				<g:HorizontalPanel ui:field="previewPanel">
+					<!-- LEFT PANEL -->
+					<g:FlowPanel ui:field="filesPanel">
+						<g:FlowPanel styleName="searchPanel">
+							<wcag:AccessibleFocusPanel styleName="searchButton"
+								ui:field="searchInputButton">
+								<g:HTML addStyleNames="searchButton-html">
+									<span class="fa-stack fa-lg">
+										<i class="fa fa-circle fa-stack-2x"></i>
+										<i class="fa fa-search fa-stack-1x"></i>
+									</span>
 								</g:HTML>
-							</g:FocusPanel>
-							<g:FocusPanel ui:field="downloadFileButton"
-								addStyleNames="filePreviewToolbarIcon filePreviewToolbarDownloadIcon">
-								<g:HTML>
-									<i class="fa fa-download"></i>
-								</g:HTML>
-							</g:FocusPanel>
+							</wcag:AccessibleFocusPanel>
+							<g:FlowPanel styleName="searchPanelLeft">
+								<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="fileListScroll">
+							<lists:SimpleFileList ui:field="filesList" />
 						</g:FlowPanel>
 					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="col_10 content" ui:field="filePreview">
-					</g:FlowPanel>
-					<!-- INFO PANEL -->
-					<g:FlowPanel addStyleNames="infoFilePanel">
-						<g:Label styleName="h1" addStyleNames="infoFileTitle">
-							<ui:text from='{messages.viewRepresentationInfoTitle}' />
-						</g:Label>
-						<g:FlowPanel ui:field="infoFilePanel">
+					<!-- RIGHT PANEL -->
+					<g:FlowPanel ui:field="filePreviewPanel">
+						<g:FlowPanel addStyleNames="filePreviewToolbar">
+							<m:BreadcrumbPanel ui:field="breadcrumb"
+								addStyleNames="viewRepresentationBreadcrumb" />
+							<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+								<g:FocusPanel ui:field="infoFileButton"
+									addStyleNames="filePreviewToolbarIcon filePreviewToolbarInfoIcon">
+									<g:HTML>
+										<i class="fa fa-info-circle"></i>
+									</g:HTML>
+								</g:FocusPanel>
+								<g:FocusPanel ui:field="downloadFileButton"
+									addStyleNames="filePreviewToolbarIcon filePreviewToolbarDownloadIcon">
+									<g:HTML>
+										<i class="fa fa-download"></i>
+									</g:HTML>
+								</g:FocusPanel>
+							</g:FlowPanel>
+						</g:FlowPanel>
+						<g:FlowPanel addStyleNames="col_10 content" ui:field="filePreview">
+						</g:FlowPanel>
+						<!-- INFO PANEL -->
+						<g:FlowPanel addStyleNames="infoFilePanel">
+							<g:Label styleName="h1" addStyleNames="infoFileTitle">
+								<ui:text from='{messages.viewRepresentationInfoTitle}' />
+							</g:Label>
+							<g:FlowPanel ui:field="infoFilePanel">
+							</g:FlowPanel>
 						</g:FlowPanel>
 					</g:FlowPanel>
-				</g:FlowPanel>
-			</g:HorizontalPanel>
+				</g:HorizontalPanel>
+			</g:FocusPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>

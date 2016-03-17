@@ -371,14 +371,24 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   public void nextItemSelection() {
+    nextItemSelection(false);
+  }
+
+  public void nextItemSelection(boolean nextPageJump) {
     if (getSelectionModel().getSelectedObject() != null) {
       T selectedItem = getSelectionModel().getSelectedObject();
       int selectedIndex = getVisibleItems().indexOf(selectedItem);
 
-      if (selectedIndex == -1) {
-        getSelectionModel().setSelected(getVisibleItems().get(0), true);
+      if (nextPageJump) {
+        if (selectedIndex == -1) {
+          getSelectionModel().setSelected(getVisibleItems().get(0), true);
+        } else {
+          getSelectionModel().setSelected(getVisibleItems().get(selectedIndex + 1), true);
+        }
       } else {
-        getSelectionModel().setSelected(getVisibleItems().get(selectedIndex + 1), true);
+        if (selectedIndex < getVisibleItems().size() - 1) {
+          getSelectionModel().setSelected(getVisibleItems().get(selectedIndex + 1), true);
+        }
       }
     } else {
       getSelectionModel().setSelected(getVisibleItems().get(0), true);
@@ -386,14 +396,24 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
   }
 
   public void previousItemSelection() {
+    previousItemSelection(false);
+  }
+
+  public void previousItemSelection(boolean previousPageJump) {
     if (getSelectionModel().getSelectedObject() != null) {
       T selectedItem = getSelectionModel().getSelectedObject();
       int selectedIndex = getVisibleItems().indexOf(selectedItem);
 
-      if (selectedIndex == -1) {
-        getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().size() - 1), true);
+      if (previousPageJump) {
+        if (selectedIndex == -1) {
+          getSelectionModel().setSelected(getVisibleItems().get(getVisibleItems().size() - 1), true);
+        } else {
+          getSelectionModel().setSelected(getVisibleItems().get(selectedIndex - 1), true);
+        }
       } else {
-        getSelectionModel().setSelected(getVisibleItems().get(selectedIndex - 1), true);
+        if (selectedIndex > 0) {
+          getSelectionModel().setSelected(getVisibleItems().get(selectedIndex - 1), true);
+        }
       }
     } else {
       getSelectionModel().setSelected(getVisibleItems().get(0), true);

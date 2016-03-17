@@ -3272,6 +3272,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-bottom: 10px !important;
 }
 
+.viewRepresentationFocusPanel,
 .viewRepresentationPreviewPanel {
 	width: 100%;
 }

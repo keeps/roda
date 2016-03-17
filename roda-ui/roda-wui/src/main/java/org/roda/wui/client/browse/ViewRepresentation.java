@@ -45,6 +45,9 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -222,13 +225,14 @@ public class ViewRepresentation extends Composite {
 
   private boolean singleFileMode = false;
   private boolean firstLoad = true;
-  private boolean showNextFile = false;
-  private boolean showPreviousFile = false;
 
   static final int WINDOW_WIDTH = 800;
 
   @UiField
   BreadcrumbPanel breadcrumb;
+
+  @UiField
+  FocusPanel focusPanel;
 
   @UiField
   HorizontalPanel previewPanel;
@@ -337,9 +341,10 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
+        GWT.log("HERE");
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null && selected.isDirectory()) {
-          jumpTo(selected);
+          //jumpTo(selected);
         } else {
           filePreview();
           panelsControl();
@@ -353,13 +358,7 @@ public class ViewRepresentation extends Composite {
 
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<IndexedFile>> event) {
-        if (showNextFile) {
-          filesList.nextItemSelection();
-          showNextFile = false;
-        } else if (showPreviousFile) {
-          filesList.previousItemSelection();
-          showPreviousFile = false;
-        } else if (firstLoad) {
+        if (firstLoad) {
           List<IndexedFile> results = event.getValue().getResults();
 
           if (results.size() == 1 && !results.get(0).isDirectory()
@@ -378,6 +377,7 @@ public class ViewRepresentation extends Composite {
 
     });
 
+    focusPanel.addStyleName("viewRepresentationFocusPanel");
     previewPanel.addStyleName("viewRepresentationPreviewPanel");
     filesPanel.addStyleName("viewRepresentationFilesPanel");
     filePreviewPanel.addStyleName("viewRepresentationFilePreviewPanel");
@@ -409,6 +409,21 @@ public class ViewRepresentation extends Composite {
       @Override
       public void onClick(ClickEvent event) {
         doSearch();
+      }
+    });
+
+    focusPanel.setFocus(true);
+    focusPanel.addKeyDownHandler(new KeyDownHandler() {
+
+      @Override
+      public void onKeyDown(KeyDownEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_LEFT || event.getNativeKeyCode() == KeyCodes.KEY_UP) {
+          event.preventDefault();
+          filesList.previousItemSelection();
+        } else if (event.getNativeKeyCode() == KeyCodes.KEY_RIGHT || event.getNativeKeyCode() == KeyCodes.KEY_DOWN) {
+          event.preventDefault();
+          filesList.nextItemSelection();
+        }
       }
     });
   }
