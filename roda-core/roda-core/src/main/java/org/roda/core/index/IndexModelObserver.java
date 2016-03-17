@@ -132,8 +132,9 @@ public class IndexModelObserver implements ModelObserver {
     NotFoundException, AuthorizationDeniedException, SolrServerException, IOException {
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
     Binary binary = model.getStorage().getBinary(filePath);
-    SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), pm.getAipId(),
-      pm.getRepresentationId(), pm.getId(), binary);
+    AIP aip = model.retrieveAIP(pm.getAipId());
+    SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
+      pm.getId(), binary);
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
     index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);
   }
@@ -243,7 +244,6 @@ public class IndexModelObserver implements ModelObserver {
     aipCreated(aip);
   }
 
-  // TODO Handle exceptions
   @Override
   public void aipDeleted(String aipId) {
     // XXX check if forcing auto commit is necessary
@@ -251,7 +251,14 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId, "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")",
       forceCommit);
 
-    // TODO delete included representations, descriptive metadata and other
+    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.SRO_AIP_ID, aipId,
+      "Error deleting representations (aipId=" + aipId + ")", forceCommit);
+
+    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
+      "Error deleting files (aipId=" + aipId + ")", forceCommit);
+
+    deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId,
+      "Error deleting files (aipId=" + aipId + ")", forceCommit);
   }
 
   @Override
@@ -302,14 +309,19 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void representationDeleted(String aipId, String representationId) {
     boolean forceCommit = false;
-    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, IdUtils.getRepresentationId(aipId, representationId),
+    String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
+    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, representationUUID,
       "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
 
-    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATION_UUID, representationId,
+    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID,
       "Error deleting Representation files (aipId=" + aipId + "; representationId=" + representationId + ")",
       forceCommit);
 
-    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
+    deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS,
+      RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID,
+      "Error deleting files (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
+
+    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE, RodaConstants.INDEX_PRESERVATION_EVENTS);
   }
 
   @Override
@@ -391,14 +403,14 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void preservationMetadataCreated(PreservationMetadata preservationMetadata) {
+  public void preservationMetadataCreated(PreservationMetadata pm) {
     try {
-      StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationMetadata);
+      StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
       Binary binary = model.getStorage().getBinary(storagePath);
-      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(preservationMetadata.getType(),
-        preservationMetadata.getAipId(), preservationMetadata.getRepresentationId(), preservationMetadata.getId(),
-        binary);
-      PreservationMetadataType type = preservationMetadata.getType();
+      AIP aip = model.retrieveAIP(pm.getAipId());
+      SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
+        pm.getId(), binary);
+      PreservationMetadataType type = pm.getType();
       if (type.equals(PreservationMetadataType.EVENT)) {
         index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisFileDocument);
         index.commit(RodaConstants.INDEX_PRESERVATION_EVENTS);

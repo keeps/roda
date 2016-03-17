@@ -443,6 +443,7 @@ public final class RodaConstants {
   public static final String PRESERVATION_EVENT_ID = "id";
   public static final String PRESERVATION_EVENT_AIP_ID = "aipID";
   public static final String PRESERVATION_EVENT_REPRESENTATION_ID = "representationID";
+  public static final String PRESERVATION_EVENT_REPRESENTATION_UUID = "representationUUID";
   public static final String PRESERVATION_EVENT_FILE_ID = "fileID";
   public static final String PRESERVATION_EVENT_DATETIME = "eventDateTime";
   public static final String PRESERVATION_EVENT_DETAIL = "eventDetail";

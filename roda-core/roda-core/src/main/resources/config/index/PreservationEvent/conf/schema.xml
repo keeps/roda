@@ -108,6 +108,7 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="aipID" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="representationID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="representationUUID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="fileID" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventDateTime" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="eventDetail" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />

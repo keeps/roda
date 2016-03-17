@@ -26,7 +26,9 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
@@ -78,7 +80,7 @@ public class PermissionsTest {
   }
 
   @Test
-  public void testAIPIndexCreateDelete() throws RODAException, ParseException {
+  public void testAIP() throws RODAException, ParseException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -125,10 +127,12 @@ public class PermissionsTest {
       showInactive);
     assertEquals(1, find7.getTotalCount());
 
+    model.deleteAIP(aipId);
+
   }
 
   @Test
-  public void testRepresentationIndexCreateDelete() throws RODAException, ParseException {
+  public void testRepresentation() throws RODAException, ParseException {
     // generate AIP ID
     final String aipId = UUID.randomUUID().toString();
 
@@ -175,6 +179,109 @@ public class PermissionsTest {
       null, user, showInactive);
     assertEquals(2, find7.getTotalCount());
 
+    model.deleteAIP(aipId);
+  }
+
+  @Test
+  public void testFiles() throws RODAException, ParseException {
+    // generate AIP ID
+    final String aipId = UUID.randomUUID().toString();
+
+    // Create AIP
+    // TODO move aip id to constants
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+
+    RodaUser user = null;
+    boolean showInactive = false;
+    IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(0, find1.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedFile> find2 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(4, find2.getTotalCount());
+
+    user = new RodaUser("testuser", "User with access", "", false);
+    showInactive = false;
+    IndexResult<IndexedFile> find3 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(0, find3.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedFile> find4 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(4, find4.getTotalCount());
+
+    user = new RodaUser("guest", "User with access", "", true);
+    showInactive = false;
+    IndexResult<IndexedFile> find5 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(0, find5.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedFile> find6 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(0, find6.getTotalCount());
+
+    user.addGroup("testgroup");
+    IndexResult<IndexedFile> find7 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
+      showInactive);
+    assertEquals(4, find7.getTotalCount());
+
+    model.deleteAIP(aipId);
+  }
+
+  @Test
+  public void testPreservationEvents() throws RODAException, ParseException {
+    // generate AIP ID
+    final String aipId = UUID.randomUUID().toString();
+
+    // Create AIP
+    // TODO move aip id to constants
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+
+    RodaUser user = null;
+    boolean showInactive = false;
+    IndexResult<IndexedPreservationEvent> find1 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(0, find1.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedPreservationEvent> find2 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(2, find2.getTotalCount());
+
+    user = new RodaUser("testuser", "User with access", "", false);
+    showInactive = false;
+    IndexResult<IndexedPreservationEvent> find3 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(0, find3.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedPreservationEvent> find4 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(2, find4.getTotalCount());
+
+    user = new RodaUser("guest", "User with access", "", true);
+    showInactive = false;
+    IndexResult<IndexedPreservationEvent> find5 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(0, find5.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedPreservationEvent> find6 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(0, find6.getTotalCount());
+
+    user.addGroup("testgroup");
+    IndexResult<IndexedPreservationEvent> find7 = index.find(IndexedPreservationEvent.class, null, null,
+      new Sublist(0, 10), null, user, showInactive);
+    assertEquals(2, find7.getTotalCount());
+
+    model.deleteAIP(aipId);
   }
 
 }

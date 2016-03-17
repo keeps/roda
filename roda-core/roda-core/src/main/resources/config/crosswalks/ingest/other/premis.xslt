@@ -9,8 +9,9 @@
 		omit-xml-declaration="yes" />
 	<xsl:param name="aipID" />
 	<xsl:param name="representationID" />
+	<xsl:param name="representationUUID" />
 	<xsl:param name="fileID" />
-	
+
 	<xsl:template match="/">
 		<doc>
 			<xsl:apply-templates />
@@ -19,7 +20,8 @@
 	<xsl:template match="prem:agent">
 		<xsl:if test="prem:agentIdentifier/prem:agentIdentifierValue">
 			<field name="id">
-				<xsl:value-of select="prem:agentIdentifier/prem:agentIdentifierValue/text()" />
+				<xsl:value-of
+					select="prem:agentIdentifier/prem:agentIdentifierValue/text()" />
 			</field>
 		</xsl:if>
 		<xsl:if test="prem:agentName">
@@ -42,7 +44,7 @@
 				<xsl:value-of select="prem:agentVersion/text()" />
 			</field>
 		</xsl:if>
-	<xsl:if test="prem:agentNote">
+		<xsl:if test="prem:agentNote">
 			<field name="note">
 				<xsl:value-of select="prem:agentNote/text()" />
 			</field>
@@ -68,6 +70,11 @@
 				<xsl:value-of select="$representationID" />
 			</field>
 		</xsl:if>
+		<xsl:if test="$representationUUID">
+			<field name="representationUUID">
+				<xsl:value-of select="$representationUUID" />
+			</field>
+		</xsl:if>
 		<xsl:if test="$fileID">
 			<field name="fileID">
 				<xsl:value-of select="$fileID" />
@@ -91,27 +98,33 @@
 		<xsl:if test="prem:eventOutcomeInformation">
 			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcome">
 				<field name="eventOutcome">
-					<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcome/text()" />
+					<xsl:value-of
+						select="prem:eventOutcomeInformation/prem:eventOutcome/text()" />
 				</field>
 			</xsl:if>
 			<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail">
-				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
+				<xsl:if
+					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension">
 					<field name="eventOutcomeDetailExtension">
-						<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/text()" />
+						<xsl:value-of
+							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailExtension/text()" />
 					</field>
 				</xsl:if>
-				<xsl:if test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
+				<xsl:if
+					test="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote">
 					<field name="eventOutcomeDetailNote">
-						<xsl:value-of select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" />
+						<xsl:value-of
+							select="prem:eventOutcomeInformation/prem:eventOutcomeDetail/prem:eventOutcomeDetailNote/text()" />
 					</field>
 				</xsl:if>
 			</xsl:if>
-			
+
 		</xsl:if>
 		<xsl:if test="prem:eventIdentifier">
 			<xsl:if test="prem:eventIdentifier/prem:eventIdentifierValue">
 				<field name="id">
-					<xsl:value-of select="prem:eventIdentifier/prem:eventIdentifierValue/text()" />
+					<xsl:value-of
+						select="prem:eventIdentifier/prem:eventIdentifierValue/text()" />
 				</field>
 			</xsl:if>
 		</xsl:if>

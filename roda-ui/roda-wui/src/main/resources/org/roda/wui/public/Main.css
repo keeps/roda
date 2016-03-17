@@ -3520,6 +3520,7 @@ td.datePickerMonth, td.datePickerYear {
 	position: absolute;
 	right: 0;
 	padding: 20px;
+	box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, -6px 0 15px -4px rgba(31, 73, 125, 0.8);
 }
 
 .viewRepresentation .infoFileTitle {

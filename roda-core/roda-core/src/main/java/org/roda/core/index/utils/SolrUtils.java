@@ -1288,7 +1288,7 @@ public class SolrUtils {
     return ipa;
   }
 
-  public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, String aipID,
+  public static SolrInputDocument premisToSolr(PreservationMetadataType preservationMetadataType, AIP aip,
     String representationID, String fileID, Binary binary) throws GenericException {
     SolrInputDocument doc;
     InputStream inputStream;
@@ -1305,11 +1305,12 @@ public class SolrUtils {
       Reader xsltReader = new InputStreamReader(transformerStream);
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
-      if (aipID != null) {
-        stylesheetOpt.put("aipID", aipID);
+      if (aip != null) {
+        stylesheetOpt.put("aipID", aip.getId());
       }
       if (representationID != null) {
         stylesheetOpt.put("representationID", representationID);
+        stylesheetOpt.put("representationUUID", IdUtils.getRepresentationId(aip.getId(), representationID));
       }
       if (fileID != null) {
         stylesheetOpt.put("fileID", fileID);
@@ -1372,6 +1373,10 @@ public class SolrUtils {
       } catch (org.roda.core.data.v2.validation.ValidationException e) {
         LOGGER.warn("Error setting linking outcome field: " + e.getMessage());
       }
+
+      // indexing active state and permissions
+      doc.addField(RodaConstants.ACTIVE, aip.isActive());
+      setPermissions(aip.getPermissions(), doc);
     }
     return doc;
   }
