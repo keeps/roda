@@ -285,7 +285,7 @@ public class BasicSearch extends Composite {
       RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
     numberOfFilesField.simpleSearchField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES,
       messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL);
-    
+
     representationsSearchAdvancedFieldsPanel.add(idField);
     representationsSearchAdvancedFieldsPanel.add(typeField);
     representationsSearchAdvancedFieldsPanel.add(sizeField);
@@ -507,7 +507,7 @@ public class BasicSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId());
+          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getUuid());
         }
       }
     });

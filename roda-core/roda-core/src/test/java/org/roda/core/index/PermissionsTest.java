@@ -26,6 +26,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
@@ -123,6 +124,56 @@ public class PermissionsTest {
     IndexResult<IndexedAIP> find7 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
       showInactive);
     assertEquals(1, find7.getTotalCount());
+
+  }
+
+  @Test
+  public void testRepresentationIndexCreateDelete() throws RODAException, ParseException {
+    // generate AIP ID
+    final String aipId = UUID.randomUUID().toString();
+
+    // Create AIP
+    // TODO move aip id to constants
+    final AIP aip = model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+
+    RodaUser user = null;
+    boolean showInactive = false;
+    IndexResult<IndexedRepresentation> find1 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(0, find1.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedRepresentation> find2 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(2, find2.getTotalCount());
+
+    user = new RodaUser("testuser", "User with access", "", false);
+    showInactive = false;
+    IndexResult<IndexedRepresentation> find3 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(0, find3.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedRepresentation> find4 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(2, find4.getTotalCount());
+
+    user = new RodaUser("guest", "User with access", "", true);
+    showInactive = false;
+    IndexResult<IndexedRepresentation> find5 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(0, find5.getTotalCount());
+
+    showInactive = true;
+    IndexResult<IndexedRepresentation> find6 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(0, find6.getTotalCount());
+
+    user.addGroup("testgroup");
+    IndexResult<IndexedRepresentation> find7 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
+      null, user, showInactive);
+    assertEquals(2, find7.getTotalCount());
 
   }
 

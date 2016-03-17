@@ -61,6 +61,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
@@ -86,7 +87,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -887,7 +887,8 @@ public class SolrUtils {
 
     StringBuilder fq = new StringBuilder();
 
-    if (user != null) {
+    // TODO find a better way to define admin super powers
+    if (user != null && !user.getName().equals("admin")) {
       String usersKey = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + PermissionType.READ;
       appendExactMatch(fq, usersKey, user.getId(), true, false);
 
@@ -896,7 +897,7 @@ public class SolrUtils {
     }
 
     if (!showInactive) {
-      appendExactMatch(fq, RodaConstants.AIP_ACTIVE, Boolean.TRUE.toString(), true, true);
+      appendExactMatch(fq, RodaConstants.ACTIVE, Boolean.TRUE.toString(), true, true);
     }
 
     return fq.toString();
@@ -916,7 +917,7 @@ public class SolrUtils {
   // the indexedaip
   public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.AIP_ACTIVE));
+    final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE));
     final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
     final List<String> descriptiveMetadataFileIds = objectToListString(
@@ -952,7 +953,7 @@ public class SolrUtils {
 
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
-    ret.addField(RodaConstants.AIP_ACTIVE, aip.isActive());
+    ret.addField(RodaConstants.ACTIVE, aip.isActive());
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
@@ -1038,6 +1039,7 @@ public class SolrUtils {
   }
 
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
+    final String uuid = objectToString(doc.get(RodaConstants.SRO_UUID));
     final String id = objectToString(doc.get(RodaConstants.SRO_ID));
     final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
     final Boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
@@ -1045,10 +1047,10 @@ public class SolrUtils {
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
 
-    return new IndexedRepresentation(id, aipId, Boolean.TRUE.equals(original), sizeInBytes, totalNumberOfFiles);
+    return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), sizeInBytes, totalNumberOfFiles);
   }
 
-  public static SolrInputDocument representationToSolrDocument(Representation rep) {
+  public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.SRO_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.SRO_ID, rep.getId());
@@ -1058,6 +1060,10 @@ public class SolrUtils {
     // TODO calculate storage size and number of files or get it from arguments
     doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, 0L);
     doc.addField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES, 0L);
+
+    // indexing active state and permissions
+    doc.addField(RodaConstants.ACTIVE, aip.isActive());
+    setPermissions(aip.getPermissions(), doc);
 
     return doc;
   }
@@ -1482,7 +1488,7 @@ public class SolrUtils {
     return job;
   }
 
-  public static SolrInputDocument fileToSolrDocument(File file, Binary premisFile, String fulltext) {
+  public static SolrInputDocument fileToSolrDocument(AIP aip, File file, Binary premisFile, String fulltext) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, IdUtils.getFileId(file));
     List<String> path = file.getPath();
@@ -1494,12 +1500,14 @@ public class SolrUtils {
         parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
       }
 
-      doc.addField(RodaConstants.FILE_PARENT_ID,
+      doc.addField(RodaConstants.FILE_PARENT_UUID,
         IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath, parentFileId));
     }
     doc.addField(RodaConstants.FILE_AIPID, file.getAipId());
     doc.addField(RodaConstants.FILE_FILEID, file.getId());
-    doc.addField(RodaConstants.FILE_REPRESENTATIONID, file.getRepresentationId());
+    doc.addField(RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId());
+    doc.addField(RodaConstants.FILE_REPRESENTATION_UUID,
+      IdUtils.getRepresentationId(file.getAipId(), file.getRepresentationId()));
     doc.addField(RodaConstants.FILE_ISDIRECTORY, file.isDirectory());
 
     // extra-fields
@@ -1526,14 +1534,20 @@ public class SolrUtils {
 
     }
 
+    // indexing active state and permissions
+    doc.addField(RodaConstants.ACTIVE, aip.isActive());
+    setPermissions(aip.getPermissions(), doc);
+
     return doc;
   }
 
   public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
     IndexedFile file = null;
     String uuid = objectToString(doc.get(RodaConstants.FILE_UUID));
+    String parentUUID = objectToString(doc.get(RodaConstants.FILE_PARENT_UUID));
     String aipId = objectToString(doc.get(RodaConstants.FILE_AIPID));
-    String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATIONID));
+    String representationId = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_ID));
+    String representationUUID = objectToString(doc.get(RodaConstants.FILE_REPRESENTATION_UUID));
     String fileId = objectToString(doc.get(RodaConstants.FILE_FILEID));
     List<String> path = objectToListString(doc.get(RodaConstants.FILE_PATH));
     // boolean entryPoint =
@@ -1574,9 +1588,10 @@ public class SolrUtils {
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
 
-    file = new IndexedFile(uuid, aipId, representationId, path, fileId, false, fileFormat, originalName, size,
-      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, storagePath,
-      otherProperties);
+    file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, fileId, false,
+      fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
+      dateCreatedByApplication, hash, storagePath, otherProperties);
+
     return file;
   }
 

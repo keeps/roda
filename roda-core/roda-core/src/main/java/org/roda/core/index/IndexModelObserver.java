@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -26,7 +27,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -144,23 +144,23 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexRepresentations(final AIP aip) {
     for (Representation representation : aip.getRepresentations()) {
-      indexRepresentation(representation);
+      indexRepresentation(aip, representation);
     }
 
     commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
   }
 
-  private void indexRepresentation(final Representation representation) {
+  private void indexRepresentation(final AIP aip, final Representation representation) {
     CloseableIterable<File> allFiles = null;
     try {
-      SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(representation);
+      SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation);
       index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
       for (File file : allFiles) {
         boolean commit = false;
         boolean recursiveIndexFile = false;
-        indexFile(file, commit, recursiveIndexFile);
+        indexFile(aip, file, commit, recursiveIndexFile);
       }
       allFiles.close();
 
@@ -172,11 +172,11 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void indexFile(File file, boolean commit, boolean recursive) {
+  private void indexFile(AIP aip, File file, boolean commit, boolean recursive) {
     Binary premisFile = getFilePremisFile(file);
     String fulltext = getFileFulltext(file);
 
-    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(file, premisFile, fulltext);
+    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, premisFile, fulltext);
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
 
@@ -188,7 +188,7 @@ public class IndexModelObserver implements ModelObserver {
       try {
         CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
         for (File subfile : allFiles) {
-          indexFile(subfile, false, false);
+          indexFile(aip, subfile, false, false);
         }
         IOUtils.closeQuietly(allFiles);
 
@@ -283,9 +283,14 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationCreated(Representation representation) {
-    indexRepresentation(representation);
-    // XXX check if forcing auto commit is necessary
-    commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
+    try {
+      indexRepresentation(model.retrieveAIP(representation.getAipId()), representation);
+      // XXX check if forcing auto commit is necessary
+      commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not index representation: " + representation, e);
+    }
+
   }
 
   @Override
@@ -300,7 +305,7 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, IdUtils.getRepresentationId(aipId, representationId),
       "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
 
-    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATIONID, representationId,
+    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATION_UUID, representationId,
       "Error deleting Representation files (aipId=" + aipId + "; representationId=" + representationId + ")",
       forceCommit);
 
@@ -311,7 +316,11 @@ public class IndexModelObserver implements ModelObserver {
   public void fileCreated(File file) {
     boolean commit = true;
     boolean recursive = true;
-    indexFile(file, commit, recursive);
+    try {
+      indexFile(model.retrieveAIP(file.getAipId()), file, commit, recursive);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error indexing file: " + file, e);
+    }
   }
 
   @Override

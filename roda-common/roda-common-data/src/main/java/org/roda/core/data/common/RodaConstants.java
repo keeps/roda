@@ -88,6 +88,7 @@ public final class RodaConstants {
    */
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
+  public static final String API_REST_V1_FILES = "api/v1/files/";
   public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
   public static final String API_REST_V1_THEME = "api/v1/theme";
   // sub-resources strings
@@ -217,7 +218,7 @@ public final class RodaConstants {
    */
   public static final String AIP_ID = "id";
   public static final String AIP_PARENT_ID = "parentId";
-  public static final String AIP_ACTIVE = "active";
+  public static final String ACTIVE = "active";
 
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";
@@ -392,12 +393,13 @@ public final class RodaConstants {
 
   public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";
-  public static final String FILE_PARENT_ID = "parentId";
+  public static final String FILE_PARENT_UUID = "parentUUID";
   public static final String FILE_AIPID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
   public static final String FILE_FILEID = "fileId";
-  public static final String FILE_REPRESENTATIONID = "representationId";
+  public static final String FILE_REPRESENTATION_UUID = "representationUUID";
+  public static final String FILE_REPRESENTATION_ID = "representationId";
   public static final String FILE_STORAGE_PATH = "storagePath";
   public static final String FILE_ISENTRYPOINT = "isEntryPoint";
   public static final String FILE_FILEFORMAT = "fileFormat";

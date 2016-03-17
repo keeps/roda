@@ -17,15 +17,17 @@ public class IndexedFile implements IsIndexed {
 
   private static final long serialVersionUID = 3303019735787641534L;
 
-  private String uuid = null;
+  private String uuid;
+  private String parentUUID;
 
-  private String aipId = null;
-  private String representationId = null;
-  private List<String> path = null;
-  private String id = null;
+  private String aipId;
+  private String representationId;
+  private String representationUUID;
+  private List<String> path;
+  private String id;
 
-  private FileFormat fileFormat = null;
-  private String originalName = null;
+  private FileFormat fileFormat;
+  private String originalName;
   private long size = 0;
   private boolean isDirectory = false;
   private String creatingApplicationName;
@@ -40,14 +42,16 @@ public class IndexedFile implements IsIndexed {
     super();
   }
 
-  public IndexedFile(String uuid, String aipId, String representationId, List<String> path, String id,
-    boolean entryPoint, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
-    String creatingApplicationName, String creatingApplicationVersion, String dateCreatedByApplication,
-    List<String> hash, String storagePath, Map<String, List<String>> otherProperties) {
+  public IndexedFile(String uuid, String parentUUID, String aipId, String representationId, String representationUUID,
+    List<String> path, String id, boolean entryPoint, FileFormat fileFormat, String originalName, long size,
+    boolean isDirectory, String creatingApplicationName, String creatingApplicationVersion,
+    String dateCreatedByApplication, List<String> hash, String storagePath, Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
+    this.parentUUID = parentUUID;
 
     this.aipId = aipId;
     this.representationId = representationId;
+    this.representationUUID = representationUUID;
     this.path = path;
     this.id = id;
 
@@ -71,6 +75,14 @@ public class IndexedFile implements IsIndexed {
     this.uuid = uuid;
   }
 
+  public String getParentUUID() {
+    return parentUUID;
+  }
+
+  public void setParentUUID(String parentUUID) {
+    this.parentUUID = parentUUID;
+  }
+
   public String getAipId() {
     return aipId;
   }
@@ -85,6 +97,14 @@ public class IndexedFile implements IsIndexed {
 
   public void setRepresentationId(String representationId) {
     this.representationId = representationId;
+  }
+
+  public String getRepresentationUUID() {
+    return representationUUID;
+  }
+
+  public void setRepresentationUUID(String representationUUID) {
+    this.representationUUID = representationUUID;
   }
 
   public List<String> getPath() {
@@ -197,8 +217,10 @@ public class IndexedFile implements IsIndexed {
     result = prime * result + (isDirectory ? 1231 : 1237);
     result = prime * result + ((originalName == null) ? 0 : originalName.hashCode());
     result = prime * result + ((otherProperties == null) ? 0 : otherProperties.hashCode());
+    result = prime * result + ((parentUUID == null) ? 0 : parentUUID.hashCode());
     result = prime * result + ((path == null) ? 0 : path.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
+    result = prime * result + ((representationUUID == null) ? 0 : representationUUID.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
     result = prime * result + ((storagePath == null) ? 0 : storagePath.hashCode());
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
@@ -260,7 +282,11 @@ public class IndexedFile implements IsIndexed {
       if (other.otherProperties != null)
         return false;
     } else if (!otherProperties.equals(other.otherProperties))
-      return false;
+      if (parentUUID == null) {
+        if (other.parentUUID != null)
+          return false;
+      } else if (!parentUUID.equals(other.parentUUID))
+        return false;
     if (path == null) {
       if (other.path != null)
         return false;
@@ -270,6 +296,11 @@ public class IndexedFile implements IsIndexed {
       if (other.representationId != null)
         return false;
     } else if (!representationId.equals(other.representationId))
+      return false;
+    if (representationUUID == null) {
+      if (other.representationUUID != null)
+        return false;
+    } else if (!representationUUID.equals(other.representationUUID))
       return false;
     if (size != other.size)
       return false;
@@ -288,12 +319,12 @@ public class IndexedFile implements IsIndexed {
 
   @Override
   public String toString() {
-    return "IndexedFile [uuid=" + uuid + ", aipId=" + aipId + ", representationId=" + representationId + ", path="
-      + path + ", id=" + id + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
-      + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
-      + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
-      + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + ", otherProperties="
-      + otherProperties + "]";
+    return "IndexedFile [uuid=" + uuid + ", parentUUID=" + parentUUID + ", aipId=" + aipId + ", representationId="
+      + representationId + ", representationUUID=" + representationUUID + ", path=" + path + ", id=" + id
+      + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size + ", isDirectory="
+      + isDirectory + ", creatingApplicationName=" + creatingApplicationName + ", creatingApplicationVersion="
+      + creatingApplicationVersion + ", dateCreatedByApplication=" + dateCreatedByApplication + ", hash=" + hash
+      + ", storagePath=" + storagePath + ", otherProperties=" + otherProperties + "]";
   }
 
 }

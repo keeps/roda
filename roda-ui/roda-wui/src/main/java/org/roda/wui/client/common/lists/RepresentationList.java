@@ -17,7 +17,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.BrowserService;
@@ -145,8 +144,7 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
 
       @Override
       public Object getKey(IndexedRepresentation item) {
-        String uuid = IdUtils.getRepresentationId(item.getAipId(), item.getId());
-        return uuid;
+        return item.getUuid();
       }
     };
   }

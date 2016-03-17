@@ -26,7 +26,6 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SelectAipDialog;
@@ -70,7 +69,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -392,7 +390,7 @@ public class Browse extends Composite {
 
       IndexedAIP aip = itemBundle.getAip();
       List<DescriptiveMetadataViewBundle> descMetadata = itemBundle.getDescriptiveMetadata();
-      List<Representation> representations = itemBundle.getRepresentations();
+      List<IndexedRepresentation> representations = itemBundle.getRepresentations();
 
       breadcrumb.updatePath(getBreadcrumbsFromAncestors(itemBundle.getAIPAncestors(), aip));
       breadcrumb.setVisible(true);
@@ -478,7 +476,7 @@ public class Browse extends Composite {
       actionsSidebar.setVisible(true);
       permissionsSidebar.setVisible(true);
 
-      for (Representation rep : representations) {
+      for (IndexedRepresentation rep : representations) {
         downloadList.add(createRepresentationDownloadButton(rep));
       }
 
@@ -562,43 +560,11 @@ public class Browse extends Composite {
     return breadcrumbLabel;
   }
 
-  @SuppressWarnings("unused")
-  private Widget createRepresentationDownloadPanel(IndexedRepresentation rep) {
-    FlowPanel downloadPanel = new FlowPanel();
-    HTML icon = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-download'></i>"));
 
-    SafeHtml labelText;
-
-    if (rep.isOriginal()) {
-      labelText = messages.downloadTitleOriginal();
-    } else {
-      labelText = messages.downloadTitleDefault();
-    }
-
-    FlowPanel labelsPanel = new FlowPanel();
-
-    Anchor label = new Anchor(labelText,
-      Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getId()));
-    Label subLabel = new Label(messages.downloadRepresentationInfo((int) rep.getTotalNumberOfFiles(),
-      Humanize.readableFileSize(rep.getSizeInBytes())));
-
-    labelsPanel.add(label);
-    labelsPanel.add(subLabel);
-    downloadPanel.add(icon);
-    downloadPanel.add(labelsPanel);
-
-    downloadPanel.addStyleName("browseDownload");
-    icon.addStyleName("browseDownloadIcon");
-    labelsPanel.addStyleName("browseDownloadLabels");
-    label.addStyleName("browseDownloadLabel");
-    subLabel.addStyleName("browseDownloadSublabel");
-    return downloadPanel;
-  }
-
-  private Widget createRepresentationDownloadButton(Representation rep) {
+  private Widget createRepresentationDownloadButton(IndexedRepresentation rep) {
     Button downloadButton = new Button();
     final String aipId = rep.getAipId();
-    final String repId = rep.getId();
+    final String repUUID = rep.getUuid();
 
     SafeHtml labelText;
 
@@ -614,7 +580,7 @@ public class Browse extends Composite {
 
       @Override
       public void onClick(ClickEvent event) {
-        Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, repId));
+        Tools.newHistory(Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, repUUID));
       }
     });
 

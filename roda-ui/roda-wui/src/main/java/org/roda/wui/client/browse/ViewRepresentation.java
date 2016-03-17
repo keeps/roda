@@ -21,10 +21,10 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.wui.client.common.UserLogin;
@@ -126,7 +126,7 @@ public class ViewRepresentation extends Composite {
     private void load(final Viewers viewers, final List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() > 1) {
         final String aipId = historyTokens.get(0);
-        final String representationId = historyTokens.get(1);
+        final String representationUUID = historyTokens.get(1);
 
         BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
@@ -138,23 +138,17 @@ public class ViewRepresentation extends Composite {
 
           @Override
           public void onSuccess(final BrowseItemBundle itemBundle) {
-            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationId)) {
+            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
               if (historyTokens.size() > 2) {
-                final List<String> fileDirectoryPath = new ArrayList<>();
-                if (historyTokens.size() > 3) {
-                  fileDirectoryPath.addAll(historyTokens.subList(2, historyTokens.size() - 1));
-                }
-                final String fileId = historyTokens.get(historyTokens.size() - 1);
-
-                String fileUUID = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
+                final String fileUUID = historyTokens.get(2);
 
                 BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
                   new AsyncCallback<IndexedFile>() {
 
                   @Override
                   public void onSuccess(IndexedFile simpleFile) {
-                    ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationId,
-                      fileId, simpleFile);
+                    ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
+                      fileUUID, simpleFile);
                     callback.onSuccess(view);
                   }
 
@@ -166,7 +160,7 @@ public class ViewRepresentation extends Composite {
                 });
 
               } else {
-                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationId);
+                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
                 callback.onSuccess(view);
               }
             } else {
@@ -179,10 +173,10 @@ public class ViewRepresentation extends Composite {
       }
     }
 
-    private boolean verifyRepresentation(List<Representation> representations, String representationId) {
+    private boolean verifyRepresentation(List<IndexedRepresentation> representations, String representationUUID) {
       boolean exist = false;
-      for (Representation representation : representations) {
-        if (representation.getId().equals(representationId)) {
+      for (IndexedRepresentation representation : representations) {
+        if (representation.getUuid().equals(representationUUID)) {
           exist = true;
         }
       }
@@ -196,12 +190,8 @@ public class ViewRepresentation extends Composite {
   };
 
   public static void jumpTo(IndexedFile selected) {
-    List<String> history = new ArrayList<>();
-    history.add(selected.getAipId());
-    history.add(selected.getRepresentationId());
-    history.addAll(selected.getPath());
-    history.add(selected.getId());
-    Tools.newHistory(ViewRepresentation.RESOLVER, history);
+    Tools.newHistory(ViewRepresentation.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(),
+      selected.getUuid());
   }
 
   interface MyUiBinder extends UiBinder<Widget, ViewRepresentation> {
@@ -217,9 +207,9 @@ public class ViewRepresentation extends Composite {
   private Viewers viewers;
   private String aipId;
   private BrowseItemBundle itemBundle;
-  private String representationId;
+  private String representationUUID;
   @SuppressWarnings("unused")
-  private String fileId;
+  private String fileUUID;
   private IndexedFile file;
   private Filter defaultFilter;
 
@@ -298,30 +288,29 @@ public class ViewRepresentation extends Composite {
    * @param viewers
    * @param aipId
    * @param itemBundle
-   * @param representationId
-   * @param fileId
+   * @param representationUUID
+   * @param fileUUID
    * @param file
    * 
    */
-  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationId,
-    String fileId, IndexedFile file) {
+  public ViewRepresentation(Viewers viewers, String aipId, BrowseItemBundle itemBundle, String representationUUID,
+    String fileUUID, IndexedFile file) {
     this.viewers = viewers;
     this.aipId = aipId;
     this.itemBundle = itemBundle;
-    this.representationId = representationId;
-    this.fileId = fileId;
+    this.representationUUID = representationUUID;
+    this.fileUUID = fileUUID;
     this.file = file;
 
-    String parentUuid = getParentUuid(file);
     if (file != null && file.isDirectory()) {
-      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_ID, file.getUuid()));
-    } else if (file != null && !file.isDirectory() && parentUuid != null) {
-      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_ID, parentUuid));
+      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getUuid()));
+    } else if (file != null && !file.isDirectory() && file.getParentUUID() != null) {
+      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getParentUUID()));
     } else {
-      defaultFilter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_ID));
+      defaultFilter = new Filter(new EmptyKeyFilterParameter(RodaConstants.FILE_PARENT_UUID));
     }
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
-    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATIONID, representationId));
+    defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
     filesList = new SimpleFileList(defaultFilter, null, null, false);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -442,13 +431,9 @@ public class ViewRepresentation extends Composite {
       String url = Window.Location.createUrlBuilder().buildString();
       String viewUrl = url.substring(0, url.indexOf('#'));
 
-      List<String> history = new ArrayList<>();
-      history.add(file.getAipId());
-      history.add(file.getRepresentationId());
-      history.addAll(file.getPath());
-      history.add(file.getId());
-
-      String hashLink = Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history.toArray(new String[] {}));
+      // TODO set representation UUID
+      String hashLink = Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, file.getAipId(),
+        file.getRepresentationUUID(), file.getUuid());
       viewUrl += hashLink;
 
       JavascriptUtils.updateURLWithoutReloading(viewUrl);
@@ -466,8 +451,8 @@ public class ViewRepresentation extends Composite {
     List<BreadcrumbItem> fileBreadcrumb = new ArrayList<>();
 
     IndexedAIP aip = itemBundle.getAip();
-    List<Representation> representations = itemBundle.getRepresentations();
-    Representation rep = selectRepresentation(representations, representationId);
+    List<IndexedRepresentation> representations = itemBundle.getRepresentations();
+    IndexedRepresentation rep = selectRepresentation(representations, representationUUID);
 
     // AIP breadcrumb
     fullBreadcrumb
@@ -481,7 +466,7 @@ public class ViewRepresentation extends Composite {
       List<String> filePath = file.getPath();
       List<String> pathBuilder = new ArrayList<>();
       pathBuilder.add(aipId);
-      pathBuilder.add(representationId);
+      pathBuilder.add(representationUUID);
       for (String folder : filePath) {
         pathBuilder.add(folder);
         List<String> path = new ArrayList<>(pathBuilder);
@@ -505,14 +490,14 @@ public class ViewRepresentation extends Composite {
       fileBreadcrumb.add(new BreadcrumbItem(
         file.isDirectory() ? getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FOLDER)
           : getBreadcrumbLabel(fileLabel, RodaConstants.VIEW_REPRESENTATION_FILE),
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId, file.getId())));
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID, file.getId())));
     }
 
     // Representation breadcrumb
     fullBreadcrumb.add(fileBreadcrumb.size() > 1
       ? new BreadcrumbItem(
         getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION),
-        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationId))
+        Tools.concat(ViewRepresentation.RESOLVER.getHistoryPath(), aipId, representationUUID))
       : new BreadcrumbItem(
         getBreadcrumbLabel(representationType(rep), RodaConstants.VIEW_REPRESENTATION_REPRESENTATION), new Command() {
 
@@ -527,10 +512,11 @@ public class ViewRepresentation extends Composite {
     return fullBreadcrumb;
   }
 
-  private Representation selectRepresentation(List<Representation> representations, String representationId) {
-    Representation rep = null;
-    for (Representation representation : representations) {
-      if (representation.getId().equals(representationId)) {
+  private IndexedRepresentation selectRepresentation(List<IndexedRepresentation> representations,
+    String representationUUID) {
+    IndexedRepresentation rep = null;
+    for (IndexedRepresentation representation : representations) {
+      if (representation.getUuid().equals(representationUUID)) {
         rep = representation;
       }
     }
@@ -577,10 +563,10 @@ public class ViewRepresentation extends Composite {
   private void downloadFile() {
     SafeUri downloadUri = null;
     if (file != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId());
+      downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUuid());
     } else if (filesList.getSelectionModel().getSelectedObject() != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(aipId, representationId,
-        filesList.getSelectionModel().getSelectedObject().getId());
+      downloadUri = RestUtils
+        .createRepresentationFileDownloadUri(filesList.getSelectionModel().getSelectedObject().getUuid());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -773,7 +759,7 @@ public class ViewRepresentation extends Composite {
   }
 
   private void imagePreview(IndexedFile file) {
-    Image image = new Image(RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getUuid()));
+    Image image = new Image(RestUtils.createRepresentationFileDownloadUri(file.getUuid()));
     image.addErrorHandler(new ErrorHandler() {
 
       @Override
@@ -787,8 +773,8 @@ public class ViewRepresentation extends Composite {
   }
 
   private void pdfPreview(IndexedFile file) {
-    String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file=" + encode(GWT.getHostPageBaseURL()
-      + RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getUuid()).asString());
+    String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file="
+      + encode(GWT.getHostPageBaseURL() + RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString());
 
     Frame frame = new Frame(viewerHtml);
     filePreview.add(frame);
@@ -797,7 +783,7 @@ public class ViewRepresentation extends Composite {
 
   private void textPreview(IndexedFile file) {
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getUuid()).asString());
+      RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString());
     try {
       request.sendRequest(null, new RequestCallback() {
 
@@ -834,8 +820,7 @@ public class ViewRepresentation extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-headphones fa-5'></i>"));
       html.setHTML(b.toSafeHtml());
 
-      audioPlayer.addSource(
-        RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString(), "audio/mpeg");
+      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString(), "audio/mpeg");
       audioPlayer.setControls(true);
       filePreview.add(html);
       filePreview.add(audioPlayer);
@@ -849,8 +834,7 @@ public class ViewRepresentation extends Composite {
   private void videoPreview(IndexedFile file) {
     Video videoPlayer = Video.createIfSupported();
     if (videoPlayer != null) {
-      videoPlayer.addSource(
-        RestUtils.createRepresentationFileDownloadUri(aipId, representationId, file.getId()).asString(), "video/dvd");
+      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString(), "video/dvd");
       videoPlayer.setControls(true);
       filePreview.add(videoPlayer);
       videoPlayer.addStyleName("viewRepresentationAudioFilePreview");
@@ -950,22 +934,5 @@ public class ViewRepresentation extends Composite {
       valueLabel.addStyleName("infoFileEntryValue");
       entry.addStyleName("infoFileEntry");
     }
-  }
-
-  private String getParentUuid(IndexedFile file) {
-    String parentUUID = null;
-    if (file != null) {
-      List<String> path = file.getPath();
-      if (path != null && !path.isEmpty()) {
-        String parentFileId = path.get(path.size() - 1);
-        List<String> parentFileDirectoryPath = new ArrayList<>();
-        if (path.size() > 1) {
-          parentFileDirectoryPath.addAll(path.subList(0, path.size() - 1));
-        }
-        parentUUID = IdUtils.getFileId(file.getAipId(), file.getRepresentationId(), parentFileDirectoryPath,
-          parentFileId);
-      }
-    }
-    return parentUUID;
   }
 }

@@ -10,14 +10,13 @@
  */
 package org.roda.wui.client.browse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
+import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -334,7 +333,7 @@ public class ShowPreservationEvent extends Composite {
 
     if (object.getType().equalsIgnoreCase("URN")) {
       String idValue = object.getValue();
-      LinkingObjectType type = IdUtils.getLinkingIdentifierType(idValue);
+      LinkingObjectType type = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
       if (type == LinkingObjectType.TRANSFERRED_RESOURCE) {
         addTransferredResourcePanel(bundle, layout, idValue);
@@ -387,7 +386,7 @@ public class ShowPreservationEvent extends Composite {
     } else {
       Label idLabel = new Label("Identifier (not found)");
       idLabel.addStyleName("label");
-      String path = IdUtils.getLinkingObjectPath(idValue);
+      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
       body.add(idLabel);
@@ -465,7 +464,7 @@ public class ShowPreservationEvent extends Composite {
       if (ifile.getPath() != null && !ifile.getPath().isEmpty()) {
         pathLabel = new Label("Path");
         pathLabel.addStyleName("label");
-        pathValue = new Label(IdUtils.getFileDirectoryPathId(ifile.getPath()));
+        pathValue = new Label(Tools.join(ifile.getPath(), "/"));
       }
 
       Label formatLabel = new Label("Format");
@@ -480,12 +479,6 @@ public class ShowPreservationEvent extends Composite {
       Label sizeLabel = new Label("Size");
       sizeLabel.addStyleName("label");
       Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
-
-      List<String> history = new ArrayList<>();
-      history.add(ifile.getAipId());
-      history.add(ifile.getRepresentationId());
-      history.addAll(ifile.getPath());
-      history.add(ifile.getId());
 
       body.add(nameLabel);
       body.add(nameValue);
@@ -502,13 +495,14 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, history));
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, ifile.getAipId(),
+        ifile.getRepresentationUUID(), ifile.getUuid()));
       footer.add(link);
 
     } else {
       Label idLabel = new Label("Identifier (not found)");
       idLabel.addStyleName("label");
-      String path = IdUtils.getLinkingObjectPath(idValue);
+      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
       body.add(idLabel);
@@ -555,7 +549,7 @@ public class ShowPreservationEvent extends Composite {
     } else {
       Label idLabel = new Label("Identifier (not found)");
       idLabel.addStyleName("label");
-      String path = IdUtils.getLinkingObjectPath(idValue);
+      String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
 
       body.add(idLabel);

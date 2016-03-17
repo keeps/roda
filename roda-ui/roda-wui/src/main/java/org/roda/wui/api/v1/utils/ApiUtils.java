@@ -117,7 +117,7 @@ public class ApiUtils {
     boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .cacheControl(cacheControl).lastModified(lastModifiedDate).build();
   }
 
@@ -129,7 +129,7 @@ public class ApiUtils {
     boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .cacheControl(cacheControl).tag(tag).build();
   }
 
@@ -140,7 +140,7 @@ public class ApiUtils {
   public static Response okResponse(StreamResponse streamResponse, boolean inline) {
     return Response.ok(streamResponse.getStream(), streamResponse.getMediaType())
       .header(HttpHeaders.CONTENT_DISPOSITION,
-        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + streamResponse.getFilename())
+        contentDisposition(inline) + CONTENT_DISPOSITION_FILENAME_ARGUMENT + "\"" + streamResponse.getFilename() + "\"")
       .build();
   }
 

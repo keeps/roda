@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -26,8 +27,8 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
+import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
@@ -347,29 +348,30 @@ public final class PluginHelper {
 
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(IdUtils.getLinkingIdentifierId(LinkingObjectType.TRANSFERRED_RESOURCE, transferredResource));
+    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(LinkingObjectType.TRANSFERRED_RESOURCE, transferredResource));
     li.setType("URN");
     li.setRoles(Arrays.asList(role));
     return li;
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.AIP, aipID, null, null, null, role);
+    return getLinkingIdentifier(LinkingObjectType.AIP, aipID, role);
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.REPRESENTATION, aipID, representationID, null, null, role);
+    return getLinkingIdentifier(LinkingObjectType.REPRESENTATION, IdUtils.getRepresentationId(aipID, representationID),
+      role);
   }
 
   public static LinkingIdentifier getLinkingIdentifier(String aipID, String representationID, List<String> filePath,
     String fileID, String role) {
-    return getLinkingIdentifier(LinkingObjectType.FILE, aipID, representationID, null, null, role);
+    return getLinkingIdentifier(LinkingObjectType.FILE, IdUtils.getFileId(aipID, representationID, filePath, fileID),
+      role);
   }
 
-  private static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String aipID, String representationID,
-    List<String> filePath, String fileID, String role) {
+  private static LinkingIdentifier getLinkingIdentifier(LinkingObjectType type, String uuid, String role) {
     LinkingIdentifier li = new LinkingIdentifier();
-    li.setValue(IdUtils.getLinkingIdentifierId(type, aipID, representationID, filePath, fileID));
+    li.setValue(LinkingObjectUtils.getLinkingIdentifierId(type, uuid));
     li.setType("URN");
     li.setRoles(Arrays.asList(role));
     return li;

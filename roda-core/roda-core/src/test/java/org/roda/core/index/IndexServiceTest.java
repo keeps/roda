@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -47,7 +48,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.IdUtils;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -487,5 +487,25 @@ public class IndexServiceTest {
     filterGroup.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "false"));
     assertThat(index.count(RODAMember.class, filterGroup), Matchers.is(1L));
 
+  }
+
+  @Test
+  public void testIdWithComma() throws RODAException {
+    // generate AIP ID
+    final String origAipId = "id, with, comma";
+    final String aipId = UUID.nameUUIDFromBytes(origAipId.getBytes()).toString();
+
+    // Create AIP
+    model.createAIP(aipId, corporaService,
+      DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, null, null, new Sublist(0, 10));
+    assertEquals(1, find.getTotalCount());
+
+    IndexedAIP aip = index.retrieve(IndexedAIP.class, UUID.nameUUIDFromBytes(origAipId.getBytes()).toString());
+    assertNotNull(aip);
+
+    // cleanup
+    model.deleteAIP(aipId);
   }
 }

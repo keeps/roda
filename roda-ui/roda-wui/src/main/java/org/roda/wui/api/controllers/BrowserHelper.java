@@ -40,6 +40,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -59,8 +60,8 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.IdUtils;
-import org.roda.core.data.v2.IdUtils.LinkingObjectType;
+import org.roda.core.data.v2.LinkingObjectUtils;
+import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -149,17 +150,17 @@ public class BrowserHelper {
     // set representations
     // getting the last [BUNDLE_MAX_REPRESENTATION_COUNT] representations
     Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_ORIGINAL, true));
-    IndexResult<Representation> findRepresentations = findRepresentations(aipId, sorter,
+    IndexResult<IndexedRepresentation> findRepresentations = findRepresentations(aipId, sorter,
       new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
-    List<Representation> representations = findRepresentations.getResults();
+    List<IndexedRepresentation> representations = findRepresentations.getResults();
 
     // if there are more representations ensure one original is there
     if (findRepresentations.getTotalCount() > findRepresentations.getLimit()) {
       boolean hasOriginals = findRepresentations.getResults().stream().anyMatch(x -> x.isOriginal());
       if (!hasOriginals) {
         boolean onlyOriginals = true;
-        IndexResult<Representation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals, sorter,
-          new Sublist(0, BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT));
+        IndexResult<IndexedRepresentation> findOriginalRepresentations = findRepresentations(aipId, onlyOriginals,
+          sorter, new Sublist(0, BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT));
         representations.addAll(findOriginalRepresentations.getResults());
       }
     }
@@ -268,13 +269,13 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().suggest(returnClass, field, query);
   }
 
-  private static IndexResult<Representation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
+  private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, Sorter sorter, Sublist sublist)
     throws GenericException, RequestNotValidException {
     return findRepresentations(aipId, false, sorter, sublist);
   }
 
-  private static IndexResult<Representation> findRepresentations(String aipId, boolean onlyOriginals, Sorter sorter,
-    Sublist sublist) throws GenericException, RequestNotValidException {
+  private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, boolean onlyOriginals,
+    Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
     if (onlyOriginals) {
@@ -282,7 +283,7 @@ public class BrowserHelper {
     }
     Facets facets = null;
 
-    return RodaCoreFactory.getIndexService().find(Representation.class, filter, sorter, sublist, facets);
+    return RodaCoreFactory.getIndexService().find(IndexedRepresentation.class, filter, sorter, sublist, facets);
 
   }
 
@@ -795,24 +796,25 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().deleteRepresentation(aipId, representationId);
   }
 
-  public static void removeRepresentationFile(String aipId, String representationId, List<String> directoryPath,
-    String fileId) throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().deleteFile(aipId, representationId, directoryPath, fileId, true);
+  public static void removeRepresentationFile(String fileUUID)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUUID);
+    RodaCoreFactory.getModelService().deleteFile(file.getAipId(), file.getRepresentationId(), file.getPath(),
+      file.getId(), true);
   }
 
-  public static StreamResponse getAipRepresentationFile(String aipId, String representationId, String fileUuid,
-    String acceptFormat)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+  public static StreamResponse getAipRepresentationFile(String fileUuid, String acceptFormat)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
 
     final String filename;
     final String mediaType;
     final StreamingOutput stream;
 
-    IndexedFile indexedFile = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
-
     StorageService storage = RodaCoreFactory.getStorageService();
-    Binary representationFileBinary = storage
-      .getBinary(ModelUtils.getFileStoragePath(aipId, representationId, indexedFile.getPath(), indexedFile.getId()));
+    Binary representationFileBinary = storage.getBinary(ModelUtils.getFileStoragePath(indexedFile.getAipId(),
+      indexedFile.getRepresentationId(), indexedFile.getPath(), indexedFile.getId()));
     filename = representationFileBinary.getStoragePath().getName();
     mediaType = MediaType.WILDCARD;
     stream = new StreamingOutput() {
@@ -1055,22 +1057,22 @@ public class BrowserHelper {
 
     for (LinkingIdentifier identifier : allLinkingIdentifiers) {
       String idValue = identifier.getValue();
-      LinkingObjectType linkingType = IdUtils.getLinkingIdentifierType(idValue);
+      LinkingObjectType linkingType = LinkingObjectUtils.getLinkingIdentifierType(idValue);
 
       try {
         if (LinkingObjectType.AIP.equals(linkingType)) {
-          String uuid = IdUtils.getAipIdFromLinkingId(idValue);
+          String uuid = LinkingObjectUtils.getAipIdFromLinkingId(idValue);
           IndexedAIP aip = retrieve(IndexedAIP.class, uuid);
           aips.put(idValue, aip);
         } else if (LinkingObjectType.REPRESENTATION.equals(linkingType)) {
-          String uuid = IdUtils.getRepresentationIdFromLinkingId(idValue);
+          String uuid = LinkingObjectUtils.getRepresentationIdFromLinkingId(idValue);
           IndexedRepresentation rep = retrieve(IndexedRepresentation.class, uuid);
           representations.put(idValue, rep);
         } else if (LinkingObjectType.FILE.equals(linkingType)) {
-          IndexedFile file = retrieve(IndexedFile.class, IdUtils.getFileIdFromLinkingId(idValue));
+          IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue));
           files.put(idValue, file);
         } else if (LinkingObjectType.TRANSFERRED_RESOURCE.equals(linkingType)) {
-          String uuid = IdUtils.getTransferredResourceIdFromLinkingId(idValue);
+          String uuid = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
           TransferredResource tr = retrieve(TransferredResource.class, uuid);
           transferredResources.put(idValue, tr);
         } else {

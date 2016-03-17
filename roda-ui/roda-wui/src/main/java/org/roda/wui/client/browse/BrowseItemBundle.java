@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 
 public class BrowseItemBundle implements Serializable {
@@ -20,14 +21,14 @@ public class BrowseItemBundle implements Serializable {
   private IndexedAIP aip;
   private List<IndexedAIP> aipAncestors;
   private List<DescriptiveMetadataViewBundle> descriptiveMetadata;
-  private List<Representation> representations;
+  private List<IndexedRepresentation> representations;
 
   public BrowseItemBundle() {
     super();
   }
 
   public BrowseItemBundle(IndexedAIP aip, List<IndexedAIP> aipAncestors,
-    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<Representation> representations) {
+    List<DescriptiveMetadataViewBundle> descriptiveMetadata, List<IndexedRepresentation> representations) {
     super();
     this.aip = aip;
     this.setAIPAncestors(aipAncestors);
@@ -51,11 +52,11 @@ public class BrowseItemBundle implements Serializable {
     this.descriptiveMetadata = descriptiveMetadata;
   }
 
-  public List<Representation> getRepresentations() {
+  public List<IndexedRepresentation> getRepresentations() {
     return representations;
   }
 
-  public void setRepresentations(List<Representation> representations) {
+  public void setRepresentations(List<IndexedRepresentation> representations) {
     this.representations = representations;
   }
 

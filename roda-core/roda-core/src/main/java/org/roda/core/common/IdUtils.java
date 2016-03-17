@@ -5,21 +5,17 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2;
+package org.roda.core.common;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
-  private static final String LINKING_ID_SEPARATOR = "/";
 
-  public enum LinkingObjectType {
-    TRANSFERRED_RESOURCE, AIP, REPRESENTATION, FILE
-  }
 
   /** Private empty constructor */
   private IdUtils() {
@@ -31,7 +27,7 @@ public final class IdUtils {
     idBuilder.append(aipId);
     idBuilder.append(ID_SEPARATOR);
     idBuilder.append(representationId);
-    return idBuilder.toString();
+    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
   }
 
   public static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
@@ -45,58 +41,24 @@ public final class IdUtils {
       idBuilder.append(ID_SEPARATOR);
     }
     idBuilder.append(fileId);
-    return idBuilder.toString();
+
+    return UUID.nameUUIDFromBytes(idBuilder.toString().getBytes()).toString();
   }
 
   public static String getFileId(File file) {
     return getFileId(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
   }
 
-  public static String getFileDirectoryPathId(List<String> path) {
-    StringBuilder idBuilder = new StringBuilder();
-    for (String string : path) {
-      if (idBuilder.length() > 0) {
-        idBuilder.append(LINKING_ID_SEPARATOR);
-      }
-      idBuilder.append(string);
-    }
-    return idBuilder.toString();
-  }
-
   public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId) {
     return type + ":" + getFileId(aipId, representationId, null, null, type.toString(), ID_SEPARATOR);
   }
-  
+
   public static String getPreservationMetadataId(PreservationMetadataType type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
   }
 
-  public static String getLinkingIdentifierId(LinkingObjectType type, String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
-    return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, null, LINKING_ID_SEPARATOR);
-  }
-
-  public static String getLinkingIdentifierId(LinkingObjectType type, TransferredResource transferredResource) {
-    return type + ":" + transferredResource.getRelativePath();
-  }
-
-  public static LinkingObjectType getLinkingIdentifierType(String value) {
-    if (value.contains(":")) {
-      return LinkingObjectType.valueOf(value.split(":")[0]);
-    } else {
-      return null;
-    }
-  }
-
-  public static String getLinkingObjectPath(String path) {
-    if (path.contains(":")) {
-      return path.substring(path.indexOf(":") + 1);
-    } else {
-      return null;
-    }
-  }
-
+  
   public static String getOtherMetadataId(String type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, type, ID_SEPARATOR);
@@ -106,27 +68,7 @@ public final class IdUtils {
     return jobId + ID_SEPARATOR + aipId;
   }
 
-  public static String[] splitLinkingId(String id) {
-    return id.split(LINKING_ID_SEPARATOR);
-  }
-
-  public static String getFileIdFromLinkingId(String linkingId) {
-    String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
-  }
-
-  public static String getRepresentationIdFromLinkingId(String linkingId) {
-    String path = getLinkingObjectPath(linkingId);
-    return path.replaceAll(LINKING_ID_SEPARATOR, ID_SEPARATOR);
-  }
-
-  public static String getAipIdFromLinkingId(String linkingId) {
-    return getLinkingObjectPath(linkingId);
-  }
-
-  public static String getTransferredResourceIdFromLinkingId(String linkingId) {
-    return getLinkingObjectPath(linkingId);
-  }
+  
 
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     String type, String separator) {

@@ -120,6 +120,11 @@
    <copyField source="id" dest="search"/>
    <copyField source="aipId" dest="search"/>
    <copyField source="fileId" dest="search"/>
+   
+   <!-- PERMISSIONS -->
+   <field name="active" type="boolean" default="false" indexed="true" stored="true" required="true" multiValued="false" />
+   <dynamicField name="permission_users_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <dynamicField name="permission_groups_*" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

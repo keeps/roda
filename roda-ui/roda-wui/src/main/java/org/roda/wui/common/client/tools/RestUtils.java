@@ -7,10 +7,7 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.util.List;
-
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.IdUtils;
 
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeUri;
@@ -33,22 +30,13 @@ public class RestUtils {
     return UriUtils.fromSafeConstant(b.toString());
   }
 
-  public static SafeUri createRepresentationFileDownloadUri(String aipId, String representationId,
-    List<String> fileDirectoryPath, String fileId) {
-    String fileUuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
-    return createRepresentationFileDownloadUri(aipId, representationId, fileUuid);
-  }
+  public static SafeUri createRepresentationFileDownloadUri(String fileUuid) {
 
-  public static SafeUri createRepresentationFileDownloadUri(String aipId, String representationId, String fileUuid) {
-
-    // api/v1/aips/{aip_id}/data/{rep_id}/file/{file_uuid}?acceptFormat=bin
+    // api/v1/files/{file_uuid}?acceptFormat=bin
 
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DATA).append(RodaConstants.API_SEP).append(UriUtils.encode(representationId))
-      .append(RodaConstants.API_SEP).append(RodaConstants.API_FILE).append(RodaConstants.API_SEP)
-      .append(UriUtils.encode(fileUuid));
+    b.append(RodaConstants.API_REST_V1_FILES).append(UriUtils.encode(fileUuid));
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);

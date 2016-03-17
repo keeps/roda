@@ -17,6 +17,7 @@ import java.util.Locale;
 import javax.xml.transform.TransformerException;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -32,6 +33,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.user.RodaUser;
@@ -662,29 +664,29 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static void removeRepresentationFile(RodaUser user, String aipId, String representationId,
-    List<String> directoryPath, String fileId)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+  public static void removeRepresentationFile(RodaUser user, String fileUUID)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedFile file = BrowserHelper.retrieve(IndexedFile.class, fileUUID);
+    // TODO check permissions from indexed file
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
-    BrowserHelper.removeRepresentationFile(aipId, representationId, directoryPath, fileId);
+    BrowserHelper.removeRepresentationFile(fileUUID);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", aip.getId(), duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId,
-      RodaConstants.API_PATH_PARAM_FILE_UUID, fileId);
+    registerAction(user, BROWSER_COMPONENT, "removeRepresentationFile", aip.getId(), duration, RodaConstants.FILE_AIPID,
+      file.getAipId(), RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH,
+      file.getPath(), RodaConstants.FILE_FILEID, file.getId());
   }
 
-  public static StreamResponse getAipRepresentationFile(RodaUser user, String aipId, String representationId,
-    String fileUuid, String acceptFormat)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+  public static StreamResponse getAipRepresentationFile(RodaUser user, String fileUuid, String acceptFormat)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -692,18 +694,19 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, BROWSE_ROLE);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedFile file = RodaCoreFactory.getIndexService().retrieve(IndexedFile.class, fileUuid);
+    // TODO get permissions from indexed file
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, file.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(aipId, representationId, fileUuid,
-      acceptFormat);
+    StreamResponse aipRepresentationFile = BrowserHelper.getAipRepresentationFile(fileUuid, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", aipId, duration,
-      RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId, RodaConstants.API_PATH_PARAM_FILE_UUID,
-      fileUuid);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationFile", file.getAipId(), duration,
+      RodaConstants.FILE_REPRESENTATION_ID, file.getRepresentationId(), RodaConstants.FILE_PATH, file.getPath(),
+      RodaConstants.FILE_FILEID, file.getId());
 
     return aipRepresentationFile;
   }

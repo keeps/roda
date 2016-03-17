@@ -13,6 +13,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
 
   private static final long serialVersionUID = -950545608880793468L;
 
+  private String uuid;
+
   private long sizeInBytes;
   private long totalNumberOfFiles;
 
@@ -20,10 +22,20 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     super();
   }
 
-  public IndexedRepresentation(String id, String aipId, boolean original, long sizeInBytes, long totalNumberOfFiles) {
+  public IndexedRepresentation(String uuid, String id, String aipId, boolean original, long sizeInBytes,
+    long totalNumberOfFiles) {
     super(id, aipId, original);
+    this.uuid = uuid;
     this.sizeInBytes = sizeInBytes;
     this.totalNumberOfFiles = totalNumberOfFiles;
+  }
+
+  public String getUuid() {
+    return uuid;
+  }
+
+  public void setUuid(String uuid) {
+    this.uuid = uuid;
   }
 
   public long getSizeInBytes() {
@@ -48,6 +60,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     int result = super.hashCode();
     result = prime * result + (int) (sizeInBytes ^ (sizeInBytes >>> 32));
     result = prime * result + (int) (totalNumberOfFiles ^ (totalNumberOfFiles >>> 32));
+    result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
 
@@ -64,13 +77,18 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
       return false;
     if (totalNumberOfFiles != other.totalNumberOfFiles)
       return false;
+    if (uuid == null) {
+      if (other.uuid != null)
+        return false;
+    } else if (!uuid.equals(other.uuid))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "IndexedRepresentation [sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles=" + totalNumberOfFiles
-      + ", super.toString()=" + super.toString() + "]";
+    return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles="
+      + totalNumberOfFiles + "]";
   }
 
 }
