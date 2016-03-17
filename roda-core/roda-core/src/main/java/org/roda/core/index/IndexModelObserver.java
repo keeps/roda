@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -45,6 +48,7 @@ import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * 
@@ -219,7 +223,7 @@ public class IndexModelObserver implements ModelObserver {
     InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
-        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT);
+        file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE);
       inputStream = fulltextBinary.getContent().createInputStream();
       fulltext = IOUtils.toString(inputStream);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
@@ -422,14 +426,21 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void otherMetadataCreated(OtherMetadata otherMetadataBinary) {
-    /*try {
-      if(otherMetadataBinary.getType().equalsIgnoreCase(TikaFullTextPlugin.OTHER_METADATA_TYPE_METADATA)){       //index tika properties...
-        
+    if (otherMetadataBinary.getType().equalsIgnoreCase(TikaFullTextPlugin.OTHER_METADATA_TYPE)
+      && otherMetadataBinary.getFileSuffix().equalsIgnoreCase(TikaFullTextPlugin.FILE_SUFFIX_METADATA)) {
+      try {
+        SolrInputDocument solrFile = SolrUtils.addOtherPropertiesToIndexedFile("tika_", otherMetadataBinary, model,
+          index);
+        LOGGER.error("SOLR after adding other properties:\n" + solrFile.toString());
+        index.add(RodaConstants.INDEX_FILE, solrFile);
+        index.commit(RodaConstants.INDEX_FILE);
+      } catch (SolrServerException | RequestNotValidException | GenericException | NotFoundException
+        | AuthorizationDeniedException | XPathExpressionException | ParserConfigurationException | SAXException
+        | IOException e) {
+        LOGGER.error("Error adding other properties to indexed file: " + e.getMessage(), e);
       }
-      
-    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Error when other metadata created on retrieving the full AIP", e);
-    }*/
+
+    }
   }
 
   @Override

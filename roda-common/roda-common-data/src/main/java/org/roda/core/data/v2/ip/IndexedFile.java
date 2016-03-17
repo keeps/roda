@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
@@ -33,6 +34,8 @@ public class IndexedFile implements IsIndexed {
   private List<String> hash;
   private String storagePath;
 
+  private Map<String, List<String>> otherProperties;
+
   public IndexedFile() {
     super();
   }
@@ -40,7 +43,7 @@ public class IndexedFile implements IsIndexed {
   public IndexedFile(String uuid, String aipId, String representationId, List<String> path, String id,
     boolean entryPoint, FileFormat fileFormat, String originalName, long size, boolean isDirectory,
     String creatingApplicationName, String creatingApplicationVersion, String dateCreatedByApplication,
-    List<String> hash, String storagePath) {
+    List<String> hash, String storagePath, Map<String, List<String>> otherProperties) {
     this.uuid = uuid;
 
     this.aipId = aipId;
@@ -57,6 +60,7 @@ public class IndexedFile implements IsIndexed {
     this.dateCreatedByApplication = dateCreatedByApplication;
     this.hash = hash;
     this.storagePath = storagePath;
+    this.otherProperties = otherProperties;
   }
 
   public String getUuid() {
@@ -171,6 +175,14 @@ public class IndexedFile implements IsIndexed {
     this.storagePath = storagePath;
   }
 
+  public Map<String, List<String>> getOtherProperties() {
+    return otherProperties;
+  }
+
+  public void setOtherProperties(Map<String, List<String>> otherProperties) {
+    this.otherProperties = otherProperties;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -184,6 +196,7 @@ public class IndexedFile implements IsIndexed {
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (isDirectory ? 1231 : 1237);
     result = prime * result + ((originalName == null) ? 0 : originalName.hashCode());
+    result = prime * result + ((otherProperties == null) ? 0 : otherProperties.hashCode());
     result = prime * result + ((path == null) ? 0 : path.hashCode());
     result = prime * result + ((representationId == null) ? 0 : representationId.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
@@ -243,6 +256,11 @@ public class IndexedFile implements IsIndexed {
         return false;
     } else if (!originalName.equals(other.originalName))
       return false;
+    if (otherProperties == null) {
+      if (other.otherProperties != null)
+        return false;
+    } else if (!otherProperties.equals(other.otherProperties))
+      return false;
     if (path == null) {
       if (other.path != null)
         return false;
@@ -274,7 +292,8 @@ public class IndexedFile implements IsIndexed {
       + path + ", id=" + id + ", fileFormat=" + fileFormat + ", originalName=" + originalName + ", size=" + size
       + ", isDirectory=" + isDirectory + ", creatingApplicationName=" + creatingApplicationName
       + ", creatingApplicationVersion=" + creatingApplicationVersion + ", dateCreatedByApplication="
-      + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + "]";
+      + dateCreatedByApplication + ", hash=" + hash + ", storagePath=" + storagePath + ", otherProperties="
+      + otherProperties + "]";
   }
 
 }

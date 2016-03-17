@@ -130,6 +130,7 @@
    <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
    
    <defaultSearchField>search</defaultSearchField>
+   <copyField source="*_txt" dest="search"/>
    <copyField source="path" dest="search"/>
    <copyField source="fileId" dest="search"/>
    <copyField source="formatMimetype" dest="search"/>

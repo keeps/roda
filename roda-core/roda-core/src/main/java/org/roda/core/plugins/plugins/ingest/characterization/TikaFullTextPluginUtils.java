@@ -10,14 +10,12 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
-import java.util.Map;
-import java.util.Properties;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
-import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
+import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -43,8 +41,6 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gov.loc.repository.bagit.BagInfoTxt;
 
 public class TikaFullTextPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(TikaFullTextPluginUtils.class);
@@ -81,25 +77,28 @@ public class TikaFullTextPluginUtils {
           });
 
           model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-            TikaFullTextPlugin.FILE_SUFFIX, TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT, payload, notify);
+            TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, notify);
 
         } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);
         }
-/*
-        try{
-          if(metadata!=null && metadata.size()>0){
-            String metadataAsString = generateMetadataFile(metadata);
+
+        try {
+          if (metadata != null && metadata.size() > 0) {
+            String metadataAsString = MetadataFileUtils.generateMetadataFile(metadata);
             ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+              TikaFullTextPlugin.FILE_SUFFIX_METADATA, TikaFullTextPlugin.OTHER_METADATA_TYPE, metadataAsPayload,
+              notify);
           }
-        }catch (IOException e) {
+        } catch (IOException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);
         }
-        */
+
         // update PREMIS
         String creatingApplicationName = metadata.get("Application-Name");
         String creatingApplicationVersion = metadata.get("Application-Version");
@@ -124,21 +123,5 @@ public class TikaFullTextPluginUtils {
     }
     IOUtils.closeQuietly(allFiles);
   }
-  
-  private static String generateMetadataFile(Metadata metadata) throws IOException {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
-    String[] names = metadata.names();
-    for(String name : names){
-      String[] values = metadata.getValues(name);
-      if(values!=null && values.length>0){
-        for(String value : values){
-          b.append("<field name='" + name + "'>" + StringEscapeUtils.escapeXml(value) + "</field>");
-        }
-      }
-      
-    }
-    b.append("</metadata>");
-    return b.toString();
-  }
+
 }

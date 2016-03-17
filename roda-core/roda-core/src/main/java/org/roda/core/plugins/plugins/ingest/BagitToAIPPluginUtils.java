@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -45,7 +46,7 @@ public class BagitToAIPPluginUtils {
     AlreadyExistsException, AuthorizationDeniedException {
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
-    String metadataAsString = generateMetadataFile(bagInfoTxt);
+    String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
     ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
     boolean active = false;
@@ -84,15 +85,5 @@ public class BagitToAIPPluginUtils {
 
   }
 
-  private static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
-    for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
-      if (!entry.getKey().equalsIgnoreCase("parent")) {
-        b.append("<field name='" + entry.getKey() + "'>" + StringEscapeUtils.escapeXml(entry.getValue()) + "</field>");
-      }
-    }
-    b.append("</metadata>");
-    return b.toString();
-  }
+  
 }

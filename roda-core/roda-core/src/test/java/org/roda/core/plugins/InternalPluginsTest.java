@@ -35,7 +35,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.PremisUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.FolderMonitorNIO;
@@ -488,13 +487,13 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    // Files with Apache Tika output
-    Assert.assertEquals(CORPORA_FILES_COUNT,
-      Iterables.size(model.listOtherMetadata(aip.getId(), TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT, true)));
+    // Files with Apache Tika output each tika run creates 2 files
+    Assert.assertEquals(2 * CORPORA_FILES_COUNT,
+      Iterables.size(model.listOtherMetadata(aip.getId(), TikaFullTextPlugin.OTHER_METADATA_TYPE, true)));
 
     Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
-      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX,
-      TikaFullTextPlugin.OTHER_METADATA_TYPE_FULLTEXT);
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT,
+      TikaFullTextPlugin.OTHER_METADATA_TYPE);
 
     Assert.assertNotNull(om);
 

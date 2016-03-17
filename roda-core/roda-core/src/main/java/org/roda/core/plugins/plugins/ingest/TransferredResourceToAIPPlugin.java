@@ -20,7 +20,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringEscapeUtils;
+import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
@@ -38,7 +38,6 @@ import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
-import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +108,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
           processTransferredResourceDirectory(model, transferredResourcePath, aip, representationId);
         }
 
-        ContentPayload metadataPayload = getMetadataPayload(transferredResource);
+        ContentPayload metadataPayload = MetadataFileUtils.getMetadataPayload(transferredResource);
         boolean notifyDescriptiveMetadataCreated = false;
 
         // TODO make the following strings constants
@@ -170,15 +169,6 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         return FileVisitResult.CONTINUE;
       }
     });
-  }
-
-  private ContentPayload getMetadataPayload(TransferredResource transferredResource) {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
-    b.append("<field name='title'>" + StringEscapeUtils.escapeXml(transferredResource.getName()) + "</field>");
-    b.append("</metadata>");
-
-    return new StringContentPayload(b.toString());
   }
 
   private List<String> extractDirectoryPath(Path transferredResourcePath, Path file) {

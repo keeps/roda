@@ -392,10 +392,11 @@ public final class ModelUtils {
       throw new RequestNotValidException("File suffix cannot be empty");
     }
 
-    if (fileSuffix.lastIndexOf('.') > 0) {
-      throw new RequestNotValidException("File suffix have dots after index 0: " + fileSuffix);
-    }
-
+    /*
+     * if (fileSuffix.lastIndexOf('.') > 0) { throw new
+     * RequestNotValidException("File suffix have dots after index 0: " +
+     * fileSuffix); }
+     */
     if (StringUtils.isBlank(type)) {
       throw new RequestNotValidException("Type cannot be empty");
     }

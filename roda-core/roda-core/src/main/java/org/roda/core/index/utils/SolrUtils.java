@@ -34,12 +34,14 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.TransformerException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -51,6 +53,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.FacetField.Count;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -59,6 +62,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.apache.solr.common.util.DateUtil;
 import org.apache.solr.handler.loader.XMLLoader;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.data.adapter.facet.FacetParameter;
@@ -102,6 +106,7 @@ import org.roda.core.data.v2.ip.metadata.FileFormat;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
@@ -122,6 +127,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * Utilities class related to Apache Solr
@@ -786,8 +792,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -1548,11 +1554,22 @@ public class SolrUtils {
     String dateCreatedByApplication = objectToString(doc.get(RodaConstants.FILE_DATE_CREATED_BY_APPLICATION));
     // String fullText = objectToString(doc.get(RodaConstants.FILE_FULLTEXT));
 
+    // handle other properties
+    Map<String, List<String>> otherProperties = new HashMap<String, List<String>>();
+    for (String fieldName : doc.getFieldNames()) {
+      if (fieldName.endsWith("_txt")) {
+        List<String> otherProperty = objectToListString(doc.get(fieldName));
+        otherProperties.put(fieldName, otherProperty);
+      }
+
+    }
+
     FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
       formatRegistries);
 
     file = new IndexedFile(uuid, aipId, representationId, path, fileId, false, fileFormat, originalName, size,
-      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, storagePath);
+      isDirectory, creatingApplicationName, creatingApplicationVersion, dateCreatedByApplication, hash, storagePath,
+      otherProperties);
     return file;
   }
 
@@ -1629,6 +1646,24 @@ public class SolrUtils {
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not get suggestions", e);
     }
+  }
+
+  public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
+    ModelService model, SolrClient index)
+      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
+    SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
+      IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
+        otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));
+
+    Binary binary = model.retrieveOtherMetadataBinary(otherMetadataBinary);
+    Map<String, List<String>> otherProperties = MetadataFileUtils.parseBinary(binary);
+
+    for (Map.Entry<String, List<String>> entry : otherProperties.entrySet()) {
+      solrDocument.setField(prefix + entry.getKey(), entry.getValue());
+    }
+    return ClientUtils.toSolrInputDocument(solrDocument);
+
   }
 
 }

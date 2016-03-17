@@ -987,7 +987,6 @@ public class ModelService extends ModelObservable {
     StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, fileDirectoryPath, fileId,
       fileSuffix, type);
     binary = storage.getBinary(binaryPath);
-
     return binary;
   }
 
@@ -1426,8 +1425,8 @@ public class ModelService extends ModelObservable {
     notifyJobReportCreatedOrUpdated(jobReport);
   }
 
-  
-  public void updateAIPPermissions(AIP aip) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+  public void updateAIPPermissions(AIP aip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     updateAIPMetadata(aip);
     notifyAipPermissionsUpdated(aip);
   }
