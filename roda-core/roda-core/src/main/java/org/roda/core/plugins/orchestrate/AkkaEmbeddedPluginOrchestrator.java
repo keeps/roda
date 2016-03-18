@@ -52,7 +52,7 @@ import scala.concurrent.duration.Duration;
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEmbeddedPluginOrchestrator.class);
 
-  private static final int BLOCK_SIZE = 5;
+  private static final int BLOCK_SIZE = 100;
   private static final Sorter SORTER = null;
   private static final int TIMEOUT = 1;
   private static final TimeUnit TIMEOUT_UNIT = TimeUnit.HOURS;

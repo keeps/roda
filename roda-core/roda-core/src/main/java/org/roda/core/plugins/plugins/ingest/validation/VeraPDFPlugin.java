@@ -53,7 +53,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class VeraPDFPlugin extends AbstractPlugin<AIP> {
-  private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
   private String profile;
   private boolean hasFeatures = false;
   private boolean hasPartialSuccessOnOutcome;
@@ -61,8 +61,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   public VeraPDFPlugin() {
     profile = "1b";
     hasFeatures = false;
-    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
-      "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   @Override
@@ -112,7 +112,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
 
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
 
       for (Representation representation : aip.getRepresentations()) {
         List<String> resourceList = new ArrayList<String>();
@@ -121,13 +121,13 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         StringBuilder details = new StringBuilder();
 
         try {
-          LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
 
           boolean recursive = true;
           CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
 
           for (File file : allFiles) {
-            LOGGER.debug("Processing file: " + file);
+            LOGGER.debug("Processing file: {}", file);
 
             if (!file.isDirectory()) {
               IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -135,7 +135,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
               if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
-                LOGGER.debug("Running veraPDF validator on " + file.getId());
+                LOGGER.debug("Running veraPDF validator on {}", file.getId());
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
                 Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
@@ -172,7 +172,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
           reportItem.setPluginState(pluginResultState);
         }
 
-        LOGGER.debug("Creating veraPDF event for the representation " + representation.getId());
+        LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
         report.addReport(reportItem);
         createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
       }
@@ -222,9 +222,11 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
     try {
       // TODO fix linking identifiers
-      PluginHelper.createPluginEvent(this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(
-        aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, pluginState,
-        outcomeDetails, notify);
+      PluginHelper
+        .createPluginEvent(
+          this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
+            representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
+          null, pluginState, outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

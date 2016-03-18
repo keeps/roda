@@ -191,13 +191,13 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
-        LOGGER.debug("Processing representation: " + representation);
+        LOGGER.debug("Processing representation: {}", representation);
         boolean recursive = true;
         CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
           recursive);
 
         for (File file : allFiles) {
-          LOGGER.debug("Processing file: " + file);
+          LOGGER.debug("Processing file: {}", file);
 
           if (!file.isDirectory()) {
             IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -206,19 +206,19 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))) {
 
               fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-              LOGGER.debug("Running DigitalSignaturePlugin on " + file.getId());
+              LOGGER.debug("Running DigitalSignaturePlugin on {}", file.getId());
 
               if (doVerify) {
-                LOGGER.debug("Verying digital signatures on " + file.getId());
+                LOGGER.debug("Verying digital signatures on {}", file.getId());
 
-                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
-                  fileFormat, fileMimetype);
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
+                  fileMimetype);
                 verifiedFiles.put(file.getId(), verification);
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome)
@@ -226,7 +226,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               }
 
               if (doExtract) {
-                LOGGER.debug("Extracting digital signatures information of " + file.getId());
+                LOGGER.debug("Extracting digital signatures information of {}", file.getId());
                 int extractResultSize = DigitalSignaturePluginUtils.runDigitalSignatureExtraction(model, file,
                   directAccess.getPath(), fileFormat, fileMimetype);
 
@@ -235,7 +235,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               }
 
               if (doStrip) {
-                LOGGER.debug("Stripping digital signatures from " + file.getId());
+                LOGGER.debug("Stripping digital signatures from {}", file.getId());
                 Path pluginResult = DigitalSignaturePluginUtils.runDigitalSignatureStrip(directAccess.getPath(),
                   fileFormat, fileMimetype);
 
@@ -243,7 +243,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                   ContentPayload payload = new FSPathContentPayload(pluginResult);
 
                   if (!newRepresentations.contains(newRepresentationID)) {
-                    LOGGER.debug("Creating a new representation " + newRepresentationID + " on AIP " + aipId);
+                    LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
                     boolean original = false;
                     newRepresentations.add(newRepresentationID);
                     model.createRepresentation(aipId, newRepresentationID, original, notify);
@@ -260,13 +260,12 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     reportItem.setPluginState(PluginState.SUCCESS);
 
                 } else {
-                  LOGGER.debug("Process failed on file " + file.getId() + " of representation "
-                    + representation.getId() + " from AIP " + aipId);
+                  LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
+                    representation.getId(), aipId);
                   pluginResultState = 0;
 
-                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-                    "Convert process failed on file " + file.getId() + " of representation " + representation.getId()
-                      + " from AIP " + aipId);
+                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Convert process failed on file "
+                    + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
                 }
               }
             } else {
@@ -277,7 +276,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
         IOUtils.closeQuietly(allFiles);
 
         // add unchanged files to the new representation
-        if (alteredFiles.size() > 0) {
+        if (!alteredFiles.isEmpty()) {
           for (File f : unchangedFiles) {
             StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
             Binary binary = storage.getBinary(fileStoragePath);
@@ -290,7 +289,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             newRepresentationID);
         }
 
-        LOGGER.debug("Creating digital signature plugin event for the representation " + representation.getId());
+        LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
         boolean notifyEvent = false;
         createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
           newRepresentationID, model, index, pluginResultState, notifyEvent);
@@ -374,7 +373,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   private String getNewFileFormat(String fileFormat, String filePronom, String fileMimetype) {
-    if (applicableTo.size() > 0) {
+    if (!applicableTo.isEmpty()) {
       if (filePronom != null && !filePronom.isEmpty() && pronomToExtension.get(filePronom) != null
         && !pronomToExtension.get(filePronom).contains(fileFormat)) {
         fileFormat = pronomToExtension.get(filePronom).get(0);

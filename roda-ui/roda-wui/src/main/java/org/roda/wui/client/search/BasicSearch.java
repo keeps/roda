@@ -93,7 +93,7 @@ public class BasicSearch extends Composite {
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
   private static final Filter DEFAULT_FILTER_REPRESENTATIONS = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.SRO_SEARCH, "*"));
+    new BasicSearchFilterParameter(RodaConstants.REPRESENTATION_SEARCH, "*"));
   private static final Filter DEFAULT_FILTER_FILES = new Filter(
     new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
 
@@ -277,13 +277,13 @@ public class BasicSearch extends Composite {
     SearchFieldPanel numberOfFilesField = new SearchFieldPanel();
     SearchFieldPanel typeField = new SearchFieldPanel();
 
-    idField.simpleSearchField(RodaConstants.SRO_ID, messages.searchRepresentationFieldIdentifier(),
+    idField.simpleSearchField(RodaConstants.REPRESENTATION_ID, messages.searchRepresentationFieldIdentifier(),
       RodaConstants.SEARCH_FIELD_TYPE_TEXT);
-    typeField.simpleSearchField(RodaConstants.SRO_ORIGINAL, messages.searchRepresentationFieldOriginal(),
+    typeField.simpleSearchField(RodaConstants.REPRESENTATION_ORIGINAL, messages.searchRepresentationFieldOriginal(),
       RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN);
-    sizeField.simpleSearchField(RodaConstants.SRO_SIZE_IN_BYTES, messages.searchRepresentationFieldSize(),
+    sizeField.simpleSearchField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, messages.searchRepresentationFieldSize(),
       RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
-    numberOfFilesField.simpleSearchField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES,
+    numberOfFilesField.simpleSearchField(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES,
       messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL);
 
     representationsSearchAdvancedFieldsPanel.add(idField);
@@ -346,7 +346,7 @@ public class BasicSearch extends Composite {
         itemsSearchAdvancedFieldsPanel);
       itemsSearchResultPanel.setFilter(filter);
     } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
-      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.SRO_SEARCH,
+      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.REPRESENTATION_SEARCH,
         representationsSearchAdvancedFieldsPanel);
       representationsSearchResultPanel.setFilter(filter);
     } else {

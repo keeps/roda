@@ -251,14 +251,14 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId, "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")",
       forceCommit);
 
-    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.SRO_AIP_ID, aipId,
+    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_AIP_ID, aipId,
       "Error deleting representations (aipId=" + aipId + ")", forceCommit);
 
     deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
       "Error deleting files (aipId=" + aipId + ")", forceCommit);
 
     deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId,
-      "Error deleting files (aipId=" + aipId + ")", forceCommit);
+      "Error deleting preservation events (aipId=" + aipId + ")", forceCommit);
   }
 
   @Override
@@ -319,7 +319,9 @@ public class IndexModelObserver implements ModelObserver {
 
     deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS,
       RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID,
-      "Error deleting files (aipId=" + aipId + "; representationId=" + representationId + ")", forceCommit);
+      "Error deleting Representation preservation events (aipId=" + aipId + "; representationId=" + representationId
+        + ")",
+      forceCommit);
 
     commit(RodaConstants.INDEX_REPRESENTATION, RodaConstants.INDEX_FILE, RodaConstants.INDEX_PRESERVATION_EVENTS);
   }

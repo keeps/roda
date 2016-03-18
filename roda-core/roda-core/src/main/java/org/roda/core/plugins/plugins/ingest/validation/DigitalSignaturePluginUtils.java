@@ -52,8 +52,7 @@ public class DigitalSignaturePluginUtils {
         return ODFSignatureUtils.runDigitalSignatureVerify(input);
       }
     } catch (IOException | GeneralSecurityException e) {
-      LOGGER.warn("Problems running digital signature verification");
-      e.printStackTrace();
+      LOGGER.warn("Problems running digital signature verification, reason: {}", e.getMessage());
     }
 
     return "Not a supported format";
@@ -68,18 +67,18 @@ public class DigitalSignaturePluginUtils {
       if (generalFileFormat.equals("pdf")) {
         extractResult = PDFSignatureUtils.runDigitalSignatureExtract(input);
 
-        if (extractResult.size() > 0) {
+        if (!extractResult.isEmpty()) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
           ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-            mainPayload, true);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
+            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
 
           if (extractResult.get(1).toFile().length() > 0) {
-            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-              .substring(0, file.getId().lastIndexOf('.')), ".pkcs7", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-              contentsPayload, true);
+            model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+              file.getId().substring(0, file.getId().lastIndexOf('.')), ".pkcs7",
+              DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, contentsPayload, true);
           }
         }
       } else if (generalFileFormat.equals("ooxml")) {
@@ -88,23 +87,23 @@ public class DigitalSignaturePluginUtils {
 
         for (Path p : extractResult) {
           ContentPayload mainPayload = new FSPathContentPayload(p);
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')) + "_" + extractMap.get(p), ".xml",
             DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
         }
       } else if (generalFileFormat.equals("odf")) {
         extractResult = ODFSignatureUtils.runDigitalSignatureExtract(input);
 
-        if (extractResult.size() > 0) {
+        if (!extractResult.isEmpty()) {
           ContentPayload mainPayload = new FSPathContentPayload(extractResult.get(0));
-          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
-            mainPayload, true);
+          model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(),
+            file.getId().substring(0, file.getId().lastIndexOf('.')), ".xml",
+            DigitalSignaturePluginUtils.OTHER_METADATA_TYPE, mainPayload, true);
         }
       }
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException | SignatureException e) {
-      LOGGER.warn("Problems running a document digital signature extraction");
+      LOGGER.warn("Problems running a document digital signature extraction, reason: {}", e.getMessage());
     }
 
     return extractResult.size();
@@ -125,7 +124,7 @@ public class DigitalSignaturePluginUtils {
 
       return output;
     } catch (IOException | InvalidFormatException | DocumentException e) {
-      LOGGER.warn("Problems running a document signature stripping");
+      LOGGER.warn("Problems running a document signature stripping, reason: {}", e.getMessage());
       return null;
     }
   }

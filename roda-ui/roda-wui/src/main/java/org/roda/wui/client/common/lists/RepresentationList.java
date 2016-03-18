@@ -126,10 +126,10 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
     } else {
 
       Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
-      columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.SRO_ID));
-      columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.SRO_ORIGINAL));
-      columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.SRO_SIZE_IN_BYTES));
-      columnSortingKeyMap.put(totalNumberOfFilesColumn, Arrays.asList(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
+      columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
+      columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
+      columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
+      columnSortingKeyMap.put(totalNumberOfFilesColumn, Arrays.asList(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

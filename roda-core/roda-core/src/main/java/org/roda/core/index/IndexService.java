@@ -74,7 +74,7 @@ public class IndexService {
         parent = getParent(actual);
       } catch (NotFoundException e) {
         parent = null;
-        LOGGER.warn("Ancestor not found: " + actual.getParentID());
+        LOGGER.warn("Ancestor not found: {}", actual.getParentID());
       }
 
       ancestors.add(parent);
@@ -121,19 +121,19 @@ public class IndexService {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<AIP> aips = null;
     try {
-      LOGGER.info(new Date().getTime() + " > Listing AIPs");
+      LOGGER.info("{} > Listing AIPs", new Date().getTime());
       aips = model.listAIPs();
       for (AIP aip : aips) {
         if (aip != null) {
-          LOGGER.info(new Date().getTime() + " > Reindexing AIP " + aip.getId());
+          LOGGER.info("{} > Reindexing AIP {}", new Date().getTime(), aip.getId());
           reindexAIP(aip);
         } else {
-          LOGGER.error(new Date().getTime() + " > An error occurred. See log for more details.");
+          LOGGER.error("{} > An error occurred. See log for more details.", new Date().getTime());
         }
       }
-      LOGGER.info(new Date().getTime() + " > Optimizing indexes");
+      LOGGER.info("{} > Optimizing indexes", new Date().getTime());
       optimizeAIPs();
-      LOGGER.info(new Date().getTime() + " > Done");
+      LOGGER.info("{} > Done", new Date().getTime());
     } finally {
       try {
         if (aips != null) {

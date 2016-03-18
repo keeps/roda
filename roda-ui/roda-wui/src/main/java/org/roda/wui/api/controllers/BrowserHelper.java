@@ -119,10 +119,10 @@ import com.github.mustachejava.MustacheFactory;
  *
  */
 public class BrowserHelper {
+  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
+
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
   protected static BrowseItemBundle getItemBundle(String aipId, Locale locale)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
@@ -149,7 +149,7 @@ public class BrowserHelper {
 
     // set representations
     // getting the last [BUNDLE_MAX_REPRESENTATION_COUNT] representations
-    Sorter sorter = new Sorter(new SortParameter(RodaConstants.SRO_ORIGINAL, true));
+    Sorter sorter = new Sorter(new SortParameter(RodaConstants.REPRESENTATION_ORIGINAL, true));
     IndexResult<IndexedRepresentation> findRepresentations = findRepresentations(aipId, sorter,
       new Sublist(0, BUNDLE_MAX_REPRESENTATION_COUNT));
     List<IndexedRepresentation> representations = findRepresentations.getResults();
@@ -277,9 +277,9 @@ public class BrowserHelper {
   private static IndexResult<IndexedRepresentation> findRepresentations(String aipId, boolean onlyOriginals,
     Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
+    filter.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
     if (onlyOriginals) {
-      filter.add(new SimpleFilterParameter(RodaConstants.SRO_ORIGINAL, Boolean.TRUE.toString()));
+      filter.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ORIGINAL, Boolean.TRUE.toString()));
     }
     Facets facets = null;
 
@@ -894,7 +894,7 @@ public class BrowserHelper {
   public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream,
     boolean forceCommit) throws GenericException, AlreadyExistsException {
     try {
-      LOGGER.debug("createTransferredResourceFile(path=" + path + ",name=" + fileName + ")");
+      LOGGER.debug("createTransferredResourceFile(path={}, name={})", path, fileName);
       RodaCoreFactory.getFolderMonitor().createFile(path, fileName, inputStream);
       if (forceCommit) {
         RodaCoreFactory.getFolderMonitor().commit();
@@ -956,8 +956,8 @@ public class BrowserHelper {
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)
     throws GenericException {
     Messages messages = RodaCoreFactory.getI18NMessages(locale);
-    String[] types = RodaCoreFactory.getRodaConfiguration().getString("ui.browser.metadata.descriptive.types")
-      .split(", ?");
+    String[] types = RodaCoreFactory.getRodaConfiguration()
+      .getString(RodaConstants.UI_BROWSER_METADATA_DESCRIPTIVE_TYPES).split(", ?");
 
     List<SupportedMetadataTypeBundle> supportedMetadata = new ArrayList<>();
 

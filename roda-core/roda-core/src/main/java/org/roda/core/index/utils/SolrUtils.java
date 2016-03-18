@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -234,7 +233,7 @@ public class SolrUtils {
       descMetadataReader.close();
 
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed desc. metadata:\n" + transformerResult);
+      LOGGER.trace("Transformed desc. metadata:\n{}", transformerResult);
       CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
@@ -342,7 +341,7 @@ public class SolrUtils {
       LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
     } else {
-      LOGGER.error("Unsupported filter parameter class: " + parameter.getClass().getName());
+      LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
     }
   }
@@ -443,14 +442,14 @@ public class SolrUtils {
     if (value != null) {
       if (valueClass.equals(Date.class)) {
         String date = DateUtil.getThreadLocalDateFormat().format(Date.class.cast(value));
-        LOGGER.trace("Appending date value \"" + date + "\" to range");
+        LOGGER.trace("Appending date value \"{}\" to range", date);
         ret.append(date);
       } else if (valueClass.equals(Long.class)) {
         ret.append(Long.class.cast(value));
       } else if (valueClass.equals(String.class)) {
         ret.append(String.class.cast(value));
       } else {
-        LOGGER.error("Cannot process range of the type " + valueClass);
+        LOGGER.error("Cannot process range of the type {}", valueClass);
       }
     } else {
       ret.append("*");
@@ -482,9 +481,9 @@ public class SolrUtils {
           appendValuesUsingOROperator(filterQuery, facetParameter.getName(),
             ((SimpleFacetParameter) facetParameter).getValues());
         } else if (facetParameter instanceof RangeFacetParameter) {
-          LOGGER.error("Unsupported facet parameter class: " + facetParameter.getClass().getName());
+          LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         } else {
-          LOGGER.error("Unsupported facet parameter class: " + facetParameter.getClass().getName());
+          LOGGER.error("Unsupported facet parameter class: {}", facetParameter.getClass().getName());
         }
       }
       if (filterQuery.length() > 0) {
@@ -626,13 +625,13 @@ public class SolrUtils {
         ret.add(o.toString());
       }
     } else {
-      LOGGER.error("Could not convert Solr object to List<String>" + object.getClass().getName());
+      LOGGER.error("Could not convert Solr object to List<String> ({})", object.getClass().getName());
       ret = new ArrayList<String>();
     }
     return ret;
   }
 
-  public static Integer objectToInteger(Object object) {
+  public static Integer objectToInteger(Object object, Integer defaultValue) {
     Integer ret;
     if (object instanceof Integer) {
       ret = (Integer) object;
@@ -641,17 +640,17 @@ public class SolrUtils {
         ret = Integer.parseInt((String) object);
       } catch (NumberFormatException e) {
         LOGGER.error("Could not convert Solr object to integer", e);
-        ret = null;
+        ret = defaultValue;
       }
     } else {
-      LOGGER.error("Could not convert Solr object to integer" + object.getClass().getName());
-      ret = null;
+      LOGGER.error("Could not convert Solr object to integer ({})", object.getClass().getName());
+      ret = defaultValue;
     }
     return ret;
   }
 
-  public static Long objectToLong(Object object) {
-    Long ret = null;
+  public static Long objectToLong(Object object, Long defaultValue) {
+    Long ret = defaultValue;
     if (object != null) {
       if (object instanceof Long) {
         ret = (Long) object;
@@ -660,11 +659,11 @@ public class SolrUtils {
           ret = Long.parseLong((String) object);
         } catch (NumberFormatException e) {
           LOGGER.error("Could not convert Solr object to long", e);
-          ret = null;
+          ret = defaultValue;
         }
       } else {
-        LOGGER.error("Could not convert Solr object to long" + object.getClass().getName());
-        ret = null;
+        LOGGER.error("Could not convert Solr object to long ({})", object.getClass().getName());
+        ret = defaultValue;
       }
     }
     return ret;
@@ -682,7 +681,7 @@ public class SolrUtils {
         ret = null;
       }
     } else {
-      LOGGER.error("Could not convert Solr object to float" + object.getClass().getName());
+      LOGGER.error("Could not convert Solr object to float ({})", object.getClass().getName());
       ret = null;
     }
     return ret;
@@ -696,14 +695,14 @@ public class SolrUtils {
       ret = (Date) object;
     } else if (object instanceof String) {
       try {
-        LOGGER.trace("Parsing date (" + object + ") from string");
+        LOGGER.trace("Parsing date ({}) from string", object);
         ret = RodaUtils.parseDate((String) object);
       } catch (ParseException e) {
         LOGGER.error("Could not convert Solr object to date", e);
         ret = null;
       }
     } else {
-      LOGGER.error("Could not convert Solr object to date, unsupported class: " + object.getClass().getName());
+      LOGGER.error("Could not convert Solr object to date, unsupported class: {}", object.getClass().getName());
       ret = null;
     }
 
@@ -723,7 +722,7 @@ public class SolrUtils {
     } else if (object instanceof String) {
       ret = Boolean.parseBoolean((String) object);
     } else {
-      LOGGER.error("Could not convert Solr object to Boolean" + object.getClass().getName());
+      LOGGER.error("Could not convert Solr object to Boolean ({})", object.getClass().getName());
       ret = null;
     }
     return ret;
@@ -736,7 +735,7 @@ public class SolrUtils {
     } else if (object instanceof String) {
       ret = (String) object;
     } else {
-      LOGGER.warn("Could not convert Solr object to string, unsupported class: " + object.getClass().getName());
+      LOGGER.warn("Could not convert Solr object to string, unsupported class: {}", object.getClass().getName());
       ret = object.toString();
     }
     return ret;
@@ -762,10 +761,10 @@ public class SolrUtils {
     } else if (resultClass.equals(Report.class)) {
       indexName = RodaConstants.INDEX_JOB_REPORT;
     } else if (resultClass.equals(User.class)) {
-      LOGGER.warn("Use " + RODAMember.class.getCanonicalName() + " instead of " + User.class.getCanonicalName());
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), User.class.getCanonicalName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(Group.class)) {
-      LOGGER.warn("Use " + RODAMember.class.getCanonicalName() + " instead of " + Group.class.getCanonicalName());
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), User.class.getCanonicalName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(RODAMember.class)) {
       indexName = RodaConstants.INDEX_MEMBERS;
@@ -805,7 +804,7 @@ public class SolrUtils {
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
-      ret = resultClass.cast(solrDocumentToSimpleFile(doc));
+      ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
       ret = resultClass.cast(solrDocumentToIndexedPreservationEvent(doc));
     } else if (resultClass.equals(IndexedPreservationAgent.class)) {
@@ -913,34 +912,22 @@ public class SolrUtils {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, showInactive).getTotalCount();
   }
 
-  // FIXME see how to handle active and all the other that are not being put in
-  // the indexedaip
   public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
     final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE));
     final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
-    final List<String> descriptiveMetadataFileIds = objectToListString(
-      doc.get(RodaConstants.AIP_DESCRIPTIVE_METADATA_ID));
-    final List<String> representationIds = objectToListString(doc.get(RodaConstants.AIP_REPRESENTATION_ID));
-
-    Permissions permissions = getPermissions(doc);
-
-    // FIXME this information is not being recorded. passing by empty
-    // collections for easier processing
-    final Map<String, List<String>> preservationRepresentationObjectsIds = new HashMap<String, List<String>>();
-    final Map<String, List<String>> preservationEventsIds = new HashMap<String, List<String>>();
-    final Map<String, List<String>> preservationFileObjectsIds = new HashMap<String, List<String>>();
-
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
     final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
     final List<String> descriptions = objectToListString(doc.get(RodaConstants.AIP_DESCRIPTION));
     final Date dateInitial = objectToDate(doc.get(RodaConstants.AIP_DATE_INITIAL));
     final Date dateFinal = objectToDate(doc.get(RodaConstants.AIP_DATE_FINAL));
-
+    Permissions permissions = getPermissions(doc);
     final String level = levels.isEmpty() ? null : levels.get(0);
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
+
+    // FIXME 20160318 hsilva: 0??? for real???
     final int childrenCount = 0;
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, childrenCount,
@@ -987,7 +974,7 @@ public class SolrUtils {
           }
         } catch (GenericException ise) {
           // TODO index the index errors for later processing
-          LOGGER.warn("Error processing descriptive metadata: " + metadata);
+          LOGGER.warn("Error processing descriptive metadata: {}", metadata);
         } catch (Throwable e) {
           LOGGER.error("Error processing descriptive metadata: " + metadata, e);
         }
@@ -1039,27 +1026,27 @@ public class SolrUtils {
   }
 
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
-    final String uuid = objectToString(doc.get(RodaConstants.SRO_UUID));
-    final String id = objectToString(doc.get(RodaConstants.SRO_ID));
-    final String aipId = objectToString(doc.get(RodaConstants.SRO_AIP_ID));
-    final Boolean original = objectToBoolean(doc.get(RodaConstants.SRO_ORIGINAL), Boolean.FALSE);
+    final String uuid = objectToString(doc.get(RodaConstants.REPRESENTATION_UUID));
+    final String id = objectToString(doc.get(RodaConstants.REPRESENTATION_ID));
+    final String aipId = objectToString(doc.get(RodaConstants.REPRESENTATION_AIP_ID));
+    final Boolean original = objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE);
 
-    final Long sizeInBytes = objectToLong(doc.get(RodaConstants.SRO_SIZE_IN_BYTES));
-    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES));
+    final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
+    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES), 0L);
 
     return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), sizeInBytes, totalNumberOfFiles);
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep) {
     SolrInputDocument doc = new SolrInputDocument();
-    doc.addField(RodaConstants.SRO_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
-    doc.addField(RodaConstants.SRO_ID, rep.getId());
-    doc.addField(RodaConstants.SRO_AIP_ID, rep.getAipId());
-    doc.addField(RodaConstants.SRO_ORIGINAL, rep.isOriginal());
+    doc.addField(RodaConstants.REPRESENTATION_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
+    doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
+    doc.addField(RodaConstants.REPRESENTATION_AIP_ID, rep.getAipId());
+    doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
 
-    // TODO calculate storage size and number of files or get it from arguments
-    doc.addField(RodaConstants.SRO_SIZE_IN_BYTES, 0L);
-    doc.addField(RodaConstants.SRO_TOTAL_NUMBER_OF_FILES, 0L);
+    // FIXME calculate storage size and number of files or get it from arguments
+    doc.addField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, 0L);
+    doc.addField(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES, 0L);
 
     // indexing active state and permissions
     doc.addField(RodaConstants.ACTIVE, aip.isActive());
@@ -1073,7 +1060,7 @@ public class SolrUtils {
     final String actionMethod = objectToString(doc.get(RodaConstants.LOG_ACTION_METHOD));
     final String address = objectToString(doc.get(RodaConstants.LOG_ADDRESS));
     final Date datetime = objectToDate(doc.get(RodaConstants.LOG_DATETIME));
-    final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION));
+    final long duration = objectToLong(doc.get(RodaConstants.LOG_DURATION), 0L);
     final String id = objectToString(doc.get(RodaConstants.LOG_ID));
     final String parameters = objectToString(doc.get(RodaConstants.LOG_PARAMETERS));
     final String relatedObjectId = objectToString(doc.get(RodaConstants.LOG_RELATED_OBJECT_ID));
@@ -1306,20 +1293,21 @@ public class SolrUtils {
       CharArrayWriter transformerResult = new CharArrayWriter();
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
       if (aip != null) {
-        stylesheetOpt.put("aipID", aip.getId());
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
       }
       if (representationID != null) {
-        stylesheetOpt.put("representationID", representationID);
-        stylesheetOpt.put("representationUUID", IdUtils.getRepresentationId(aip.getId(), representationID));
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+          IdUtils.getRepresentationId(aip.getId(), representationID));
       }
       if (fileID != null) {
-        stylesheetOpt.put("fileID", fileID);
+        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_ID, fileID);
       }
       RodaUtils.applyStylesheet(xsltReader, descMetadataReader, stylesheetOpt, transformerResult);
       descMetadataReader.close();
 
       XMLLoader loader = new XMLLoader();
-      LOGGER.trace("Transformed premis metadata:\n" + transformerResult);
+      LOGGER.trace("Transformed premis metadata:\n{}", transformerResult);
       CharArrayReader transformationResult = new CharArrayReader(transformerResult.toCharArray());
       XMLStreamReader parser = XMLInputFactory.newInstance().createXMLStreamReader(transformationResult);
 
@@ -1353,7 +1341,7 @@ public class SolrUtils {
           doc.addField(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER, JsonUtils.getJsonFromObject(id));
         }
       } catch (org.roda.core.data.v2.validation.ValidationException e) {
-        LOGGER.warn("Error setting linking agent field: " + e.getMessage());
+        LOGGER.warn("Error setting linking agent field: {}", e.getMessage());
       }
       try {
         List<LinkingIdentifier> sources = PremisV3Utils.extractObjectFromEvent(binary);
@@ -1362,7 +1350,7 @@ public class SolrUtils {
             JsonUtils.getJsonFromObject(id));
         }
       } catch (org.roda.core.data.v2.validation.ValidationException e) {
-        LOGGER.warn("Error setting linking source field: " + e.getMessage());
+        LOGGER.warn("Error setting linking source field: {}", e.getMessage());
       }
       try {
         List<LinkingIdentifier> outcomes = PremisV3Utils.extractObjectFromEvent(binary);
@@ -1371,7 +1359,7 @@ public class SolrUtils {
             JsonUtils.getJsonFromObject(id));
         }
       } catch (org.roda.core.data.v2.validation.ValidationException e) {
-        LOGGER.warn("Error setting linking outcome field: " + e.getMessage());
+        LOGGER.warn("Error setting linking outcome field: {}", e.getMessage());
       }
 
       // indexing active state and permissions
@@ -1391,15 +1379,14 @@ public class SolrUtils {
     }
     String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
 
-    Date d = new Date();
-    try {
-      d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
-    } catch (Exception e) {
-      LOGGER.error("ERROR PARSING DATE: " + e.getMessage());
+    Date d = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_DATE));
+    if (d == null) {
+      LOGGER.warn("Error parsing transferred resource date: {}. Setting date to current date.");
+      d = new Date();
     }
 
     boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
-    long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE));
+    long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE), 0L);
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
 
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
@@ -1431,7 +1418,7 @@ public class SolrUtils {
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, resource.isFile());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_SIZE, resource.getSize());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_NAME, resource.getName());
-    if (resource.getAncestorsPaths() != null && resource.getAncestorsPaths().size() > 0) {
+    if (resource.getAncestorsPaths() != null && !resource.getAncestorsPaths().isEmpty()) {
       transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
     }
     return transferredResource;
@@ -1482,7 +1469,7 @@ public class SolrUtils {
     job.setStartDate(objectToDate(doc.get(RodaConstants.JOB_START_DATE)));
     job.setEndDate(objectToDate(doc.get(RodaConstants.JOB_END_DATE)));
     job.setState(JOB_STATE.valueOf(objectToString(doc.get(RodaConstants.JOB_STATE))));
-    job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE)));
+    job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE), 0));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
@@ -1546,7 +1533,7 @@ public class SolrUtils {
     return doc;
   }
 
-  public static IndexedFile solrDocumentToSimpleFile(SolrDocument doc) {
+  public static IndexedFile solrDocumentToIndexedFile(SolrDocument doc) {
     IndexedFile file = null;
     String uuid = objectToString(doc.get(RodaConstants.FILE_UUID));
     String parentUUID = objectToString(doc.get(RodaConstants.FILE_PARENT_UUID));
@@ -1560,8 +1547,7 @@ public class SolrUtils {
 
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
-    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE)) != null ? objectToLong(doc.get(RodaConstants.FILE_SIZE))
-      : 0;
+    long size = objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L);
     boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
     String storagePath = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
@@ -1631,9 +1617,9 @@ public class SolrUtils {
     jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));
-    jobReport.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE)));
-    jobReport.setStepsCompleted(objectToInteger(doc.get(RodaConstants.JOB_REPORT_STEPS_COMPLETED)));
-    jobReport.setTotalSteps(objectToInteger(doc.get(RodaConstants.JOB_REPORT_TOTAL_STEPS)));
+    jobReport.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_REPORT_COMPLETION_PERCENTAGE), 0));
+    jobReport.setStepsCompleted(objectToInteger(doc.get(RodaConstants.JOB_REPORT_STEPS_COMPLETED), 0));
+    jobReport.setTotalSteps(objectToInteger(doc.get(RodaConstants.JOB_REPORT_TOTAL_STEPS), 0));
     jobReport.setPlugin(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN)));
     jobReport.setPluginState(PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE))));
     jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS)));
@@ -1645,15 +1631,6 @@ public class SolrUtils {
     }
 
     return jobReport;
-  }
-
-  public static SolrInputDocument linkingIdentifierToSolrDocument(LinkingIdentifier i) {
-    SolrInputDocument doc = new SolrInputDocument();
-    doc.addField("id", UUID.randomUUID().toString());
-    doc.addField(RodaConstants.LINKING_IDENTIFIER_VALUE, i.getValue());
-    doc.addField(RodaConstants.LINKING_IDENTIFIER_TYPE, i.getType());
-    doc.addField(RodaConstants.LINKING_IDENTIFIER_ROLES, i.getRoles());
-    return doc;
   }
 
   public static <T extends Serializable> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,

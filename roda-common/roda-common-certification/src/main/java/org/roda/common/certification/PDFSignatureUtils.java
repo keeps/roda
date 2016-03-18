@@ -123,7 +123,7 @@ public class PDFSignatureUtils {
     String filename = input.getFileName().toString();
     filename = filename.substring(0, filename.lastIndexOf('.'));
 
-    if (names.size() == 0)
+    if (names.isEmpty())
       return paths;
 
     StringBuilder sb = getExtractionInformation(fields, names, outputContents, filename);
@@ -225,8 +225,8 @@ public class PDFSignatureUtils {
         sb = addElementToExtractionResult(sb, "ft", widget.get(PdfName.FT).toString());
 
         if (infoDictionary.contains(PdfName.CONTACTINFO))
-          sb = addElementToExtractionResult(sb, "contact-info", infoDictionary.getAsString(PdfName.CONTACTINFO)
-            .toString());
+          sb = addElementToExtractionResult(sb, "contact-info",
+            infoDictionary.getAsString(PdfName.CONTACTINFO).toString());
 
         if (infoDictionary.contains(PdfName.FILTER))
           sb = addElementToExtractionResult(sb, "filter", infoDictionary.get(PdfName.FILTER).toString());
@@ -247,20 +247,16 @@ public class PDFSignatureUtils {
         LOGGER.warn("DS information extraction did not execute properly");
       }
 
-      sb.append("<signature>");
+      sb.append("</signature>");
     }
 
     return sb;
   }
 
   private static StringBuilder addElementToExtractionResult(StringBuilder sb, String tagName, String value) {
-    sb.append("<");
-    sb.append(tagName);
-    sb.append(">");
+    sb.append("<").append(tagName).append(">");
     sb.append(value);
-    sb.append("</");
-    sb.append(tagName);
-    sb.append(">\n");
+    sb.append("</").append(tagName).append(">\n");
     return sb;
   }
 
@@ -272,7 +268,7 @@ public class PDFSignatureUtils {
       ArrayList<String> names = af.getSignatureNames();
       counter = names.size();
     } catch (IOException e) {
-      LOGGER.error("Error getting path of file " + e.getMessage());
+      LOGGER.error("Error getting path of file {}", e.getMessage());
     }
     return counter;
   }

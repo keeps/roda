@@ -164,7 +164,7 @@ public class JsonUtils {
     AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
     if (modelAIP != null) {
       List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
-      if (descriptiveMetadata != null && descriptiveMetadata.size() > 0) {
+      if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
         ArrayNode metadata = mapper.createArrayNode();
         for (DescriptiveMetadata dm : descriptiveMetadata) {
           ObjectNode dmNode = mapper.createObjectNode();

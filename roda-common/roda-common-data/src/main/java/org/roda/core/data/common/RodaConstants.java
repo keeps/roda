@@ -46,6 +46,7 @@ public final class RodaConstants {
   }
 
   public static final String CROSSWALKS_DISSEMINATION_HTML_PATH = "crosswalks/dissemination/html";
+  public static final String UI_BROWSER_METADATA_DESCRIPTIVE_TYPES = "ui.browser.metadata.descriptive.types";
   public static final String I18N_UI_BROWSE_METADATA_DESCRIPTIVE_TYPE_PREFIX = "ui.browse.metadata.descriptive.type.";
   public static final String I18N_CROSSWALKS_DISSEMINATION_HTML_PREFIX = "crosswalks.dissemination.html.";
   public static final String I18N_UI_FACETS_PREFIX = "ui.facets.";
@@ -190,7 +191,6 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
 
-
   /*
    * STORAGE DIRECTORIES
    */
@@ -204,14 +204,10 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_OTHER = "other";
 
   /*
-   * STORAGE METADATA
+   * Permissions
    */
-  public static final String STORAGE_META_PARENT_ID = "parentId";
-  public static final String STORAGE_META_TYPE = "type";
-
   public static final String INDEX_PERMISSION_USERS_PREFIX = "permission_users_";
   public static final String INDEX_PERMISSION_GROUPS_PREFIX = "permission_groups_";
-  
 
   /*
    * AIP FIELDS
@@ -226,7 +222,6 @@ public final class RodaConstants {
   public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
   public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
 
-
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
   public static final String AIP_TITLE_SORT = "title_sort";
@@ -239,75 +234,15 @@ public final class RodaConstants {
   public static final String AIP_SEARCH = "search";
 
   /*
-   * Descriptive Metadata fields
+   * Representation FIELDS
    */
-  public static final String DESCRIPTIVE_METADATA_ID = "id";
-
-  /*
-   * SRO FIELDS
-   */
-  public static final String SRO_UUID = "uuid";
-  public static final String SRO_ID = "id";
-  public static final String SRO_AIP_ID = "aipId";
-  public static final String SRO_ORIGINAL = "original";
-  public static final String SRO_EVENT_PRESERVATION_IDS = "eventId";
-  public static final String SRO_REPRESENTATION_PRESERVATION_IDS = "representationId";
-  public static final String SRO_SIZE_IN_BYTES = "sizeInBytes";
-  public static final String SRO_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
-  public static final String SRO_SEARCH = "search";
-
-  /*
-   * SEPM FIELDS
-   */
-  public static final String SEPM_AGENT_ID = "agentId";
-  public static final String SEPM_CREATED_DATE = "dateCreated";
-  public static final String SEPM_ID = "id";
-  public static final String SEPM_LABEL = "label";
-  public static final String SEPM_LAST_MODIFIED_DATE = "dateModified";
-  public static final String SEPM_STATE = "state";
-  public static final String SEPM_TARGET_ID = "targetId";
-  public static final String SEPM_TYPE = "type";
-  public static final String SEPM_AIP_ID = "aipId";
-  public static final String SEPM_DATETIME = "datetime";
-  public static final String SEPM_NAME = "name";
-  public static final String SEPM_DESCRIPTION = "description";
-  public static final String SEPM_OUTCOME_RESULT = "outcomeResult";
-  public static final String SEPM_OUTCOME_DETAILS = "outcomeDetails";
-  public static final String SEPM_REPRESENTATION_ID = "representationId";
-  public static final String SEPM_FILE_ID = "fileId";
-
-  /*
-   * SRPM FIELDS
-   */
-  public static final String SRPM_CREATED_DATE = "dateCreated";
-  public static final String SRPM_ID = "id";
-  public static final String SRPM_LABEL = "label";
-  public static final String SRPM_LAST_MODIFIED_DATE = "dateModified";
-  public static final String SRPM_REPRESENTATION_OBJECT_ID = "representationObjectId";
-  public static final String SRPM_STATE = "state";
-  public static final String SRPM_TYPE = "type";
-  public static final String SRPM_AIP_ID = "aipId";
-  public static final String SRPM_MODEL = "model";
-  public static final String SRPM_REPRESENTATION_ID = "representationId";
-  public static final String SRPM_FILE_ID = "fileId";
-
-  /*
-   * SRFM
-   */
-  public static final String SRFM_CREATED_DATE = "dateCreated";
-  public static final String SRFM_ID = "id";
-  public static final String SRFM_LABEL = "label";
-  public static final String SRFM_LAST_MODIFIED_DATE = "dateModified";
-  public static final String SRFM_REPRESENTATION_OBJECT_ID = "representationObjectId";
-  public static final String SRFM_STATE = "state";
-  public static final String SRFM_TYPE = "type";
-  public static final String SRFM_AIP_ID = "aipId";
-  public static final String SRFM_REPRESENTATION_ID = "representationId";
-  public static final String SRFM_FILE_ID = "fileId";
-  public static final String SRFM_HASH = "hash";
-  public static final String SRFM_MIMETYPE = "mimetype";
-  public static final String SRFM_PRONOM_ID = "pronomId";
-  public static final String SRFM_SIZE = "size";
+  public static final String REPRESENTATION_UUID = "uuid";
+  public static final String REPRESENTATION_ID = "id";
+  public static final String REPRESENTATION_AIP_ID = "aipId";
+  public static final String REPRESENTATION_ORIGINAL = "original";
+  public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
+  public static final String REPRESENTATION_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
+  public static final String REPRESENTATION_SEARCH = "search";
 
   /*
    * OTHER FIELDS
@@ -415,14 +350,6 @@ public final class RodaConstants {
   public static final String FILE_HASH = "hash";
   public static final String FILE_FULLTEXT = "fulltext";
   public static final String FILE_SEARCH = "search";
-
-  public static final String REPORT_ATTR_AIP_ID = "aip.id";
-  public static final String REPORT_ATTR_DATETIME = "datetime";
-  public static final String REPORT_ATTR_OUTCOME = "outcome";
-  public static final String REPORT_ATTR_OUTCOME_SUCCESS = "success";
-  public static final String REPORT_ATTR_OUTCOME_FAILURE = "failure";
-  public static final String REPORT_ATTR_OUTCOME_DETAILS = "outcomeDetails";
-  public static final String REPORT_ATTR_REASON = "reason";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
@@ -546,5 +473,5 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
-  
+
 }

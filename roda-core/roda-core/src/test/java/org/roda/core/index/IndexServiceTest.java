@@ -153,7 +153,7 @@ public class IndexServiceTest {
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();
-    filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.SRO_AIP_ID, aipId));
+    filterParentTheAIP.add(new SimpleFilterParameter(RodaConstants.REPRESENTATION_AIP_ID, aipId));
     IndexResult<Representation> sros = index.find(Representation.class, filterParentTheAIP, null, new Sublist(0, 10),
       null);
     assertEquals(aip.getRepresentations().size(), sros.getTotalCount());
