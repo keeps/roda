@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
@@ -236,10 +237,8 @@ public class IndexModelObserver implements ModelObserver {
       "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
     deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_AIP_ID, aipId,
       "Error deleting representations (aipId=" + aipId + ")");
-
     deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
       "Error deleting files (aipId=" + aipId + ")");
-
     deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId,
       "Error deleting files (aipId=" + aipId + ")");
   }
@@ -474,6 +473,14 @@ public class IndexModelObserver implements ModelObserver {
   public void transferredResourceDeleted(String transferredResourceID) {
     deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
       "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
+  }
+
+  public void riskCreatedOrUpdated(Risk risk, boolean forceCommit) {
+    addDocumentToIndex(RodaConstants.INDEX_RISK, SolrUtils.riskToSolrDocument(risk), "Error creating Risk");
+  }
+
+  public void riskDeleted(String riskId) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
   }
 
 }

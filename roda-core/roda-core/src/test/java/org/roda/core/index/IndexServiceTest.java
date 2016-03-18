@@ -10,6 +10,7 @@ package org.roda.core.index;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.net.URL;
@@ -20,6 +21,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -56,6 +58,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -249,8 +252,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
-      null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null,
+      new Sublist(0, 10), null);
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
@@ -507,5 +510,64 @@ public class IndexServiceTest {
 
     // cleanup
     model.deleteAIP(aipId);
+  }
+
+  @Test
+  public void testRiskIndex() {
+    try {
+      Risk risk = new Risk();
+      risk.setId("R11");
+      risk.setName("Risk name");
+      risk.setDescription("Risk description");
+      risk.setIdentifiedOn(new Date());
+      risk.setIdentifiedBy("Risk identifier");
+      risk.setCategory("Risk category");
+      risk.setNotes("Risk notes");
+
+      risk.setPreMitigationProbability(1);
+      risk.setPreMitigationImpact(1);
+      risk.setPreMitigationSeverity(1);
+      risk.setPreMitigationNotes("Pre Notes");
+
+      risk.setPosMitigationProbability(2);
+      risk.setPosMitigationImpact(2);
+      risk.setPosMitigationSeverity(2);
+      risk.setPosMitigationNotes("Pos Notes");
+
+      risk.setMitigationStrategy("Mitigation Strategy");
+      risk.setMitigationOwnerType("Owner type");
+      risk.setMitigationOwner("Owner");
+      risk.setMitigationRelatedEventIdentifierType("Mitigation REI type");
+      risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
+
+      HashMap<String, String> affectedObjects = new HashMap<String, String>();
+      affectedObjects.put("Affected related type", "Affected related value");
+      risk.setAffectedObjects(affectedObjects);
+      model.createRisk(risk, true);
+
+      // Thread.sleep(10000);
+      IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
+
+      Risk risk2 = index.retrieve(Risk.class, "R11");
+      assertNotNull(risk2);
+      assertEquals(risk.getId(), risk2.getId());
+      assertEquals(risk.getName(), risk2.getName());
+
+      risk2.setName("Risk Name 2");
+      model.updateRisk(risk2, true);
+
+      IndexResult<Risk> find2 = index.find(Risk.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find2.getTotalCount());
+
+      Risk risk3 = index.retrieve(Risk.class, "R11");
+      assertNotNull(risk3);
+      assertEquals(risk.getId(), risk3.getId());
+
+      model.deleteRisk("R11");
+
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(1 == 0);
+    }
   }
 }

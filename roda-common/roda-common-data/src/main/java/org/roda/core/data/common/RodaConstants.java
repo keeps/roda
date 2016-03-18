@@ -80,6 +80,7 @@ public final class RodaConstants {
   public static final String CORE_LDAP_FOLDER = "ldap";
   public static final String CORE_THEME_FOLDER = "theme";
   public static final String CORE_EXAMPLE_THEME_FOLDER = "example-theme";
+  public static final String CORE_RISK_FOLDER = "risk";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -172,6 +173,7 @@ public final class RodaConstants {
   public static final String INDEX_JOB = "Job";
   public static final String INDEX_JOB_REPORT = "JobReport";
   public static final String INDEX_FILE = "File";
+  public static final String INDEX_RISK = "Risk";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
   // "DescriptiveMetadata";
@@ -190,6 +192,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
   public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
+  public static final String STORAGE_CONTAINER_RISK = "Risk";
 
   /*
    * STORAGE DIRECTORIES
@@ -351,6 +354,33 @@ public final class RodaConstants {
   public static final String FILE_HASH = "hash";
   public static final String FILE_FULLTEXT = "fulltext";
   public static final String FILE_SEARCH = "search";
+
+  /* Risks */
+  public static final String RISK_ID = "id";
+  public static final String RISK_NAME = "name";
+  public static final String RISK_DESCRIPTION = "description";
+  public static final String RISK_IDENTIFIED_ON = "identifiedOn";
+  public static final String RISK_IDENTIFIED_BY = "identifiedBy";
+  public static final String RISK_CATEGORY = "category";
+  public static final String RISK_NOTES = "notes";
+
+  public static final String RISK_PRE_MITIGATION_PROBABILITY = "preMitigationProbability";
+  public static final String RISK_PRE_MITIGATION_IMPACT = "preMitigationImpact";
+  public static final String RISK_PRE_MITIGATION_SEVERITY = "preMitigationSeverity";
+  public static final String RISK_PRE_MITIGATION_NOTES = "preMitigationNotes";
+
+  public static final String RISK_POS_MITIGATION_PROBABILITY = "posMitigationProbability";
+  public static final String RISK_POS_MITIGATION_IMPACT = "posMitigationImpact";
+  public static final String RISK_POS_MITIGATION_SEVERITY = "posMitigationSeverity";
+  public static final String RISK_POS_MITIGATION_NOTES = "posMitigationNotes";
+
+  public static final String RISK_MITIGATION_STRATEGY = "mitigationStrategy";
+  public static final String RISK_MITIGATION_OWNER_TYPE = "mitigationOwnerType";
+  public static final String RISK_MITIGATION_OWNER = "mitigationOwner";
+  public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE = "mitigationRelatedEventIdentifierType";
+  public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
+
+  public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

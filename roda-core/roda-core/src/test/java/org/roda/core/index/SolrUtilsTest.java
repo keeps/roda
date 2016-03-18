@@ -62,16 +62,16 @@ public class SolrUtilsTest {
 
   @Test
   public void testGetDescriptiveMetataFields() throws RODAException {
-    final DefaultStoragePath strangeMetadataPath = DefaultStoragePath
-      .parse(CorporaConstants.SOURCE_DESC_METADATA_CONTAINER, CorporaConstants.STRANGE_DESC_METADATA_FILE);
+    final DefaultStoragePath strangeMetadataPath = DefaultStoragePath.parse(
+      CorporaConstants.SOURCE_DESC_METADATA_CONTAINER, CorporaConstants.STRANGE_DESC_METADATA_FILE);
     Binary strangeMetadata = corporaService.getBinary(strangeMetadataPath);
 
-    SolrInputDocument descriptiveMetataFields = SolrUtils.getDescriptiveMetataFields(strangeMetadata, null,null);
+    SolrInputDocument descriptiveMetataFields = SolrUtils.getDescriptiveMetataFields(strangeMetadata, null, null);
 
     assertNotNull(descriptiveMetataFields);
     assertEquals(5, descriptiveMetataFields.size());
-    SolrInputField field1 = descriptiveMetataFields
-      .getField(RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX + ".note.to_txt");
+    SolrInputField field1 = descriptiveMetataFields.getField(RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX
+      + ".note.to_txt");
     assertNotNull(field1);
     assertEquals(RodaConstants.INDEX_OTHER_DESCRIPTIVE_DATA_PREFIX + ".note.to_txt", field1.getName());
     assertEquals("Tove", field1.getValue());
@@ -123,9 +123,8 @@ public class SolrUtilsTest {
       filter.add(new SimpleFilterParameter(RodaConstants.AIP_SEARCH, series));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(
-        String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
-        stringFilter);
+      assertEquals(String.format("(%s: \"%s\") AND (%s: \"%s\")", RodaConstants.AIP_SEARCH, fonds,
+        RodaConstants.AIP_SEARCH, series), stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
     }
@@ -137,9 +136,8 @@ public class SolrUtilsTest {
       filter.add(new OneOfManyFilterParameter(RodaConstants.AIP_SEARCH, oneOfManyValues));
       stringFilter = SolrUtils.parseFilter(filter);
       assertNotNull(stringFilter);
-      assertEquals(
-        String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.AIP_SEARCH, fonds, RodaConstants.AIP_SEARCH, series),
-        stringFilter);
+      assertEquals(String.format("((%s: \"%s\") OR (%s: \"%s\"))", RodaConstants.AIP_SEARCH, fonds,
+        RodaConstants.AIP_SEARCH, series), stringFilter);
     } catch (RODAException e) {
       fail("An exception was not expected!");
     }

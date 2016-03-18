@@ -52,6 +52,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -1427,7 +1428,6 @@ public class ModelService extends ModelObservable {
 
   public Report retrieveJobReport(String jobId, String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-
     StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(IdUtils.getJobReportId(jobId, aipId));
     Binary binary = storage.getBinary(jobReportPath);
     Report ret;
@@ -1477,6 +1477,41 @@ public class ModelService extends ModelObservable {
   public void deleteTransferredResource(TransferredResource transferredResource) {
     FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
     notifyTransferredResourceDeleted(transferredResource.getId());
+  }
+
+  /***************** Risk related *****************/
+  /************************************************/
+
+  public void createRisk(Risk risk, boolean forceCommit) throws GenericException {
+    try {
+      String riskAsJson = JsonUtils.getJsonFromObject(risk);
+      StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
+      storage.createBinary(riskPath, new StringContentPayload(riskAsJson), false);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
+      LOGGER.error("Error creating/updating risk in storage", e);
+    }
+
+    notifyRiskCreatedOrUpdated(risk, forceCommit);
+  }
+
+  public void updateRisk(Risk risk, boolean forceCommit) throws GenericException {
+    try {
+      String riskAsJson = JsonUtils.getJsonFromObject(risk);
+      StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
+      storage.updateBinaryContent(riskPath, new StringContentPayload(riskAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error creating/updating risk in storage", e);
+    }
+
+    notifyRiskCreatedOrUpdated(risk, forceCommit);
+  }
+
+  public void deleteRisk(String riskId)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
+    storage.deleteResource(riskPath);
+    notifyRiskDeleted(riskId);
   }
 
 }

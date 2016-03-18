@@ -19,6 +19,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 
@@ -210,6 +211,18 @@ public abstract class ModelObservable {
   protected void notifyTransferredResourceDeleted(String transferredResourceID) {
     for (ModelObserver observer : observers) {
       observer.transferredResourceDeleted(transferredResourceID);
+    }
+  }
+
+  protected void notifyRiskCreatedOrUpdated(Risk risk, boolean forceCommit) {
+    for (ModelObserver observer : observers) {
+      observer.riskCreatedOrUpdated(risk, forceCommit);
+    }
+  }
+
+  protected void notifyRiskDeleted(String riskId) {
+    for (ModelObserver observer : observers) {
+      observer.riskDeleted(riskId);
     }
   }
 }

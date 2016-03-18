@@ -494,6 +494,7 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.job", indexDataPath.resolve(RodaConstants.CORE_JOB_FOLDER).toString());
     System.setProperty("solr.data.dir.jobreport",
       indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
+    System.setProperty("solr.data.dir.risk", indexDataPath.resolve(RodaConstants.CORE_RISK_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {

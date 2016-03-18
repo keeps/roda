@@ -114,6 +114,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaGroup;
@@ -774,6 +775,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_JOB;
     } else if (resultClass.equals(IndexedFile.class)) {
       indexName = RodaConstants.INDEX_FILE;
+    } else if (resultClass.equals(Risk.class)) {
+      indexName = RodaConstants.INDEX_RISK;
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -827,6 +830,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
+    } else if (resultClass.equals(Risk.class)) {
+      ret = resultClass.cast(solrDocumentToRisk(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -1502,6 +1507,74 @@ public class SolrUtils {
     job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
 
     return job;
+  }
+
+  public static SolrInputDocument riskToSolrDocument(Risk risk) {
+    SolrInputDocument doc = new SolrInputDocument();
+
+    doc.addField(RodaConstants.RISK_ID, risk.getId());
+    doc.addField(RodaConstants.RISK_NAME, risk.getName());
+    doc.addField(RodaConstants.RISK_DESCRIPTION, risk.getDescription());
+    doc.addField(RodaConstants.RISK_IDENTIFIED_ON, risk.getIdentifiedOn());
+    doc.addField(RodaConstants.RISK_IDENTIFIED_BY, risk.getIdentifiedBy());
+    doc.addField(RodaConstants.RISK_CATEGORY, risk.getCategory());
+    doc.addField(RodaConstants.RISK_NOTES, risk.getNotes());
+
+    doc.addField(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, risk.getPreMitigationProbability());
+    doc.addField(RodaConstants.RISK_PRE_MITIGATION_IMPACT, risk.getPreMitigationImpact());
+    doc.addField(RodaConstants.RISK_PRE_MITIGATION_SEVERITY, risk.getPreMitigationSeverity());
+    doc.addField(RodaConstants.RISK_PRE_MITIGATION_NOTES, risk.getPreMitigationNotes());
+
+    doc.addField(RodaConstants.RISK_POS_MITIGATION_PROBABILITY, risk.getPosMitigationProbability());
+    doc.addField(RodaConstants.RISK_POS_MITIGATION_IMPACT, risk.getPosMitigationImpact());
+    doc.addField(RodaConstants.RISK_POS_MITIGATION_SEVERITY, risk.getPosMitigationSeverity());
+    doc.addField(RodaConstants.RISK_POS_MITIGATION_NOTES, risk.getPosMitigationNotes());
+
+    doc.addField(RodaConstants.RISK_MITIGATION_STRATEGY, risk.getMitigationStrategy());
+    doc.addField(RodaConstants.RISK_MITIGATION_OWNER_TYPE, risk.getMitigationOwnerType());
+    doc.addField(RodaConstants.RISK_MITIGATION_OWNER, risk.getMitigationOwner());
+    doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE,
+      risk.getMitigationRelatedEventIdentifierType());
+    doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE,
+      risk.getMitigationRelatedEventIdentifierValue());
+
+    doc.addField(RodaConstants.RISK_AFFECTED_OBJECTS, JsonUtils.getJsonFromObject(risk.getAffectedObjects()));
+
+    return doc;
+  }
+
+  public static Risk solrDocumentToRisk(SolrDocument doc) {
+    Risk risk = new Risk();
+
+    risk.setId(objectToString(doc.get(RodaConstants.RISK_ID)));
+    risk.setName(objectToString(doc.get(RodaConstants.RISK_NAME)));
+    risk.setDescription(objectToString(doc.get(RodaConstants.RISK_DESCRIPTION)));
+    risk.setIdentifiedOn(objectToDate(doc.get(RodaConstants.RISK_IDENTIFIED_ON)));
+    risk.setIdentifiedBy(objectToString(doc.get(RodaConstants.RISK_IDENTIFIED_BY)));
+    risk.setCategory(objectToString(doc.get(RodaConstants.RISK_CATEGORY)));
+    risk.setNotes(objectToString(doc.get(RodaConstants.RISK_NOTES)));
+
+    risk.setPreMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY), 0));
+    risk.setPreMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_IMPACT), 0));
+    risk.setPreMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY), 0));
+    risk.setPreMitigationNotes(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_NOTES)));
+
+    risk.setPosMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_PROBABILITY), 0));
+    risk.setPosMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_IMPACT), 0));
+    risk.setPosMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_SEVERITY), 0));
+    risk.setPosMitigationNotes(objectToString(doc.get(RodaConstants.RISK_POS_MITIGATION_NOTES)));
+
+    risk.setMitigationStrategy(objectToString(doc.get(RodaConstants.RISK_MITIGATION_STRATEGY)));
+    risk.setMitigationOwnerType(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER_TYPE)));
+    risk.setMitigationOwner(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER)));
+    risk.setMitigationRelatedEventIdentifierType(
+      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE)));
+    risk.setMitigationRelatedEventIdentifierValue(
+      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
+
+    risk.setAffectedObjects(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.RISK_AFFECTED_OBJECTS))));
+
+    return risk;
   }
 
   public static SolrInputDocument fileToSolrDocument(AIP aip, File file, Binary premisFile, String fulltext) {

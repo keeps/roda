@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 
@@ -80,5 +81,9 @@ public interface ModelObserver {
   public void aipPermissionsUpdated(AIP aip);
 
   public void transferredResourceDeleted(String transferredResourceID);
+
+  public void riskCreatedOrUpdated(Risk risk, boolean forceCommit);
+
+  public void riskDeleted(String riskId);
 
 }

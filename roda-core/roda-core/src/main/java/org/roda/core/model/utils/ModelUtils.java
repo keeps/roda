@@ -102,8 +102,8 @@ public final class ModelUtils {
     return build(getRepresentationMetadataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_OTHER, type);
   }
 
-  public static StoragePath getRepresentationOtherMetadataStoragePath(String aipId, String representationId,
-    String type) throws RequestNotValidException {
+  public static StoragePath getRepresentationOtherMetadataStoragePath(String aipId, String representationId, String type)
+    throws RequestNotValidException {
     return DefaultStoragePath.parse(getRepresentationOtherMetadataPath(aipId, representationId, type));
   }
 
@@ -300,8 +300,7 @@ public final class ModelUtils {
     }
   }
 
-  public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm)
-    throws RequestNotValidException {
+  public static StoragePath getPreservationMetadataStoragePath(PreservationMetadata pm) throws RequestNotValidException {
     return getPreservationMetadataStoragePath(pm.getId(), pm.getType(), pm.getAipId(), pm.getRepresentationId(),
       pm.getFileDirectoryPath(), pm.getFileId());
   }
@@ -326,8 +325,8 @@ public final class ModelUtils {
     List<String> path = null;
     if (type != null) {
       if (type.equals(PreservationMetadataType.AGENT)) {
-        path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS,
-          id + RodaConstants.PREMIS_AGENT_SUFFIX);
+        path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION, RodaConstants.STORAGE_DIRECTORY_AGENTS, id
+          + RodaConstants.PREMIS_AGENT_SUFFIX);
       } else if (type.equals(PreservationMetadataType.OBJECT_REPRESENTATION)) {
         if (aipId != null && representationId != null) {
           String pFileId = id + RodaConstants.PREMIS_REPRESENTATION_SUFFIX;
@@ -383,6 +382,14 @@ public final class ModelUtils {
 
   public static StoragePath getJobReportStoragePath(String jobReportId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT, jobReportId);
+  }
+
+  public static StoragePath getRiskContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK);
+  }
+
+  public static StoragePath getRiskStoragePath(String riskId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId);
   }
 
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,
