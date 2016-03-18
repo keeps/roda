@@ -15,10 +15,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -85,8 +83,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   }
 
   public boolean hasPartialSuccessOnOutcome() {
-    return Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    return Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins",
+      "hasPartialSuccessOnOutcome"));
   }
 
   public abstract List<String> getApplicableTo();
@@ -218,7 +216,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-                // FIXME file that doesn't get deleted afterwards
                 LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
                 try {
                   Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
@@ -281,9 +278,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
       try {
         for (String repId : newRepresentations) {
-          boolean inotify = false;
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aip.getId(), repId,
-            inotify);
+          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aip.getId(), repId);
         }
 
         model.notifyAIPUpdated(aip.getId());
@@ -343,7 +338,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
               DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-              // FIXME file that doesn't get deleted afterwards
               LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
               try {
                 Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
@@ -386,9 +380,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         if (alteredFiles.size() > 0) {
           createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
 
-          boolean notifyReindex = false;
           AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
-            newRepresentationID, notifyReindex);
+            newRepresentationID);
         }
 
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
@@ -420,7 +413,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     throws PluginException {
 
     PluginState pluginResultState = PluginState.SUCCESS;
-    Set<String> aipSet = new HashSet<String>();
+    Map<String, String> changedRepresentationsOnAIPs = new HashMap<String, String>();
     boolean notify = true;
     String newRepresentationID = null;
     String newFileId = null;
@@ -455,7 +448,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
             StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
             DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
 
-            // FIXME file that doesn't get deleted afterwards
             LOGGER.debug("Running a ConvertPlugin (" + fileFormat + " to " + outputFormat + ") on " + file.getId());
             try {
               Path pluginResult = Files.createTempFile("converted", "." + getOutputFormat());
@@ -477,7 +469,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
               File f = model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload,
                 notify);
               newFiles.add(f);
-              aipSet.add(file.getAipId());
+              changedRepresentationsOnAIPs.put(file.getRepresentationId(), file.getAipId());
 
               reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails(result);
 
@@ -508,7 +500,10 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     }
 
     try {
-      AbstractConvertPluginUtils.reIndexPlugins(model, aipSet);
+      for (String representation : changedRepresentationsOnAIPs.keySet()) {
+        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage,
+          changedRepresentationsOnAIPs.get(representation), representation);
+      }
     } catch (Throwable e) {
       LOGGER.debug("Error re-indexing AIPs after conversion.");
     }
@@ -568,9 +563,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     Map<String, List<String>> mimetypeToExtension) {
     if (((!getInputFormat().isEmpty() && fileFormat.equalsIgnoreCase(getInputFormat())) || (getInputFormat().isEmpty()))
       && (applicableTo.size() == 0 || (filePronom != null && pronomToExtension.containsKey(filePronom))
-        || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype))
-        || (applicableTo.contains(fileFormat)))
-      && (convertableTo.size() == 0 || convertableTo.contains(outputFormat)))
+        || (fileMimetype != null && mimetypeToExtension.containsKey(fileMimetype)) || (applicableTo
+          .contains(fileFormat))) && (convertableTo.size() == 0 || convertableTo.contains(outputFormat)))
       return true;
     else
       return false;
@@ -594,7 +588,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   private void createNewFilesOnRepresentation(StorageService storage, ModelService model, List<File> unchangedFiles,
     String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
+    AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
 
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);

@@ -101,9 +101,9 @@ public class PDFSignatureUtils {
       } catch (NoSuchFieldError e) {
         result = "Missing signature timestamp field";
       } catch (CertificateExpiredException e) {
-        result = "There are expired certificates";
+        result = "Contains expired certificates";
       } catch (CertificateNotYetValidException e) {
-        result = "There are certificates not yet valid";
+        result = "Contains certificates not yet valid";
       }
     }
 
@@ -115,7 +115,7 @@ public class PDFSignatureUtils {
     Security.addProvider(new BouncyCastleProvider());
 
     List<Path> paths = new ArrayList<Path>();
-    Path output = Files.createTempFile("extraction", ".txt");
+    Path output = Files.createTempFile("extraction", ".xml");
     Path outputContents = Files.createTempFile("contents", ".pkcs7");
     PdfReader reader = new PdfReader(input.toString());
     AcroFields fields = reader.getAcroFields();
@@ -132,6 +132,7 @@ public class PDFSignatureUtils {
     OutputStreamWriter osw = new OutputStreamWriter(fos);
     PrintWriter out = new PrintWriter(osw, true);
 
+    out.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     out.println("<signatures>");
     out.println(sb.toString());
     out.println("</signatures>");
@@ -261,5 +262,18 @@ public class PDFSignatureUtils {
     sb.append(tagName);
     sb.append(">\n");
     return sb;
+  }
+
+  public static int countSignaturesPDF(Path base, String input, String intermediatePath) {
+    int counter = -1;
+    try {
+      PdfReader reader = new PdfReader(base.toString() + intermediatePath + input);
+      AcroFields af = reader.getAcroFields();
+      ArrayList<String> names = af.getSignatureNames();
+      counter = names.size();
+    } catch (IOException e) {
+      LOGGER.error("Error getting path of file " + e.getMessage());
+    }
+    return counter;
   }
 }

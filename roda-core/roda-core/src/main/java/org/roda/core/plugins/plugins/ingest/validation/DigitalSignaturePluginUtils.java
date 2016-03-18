@@ -26,7 +26,6 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.File;
-import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
@@ -34,8 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfReader;
 
 public class DigitalSignaturePluginUtils {
 
@@ -56,6 +53,7 @@ public class DigitalSignaturePluginUtils {
       }
     } catch (IOException | GeneralSecurityException e) {
       LOGGER.warn("Problems running digital signature verification");
+      e.printStackTrace();
     }
 
     return "Not a supported format";
@@ -75,7 +73,7 @@ public class DigitalSignaturePluginUtils {
           ContentPayload contentsPayload = new FSPathContentPayload(extractResult.get(1));
 
           model.createOtherMetadata(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId()
-            .substring(0, file.getId().lastIndexOf('.')), ".txt", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
+            .substring(0, file.getId().lastIndexOf('.')), ".xml", DigitalSignaturePluginUtils.OTHER_METADATA_TYPE,
             mainPayload, true);
 
           if (extractResult.get(1).toFile().length() > 0) {
@@ -130,19 +128,6 @@ public class DigitalSignaturePluginUtils {
       LOGGER.warn("Problems running a document signature stripping");
       return null;
     }
-  }
-
-  public static int countSignaturesPDF(Path base, StoragePath input, String intermediatePath) {
-    int counter = -1;
-    try {
-      PdfReader reader = new PdfReader(base.toString() + intermediatePath + input.toString());
-      AcroFields af = reader.getAcroFields();
-      ArrayList<String> names = af.getSignatureNames();
-      counter = names.size();
-    } catch (IOException e) {
-      LOGGER.error("Error getting path of file " + e.getMessage());
-    }
-    return counter;
   }
 
 }

@@ -53,7 +53,7 @@ public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertP
     try {
       return AvconvConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting Avconv version");
+      LoggerFactory.getLogger(AvconvConvertPlugin.class).debug("Error getting Avconv version");
       return "1.0";
     }
   }

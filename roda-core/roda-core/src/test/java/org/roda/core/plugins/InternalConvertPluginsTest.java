@@ -24,9 +24,9 @@ import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
@@ -67,7 +67,6 @@ import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPluginUtils;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePluginUtils;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
@@ -623,11 +622,10 @@ public class InternalConvertPluginsTest {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
       String intermediatePath = "/data/storage/";
       Assert.assertEquals(0,
-        DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
+        PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
     }
   }
 
-  @Ignore
   @Test
   public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException {
@@ -637,7 +635,8 @@ public class InternalConvertPluginsTest {
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     String intermediatePath = "/data/storage/";
-    Assert.assertEquals(0, DigitalSignaturePluginUtils.countSignaturesPDF(basePath, fileStoragePath, intermediatePath));
+    Assert
+      .assertEquals(0, PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
 
     Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
@@ -654,7 +653,7 @@ public class InternalConvertPluginsTest {
 
     StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile);
     Assert.assertEquals(1,
-      DigitalSignaturePluginUtils.countSignaturesPDF(basePath, newFileStoragePath, intermediatePath));
+      PDFSignatureUtils.countSignaturesPDF(basePath, newFileStoragePath.asString(), intermediatePath));
   }
 
   @Test

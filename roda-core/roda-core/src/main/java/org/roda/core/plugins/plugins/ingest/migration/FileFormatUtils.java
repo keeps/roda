@@ -34,7 +34,6 @@ public class FileFormatUtils {
 
     for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
       String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
-
       map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
     }
 

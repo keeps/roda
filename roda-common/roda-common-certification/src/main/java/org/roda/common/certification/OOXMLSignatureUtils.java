@@ -91,9 +91,9 @@ public class OOXMLSignatureUtils {
     } catch (InvalidFormatException e) {
       return "Error opening a document file";
     } catch (CertificateExpiredException e) {
-      return "There are expired certificates";
+      return "Contains expired certificates";
     } catch (CertificateNotYetValidException e) {
-      return "There are certificates not yet valid";
+      return "Contains certificates not yet valid";
     }
 
     return isValid ? "Passed" : "Not passed";

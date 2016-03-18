@@ -61,8 +61,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   public VeraPDFPlugin() {
     profile = "1b";
     hasFeatures = false;
-    hasPartialSuccessOnOutcome = Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
+      "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   @Override
@@ -135,11 +135,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
               String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
               if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
+                LOGGER.debug("Running veraPDF validator on " + file.getId());
                 StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                 DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-
-                // FIXME file that doesn't get deleted afterwards
-                LOGGER.debug("Running veraPDF validator on " + file.getId());
                 Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
 
                 if (veraPDFResult != null) {
@@ -224,11 +222,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
     try {
       // TODO fix linking identifiers
-      PluginHelper
-        .createPluginEvent(
-          this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-            representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
-          null, pluginState, outcomeDetails, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(
+        aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, pluginState,
+        outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

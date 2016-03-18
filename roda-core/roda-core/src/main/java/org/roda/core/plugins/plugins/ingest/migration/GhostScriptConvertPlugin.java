@@ -39,7 +39,7 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
     try {
       return GhostScriptConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting GhostScript version");
+      LoggerFactory.getLogger(GhostScriptConvertPlugin.class).debug("Error getting GhostScript version");
       return "1.0";
     }
   }

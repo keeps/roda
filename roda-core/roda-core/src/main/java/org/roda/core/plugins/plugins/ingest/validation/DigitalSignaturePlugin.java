@@ -206,8 +206,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
-              || (applicableTo.contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
+                .contains(fileFormat)))) {
 
               fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
@@ -217,8 +217,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               if (doVerify) {
                 LOGGER.debug("Verying digital signatures on " + file.getId());
 
-                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
-                  fileMimetype);
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
+                  fileFormat, fileMimetype);
                 verifiedFiles.put(file.getId(), verification);
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome)
@@ -260,12 +260,13 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     reportItem.setPluginState(PluginState.SUCCESS);
 
                 } else {
-                  LOGGER.debug("Process failed on file " + file.getId() + " of representation " + representation.getId()
-                    + " from AIP " + aipId);
+                  LOGGER.debug("Process failed on file " + file.getId() + " of representation "
+                    + representation.getId() + " from AIP " + aipId);
                   pluginResultState = 0;
 
-                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Convert process failed on file "
-                    + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
+                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
+                    "Convert process failed on file " + file.getId() + " of representation " + representation.getId()
+                      + " from AIP " + aipId);
                 }
               }
             } else {
@@ -285,9 +286,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
           }
 
-          boolean notifyReindex = false;
           AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
-            newRepresentationID, notifyReindex);
+            newRepresentationID);
         }
 
         LOGGER.debug("Creating digital signature plugin event for the representation " + representation.getId());

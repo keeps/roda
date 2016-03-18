@@ -116,7 +116,6 @@ public class ODFSignatureUtils {
         InputSource inputSource = new InputSource(zipStream);
         DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
         documentBuilderFactory.setNamespaceAware(true);
-        IOUtils.closeQuietly(zipStream);
         try {
           DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
           Document document = documentBuilder.parse(inputSource);
@@ -128,14 +127,16 @@ public class ODFSignatureUtils {
         } catch (ParserConfigurationException | SAXException e) {
           result = "Signatures document can not be parsed";
         } catch (CertificateExpiredException e) {
-          result = "There are expired certificates";
+          result = "Contains expired certificates";
         } catch (CertificateRevokedException e) {
-          result = "There are revoked certificates";
+          result = "Contains revoked certificates";
         } catch (CertificateNotYetValidException e) {
-          result = "There are certificates not yet valid";
+          result = "Contains certificates not yet valid";
         } catch (MarshalException | XMLSignatureException e) {
           result = "Digital signatures are not valid";
         }
+
+        IOUtils.closeQuietly(zipStream);
       }
     }
 

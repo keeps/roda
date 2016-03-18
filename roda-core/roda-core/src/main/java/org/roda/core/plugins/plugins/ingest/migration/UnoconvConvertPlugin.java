@@ -17,6 +17,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.util.CommandException;
+import org.slf4j.LoggerFactory;
 
 public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvertPlugin<T> {
 
@@ -37,7 +38,7 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
     try {
       return UnoconvConvertPluginUtils.getVersion();
     } catch (UnsupportedOperationException | CommandException | IOException e) {
-      e.printStackTrace();
+      LoggerFactory.getLogger(UnoconvConvertPlugin.class).debug("Error getting unoconv version");
       return "1.0";
     }
   }

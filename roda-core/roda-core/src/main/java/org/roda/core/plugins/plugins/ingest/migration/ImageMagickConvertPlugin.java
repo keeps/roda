@@ -38,7 +38,7 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
     try {
       return ImageMagickConvertPluginUtils.getVersion();
     } catch (CommandException | IOException | UnsupportedOperationException e) {
-      LoggerFactory.getLogger(SoxConvertPlugin.class).debug("Error getting ImageMagick version");
+      LoggerFactory.getLogger(ImageMagickConvertPlugin.class).debug("Error getting ImageMagick version");
       return "1.0";
     }
   }

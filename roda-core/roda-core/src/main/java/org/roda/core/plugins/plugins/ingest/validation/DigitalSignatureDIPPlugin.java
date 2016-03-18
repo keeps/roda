@@ -180,7 +180,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
         IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(PluginState.SUCCESS);
         AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
-          newRepresentationID, false);
+          newRepresentationID);
 
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);

@@ -36,7 +36,7 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
 
   @Override
   public String getDescription() {
-    return "Generates a PDF/A file format from a PDF one that passes veraPDF validation.";
+    return "Generates a PDF/A format file, from a PDF one, that passes veraPDF validation.";
   }
 
   @Override
