@@ -760,11 +760,11 @@ pre>code {
 .dropdown-label {
 	border: 1px solid #eee;
 	-webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none;   /* Chrome/Safari/Opera */
-  -khtml-user-select: none;    /* Konqueror */
-  -moz-user-select: none;      /* Firefox */
-  -ms-user-select: none;       /* IE/Edge */
-  user-select: none;  
+	-webkit-user-select: none;   /* Chrome/Safari/Opera */
+	-khtml-user-select: none;    /* Konqueror */
+	-moz-user-select: none;      /* Firefox */
+	-ms-user-select: none;       /* IE/Edge */
+	user-select: none;  
 }
 .dropdown-popup {
 	border: 1px solid #eee;
@@ -2717,7 +2717,7 @@ td.datePickerMonth, td.datePickerYear {
 ************************************************/
 .searchPanel {
 	margin-right: 80px;
-	height: 40px;
+	height: 4rem;
 	background-color: #eee;
 }
 
@@ -2738,17 +2738,18 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchInputListBox .dropdown-label,
 .searchInputListBoxPopup .dropdown-item {
-	line-height: 3rem;
+	line-height: 4rem;
 	background-color: #089de3;
 	color: white;
 	border: none;
+	padding: 0 0 0 0;
 	padding-left: 20px;
     padding-right: 10px;
     min-width: 160px;
 }
 
 .searchInputListBox .dropdown-label:after {
-	line-height: 3rem;
+	line-height: 4rem;
 	font-size: 20px;
 }
 
@@ -2767,6 +2768,12 @@ td.datePickerMonth, td.datePickerYear {
 	float: right;
 	width: 80px;
 	margin-right: -80px;
+	height: 4rem;
+}
+
+.searchPanelRight .fa-stack {
+	line-height: 4rem;
+	height: 4rem;
 }
 
 .searchBox {
@@ -2791,7 +2798,6 @@ td.datePickerMonth, td.datePickerYear {
 	cursor: hand;
 	position: relative;
 	float: left;
-    height: 40px;
     width: 40px;
     background-color: #089de3;
 }
@@ -2864,7 +2870,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .search-field {
 	margin-right: 20px;
-	height: 35px;
 }
 
 .search-field.full_width {

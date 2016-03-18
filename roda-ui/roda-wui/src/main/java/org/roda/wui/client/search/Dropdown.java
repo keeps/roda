@@ -22,11 +22,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 
 public class Dropdown extends Composite implements HasValueChangeHandlers<String> {
   private FocusPanel focusPanel;
-  private VerticalPanel panel;
+  private SimplePanel panel;
   private Label selectedLabel;
   private PopupPanel popup;
   private VerticalPanel popupPanel;
@@ -36,7 +37,7 @@ public class Dropdown extends Composite implements HasValueChangeHandlers<String
 
   public Dropdown() {
     focusPanel = new FocusPanel();
-    panel = new VerticalPanel();
+    panel = new SimplePanel();
     selectedLabel = new Label();
     popup = new PopupPanel(true);
     popupPanel = new VerticalPanel();
