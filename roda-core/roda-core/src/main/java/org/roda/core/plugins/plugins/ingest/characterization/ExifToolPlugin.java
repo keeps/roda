@@ -72,11 +72,11 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
 
-        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
 
         DirectResourceAccess directAccess = null;
         try {
@@ -85,8 +85,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
           directAccess = storage.getDirectAccess(representationDataPath);
 
           Path metadata = Files.createTempDirectory("metadata");
-          String exifOutput = ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
-          LOGGER.debug("ExifOutput: " + exifOutput);
+          ExifToolPluginUtils.runExifToolOnPath(directAccess.getPath(), metadata);
 
           try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(metadata)) {
             for (Path path : directoryStream) {
@@ -105,7 +104,7 @@ public class ExifToolPlugin extends AbstractPlugin<AIP> {
           }
           FSUtils.deletePath(metadata);
         } catch (RODAException | IOException | CommandException e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);
         }

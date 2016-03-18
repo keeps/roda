@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -53,54 +55,54 @@ public class SiegfriedPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     List<String> command;
-    String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "binary");
+    String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
     command = new ArrayList<String>(
       Arrays.asList(siegfriedPath.toString(), "-json=true", "-z=false", sourceDirectory.toFile().getAbsolutePath()));
     return command;
   }
-  
+
   private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
     String siegfriedServer = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "server");
-    String endpoint = siegfriedServer+"/identify/"+new String(Base64.encode(sourceDirectory.toString().getBytes()));
+    String endpoint = siegfriedServer + "/identify/" + new String(Base64.encode(sourceDirectory.toString().getBytes()));
     return endpoint;
   }
 
   public static String runSiegfriedOnPath(Path sourceDirectory) throws PluginException {
     try {
-      String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "mode");
-      if(siegfriedMode!=null && siegfriedMode.equalsIgnoreCase("server")){
-        LOGGER.debug("Running siegfried on server mode");
+      String siegfriedMode = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "mode");
+      if (siegfriedMode != null && siegfriedMode.equalsIgnoreCase("server")) {
+        LOGGER.debug("Running Siegfried on server mode");
         String endpoint = getSiegfriedServerEndpoint(sourceDirectory);
         return HTTPUtility.doGet(endpoint);
-      }else{
-        LOGGER.debug("Running siegfried on standalone mode");
+      } else {
+        LOGGER.debug("Running Siegfried on standalone mode");
         List<String> command = getBatchCommand(sourceDirectory);
         return CommandUtility.execute(command, false);
       }
     } catch (CommandException | IOException | GenericException e) {
-      throw new PluginException("Error while executing Siegfried: "+e.getMessage());
+      throw new PluginException("Error while executing Siegfried: " + e.getMessage());
     }
   }
 
   public static String getVersion() {
     String version = null;
     try {
-      List<String> command;
-      String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "binary");
-      command = new ArrayList<String>(Arrays.asList(siegfriedPath.toString(), "--version"));
+      String siegfriedPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "binary");
+      List<String> command = new ArrayList<String>(Arrays.asList(siegfriedPath.toString(), "--version"));
       String siegfriedOutput = CommandUtility.execute(command);
       if (siegfriedOutput.contains("\n")) {
         return siegfriedOutput.split("\\n")[0].split(" ")[1];
       }
     } catch (CommandException ce) {
-      LOGGER.error("Error getting siegfried version: " + ce.getMessage(), ce);
+      LOGGER.error("Error getting Siegfried version: " + ce.getMessage(), ce);
     }
     return version;
   }
 
-  public static void runSiegfriedOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation) throws GenericException, RequestNotValidException, AlreadyExistsException,
-      NotFoundException, AuthorizationDeniedException, PluginException {
+  public static <T extends Serializable> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
+    ModelService model, StorageService storage, AIP aip, Representation representation)
+      throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
+      AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
       representation.getId());
@@ -141,7 +143,7 @@ public class SiegfriedPluginUtils {
           String pronom = null;
           String mime = null;
 
-          if (getVersion().startsWith("1.5")) {
+          if (plugin.getVersion().startsWith("1.5")) {
             if (match.getString("ns").equalsIgnoreCase("pronom")) {
               format = match.getString("format");
               version = match.getString("version");

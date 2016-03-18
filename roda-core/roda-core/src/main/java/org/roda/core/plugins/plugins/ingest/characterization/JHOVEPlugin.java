@@ -67,16 +67,16 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       try {
         for (Representation representation : aip.getRepresentations()) {
-          LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+          LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
           boolean recursive = true;
           CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
           for (File file : allFiles) {
             if (!file.isDirectory()) {
-              LOGGER.debug("Processing file: " + file);
+              LOGGER.debug("Processing file: {}", file);
               StoragePath storagePath = ModelUtils.getFileStoragePath(file);
               Binary binary = storage.getBinary(storagePath);
 

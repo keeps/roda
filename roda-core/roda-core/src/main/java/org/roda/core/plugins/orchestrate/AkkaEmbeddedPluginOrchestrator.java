@@ -96,6 +96,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
+      LOGGER.info("Started {}", plugin.getName());
       plugin.beforeExecute(index, model, storage);
       IndexResult<T> find;
       int offset = 0;
@@ -118,13 +119,14 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
     }
+    LOGGER.info("Ended {}", plugin.getName());
   }
 
   @Override
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
+      LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
@@ -153,34 +155,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
+      LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
 
     } catch (Exception e) {
-      // FIXME catch proper exception
-      LOGGER.error("Error executing job", e);
+      LOGGER.error("Error running plugin on AIPs", e);
     }
-    LOGGER.info("Ended " + plugin.getName());
-    return null;
-  }
 
-  private List<Report> mapToReports(Iterable<Object> reports) {
-    List<Report> ret;
-    ret = new ArrayList<>();
-    for (Object o : reports) {
-      if (o instanceof Report) {
-        ret.add((Report) o);
-      } else {
-        LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
-      }
-    }
-    return ret;
+    LOGGER.info("Ended {}", plugin.getName());
+    return null;
   }
 
   @Override
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
+      LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
@@ -209,10 +199,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
+      LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
 
     } catch (Exception e) {
-      // FIXME catch proper exception
       LOGGER.error("Error running plugin on all AIPs", e);
     }
     LOGGER.info("Ended " + plugin.getName());
@@ -221,8 +211,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
-    LOGGER.info("Started " + plugin.getName());
     try {
+      LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
@@ -255,19 +245,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
+      LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
+
     } catch (Exception e) {
-      // FIXME catch proper exception
       e.printStackTrace();
-      LOGGER.error("Error while runPluginOnAllRepresentations", e);
+      LOGGER.error("Error running plugin on all representations", e);
     }
-    LOGGER.info("Ended " + plugin.getName());
+
+    LOGGER.info("Ended {}", plugin.getName());
     return null;
   }
 
   @Override
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
+      LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
       plugin.beforeExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
@@ -313,22 +306,23 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
+      LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
 
     } catch (Exception e) {
-      // TODO Auto-generated catch block
-      LOGGER.error("Error while runPluginOnAllFiles", e);
+      LOGGER.error("Error running plugin on all files", e);
     }
-    return null;
 
+    LOGGER.info("Ended {}", plugin.getName());
+    return null;
   }
 
   @Override
   public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
     List<TransferredResource> resources) {
     try {
+      LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      LOGGER.info("Started " + plugin.getName());
       plugin.beforeExecute(index, model, storage);
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
 
@@ -355,30 +349,32 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.afterExecute(index, model, storage);
 
+      LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
 
     } catch (Exception e) {
-      // FIXME catch proper exception
-      LOGGER.error("Error while runPluginOnTransferredResources", e);
+      LOGGER.error("Error running plugin on transferred resources", e);
     }
-    LOGGER.info("Ended " + plugin.getName());
+
+    LOGGER.info("Ended {}", plugin.getName());
     return null;
   }
 
   @Override
   public void executeJob(Job job) {
+    LOGGER.info("Started processing job '{}' ({})", job.getName(), job.getId());
     Future<Object> future = Patterns.ask(jobWorkersRouter, job, DEFAULT_TIMEOUT);
 
     future.onSuccess(new OnSuccess<Object>() {
       @Override
       public void onSuccess(Object msg) throws Throwable {
-        LOGGER.info("Success executing job with id '{}'", job.getId());
+        LOGGER.info("Success executing job '{}' ({})", job.getName(), job.getId());
       }
     }, workersSystem.dispatcher());
     future.onFailure(new OnFailure() {
       @Override
       public void onFailure(Throwable error) throws Throwable {
-        LOGGER.error("Failure executing job with id '{}': {}", job.getId(), error);
+        LOGGER.error("Failure executing job '{}' ({}): {}", job.getName(), job.getId(), error);
       }
     }, workersSystem.dispatcher());
 
@@ -387,7 +383,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     try {
-      LOGGER.info("Started " + plugin.getName());
+      LOGGER.info("Started {}", plugin.getName());
       plugin.beforeExecute(index, model, storage);
 
       // FIXME what to do with the askFuture???
@@ -400,70 +396,45 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           // FIXME this should be sent inside a message that can be easily
           // identified as a list of reports
           if (msg != null && msg instanceof List<?>) {
-            LOGGER.info("Success executing job: {}", (List<Report>) msg);
+            LOGGER.info("Success running plugin: {}", (List<Report>) msg);
           }
 
           plugin.afterExecute(index, model, storage);
-          LOGGER.info("Ended " + plugin.getName());
+          LOGGER.info("Ended {}", plugin.getName());
         }
       }, workersSystem.dispatcher());
       future.onFailure(new OnFailure() {
         @Override
         public void onFailure(Throwable error) throws Throwable {
-          LOGGER.error("Failure executing job: {}", error);
+          LOGGER.error("Failure running plugin: {}", error);
 
           plugin.afterExecute(index, model, storage);
-          LOGGER.info("Ended " + plugin.getName());
+          LOGGER.info("Ended {}", plugin.getName());
         }
       }, workersSystem.dispatcher());
 
     } catch (Exception e) {
-      // // FIXME catch proper exception
-      LOGGER.error("Error while runPlugin", e);
+      LOGGER.error("Error running plugin", e);
     }
   }
 
   @Override
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
-    // try {
-    // int multiplier = 0;
-    // LOGGER.info("Executing beforeExecute");
-    // plugin.beforeExecute(index, model, storage);
-    // List<Future<Object>> futures = new ArrayList<Future<Object>>();
-    //
-    // List<String> block = new ArrayList<String>();
-    // for (String id : ids) {
-    // if (block.size() == BLOCK_SIZE) {
-    // futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block,
-    // plugin),
-    // new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
-    // block = new ArrayList<String>();
-    // multiplier++;
-    // }
-    //
-    // block.add(id);
-    // }
-    //
-    // if (!block.isEmpty()) {
-    // futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(block,
-    // plugin),
-    // new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT))));
-    // multiplier++;
-    // }
-    //
-    // final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures,
-    // workersSystem.dispatcher());
-    // Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT,
-    // TIMEOUT_UNIT));
-    //
-    // plugin.afterExecute(index, model, storage);
-    //
-    // } catch (Exception e) {
-    // // FIXME catch proper exception
-    // e.printStackTrace();
-    // }
-    // LOGGER.info("End of method");
+    // FIXME
+    LOGGER.error("Method runPluginOnObjects@{} still not implemented!", this.getClass().getName());
+  }
 
+  private List<Report> mapToReports(Iterable<Object> reports) {
+    List<Report> ret;
+    ret = new ArrayList<>();
+    for (Object o : reports) {
+      if (o instanceof Report) {
+        ret.add((Report) o);
+      } else {
+        LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
+      }
+    }
+    return ret;
   }
 
   public class PluginMessage<T extends Serializable> {

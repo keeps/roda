@@ -93,10 +93,10 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
-        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
         DirectResourceAccess directAccess = null;
         try {
           StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
@@ -111,14 +111,15 @@ public class MediaInfoPlugin extends AbstractPlugin<AIP> {
             List<String> directoryPath = new ArrayList<>();
             String fileId = entry.getKey();
             ContentPayload payload = new FSPathContentPayload(entry.getValue());
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
-              + ", FILE: " + entry.getValue().toFile().getName() + ")");
+            LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
+              representation.getId(), entry.getValue().toFile().getName());
             model.createOtherMetadata(aip.getId(), representation.getId(), directoryPath, fileId, ".xml", "MediaInfo",
               payload, inotify);
           }
         } catch (RODAException | IOException | CommandException | XPathExpressionException
-          | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError | TransformerException sse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+          | ParserConfigurationException | SAXException | TransformerFactoryConfigurationError
+          | TransformerException sse) {
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), sse.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);
         }

@@ -68,10 +68,10 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
-        LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
         DirectResourceAccess directAccess = null;
         try {
           StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
@@ -79,7 +79,6 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
           directAccess = storage.getDirectAccess(representationDataPath);
 
           String droidOutput = DroidPluginUtils.runDROIDOnPath(directAccess.getPath());
-          LOGGER.debug("DROID OUTPUT: " + droidOutput);
 
           for (String outputLine : droidOutput.split("\n")) {
             int splitterPosition = outputLine.lastIndexOf(",");
@@ -88,8 +87,6 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
             String fileId = outputLine.substring(0, splitterPosition);
             fileId = fileId.substring(fileId.lastIndexOf(File.separatorChar) + 1);
             String format = outputLine.substring(splitterPosition + 1);
-            LOGGER.error("FILE: " + fileId);
-            LOGGER.error("FORMAT: " + format);
             String xmlOutput = "<droid>" + format + "</droid>";
             ContentPayload payload = new StringContentPayload(xmlOutput);
 
@@ -97,7 +94,7 @@ public class DroidPlugin extends AbstractPlugin<AIP> {
               payload, inotify);
           }
         } catch (RODAException e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);
         }

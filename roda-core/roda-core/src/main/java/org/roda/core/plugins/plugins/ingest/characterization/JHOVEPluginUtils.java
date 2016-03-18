@@ -10,22 +10,20 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Calendar;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.storage.Binary;
 import org.roda.core.util.FileUtility;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import edu.harvard.hul.ois.jhove.App;
 import edu.harvard.hul.ois.jhove.JhoveBase;
-import edu.harvard.hul.ois.jhove.JhoveException;
 import edu.harvard.hul.ois.jhove.Module;
 import edu.harvard.hul.ois.jhove.OutputHandler;
 
@@ -35,7 +33,7 @@ public class JHOVEPluginUtils {
   public static Path inspect(File targetFile) throws Exception {
 
     if (targetFile == null || !targetFile.isFile() || !targetFile.exists()) {
-      LOGGER.warn("target file '" + targetFile + "' cannot be found.");
+      LOGGER.warn("target file '{}' cannot be found.", targetFile);
       throw new FileNotFoundException("target file '" + targetFile + "' cannot be found.");
     }
 
@@ -50,7 +48,7 @@ public class JHOVEPluginUtils {
     // optimized???
     File configFile = File.createTempFile("jhove", "conf");
     FileOutputStream fos = new FileOutputStream(configFile);
-    String jhoveConfigPath = RodaCoreFactory.getRodaConfigurationAsString("tools", "jhove", "config");
+    String jhoveConfigPath = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "jhove", "config");
     IOUtils.copy(FileUtility.getConfigurationFile(RodaCoreFactory.getConfigPath(), jhoveConfigPath), fos);
     fos.close();
     // System.setProperty("edu.harvard.hul.ois.jhove.saxClass", );
@@ -58,13 +56,13 @@ public class JHOVEPluginUtils {
     jhoveBase.init(configFile.getAbsolutePath(), null);
 
     File outputFile = File.createTempFile("jhove", "output");
-    LOGGER.debug("JHOVE output file " + outputFile);
+    LOGGER.debug("JHOVE output file {}", outputFile);
 
     Module module = jhoveBase.getModule(null);
     OutputHandler aboutHandler = jhoveBase.getHandler(null);
     OutputHandler xmlHandler = jhoveBase.getHandler("XML");
 
-    LOGGER.debug("Calling JHOVE dispatch(...) on file " + targetFile);
+    LOGGER.debug("Calling JHOVE dispatch(...) on file {}", targetFile);
 
     jhoveBase.dispatch(app, module, aboutHandler, xmlHandler, outputFile.getAbsolutePath(),
       new String[] {targetFile.getAbsolutePath()});

@@ -71,10 +71,10 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
-        LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
         CloseableIterable<File> allFiles = null;
         DirectResourceAccess directAccess = null;
         try {
@@ -91,15 +91,15 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
             // TODO the following path is not expecting folders
             Path p = output.resolve(file.getId() + ".fits.xml");
             ContentPayload payload = new FSPathContentPayload(p);
-            LOGGER.debug("Creating other metadata (AIP: " + aip.getId() + ", REPRESENTATION: " + representation.getId()
-              + ", FILE: " + file.getId() + ")");
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-              "FITS", payload, inotify);
+            LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
+              representation.getId(), file.getId());
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
+              payload, inotify);
           }
 
           FSUtils.deletePath(output);
         } catch (RODAException | IOException e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
         } finally {
           IOUtils.closeQuietly(directAccess);
           IOUtils.closeQuietly(allFiles);

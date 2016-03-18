@@ -24,7 +24,7 @@ public class MediaInfoPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(MediaInfoPluginUtils.class);
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
-    Path mediaInfoHome = Paths.get(RodaCoreFactory.getRodaConfigurationAsString("tools", "mediainfo", "path"));
+    Path mediaInfoHome = Paths.get(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mediainfo", "path"));
 
     File MEDIAINFO_DIRECTORY = mediaInfoHome.toFile();
 
@@ -44,8 +44,7 @@ public class MediaInfoPluginUtils {
 
   public static String runMediaInfoOnPath(Path sourceDirectory) throws CommandException {
     List<String> command = getBatchCommand(sourceDirectory);
-    String mediaInfoOutput = CommandUtility.execute(command);
-    return mediaInfoOutput;
+    return CommandUtility.execute(command);
   }
 
 }

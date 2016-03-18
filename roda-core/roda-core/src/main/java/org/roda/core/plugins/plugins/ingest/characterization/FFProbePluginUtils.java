@@ -42,7 +42,8 @@ public class FFProbePluginUtils {
 
   private static List<String> getCommand() {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path ffProbeHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "ffprobe", "path"));
+    Path ffProbeHome = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ffprobe", "path"));
 
     File FFPROBE_DIRECTORY = ffProbeHome.toFile();
 

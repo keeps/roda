@@ -57,7 +57,7 @@ public class FITSPluginUtils {
 
   private static List<String> getCommand() {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path fitsHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "fits", "home"));
+    Path fitsHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "fits", "home"));
 
     File FITS_DIRECTORY = fitsHome.toFile();
 
@@ -86,7 +86,7 @@ public class FITSPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory, Path outputDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path fitsHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "fits", "home"));
+    Path fitsHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "fits", "home"));
 
     File FITS_DIRECTORY = fitsHome.toFile();
 

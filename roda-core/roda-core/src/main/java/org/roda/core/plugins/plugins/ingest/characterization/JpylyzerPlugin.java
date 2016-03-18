@@ -68,10 +68,10 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
-        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
         try {
           boolean recursive = true;
           CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
@@ -79,7 +79,7 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
             if (!file.isDirectory()) {
               // TODO check if file is JPEG2000
               try {
-                LOGGER.debug("Processing file: " + file);
+                LOGGER.debug("Processing file: {}", file);
                 StoragePath storagePath = ModelUtils.getFileStoragePath(file);
                 Binary binary = storage.getBinary(storagePath);
 
@@ -88,13 +88,13 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
                 model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
                   "jpylyzer", payload, inotify);
               } catch (RODAException | IOException sse) {
-                LOGGER.error("Error processing AIP " + aip.getId() + ": " + sse.getMessage());
+                LOGGER.error("Error processing AIP {}: {}", aip.getId(), sse.getMessage());
               }
             }
           }
           IOUtils.closeQuietly(allFiles);
         } catch (RODAException mse) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + mse.getMessage());
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), mse.getMessage());
         }
       }
 

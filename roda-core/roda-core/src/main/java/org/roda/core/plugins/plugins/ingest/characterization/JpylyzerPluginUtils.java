@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,24 +41,26 @@ public class JpylyzerPluginUtils {
 
   private static List<String> getCommand() {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path jpylyzerHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "jpylyzer", "path"));
+    Path jpylyzerHome = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "jpylyzer", "path"));
 
-    File JPYLYZER_DIRECTORY = jpylyzerHome.toFile();
+    File jpylyzerDirectory = jpylyzerHome.toFile();
 
     String osName = System.getProperty("os.name");
     List<String> command;
     if (osName.startsWith("Windows")) {
       command = new ArrayList<String>(
-        Arrays.asList(JPYLYZER_DIRECTORY.getAbsolutePath() + File.separator + "jpylyzer.exe"));
+        Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer.exe"));
     } else {
-      command = new ArrayList<String>(
-        Arrays.asList(JPYLYZER_DIRECTORY.getAbsolutePath() + File.separator + "jpylyzer"));
+      command = new ArrayList<String>(Arrays.asList(jpylyzerDirectory.getAbsolutePath() + File.separator + "jpylyzer"));
     }
     return command;
   }
 
   public static String runJpylyzer(org.roda.core.data.v2.ip.File file, Binary binary,
     Map<String, String> parameterValues) throws IOException, PluginException {
+    // TODO f is not deleted in runtime
+    // TODO use storage method to get direct access to file
     java.io.File f = File.createTempFile("temp", ".temp");
     FileOutputStream fos = new FileOutputStream(f);
     InputStream inputStream = binary.getContent().createInputStream();

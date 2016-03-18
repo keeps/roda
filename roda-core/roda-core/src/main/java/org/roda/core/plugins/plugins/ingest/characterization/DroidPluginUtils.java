@@ -25,10 +25,11 @@ public class DroidPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path droidHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "home"));
-    Path signature = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "signatureFile"));
+    Path droidHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "home"));
+    Path signature = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "signatureFile"));
     Path containerSignature = rodaHome
-      .resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "droid", "containerSignatureFile"));
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "droid", "containerSignatureFile"));
 
     File DROID_DIRECTORY = droidHome.toFile();
 

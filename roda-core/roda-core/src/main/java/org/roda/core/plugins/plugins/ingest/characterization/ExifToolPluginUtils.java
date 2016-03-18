@@ -28,7 +28,7 @@ import org.roda.core.util.CommandException;
 import org.roda.core.util.CommandUtility;
 
 public class ExifToolPluginUtils {
-  static final private Logger logger = LoggerFactory.getLogger(ExifToolPluginUtils.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExifToolPluginUtils.class);
 
   public static Path inspect(File f) throws PluginException {
     try {
@@ -47,7 +47,8 @@ public class ExifToolPluginUtils {
 
   private static List<String> getCommand() {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path exifToolHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "exiftool", "home"));
+    Path exifToolHome = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "exiftool", "home"));
 
     File EXIFTOOL_DIRECTORY = exifToolHome.toFile();
 
@@ -65,7 +66,8 @@ public class ExifToolPluginUtils {
 
   private static List<String> getBatchCommand(Path sourceDirectory, Path exifToolOutputDirectory) {
     Path rodaHome = RodaCoreFactory.getRodaHomePath();
-    Path exifToolHome = rodaHome.resolve(RodaCoreFactory.getRodaConfigurationAsString("tools", "exiftool", "home"));
+    Path exifToolHome = rodaHome
+      .resolve(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "exiftool", "home"));
 
     File EXIFTOOL_DIRECTORY = exifToolHome.toFile();
 

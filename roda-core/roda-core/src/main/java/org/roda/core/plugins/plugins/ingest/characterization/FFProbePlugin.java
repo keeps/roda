@@ -68,10 +68,10 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     for (AIP aip : list) {
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
-        LOGGER.debug("Processing representation " + representation.getId() + " from AIP " + aip.getId());
+        LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
         try {
           boolean recursive = true;
           CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
@@ -90,7 +90,7 @@ public class FFProbePlugin extends AbstractPlugin<AIP> {
           }
           IOUtils.closeQuietly(allFiles);
         } catch (RODAException | IOException e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage());
+          LOGGER.error("Error processing AIP {}: {}", aip.getId(), e.getMessage());
         }
 
       }
