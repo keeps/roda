@@ -237,6 +237,16 @@ public final class PluginHelper {
     return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, outcomes, outcome,
       outcomeDetailExtension, notify, new Date());
   }
+  public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
+    ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify, Date eventDate)
+      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+      ValidationException, AlreadyExistsException {
+    List<LinkingIdentifier> sources = Arrays
+      .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+    List<LinkingIdentifier> outcomes = null;
+    return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, outcomes, outcome,
+      outcomeDetailExtension, notify, eventDate);
+  }
 
   /**
    * For AIP

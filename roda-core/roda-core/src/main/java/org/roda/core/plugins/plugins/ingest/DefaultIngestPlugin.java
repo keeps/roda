@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -176,6 +177,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     // transferredResourceId > report
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
+    
+    Date startDate = new Date();
 
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
@@ -192,7 +195,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
-    createIngestStartedEvent(model, index, aips);
+    createIngestStartedEvent(model, index, aips, startDate);
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
@@ -290,7 +293,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return effectiveTotalSteps;
   }
 
-  private void createIngestStartedEvent(ModelService model, IndexService index, List<AIP> aips) {
+  private void createIngestStartedEvent(ModelService model, IndexService index, List<AIP> aips, Date startDate) {
     setPreservationEventType(START_TYPE);
     setPreservationSuccessMessage(START_SUCCESS);
     setPreservationFailureMessage(START_FAILURE);
@@ -298,7 +301,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     for (AIP aip : aips) {
       try {
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify, startDate);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
