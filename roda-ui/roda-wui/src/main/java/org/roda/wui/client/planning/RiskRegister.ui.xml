@@ -35,8 +35,7 @@
 						</wcag:AccessibleFocusPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<!-- <lists:LogEntryList addStyleNames="searchResults" -->
-				<!-- ui:field="logList" /> -->
+				<lists:RiskList addStyleNames="searchResults" ui:field="riskList" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

@@ -45,11 +45,10 @@ public class Risk implements IsIndexed, Serializable {
 
   public Risk() {
     super();
-    identifiedOn = new Date();
+    this.identifiedOn = new Date();
   }
 
   public Risk(Risk risk) {
-    this.id = risk.getId();
     this.name = risk.getName();
     this.description = risk.getDescription();
     this.identifiedOn = risk.getIdentifiedOn();

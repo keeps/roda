@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -175,6 +176,15 @@ public interface UserManagementServiceAsync {
   void retrieveLogEntry(String logEntryId, AsyncCallback<LogEntry> callback);
 
   /**
+   * Get risk
+   *
+   * @param riskId
+   * @return
+   * @throws RODAException
+   */
+  void retrieveRisk(String riskId, AsyncCallback<Risk> callback);
+
+  /**
    * Resend the email challenge to a user email
    *
    * @param username
@@ -242,6 +252,6 @@ public interface UserManagementServiceAsync {
    * @throws LdapUtilityException
    * @throws NotFoundException
    */
-  public void resetUserPassword(String username, String password, String resetPasswordToken, 
+  public void resetUserPassword(String username, String password, String resetPasswordToken,
     AsyncCallback<Void> callback);
 }

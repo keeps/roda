@@ -12,6 +12,7 @@ package org.roda.wui.client.management;
 
 import java.util.List;
 
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -28,6 +29,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -67,8 +69,8 @@ public interface UserManagementService extends RemoteService {
     }
   }
 
-  public Long getMemberCount(Filter filter)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+  public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException;
 
   public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -111,8 +113,8 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, String password, String captcha)
-    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
+  public void registerUser(User user, String password, String captcha) throws GenericException,
+    UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
 
   /**
    * Create a new user
@@ -143,8 +145,8 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void modifyUser(User user, String password)
-    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
+  public void modifyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
+    AlreadyExistsException, GenericException;
 
   /**
    * Modify the authenticated user
@@ -217,8 +219,17 @@ public interface UserManagementService extends RemoteService {
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  public LogEntry retrieveLogEntry(String logEntryId)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  public LogEntry retrieveLogEntry(String logEntryId) throws AuthorizationDeniedException, GenericException,
+    NotFoundException;
+
+  /**
+   * Get risk
+   *
+   * @param riskId
+   * @return
+   * @throws RODAException
+   */
+  public Risk retrieveRisk(String riskId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
    * Send the email challenge to a user email
@@ -241,8 +252,8 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws GenericException
    */
-  public void confirmUserEmail(String username, String emailConfirmationToken)
-    throws InvalidTokenException, NotFoundException, GenericException;
+  public void confirmUserEmail(String username, String emailConfirmationToken) throws InvalidTokenException,
+    NotFoundException, GenericException;
 
   /**
    * Change the email of a user that is still not active due to a email
@@ -272,8 +283,8 @@ public interface UserManagementService extends RemoteService {
    * @throws LdapUtilityException
    * @throws RecaptchaException
    */
-  public void requestPasswordReset(String usernameOrEmail, String captcha)
-    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException;
+  public void requestPasswordReset(String usernameOrEmail, String captcha) throws GenericException, NotFoundException,
+    IllegalOperationException, RecaptchaException;
 
   /**
    * Reset a user password
@@ -292,4 +303,5 @@ public interface UserManagementService extends RemoteService {
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException;
+
 }

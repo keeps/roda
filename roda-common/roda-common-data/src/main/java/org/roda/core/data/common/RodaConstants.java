@@ -382,6 +382,8 @@ public final class RodaConstants {
 
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
+  public static final String RISK_EXTENSION = ".json";
+
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";

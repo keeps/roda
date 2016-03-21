@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.IdUtils;
@@ -1484,12 +1485,15 @@ public class ModelService extends ModelObservable {
 
   public void createRisk(Risk risk, boolean forceCommit) throws GenericException {
     try {
+      if (risk.getId() == null) {
+        risk.setId(UUID.randomUUID().toString());
+      }
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
       storage.createBinary(riskPath, new StringContentPayload(riskAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | AlreadyExistsException e) {
-      LOGGER.error("Error creating/updating risk in storage", e);
+      LOGGER.error("Error creating risk in storage", e);
     }
 
     notifyRiskCreatedOrUpdated(risk, forceCommit);
@@ -1501,7 +1505,7 @@ public class ModelService extends ModelObservable {
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
       storage.updateBinaryContent(riskPath, new StringContentPayload(riskAsJson), false, true);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error creating/updating risk in storage", e);
+      LOGGER.error("Error updating risk in storage", e);
     }
 
     notifyRiskCreatedOrUpdated(risk, forceCommit);
@@ -1512,6 +1516,24 @@ public class ModelService extends ModelObservable {
     StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
     storage.deleteResource(riskPath);
     notifyRiskDeleted(riskId);
+  }
+
+  public Risk retrieveRisk(String riskId) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
+
+    StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
+    Binary binary = storage.getBinary(riskPath);
+    Risk ret;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, Risk.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading risk", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
   }
 
 }

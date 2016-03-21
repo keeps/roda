@@ -389,7 +389,7 @@ public final class ModelUtils {
   }
 
   public static StoragePath getRiskStoragePath(String riskId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId);
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId + RodaConstants.RISK_EXTENSION);
   }
 
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,

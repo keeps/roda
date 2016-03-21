@@ -516,7 +516,7 @@ public class IndexServiceTest {
   public void testRiskIndex() {
     try {
       Risk risk = new Risk();
-      risk.setId("R11");
+      risk.setId("R1");
       risk.setName("Risk name");
       risk.setDescription("Risk description");
       risk.setIdentifiedOn(new Date());
@@ -545,29 +545,33 @@ public class IndexServiceTest {
       risk.setAffectedObjects(affectedObjects);
       model.createRisk(risk, true);
 
-      // Thread.sleep(10000);
-      IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
-      assertEquals(1, find.getTotalCount());
-
-      Risk risk2 = index.retrieve(Risk.class, "R11");
+      Risk risk2 = model.retrieveRisk("R1");
       assertNotNull(risk2);
       assertEquals(risk.getId(), risk2.getId());
       assertEquals(risk.getName(), risk2.getName());
 
-      risk2.setName("Risk Name 2");
-      model.updateRisk(risk2, true);
+      IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
+
+      Risk risk3 = index.retrieve(Risk.class, "R1");
+      assertNotNull(risk3);
+      assertEquals(risk.getId(), risk3.getId());
+      assertEquals(risk.getName(), risk3.getName());
+
+      risk3.setName("Risk New Name");
+      model.updateRisk(risk3, true);
 
       IndexResult<Risk> find2 = index.find(Risk.class, null, null, new Sublist(0, 10));
       assertEquals(1, find2.getTotalCount());
 
-      Risk risk3 = index.retrieve(Risk.class, "R11");
-      assertNotNull(risk3);
-      assertEquals(risk.getId(), risk3.getId());
+      Risk risk4 = index.retrieve(Risk.class, "R1");
+      assertNotNull(risk4);
+      assertEquals(risk.getId(), risk4.getId());
 
-      model.deleteRisk("R11");
+      model.deleteRisk("R1");
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
-      assertTrue(1 == 0);
+      assertTrue(false);
     }
   }
 }

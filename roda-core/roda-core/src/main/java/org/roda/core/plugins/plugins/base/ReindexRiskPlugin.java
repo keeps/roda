@@ -86,19 +86,23 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = false;
-      listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getRiskContainerPath(), recursive);
+      listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getRiskContainerPath(), recursive);
+      LOGGER.info("Reindexing all risks under " + ModelUtils.getRiskContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
-        Binary binary = storage.getBinary(resource.getStoragePath());
-        InputStream inputStream = binary.getContent().createInputStream();
-        Risk objectFromJson = JsonUtils.getObjectFromJson(inputStream, Risk.class);
-        IOUtils.closeQuietly(inputStream);
-        index.reindexRisk(objectFromJson, false);
+        if (!resource.isDirectory()) {
+          Binary binary = (Binary) resource;
+          InputStream inputStream = binary.getContent().createInputStream();
+          String jsonString = IOUtils.toString(inputStream);
+          Risk risk = JsonUtils.getObjectFromJson(jsonString, Risk.class);
+          IOUtils.closeQuietly(inputStream);
+          index.reindexRisk(risk, false);
+        }
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("", e);
+      LOGGER.error("Error re-indexing risks", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }

@@ -7,6 +7,9 @@
  */
 package org.roda.wui.api.v1;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +39,7 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
+import org.roda.core.plugins.plugins.base.ReindexRiskPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.entities.TaskList;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -43,9 +47,6 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.RodaCoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
 
 @Api(value = ManagementTasksResource.SWAGGER_ENDPOINT)
 @Path(ManagementTasksResource.ENDPOINT)
@@ -70,7 +71,7 @@ public class ManagementTasksResource extends RodaCoreService {
   public Response executeTask(
     @ApiParam(value = "", allowableValues = "index", defaultValue = "index") final @PathParam("sub_resource") String sub_resource,
     @ApiParam(value = "", allowableValues = "reindex,logclean", defaultValue = "reindex") final @PathParam("task_id") String task_id,
-    @ApiParam(value = "", allowableValues = "aip,job", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -79,8 +80,8 @@ public class ManagementTasksResource extends RodaCoreService {
     // FIXME see if this is the proper way to ensure that the user can execute
     // this task
     if (!user.getAllGroups().contains("administrators")) {
-      throw new AuthorizationDeniedException(
-        "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
+      throw new AuthorizationDeniedException("User \"" + user.getId()
+        + "\" doesn't have permission the execute the requested task!");
     }
 
     return execute(user, startDate, sub_resource, task_id, entity, params);
@@ -90,8 +91,11 @@ public class ManagementTasksResource extends RodaCoreService {
   private Response execute(RodaUser user, Date startDate, final String sub_resource, final String task_id,
     String entity, List<String> params) {
     if (!TASKS.getTasks().contains(sub_resource + "/" + task_id)) {
-      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
-        "No task was found in the sub-resource \"" + sub_resource + "\" with the id \"" + task_id + "\"")).build();
+      return Response
+        .serverError()
+        .entity(
+          new ApiResponseMessage(ApiResponseMessage.ERROR, "No task was found in the sub-resource \"" + sub_resource
+            + "\" with the id \"" + task_id + "\"")).build();
     } else {
       ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
       if ("index".equals(sub_resource)) {
@@ -104,6 +108,8 @@ public class ManagementTasksResource extends RodaCoreService {
             }
           } else if ("job".equals(entity)) {
             response = createJobToReindexAllJobs(user, startDate);
+          } else if ("risk".equals(entity)) {
+            response = createJobToReindexAllRisks(user, startDate);
           }
         } else if ("logclean".equals(task_id)) {
           response = createJobForRunningLogCleaner(user, params);
@@ -127,6 +133,23 @@ public class ManagementTasksResource extends RodaCoreService {
       registerAction(user, "ManagementTasks", "reindex jobs", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
       LOGGER.error("Error creating reindex Jobs job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToReindexAllRisks(RodaUser user, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setPlugin(ReindexRiskPlugin.class.getCanonicalName());
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex job", e);
     }
     return response;
   }
