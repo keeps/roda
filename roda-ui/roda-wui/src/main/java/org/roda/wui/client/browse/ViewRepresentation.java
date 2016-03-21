@@ -333,7 +333,7 @@ public class ViewRepresentation extends Composite {
         GWT.log("HERE");
         IndexedFile selected = filesList.getSelectionModel().getSelectedObject();
         if (selected != null && selected.isDirectory()) {
-          //jumpTo(selected);
+          jumpTo(selected);
         } else {
           filePreview();
           panelsControl();
