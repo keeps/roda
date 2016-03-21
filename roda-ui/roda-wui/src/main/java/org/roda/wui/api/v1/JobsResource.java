@@ -9,6 +9,7 @@ package org.roda.wui.api.v1;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -34,6 +35,7 @@ import org.roda.core.data.v2.jobs.Jobs;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.JobsHelper;
+import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -87,7 +89,6 @@ public class JobsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    // TODO run in a separate thread to be able to return right away
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
 
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
@@ -107,6 +108,22 @@ public class JobsResource {
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
 
     return Response.ok(job, mediaType).build();
+  }
+
+  @DELETE
+  @Path("/{jobId}")
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Delete Job", notes = "Delete a particular Job, stoping it if still running.", response = ApiResponseMessage.class)
+  public Response deleteJob(@PathParam("jobId") String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    org.roda.wui.api.controllers.Jobs.deleteJob(user, jobId);
+
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Job deleted"), mediaType).build();
   }
 
   // FIXME WIP - not working yet

@@ -345,4 +345,9 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     // TODO
   }
 
+  @Override
+  public void stopJob(Job job) {
+    // TODO
+  }
+
 }

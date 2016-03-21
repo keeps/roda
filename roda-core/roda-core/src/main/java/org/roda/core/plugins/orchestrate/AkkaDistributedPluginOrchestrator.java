@@ -189,4 +189,9 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public void stopJob(Job job) {
+    // TODO
+  }
+
 }

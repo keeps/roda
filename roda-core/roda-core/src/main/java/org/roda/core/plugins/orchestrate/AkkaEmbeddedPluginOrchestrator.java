@@ -38,11 +38,13 @@ import org.slf4j.LoggerFactory;
 
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
+import akka.actor.Kill;
 import akka.actor.Props;
 import akka.dispatch.Futures;
 import akka.dispatch.OnFailure;
 import akka.dispatch.OnSuccess;
 import akka.pattern.Patterns;
+import akka.routing.Broadcast;
 import akka.routing.RoundRobinPool;
 import akka.util.Timeout;
 import scala.concurrent.Await;
@@ -378,6 +380,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
     }, workersSystem.dispatcher());
 
+  }
+
+  @Override
+  public void stopJob(Job job) {
+    // FIXME this is not the solution
+    Patterns.ask(workersRouter, new Broadcast(Kill.getInstance()), DEFAULT_TIMEOUT);
+    Patterns.ask(workersRouter, Kill.getInstance(), DEFAULT_TIMEOUT);
   }
 
   @Override

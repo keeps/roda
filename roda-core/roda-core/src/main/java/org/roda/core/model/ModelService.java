@@ -39,8 +39,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -1393,6 +1393,35 @@ public class ModelService extends ModelObservable {
     notifyJobCreatedOrUpdated(job);
   }
 
+  public Job retrieveJob(String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    StoragePath jobPath = ModelUtils.getJobStoragePath(jobId);
+    Binary binary = storage.getBinary(jobPath);
+    Job ret;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, Job.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading job", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  public void deleteJob(String jobId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath jobPath = ModelUtils.getJobStoragePath(jobId);
+
+    // remove it from storage
+    storage.deleteResource(jobPath);
+
+    // remove it from index
+    notifyJobDeleted(jobId);
+  }
+
   public Report retrieveJobReport(String jobId, String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
@@ -1423,6 +1452,17 @@ public class ModelService extends ModelObservable {
 
     // index it
     notifyJobReportCreatedOrUpdated(jobReport);
+  }
+
+  public void deleteJobReport(String jobReportId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReportId);
+
+    // remove it from storage
+    storage.deleteResource(jobReportPath);
+
+    // remove it from index
+    notifyJobReportDeleted(jobReportId);
   }
 
   public void updateAIPPermissions(AIP aip)

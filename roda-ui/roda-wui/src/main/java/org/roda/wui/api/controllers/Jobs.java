@@ -56,35 +56,38 @@ public class Jobs extends RodaCoreService {
     return updatedJob;
   }
 
-  public static void pauseJob(RodaUser user, String jobId) {
-    Date startDate = new Date();
+  // public static void pauseJob(RodaUser user, String jobId) {
+  // Date startDate = new Date();
+  //
+  // // check user permissions
+  // // FIXME
+  //
+  // // delegate
+  // JobsHelper.pauseJob(jobId);
+  //
+  // // register action
+  // long duration = new Date().getTime() - startDate.getTime();
+  // registerAction(user, JOBS_COMPONENT, "pauseJob", null, duration, "jobId",
+  // jobId);
+  // }
+  //
+  // public static void resumeJob(RodaUser user, String jobId) {
+  // Date startDate = new Date();
+  //
+  // // check user permissions
+  // // FIXME
+  //
+  // // delegate
+  // JobsHelper.resumeJob(jobId);
+  //
+  // // register action
+  // long duration = new Date().getTime() - startDate.getTime();
+  // registerAction(user, JOBS_COMPONENT, "resumeJob", null, duration, "jobId",
+  // jobId);
+  // }
 
-    // check user permissions
-    // FIXME
-
-    // delegate
-    JobsHelper.pauseJob(jobId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "pauseJob", null, duration, "jobId", jobId);
-  }
-
-  public static void resumeJob(RodaUser user, String jobId) {
-    Date startDate = new Date();
-
-    // check user permissions
-    // FIXME
-
-    // delegate
-    JobsHelper.resumeJob(jobId);
-
-    // register action
-    long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, JOBS_COMPONENT, "resumeJob", null, duration, "jobId", jobId);
-  }
-
-  public static void stopJob(RodaUser user, String jobId) {
+  public static void stopJob(RodaUser user, String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
@@ -98,7 +101,8 @@ public class Jobs extends RodaCoreService {
     registerAction(user, JOBS_COMPONENT, "stopJob", null, duration, "jobId", jobId);
   }
 
-  public static void deleteJob(RodaUser user, String jobId) {
+  public static void deleteJob(RodaUser user, String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions

@@ -41,6 +41,9 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
+  /** 201603 hsilva: this method should be async */
   public void executeJob(Job job);
+
+  public void stopJob(Job job);
 
 }

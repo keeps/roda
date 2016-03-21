@@ -160,7 +160,7 @@ public final class PluginHelper {
     if (jobID != null) {
       return index.retrieve(Job.class, jobID);
     } else {
-      return null;
+      throw new NotFoundException("Job not found");
     }
 
   }
@@ -329,7 +329,7 @@ public final class PluginHelper {
   public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, IndexService index, ModelService model,
     int newCompletionPercentage) {
     try {
-      LOGGER.debug("New job completionPercentage: " + newCompletionPercentage);
+      LOGGER.debug("New job completionPercentage: {}", newCompletionPercentage);
       Job job = PluginHelper.getJobFromIndex(plugin, index);
       job.setCompletionPercentage(newCompletionPercentage);
 

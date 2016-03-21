@@ -840,8 +840,7 @@ public class SolrUtils {
     Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
-    String queryString = parseFilter(filter);
-    query.setQuery(queryString);
+    query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());
@@ -862,8 +861,7 @@ public class SolrUtils {
       throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
-    String queryString = parseFilter(filter);
-    query.setQuery(queryString);
+    query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
     query.setRows(sublist.getMaximumElementCount());

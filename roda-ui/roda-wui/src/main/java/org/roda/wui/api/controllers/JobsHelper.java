@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -19,12 +24,13 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import akka.pattern.Patterns;
 
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
@@ -89,24 +95,49 @@ public class JobsHelper {
     return jobs;
   }
 
-  public static void pauseJob(String jobId) {
-    // TODO Auto-generated method stub
-    
+  public static Job stopJob(String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    // retrieve job
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+
+    // stop it
+    RodaCoreFactory.getPluginOrchestrator().stopJob(job);
+
+    return job;
   }
 
-  public static void resumeJob(String jobId) {
-    // TODO Auto-generated method stub
-    
+  public static void deleteJob(String jobId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    // stop it (if it is running)
+    Job job = stopJob(jobId);
+
+    // delete all job reports associated with this job
+    deleteJobReports(job);
+
+    // delete it
+    RodaCoreFactory.getModelService().deleteJob(jobId);
+
   }
 
-  public static void stopJob(String jobId) {
-    // TODO Auto-generated method stub
-    
-  }
+  private static void deleteJobReports(Job job) throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
+    Sublist sublist = new Sublist(0, 100);
+    ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
+    Long jobReportsCount = index.count(Report.class, filter);
 
-  public static void deleteJob(String jobId) {
-    // TODO Auto-generated method stub
-    
+    for (int i = 0; i < jobReportsCount; i += 100) {
+      sublist.setFirstElementIndex(i);
+      IndexResult<Report> jobReports = index.find(Report.class, filter, null, sublist);
+      for (Report report : jobReports.getResults()) {
+        try {
+          model.deleteJobReport(report.getId());
+        } catch (NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Error while deleting Job Report", e);
+        }
+      }
+
+    }
   }
 
 }
