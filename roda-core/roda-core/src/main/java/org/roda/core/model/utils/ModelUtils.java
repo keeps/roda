@@ -392,6 +392,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId + RodaConstants.RISK_EXTENSION);
   }
 
+  public static StoragePath getAgentContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AGENT);
+  }
+
+  public static StoragePath getAgentStoragePath(String agentId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AGENT, agentId + RodaConstants.AGENT_EXTENSION);
+  }
+
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,
     List<String> directoryPath, String fileName, String fileSuffix, String type) throws RequestNotValidException {
 

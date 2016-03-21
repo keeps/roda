@@ -81,6 +81,7 @@ public final class RodaConstants {
   public static final String CORE_THEME_FOLDER = "theme";
   public static final String CORE_EXAMPLE_THEME_FOLDER = "example-theme";
   public static final String CORE_RISK_FOLDER = "risk";
+  public static final String CORE_AGENT_FOLDER = "agent";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -174,6 +175,7 @@ public final class RodaConstants {
   public static final String INDEX_JOB_REPORT = "JobReport";
   public static final String INDEX_FILE = "File";
   public static final String INDEX_RISK = "Risk";
+  public static final String INDEX_AGENT = "Agent";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
   // "DescriptiveMetadata";
@@ -193,6 +195,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
   public static final String STORAGE_CONTAINER_RISK = "Risk";
+  public static final String STORAGE_CONTAINER_AGENT = "Agent";
 
   /*
    * STORAGE DIRECTORIES
@@ -383,6 +386,24 @@ public final class RodaConstants {
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   public static final String RISK_EXTENSION = ".json";
+
+  /* Agents */
+  public static final String AGENT_ID = "id";
+  public static final String AGENT_NAME = "name";
+  public static final String AGENT_TYPE = "type";
+  public static final String AGENT_DESCRIPTION = "description";
+  public static final String AGENT_CATEGORY = "category";
+  public static final String AGENT_VERSION = "version";
+  public static final String AGENT_LICENSE = "license";
+  public static final String AGENT_POPULARITY = "popularity";
+  public static final String AGENT_DEVELOPER = "developer";
+  public static final String AGENT_INITIAL_RELEASE = "initialRelease";
+  public static final String AGENT_WEBSITE = "website";
+  public static final String AGENT_DOWNLOAD = "download";
+  public static final String AGENT_PROVENANCE_INFORMATION = "provenanceInformation";
+  public static final String AGENT_PLATFORMS = "platforms";
+
+  public static final String AGENT_EXTENSION = ".json";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

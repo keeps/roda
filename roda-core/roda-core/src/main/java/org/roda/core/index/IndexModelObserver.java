@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -481,6 +482,17 @@ public class IndexModelObserver implements ModelObserver {
 
   public void riskDeleted(String riskId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
+  }
+
+  public void agentCreatedOrUpdated(Agent agent, boolean forceCommit) {
+    addDocumentToIndex(RodaConstants.INDEX_AGENT, SolrUtils.agentToSolrDocument(agent), "Error creating Agent",
+      forceCommit);
+  }
+
+  public void agentDeleted(String agentId) {
+    boolean forceCommit = false;
+    deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")",
+      forceCommit);
   }
 
 }

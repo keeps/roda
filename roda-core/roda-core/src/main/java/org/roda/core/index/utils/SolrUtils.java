@@ -86,6 +86,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -777,6 +778,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_FILE;
     } else if (resultClass.equals(Risk.class)) {
       indexName = RodaConstants.INDEX_RISK;
+    } else if (resultClass.equals(Agent.class)) {
+      indexName = RodaConstants.INDEX_AGENT;
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -832,6 +835,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToJob(doc));
     } else if (resultClass.equals(Risk.class)) {
       ret = resultClass.cast(solrDocumentToRisk(doc));
+    } else if (resultClass.equals(Agent.class)) {
+      ret = resultClass.cast(solrDocumentToAgent(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -1575,6 +1580,48 @@ public class SolrUtils {
     risk.setAffectedObjects(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.RISK_AFFECTED_OBJECTS))));
 
     return risk;
+  }
+
+  public static SolrInputDocument agentToSolrDocument(Agent agent) {
+    SolrInputDocument doc = new SolrInputDocument();
+
+    doc.addField(RodaConstants.AGENT_ID, agent.getId());
+    doc.addField(RodaConstants.AGENT_NAME, agent.getName());
+    doc.addField(RodaConstants.AGENT_TYPE, agent.getType());
+    doc.addField(RodaConstants.AGENT_DESCRIPTION, agent.getDescription());
+    doc.addField(RodaConstants.AGENT_CATEGORY, agent.getCategory());
+    doc.addField(RodaConstants.AGENT_VERSION, agent.getVersion());
+    doc.addField(RodaConstants.AGENT_LICENSE, agent.getLicense());
+    doc.addField(RodaConstants.AGENT_POPULARITY, agent.getPopularity());
+    doc.addField(RodaConstants.AGENT_DEVELOPER, agent.getDeveloper());
+    doc.addField(RodaConstants.AGENT_INITIAL_RELEASE, agent.getInitialRelease());
+    doc.addField(RodaConstants.AGENT_WEBSITE, agent.getWebsite());
+    doc.addField(RodaConstants.AGENT_DOWNLOAD, agent.getDownload());
+    doc.addField(RodaConstants.AGENT_PROVENANCE_INFORMATION, agent.getProvenanceInformation());
+    doc.addField(RodaConstants.AGENT_PLATFORMS, agent.getPlatforms());
+
+    return doc;
+  }
+
+  public static Agent solrDocumentToAgent(SolrDocument doc) {
+    Agent agent = new Agent();
+
+    agent.setId(objectToString(doc.get(RodaConstants.AGENT_ID)));
+    agent.setName(objectToString(doc.get(RodaConstants.AGENT_NAME)));
+    agent.setType(objectToString(doc.get(RodaConstants.AGENT_TYPE)));
+    agent.setDescription(objectToString(doc.get(RodaConstants.AGENT_DESCRIPTION)));
+    agent.setCategory(objectToString(doc.get(RodaConstants.AGENT_CATEGORY)));
+    agent.setVersion(objectToString(doc.get(RodaConstants.AGENT_VERSION)));
+    agent.setLicense(objectToString(doc.get(RodaConstants.AGENT_LICENSE)));
+    agent.setPopularity(objectToInteger(doc.get(RodaConstants.AGENT_POPULARITY)));
+    agent.setDeveloper(objectToString(doc.get(RodaConstants.AGENT_DEVELOPER)));
+    agent.setInitialRelease(objectToDate(doc.get(RodaConstants.AGENT_INITIAL_RELEASE)));
+    agent.setWebsite(objectToString(doc.get(RodaConstants.AGENT_WEBSITE)));
+    agent.setDownload(objectToString(doc.get(RodaConstants.AGENT_DOWNLOAD)));
+    agent.setProvenanceInformation(objectToString(doc.get(RodaConstants.AGENT_PROVENANCE_INFORMATION)));
+    agent.setPlatforms(objectToListString(doc.get(RodaConstants.AGENT_PLATFORMS)));
+
+    return agent;
   }
 
   public static SolrInputDocument fileToSolrDocument(AIP aip, File file, Binary premisFile, String fulltext) {

@@ -40,6 +40,7 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
@@ -1530,6 +1531,63 @@ public class ModelService extends ModelObservable {
       ret = JsonUtils.getObjectFromJson(inputStream, Risk.class);
     } catch (IOException e) {
       throw new GenericException("Error reading risk", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  /***************** Agent related *****************/
+  /************************************************/
+
+  public void createAgent(Agent agent, boolean forceCommit) throws GenericException {
+    try {
+      if (agent.getId() == null) {
+        agent.setId(UUID.randomUUID().toString());
+      }
+      String agentAsJson = JsonUtils.getJsonFromObject(agent);
+      StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
+      storage.createBinary(agentPath, new StringContentPayload(agentAsJson), false);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
+      LOGGER.error("Error creating agent in storage", e);
+    }
+
+    notifyAgentCreatedOrUpdated(agent, forceCommit);
+  }
+
+  public void updateAgent(Agent agent, boolean forceCommit) throws GenericException {
+    try {
+      String agentAsJson = JsonUtils.getJsonFromObject(agent);
+      StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
+      storage.updateBinaryContent(agentPath, new StringContentPayload(agentAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error updating agent in storage", e);
+    }
+
+    notifyAgentCreatedOrUpdated(agent, forceCommit);
+  }
+
+  public void deleteAgent(String agentId) throws GenericException, NotFoundException, AuthorizationDeniedException,
+    RequestNotValidException {
+
+    StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
+    storage.deleteResource(agentPath);
+    notifyRiskDeleted(agentId);
+  }
+
+  public Agent retrieveAgent(String agentId) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
+
+    StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
+    Binary binary = storage.getBinary(agentPath);
+    Agent ret;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, Agent.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading agent", e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }

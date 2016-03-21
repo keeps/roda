@@ -9,6 +9,7 @@ package org.roda.core.model;
 
 import java.util.List;
 
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -85,5 +86,9 @@ public interface ModelObserver {
   public void riskCreatedOrUpdated(Risk risk, boolean forceCommit);
 
   public void riskDeleted(String riskId);
+
+  public void agentCreatedOrUpdated(Agent agent, boolean forceCommit);
+
+  public void agentDeleted(String agentId);
 
 }

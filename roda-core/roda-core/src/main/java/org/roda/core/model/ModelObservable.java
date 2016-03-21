@@ -10,6 +10,7 @@ package org.roda.core.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -223,6 +224,18 @@ public abstract class ModelObservable {
   protected void notifyRiskDeleted(String riskId) {
     for (ModelObserver observer : observers) {
       observer.riskDeleted(riskId);
+    }
+  }
+
+  protected void notifyAgentCreatedOrUpdated(Agent agent, boolean forceCommit) {
+    for (ModelObserver observer : observers) {
+      observer.agentCreatedOrUpdated(agent, forceCommit);
+    }
+  }
+
+  protected void notifyAgentDeleted(String agentId) {
+    for (ModelObserver observer : observers) {
+      observer.agentDeleted(agentId);
     }
   }
 }
