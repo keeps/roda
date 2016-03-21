@@ -209,4 +209,9 @@ public class Job implements IsIndexed, Serializable {
       + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
   }
 
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
 }

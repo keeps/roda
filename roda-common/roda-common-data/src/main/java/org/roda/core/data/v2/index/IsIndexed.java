@@ -11,4 +11,6 @@ import java.io.Serializable;
 
 public interface IsIndexed extends Serializable {
 
+  public String getUUID();
+
 }

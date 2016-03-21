@@ -7,7 +7,6 @@
  */
 package org.roda.wui.client.common.lists;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +19,7 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
@@ -51,15 +51,14 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.CellPreviewEvent.Handler;
-
-import config.i18n.client.BrowseMessages;
-
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 import com.google.gwt.view.client.ProvidesKey;
 import com.google.gwt.view.client.Range;
 import com.google.gwt.view.client.SingleSelectionModel;
 
-public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
+import config.i18n.client.BrowseMessages;
+
+public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
   implements HasValueChangeHandlers<IndexResult<T>> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
@@ -172,7 +171,7 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
       selectColumn = new Column<T, Boolean>(new CheckboxCell(true, false)) {
         @Override
         public Boolean getValue(T object) {
-          return getSelected().contains(object);
+          return selected.contains(object);
         }
       };
 
@@ -180,9 +179,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
         @Override
         public void update(int index, T object, Boolean isSelected) {
           if (isSelected) {
-            getSelected().add(object);
+            selected.add(object);
           } else {
-            getSelected().remove(object);
+            selected.remove(object);
           }
 
           // update header
@@ -238,7 +237,15 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   protected abstract int getInitialPageSize();
 
-  protected abstract ProvidesKey<T> getKeyProvider();
+  protected ProvidesKey<T> getKeyProvider() {
+    return new ProvidesKey<T>() {
+
+      @Override
+      public Object getKey(T item) {
+        return item.getUUID();
+      }
+    };
+  }
 
   protected abstract void getData(Sublist sublist, ColumnSortList columnSortList,
     AsyncCallback<IndexResult<T>> callback);
@@ -458,8 +465,15 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     this.selectable = selectable;
   }
 
-  public Set<T> getSelected() {
-    return selected;
+  public SelectedItems<T> getSelected() {
+    SelectedItems<T> ret;
+    if (isAllSelected()) {
+      ret = new SelectedItemsFilter<T>(getFilter());
+    } else {
+      ret = new SelectedItemsSet<T>(selected);
+    }
+
+    return ret;
   }
 
   public void setSelected(Set<T> newSelected) {
@@ -471,8 +485,8 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
   // LISTENER
 
-  public interface CheckboxSelectionListener<T> {
-    public void onSelectionChange(Set<T> selected);
+  public interface CheckboxSelectionListener<T extends IsIndexed> {
+    public void onSelectionChange(SelectedItems<T> selected);
   }
 
   public void addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
@@ -504,6 +518,15 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
 
     selectAllPanel.addStyleName("panel");
     selectAllPanelBody.addStyleName("panel-body");
+
+    selectAllCheckBox.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<Boolean> event) {
+        fireOnCheckboxSelectionChanged();
+      }
+    });
+
   }
 
   public void showSelectAllPanel() {
@@ -518,4 +541,9 @@ public abstract class AsyncTableCell<T extends Serializable> extends FlowPanel
     selectAllCheckBox.setValue(false);
     selectAllPanel.setVisible(false);
   }
+
+  public Boolean isAllSelected() {
+    return selectAllCheckBox.getValue();
+  }
+
 }

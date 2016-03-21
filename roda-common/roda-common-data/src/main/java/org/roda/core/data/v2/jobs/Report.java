@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Report implements Serializable, IsIndexed {
   private static final long serialVersionUID = 4316398565678538090L;
 
@@ -212,6 +214,12 @@ public class Report implements Serializable, IsIndexed {
       + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
       + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
       + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails + ", reports=" + reports + "]";
+  }
+
+  @JsonIgnore
+  @Override
+  public String getUUID() {
+    return getId();
   }
 
 }

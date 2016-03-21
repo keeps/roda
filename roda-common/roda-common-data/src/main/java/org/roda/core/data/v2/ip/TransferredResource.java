@@ -117,4 +117,9 @@ public class TransferredResource implements IsIndexed {
       + ", name=" + name + ", file=" + file + "]";
   }
 
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
 }

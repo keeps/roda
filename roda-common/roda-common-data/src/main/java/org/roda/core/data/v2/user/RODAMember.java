@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.user;
 
-import java.io.Serializable;
 import java.util.Set;
 
-public interface RODAMember extends Serializable {
+import org.roda.core.data.v2.index.IsIndexed;
+
+public interface RODAMember extends IsIndexed {
 
   public boolean isActive();
 

@@ -39,7 +39,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.cellview.client.TextHeader;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 /**
  * 
@@ -170,17 +169,6 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
     BrowserService.Util.getInstance().find(TransferredResource.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-  }
-
-  @Override
-  protected ProvidesKey<TransferredResource> getKeyProvider() {
-    return new ProvidesKey<TransferredResource>() {
-
-      @Override
-      public Object getKey(TransferredResource item) {
-        return item.getId();
-      }
-    };
   }
 
   @Override

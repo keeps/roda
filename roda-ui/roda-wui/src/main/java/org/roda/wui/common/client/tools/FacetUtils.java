@@ -16,6 +16,7 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.lists.AsyncTableCell;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -28,12 +29,12 @@ public class FacetUtils {
 
   private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
 
-  public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
+  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T> list,
     final Map<String, FlowPanel> facetPanels) {
     bindFacets(list, facetPanels, false);
   }
 
-  public static <T extends Serializable> void bindFacets(final AsyncTableCell<T> list,
+  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T> list,
     final Map<String, FlowPanel> facetPanels, final boolean hideDisabled) {
     list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
 
@@ -44,7 +45,7 @@ public class FacetUtils {
     });
   }
 
-  private static <T extends Serializable> void updateFacetPanels(final AsyncTableCell<T> list,
+  private static <T extends IsIndexed> void updateFacetPanels(final AsyncTableCell<T> list,
     final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults, final boolean hideDisabled) {
 
     for (FacetFieldResult facetResult : facetResults) {

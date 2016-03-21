@@ -176,7 +176,7 @@ public class ViewRepresentation extends Composite {
     private boolean verifyRepresentation(List<IndexedRepresentation> representations, String representationUUID) {
       boolean exist = false;
       for (IndexedRepresentation representation : representations) {
-        if (representation.getUuid().equals(representationUUID)) {
+        if (representation.getUUID().equals(representationUUID)) {
           exist = true;
         }
       }
@@ -191,7 +191,7 @@ public class ViewRepresentation extends Composite {
 
   public static void jumpTo(IndexedFile selected) {
     Tools.newHistory(ViewRepresentation.RESOLVER, selected.getAipId(), selected.getRepresentationUUID(),
-      selected.getUuid());
+      selected.getUUID());
   }
 
   interface MyUiBinder extends UiBinder<Widget, ViewRepresentation> {
@@ -303,7 +303,7 @@ public class ViewRepresentation extends Composite {
     this.file = file;
 
     if (file != null && file.isDirectory()) {
-      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getUuid()));
+      defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getUUID()));
     } else if (file != null && !file.isDirectory() && file.getParentUUID() != null) {
       defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getParentUUID()));
     } else {
@@ -433,7 +433,7 @@ public class ViewRepresentation extends Composite {
 
       // TODO set representation UUID
       String hashLink = Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, file.getAipId(),
-        file.getRepresentationUUID(), file.getUuid());
+        file.getRepresentationUUID(), file.getUUID());
       viewUrl += hashLink;
 
       JavascriptUtils.updateURLWithoutReloading(viewUrl);
@@ -516,7 +516,7 @@ public class ViewRepresentation extends Composite {
     String representationUUID) {
     IndexedRepresentation rep = null;
     for (IndexedRepresentation representation : representations) {
-      if (representation.getUuid().equals(representationUUID)) {
+      if (representation.getUUID().equals(representationUUID)) {
         rep = representation;
       }
     }
@@ -563,10 +563,10 @@ public class ViewRepresentation extends Composite {
   private void downloadFile() {
     SafeUri downloadUri = null;
     if (file != null) {
-      downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUuid());
+      downloadUri = RestUtils.createRepresentationFileDownloadUri(file.getUUID());
     } else if (filesList.getSelectionModel().getSelectedObject() != null) {
       downloadUri = RestUtils
-        .createRepresentationFileDownloadUri(filesList.getSelectionModel().getSelectedObject().getUuid());
+        .createRepresentationFileDownloadUri(filesList.getSelectionModel().getSelectedObject().getUUID());
     }
     if (downloadUri != null) {
       Window.Location.assign(downloadUri.asString());
@@ -759,7 +759,7 @@ public class ViewRepresentation extends Composite {
   }
 
   private void imagePreview(IndexedFile file) {
-    Image image = new Image(RestUtils.createRepresentationFileDownloadUri(file.getUuid()));
+    Image image = new Image(RestUtils.createRepresentationFileDownloadUri(file.getUUID()));
     image.addErrorHandler(new ErrorHandler() {
 
       @Override
@@ -774,7 +774,7 @@ public class ViewRepresentation extends Composite {
 
   private void pdfPreview(IndexedFile file) {
     String viewerHtml = GWT.getHostPageBaseURL() + "pdf/viewer.html?file="
-      + encode(GWT.getHostPageBaseURL() + RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString());
+      + encode(GWT.getHostPageBaseURL() + RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
 
     Frame frame = new Frame(viewerHtml);
     filePreview.add(frame);
@@ -783,7 +783,7 @@ public class ViewRepresentation extends Composite {
 
   private void textPreview(IndexedFile file) {
     RequestBuilder request = new RequestBuilder(RequestBuilder.GET,
-      RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString());
+      RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString());
     try {
       request.sendRequest(null, new RequestCallback() {
 
@@ -820,7 +820,7 @@ public class ViewRepresentation extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-headphones fa-5'></i>"));
       html.setHTML(b.toSafeHtml());
 
-      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString(), "audio/mpeg");
+      audioPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(), "audio/mpeg");
       audioPlayer.setControls(true);
       filePreview.add(html);
       filePreview.add(audioPlayer);
@@ -834,7 +834,7 @@ public class ViewRepresentation extends Composite {
   private void videoPreview(IndexedFile file) {
     Video videoPlayer = Video.createIfSupported();
     if (videoPlayer != null) {
-      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUuid()).asString(), "video/dvd");
+      videoPlayer.addSource(RestUtils.createRepresentationFileDownloadUri(file.getUUID()).asString(), "video/dvd");
       videoPlayer.setControls(true);
       filePreview.add(videoPlayer);
       videoPlayer.addStyleName("viewRepresentationAudioFilePreview");

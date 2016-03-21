@@ -38,7 +38,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.BrowseMessages;
 
@@ -169,17 +168,6 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
 
     BrowserService.Util.getInstance().find(IndexedPreservationEvent.class.getName(), filter, sorter, sublist,
       getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-  }
-
-  @Override
-  protected ProvidesKey<IndexedPreservationEvent> getKeyProvider() {
-    return new ProvidesKey<IndexedPreservationEvent>() {
-
-      @Override
-      public Object getKey(IndexedPreservationEvent event) {
-        return event.getId();
-      }
-    };
   }
 
   @Override

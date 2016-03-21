@@ -31,7 +31,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
 
@@ -136,17 +135,6 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
       BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
         getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-  }
-
-  @Override
-  protected ProvidesKey<IndexedRepresentation> getKeyProvider() {
-    return new ProvidesKey<IndexedRepresentation>() {
-
-      @Override
-      public Object getKey(IndexedRepresentation item) {
-        return item.getUuid();
-      }
-    };
   }
 
   @Override

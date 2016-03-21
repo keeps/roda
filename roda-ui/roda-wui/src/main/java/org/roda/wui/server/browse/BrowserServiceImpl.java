@@ -11,6 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -28,7 +31,9 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -46,6 +51,9 @@ import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
+import org.roda.wui.client.common.lists.SelectedItems;
+import org.roda.wui.client.common.lists.SelectedItemsFilter;
+import org.roda.wui.client.common.lists.SelectedItemsSet;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -276,10 +284,34 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void removeTransferredResources(List<String> ids)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public void removeTransferredResources(SelectedItems<TransferredResource> selected)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+
+    List<String> ids = new ArrayList<>();
+
+    ids = consolidate(user, TransferredResource.class, selected);
+
     Browser.removeTransferredResources(user, ids, true);
+  }
+
+  private static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
+    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    List<String> ret;
+
+    if (selected instanceof SelectedItemsSet) {
+      Set<T> set = ((SelectedItemsSet<T>) selected).getSet();
+      ret = set.stream().map(i -> i.getUUID()).collect(Collectors.toList());
+    } else if (selected instanceof SelectedItemsFilter) {
+      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
+      Long count = Browser.count(user, classToReturn, filter);
+      IndexResult<T> find = Browser.find(user, classToReturn, filter, null, new Sublist(0, count.intValue()), null);
+      ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
+    } else {
+      throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
+    }
+
+    return ret;
   }
 
   @Override
@@ -322,6 +354,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public Job createJob(Job job)
     throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Jobs.createJob(user, job);
+  }
+
+  @Override
+  public Job createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
+    Map<String, String> parameters)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+
+    Job job = new Job();
+    job.setName(jobName);
+
+    List<String> objectIds = consolidate(user, TransferredResource.class, selected);
+    job.setObjectIds(objectIds);
+    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
+
+    job.setPlugin(plugin);
+    job.setPluginParameters(parameters);
+
     return Jobs.createJob(user, job);
   }
 
@@ -409,4 +461,5 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Browser.removeDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
   }
+
 }

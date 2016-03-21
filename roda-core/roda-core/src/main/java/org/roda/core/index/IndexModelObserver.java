@@ -541,7 +541,6 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Error commiting into collection: " + collection, e);
       }
     }
-
   }
 
   @Override

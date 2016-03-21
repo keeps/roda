@@ -1361,8 +1361,10 @@ public class SolrUtils {
       }
 
       // indexing active state and permissions
-      doc.addField(RodaConstants.ACTIVE, aip.isActive());
-      setPermissions(aip.getPermissions(), doc);
+      if (aip != null) {
+        doc.addField(RodaConstants.ACTIVE, aip.isActive());
+        setPermissions(aip.getPermissions(), doc);
+      }
     }
     return doc;
   }

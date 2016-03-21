@@ -200,4 +200,10 @@ public class RodaUser extends RodaSimpleUser implements RODAMember {
   public boolean hasRole(String role) {
     return allRoles.contains(role);
   }
+  
+  @Override
+  public String getUUID() {
+    // TODO needs prefix to distinguish from group?
+    return getId();
+  }
 }

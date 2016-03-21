@@ -511,7 +511,7 @@ public class BasicSearch extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         IndexedRepresentation rep = representationsSearchResultPanel.getSelectionModel().getSelectedObject();
         if (rep != null) {
-          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getUuid());
+          Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
         }
       }
     });

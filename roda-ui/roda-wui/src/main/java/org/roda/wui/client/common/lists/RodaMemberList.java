@@ -33,7 +33,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
@@ -140,17 +139,6 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
     UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-  }
-
-  @Override
-  protected ProvidesKey<RODAMember> getKeyProvider() {
-    return new ProvidesKey<RODAMember>() {
-
-      @Override
-      public Object getKey(RODAMember item) {
-        return item.getId();
-      }
-    };
   }
 
   @Override

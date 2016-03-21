@@ -564,7 +564,7 @@ public class Browse extends Composite {
   private Widget createRepresentationDownloadButton(IndexedRepresentation rep) {
     Button downloadButton = new Button();
     final String aipId = rep.getAipId();
-    final String repUUID = rep.getUuid();
+    final String repUUID = rep.getUUID();
 
     SafeHtml labelText;
 

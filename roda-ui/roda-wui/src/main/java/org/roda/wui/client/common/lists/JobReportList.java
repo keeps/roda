@@ -39,7 +39,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.BrowseMessages;
 
@@ -210,17 +209,6 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     BrowserService.Util.getInstance().find(Report.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
-  }
-
-  @Override
-  protected ProvidesKey<Report> getKeyProvider() {
-    return new ProvidesKey<Report>() {
-
-      @Override
-      public Object getKey(Report item) {
-        return item.getId();
-      }
-    };
   }
 
   @Override

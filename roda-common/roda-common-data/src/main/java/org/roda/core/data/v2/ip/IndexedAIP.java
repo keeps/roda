@@ -311,4 +311,9 @@ public class IndexedAIP implements IsIndexed {
       + ", subElementsCount=" + subElementsCount + ", permissions=" + permissions + "]";
   }
 
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
 }

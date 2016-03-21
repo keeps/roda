@@ -30,11 +30,12 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     this.totalNumberOfFiles = totalNumberOfFiles;
   }
 
-  public String getUuid() {
+  @Override
+  public String getUUID() {
     return uuid;
   }
 
-  public void setUuid(String uuid) {
+  public void setUUID(String uuid) {
     this.uuid = uuid;
   }
 

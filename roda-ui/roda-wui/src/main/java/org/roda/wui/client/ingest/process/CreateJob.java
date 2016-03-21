@@ -15,14 +15,19 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.SelectedItems;
+import org.roda.wui.client.common.lists.SelectedItemsFilter;
+import org.roda.wui.client.common.lists.SelectedItemsSet;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
@@ -41,6 +46,7 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -60,8 +66,8 @@ public class CreateJob extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 0) {
-        final Set<TransferredResource> selected = IngestTransfer.getInstance().getSelected();
-        if (selected.isEmpty()) {
+        final SelectedItems<TransferredResource> selected = IngestTransfer.getInstance().getSelected();
+        if (SelectedItemsUtils.isEmpty(selected)) {
           Tools.newHistory(IngestTransfer.RESOLVER);
           callback.onSuccess(null);
         } else {
@@ -111,14 +117,14 @@ public class CreateJob extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final Set<TransferredResource> selected;
+  private final SelectedItems<TransferredResource> selected;
   private final List<PluginInfo> ingestPlugins;
 
   @UiField
   TextBox name;
 
   @UiField
-  HTML objectList;
+  FlowPanel targetPanel;
 
   @UiField
   ListBox ingestWorkflowList;
@@ -137,7 +143,7 @@ public class CreateJob extends Composite {
 
   private PluginInfo selectedIngestPlugin = null;
 
-  public CreateJob(Set<TransferredResource> selected, List<PluginInfo> ingestPlugins,
+  public CreateJob(SelectedItems<TransferredResource> selected, List<PluginInfo> ingestPlugins,
     List<PluginInfo> sipToAipPlugins) {
     this.selected = selected;
     this.ingestPlugins = ingestPlugins;
@@ -165,21 +171,33 @@ public class CreateJob extends Composite {
   }
 
   private void updateObjectList() {
-    SafeHtmlBuilder b = new SafeHtmlBuilder();
-    b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
 
     if (selected != null) {
-      for (TransferredResource transferredResource : selected) {
-        b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
-        b.append(SafeHtmlUtils.fromSafeConstant(
-          transferredResource.isFile() ? "<i class='fa fa-file-o'></i>" : "<i class='fa fa-folder-o'></i>"));
-        b.append(SafeHtmlUtils.fromString(transferredResource.getName()));
-        b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
+      if (selected instanceof SelectedItemsSet) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
+        Set<TransferredResource> set = ((SelectedItemsSet<TransferredResource>) selected).getSet();
+        for (TransferredResource transferredResource : set) {
+          b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
+          b.append(SafeHtmlUtils.fromSafeConstant(
+            transferredResource.isFile() ? "<i class='fa fa-file-o'></i>" : "<i class='fa fa-folder-o'></i>"));
+          b.append(SafeHtmlUtils.fromString(transferredResource.getName()));
+          b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
+        }
+        b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
+        HTML objectList = new HTML(b.toSafeHtml());
+        objectList.addStyleName("wui-transferredResourceList");
+        targetPanel.clear();
+        targetPanel.add(objectList);
+      } else if (selected instanceof SelectedItemsFilter) {
+        Filter filter = ((SelectedItemsFilter<TransferredResource>) selected).getFilter();
+        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false);
+        targetPanel.clear();
+        targetPanel.add(list);
+      } else {
+        // do nothing
       }
     }
-
-    b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
-    objectList.setHTML(b.toSafeHtml());
 
   }
 
@@ -237,38 +255,25 @@ public class CreateJob extends Composite {
   void buttonCreateHandler(ClickEvent e) {
     buttonCreate.setEnabled(false);
     String jobName = this.name.getText();
-    // TODO test if name is valid
-    Job job = new Job();
-    job.setName(jobName);
-
-    List<String> objectIds = new ArrayList<String>();
-    if (selected != null) {
-      for (TransferredResource r : selected) {
-        objectIds.add(r.getId());
-      }
-    }
-    job.setObjectIds(objectIds);
-    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
-
-    job.setPlugin(selectedIngestPlugin.getId());
-    job.setPluginParameters(ingestWorkflowOptions.getValue());
 
     List<PluginParameter> missingMandatoryParameters = ingestWorkflowOptions.getMissingMandatoryParameters();
     if (missingMandatoryParameters.isEmpty()) {
-      BrowserService.Util.getInstance().createJob(job, new AsyncCallback<Job>() {
 
-        @Override
-        public void onFailure(Throwable caught) {
-          Toast.showError("Error", caught.getMessage());
-          buttonCreate.setEnabled(true);
-        }
+      BrowserService.Util.getInstance().createIngestProcess(jobName, selected, selectedIngestPlugin.getId(),
+        ingestWorkflowOptions.getValue(), new AsyncCallback<Job>() {
 
-        @Override
-        public void onSuccess(Job result) {
-          Toast.showInfo("Done", "New ingest process created");
-          Tools.newHistory(IngestProcess.RESOLVER);
-        }
-      });
+          @Override
+          public void onFailure(Throwable caught) {
+            Toast.showError("Error", caught.getMessage());
+            buttonCreate.setEnabled(true);
+          }
+
+          @Override
+          public void onSuccess(Job result) {
+            Toast.showInfo("Done", "New ingest process created");
+            Tools.newHistory(IngestProcess.RESOLVER);
+          }
+        });
     } else {
 
       List<String> missingPluginNames = new ArrayList<>();

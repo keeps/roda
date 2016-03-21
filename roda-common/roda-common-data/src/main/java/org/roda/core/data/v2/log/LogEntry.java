@@ -7,15 +7,16 @@
  */
 package org.roda.core.data.v2.log;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
+import org.roda.core.data.v2.index.IsIndexed;
 
 /**
  * @author Rui Castro
  * 
  */
-public class LogEntry implements Serializable {
+public class LogEntry implements IsIndexed {
   private static final long serialVersionUID = -178083792639806983L;
 
   private String id;
@@ -306,6 +307,11 @@ public class LogEntry implements Serializable {
    */
   public void setDuration(long duration) {
     this.duration = duration;
+  }
+
+  @Override
+  public String getUUID() {
+    return getId();
   }
 
 }

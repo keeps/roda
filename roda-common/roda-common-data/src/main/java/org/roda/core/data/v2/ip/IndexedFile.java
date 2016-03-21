@@ -67,11 +67,12 @@ public class IndexedFile implements IsIndexed {
     this.otherProperties = otherProperties;
   }
 
-  public String getUuid() {
+  @Override
+  public String getUUID() {
     return uuid;
   }
 
-  public void setUuid(String uuid) {
+  public void setUUID(String uuid) {
     this.uuid = uuid;
   }
 

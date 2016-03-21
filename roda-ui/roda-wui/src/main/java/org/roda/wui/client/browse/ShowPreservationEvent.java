@@ -203,8 +203,10 @@ public class ShowPreservationEvent extends Composite {
 
     for (LinkingIdentifier agentId : event.getLinkingAgentIds()) {
       IndexedPreservationAgent agent = agents.get(agentId.getValue());
-      FlowPanel layout = createAgentPanel(agentId, agent);
-      agentsPanel.add(layout);
+      if (agent != null) {
+        FlowPanel layout = createAgentPanel(agentId, agent);
+        agentsPanel.add(layout);
+      }
     }
 
     // Source objects
@@ -496,7 +498,7 @@ public class ShowPreservationEvent extends Composite {
       layout.add(footer);
 
       Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, ifile.getAipId(),
-        ifile.getRepresentationUUID(), ifile.getUuid()));
+        ifile.getRepresentationUUID(), ifile.getUUID()));
       footer.add(link);
 
     } else {

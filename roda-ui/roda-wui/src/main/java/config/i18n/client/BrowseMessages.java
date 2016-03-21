@@ -207,7 +207,7 @@ public interface BrowseMessages extends Messages {
   String ingestTransferRemoveFolderConfirmDialogMessage(String folderName);
 
   @DefaultMessage("Are you sure you want to remove the the selected {0} files and folders?")
-  String ingestTransferRemoveSelectedConfirmDialogMessage(int size);
+  String ingestTransferRemoveSelectedConfirmDialogMessage(Long size);
 
   @DefaultMessage("No")
   String ingestTransferRemoveFolderConfirmDialogCancel();
@@ -219,7 +219,7 @@ public interface BrowseMessages extends Messages {
   String ingestTransferRemoveSuccessTitle();
 
   @DefaultMessage("Successfully removed {0} items")
-  String ingestTransferRemoveSuccessMessage(int size);
+  String ingestTransferRemoveSuccessMessage(Long size);
 
   @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();

@@ -8,6 +8,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -21,10 +22,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.validation.ValidationException;
+import org.roda.wui.client.common.lists.SelectedItems;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -94,8 +97,8 @@ public interface BrowserService extends RemoteService {
   String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException;
 
-  void removeTransferredResources(List<String> ids)
-    throws AuthorizationDeniedException, GenericException, NotFoundException;
+  void removeTransferredResources(SelectedItems<TransferredResource> selected)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
 
@@ -151,4 +154,8 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  Job createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
+    Map<String, String> parameters)
+      throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 }

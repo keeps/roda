@@ -11,6 +11,7 @@
 package org.roda.wui.client.browse;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -19,9 +20,11 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.wui.client.common.lists.SelectedItems;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -56,7 +59,7 @@ public interface BrowserServiceAsync {
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
-  void removeTransferredResources(List<String> ids, AsyncCallback<Void> callback);
+  void removeTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
 
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
 
@@ -99,5 +102,8 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
   void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
+
+  void createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
+    Map<String, String> parameters, AsyncCallback<Job> asyncCallback);
 
 }

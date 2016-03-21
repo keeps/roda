@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
@@ -29,8 +28,12 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
+import org.roda.wui.client.common.lists.SelectedItems;
+import org.roda.wui.client.common.lists.SelectedItemsFilter;
+import org.roda.wui.client.common.lists.SelectedItemsSet;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.CreateJob;
@@ -234,10 +237,12 @@ public class IngestTransfer extends Composite {
     transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
 
       @Override
-      public void onSelectionChange(Set<TransferredResource> selected) {
-        remove.setText(selected.isEmpty() ? messages.ingestTransferButtonRemoveWholeFolder()
+      public void onSelectionChange(SelectedItems<TransferredResource> selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+
+        remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()
           : messages.ingestTransferButtonRemoveSelectedItems());
-        startIngest.setText(selected.isEmpty() ? messages.ingestTransferButtonIngestWholeFolder()
+        startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder()
           : messages.ingestTransferButtonIngestSelectedItems());
         updateVisibles();
       }
@@ -397,8 +402,11 @@ public class IngestTransfer extends Composite {
   protected void updateVisibles() {
     uploadFiles.setEnabled(resource == null || !resource.isFile());
     createFolder.setEnabled(resource == null || !resource.isFile());
-    remove.setEnabled(resource != null || !transferredResourceList.getSelected().isEmpty());
-    startIngest.setEnabled(resource != null || !transferredResourceList.getSelected().isEmpty());
+
+    boolean empty = SelectedItemsUtils.isEmpty(transferredResourceList.getSelected());
+
+    remove.setEnabled(resource != null || !empty);
+    startIngest.setEnabled(resource != null || !empty);
   }
 
   @UiHandler("uploadFiles")
@@ -442,9 +450,10 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    Set<TransferredResource> selected = transferredResourceList.getSelected();
 
-    if (selected.isEmpty()) {
+    final SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+
+    if (SelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
 
       if (resource != null) {
@@ -461,8 +470,8 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().removeTransferredResources(Arrays.asList(resource.getId()),
-                  new AsyncCallback<Void>() {
+                SelectedItems<TransferredResource> s = new SelectedItemsSet<>(new HashSet<>(Arrays.asList(resource)));
+                BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
@@ -472,7 +481,7 @@ public class IngestTransfer extends Composite {
                   @Override
                   public void onSuccess(Void result) {
                     Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(1));
+                      messages.ingestTransferRemoveSuccessMessage(1L));
                     Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(resource.getParentId()));
                   }
                 });
@@ -485,42 +494,49 @@ public class IngestTransfer extends Composite {
     } else {
       // Remove all selected resources
 
-      final List<String> idsToRemove = new ArrayList<>();
-      for (TransferredResource r : selected) {
-        idsToRemove.add(r.getId());
-      }
+      SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
 
-      Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
-        messages.ingestTransferRemoveSelectedConfirmDialogMessage(selected.size()),
-        messages.ingestTransferRemoveFolderConfirmDialogCancel(), messages.ingestTransferRemoveFolderConfirmDialogOk(),
-        new AsyncCallback<Boolean>() {
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncRequestUtils.defaultFailureTreatment(caught);
+        }
 
-          @Override
-          public void onFailure(Throwable caught) {
-            AsyncRequestUtils.defaultFailureTreatment(caught);
-          }
+        @Override
+        public void onSuccess(final Long size) {
+          Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
+            messages.ingestTransferRemoveFolderConfirmDialogCancel(),
+            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              BrowserService.Util.getInstance().removeTransferredResources(idsToRemove, new AsyncCallback<Void>() {
-
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncRequestUtils.defaultFailureTreatment(caught);
-                  transferredResourceList.refresh();
-                }
-
-                @Override
-                public void onSuccess(Void result) {
-                  Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                    messages.ingestTransferRemoveSuccessMessage(idsToRemove.size()));
-                  transferredResourceList.refresh();
-                }
-              });
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncRequestUtils.defaultFailureTreatment(caught);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().removeTransferredResources(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                    transferredResourceList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(size));
+                    transferredResourceList.refresh();
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
+
     }
 
   }
@@ -530,10 +546,13 @@ public class IngestTransfer extends Composite {
     Tools.newHistory(CreateJob.RESOLVER);
   }
 
-  public Set<TransferredResource> getSelected() {
-    Set<TransferredResource> selected = transferredResourceList.getSelected();
-    if (selected.isEmpty() && resource != null) {
-      selected = new HashSet<>(Arrays.asList(resource));
+  public SelectedItems<TransferredResource> getSelected() {
+    SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+    if (selected instanceof SelectedItemsSet) {
+      SelectedItemsSet<?> selectedset = (SelectedItemsSet<?>) selected;
+      if (selectedset.getSet().isEmpty() && resource != null) {
+        selected = new SelectedItemsSet<>(new HashSet<>(Arrays.asList(resource)));
+      }
     }
 
     return selected;

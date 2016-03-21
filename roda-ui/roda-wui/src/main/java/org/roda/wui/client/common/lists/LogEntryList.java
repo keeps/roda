@@ -34,7 +34,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
-import com.google.gwt.view.client.ProvidesKey;
 
 public class LogEntryList extends AsyncTableCell<LogEntry> {
 
@@ -174,17 +173,6 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
     UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
 
-  }
-
-  @Override
-  protected ProvidesKey<LogEntry> getKeyProvider() {
-    return new ProvidesKey<LogEntry>() {
-
-      @Override
-      public Object getKey(LogEntry item) {
-        return item.getId();
-      }
-    };
   }
 
   @Override

@@ -196,4 +196,11 @@ public class RodaGroup extends RodaPrincipal implements RODAMember {
       directGroups.remove(group);
     }
   }
+
+  @Override
+  public String getUUID() {
+    // TODO needs prefix to distinguish from user?
+    return getId();
+  }
+  
 }

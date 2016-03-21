@@ -37,7 +37,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
@@ -187,17 +186,6 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-  }
-
-  @Override
-  protected ProvidesKey<IndexedFile> getKeyProvider() {
-    return new ProvidesKey<IndexedFile>() {
-
-      @Override
-      public Object getKey(IndexedFile item) {
-        return item.getUuid();
-      }
-    };
   }
 
   @Override

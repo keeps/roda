@@ -36,7 +36,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.view.client.ProvidesKey;
 
 public class AIPList extends AsyncTableCell<IndexedAIP> {
 
@@ -132,17 +131,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-  }
-
-  @Override
-  protected ProvidesKey<IndexedAIP> getKeyProvider() {
-    return new ProvidesKey<IndexedAIP>() {
-
-      @Override
-      public Object getKey(IndexedAIP item) {
-        return item.getId();
-      }
-    };
   }
 
   @Override

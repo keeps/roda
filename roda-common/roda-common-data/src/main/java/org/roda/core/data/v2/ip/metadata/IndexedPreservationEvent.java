@@ -141,4 +141,9 @@ public class IndexedPreservationEvent implements IsIndexed {
       + ", outcomeObjectIds=" + outcomeObjectIds + ", sourcesObjectIds=" + sourcesObjectIds + "]";
   }
 
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
 }
