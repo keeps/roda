@@ -869,7 +869,7 @@ public class SolrUtils {
     query.setRows(sublist.getMaximumElementCount());
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
-      query.setFilterQueries(getFilterQueries(user, showInactive));
+      query.addFilterQuery(getFilterQueries(user, showInactive));
     }
 
     try {

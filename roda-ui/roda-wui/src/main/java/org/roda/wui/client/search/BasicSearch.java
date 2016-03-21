@@ -180,6 +180,10 @@ public class BasicSearch extends Composite {
   private BasicSearch() {
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
+    
+    facetFormats = new FlowPanel();
+    facetPronoms = new FlowPanel();
+    facetMimetypes = new FlowPanel();
 
     searchInputListBox = new Dropdown();
     searchAdvancedFieldOptions = new ListBox();

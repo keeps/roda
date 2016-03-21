@@ -66,4 +66,7 @@ public abstract class FacetParameter implements Serializable {
     this.minCount = minCount;
   }
 
+  public String toString() {
+    return "FacetParameter [name=" + name + ", values=" + values.toString() + "]";
+  }
 }

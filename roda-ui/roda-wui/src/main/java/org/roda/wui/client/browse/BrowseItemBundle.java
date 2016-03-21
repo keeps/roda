@@ -12,7 +12,6 @@ import java.util.List;
 
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 
 public class BrowseItemBundle implements Serializable {
 
