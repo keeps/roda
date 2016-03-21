@@ -285,7 +285,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
           }
 
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
+          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
             newRepresentationID);
         }
 

@@ -51,8 +51,8 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   private boolean doEmbeddedSignature;
 
   public DigitalSignatureDIPPlugin() {
-    doEmbeddedSignature = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
-      "doEmbeddedSignature"));
+    doEmbeddedSignature = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "doEmbeddedSignature"));
   }
 
   public boolean getDoEmbeddedSignature() {
@@ -179,7 +179,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
         IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(PluginState.SUCCESS);
-        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
+        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
           newRepresentationID);
 
       } catch (Throwable e) {

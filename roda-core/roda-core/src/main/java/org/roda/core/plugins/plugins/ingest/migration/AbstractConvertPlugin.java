@@ -278,7 +278,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
       try {
         for (String repId : newRepresentations) {
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aip.getId(), repId);
+          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aip.getId(),
+            repId);
         }
 
         model.notifyAIPUpdated(aip.getId());
@@ -380,7 +381,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         if (!alteredFiles.isEmpty()) {
           createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
 
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage, aipId,
+          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
             newRepresentationID);
         }
 
@@ -501,7 +502,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
     try {
       for (String representation : changedRepresentationsOnAIPs.keySet()) {
-        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(index, model, storage,
+        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage,
           changedRepresentationsOnAIPs.get(representation), representation);
       }
     } catch (Throwable e) {
