@@ -198,7 +198,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
-    createIngestStartedEvent(model, index, aips, startDate);
+    createIngestStartedEvent(model, index, aipIdToObjectId, startDate);
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
@@ -296,15 +296,18 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return effectiveTotalSteps;
   }
 
-  private void createIngestStartedEvent(ModelService model, IndexService index, List<AIP> aips, Date startDate) {
+  private void createIngestStartedEvent(ModelService model, IndexService index, Map<String, String> sipToAIP,
+    Date startDate) {
     setPreservationEventType(START_TYPE);
     setPreservationSuccessMessage(START_SUCCESS);
     setPreservationFailureMessage(START_FAILURE);
     setPreservationEventDescription(START_DESCRIPTION);
-    for (AIP aip : aips) {
+    for (Map.Entry<String, String> entry : sipToAIP.entrySet()) {
       try {
+        AIP aip = model.retrieveAIP(entry.getKey());
+        TransferredResource tr = index.retrieve(TransferredResource.class, entry.getValue());
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify, startDate);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", notify, startDate);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
