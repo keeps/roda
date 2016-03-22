@@ -234,7 +234,7 @@ public class IndexModelObserver implements ModelObserver {
   public void aipDeleted(String aipId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId,
       "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.SRO_AIP_ID, aipId,
+    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_AIP_ID, aipId,
       "Error deleting representations (aipId=" + aipId + ")");
 
     deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
