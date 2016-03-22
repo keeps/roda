@@ -58,7 +58,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Check producer authorization";
+    return "Verify producer authorization";
   }
 
   @Override
@@ -68,7 +68,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getDescription() {
-    return "Check SIP producer authorization. Verifies that the producer of the SIP has permissions to ingest to the specified Fonds.";
+    return "Checks if the producer has enough permissions to place the AIP under the desired node in the classification scheme";
   }
 
   @Override
@@ -86,21 +86,21 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       try {
         currentJob = PluginHelper.getJobFromIndex(this, index);
       } catch (NotFoundException | GenericException e) {
-        LOGGER.error(e.getMessage(),e);
+        LOGGER.error(e.getMessage(), e);
       }
       if (currentJob != null) {
         try {
           AIP parentAIP = null;
           if (aip.getParentId() != null) {
-            LOGGER.debug("PARENT ID: "+aip.getParentId());
+            LOGGER.debug("PARENT ID: " + aip.getParentId());
             try {
               parentAIP = model.retrieveAIP(aip.getParentId());
               Set<PermissionType> userPermissions = parentAIP.getPermissions()
                 .getUserPermissions(currentJob.getUsername());
               if (userPermissions.contains(PermissionType.CREATE)) {
                 LOGGER.debug("User have CREATE permission on parent... Granting user permission to this aip");
-                grantPermissionToUser(currentJob.getUsername(),aip,model);
-              } else {               
+                grantPermissionToUser(currentJob.getUsername(), aip, model);
+              } else {
                 LOGGER.debug("User doesn't have CREATE permission on parent... Error...");
                 state = PluginState.FAILURE;
                 details = NO_PERMISSION_TO_CREATE_UNDER_AIP;
@@ -117,24 +117,25 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           } else {
             RODAMember member = index.retrieve(RODAMember.class, currentJob.getUsername());
             if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
-              LOGGER.debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
-              grantPermissionToUser(currentJob.getUsername(),aip,model);
-            }else{
+              LOGGER.debug(
+                "User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
+              grantPermissionToUser(currentJob.getUsername(), aip, model);
+            } else {
               state = PluginState.FAILURE;
               details = NO_CREATE_TOP_LEVEL_AIP_PERMISSION;
               LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
             }
           }
         } catch (GenericException | RequestNotValidException e) {
-          LOGGER.error("Error: "+e.getMessage(),e);
+          LOGGER.error("Error: " + e.getMessage(), e);
           state = PluginState.FAILURE;
           details = e.getMessage();
         } catch (NotFoundException e) { // thrown if user associated to job
                                         // doesn't exist... never thrown, i
                                         // guess...
 
-        } catch(AuthorizationDeniedException ade){
-          LOGGER.error("Authorization denied: "+ade.getMessage(),ade);
+        } catch (AuthorizationDeniedException ade) {
+          LOGGER.error("Authorization denied: " + ade.getMessage(), ade);
           state = PluginState.FAILURE;
           details = ade.getMessage();
         }
@@ -161,10 +162,11 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     return report;
   }
 
-  private void grantPermissionToUser(String username, AIP aip, ModelService model) throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+  private void grantPermissionToUser(String username, AIP aip, ModelService model)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     Permissions aipPermissions = aip.getPermissions();
-    Set<PermissionType> allPermissions = Stream.of(PermissionType.CREATE, PermissionType.DELETE,
-      PermissionType.GRANT, PermissionType.READ, PermissionType.UPDATE).collect(Collectors.toSet());
+    Set<PermissionType> allPermissions = Stream.of(PermissionType.CREATE, PermissionType.DELETE, PermissionType.GRANT,
+      PermissionType.READ, PermissionType.UPDATE).collect(Collectors.toSet());
     aipPermissions.setUserPermissions(username, allPermissions);
     aip.setPermissions(aipPermissions);
     model.updateAIPPermissions(aip);
@@ -197,24 +199,23 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.OBJECT_VALIDATION;
+    return PreservationEventType.AUTORIZATION_CHECK;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Producer permissions have been checked to insure that he has suficient authorization to store the AIP under the desired node of the classification scheme.";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "The producer has enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "The producer does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
   }
 }

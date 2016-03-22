@@ -426,7 +426,8 @@ public final class RodaConstants {
     NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
     MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
     ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
-    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation");
+    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
+    AUTORIZATION_CHECK("authorization check");
 
     private final String text;
 
