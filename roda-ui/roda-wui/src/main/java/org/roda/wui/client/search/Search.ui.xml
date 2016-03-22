@@ -4,19 +4,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:search="urn:import:org.roda.wui.client.search"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
 
 	<ui:style>
-		.addlistbox {
-		margin-right: 10px;
-		}
-		.addbutton {
-
-		}
-
-		.searchbutton {
-		float: right;
-		}
 	</ui:style>
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
@@ -29,49 +19,7 @@
 				</g:HTML>
 				<g:FlowPanel addStyleNames="page-description" ui:field="searchDescription">
 				</g:FlowPanel>
-				<g:FlowPanel styleName="searchPanel">
-					<g:FlowPanel styleName="searchPanelLeft">
-						<search:Dropdown ui:field="searchInputListBox"
-							addStyleNames="searchInputListBox" />
-						<g:FlowPanel styleName="searchPanelLeftInput">
-							<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
-						</g:FlowPanel>
-					</g:FlowPanel>
-					<g:FlowPanel styleName="searchPanelRight">
-						<wcag:AccessibleFocusPanel styleName="searchAdvancedDisclosureButton"
-							ui:field="searchAdvancedDisclosureButton">
-							<g:HTML addStyleNames="searchButton-html">
-								<span class="fa-stack fa-lg">
-									<i class="fa fa-angle-down fa-stack-1x"></i>
-									<i class="fa fa-angle-up fa-stack-1x"></i>
-								</span>
-							</g:HTML>
-						</wcag:AccessibleFocusPanel>
-						<wcag:AccessibleFocusPanel styleName="searchButton"
-							ui:field="searchInputButton">
-							<g:HTML addStyleNames="searchButton-html">
-								<span class="fa-stack fa-lg">
-									<i class="fa fa-search fa-stack-1x"></i>
-								</span>
-							</g:HTML>
-						</wcag:AccessibleFocusPanel>
-					</g:FlowPanel>
-				</g:FlowPanel>
-				<g:FlowPanel addStyleNames="searchAdvancedPanel"
-					ui:field="searchAdvancedPanel">
-					<g:FlowPanel ui:field="itemsSearchAdvancedFieldsPanel"
-						styleName="searchAdvancedFieldsPanel empty" />
-					<g:FlowPanel ui:field="representationsSearchAdvancedFieldsPanel"
-						styleName="searchAdvancedFieldsPanel empty" />
-					<g:FlowPanel ui:field="filesSearchAdvancedFieldsPanel"
-						styleName="searchAdvancedFieldsPanel empty" />
-					<g:FlowPanel styleName="searchAdvancedFieldAdd">
-						<g:Button styleName="btn btn-plus {style.addbutton}"
-							ui:field="searchAdvancedFieldOptionsAdd">Add search field</g:Button>
-						<g:Button styleName="btn btn-search {style.searchbutton}"
-							ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
-					</g:FlowPanel>
-				</g:FlowPanel>
+				<common:BasicSearch ui:field="basicSearch" />
 				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

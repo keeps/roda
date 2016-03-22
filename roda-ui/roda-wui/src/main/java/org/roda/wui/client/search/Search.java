@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.common.BasicSearch;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
@@ -38,7 +39,6 @@ import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -48,13 +48,10 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -65,7 +62,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria
  * 
  */
-public class BasicSearch extends Composite {
+public class Search extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -97,16 +94,16 @@ public class BasicSearch extends Composite {
   private static final Filter DEFAULT_FILTER_FILES = new Filter(
     new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, "*"));
 
-  private static BasicSearch instance = null;
+  private static Search instance = null;
 
-  public static BasicSearch getInstance() {
+  public static Search getInstance() {
     if (instance == null) {
-      instance = new BasicSearch();
+      instance = new Search();
     }
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, BasicSearch> {
+  interface MyUiBinder extends UiBinder<Widget, Search> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -119,38 +116,11 @@ public class BasicSearch extends Composite {
   @UiField
   FlowPanel searchDescription;
 
-  @UiField
-  Dropdown searchInputListBox;
-
-  @UiField
-  TextBox searchInputBox;
-
-  @UiField
-  AccessibleFocusPanel searchInputButton;
-
-  @UiField
-  AccessibleFocusPanel searchAdvancedDisclosureButton;
+  @UiField(provided = true)
+  BasicSearch basicSearch;
 
   @UiField
   FlowPanel searchResultPanel;
-
-  @UiField
-  FlowPanel searchAdvancedPanel;
-
-  @UiField
-  FlowPanel itemsSearchAdvancedFieldsPanel;
-
-  @UiField
-  FlowPanel filesSearchAdvancedFieldsPanel;
-
-  @UiField
-  FlowPanel representationsSearchAdvancedFieldsPanel;
-
-  @UiField
-  Button searchAdvancedFieldOptionsAdd;
-
-  @UiField
-  Button searchAdvancedGo;
 
   // FILTERS
   @UiField
@@ -173,74 +143,56 @@ public class BasicSearch extends Composite {
   RepresentationList representationsSearchResultPanel;
   SearchFileList filesSearchResultPanel;
 
+  FlowPanel itemsSearchAdvancedFieldsPanel;
+  FlowPanel filesSearchAdvancedFieldsPanel;
+  FlowPanel representationsSearchAdvancedFieldsPanel;
+
   ListBox searchAdvancedFieldOptions;
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
 
-  private BasicSearch() {
+  private Search() {
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
-    
+
     facetFormats = new FlowPanel();
     facetPronoms = new FlowPanel();
     facetMimetypes = new FlowPanel();
 
-    searchInputListBox = new Dropdown();
+    itemsSearchAdvancedFieldsPanel = new FlowPanel();
+    filesSearchAdvancedFieldsPanel = new FlowPanel();
+    representationsSearchAdvancedFieldsPanel = new FlowPanel();
+
+    basicSearch = new BasicSearch(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true,
+      true);
+
     searchAdvancedFieldOptions = new ListBox();
 
     initWidget(uiBinder.createAndBindUi(this));
 
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
 
-    searchInputListBox.setLabel(messages.searchListBoxItems());
-    searchInputListBox.addItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
-    searchInputListBox.addItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
-    searchInputListBox.addItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
+    basicSearch.setDropdownLabel(messages.searchListBoxItems());
+    basicSearch.addDropdownItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
+    basicSearch.addDropdownItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
+    basicSearch.addDropdownItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
 
-    searchInputListBox.addValueChangeHandler(new ValueChangeHandler<String>() {
+    basicSearch.addValueChangeHandler(new ValueChangeHandler<String>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
+        if (basicSearch.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
           showSearchAdvancedFieldsPanel();
-        } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
+        } else if (basicSearch.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
           showRepresentationsSearchAdvancedFieldsPanel();
         } else {
           showFilesSearchAdvancedFieldsPanel();
         }
-        doSearch();
+        basicSearch.doSearch();
       }
     });
 
-    searchInputListBox.addPopupStyleName("searchInputListBoxPopup");
-
-    searchInputBox.getElement().setPropertyString("placeholder", messages.searchPlaceHolder());
-    searchAdvancedPanel.setVisible(false);
-
-    searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        doSearch();
-      }
-    });
-
-    searchInputButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        doSearch();
-      }
-    });
-
-    searchAdvancedDisclosureButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        showSearchAdvancedPanel();
-      }
-
-    });
+    basicSearch.addDropdownPopupStyleName("searchInputListBoxPopup");
 
     BrowserService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
@@ -251,24 +203,40 @@ public class BasicSearch extends Composite {
 
         @Override
         public void onSuccess(List<SearchField> searchFields) {
-          BasicSearch.this.searchFields.clear();
+          Search.this.searchFields.clear();
           for (SearchField searchField : searchFields) {
             ListboxUtils.insertItemByAlphabeticOrder(searchAdvancedFieldOptions, searchField.getLabel(),
               searchField.getId());
-            BasicSearch.this.searchFields.put(searchField.getId(), searchField);
+            Search.this.searchFields.put(searchField.getId(), searchField);
           }
 
           for (SearchField searchField : searchFields) {
             if (searchField.isFixed()) {
               SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
               searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
-              searchFieldPanel.setSearchFields(BasicSearch.this.searchFields);
+              searchFieldPanel.setSearchFields(Search.this.searchFields);
               addSearchFieldPanel(searchFieldPanel);
               searchFieldPanel.selectSearchField(searchField.getId());
             }
           }
         }
       });
+
+    basicSearch.addSearchAdvancedFieldAddHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
+        searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
+        searchFieldPanel.setSearchFields(searchFields);
+        searchFieldPanel.selectFirstSearchField();
+        addSearchFieldPanel(searchFieldPanel);
+      }
+    });
+
+    itemsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
+    filesSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
+    representationsSearchAdvancedFieldsPanel.addStyleName("searchAdvancedFieldsPanel empty");
 
     createRepresentationsSearchAdvancedFieldsPanel();
     createFilesSearchAdvancedFieldsPanel();
@@ -332,34 +300,6 @@ public class BasicSearch extends Composite {
     filesSearchAdvancedFieldsPanel.add(fulltextField);
   }
 
-  private void showSearchAdvancedPanel() {
-    searchAdvancedPanel.setVisible(!searchAdvancedPanel.isVisible());
-    if (searchAdvancedPanel.isVisible()) {
-      searchAdvancedDisclosureButton.addStyleName("open");
-    } else {
-      searchAdvancedDisclosureButton.removeStyleName("open");
-    }
-  }
-
-  public void doSearch() {
-    Filter filter = DEFAULT_FILTER_AIP;
-    String basicQuery = searchInputBox.getText();
-
-    if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
-      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH,
-        itemsSearchAdvancedFieldsPanel);
-      itemsSearchResultPanel.setFilter(filter);
-    } else if (searchInputListBox.getSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
-      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.REPRESENTATION_SEARCH,
-        representationsSearchAdvancedFieldsPanel);
-      representationsSearchResultPanel.setFilter(filter);
-    } else {
-      filter = buildSearchFilter(basicQuery, DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH,
-        filesSearchAdvancedFieldsPanel);
-      filesSearchResultPanel.setFilter(filter);
-    }
-  }
-
   public Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel) {
     List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
@@ -396,24 +336,11 @@ public class BasicSearch extends Composite {
     }
   }
 
-  @UiHandler("searchAdvancedFieldOptionsAdd")
-  void handleSearchAdvancedFieldAdd(ClickEvent e) {
-    SearchFieldPanel searchFieldPanel = new SearchFieldPanel();
-    searchFieldPanel.setSearchAdvancedFields(searchAdvancedFieldOptions);
-    searchFieldPanel.setSearchFields(searchFields);
-    searchFieldPanel.selectFirstSearchField();
-    addSearchFieldPanel(searchFieldPanel);
-  }
-
-  @UiHandler("searchAdvancedGo")
-  void handleSearchAdvancedGo(ClickEvent e) {
-    doSearch();
-  }
-
   private void addSearchFieldPanel(final SearchFieldPanel searchFieldPanel) {
     itemsSearchAdvancedFieldsPanel.add(searchFieldPanel);
     itemsSearchAdvancedFieldsPanel.removeStyleName("empty");
-    searchAdvancedGo.setEnabled(true);
+
+    basicSearch.setSearchAdvancedGoEnabled(true);
 
     ClickHandler clickHandler = new ClickHandler() {
 
@@ -422,7 +349,7 @@ public class BasicSearch extends Composite {
         itemsSearchAdvancedFieldsPanel.remove(searchFieldPanel);
         if (itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0) {
           itemsSearchAdvancedFieldsPanel.addStyleName("empty");
-          searchAdvancedGo.setEnabled(false);
+          basicSearch.setSearchAdvancedGoEnabled(false);
         }
       }
     };
@@ -435,12 +362,12 @@ public class BasicSearch extends Composite {
       createItemsSearchResultPanel();
     }
 
+    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
+      itemsSearchAdvancedFieldsPanel);
+    basicSearch.setSearchAdvancedFieldOptionsAddVisible(true);
+
     searchResultPanel.clear();
     searchResultPanel.add(itemsSearchResultPanel);
-
-    itemsSearchAdvancedFieldsPanel.setVisible(true);
-    filesSearchAdvancedFieldsPanel.setVisible(false);
-    representationsSearchAdvancedFieldsPanel.setVisible(false);
 
     itemsFacets.setVisible(true);
     filesFacets.setVisible(false);
@@ -451,12 +378,12 @@ public class BasicSearch extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
+    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH,
+      representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
+    basicSearch.setSearchAdvancedFieldOptionsAddVisible(false);
+
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
-
-    itemsSearchAdvancedFieldsPanel.setVisible(false);
-    filesSearchAdvancedFieldsPanel.setVisible(false);
-    representationsSearchAdvancedFieldsPanel.setVisible(true);
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(false);
@@ -467,12 +394,12 @@ public class BasicSearch extends Composite {
       createFilesSearchResultPanel();
     }
 
+    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
+      filesSearchAdvancedFieldsPanel);
+    basicSearch.setSearchAdvancedFieldOptionsAddVisible(false);
+
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);
-
-    itemsSearchAdvancedFieldsPanel.setVisible(false);
-    filesSearchAdvancedFieldsPanel.setVisible(true);
-    representationsSearchAdvancedFieldsPanel.setVisible(false);
 
     itemsFacets.setVisible(false);
     filesFacets.setVisible(true);

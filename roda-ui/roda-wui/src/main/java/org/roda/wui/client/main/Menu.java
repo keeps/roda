@@ -28,7 +28,7 @@ import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskRegister;
-import org.roda.wui.client.search.BasicSearch;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
@@ -118,7 +118,7 @@ public class Menu extends Composite {
     dissemination_browse = new MenuItem(constants.title_dissemination_browse(),
       createCommand(Browse.RESOLVER.getHistoryPath()));
     dissemination_searchBasic = new MenuItem(constants.title_dissemination_search_basic(),
-      createCommand(BasicSearch.RESOLVER.getHistoryPath()));
+      createCommand(Search.RESOLVER.getHistoryPath()));
 
     ingestMenu = new MenuBar(true);
     ingest_pre = ingestMenu.addItem(constants.title_ingest_pre(), createCommand(PreIngest.RESOLVER.getHistoryPath()));
@@ -218,7 +218,7 @@ public class Menu extends Composite {
 
     // Dissemination
     updateResolverTopItemVisibility(Browse.RESOLVER, dissemination_browse, 1);
-    updateResolverTopItemVisibility(BasicSearch.RESOLVER, dissemination_searchBasic, 2);
+    updateResolverTopItemVisibility(Search.RESOLVER, dissemination_searchBasic, 2);
 
     // Ingest
     updateResolverSubItemVisibility(PreIngest.RESOLVER, ingest_pre);

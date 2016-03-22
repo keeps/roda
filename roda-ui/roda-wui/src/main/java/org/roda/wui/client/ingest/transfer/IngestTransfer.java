@@ -16,21 +16,19 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.BasicSearch;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.SelectedItems;
-import org.roda.wui.client.common.lists.SelectedItemsFilter;
 import org.roda.wui.client.common.lists.SelectedItemsSet;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
@@ -46,11 +44,9 @@ import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.regexp.shared.RegExp;
@@ -68,7 +64,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -149,17 +144,11 @@ public class IngestTransfer extends Composite {
   @UiField
   BreadcrumbPanel breadcrumb;
 
-  @UiField
-  FlowPanel searchPanel;
-
-  @UiField
-  TextBox searchInputBox;
+  @UiField(provided = true)
+  BasicSearch basicSearch;
 
   @UiField
   Button download;
-
-  @UiField
-  AccessibleFocusPanel searchInputButton;
 
   @UiField(provided = true)
   TransferredResourceList transferredResourceList;
@@ -191,28 +180,12 @@ public class IngestTransfer extends Composite {
 
     transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList(), true);
 
+    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.TRANSFERRED_RESOURCE_NAME,
+      messages.ingestTransferSearchPlaceHolder(), false, false);
+
     initWidget(uiBinder.createAndBindUi(this));
 
     ingestTransferDescription.add(new HTMLWidgetWrapper("IngestTransferDescription.html"));
-
-    searchInputBox.getElement().setPropertyString("placeholder", messages.ingestTransferSearchPlaceHolder());
-
-    searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        doSearch();
-      }
-    });
-
-    searchInputButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        doSearch();
-      }
-
-    });
 
     transferredResourceList.addValueChangeHandler(new ValueChangeHandler<IndexResult<TransferredResource>>() {
 
@@ -228,7 +201,7 @@ public class IngestTransfer extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
         if (r != null) {
-          searchInputBox.setText("");
+          basicSearch.clearSearchInputBox();
           Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
         }
       }
@@ -267,7 +240,7 @@ public class IngestTransfer extends Composite {
 
     if (r.isFile()) {
       // TODO add big download button
-      searchPanel.setVisible(false);
+      basicSearch.setVisible(false);
       transferredResourceList.setVisible(false);
       download.setVisible(true);
     } else {
@@ -276,7 +249,7 @@ public class IngestTransfer extends Composite {
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
       transferredResourceList.setFilter(filter);
 
-      searchPanel.setVisible(true);
+      basicSearch.setVisible(true);
       transferredResourceList.setVisible(true);
       download.setVisible(false);
     }
@@ -301,7 +274,7 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    searchPanel.setVisible(true);
+    basicSearch.setVisible(true);
     transferredResourceList.setVisible(true);
     download.setVisible(false);
 
@@ -556,24 +529,6 @@ public class IngestTransfer extends Composite {
     }
 
     return selected;
-  }
-
-  private void doSearch() {
-    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
-
-    String basicQuery = searchInputBox.getText();
-    if (!basicQuery.isEmpty()) {
-      parameters.add(new BasicSearchFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_NAME, basicQuery));
-    }
-
-    Filter filter = new Filter(DEFAULT_FILTER);
-    if (resource != null) {
-      filter = new Filter(
-        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getRelativePath()));
-    }
-    filter.add(parameters);
-
-    transferredResourceList.setFilter(filter);
   }
 
   @UiHandler("download")

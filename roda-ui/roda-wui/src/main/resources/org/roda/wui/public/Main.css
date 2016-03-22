@@ -2667,9 +2667,13 @@ td.datePickerMonth, td.datePickerYear {
 				DEFAULT SEARCH + ADV SEARCH
 ************************************************/
 .searchPanel {
-	margin-right: 80px;
+	margin-right: 40px;
 	height: 4rem;
 	background-color: #eee;
+}
+
+.searchPanelAdvanced {
+	margin-right: 80px;
 }
 
 .searchPanelLeft {
@@ -2717,9 +2721,14 @@ td.datePickerMonth, td.datePickerYear {
 
 .searchPanelRight {
 	float: right;
+	width: 40px;
+	margin-right: -40px;
+	height: 4rem;
+}
+
+.searchPanelAdvanced .searchPanelRight {
 	width: 80px;
 	margin-right: -80px;
-	height: 4rem;
 }
 
 .searchPanelRight .fa-stack {
@@ -2751,6 +2760,10 @@ td.datePickerMonth, td.datePickerYear {
 	float: left;
     width: 40px;
     background-color: #089de3;
+}
+
+.advancedSearchButton {
+	float: right;	
 }
 
 .searchAdvancedDisclosureButton {
@@ -2816,11 +2829,13 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .searchAdvancedFieldsPanel {
+	display: block;
 	margin-bottom: 15px;
 }
 
 .search-field {
 	margin-right: 20px;
+	height: 35px;
 }
 
 .search-field.full_width {
@@ -2874,11 +2889,15 @@ td.datePickerMonth, td.datePickerYear {
 	vertical-align: top;
 }
 
-.searchAdvancedFieldsPanel+.searchAdvancedFieldAdd {
+.searchAdvancedPanelButtons {
+	height: 30px;
+}
+
+.searchAdvancedFieldsPanel+.searchAdvancedPanelButtons {
 	margin-top: 10px;
 }
 
-.searchAdvancedFieldsPanel.empty+.searchAdvancedFieldAdd {
+.searchAdvancedFieldsPanel.empty+.searchAdvancedPanelButtons {
 	margin-top: 0;
 }
 
@@ -3514,7 +3533,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-ingest-transfer .searchPanel {
-	margin-right: 40px;
+/* 	margin-right: 40px; */
 	margin-bottom: 20px;
 	margin-top: 10px;
 }
@@ -4549,14 +4568,14 @@ td.datePickerMonth, td.datePickerYear {
 /* 	width: 100%; */
 }
 
-.selectAip .searchPanel {
-	margin-right: 40px;
-}
+/* .selectAip .searchPanel { */
+/* 	margin-right: 40px; */
+/* } */
 
-.selectAip .searchPanelRight {
-	width: 40px;
-	margin-right: -40px;
-}
+/* .selectAip .searchPanelRight { */
+/* 	width: 40px; */
+/* 	margin-right: -40px; */
+/* } */
 
 .selectAip .selectAipResultsPanel {
 	width: 800px;

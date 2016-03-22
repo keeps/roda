@@ -221,9 +221,6 @@ public class Browse extends Composite {
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
-    /* TODO set this pages enabled after developed */
-    editPermissions.setEnabled(false);
-
     fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
@@ -275,6 +272,9 @@ public class Browse extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() > 1
+      && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
+      EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -811,6 +811,13 @@ public class Browse extends Composite {
           });
         }
       });
+    }
+  }
+  
+  @UiHandler("editPermissions")
+  void buttonEditPermissionsHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
     }
   }
 }
