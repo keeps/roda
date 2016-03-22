@@ -162,16 +162,16 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Reindex all agents";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "All agents reindexing run successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "All agents reindexing failed";
   }
 }

@@ -1648,4 +1648,130 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
+  /***************** Format-Agent related *****************/
+  /************************************************/
+
+  public List<Format> retrieveFormatsFromAgent(String agentId) {
+    try {
+      Agent agent = retrieveAgent(agentId);
+      return retrieveFormatsFromAgent(agent);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting agent formats");
+      return new ArrayList<Format>();
+    }
+  }
+
+  public List<Format> retrieveFormatsFromAgent(Agent agent) {
+    try {
+      CloseableIterable<Resource> allFormats = storage.listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(),
+        true);
+      List<Format> formats = new ArrayList<Format>();
+
+      for (Resource resource : allFormats) {
+        String resourceName = resource.getStoragePath().getName();
+        Format format = this.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
+        boolean formatAdded = false;
+
+        if (agent.getFormatIds().contains(format.getId())) {
+          formats.add(format);
+          formatAdded = true;
+        }
+
+        for (int i = 0; i < format.getPronoms().size() && formatAdded == false; i++) {
+          if (agent.getPronoms().contains(format.getPronoms().get(i))) {
+            formats.add(format);
+            formatAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getMimetypes().size() && formatAdded == false; i++) {
+          if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
+            formats.add(format);
+            formatAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getExtensions().size() && formatAdded == false; i++) {
+          if (agent.getExtensions().contains(format.getExtensions().get(i))) {
+            formats.add(format);
+            formatAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getUtis().size() && formatAdded == false; i++) {
+          if (agent.getUtis().contains(format.getUtis().get(i))) {
+            formats.add(format);
+            formatAdded = true;
+          }
+        }
+      }
+
+      return formats;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error getting agent formats");
+      return new ArrayList<Format>();
+    }
+  }
+
+  public List<Agent> retrieveAgentsFromFormat(String formatId) {
+    try {
+      Format format = retrieveFormat(formatId);
+      return retrieveAgentsFromFormat(format);
+    } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error getting format agents");
+      return new ArrayList<Agent>();
+    }
+  }
+
+  public List<Agent> retrieveAgentsFromFormat(Format format) {
+    try {
+      CloseableIterable<Resource> allAgents = storage.listResourcesUnderDirectory(ModelUtils.getAgentContainerPath(),
+        true);
+      List<Agent> agents = new ArrayList<Agent>();
+
+      for (Resource resource : allAgents) {
+        String resourceName = resource.getStoragePath().getName();
+        Agent agent = this.retrieveAgent(resourceName.substring(0, resourceName.lastIndexOf('.')));
+        boolean agentAdded = false;
+
+        if (agent.getFormatIds().contains(format.getId())) {
+          agents.add(agent);
+          agentAdded = true;
+        }
+
+        for (int i = 0; i < format.getPronoms().size() && agentAdded == false; i++) {
+          if (agent.getPronoms().contains(format.getPronoms().get(i))) {
+            agents.add(agent);
+            agentAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getMimetypes().size() && agentAdded == false; i++) {
+          if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
+            agents.add(agent);
+            agentAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getExtensions().size() && agentAdded == false; i++) {
+          if (agent.getExtensions().contains(format.getExtensions().get(i))) {
+            agents.add(agent);
+            agentAdded = true;
+          }
+        }
+
+        for (int i = 0; i < format.getUtis().size() && agentAdded == false; i++) {
+          if (agent.getUtis().contains(format.getUtis().get(i))) {
+            agents.add(agent);
+            agentAdded = true;
+          }
+        }
+      }
+
+      return agents;
+    } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException e) {
+      LOGGER.error("Error getting format agents");
+      return new ArrayList<Agent>();
+    }
+  }
 }

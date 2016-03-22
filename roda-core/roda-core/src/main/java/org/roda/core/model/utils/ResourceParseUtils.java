@@ -39,8 +39,8 @@ public class ResourceParseUtils {
 
   }
 
-  private static File convertResourceToFile(Resource resource)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+  private static File convertResourceToFile(Resource resource) throws GenericException, NotFoundException,
+    AuthorizationDeniedException, RequestNotValidException {
     File ret;
 
     if (resource == null) {
@@ -135,9 +135,9 @@ public class ResourceParseUtils {
     String representationId = ModelUtils.extractRepresentationId(resourcePath);
     String type = representationId != null ? ModelUtils.extractTypeFromRepresentationOtherMetadata(resourcePath)
       : ModelUtils.extractTypeFromAipOtherMetadata(resourcePath);
-    List<String> fileDirectoryPath = representationId != null
-      ? ModelUtils.extractFilePathFromRepresentationOtherMetadata(resourcePath)
-      : ModelUtils.extractFilePathFromAipOtherMetadata(resourcePath);
+    List<String> fileDirectoryPath = representationId != null ? ModelUtils
+      .extractFilePathFromRepresentationOtherMetadata(resourcePath) : ModelUtils
+      .extractFilePathFromAipOtherMetadata(resourcePath);
     String fileId = filename.substring(0, filename.lastIndexOf('.'));
 
     om.setAipId(aipId);

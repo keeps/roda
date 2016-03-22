@@ -135,6 +135,7 @@ import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
+import org.roda.core.plugins.plugins.ingest.validation.FileFormatPlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
@@ -1292,6 +1293,11 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
   }
 
+  private static void runFileFormatPlugin() {
+    Plugin<Representation> plugin = new FileFormatPlugin();
+    getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
+  }
+
   private static void runReindexingPlugins() {
     try {
       Plugin<AIP> psp = new PremisSkeletonPlugin();
@@ -1486,6 +1492,7 @@ public class RodaCoreFactory {
     System.err.println("java -jar x.jar unoconvconvert");
     System.err.println("java -jar x.jar generalcommandconvert");
     System.err.println("java -jar x.jar digitalsignature");
+    System.err.println("java -jar x.jar fileformat");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1611,6 +1618,8 @@ public class RodaCoreFactory {
       runDigitalSignaturePlugin(args.get(1), args.get(2), args.get(3), args.get(4));
     } else if ("digitalsignaturedip".equals(args.get(0))) {
       runDigitalSignatureDIPPlugin();
+    } else if ("fileformat".equals(args.get(0))) {
+      runFileFormatPlugin();
     } else if ("reindexer".equals(args.get(0))) {
       runReindexingPlugins();
     } else if ("jhove".equals(args.get(0))) {
