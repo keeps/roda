@@ -700,4 +700,11 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")");
   }
 
+  @Override
+  public void transferredResourceDeleted(String transferredResourceID) {
+    boolean forceCommit = false;
+    deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
+      "Error deleting Transferred Resource(id=" + transferredResourceID + ")", forceCommit);
+  }
+
 }

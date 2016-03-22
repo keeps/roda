@@ -97,5 +97,4 @@ public interface ModelObserver {
   public void formatCreatedOrUpdated(Format format);
 
   public void formatDeleted(String formatId);
-
 }
