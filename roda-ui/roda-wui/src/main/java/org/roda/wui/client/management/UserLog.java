@@ -17,10 +17,12 @@ import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.wui.client.common.BasicSearch;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.common.client.ClientLogger;
@@ -100,6 +102,9 @@ public class UserLog extends Composite {
   @UiField
   FlowPanel userLogDescription;
 
+  @UiField(provided = true)
+  BasicSearch basicSearch;
+
   @UiField
   DateBox inputDateInitial;
 
@@ -118,6 +123,9 @@ public class UserLog extends Composite {
   @UiField(provided = true)
   FlowPanel facetUsers;
 
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.LOG_SEARCH, "*"));
+
   /**
    * Create a new user log
    *
@@ -128,6 +136,11 @@ public class UserLog extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.LOG_ACTION_COMPONENT),
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
     logList = new LogEntryList(filter, facets, "Logs", false);
+
+    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
+      false);
+    basicSearch.setList(logList);
+
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();
     facetUsers = new FlowPanel();

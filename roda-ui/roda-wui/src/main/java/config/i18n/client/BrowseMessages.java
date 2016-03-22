@@ -609,4 +609,9 @@ public interface BrowseMessages extends Messages {
   
   @DefaultMessage("Start new process")
   String riskRegisterProcessButton();
+  
+  /************* User log ****************/
+  
+  @DefaultMessage("Search log...")
+  String userLogSearchPlaceHolder();
 }
