@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -245,6 +246,10 @@ public class IndexService {
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Error while optimizing indexes", e);
     }
+  }
+
+  public <T> void commit(List<Class<T>> classToCommit) throws GenericException {
+    SolrUtils.commit(index, classToCommit);
   }
 
   public <T extends Serializable> List<String> suggest(Class<T> returnClass, String field, String query)

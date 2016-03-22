@@ -780,6 +780,30 @@ public class SolrUtils {
     return indexName;
   }
 
+  private static void commit(SolrClient index, String... collections) {
+
+    boolean waitFlush = false;
+    boolean waitSearcher = true;
+    boolean softCommit = true;
+
+    for (String collection : collections) {
+      try {
+        index.commit(collection, waitFlush, waitSearcher, softCommit);
+      } catch (SolrServerException | IOException e) {
+        LOGGER.error("Error commiting into collection: " + collection, e);
+      }
+    }
+  }
+
+  public static <T> void commit(SolrClient index, List<Class<T>> resultClasses) throws GenericException {
+    List<String> collections = new ArrayList<>();
+    for (Class<T> resultClass : resultClasses) {
+      collections.add(getIndexName(resultClass));
+    }
+
+    commit(index, collections.toArray(new String[] {}));
+  }
+
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
     return resultClass.equals(AIP.class) || resultClass.equals(IndexedAIP.class)
       || resultClass.equals(Representation.class) || resultClass.equals(IndexedRepresentation.class)

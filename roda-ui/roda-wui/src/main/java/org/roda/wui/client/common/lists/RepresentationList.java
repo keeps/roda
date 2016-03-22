@@ -34,8 +34,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
 
-  private static final int PAGE_SIZE = 20;
-
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -135,11 +133,6 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
       BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
         getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

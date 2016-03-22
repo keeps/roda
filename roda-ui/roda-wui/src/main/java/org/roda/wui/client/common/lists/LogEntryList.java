@@ -37,8 +37,6 @@ import com.google.gwt.view.client.DefaultSelectionEventManager;
 
 public class LogEntryList extends AsyncTableCell<LogEntry> {
 
-  private static final int PAGE_SIZE = 20;
-
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;
   private TextColumn<LogEntry> actionMethodColumn;
@@ -173,11 +171,6 @@ public class LogEntryList extends AsyncTableCell<LogEntry> {
 
     UserManagementService.Util.getInstance().findLogEntries(filter, sorter, sublist, getFacets(), callback);
 
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
   @Override

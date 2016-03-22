@@ -40,8 +40,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class SearchFileList extends AsyncTableCell<IndexedFile> {
 
-  private static final int PAGE_SIZE = 20;
-
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<IndexedFile, SafeHtml> iconColumn;
@@ -187,10 +185,4 @@ public class SearchFileList extends AsyncTableCell<IndexedFile> {
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
   }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
-  }
-
 }

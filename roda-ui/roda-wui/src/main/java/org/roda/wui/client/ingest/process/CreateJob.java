@@ -191,7 +191,8 @@ public class CreateJob extends Composite {
         targetPanel.add(objectList);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<TransferredResource>) selected).getFilter();
-        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false);
+        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
+          10);
         targetPanel.clear();
         targetPanel.add(list);
       } else {

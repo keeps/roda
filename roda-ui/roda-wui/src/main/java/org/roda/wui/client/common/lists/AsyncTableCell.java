@@ -86,14 +86,23 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static int PAGE_SIZE_PAGER_INCREMENT = 100;
+  private int initialPageSize = 20;
+  private int pageSizeIncrement = 100;
 
   public AsyncTableCell() {
-    this(null, null, null, false);
+    this(null, null, null, false, 20, 100);
   }
 
   public AsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable) {
+    this(filter, facets, summary, selectable, 20, 100);
+  }
+
+  public AsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+    int pageSizeIncrement) {
     super();
+
+    this.initialPageSize = initialPageSize;
+    this.pageSizeIncrement = pageSizeIncrement;
 
     if (summary == null) {
       summary = "summary" + Random.nextInt(1000);
@@ -235,7 +244,9 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   protected abstract void configureDisplay(CellTable<T> display);
 
-  protected abstract int getInitialPageSize();
+  protected int getInitialPageSize() {
+    return initialPageSize;
+  }
 
   protected ProvidesKey<T> getKeyProvider() {
     return new ProvidesKey<T>() {
@@ -251,7 +262,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     AsyncCallback<IndexResult<T>> callback);
 
   protected int getPageSizePagerIncrement() {
-    return PAGE_SIZE_PAGER_INCREMENT;
+    return pageSizeIncrement;
   }
 
   protected CellPreviewEvent.Handler<T> getSelectionEventManager() {
@@ -531,7 +542,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   public void showSelectAllPanel() {
     if (!selectAllPanel.isVisible() && resultsPager.hasNextPage() || resultsPager.hasPreviousPage()) {
-      selectAllLabel.setText(messages.listSelectAllMessage());
+      selectAllLabel.setText(messages.listSelectAllMessage(dataProvider.getRowCount()));
       selectAllCheckBox.setValue(false);
       selectAllPanel.setVisible(true);
     }

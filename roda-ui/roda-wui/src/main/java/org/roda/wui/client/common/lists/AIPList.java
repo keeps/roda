@@ -39,7 +39,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class AIPList extends AsyncTableCell<IndexedAIP> {
 
-  private static final int PAGE_SIZE = 20;
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -133,8 +132,4 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     }
   }
 
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
-  }
 }

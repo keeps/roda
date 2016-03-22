@@ -47,8 +47,6 @@ import com.google.gwt.user.client.ui.Label;
  */
 public class TransferredResourceList extends AsyncTableCell<TransferredResource> {
 
-  private static final int PAGE_SIZE = 20;
-
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<TransferredResource, SafeHtml> isFileColumn;
@@ -62,6 +60,11 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+  }
+
+  public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
+    int pageSizeIncrement) {
+    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement);
   }
 
   @Override
@@ -171,8 +174,4 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
 
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
-  }
 }

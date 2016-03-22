@@ -581,10 +581,11 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Select parent")
   String selectParentTitle();
 
-  /************* Lists ****************/
+  /************* Lists 
+   * @param count ****************/
 
-  @DefaultMessage("Select all pages of this search")
-  String listSelectAllMessage();
+  @DefaultMessage("Select all {0} items")
+  String listSelectAllMessage(int count);
 
   /************* Risk register ****************/
 

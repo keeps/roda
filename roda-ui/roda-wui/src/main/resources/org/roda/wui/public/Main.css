@@ -3657,6 +3657,17 @@ td.datePickerMonth, td.datePickerYear {
 	display: inline;
 }
 
+.plugin-options-parameter:first-child {
+    border: none;
+    padding: 0;
+}
+
+.plugin-options-parameter {
+    border-top: 1px solid #eee;
+    padding-top: 10px;
+    padding-bottom: 5px;
+}
+
 /**********************************************
 				INGEST PROCESS VIEW
 ************************************************/

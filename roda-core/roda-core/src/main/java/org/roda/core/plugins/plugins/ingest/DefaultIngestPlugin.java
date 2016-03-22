@@ -278,7 +278,9 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     Map<String, String> aipIdToObjectId) {
     for (int i = 0; i < aips.size(); i++) {
       AIP aip = aips.get(i);
-      if (reports.get(aipIdToObjectId.get(aip.getId())).getPluginState() == PluginState.FAILURE) {
+      String transferredResourceId = aipIdToObjectId.get(aip.getId());
+      Report report = reports.get(transferredResourceId);
+      if (report.getPluginState() == PluginState.FAILURE) {
         aips.remove(i);
       }
     }

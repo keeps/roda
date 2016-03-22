@@ -36,7 +36,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class RodaMemberList extends AsyncTableCell<RODAMember> {
 
-  private static final int PAGE_SIZE = 20;
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -140,10 +139,4 @@ public class RodaMemberList extends AsyncTableCell<RODAMember> {
     UserManagementService.Util.getInstance().findMembers(filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
-  }
-
 }

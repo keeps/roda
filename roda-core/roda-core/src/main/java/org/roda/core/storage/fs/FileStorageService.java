@@ -293,6 +293,8 @@ public class FileStorageService implements StorageService {
           Map<String, String> contentDigest = null;
 
           return new DefaultBinary(storagePath, newPayload, sizeInBytes, isReference, contentDigest);
+        } catch (FileAlreadyExistsException e) {
+          throw new AlreadyExistsException("Binary already exists: " + binPath);
         } catch (IOException e) {
           throw new GenericException("Could not create binary", e);
         }

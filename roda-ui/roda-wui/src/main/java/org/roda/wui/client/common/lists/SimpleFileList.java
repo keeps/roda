@@ -36,8 +36,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class SimpleFileList extends AsyncTableCell<IndexedFile> {
 
-  private static final int PAGE_SIZE = 20;
-
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<IndexedFile, SafeHtml> iconColumn;
@@ -120,11 +118,6 @@ public class SimpleFileList extends AsyncTableCell<IndexedFile> {
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), callback);
     }
-  }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
   }
 
 }

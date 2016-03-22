@@ -30,7 +30,6 @@ import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -53,12 +52,11 @@ public class JobReportList extends AsyncTableCell<Report> {
 
   private static final String STATUS_OK = "<i class='fa fa-check-circle'></i>";
 
-  private static final int PAGE_SIZE = 20;
-
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
-  private Column<Report, SafeHtml> objectIdColumn;
+  // private Column<Report, SafeHtml> objectIdColumn;
+  private TextColumn<Report> sourceObjectColumn;
   private Column<Report, Date> updatedDateColumn;
   private TextColumn<Report> lastPluginRunColumn;
   private Column<Report, SafeHtml> lastPluginRunStateColumn;
@@ -79,30 +77,46 @@ public class JobReportList extends AsyncTableCell<Report> {
   @Override
   protected void configureDisplay(CellTable<Report> display) {
 
-    objectIdColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
+    // objectIdColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
+    // @Override
+    // public SafeHtml getValue(Report Report) {
+    // SafeHtml ret = null;
+    // if (Report != null) {
+    // SafeHtmlBuilder b = new SafeHtmlBuilder();
+    // String objId = Report.getOtherId();
+    // if (objId != null) {
+    // b.append(SafeHtmlUtils.fromSafeConstant("<div
+    // class='job-report-object-input'>"));
+    // b.append(SafeHtmlUtils.fromString(objId));
+    // b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+    // }
+    //
+    // String aipId = Report.getItemId();
+    // if (aipId != null) {
+    // b.append(SafeHtmlUtils.fromSafeConstant("<div
+    // class='job-report-object-output'>"));
+    // b.append(SafeHtmlUtils.fromSafeConstant("<span
+    // class='job-report-object-output-icon'>&#10551;</span>"));
+    // b.append(SafeHtmlUtils.fromString(aipId));
+    // b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
+    // }
+    // ret = b.toSafeHtml();
+    //
+    // }
+    // return ret;
+    // }
+    // };
+
+    sourceObjectColumn = new TextColumn<Report>() {
+
       @Override
-      public SafeHtml getValue(Report Report) {
-        SafeHtml ret = null;
-        if (Report != null) {
-          SafeHtmlBuilder b = new SafeHtmlBuilder();
-          String objId = Report.getOtherId();
-          if (objId != null) {
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-input'>"));
-            b.append(SafeHtmlUtils.fromString(objId));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-          }
-
-          String aipId = Report.getItemId();
-          if (aipId != null) {
-            b.append(SafeHtmlUtils.fromSafeConstant("<div class='job-report-object-output'>"));
-            b.append(SafeHtmlUtils.fromSafeConstant("<span class='job-report-object-output-icon'>&#10551;</span>"));
-            b.append(SafeHtmlUtils.fromString(aipId));
-            b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-          }
-          ret = b.toSafeHtml();
-
+      public String getValue(Report report) {
+        String value = "";
+        if (report != null) {
+          value = report.getOtherId();
         }
-        return ret;
+
+        return value;
       }
     };
 
@@ -168,20 +182,20 @@ public class JobReportList extends AsyncTableCell<Report> {
       }
     };
 
-    objectIdColumn.setSortable(true);
+    sourceObjectColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
-    display.addColumn(objectIdColumn, "Information Packages");
+    display.addColumn(sourceObjectColumn, "Submission Information Package");
     display.addColumn(updatedDateColumn, "Last updated at");
     display.addColumn(lastPluginRunColumn, "Last run task");
     display.addColumn(lastPluginRunStateColumn, SafeHtmlUtils.fromSafeConstant(STATUS_OK));
     display.addColumn(completionStatusColumn, "Completion status");
 
-    display.setColumnWidth(objectIdColumn, "100%");
+    display.setColumnWidth(sourceObjectColumn, "100%");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -200,7 +214,7 @@ public class JobReportList extends AsyncTableCell<Report> {
     Filter filter = getFilter();
 
     Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
-    columnSortingKeyMap.put(objectIdColumn, Arrays.asList(RodaConstants.JOB_REPORT_OTHER_ID));
+    columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OTHER_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));
@@ -210,10 +224,4 @@ public class JobReportList extends AsyncTableCell<Report> {
     BrowserService.Util.getInstance().find(Report.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
   }
-
-  @Override
-  protected int getInitialPageSize() {
-    return PAGE_SIZE;
-  }
-
 }
