@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -43,6 +44,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -67,6 +69,7 @@ import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSPathContentPayload;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1469,6 +1472,11 @@ public class ModelService extends ModelObservable {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     updateAIPMetadata(aip);
     notifyAipPermissionsUpdated(aip);
+  }
+
+  public void deleteTransferredResource(TransferredResource transferredResource) {
+    FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
+    notifyTransferredResourceDeleted(transferredResource.getId());
   }
 
 }

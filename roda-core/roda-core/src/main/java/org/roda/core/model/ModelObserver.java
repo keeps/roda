@@ -79,4 +79,6 @@ public interface ModelObserver {
 
   public void aipPermissionsUpdated(AIP aip);
 
+  public void transferredResourceDeleted(String transferredResourceID);
+
 }

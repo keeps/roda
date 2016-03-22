@@ -470,4 +470,10 @@ public class IndexModelObserver implements ModelObserver {
     indexAIP(aip);
   }
 
+  @Override
+  public void transferredResourceDeleted(String transferredResourceID) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
+      "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
+  }
+
 }

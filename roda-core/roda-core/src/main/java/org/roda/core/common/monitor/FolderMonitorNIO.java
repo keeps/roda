@@ -48,8 +48,8 @@ public class FolderMonitorNIO {
 
     startWatch();
   }
-  
-  public void commit() throws SolrServerException, IOException{
+
+  public void commit() throws SolrServerException, IOException {
     index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
   }
 
