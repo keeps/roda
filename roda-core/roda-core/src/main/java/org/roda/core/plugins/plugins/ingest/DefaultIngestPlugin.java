@@ -198,7 +198,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
-    createIngestStartedEvent(model, index, aipIdToObjectId, startDate);
+    createIngestStartedEvent(model, index, aipIdToTransferredResourceId, startDate);
 
     // 2) do virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
