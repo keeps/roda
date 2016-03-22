@@ -182,6 +182,8 @@ public class IngestTransfer extends Composite {
 
     basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.TRANSFERRED_RESOURCE_NAME,
       messages.ingestTransferSearchPlaceHolder(), false, false);
+    basicSearch.setList(transferredResourceList);
+    basicSearch.setDefaultFilterIncremental(true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -248,6 +250,7 @@ public class IngestTransfer extends Composite {
       Filter filter = new Filter(
         new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
       transferredResourceList.setFilter(filter);
+      basicSearch.setDefaultFilter(filter);
 
       basicSearch.setVisible(true);
       transferredResourceList.setVisible(true);
@@ -279,6 +282,7 @@ public class IngestTransfer extends Composite {
     download.setVisible(false);
 
     transferredResourceList.setFilter(DEFAULT_FILTER);
+    basicSearch.setDefaultFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
     updateVisibles();

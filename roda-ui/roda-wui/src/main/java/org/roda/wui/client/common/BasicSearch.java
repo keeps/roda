@@ -62,6 +62,9 @@ public class BasicSearch extends Composite implements HasValueChangeHandlers<Str
 
   private Filter defaultFilter;
   private String allFilter;
+  private boolean defaultFilterIncremental = false;
+  
+
   private FlowPanel fieldsPanel;
   private AsyncTableCell<?> list;
 
@@ -118,11 +121,12 @@ public class BasicSearch extends Composite implements HasValueChangeHandlers<Str
   }
 
   public void doSearch() {
-    Filter filter = buildSearchFilter(searchInputBox.getText(), defaultFilter, allFilter, fieldsPanel);
+    Filter filter = buildSearchFilter(searchInputBox.getText(), defaultFilter, allFilter, fieldsPanel, defaultFilterIncremental);
     list.setFilter(filter);
   }
 
-  private Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel) {
+  private Filter buildSearchFilter(String basicQuery, Filter defaultFilter, String allFilter, FlowPanel fieldsPanel,
+    boolean defaultFilterIncremental) {
     List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
     if (basicQuery != null && basicQuery.trim().length() > 0) {
@@ -141,7 +145,10 @@ public class BasicSearch extends Composite implements HasValueChangeHandlers<Str
     }
 
     Filter filter;
-    if (parameters.size() == 0) {
+    if (defaultFilterIncremental) {
+      filter = new Filter(defaultFilter);
+      filter.add(parameters);
+    } else if (parameters.size() == 0) {
       filter = defaultFilter;
     } else {
       filter = new Filter(parameters);
@@ -199,6 +206,10 @@ public class BasicSearch extends Composite implements HasValueChangeHandlers<Str
     setAllFilter(allFilter);
     setList(list);
     setFieldsPanel(fieldsPanel);
+  }
+  
+  public void setDefaultFilterIncremental(boolean defaultFilterIncremental) {
+    this.defaultFilterIncremental = defaultFilterIncremental;
   }
 
   public void clearSearchInputBox() {

@@ -3533,7 +3533,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .wui-ingest-transfer .searchPanel {
-/* 	margin-right: 40px; */
 	margin-bottom: 20px;
 	margin-top: 10px;
 }
@@ -4565,17 +4564,7 @@ td.datePickerMonth, td.datePickerYear {
 				SELECT AIP
 ************************************************/
 .selectAip {
-/* 	width: 100%; */
 }
-
-/* .selectAip .searchPanel { */
-/* 	margin-right: 40px; */
-/* } */
-
-/* .selectAip .searchPanelRight { */
-/* 	width: 40px; */
-/* 	margin-right: -40px; */
-/* } */
 
 .selectAip .selectAipResultsPanel {
 	width: 800px;
