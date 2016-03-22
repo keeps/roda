@@ -73,14 +73,22 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Virus check";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Scans a package for malicious programs using ClamAV.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

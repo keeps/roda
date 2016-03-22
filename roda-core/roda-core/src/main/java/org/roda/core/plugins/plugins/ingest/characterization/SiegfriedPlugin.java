@@ -53,14 +53,22 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Format identification";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Identification of the object's file formats and versions using Siegfried.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

@@ -44,19 +44,27 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
+  public static String getStaticName() {
+    return "Auto accept";
+  }
+
   @Override
   public String getName() {
-    return "Auto accept";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "Adds package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
   public String getVersionImpl() {
     return "1.0";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Adds package to the inventory without any human appraisal. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
   }
 
   @Override

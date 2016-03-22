@@ -53,14 +53,22 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Full-text extraction action";
   }
 
   @Override
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "Extracts the full-text from the representation files.";
+  }
+
+  @Override
   public String getDescription() {
-    return "Extracts the full-text from the representation files";
+    return getStaticDescription();
   }
 
   @Override

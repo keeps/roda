@@ -59,46 +59,49 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(DefaultIngestPlugin.class);
 
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
-    "SIP format", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
-    "Known format of SIP to be ingest into the repository.");
+    "Format of the Submission Information Packages", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
+    "Select the format of the Submission Information Packages to be ingested in this ingest process.");
+
   public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
     "Parent Object", PluginParameterType.AIP_ID, "", false, false,
     "Use the provided parent object if the SIPs does not provide one.");
   public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter(
     RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object", PluginParameterType.BOOLEAN, "false", false,
     false, "Use the provided parent object even if the SIPs provide one.");
+
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
-    "Virus check", PluginParameterType.BOOLEAN, "true", true, false, "Verifies if an SIP is free of virus.");
+    AntivirusPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
+    AntivirusPlugin.getStaticDescription());
 
   public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
-    "parameter.do_pdftopdfa_conversion", "Convert PDF to valid PDF/A", PluginParameterType.BOOLEAN, "false", true,
-    false, "Converts PDF files into veraPDF valid PDF/A files.");
+    "parameter.do_pdftopdfa_conversion", PdfToPdfaPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true,
+    false, PdfToPdfaPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_VERAPDF_CHECK = new PluginParameter("parameter.do_verapdf_check",
-    "VeraPDF check", PluginParameterType.BOOLEAN, "false", true, false,
-    "Verifies if PDF files sent are veraPDF valid PDF/A files.");
+    VeraPDFPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true, false,
+    VeraPDFPlugin.getStaticDescription());
 
   public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
-    "parameter.create.premis.skeleton", "Create basic PREMIS information", PluginParameterType.BOOLEAN, "true", true,
-    true, "Create basic PREMIS information (e.g. PREMIS object for each representation file, etc.).");
+    "parameter.create.premis.skeleton", PremisSkeletonPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true,
+    true, PremisSkeletonPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_SIP_SYNTAX_CHECK = new PluginParameter(
-    "parameter.do_sip_syntax_check", "SIP syntax check", PluginParameterType.BOOLEAN, "true", true, true,
-    "Check SIP coherence. Verifies the validity and completeness of a SIP.");
+    "parameter.do_sip_syntax_check", "XXX SIP syntax check", PluginParameterType.BOOLEAN, "true", true, true,
+    "XXX Check SIP coherence. Verifies the validity and completeness of a SIP.");
   public static final PluginParameter PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK = new PluginParameter(
-    "parameter.do_producer_authorization_check", "Producer authorization check", PluginParameterType.BOOLEAN, "true",
-    true, true,
-    "Check SIP producer authorization. Verifies that the producer of the SIP has permissions to ingest to the specified Fonds.");
+    "parameter.do_producer_authorization_check", VerifyProducerAuthorizationPlugin.getStaticName(),
+    PluginParameterType.BOOLEAN, "true", true, true, VerifyProducerAuthorizationPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_FILE_FORMAT_IDENTIFICATION = new PluginParameter(
-    "parameter.do_file_format_identification", "File format identification", PluginParameterType.BOOLEAN, "true", true,
-    false, "Does file format identification.");
+    "parameter.do_file_format_identification", SiegfriedPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true",
+    true, false, SiegfriedPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION = new PluginParameter(
-    "parameter.do_metadata_and_full_text_extraction", "File metadata and full text extraction",
-    PluginParameterType.BOOLEAN, "true", true, false, "Extracts file metadata and full text.");
+    "parameter.do_metadata_and_full_text_extraction", TikaFullTextPlugin.getStaticName(), PluginParameterType.BOOLEAN,
+    "true", true, false, TikaFullTextPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
-    "Auto accept SIP", PluginParameterType.BOOLEAN, "true", true, false, "Automatically accept SIPs.");
+    AutoAcceptSIPPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
+    AutoAcceptSIPPlugin.getStaticDescription());
 
   private int stepsCompleted = 0;
   private int totalSteps = 8;
-  private Map<String, String> aipIdToObjectId;
+  private Map<String, String> aipIdToTransferredResourceId;
 
   private String successMessage;
   private String failureMessage;
@@ -176,7 +179,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
     // transferredResourceId > report
     Map<String, Report> reports = new HashMap<>();
-    aipIdToObjectId = new HashMap<>();
+    aipIdToTransferredResourceId = new HashMap<>();
 
     Date startDate = new Date();
 
@@ -202,7 +205,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
     }
 
     // 2.1) do pdftopdfa conversion
@@ -231,20 +234,20 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     pluginReport = createPremisSkeleton(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
 
     // 4) verify if AIP is well formed
     pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
 
     // 5) verify if the user has permissions to ingest SIPS into the specified
     // fonds
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
 
     // 6) do file format identification (sieg)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
@@ -266,7 +269,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       reports = mergeReports(reports, pluginReport);
     }
 
-    createIngestEndedEvent(model, index, aips, reports, aipIdToObjectId);
+    createIngestEndedEvent(model, index, aips, reports, aipIdToTransferredResourceId);
 
     return report;
   }
@@ -362,14 +365,14 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     if (plugin != null) {
       for (Report reportItem : plugin.getReports()) {
         if (StringUtils.isNotBlank(reportItem.getOtherId())) {
-          aipIdToObjectId.put(reportItem.getItemId(), reportItem.getOtherId());
+          aipIdToTransferredResourceId.put(reportItem.getItemId(), reportItem.getOtherId());
           Report report = new Report();
           report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
-        } else
-          if (StringUtils.isNotBlank(reportItem.getItemId()) && aipIdToObjectId.get(reportItem.getItemId()) != null) {
-          reports.get(aipIdToObjectId.get(reportItem.getItemId())).addReport(reportItem);
+        } else if (StringUtils.isNotBlank(reportItem.getItemId())
+          && aipIdToTransferredResourceId.get(reportItem.getItemId()) != null) {
+          reports.get(aipIdToTransferredResourceId.get(reportItem.getItemId())).addReport(reportItem);
         }
       }
     }

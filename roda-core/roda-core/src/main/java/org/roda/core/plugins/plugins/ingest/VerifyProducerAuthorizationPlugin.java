@@ -56,19 +56,27 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
+  public static String getStaticName() {
+    return "Verify producer authorization";
+  }
+
   @Override
   public String getName() {
-    return "Verify producer authorization";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "Checks if the producer has enough permissions to place the AIP under the desired node in the classification scheme";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
   public String getVersionImpl() {
     return "1.0";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Checks if the producer has enough permissions to place the AIP under the desired node in the classification scheme";
   }
 
   @Override
@@ -201,7 +209,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
-    return PreservationEventType.AUTORIZATION_CHECK;
+    return PreservationEventType.AUTHORIZATION_CHECK;
   }
 
   @Override

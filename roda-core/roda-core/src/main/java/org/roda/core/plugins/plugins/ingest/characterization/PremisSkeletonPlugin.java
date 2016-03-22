@@ -50,14 +50,22 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Create file fixity information";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Creates base PREMIS objects with file original name and file fixity information (SHA-256).";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

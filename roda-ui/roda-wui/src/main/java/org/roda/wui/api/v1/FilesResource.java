@@ -81,7 +81,6 @@ public class FilesResource {
   }
 
   @POST
-  @Path("/")
   @ApiOperation(value = "Create representation with one file", notes = "Create a new representation on the AIP", response = File.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = File.class),
     @ApiResponse(code = 409, message = "Already exists", response = File.class)})

@@ -75,14 +75,22 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "PDF/A format validator";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "PDF/A format validator using VeraPDF.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

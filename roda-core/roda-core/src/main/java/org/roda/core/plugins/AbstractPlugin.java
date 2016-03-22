@@ -21,7 +21,6 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
 
   private List<PluginParameter> pluginParameters = new ArrayList<PluginParameter>();
   private Map<String, String> parameterValues = new HashMap<String, String>();
-
   private String version = null;
 
   @Override
@@ -55,5 +54,13 @@ public abstract class AbstractPlugin<T extends Serializable> implements Plugin<T
   }
 
   public abstract String getVersionImpl();
+
+  public static String getStaticName() {
+    return "PLUGIN STATIC NAME NOT DEFINED";
+  }
+
+  public static String getStaticDescription() {
+    return "PLUGIN STATIC DESCRIPTION NOT DEFINED";
+  }
 
 }

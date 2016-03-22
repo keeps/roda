@@ -29,14 +29,22 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
     super.setOutputFormat("pdf");
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "PDF to PDFA conversion";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Generates a PDF/A format file, from a PDF one, that passes veraPDF validation.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
@@ -50,8 +58,8 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
   }
 
   @Override
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException {
 
     try {
       return PdfToPdfaPluginUtils.executePdfToPdfa(inputPath, outputPath);

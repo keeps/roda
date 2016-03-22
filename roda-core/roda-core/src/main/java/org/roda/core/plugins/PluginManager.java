@@ -189,7 +189,7 @@ public class PluginManager {
     this.loadPluginsTimer = new Timer("Plugin scanner timer", true);
     this.loadPluginsTimer.schedule(new SearchPluginsTask(), new Date(), timeInSeconds * 1000);
 
-    LOGGER.info(getClass().getSimpleName() + " init OK");
+    LOGGER.info("{} init OK", getClass().getSimpleName());
   }
 
   private <T extends Serializable> PluginInfo getPluginInfo(Plugin<T> plugin) {
