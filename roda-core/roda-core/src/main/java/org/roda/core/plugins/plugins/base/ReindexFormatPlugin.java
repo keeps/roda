@@ -21,7 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -37,9 +37,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
+public class ReindexFormatPlugin extends AbstractPlugin<Format> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAgentPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexFormatPlugin.class);
   private boolean clearIndexes = true;
 
   @Override
@@ -54,7 +54,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
   @Override
   public String getName() {
-    return "Reindex Agents";
+    return "Reindex Formats";
   }
 
   @Override
@@ -80,29 +80,29 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Agent> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Format> list)
     throws PluginException {
 
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = false;
-      listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getAgentContainerPath(), recursive);
-      LOGGER.info("Reindexing all agents under " + ModelUtils.getAgentContainerPath());
+      listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getFormatContainerPath(), recursive);
+      LOGGER.info("Reindexing all formats under " + ModelUtils.getFormatContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
           Binary binary = (Binary) resource;
           InputStream inputStream = binary.getContent().createInputStream();
           String jsonString = IOUtils.toString(inputStream);
-          Agent agent = JsonUtils.getObjectFromJson(jsonString, Agent.class);
+          Format format = JsonUtils.getObjectFromJson(jsonString, Format.class);
           IOUtils.closeQuietly(inputStream);
-          index.reindexAgent(agent, false);
+          index.reindexFormat(format, false);
         }
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing agents", e);
+      LOGGER.error("Error re-indexing formats", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -116,7 +116,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_AGENT);
+        index.clearIndex(RodaConstants.INDEX_FORMAT);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -131,7 +131,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
-      index.optimizeIndex(RodaConstants.INDEX_AGENT);
+      index.optimizeIndex(RodaConstants.INDEX_FORMAT);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
@@ -140,8 +140,8 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
-  public Plugin<Agent> cloneMe() {
-    return new ReindexAgentPlugin();
+  public Plugin<Format> cloneMe() {
+    return new ReindexFormatPlugin();
   }
 
   @Override

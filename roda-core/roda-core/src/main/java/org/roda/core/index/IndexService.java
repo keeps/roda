@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -177,6 +178,10 @@ public class IndexService {
 
   public void reindexAgent(Agent agent, boolean forceCommit) {
     observer.agentCreatedOrUpdated(agent, forceCommit);
+  }
+
+  public void reindexFormat(Format format, boolean forceCommit) {
+    observer.formatCreatedOrUpdated(format, forceCommit);
   }
 
   public void reindexActionLogs() throws GenericException, NotFoundException, AuthorizationDeniedException,

@@ -10,6 +10,7 @@ package org.roda.core.model;
 import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -90,5 +91,9 @@ public interface ModelObserver {
   public void agentCreatedOrUpdated(Agent agent, boolean forceCommit);
 
   public void agentDeleted(String agentId);
+
+  public void formatCreatedOrUpdated(Format format, boolean forceCommit);
+
+  public void formatDeleted(String formatId);
 
 }

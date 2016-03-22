@@ -87,6 +87,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
@@ -780,6 +781,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_RISK;
     } else if (resultClass.equals(Agent.class)) {
       indexName = RodaConstants.INDEX_AGENT;
+    } else if (resultClass.equals(Format.class)) {
+      indexName = RodaConstants.INDEX_FORMAT;
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -837,6 +840,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToRisk(doc));
     } else if (resultClass.equals(Agent.class)) {
       ret = resultClass.cast(solrDocumentToAgent(doc));
+    } else if (resultClass.equals(Format.class)) {
+      ret = resultClass.cast(solrDocumentToFormat(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -1599,6 +1604,12 @@ public class SolrUtils {
     doc.addField(RodaConstants.AGENT_DOWNLOAD, agent.getDownload());
     doc.addField(RodaConstants.AGENT_PROVENANCE_INFORMATION, agent.getProvenanceInformation());
     doc.addField(RodaConstants.AGENT_PLATFORMS, agent.getPlatforms());
+    doc.addField(RodaConstants.AGENT_EXTENSIONS, agent.getExtensions());
+    doc.addField(RodaConstants.AGENT_MIMETYPES, agent.getMimetypes());
+    doc.addField(RodaConstants.AGENT_PRONOMS, agent.getPronoms());
+    doc.addField(RodaConstants.AGENT_UTIS, agent.getUtis());
+    doc.addField(RodaConstants.AGENT_FORMAT_IDS, agent.getFormatIds());
+    doc.addField(RodaConstants.AGENT_AGENTS_REQUIRED, agent.getAgentsRequired());
 
     return doc;
   }
@@ -1620,8 +1631,60 @@ public class SolrUtils {
     agent.setDownload(objectToString(doc.get(RodaConstants.AGENT_DOWNLOAD)));
     agent.setProvenanceInformation(objectToString(doc.get(RodaConstants.AGENT_PROVENANCE_INFORMATION)));
     agent.setPlatforms(objectToListString(doc.get(RodaConstants.AGENT_PLATFORMS)));
+    agent.setExtensions(objectToListString(doc.get(RodaConstants.AGENT_EXTENSIONS)));
+    agent.setMimetypes(objectToListString(doc.get(RodaConstants.AGENT_MIMETYPES)));
+    agent.setPronoms(objectToListString(doc.get(RodaConstants.AGENT_PRONOMS)));
+    agent.setUtis(objectToListString(doc.get(RodaConstants.AGENT_UTIS)));
+    agent.setFormatIds(objectToListString(doc.get(RodaConstants.AGENT_FORMAT_IDS)));
+    agent.setAgentsRequired(objectToListString(doc.get(RodaConstants.AGENT_AGENTS_REQUIRED)));
 
     return agent;
+  }
+
+  public static SolrInputDocument formatToSolrDocument(Format format) {
+    SolrInputDocument doc = new SolrInputDocument();
+
+    doc.addField(RodaConstants.FORMAT_ID, format.getId());
+    doc.addField(RodaConstants.FORMAT_NAME, format.getName());
+    doc.addField(RodaConstants.FORMAT_DEFINITION, format.getDefinition());
+    doc.addField(RodaConstants.FORMAT_CATEGORY, format.getCategory());
+    doc.addField(RodaConstants.FORMAT_LATEST_VERSION, format.getLatestVersion());
+    doc.addField(RodaConstants.FORMAT_POPULARITY, format.getPopularity());
+    doc.addField(RodaConstants.FORMAT_DEVELOPER, format.getDeveloper());
+    doc.addField(RodaConstants.FORMAT_INITIAL_RELEASE, format.getInitialRelease());
+    doc.addField(RodaConstants.FORMAT_STANDARD, format.getStandard());
+    doc.addField(RodaConstants.FORMAT_IS_OPEN_FORMAT, format.isOpenFormat());
+    doc.addField(RodaConstants.FORMAT_WEBSITE, format.getWebsite());
+    doc.addField(RodaConstants.FORMAT_PROVENANCE_INFORMATION, format.getProvenanceInformation());
+    doc.addField(RodaConstants.FORMAT_EXTENSIONS, format.getExtensions());
+    doc.addField(RodaConstants.FORMAT_MIMETYPES, format.getMimetypes());
+    doc.addField(RodaConstants.FORMAT_PRONOMS, format.getPronoms());
+    doc.addField(RodaConstants.FORMAT_UTIS, format.getUtis());
+
+    return doc;
+  }
+
+  public static Format solrDocumentToFormat(SolrDocument doc) {
+    Format format = new Format();
+
+    format.setId(objectToString(doc.get(RodaConstants.FORMAT_ID)));
+    format.setName(objectToString(doc.get(RodaConstants.FORMAT_NAME)));
+    format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION)));
+    format.setCategory(objectToString(doc.get(RodaConstants.FORMAT_CATEGORY)));
+    format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION)));
+    format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY)));
+    format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
+    format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
+    format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));
+    format.setOpenFormat(objectToBoolean(doc.get(RodaConstants.FORMAT_IS_OPEN_FORMAT)));
+    format.setWebsite(objectToString(doc.get(RodaConstants.FORMAT_WEBSITE)));
+    format.setProvenanceInformation(objectToString(doc.get(RodaConstants.FORMAT_PROVENANCE_INFORMATION)));
+    format.setExtensions(objectToListString(doc.get(RodaConstants.FORMAT_EXTENSIONS)));
+    format.setMimetypes(objectToListString(doc.get(RodaConstants.FORMAT_MIMETYPES)));
+    format.setPronoms(objectToListString(doc.get(RodaConstants.FORMAT_PRONOMS)));
+    format.setUtis(objectToListString(doc.get(RodaConstants.FORMAT_UTIS)));
+
+    return format;
   }
 
   public static SolrInputDocument fileToSolrDocument(AIP aip, File file, Binary premisFile, String fulltext) {

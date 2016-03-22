@@ -49,6 +49,7 @@ public class Risk implements IsIndexed, Serializable {
   }
 
   public Risk(Risk risk) {
+    this.id = risk.getId();
     this.name = risk.getName();
     this.description = risk.getDescription();
     this.identifiedOn = risk.getIdentifiedOn();
@@ -241,6 +242,20 @@ public class Risk implements IsIndexed, Serializable {
 
   public void setAffectedObjects(Map<String, String> affectedObjects) {
     this.affectedObjects = affectedObjects;
+  }
+
+  @Override
+  public String toString() {
+    return "Format [id=" + id + ", name=" + name + ", description=" + description + ", identifiedOn=" + identifiedOn
+      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
+      + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
+      + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
+      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
+      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
+      + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
+      + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
+      + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
+      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
   }
 
 }

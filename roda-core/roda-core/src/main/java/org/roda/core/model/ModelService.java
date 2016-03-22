@@ -41,6 +41,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
@@ -1542,9 +1543,7 @@ public class ModelService extends ModelObservable {
 
   public void createAgent(Agent agent, boolean forceCommit) throws GenericException {
     try {
-      if (agent.getId() == null) {
-        agent.setId(UUID.randomUUID().toString());
-      }
+      agent.setId(UUID.randomUUID().toString());
       String agentAsJson = JsonUtils.getJsonFromObject(agent);
       StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
       storage.createBinary(agentPath, new StringContentPayload(agentAsJson), false);
@@ -1573,7 +1572,7 @@ public class ModelService extends ModelObservable {
 
     StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
     storage.deleteResource(agentPath);
-    notifyRiskDeleted(agentId);
+    notifyAgentDeleted(agentId);
   }
 
   public Agent retrieveAgent(String agentId) throws RequestNotValidException, GenericException, NotFoundException,
@@ -1588,6 +1587,61 @@ public class ModelService extends ModelObservable {
       ret = JsonUtils.getObjectFromJson(inputStream, Agent.class);
     } catch (IOException e) {
       throw new GenericException("Error reading agent", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  /***************** Format related *****************/
+  /************************************************/
+
+  public void createFormat(Format format, boolean forceCommit) throws GenericException {
+    try {
+      format.setId(UUID.randomUUID().toString());
+      String formatAsJson = JsonUtils.getJsonFromObject(format);
+      StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
+      storage.createBinary(formatPath, new StringContentPayload(formatAsJson), false);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException e) {
+      LOGGER.error("Error creating format in storage", e);
+    }
+
+    notifyFormatCreatedOrUpdated(format, forceCommit);
+  }
+
+  public void updateFormat(Format format, boolean forceCommit) throws GenericException {
+    try {
+      String formatAsJson = JsonUtils.getJsonFromObject(format);
+      StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
+      storage.updateBinaryContent(formatPath, new StringContentPayload(formatAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error updating format in storage", e);
+    }
+
+    notifyFormatCreatedOrUpdated(format, forceCommit);
+  }
+
+  public void deleteFormat(String formatId) throws GenericException, NotFoundException, AuthorizationDeniedException,
+    RequestNotValidException {
+
+    StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
+    storage.deleteResource(formatPath);
+    notifyFormatDeleted(formatId);
+  }
+
+  public Format retrieveFormat(String formatId) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
+
+    StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
+    Binary binary = storage.getBinary(formatPath);
+    Format ret;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, Format.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading format", e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }

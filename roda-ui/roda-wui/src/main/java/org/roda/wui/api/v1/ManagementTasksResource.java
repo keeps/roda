@@ -38,6 +38,8 @@ import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
+import org.roda.core.plugins.plugins.base.ReindexAgentPlugin;
+import org.roda.core.plugins.plugins.base.ReindexFormatPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRiskPlugin;
 import org.roda.wui.api.controllers.Jobs;
@@ -71,7 +73,7 @@ public class ManagementTasksResource extends RodaCoreService {
   public Response executeTask(
     @ApiParam(value = "", allowableValues = "index", defaultValue = "index") final @PathParam("sub_resource") String sub_resource,
     @ApiParam(value = "", allowableValues = "reindex,logclean", defaultValue = "reindex") final @PathParam("task_id") String task_id,
-    @ApiParam(value = "", allowableValues = "aip,job,risk", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk,agent,format", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -110,6 +112,10 @@ public class ManagementTasksResource extends RodaCoreService {
             response = createJobToReindexAllJobs(user, startDate);
           } else if ("risk".equals(entity)) {
             response = createJobToReindexAllRisks(user, startDate);
+          } else if ("agent".equals(entity)) {
+            response = createJobToReindexAllAgents(user, startDate);
+          } else if ("format".equals(entity)) {
+            response = createJobToReindexAllFormats(user, startDate);
           }
         } else if ("logclean".equals(task_id)) {
           response = createJobForRunningLogCleaner(user, params);
@@ -142,6 +148,40 @@ public class ManagementTasksResource extends RodaCoreService {
     Job job = new Job();
     job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
       .setPlugin(ReindexRiskPlugin.class.getCanonicalName());
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToReindexAllAgents(RodaUser user, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setPlugin(ReindexAgentPlugin.class.getCanonicalName());
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToReindexAllFormats(RodaUser user, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setPlugin(ReindexFormatPlugin.class.getCanonicalName());
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");

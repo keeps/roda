@@ -106,25 +106,21 @@
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="name" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="type" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="definition" type="text_general" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="category" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="version" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="license" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="latestVersion" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="popularity" type="int" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="developer" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="initialRelease" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
+   <field name="standard" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="isOpenFormat" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="website" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="download" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="provenanceInformation" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
-   <field name="platforms" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="extensions" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="mimetypes" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="pronoms" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="utis" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="formatIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
-   <field name="agentsRequired" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

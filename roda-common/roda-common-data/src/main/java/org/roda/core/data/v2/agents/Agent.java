@@ -32,6 +32,12 @@ public class Agent implements IsIndexed, Serializable {
   private String provenanceInformation = null;
 
   private List<String> platforms = new ArrayList<String>();
+  private List<String> extensions = new ArrayList<String>();
+  private List<String> mimetypes = new ArrayList<String>();
+  private List<String> pronoms = new ArrayList<String>();
+  private List<String> utis = new ArrayList<String>();
+  private List<String> formatIds = new ArrayList<String>();
+  private List<String> agentsRequired = new ArrayList<String>();
 
   public Agent() {
     super();
@@ -39,6 +45,7 @@ public class Agent implements IsIndexed, Serializable {
   }
 
   public Agent(Agent agent) {
+    this.id = agent.getId();
     this.name = agent.getName();
     this.type = agent.getType();
     this.description = agent.getDescription();
@@ -53,6 +60,12 @@ public class Agent implements IsIndexed, Serializable {
     this.provenanceInformation = agent.getProvenanceInformation();
 
     this.platforms = new ArrayList<String>(agent.getPlatforms());
+    this.extensions = new ArrayList<String>(agent.getExtensions());
+    this.mimetypes = new ArrayList<String>(agent.getMimetypes());
+    this.pronoms = new ArrayList<String>(agent.getPronoms());
+    this.utis = new ArrayList<String>(agent.getUtis());
+    this.formatIds = new ArrayList<String>(agent.getFormatIds());
+    this.agentsRequired = new ArrayList<String>(agent.getAgentsRequired());
   }
 
   public String getId() {
@@ -165,6 +178,64 @@ public class Agent implements IsIndexed, Serializable {
 
   public void setProvenanceInformation(String provenanceInformation) {
     this.provenanceInformation = provenanceInformation;
+  }
+
+  public List<String> getExtensions() {
+    return extensions;
+  }
+
+  public void setExtensions(List<String> extensions) {
+    this.extensions = extensions;
+  }
+
+  public List<String> getMimetypes() {
+    return mimetypes;
+  }
+
+  public void setMimetypes(List<String> mimetypes) {
+    this.mimetypes = mimetypes;
+  }
+
+  public List<String> getPronoms() {
+    return pronoms;
+  }
+
+  public void setPronoms(List<String> pronoms) {
+    this.pronoms = pronoms;
+  }
+
+  public List<String> getUtis() {
+    return utis;
+  }
+
+  public void setUtis(List<String> utis) {
+    this.utis = utis;
+  }
+
+  public List<String> getFormatIds() {
+    return formatIds;
+  }
+
+  public void setFormatIds(List<String> formatIds) {
+    this.formatIds = formatIds;
+  }
+
+  public List<String> getAgentsRequired() {
+    return agentsRequired;
+  }
+
+  public void setAgentsRequired(List<String> agentsRequired) {
+    this.agentsRequired = agentsRequired;
+  }
+
+  @Override
+  public String toString() {
+    return "Agent [id=" + id + ", name=" + name + ", type=" + type + ", description=" + description + ", category="
+      + category + ", version=" + version + ", license=" + license + ", popularity=" + popularity + ", developer="
+      + developer + ", initialRelease=" + initialRelease + ", website=" + website + ", download=" + download
+      + ", provenanceInformation=" + provenanceInformation + ", platforms=" + platforms + ", extensions=" + extensions
+      + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + ", formatIds=" + formatIds
+      + ", agentsRequired=" + agentsRequired + "]";
   }
 
 }

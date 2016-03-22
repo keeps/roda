@@ -50,6 +50,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -569,6 +571,145 @@ public class IndexServiceTest {
       assertEquals(risk.getId(), risk4.getId());
 
       model.deleteRisk("R1");
+
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(false);
+    }
+  }
+
+  @Test
+  public void testAgentIndex() {
+    try {
+      Agent agent = new Agent();
+      agent.setName("Acrobat reader");
+      agent.setType("Software");
+      agent.setDescription("Agent description");
+      agent.setCategory("Desktop publishing");
+      agent.setVersion("1.7");
+      agent.setLicense("Proprietary");
+      agent.setPopularity(5);
+      agent.setDeveloper("Adobe Systems");
+      agent.setInitialRelease(new Date());
+      agent.setWebsite("acrobat.adobe.com");
+      agent.setDownload("https://get.adobe.com/br/reader/");
+      agent.setProvenanceInformation("https://en.wikipedia.org/wiki/Adobe_Acrobat");
+
+      List<String> platforms = new ArrayList<String>();
+      platforms.add("Windows");
+      platforms.add("MAC OS X");
+      platforms.add("Linux");
+      agent.setPlatforms(platforms);
+
+      List<String> extensions = new ArrayList<String>();
+      extensions.add(".pdf");
+      agent.setExtensions(extensions);
+
+      List<String> mimetypes = new ArrayList<String>();
+      mimetypes.add("application/pdf");
+      agent.setMimetypes(mimetypes);
+
+      List<String> pronoms = new ArrayList<String>();
+      pronoms.add("fmt/100");
+      agent.setPronoms(pronoms);
+
+      List<String> utis = new ArrayList<String>();
+      utis.add("com.adobe.pdf");
+      agent.setUtis(utis);
+
+      List<String> formatIds = new ArrayList<String>();
+      formatIds.add("format1");
+      agent.setFormatIds(formatIds);
+
+      model.createAgent(agent, true);
+
+      Agent agent2 = model.retrieveAgent(agent.getId());
+      assertNotNull(agent2);
+      assertEquals(agent.getId(), agent2.getId());
+      assertEquals(agent.getName(), agent2.getName());
+
+      IndexResult<Agent> find = index.find(Agent.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
+
+      Agent agent3 = index.retrieve(Agent.class, agent.getId());
+      assertNotNull(agent3);
+      assertEquals(agent.getId(), agent3.getId());
+      assertEquals(agent.getName(), agent3.getName());
+
+      agent3.setName("Agent New Name");
+      model.updateAgent(agent3, true);
+
+      IndexResult<Agent> find2 = index.find(Agent.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find2.getTotalCount());
+
+      Agent agent4 = index.retrieve(Agent.class, agent.getId());
+      assertNotNull(agent4);
+      assertEquals(agent.getId(), agent4.getId());
+
+      model.deleteAgent(agent.getId());
+
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(false);
+    }
+  }
+
+  @Test
+  public void testFormatIndex() {
+    try {
+      Format format = new Format();
+      format.setName("Portable Document Format");
+      format.setDefinition("PDF definition");
+      format.setCategory("Page Layout Files");
+      format.setLatestVersion("1.7");
+      format.setPopularity(4);
+      format.setDeveloper("Adobe Systems");
+      format.setInitialRelease(new Date());
+      format.setStandard("ISO 32000-1");
+      format.setOpenFormat(true);
+      format.setWebsite("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html");
+      format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
+
+      List<String> extensions = new ArrayList<String>();
+      extensions.add(".pdf");
+      format.setExtensions(extensions);
+
+      List<String> mimetypes = new ArrayList<String>();
+      mimetypes.add("application/pdf");
+      format.setMimetypes(mimetypes);
+
+      List<String> pronoms = new ArrayList<String>();
+      pronoms.add("fmt/100");
+      format.setPronoms(pronoms);
+
+      List<String> utis = new ArrayList<String>();
+      utis.add("com.adobe.pdf");
+      format.setUtis(utis);
+
+      model.createFormat(format, true);
+
+      Format format2 = model.retrieveFormat(format.getId());
+      assertNotNull(format2);
+      assertEquals(format.getId(), format2.getId());
+      assertEquals(format.getName(), format2.getName());
+
+      IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
+
+      Format format3 = index.retrieve(Format.class, format.getId());
+      assertNotNull(format3);
+      assertEquals(format.getId(), format3.getId());
+      assertEquals(format.getName(), format3.getName());
+
+      format3.setName("Format New Name");
+      model.updateFormat(format3, true);
+
+      IndexResult<Format> find2 = index.find(Format.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find2.getTotalCount());
+
+      Format format4 = index.retrieve(Format.class, format.getId());
+      assertNotNull(format4);
+      assertEquals(format.getId(), format4.getId());
+
+      model.deleteFormat(format.getId());
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       assertTrue(false);

@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -236,6 +237,18 @@ public abstract class ModelObservable {
   protected void notifyAgentDeleted(String agentId) {
     for (ModelObserver observer : observers) {
       observer.agentDeleted(agentId);
+    }
+  }
+
+  protected void notifyFormatCreatedOrUpdated(Format format, boolean forceCommit) {
+    for (ModelObserver observer : observers) {
+      observer.formatCreatedOrUpdated(format, forceCommit);
+    }
+  }
+
+  protected void notifyFormatDeleted(String formatId) {
+    for (ModelObserver observer : observers) {
+      observer.formatDeleted(formatId);
     }
   }
 }

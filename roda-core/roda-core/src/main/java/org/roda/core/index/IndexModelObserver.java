@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -492,6 +493,17 @@ public class IndexModelObserver implements ModelObserver {
   public void agentDeleted(String agentId) {
     boolean forceCommit = false;
     deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")",
+      forceCommit);
+  }
+
+  public void formatCreatedOrUpdated(Format format, boolean forceCommit) {
+    addDocumentToIndex(RodaConstants.INDEX_FORMAT, SolrUtils.formatToSolrDocument(format), "Error creating Format",
+      forceCommit);
+  }
+
+  public void formatDeleted(String formatId) {
+    boolean forceCommit = false;
+    deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")",
       forceCommit);
   }
 

@@ -82,6 +82,7 @@ public final class RodaConstants {
   public static final String CORE_EXAMPLE_THEME_FOLDER = "example-theme";
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
+  public static final String CORE_FORMAT_FOLDER = "format";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -176,6 +177,7 @@ public final class RodaConstants {
   public static final String INDEX_FILE = "File";
   public static final String INDEX_RISK = "Risk";
   public static final String INDEX_AGENT = "Agent";
+  public static final String INDEX_FORMAT = "Format";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
   // "DescriptiveMetadata";
@@ -196,6 +198,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
   public static final String STORAGE_CONTAINER_RISK = "Risk";
   public static final String STORAGE_CONTAINER_AGENT = "Agent";
+  public static final String STORAGE_CONTAINER_FORMAT = "Format";
 
   /*
    * STORAGE DIRECTORIES
@@ -385,7 +388,7 @@ public final class RodaConstants {
 
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
-  public static final String RISK_EXTENSION = ".json";
+  public static final String RISK_FILE_EXTENSION = ".json";
 
   /* Agents */
   public static final String AGENT_ID = "id";
@@ -402,8 +405,34 @@ public final class RodaConstants {
   public static final String AGENT_DOWNLOAD = "download";
   public static final String AGENT_PROVENANCE_INFORMATION = "provenanceInformation";
   public static final String AGENT_PLATFORMS = "platforms";
+  public static final String AGENT_EXTENSIONS = "extensions";
+  public static final String AGENT_MIMETYPES = "mimetypes";
+  public static final String AGENT_PRONOMS = "pronoms";
+  public static final String AGENT_UTIS = "utis";
+  public static final String AGENT_FORMAT_IDS = "formatIds";
+  public static final String AGENT_AGENTS_REQUIRED = "agentsRequired";
 
-  public static final String AGENT_EXTENSION = ".json";
+  public static final String AGENT_FILE_EXTENSION = ".json";
+
+  /* Formats */
+  public static final String FORMAT_ID = "id";
+  public static final String FORMAT_NAME = "name";
+  public static final String FORMAT_DEFINITION = "definition";
+  public static final String FORMAT_CATEGORY = "category";
+  public static final String FORMAT_LATEST_VERSION = "latestVersion";
+  public static final String FORMAT_POPULARITY = "popularity";
+  public static final String FORMAT_DEVELOPER = "developer";
+  public static final String FORMAT_INITIAL_RELEASE = "initialRelease";
+  public static final String FORMAT_STANDARD = "standard";
+  public static final String FORMAT_IS_OPEN_FORMAT = "isOpenFormat";
+  public static final String FORMAT_WEBSITE = "website";
+  public static final String FORMAT_PROVENANCE_INFORMATION = "provenanceInformation";
+  public static final String FORMAT_EXTENSIONS = "extensions";
+  public static final String FORMAT_MIMETYPES = "mimetypes";
+  public static final String FORMAT_PRONOMS = "pronoms";
+  public static final String FORMAT_UTIS = "utis";
+
+  public static final String FORMAT_FILE_EXTENSION = ".json";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

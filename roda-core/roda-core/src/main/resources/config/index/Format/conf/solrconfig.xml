@@ -44,7 +44,7 @@
        replication is in use, this should match the replication
        configuration.
     -->
-  <dataDir>${solr.data.dir.format:}</dataDir>
+  <dataDir>${solr.data.dir.agent:}</dataDir>
 
 
   <!-- The DirectoryFactory to use for indexes.
