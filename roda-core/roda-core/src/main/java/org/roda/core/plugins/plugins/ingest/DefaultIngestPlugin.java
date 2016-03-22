@@ -177,7 +177,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     // transferredResourceId > report
     Map<String, Report> reports = new HashMap<>();
     aipIdToObjectId = new HashMap<>();
-    
+
     Date startDate = new Date();
 
     // 0) process "parent id" and "force parent id" info. (because we might need
@@ -367,8 +367,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
           report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
 
-        } else if (StringUtils.isNotBlank(reportItem.getItemId())
-          && aipIdToObjectId.get(reportItem.getItemId()) != null) {
+        } else
+          if (StringUtils.isNotBlank(reportItem.getItemId()) && aipIdToObjectId.get(reportItem.getItemId()) != null) {
           reports.get(aipIdToObjectId.get(reportItem.getItemId())).addReport(reportItem);
         }
       }

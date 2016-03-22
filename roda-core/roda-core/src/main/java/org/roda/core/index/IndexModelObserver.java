@@ -132,7 +132,8 @@ public class IndexModelObserver implements ModelObserver {
     NotFoundException, AuthorizationDeniedException, SolrServerException, IOException {
     StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
     Binary binary = model.getStorage().getBinary(filePath);
-    AIP aip = model.retrieveAIP(pm.getAipId());
+    AIP aip = pm.getAipId() != null ? model.retrieveAIP(pm.getAipId()) : null;
+
     SolrInputDocument premisEventDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
       pm.getId(), binary);
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
@@ -409,7 +410,8 @@ public class IndexModelObserver implements ModelObserver {
     try {
       StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(pm);
       Binary binary = model.getStorage().getBinary(storagePath);
-      AIP aip = model.retrieveAIP(pm.getAipId());
+      AIP aip = pm.getAipId() != null ? model.retrieveAIP(pm.getAipId()) : null;
+
       SolrInputDocument premisFileDocument = SolrUtils.premisToSolr(pm.getType(), aip, pm.getRepresentationId(),
         pm.getId(), binary);
       PreservationMetadataType type = pm.getType();
