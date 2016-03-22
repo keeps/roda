@@ -130,7 +130,7 @@ public class ClamAntiVirus implements AntiVirus {
 
     try {
 
-      LOGGER.debug("Executing virus scan in " + path.toString());
+      LOGGER.debug("Executing virus scan in {}", path);
 
       // clamscan -r -i bin/ 2> /dev/null
       String clamavBin = RodaCoreFactory.getRodaConfiguration()
@@ -140,6 +140,7 @@ public class ClamAntiVirus implements AntiVirus {
       ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, clamavParams, path.toString());
 
       // processBuilder.redirectErrorStream();
+
       Process process = processBuilder.start();
 
       StringWriter outputWriter = new StringWriter();

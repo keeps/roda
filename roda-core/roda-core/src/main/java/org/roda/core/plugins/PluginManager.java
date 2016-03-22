@@ -145,6 +145,10 @@ public class PluginManager {
     return plugin;
   }
 
+  public <T extends Serializable> Plugin<T> getPlugin(String pluginID, Class<T> pluginClass) {
+    return (Plugin<T>) getPlugin(pluginID);
+  }
+
   /**
    * @param pluginID
    * 

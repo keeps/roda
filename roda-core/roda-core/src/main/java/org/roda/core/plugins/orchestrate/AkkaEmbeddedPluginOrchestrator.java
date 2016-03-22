@@ -325,14 +325,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      plugin.beforeExecute(index, model, storage);
+      // plugin.beforeExecute(index, model, storage);
       List<Future<Object>> futures = new ArrayList<Future<Object>>();
+      List<Plugin<TransferredResource>> innerPlugins = new ArrayList<>();
+      Plugin<TransferredResource> innerPlugin;
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
       for (TransferredResource resource : resources) {
         if (block.size() == BLOCK_SIZE) {
-          futures
-            .add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, plugin), DEFAULT_TIMEOUT));
+          innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
+            TransferredResource.class);
+          innerPlugin.setParameterValues(plugin.getParameterValues());
+          innerPlugins.add(innerPlugin);
+          innerPlugin.beforeExecute(index, model, storage);
+          futures.add(
+            Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin), DEFAULT_TIMEOUT));
           block = new ArrayList<TransferredResource>();
           multiplier++;
         }
@@ -341,15 +348,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       if (!block.isEmpty()) {
-        futures
-          .add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, plugin), DEFAULT_TIMEOUT));
+        innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
+          TransferredResource.class);
+        innerPlugin.setParameterValues(plugin.getParameterValues());
+        innerPlugins.add(innerPlugin);
+        innerPlugin.beforeExecute(index, model, storage);
+        futures.add(
+          Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin), DEFAULT_TIMEOUT));
         multiplier++;
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
-      plugin.afterExecute(index, model, storage);
+      for (Plugin<TransferredResource> p : innerPlugins) {
+        p.afterExecute(index, model, storage);
+      }
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
