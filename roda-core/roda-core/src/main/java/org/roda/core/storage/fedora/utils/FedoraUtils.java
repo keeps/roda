@@ -7,12 +7,20 @@
  */
 package org.roda.core.storage.fedora.utils;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.fcrepo.client.FedoraDatastream;
+import org.fcrepo.client.FedoraException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
+import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.fedora.FedoraStorageService;
 
 /**

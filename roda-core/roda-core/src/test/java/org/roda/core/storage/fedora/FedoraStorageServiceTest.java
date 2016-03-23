@@ -15,6 +15,8 @@ import static org.junit.Assert.fail;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.nio.file.Paths;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -23,9 +25,11 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -33,6 +37,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.AbstractStorageServiceTest;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.RandomMockContentPayload;
@@ -146,7 +151,32 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     } catch (NotFoundException e) {
       // do nothing
     }
-
+    
+    
+    
+    // 6) Versionning
+    final StoragePath binaryStoragePathVersionning = StorageTestUtils.generateRandomResourceStoragePathUnder(containerStoragePath);
+    final ContentPayload payloadV0 = new RandomMockContentPayload();
+    getStorage().createBinary(binaryStoragePathVersionning, payloadV0, false);
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V0");
+    final ContentPayload payloadV1 = new RandomMockContentPayload();
+    getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV1, false, true);
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V1");
+    final ContentPayload payloadV2 = new RandomMockContentPayload();
+    getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV2, false, true);
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V2");
+    final ContentPayload payloadV3 = new RandomMockContentPayload();
+    getStorage().updateBinaryContent(binaryStoragePathVersionning, payloadV3, false, true);
+    getStorage().createBinaryVersion(binaryStoragePathVersionning, "V3");
+    
+    int counter = 0;
+    CloseableIterable<BinaryVersion> versions = getStorage().listBinaryVersions(binaryStoragePathVersionning);
+    Iterator<BinaryVersion> it = versions.iterator();
+    while(it.hasNext()){
+      BinaryVersion next = it.next();
+      counter++;
+    }
+    Assert.assertEquals(4, counter);
     // cleanup
     getStorage().deleteContainer(containerStoragePath);
   }
@@ -157,7 +187,6 @@ public class FedoraStorageServiceTest extends AbstractStorageServiceTest<FedoraS
     super.testMoveBinaryToSameStorage();
   }
 
-  @Ignore
   @Test
   public void testBinaryVersions() throws RODAException, IOException {
     super.testBinaryVersions();

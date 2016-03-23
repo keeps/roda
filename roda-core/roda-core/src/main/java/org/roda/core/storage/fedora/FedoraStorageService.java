@@ -12,6 +12,8 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -621,32 +623,136 @@ public class FedoraStorageService implements StorageService {
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    // TODO Auto-generated method stub
-    return null;
+    try {
+      String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
+      FedoraDatastream ds = fedoraRepository.getDatastream(fedoraPath);
+
+      if (!isDatastream(ds)) {
+        throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
+      }
+      List<String> versions = ds.getVersionsName();
+      final Iterator<String> versionsIterator = versions.iterator();
+      CloseableIterable<BinaryVersion> iterable = new CloseableIterable<BinaryVersion>() {
+
+        @Override
+        public Iterator<BinaryVersion> iterator() {
+          return new Iterator<BinaryVersion>() {
+
+            @Override
+            public boolean hasNext() {
+              return versionsIterator.hasNext();
+            }
+
+            @Override
+            public BinaryVersion next() {
+              String next = versionsIterator.next();
+              String message = next.substring(next.length() - 36);
+              String id = next.substring(0, next.length() - 36);
+              BinaryVersion ret;
+              try {
+                FedoraDatastream version = fedoraRepository.getDatastreamVersion(fedoraPath, next);
+                ret = FedoraConversionUtils.convertDataStreamToBinaryVersion(version, id, message);
+              } catch (FedoraException | GenericException | RequestNotValidException e) {
+                ret = null;
+              }
+
+              return ret;
+            }
+
+          };
+        }
+
+        @Override
+        public void close() throws IOException {
+        }
+      };
+      return iterable;
+    } catch (ForbiddenException e) {
+      throw new AuthorizationDeniedException(e.getMessage(), e);
+    } catch (BadRequestException e) {
+      throw new RequestNotValidException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   @Override
-  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    return null;
+  public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    try {
+      FedoraDatastream ds = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      if (!isDatastream(ds)) {
+        throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
+      }
+      System.out.println("FULL: "+version);
+      String message = version.substring(36);
+      String id = version.substring(0,36);
+      System.out.println("MESSAGE: "+message);
+      System.out.println("ID: "+id);
+      return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, id,message);
+    } catch (ForbiddenException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    } catch (BadRequestException e) {
+      throw new RequestNotValidException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new NotFoundException(e.getMessage(), e);
+    } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (GenericException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (RequestNotValidException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   @Override
-  public BinaryVersion createBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-    return null;
+  public BinaryVersion createBinaryVersion(StoragePath storagePath, String message)
+    throws RequestNotValidException, NotFoundException, GenericException {
+    try {
+      String id = UUID.randomUUID().toString();
+      String version = id+message;
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      binary.createVersionSnapshot(version);
+      return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id,message);
+    } catch (ForbiddenException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   @Override
-  public void revertBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-
+  public void revertBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, RequestNotValidException, GenericException {
+    try {
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      binary.revertToVersion(version);
+    } catch (ForbiddenException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
   @Override
-  public void deleteBinaryVersion(StoragePath storagePath, String version) {
-    // TODO Auto-generated method stub
-
+  public void deleteBinaryVersion(StoragePath storagePath, String version)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    try {
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      binary.deleteVersion(version);
+    } catch (ForbiddenException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (org.fcrepo.client.NotFoundException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    }
   }
 
 }

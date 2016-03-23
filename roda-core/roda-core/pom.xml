@@ -134,7 +134,7 @@
 			<!-- available at artifactory.keep.pt -->
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-client-impl</artifactId>
-			<version>${fcrepo.version}-hsilva-datastream-fixes</version>
+			<version>${fcrepo.version}-sleroux-dev</version>
 		</dependency>
 		<dependency>
 			<groupId>org.yaml</groupId>

@@ -25,9 +25,11 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.Container;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultBinary;
+import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
 import org.roda.core.storage.DefaultStoragePath;
@@ -114,7 +116,13 @@ public final class FedoraConversionUtils {
     throws GenericException, RequestNotValidException {
     try {
       ContentPayload cp = new FedoraContentPayload(datastream);
-      long sizeInBytes = datastream.getContentSize();
+      //TODO version properties doesn't contain size...
+      long sizeInBytes = 0;
+      try{
+        sizeInBytes = datastream.getContentSize();
+      }catch(NullPointerException npe){
+        
+      }
       URI contentDigest = datastream.getContentDigest();
       return new DefaultBinary(getStoragePath(datastream), cp, sizeInBytes, false, extractContentDigest(contentDigest));
     } catch (FedoraException e) {
@@ -216,5 +224,20 @@ public final class FedoraConversionUtils {
   public static Container fedoraObjectToContainer(FedoraObject object)
     throws GenericException, RequestNotValidException {
     return new DefaultContainer(getStoragePath(object));
+  }
+  
+  /**
+   * Converts a {@code FedoraDatastream} into a {@code BinaryVersion}
+   * 
+   * @param datastream
+   *          Fedora data stream to be converted
+   * @param version
+   *          The version label
+   * @param id 
+   * @throws GenericException, RequestNotValidException, FedoraException
+   */
+  public static BinaryVersion convertDataStreamToBinaryVersion(FedoraDatastream datastream, String id, String message) throws GenericException, RequestNotValidException, FedoraException {
+    Binary binary = FedoraConversionUtils.fedoraDatastreamToBinary(datastream);
+    return new DefaultBinaryVersion(binary, id, message, datastream.getCreatedDate());
   }
 }
