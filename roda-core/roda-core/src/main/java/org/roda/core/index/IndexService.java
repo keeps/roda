@@ -31,7 +31,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
@@ -88,8 +87,8 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter) throws GenericException,
-    RequestNotValidException {
+  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter)
+    throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
@@ -106,8 +105,8 @@ public class IndexService {
   }
 
   public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, RodaUser user, boolean showInactive) throws GenericException,
-    RequestNotValidException {
+    Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
+      throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
@@ -116,13 +115,13 @@ public class IndexService {
     return SolrUtils.count(index, returnClass, filter, user, showInactive);
   }
 
-  public <T extends Serializable> T retrieve(Class<T> returnClass, String id) throws NotFoundException,
-    GenericException {
+  public <T extends Serializable> T retrieve(Class<T> returnClass, String id)
+    throws NotFoundException, GenericException {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
-  public void reindexAIPs() throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
+  public void reindexAIPs()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<AIP> aips = null;
     try {
       LOGGER.info("{} > Listing AIPs", new Date().getTime());
@@ -172,26 +171,26 @@ public class IndexService {
     observer.jobReportCreatedOrUpdated(jobReport);
   }
 
-  public void reindexRisk(Risk risk, boolean forceCommit) {
-    observer.riskCreatedOrUpdated(risk, forceCommit);
+  public void reindexRisk(Risk risk) {
+    observer.riskCreatedOrUpdated(risk);
   }
 
-  public void reindexAgent(Agent agent, boolean forceCommit) {
-    observer.agentCreatedOrUpdated(agent, forceCommit);
+  public void reindexAgent(Agent agent) {
+    observer.agentCreatedOrUpdated(agent);
   }
 
-  public void reindexFormat(Format format, boolean forceCommit) {
-    observer.formatCreatedOrUpdated(format, forceCommit);
+  public void reindexFormat(Format format) {
+    observer.formatCreatedOrUpdated(format);
   }
 
-  public void reindexActionLogs() throws GenericException, NotFoundException, AuthorizationDeniedException,
-    RequestNotValidException {
+  public void reindexActionLogs()
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     CloseableIterable<Resource> actionLogs = null;
 
     try {
       boolean recursive = false;
-      actionLogs = model.getStorage().listResourcesUnderContainer(
-        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+      actionLogs = model.getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {

@@ -197,4 +197,10 @@ public class Format implements IsIndexed, Serializable {
       + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + "]";
   }
 
+  @Override
+  public String getUUID() {
+    // FIXME 20160323 hsilva: see if this is the right way to do it
+    return getId();
+  }
+
 }

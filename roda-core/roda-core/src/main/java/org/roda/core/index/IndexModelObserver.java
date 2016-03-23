@@ -477,7 +477,7 @@ public class IndexModelObserver implements ModelObserver {
       "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
   }
 
-  public void riskCreatedOrUpdated(Risk risk, boolean forceCommit) {
+  public void riskCreatedOrUpdated(Risk risk) {
     addDocumentToIndex(RodaConstants.INDEX_RISK, SolrUtils.riskToSolrDocument(risk), "Error creating Risk");
   }
 
@@ -485,26 +485,20 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
   }
 
-  public void agentCreatedOrUpdated(Agent agent, boolean forceCommit) {
-    addDocumentToIndex(RodaConstants.INDEX_AGENT, SolrUtils.agentToSolrDocument(agent), "Error creating Agent",
-      forceCommit);
+  public void agentCreatedOrUpdated(Agent agent) {
+    addDocumentToIndex(RodaConstants.INDEX_AGENT, SolrUtils.agentToSolrDocument(agent), "Error creating Agent");
   }
 
   public void agentDeleted(String agentId) {
-    boolean forceCommit = false;
-    deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")",
-      forceCommit);
+    deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")");
   }
 
-  public void formatCreatedOrUpdated(Format format, boolean forceCommit) {
-    addDocumentToIndex(RodaConstants.INDEX_FORMAT, SolrUtils.formatToSolrDocument(format), "Error creating Format",
-      forceCommit);
+  public void formatCreatedOrUpdated(Format format) {
+    addDocumentToIndex(RodaConstants.INDEX_FORMAT, SolrUtils.formatToSolrDocument(format), "Error creating Format");
   }
 
   public void formatDeleted(String formatId) {
-    boolean forceCommit = false;
-    deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")",
-      forceCommit);
+    deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")");
   }
 
 }

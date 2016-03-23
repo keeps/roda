@@ -254,8 +254,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null,
-      new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
+      null);
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
@@ -545,7 +545,7 @@ public class IndexServiceTest {
       HashMap<String, String> affectedObjects = new HashMap<String, String>();
       affectedObjects.put("Affected related type", "Affected related value");
       risk.setAffectedObjects(affectedObjects);
-      model.createRisk(risk, true);
+      model.createRisk(risk);
 
       Risk risk2 = model.retrieveRisk("R1");
       assertNotNull(risk2);
@@ -561,7 +561,7 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk3.getName());
 
       risk3.setName("Risk New Name");
-      model.updateRisk(risk3, true);
+      model.updateRisk(risk3);
 
       IndexResult<Risk> find2 = index.find(Risk.class, null, null, new Sublist(0, 10));
       assertEquals(1, find2.getTotalCount());
@@ -620,7 +620,7 @@ public class IndexServiceTest {
       formatIds.add("format1");
       agent.setFormatIds(formatIds);
 
-      model.createAgent(agent, true);
+      model.createAgent(agent);
 
       Agent agent2 = model.retrieveAgent(agent.getId());
       assertNotNull(agent2);
@@ -636,7 +636,7 @@ public class IndexServiceTest {
       assertEquals(agent.getName(), agent3.getName());
 
       agent3.setName("Agent New Name");
-      model.updateAgent(agent3, true);
+      model.updateAgent(agent3);
 
       IndexResult<Agent> find2 = index.find(Agent.class, null, null, new Sublist(0, 10));
       assertEquals(1, find2.getTotalCount());
@@ -684,7 +684,7 @@ public class IndexServiceTest {
       utis.add("com.adobe.pdf");
       format.setUtis(utis);
 
-      model.createFormat(format, true);
+      model.createFormat(format);
 
       Format format2 = model.retrieveFormat(format.getId());
       assertNotNull(format2);
@@ -700,7 +700,7 @@ public class IndexServiceTest {
       assertEquals(format.getName(), format3.getName());
 
       format3.setName("Format New Name");
-      model.updateFormat(format3, true);
+      model.updateFormat(format3);
 
       IndexResult<Format> find2 = index.find(Format.class, null, null, new Sublist(0, 10));
       assertEquals(1, find2.getTotalCount());

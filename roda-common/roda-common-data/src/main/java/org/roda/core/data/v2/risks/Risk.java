@@ -247,15 +247,21 @@ public class Risk implements IsIndexed, Serializable {
   @Override
   public String toString() {
     return "Format [id=" + id + ", name=" + name + ", description=" + description + ", identifiedOn=" + identifiedOn
-      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
-      + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
-      + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
-      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
-      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
-      + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
-      + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
-      + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
-      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
+      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes + ", preMitigationProbability="
+      + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact + ", preMitigationSeverity="
+      + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes + ", posMitigationProbability="
+      + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact + ", posMitigationSeverity="
+      + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes + ", mitigationStrategy="
+      + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner
+      + ", mitigationRelatedEventIdentifierType=" + mitigationRelatedEventIdentifierType
+      + ", mitigationRelatedEventIdentifierValue=" + mitigationRelatedEventIdentifierValue + ", affectedObjects="
+      + affectedObjects + "]";
+  }
+
+  @Override
+  public String getUUID() {
+    // FIXME 20160323 hsilva: see if this is the right way to do it
+    return getId();
   }
 
 }

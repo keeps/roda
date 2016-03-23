@@ -216,9 +216,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyRiskCreatedOrUpdated(Risk risk, boolean forceCommit) {
+  protected void notifyRiskCreatedOrUpdated(Risk risk) {
     for (ModelObserver observer : observers) {
-      observer.riskCreatedOrUpdated(risk, forceCommit);
+      observer.riskCreatedOrUpdated(risk);
     }
   }
 
@@ -228,9 +228,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyAgentCreatedOrUpdated(Agent agent, boolean forceCommit) {
+  protected void notifyAgentCreatedOrUpdated(Agent agent) {
     for (ModelObserver observer : observers) {
-      observer.agentCreatedOrUpdated(agent, forceCommit);
+      observer.agentCreatedOrUpdated(agent);
     }
   }
 
@@ -240,9 +240,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyFormatCreatedOrUpdated(Format format, boolean forceCommit) {
+  protected void notifyFormatCreatedOrUpdated(Format format) {
     for (ModelObserver observer : observers) {
-      observer.formatCreatedOrUpdated(format, forceCommit);
+      observer.formatCreatedOrUpdated(format);
     }
   }
 

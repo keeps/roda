@@ -1624,7 +1624,7 @@ public class SolrUtils {
     agent.setCategory(objectToString(doc.get(RodaConstants.AGENT_CATEGORY)));
     agent.setVersion(objectToString(doc.get(RodaConstants.AGENT_VERSION)));
     agent.setLicense(objectToString(doc.get(RodaConstants.AGENT_LICENSE)));
-    agent.setPopularity(objectToInteger(doc.get(RodaConstants.AGENT_POPULARITY)));
+    agent.setPopularity(objectToInteger(doc.get(RodaConstants.AGENT_POPULARITY), 0));
     agent.setDeveloper(objectToString(doc.get(RodaConstants.AGENT_DEVELOPER)));
     agent.setInitialRelease(objectToDate(doc.get(RodaConstants.AGENT_INITIAL_RELEASE)));
     agent.setWebsite(objectToString(doc.get(RodaConstants.AGENT_WEBSITE)));
@@ -1672,7 +1672,7 @@ public class SolrUtils {
     format.setDefinition(objectToString(doc.get(RodaConstants.FORMAT_DEFINITION)));
     format.setCategory(objectToString(doc.get(RodaConstants.FORMAT_CATEGORY)));
     format.setLatestVersion(objectToString(doc.get(RodaConstants.FORMAT_LATEST_VERSION)));
-    format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY)));
+    format.setPopularity(objectToInteger(doc.get(RodaConstants.FORMAT_POPULARITY), 0));
     format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
     format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
     format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));

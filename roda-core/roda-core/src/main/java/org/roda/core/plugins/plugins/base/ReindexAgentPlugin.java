@@ -96,7 +96,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
           String jsonString = IOUtils.toString(inputStream);
           Agent agent = JsonUtils.getObjectFromJson(jsonString, Agent.class);
           IOUtils.closeQuietly(inputStream);
-          index.reindexAgent(agent, false);
+          index.reindexAgent(agent);
         }
       }
 

@@ -238,4 +238,10 @@ public class Agent implements IsIndexed, Serializable {
       + ", agentsRequired=" + agentsRequired + "]";
   }
 
+  @Override
+  public String getUUID() {
+    // FIXME 20160323 hsilva: see if this is the right way to do it
+    return getId();
+  }
+
 }

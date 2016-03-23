@@ -96,7 +96,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
           String jsonString = IOUtils.toString(inputStream);
           Format format = JsonUtils.getObjectFromJson(jsonString, Format.class);
           IOUtils.closeQuietly(inputStream);
-          index.reindexFormat(format, false);
+          index.reindexFormat(format);
         }
       }
 

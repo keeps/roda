@@ -96,7 +96,7 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
           String jsonString = IOUtils.toString(inputStream);
           Risk risk = JsonUtils.getObjectFromJson(jsonString, Risk.class);
           IOUtils.closeQuietly(inputStream);
-          index.reindexRisk(risk, false);
+          index.reindexRisk(risk);
         }
       }
 
