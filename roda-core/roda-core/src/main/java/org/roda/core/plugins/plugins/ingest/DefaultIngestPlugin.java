@@ -53,6 +53,9 @@ import org.slf4j.LoggerFactory;
  * https://docs.google.com/spreadsheets/d/
  * 1Ncu0My6tf19umSClIA6iXeYlJ4_FP6MygRwFCe0EzyM
  * 
+ * FIXME 20160323 hsilva: after each task (i.e. plugin), the AIP should be
+ * obtained again from model (as it might have changed)
+ * 
  * @author Hélder Silva <hsilva@keep.pt>
  */
 public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
@@ -195,7 +198,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     // transferred resources
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    List<AIP> aips = getAIPsFromReports(index, model, storage, reports);
+    List<AIP> aips = getAIPsFromReports(model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
     createIngestStartedEvent(model, index, aipIdToTransferredResourceId, startDate);
@@ -336,8 +339,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     }
   }
 
-  private List<AIP> getAIPsFromReports(IndexService index, ModelService model, StorageService storage,
-    Map<String, Report> reports) {
+  private List<AIP> getAIPsFromReports(ModelService model, StorageService storage, Map<String, Report> reports) {
     List<AIP> aips = new ArrayList<>();
     List<String> aipIds = getAIPsIdsFromReport(reports);
 

@@ -30,6 +30,8 @@ public interface ModelObserver {
 
   public void aipUpdated(AIP aip);
 
+  public void aipActiveFlagUpdated(AIP aip);
+
   public void aipDeleted(String aipId);
 
   public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);

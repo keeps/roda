@@ -88,7 +88,7 @@
 		required="true" multiValued="false" />
 	<field name="isFile" type="boolean" indexed="true" stored="true"
 		required="false" multiValued="false" />
-	<field name="name" type="string" indexed="true" stored="true"
+	<field name="name" type="text_general" indexed="true" stored="true"
 		required="true" multiValued="false" />
 	<field name="size" type="long" indexed="true" stored="true"
 		required="true" multiValued="false" />
@@ -294,20 +294,28 @@
 		positionIncrementGap="100">
 		<analyzer type="index">
 			<tokenizer class="solr.StandardTokenizerFactory" />
-			<filter class="solr.StopFilterFactory" ignoreCase="true"
-				words="stopwords.txt" />
+			<filter class="solr.ASCIIFoldingFilterFactory" />
+			<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_pt.txt" /> -->
+			<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_en.txt" /> -->
 			<!-- in this example, we will only use synonyms at query time <filter 
 				class="solr.SynonymFilterFactory" synonyms="index_synonyms.txt" ignoreCase="true" 
 				expand="false"/> -->
 			<filter class="solr.LowerCaseFilterFactory" />
+			<filter class="solr.KeywordRepeatFilterFactory"/>
+			<!-- <filter class="solr.SnowballPorterFilterFactory" language="Portuguese" /> -->
+			<filter class="solr.PorterStemFilterFactory"/>
+			<filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
 		</analyzer>
 		<analyzer type="query">
 			<tokenizer class="solr.StandardTokenizerFactory" />
-			<filter class="solr.StopFilterFactory" ignoreCase="true"
-				words="stopwords.txt" />
-			<filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt"
-				ignoreCase="true" expand="true" />
+			<filter class="solr.ASCIIFoldingFilterFactory" />
+			<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_pt.txt" /> -->
+			<!-- <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_en.txt" /> -->
+			<!-- <filter class="solr.SynonymFilterFactory" synonyms="synonyms.txt" 
+				ignoreCase="true" expand="true"/> -->
 			<filter class="solr.LowerCaseFilterFactory" />
+			<!-- <filter class="solr.SnowballPorterFilterFactory" language="Portuguese" /> -->
+			<filter class="solr.PorterStemFilterFactory"/>
 		</analyzer>
 	</fieldType>
 

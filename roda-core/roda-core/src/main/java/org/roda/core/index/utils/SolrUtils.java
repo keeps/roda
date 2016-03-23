@@ -140,8 +140,8 @@ import org.xml.sax.SAXException;
 public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
 
-  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(
-    Arrays.asList("title", "level", "dateInitial", "dateFinal"));
+  private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
+    RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
   /** Private empty constructor */
   private SolrUtils() {
@@ -744,7 +744,6 @@ public class SolrUtils {
     return ret;
   }
 
-  // TODO: Handle SimpleRepresentationPreservationMetadata
   private static <T> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
     if (resultClass.equals(AIP.class)) {
@@ -1019,6 +1018,34 @@ public class SolrUtils {
     }
 
     return ret;
+  }
+
+  public static SolrInputDocument aipActiveFlagUpdateToSolrDocument(AIP aip) {
+    return activeFlagUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.isActive());
+  }
+
+  public static SolrInputDocument representationActiveFlagUpdateToSolrDocument(Representation representation,
+    boolean active) {
+    return activeFlagUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
+      IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), active);
+  }
+
+  public static SolrInputDocument fileActiveFlagUpdateToSolrDocument(File file, boolean active) {
+    return activeFlagUpdateToSolrDocument(RodaConstants.FILE_UUID, file.getId(), active);
+  }
+
+  public static SolrInputDocument preservationEventActiveFlagUpdateToSolrDocument(String preservationEventID,
+    boolean active) {
+    return activeFlagUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID, active);
+  }
+
+  private static SolrInputDocument activeFlagUpdateToSolrDocument(String idField, String idValue, boolean active) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(idField, idValue);
+    Map<String, Object> fieldModifier = new HashMap<>(1);
+    fieldModifier.put("set", active);
+    doc.addField(RodaConstants.ACTIVE, fieldModifier);
+    return doc;
   }
 
   private static Permissions getPermissions(SolrDocument doc) {

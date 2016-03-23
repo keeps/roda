@@ -45,6 +45,12 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 
+/**
+ * 
+ * @deprecated 20160323 hsilva: it's not safe to use this orchestrator in
+ *             production as it wasn't fully tested and it might have (most
+ *             certainly has) strange/not expected behavior
+ */
 public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private static final int BLOCK_SIZE = 100;
@@ -69,7 +75,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("plugin-%d").setDaemon(true).build();
     int threads = Runtime.getRuntime().availableProcessors() + 1;
     executorService = Executors.newFixedThreadPool(threads, threadFactory);
-    LOGGER.debug("Running embedded plugin orchestrator on a " + threads + " thread pool");
+    LOGGER.debug("Running embedded plugin orchestrator on a {} thread pool", threads);
 
   }
 

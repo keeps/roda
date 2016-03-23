@@ -407,6 +407,14 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public AIP updateAIPActiveFlag(AIP aip)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    updateAIPMetadata(aip);
+    notifyAipActiveFlagUpdated(aip);
+
+    return aip;
+  }
+
   public void deleteAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);

@@ -80,8 +80,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Auto accepting AIP {}", aip.getId());
 
         aip.setActive(true);
-        // FIXME
-        aip = model.updateAIP(aip);
+        aip = model.updateAIPActiveFlag(aip);
         reportItem.setPluginState(PluginState.SUCCESS);
         LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
       } catch (RODAException e) {

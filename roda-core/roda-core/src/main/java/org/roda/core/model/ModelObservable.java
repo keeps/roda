@@ -53,6 +53,12 @@ public abstract class ModelObservable {
     }
   }
 
+  protected void notifyAipActiveFlagUpdated(AIP aip) {
+    for (ModelObserver observer : observers) {
+      observer.aipActiveFlagUpdated(aip);
+    }
+  }
+
   protected void notifyAipDeleted(String aipId) {
     for (ModelObserver observer : observers) {
       observer.aipDeleted(aipId);

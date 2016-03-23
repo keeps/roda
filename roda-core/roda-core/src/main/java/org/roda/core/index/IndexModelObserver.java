@@ -75,10 +75,8 @@ public class IndexModelObserver implements ModelObserver {
   public void aipCreated(final AIP aip) {
     indexAIP(aip);
     indexRepresentations(aip);
-    // indexPreservationFileObjects(aip);
     indexPreservationsEvents(aip);
     // indexOtherMetadata(aip);
-
   }
 
   private void indexAIP(final AIP aip) {
@@ -231,6 +229,103 @@ public class IndexModelObserver implements ModelObserver {
     // TODO Is this the best way to update?
     aipDeleted(aip.getId());
     aipCreated(aip);
+  }
+
+  @Override
+  public void aipActiveFlagUpdated(AIP aip) {
+    try {
+      // change AIP
+      SolrInputDocument aipDoc = SolrUtils.aipActiveFlagUpdateToSolrDocument(aip);
+      index.add(RodaConstants.INDEX_AIP, aipDoc);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not do a partial update", e);
+    }
+
+    // change Representations and Files
+    representationsActiveFlagUpdated(aip);
+    // change Preservation events
+    preservationEventsActiveFlagUpdated(aip);
+
+  }
+
+  private void representationsActiveFlagUpdated(final AIP aip) {
+    for (Representation representation : aip.getRepresentations()) {
+      representationActiveFlagUpdated(aip, representation);
+    }
+  }
+
+  private void representationActiveFlagUpdated(final AIP aip, final Representation representation) {
+    CloseableIterable<File> allFiles = null;
+    try {
+      SolrInputDocument repDoc = SolrUtils.representationActiveFlagUpdateToSolrDocument(representation, aip.isActive());
+      index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
+      final boolean recursive = true;
+      allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
+      for (File file : allFiles) {
+        boolean recursiveIndexFile = false;
+        fileActiveFlagUpdated(aip, file, recursiveIndexFile);
+      }
+
+    } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
+      | RequestNotValidException e) {
+      LOGGER.error("Could not do a partial update", e);
+    } finally {
+      IOUtils.closeQuietly(allFiles);
+    }
+  }
+
+  private void fileActiveFlagUpdated(AIP aip, File file, boolean recursive) {
+    SolrInputDocument fileDoc = SolrUtils.fileActiveFlagUpdateToSolrDocument(file, aip.isActive());
+    try {
+      index.add(RodaConstants.INDEX_FILE, fileDoc);
+
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not index file: " + file, e);
+    }
+
+    if (recursive && file.isDirectory()) {
+      try {
+        CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
+        for (File subfile : allFiles) {
+          fileActiveFlagUpdated(aip, subfile, false);
+        }
+        IOUtils.closeQuietly(allFiles);
+
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not index file sub-resources: " + file, e);
+      }
+    }
+  }
+
+  private void preservationEventsActiveFlagUpdated(final AIP aip) {
+
+    CloseableIterable<PreservationMetadata> preservationMetadata = null;
+    try {
+      boolean includeRepresentations = true;
+      preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
+      for (PreservationMetadata pm : preservationMetadata) {
+        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          try {
+            preservationEventActiveFlagUpdated(pm, aip.isActive());
+          } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+            | AuthorizationDeniedException e) {
+            LOGGER.error("Could not index premis event", e);
+          }
+        }
+      }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not index preservation events", e);
+    } finally {
+      IOUtils.closeQuietly(preservationMetadata);
+    }
+
+  }
+
+  private void preservationEventActiveFlagUpdated(PreservationMetadata pm, boolean active)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    SolrServerException, IOException {
+    SolrInputDocument premisEventDocument = SolrUtils.preservationEventActiveFlagUpdateToSolrDocument(pm.getId(), active);
+    index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
   @Override
