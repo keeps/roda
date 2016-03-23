@@ -107,7 +107,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
-    return null;
+    return new Report();
 
   }
 
@@ -124,7 +124,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
       LOGGER.debug("Skipping clear indexes");
     }
 
-    return null;
+    return new Report();
   }
 
   @Override
@@ -136,7 +136,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
       throw new PluginException("Error optimizing index", e);
     }
 
-    return null;
+    return new Report();
   }
 
   @Override

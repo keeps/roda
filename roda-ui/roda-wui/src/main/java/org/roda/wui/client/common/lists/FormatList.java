@@ -63,16 +63,16 @@ public class FormatList extends AsyncTableCell<Format> {
     nameColumn = new TextColumn<Format>() {
 
       @Override
-      public String getValue(Format Format) {
-        return Format != null ? Format.getName() : null;
+      public String getValue(Format format) {
+        return format != null ? format.getName() : null;
       }
     };
 
     categoryColumn = new TextColumn<Format>() {
 
       @Override
-      public String getValue(Format Format) {
-        return Format != null ? Format.getCategory() : null;
+      public String getValue(Format format) {
+        return format != null ? format.getCategory() : null;
       }
     };
 

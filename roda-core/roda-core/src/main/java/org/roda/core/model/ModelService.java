@@ -22,7 +22,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import javax.mail.MessagingException;
+
 import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.UserUtility;
@@ -55,6 +59,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -316,8 +321,8 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String parentId, Permissions permissions) throws RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(String parentId, Permissions permissions) throws RequestNotValidException, NotFoundException,
+    GenericException, AlreadyExistsException, AuthorizationDeniedException {
     boolean active = true;
     boolean notify = true;
     return createAIP(active, parentId, permissions, notify);
@@ -1493,9 +1498,7 @@ public class ModelService extends ModelObservable {
 
   public void createRisk(Risk risk) throws GenericException {
     try {
-      if (risk.getId() == null) {
-        risk.setId(UUID.randomUUID().toString());
-      }
+      risk.setId(UUID.randomUUID().toString());
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
       storage.createBinary(riskPath, new StringContentPayload(riskAsJson), false);
@@ -1781,4 +1784,93 @@ public class ModelService extends ModelObservable {
     }
   }
 
+  /***************** Message related *****************/
+  /************************************************/
+
+  public void createMessage(Message message) throws GenericException {
+    try {
+      message.setId(UUID.randomUUID().toString());
+      message.setAcknowledgeToken(UUID.randomUUID().toString());
+
+      // update body message with the recipient user and acknowledge URL
+      String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
+      ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
+      ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken());
+
+      String fromTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "fromTag");
+      String recipientTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "recipientTag");
+      String acknowledgeTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "acknowledgeTag");
+
+      String body = message.getBody();
+      body = body.replaceAll(fromTag, message.getFromUser());
+      body = body.replaceAll(recipientTag, message.getRecipientUser());
+      body = body.replaceAll(acknowledgeTag, ackUrl);
+      message.setBody(body);
+
+      LOGGER.info("Sending message ...");
+      String[] recipients = {message.getRecipientUser()};
+      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility();
+      emailUtility.sendMail(message.getFromUser(), recipients, message.getSubject(), body);
+      LOGGER.info("Message sent");
+
+      String messageAsJson = JsonUtils.getJsonFromObject(message);
+      StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
+      storage.createBinary(messagePath, new StringContentPayload(messageAsJson), false);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | AlreadyExistsException | MessagingException e) {
+      LOGGER.error("Error creating message in storage", e);
+    }
+
+    notifyMessageCreatedOrUpdated(message);
+  }
+
+  public void updateMessage(Message message) throws GenericException {
+    try {
+      String messageAsJson = JsonUtils.getJsonFromObject(message);
+      StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
+      storage.updateBinaryContent(messagePath, new StringContentPayload(messageAsJson), false, true);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      LOGGER.error("Error updating message in storage", e);
+    }
+
+    notifyMessageCreatedOrUpdated(message);
+  }
+
+  public void deleteMessage(String messageId)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+
+    StoragePath messagePath = ModelUtils.getMessageStoragePath(messageId);
+    storage.deleteResource(messagePath);
+    notifyMessageDeleted(messageId);
+  }
+
+  public Message retrieveMessage(String messageId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    StoragePath messagePath = ModelUtils.getMessageStoragePath(messageId);
+    Binary binary = storage.getBinary(messagePath);
+    Message ret;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      ret = JsonUtils.getObjectFromJson(inputStream, Message.class);
+    } catch (IOException e) {
+      throw new GenericException("Error reading message", e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+    return ret;
+  }
+
+  public void acknowledgeMessage(String messageId, String token)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    Message message = this.retrieveMessage(messageId);
+
+    if (message.getAcknowledgeToken().equals(token)) {
+      message.setAcknowledged(true);
+      message.setAcknowledgedOn(new Date());
+      this.updateMessage(message);
+    }
+  }
 }

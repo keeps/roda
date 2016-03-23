@@ -61,6 +61,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -159,8 +160,8 @@ public class IndexServiceTest {
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
-    IndexedRepresentation rep1 = index.retrieve(IndexedRepresentation.class,
-      IdUtils.getRepresentationId(aipId, rep1Id));
+    IndexedRepresentation rep1 = index
+      .retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, rep1Id));
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();
@@ -264,8 +265,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
-      null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null,
+      new Sublist(0, 10), null);
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());
@@ -530,205 +531,244 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testRiskIndex()
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Risk risk = new Risk();
-    risk.setId("R1");
-    risk.setName("Risk name");
-    risk.setDescription("Risk description");
-    risk.setIdentifiedOn(new Date());
-    risk.setIdentifiedBy("Risk identifier");
-    risk.setCategory("Risk category");
-    risk.setNotes("Risk notes");
+  public void testRiskIndex() {
+    try {
+      Risk risk = new Risk();
+      risk.setName("Risk name");
+      risk.setDescription("Risk description");
+      risk.setIdentifiedOn(new Date());
+      risk.setIdentifiedBy("Risk identifier");
+      risk.setCategory("Risk category");
+      risk.setNotes("Risk notes");
 
-    risk.setPreMitigationProbability(1);
-    risk.setPreMitigationImpact(1);
-    risk.setPreMitigationSeverity(1);
-    risk.setPreMitigationNotes("Pre Notes");
+      risk.setPreMitigationProbability(1);
+      risk.setPreMitigationImpact(1);
+      risk.setPreMitigationSeverity(1);
+      risk.setPreMitigationNotes("Pre Notes");
 
-    risk.setPosMitigationProbability(2);
-    risk.setPosMitigationImpact(2);
-    risk.setPosMitigationSeverity(2);
-    risk.setPosMitigationNotes("Pos Notes");
+      risk.setPosMitigationProbability(2);
+      risk.setPosMitigationImpact(2);
+      risk.setPosMitigationSeverity(2);
+      risk.setPosMitigationNotes("Pos Notes");
 
-    risk.setMitigationStrategy("Mitigation Strategy");
-    risk.setMitigationOwnerType("Owner type");
-    risk.setMitigationOwner("Owner");
-    risk.setMitigationRelatedEventIdentifierType("Mitigation REI type");
-    risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
+      risk.setMitigationStrategy("Mitigation Strategy");
+      risk.setMitigationOwnerType("Owner type");
+      risk.setMitigationOwner("Owner");
+      risk.setMitigationRelatedEventIdentifierType("Mitigation REI type");
+      risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
 
-    HashMap<String, String> affectedObjects = new HashMap<String, String>();
-    affectedObjects.put("Affected related type", "Affected related value");
-    risk.setAffectedObjects(affectedObjects);
-    model.createRisk(risk);
+      HashMap<String, String> affectedObjects = new HashMap<String, String>();
+      affectedObjects.put("Affected related type", "Affected related value");
+      risk.setAffectedObjects(affectedObjects);
+      model.createRisk(risk);
 
-    index.commit(Risk.class);
+      index.commit(Risk.class);
 
-    Risk risk2 = model.retrieveRisk("R1");
-    assertNotNull(risk2);
-    assertEquals(risk.getId(), risk2.getId());
-    assertEquals(risk.getName(), risk2.getName());
+      Risk risk2 = model.retrieveRisk(risk.getId());
+      assertNotNull(risk2);
+      assertEquals(risk.getId(), risk2.getId());
+      assertEquals(risk.getName(), risk2.getName());
 
-    IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find.getTotalCount());
+      IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
 
-    Risk risk3 = index.retrieve(Risk.class, "R1");
-    assertNotNull(risk3);
-    assertEquals(risk.getId(), risk3.getId());
-    assertEquals(risk.getName(), risk3.getName());
+      Risk risk3 = index.retrieve(Risk.class, risk.getId());
+      assertNotNull(risk3);
+      assertEquals(risk.getId(), risk3.getId());
+      assertEquals(risk.getName(), risk3.getName());
 
-    risk3.setName("Risk New Name");
-    model.updateRisk(risk3);
-    index.commit(Risk.class);
+      risk3.setName("Risk New Name");
+      model.updateRisk(risk3);
 
-    IndexResult<Risk> find2 = index.find(Risk.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find2.getTotalCount());
+      Risk risk4 = index.retrieve(Risk.class, risk.getId());
+      assertNotNull(risk4);
+      assertEquals(risk.getId(), risk4.getId());
+      assertEquals(risk4.getName(), "Risk New Name");
 
-    Risk risk4 = index.retrieve(Risk.class, "R1");
-    assertNotNull(risk4);
-    assertEquals(risk.getId(), risk4.getId());
+      model.deleteRisk(risk.getId());
 
-    model.deleteRisk("R1");
-
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      e.printStackTrace();
+      assertTrue(false);
+    }
   }
 
   @Test
-  public void testAgentIndex()
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Agent agent = new Agent();
-    agent.setName("Acrobat reader");
-    agent.setType("Software");
-    agent.setDescription("Agent description");
-    agent.setCategory("Desktop publishing");
-    agent.setVersion("1.7");
-    agent.setLicense("Proprietary");
-    agent.setPopularity(5);
-    agent.setDeveloper("Adobe Systems");
-    agent.setInitialRelease(new Date());
-    agent.setWebsite("acrobat.adobe.com");
-    agent.setDownload("https://get.adobe.com/br/reader/");
-    agent.setProvenanceInformation("https://en.wikipedia.org/wiki/Adobe_Acrobat");
+  public void testAgentIndex() {
+    try {
+      Agent agent = new Agent();
+      agent.setName("Acrobat reader");
+      agent.setType("Software");
+      agent.setDescription("Agent description");
+      agent.setCategory("Desktop publishing");
+      agent.setVersion("1.7");
+      agent.setLicense("Proprietary");
+      agent.setPopularity(5);
+      agent.setDeveloper("Adobe Systems");
+      agent.setInitialRelease(new Date());
+      agent.setWebsite("acrobat.adobe.com");
+      agent.setDownload("https://get.adobe.com/br/reader/");
+      agent.setProvenanceInformation("https://en.wikipedia.org/wiki/Adobe_Acrobat");
 
-    List<String> platforms = new ArrayList<String>();
-    platforms.add("Windows");
-    platforms.add("MAC OS X");
-    platforms.add("Linux");
-    agent.setPlatforms(platforms);
+      List<String> platforms = new ArrayList<String>();
+      platforms.add("Windows");
+      platforms.add("MAC OS X");
+      platforms.add("Linux");
+      agent.setPlatforms(platforms);
 
-    List<String> extensions = new ArrayList<String>();
-    extensions.add(".pdf");
-    agent.setExtensions(extensions);
+      List<String> extensions = new ArrayList<String>();
+      extensions.add(".pdf");
+      agent.setExtensions(extensions);
 
-    List<String> mimetypes = new ArrayList<String>();
-    mimetypes.add("application/pdf");
-    agent.setMimetypes(mimetypes);
+      List<String> mimetypes = new ArrayList<String>();
+      mimetypes.add("application/pdf");
+      agent.setMimetypes(mimetypes);
 
-    List<String> pronoms = new ArrayList<String>();
-    pronoms.add("fmt/100");
-    agent.setPronoms(pronoms);
+      List<String> pronoms = new ArrayList<String>();
+      pronoms.add("fmt/100");
+      agent.setPronoms(pronoms);
 
-    List<String> utis = new ArrayList<String>();
-    utis.add("com.adobe.pdf");
-    agent.setUtis(utis);
+      List<String> utis = new ArrayList<String>();
+      utis.add("com.adobe.pdf");
+      agent.setUtis(utis);
 
-    List<String> formatIds = new ArrayList<String>();
-    formatIds.add("format1");
-    agent.setFormatIds(formatIds);
+      List<String> formatIds = new ArrayList<String>();
+      formatIds.add("format1");
+      agent.setFormatIds(formatIds);
 
-    model.createAgent(agent);
+      model.createAgent(agent);
 
-    Agent agent2 = model.retrieveAgent(agent.getId());
-    assertNotNull(agent2);
-    assertEquals(agent.getId(), agent2.getId());
-    assertEquals(agent.getName(), agent2.getName());
+      Agent agent2 = model.retrieveAgent(agent.getId());
+      assertNotNull(agent2);
+      assertEquals(agent.getId(), agent2.getId());
+      assertEquals(agent.getName(), agent2.getName());
 
-    index.commit(Agent.class);
+      index.commit(Agent.class);
 
-    IndexResult<Agent> find = index.find(Agent.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find.getTotalCount());
+      IndexResult<Agent> find = index.find(Agent.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
 
-    Agent agent3 = index.retrieve(Agent.class, agent.getId());
-    assertNotNull(agent3);
-    assertEquals(agent.getId(), agent3.getId());
-    assertEquals(agent.getName(), agent3.getName());
+      Agent agent3 = index.retrieve(Agent.class, agent.getId());
+      assertNotNull(agent3);
+      assertEquals(agent.getId(), agent3.getId());
+      assertEquals(agent.getName(), agent3.getName());
 
-    agent3.setName("Agent New Name");
-    model.updateAgent(agent3);
+      agent3.setName("Agent New Name");
+      model.updateAgent(agent3);
 
-    index.commit(Agent.class);
+      Agent agent4 = index.retrieve(Agent.class, agent.getId());
+      assertNotNull(agent4);
+      assertEquals(agent.getId(), agent4.getId());
+      assertEquals(agent4.getName(), "Agent New Name");
 
-    IndexResult<Agent> find2 = index.find(Agent.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find2.getTotalCount());
+      model.deleteAgent(agent.getId());
 
-    Agent agent4 = index.retrieve(Agent.class, agent.getId());
-    assertNotNull(agent4);
-    assertEquals(agent.getId(), agent4.getId());
-
-    model.deleteAgent(agent.getId());
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(false);
+    }
   }
 
   @Test
-  public void testFormatIndex()
-    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Format format = new Format();
-    format.setName("Portable Document Format");
-    format.setDefinition("PDF definition");
-    format.setCategory("Page Layout Files");
-    format.setLatestVersion("1.7");
-    format.setPopularity(4);
-    format.setDeveloper("Adobe Systems");
-    format.setInitialRelease(new Date());
-    format.setStandard("ISO 32000-1");
-    format.setOpenFormat(true);
-    format.setWebsite("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html");
-    format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
+  public void testFormatIndex() {
+    try {
+      Format format = new Format();
+      format.setName("Portable Document Format");
+      format.setDefinition("PDF definition");
+      format.setCategory("Page Layout Files");
+      format.setLatestVersion("1.7");
+      format.setPopularity(4);
+      format.setDeveloper("Adobe Systems");
+      format.setInitialRelease(new Date());
+      format.setStandard("ISO 32000-1");
+      format.setOpenFormat(true);
+      format.setWebsite("https://www.adobe.com/devnet/pdf/pdf_reference_archive.html");
+      format.setProvenanceInformation("https://en.wikipedia.org/wiki/Portable_Document_Format");
 
-    List<String> extensions = new ArrayList<String>();
-    extensions.add(".pdf");
-    format.setExtensions(extensions);
+      List<String> extensions = new ArrayList<String>();
+      extensions.add(".pdf");
+      format.setExtensions(extensions);
 
-    List<String> mimetypes = new ArrayList<String>();
-    mimetypes.add("application/pdf");
-    format.setMimetypes(mimetypes);
+      List<String> mimetypes = new ArrayList<String>();
+      mimetypes.add("application/pdf");
+      format.setMimetypes(mimetypes);
 
-    List<String> pronoms = new ArrayList<String>();
-    pronoms.add("fmt/100");
-    format.setPronoms(pronoms);
+      List<String> pronoms = new ArrayList<String>();
+      pronoms.add("fmt/100");
+      format.setPronoms(pronoms);
 
-    List<String> utis = new ArrayList<String>();
-    utis.add("com.adobe.pdf");
-    format.setUtis(utis);
+      List<String> utis = new ArrayList<String>();
+      utis.add("com.adobe.pdf");
+      format.setUtis(utis);
 
-    model.createFormat(format);
+      model.createFormat(format);
 
-    index.commit(Format.class);
+      index.commit(Format.class);
 
-    Format format2 = model.retrieveFormat(format.getId());
-    assertNotNull(format2);
-    assertEquals(format.getId(), format2.getId());
-    assertEquals(format.getName(), format2.getName());
+      Format format2 = model.retrieveFormat(format.getId());
+      assertNotNull(format2);
+      assertEquals(format.getId(), format2.getId());
+      assertEquals(format.getName(), format2.getName());
 
-    IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find.getTotalCount());
+      IndexResult<Format> find = index.find(Format.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
 
-    Format format3 = index.retrieve(Format.class, format.getId());
-    assertNotNull(format3);
-    assertEquals(format.getId(), format3.getId());
-    assertEquals(format.getName(), format3.getName());
+      Format format3 = index.retrieve(Format.class, format.getId());
+      assertNotNull(format3);
+      assertEquals(format.getId(), format3.getId());
+      assertEquals(format.getName(), format3.getName());
 
-    format3.setName("Format New Name");
-    model.updateFormat(format3);
+      format3.setName("Format New Name");
+      model.updateFormat(format3);
 
-    index.commit(Format.class);
+      Format format4 = index.retrieve(Format.class, format.getId());
+      assertNotNull(format4);
+      assertEquals(format.getId(), format4.getId());
+      assertEquals(format4.getName(), "Format New Name");
 
-    IndexResult<Format> find2 = index.find(Format.class, null, null, new Sublist(0, 10));
-    assertEquals(1, find2.getTotalCount());
+      model.deleteFormat(format.getId());
 
-    Format format4 = index.retrieve(Format.class, format.getId());
-    assertNotNull(format4);
-    assertEquals(format.getId(), format4.getId());
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(false);
+    }
+  }
 
-    model.deleteFormat(format.getId());
+  @Test
+  public void testMessageIndex() {
+    try {
+      Message message = new Message();
+      message.setSubject("Message subject");
+      message.setBody("Message body");
+      message.setSentOn(new Date());
+      message.setFromUser("fromuser@example.com");
+      message.setRecipientUser("recipientuser@example.com");
+      model.createMessage(message);
+      // Thread.sleep(2000); sleep needed to pass the test (async)
 
+      Message message2 = model.retrieveMessage(message.getId());
+      assertNotNull(message2);
+      assertEquals(message.getId(), message2.getId());
+      assertEquals(message.getSubject(), message2.getSubject());
+
+      IndexResult<Message> find = index.find(Message.class, null, null, new Sublist(0, 10));
+      assertEquals(1, find.getTotalCount());
+
+      Message message3 = index.retrieve(Message.class, message.getId());
+      assertNotNull(message3);
+      assertEquals(message.getId(), message3.getId());
+      assertEquals(message3.getSubject(), message3.getSubject());
+
+      message3.setSubject("Message New Subject");
+      model.updateMessage(message3);
+
+      Message message4 = index.retrieve(Message.class, message.getId());
+      assertNotNull(message4);
+      assertEquals(message.getId(), message4.getId());
+      assertEquals(message4.getSubject(), "Message New Subject");
+
+      model.deleteMessage(message.getId());
+
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      assertTrue(false);
+    }
   }
 }

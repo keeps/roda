@@ -1,5 +1,6 @@
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.util.Date;
 import java.util.List;
 
 import org.roda.core.common.IdUtils;
@@ -16,6 +17,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -86,6 +88,15 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
       Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
+
+        Message message = new Message();
+        message.setSubject("Message subject");
+        message.setBody("Message body {from} to {recipient}, {acknowledge}");
+        message.setSentOn(new Date());
+        message.setFromUser("testesdoroda@gmail.com");
+        message.setRecipientUser("nunovieira220@gmail.com");
+        model.createMessage(message);
+
         boolean recursive = true;
         CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
           recursive);
@@ -102,6 +113,7 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
           for (Resource resource : allFormats) {
             String resourceName = resource.getStoragePath().getName();
             Format format = model.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
+            boolean hasAgent = false;
 
             if (format.getPronoms().contains(filePronom)) {
               if (!format.getMimetypes().contains(fileMimetype)) {
@@ -111,12 +123,24 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
               if (!format.getExtensions().contains(fileFormat)) {
                 // create risk ?
               }
+
+              if (model.retrieveAgentsFromFormat(format).size() > 0) {
+                hasAgent = true;
+              }
             }
 
             if (format.getMimetypes().contains(fileMimetype)) {
               if (!format.getExtensions().contains(fileFormat)) {
                 // create risk ?
               }
+
+              if (hasAgent == false && model.retrieveAgentsFromFormat(format).size() > 0) {
+                hasAgent = true;
+              }
+            }
+
+            if (hasAgent == false) {
+              // create risk ?
             }
           }
         }
@@ -125,9 +149,9 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.warn("File format plugin did not run properly");
         reportItem.setPluginState(PluginState.FAILURE);
+      } finally {
+        report.addReport(reportItem);
       }
-
-      report.addReport(reportItem);
     }
 
     return report;

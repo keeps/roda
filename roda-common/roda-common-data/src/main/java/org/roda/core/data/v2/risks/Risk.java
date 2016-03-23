@@ -19,6 +19,8 @@ public class Risk implements IsIndexed, Serializable {
   private static final long serialVersionUID = -585753367605901060L;
 
   private String id = null;
+  // FIXME uuid is needed but should it?
+  private String uuid = null;
   private String name = null;
   private String description = null;
   private Date identifiedOn = null;
@@ -248,21 +250,20 @@ public class Risk implements IsIndexed, Serializable {
   @Override
   public String toString() {
     return "Format [id=" + id + ", name=" + name + ", description=" + description + ", identifiedOn=" + identifiedOn
-      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes + ", preMitigationProbability="
-      + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact + ", preMitigationSeverity="
-      + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes + ", posMitigationProbability="
-      + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact + ", posMitigationSeverity="
-      + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes + ", mitigationStrategy="
-      + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner
-      + ", mitigationRelatedEventIdentifierType=" + mitigationRelatedEventIdentifierType
-      + ", mitigationRelatedEventIdentifierValue=" + mitigationRelatedEventIdentifierValue + ", affectedObjects="
-      + affectedObjects + "]";
+      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
+      + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
+      + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
+      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
+      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
+      + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
+      + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
+      + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
+      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
   }
 
   @JsonIgnore
   @Override
   public String getUUID() {
-    // FIXME 20160323 hsilva: see if this is the right way to do it
     return getId();
   }
 

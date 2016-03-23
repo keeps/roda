@@ -41,6 +41,7 @@ import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAgentPlugin;
 import org.roda.core.plugins.plugins.base.ReindexFormatPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
+import org.roda.core.plugins.plugins.base.ReindexMessagePlugin;
 import org.roda.core.plugins.plugins.base.ReindexRiskPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.entities.TaskList;
@@ -73,7 +74,7 @@ public class ManagementTasksResource extends RodaCoreService {
   public Response executeTask(
     @ApiParam(value = "", allowableValues = "index", defaultValue = "index") final @PathParam("sub_resource") String sub_resource,
     @ApiParam(value = "", allowableValues = "reindex,logclean", defaultValue = "reindex") final @PathParam("task_id") String task_id,
-    @ApiParam(value = "", allowableValues = "aip,job,risk,agent,format", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk,agent,format,message", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -116,6 +117,8 @@ public class ManagementTasksResource extends RodaCoreService {
             response = createJobToReindexAllAgents(user, startDate);
           } else if ("format".equals(entity)) {
             response = createJobToReindexAllFormats(user, startDate);
+          } else if ("message".equals(entity)) {
+            response = createJobToReindexAllMessages(user, startDate);
           }
         } else if ("logclean".equals(task_id)) {
           response = createJobForRunningLogCleaner(user, params);
@@ -153,9 +156,9 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex", null, duration);
+      registerAction(user, "ManagementTasks", "reindex risks", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      LOGGER.error("Error creating reindex job", e);
+      LOGGER.error("Error creating reindex Risks job", e);
     }
     return response;
   }
@@ -170,9 +173,9 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex", null, duration);
+      registerAction(user, "ManagementTasks", "reindex agents", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      LOGGER.error("Error creating reindex job", e);
+      LOGGER.error("Error creating reindex Agents job", e);
     }
     return response;
   }
@@ -187,9 +190,26 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex", null, duration);
+      registerAction(user, "ManagementTasks", "reindex formats", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      LOGGER.error("Error creating reindex job", e);
+      LOGGER.error("Error creating reindex Formats job", e);
+    }
+    return response;
+  }
+
+  private ApiResponseMessage createJobToReindexAllMessages(RodaUser user, Date startDate) {
+    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    Job job = new Job();
+    job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setPlugin(ReindexMessagePlugin.class.getCanonicalName());
+    try {
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Reindex job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "reindex messages", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating reindex Messages job", e);
     }
     return response;
   }

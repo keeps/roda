@@ -63,16 +63,16 @@ public class AgentList extends AsyncTableCell<Agent> {
     nameColumn = new TextColumn<Agent>() {
 
       @Override
-      public String getValue(Agent Agent) {
-        return Agent != null ? Agent.getName() : null;
+      public String getValue(Agent agent) {
+        return agent != null ? agent.getName() : null;
       }
     };
 
     typeColumn = new TextColumn<Agent>() {
 
       @Override
-      public String getValue(Agent Agent) {
-        return Agent != null ? Agent.getType() : null;
+      public String getValue(Agent agent) {
+        return agent != null ? agent.getType() : null;
       }
     };
 

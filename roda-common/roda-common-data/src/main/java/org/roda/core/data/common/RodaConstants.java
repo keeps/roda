@@ -83,6 +83,7 @@ public final class RodaConstants {
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_FORMAT_FOLDER = "format";
+  public static final String CORE_MESSAGE_FOLDER = "message";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -178,6 +179,7 @@ public final class RodaConstants {
   public static final String INDEX_RISK = "Risk";
   public static final String INDEX_AGENT = "Agent";
   public static final String INDEX_FORMAT = "Format";
+  public static final String INDEX_MESSAGE = "Message";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
   // "DescriptiveMetadata";
@@ -199,6 +201,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_RISK = "Risk";
   public static final String STORAGE_CONTAINER_AGENT = "Agent";
   public static final String STORAGE_CONTAINER_FORMAT = "Format";
+  public static final String STORAGE_CONTAINER_MESSAGE = "Message";
 
   /*
    * STORAGE DIRECTORIES
@@ -439,6 +442,19 @@ public final class RodaConstants {
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
 
+  /* Messages */
+  public static final String MESSAGE_ID = "id";
+  public static final String MESSAGE_SUBJECT = "subject";
+  public static final String MESSAGE_BODY = "body";
+  public static final String MESSAGE_SENT_ON = "sentOn";
+  public static final String MESSAGE_FROM_USER = "fromUser";
+  public static final String MESSAGE_RECIPIENT_USER = "recipientUser";
+  public static final String MESSAGE_ACKNOWLEDGE_TOKEN = "acknowledgeToken";
+  public static final String MESSAGE_IS_ACKNOWLEDGED = "isAcknowledged";
+  public static final String MESSAGE_ACKNOWLEDGED_ON = "acknowledgedOn";
+
+  public static final String MESSAGE_FILE_EXTENSION = ".json";
+
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
   public static final String VIEW_REPRESENTATION_REPRESENTATION = "representation";
@@ -510,12 +526,12 @@ public final class RodaConstants {
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
-    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
-    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
-    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
-    AUTHORIZATION_CHECK("authorization check"), DELETION("deletion");
+    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"), NORMALIZATION(
+      "normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"), ACCESSION(
+      "accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), WELLFORMEDNESS_CHECK(
+      "wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"), AUTHORIZATION_CHECK(
+      "authorization check"), DELETION("deletion");
 
     private final String text;
 

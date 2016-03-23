@@ -21,6 +21,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -113,8 +114,7 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
-    String fileId) {
+  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
     for (ModelObserver observer : observers) {
       observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId);
     }
@@ -255,6 +255,18 @@ public abstract class ModelObservable {
   protected void notifyFormatDeleted(String formatId) {
     for (ModelObserver observer : observers) {
       observer.formatDeleted(formatId);
+    }
+  }
+
+  protected void notifyMessageCreatedOrUpdated(Message message) {
+    for (ModelObserver observer : observers) {
+      observer.messageCreatedOrUpdated(message);
+    }
+  }
+
+  protected void notifyMessageDeleted(String messageId) {
+    for (ModelObserver observer : observers) {
+      observer.messageDeleted(messageId);
     }
   }
 }

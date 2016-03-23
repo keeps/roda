@@ -68,24 +68,24 @@ public class RiskList extends AsyncTableCell<Risk> {
     nameColumn = new TextColumn<Risk>() {
 
       @Override
-      public String getValue(Risk Risk) {
-        return Risk != null ? Risk.getName() : null;
+      public String getValue(Risk risk) {
+        return risk != null ? risk.getName() : null;
       }
     };
 
     identifiedOnColumn = new Column<Risk, Date>(new DateCell(
       DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
-      public Date getValue(Risk Risk) {
-        return Risk != null ? Risk.getIdentifiedOn() : null;
+      public Date getValue(Risk risk) {
+        return risk != null ? risk.getIdentifiedOn() : null;
       }
     };
 
     identifiedByColumn = new TextColumn<Risk>() {
 
       @Override
-      public String getValue(Risk Risk) {
-        return Risk != null ? Risk.getIdentifiedBy() : null;
+      public String getValue(Risk risk) {
+        return risk != null ? risk.getIdentifiedBy() : null;
       }
     };
 

@@ -39,6 +39,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.utils.SolrUtils;
@@ -90,8 +91,8 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter)
-    throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter) throws GenericException,
+    RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
@@ -121,8 +122,8 @@ public class IndexService {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
-  public void reindexAIPs()
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+  public void reindexAIPs() throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException {
     CloseableIterable<AIP> aips = null;
     try {
       LOGGER.info("{} > Listing AIPs", new Date().getTime());
@@ -190,14 +191,18 @@ public class IndexService {
     observer.formatCreatedOrUpdated(format);
   }
 
-  public void reindexActionLogs()
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+  public void reindexMessage(Message message) {
+    observer.messageCreatedOrUpdated(message);
+  }
+
+  public void reindexActionLogs() throws GenericException, NotFoundException, AuthorizationDeniedException,
+    RequestNotValidException {
     CloseableIterable<Resource> actionLogs = null;
 
     try {
       boolean recursive = false;
-      actionLogs = model.getStorage()
-        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+      actionLogs = model.getStorage().listResourcesUnderContainer(
+        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {

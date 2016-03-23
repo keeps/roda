@@ -410,6 +410,15 @@ public final class ModelUtils {
       + RodaConstants.FORMAT_FILE_EXTENSION);
   }
 
+  public static StoragePath getMessageContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_MESSAGE);
+  }
+
+  public static StoragePath getMessageStoragePath(String messageId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_MESSAGE, messageId
+      + RodaConstants.MESSAGE_FILE_EXTENSION);
+  }
+
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,
     List<String> directoryPath, String fileName, String fileSuffix, String type) throws RequestNotValidException {
 

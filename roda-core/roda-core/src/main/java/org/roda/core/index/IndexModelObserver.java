@@ -42,6 +42,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
@@ -698,6 +699,14 @@ public class IndexModelObserver implements ModelObserver {
   public void transferredResourceDeleted(String transferredResourceID) {
     deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
       "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
+  }
+
+  public void messageCreatedOrUpdated(Message message) {
+    addDocumentToIndex(RodaConstants.INDEX_MESSAGE, SolrUtils.messageToSolrDocument(message), "Error creating Message");
+  }
+
+  public void messageDeleted(String messageId) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_MESSAGE, messageId, "Error deleting Message (id=" + messageId + ")");
   }
 
 }

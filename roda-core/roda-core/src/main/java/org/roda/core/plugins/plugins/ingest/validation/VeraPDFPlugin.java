@@ -61,8 +61,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   public VeraPDFPlugin() {
     profile = "1b";
     hasFeatures = false;
-    hasPartialSuccessOnOutcome = Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools",
+      "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   @Override
@@ -180,11 +180,11 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
           LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
           pluginResultState = PluginState.FAILURE;
           reportItem.setPluginState(pluginResultState);
+        } finally {
+          LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
+          report.addReport(reportItem);
+          createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
         }
-
-        LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-        report.addReport(reportItem);
-        createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
       }
     }
 
@@ -232,11 +232,9 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
     try {
       // TODO fix linking identifiers
-      PluginHelper
-        .createPluginEvent(
-          this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(aip.getId(),
-            representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)),
-          null, pluginState, outcomeDetails, notify);
+      PluginHelper.createPluginEvent(this, aip.getId(), model, index, Arrays.asList(PluginHelper.getLinkingIdentifier(
+        aip.getId(), representationId, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE)), null, pluginState,
+        outcomeDetails, notify);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | ValidationException | AlreadyExistsException e) {
       LOGGER.error("Error creating event: " + e.getMessage(), e);

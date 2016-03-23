@@ -21,9 +21,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
@@ -37,9 +37,9 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
+public class ReindexMessagePlugin extends AbstractPlugin<Message> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAgentPlugin.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexMessagePlugin.class);
   private boolean clearIndexes = true;
 
   @Override
@@ -54,7 +54,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
   @Override
   public String getName() {
-    return "Reindex Agents";
+    return "Reindex Messages";
   }
 
   @Override
@@ -80,29 +80,30 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Agent> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<Message> list)
     throws PluginException {
 
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = false;
-      listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getAgentContainerPath(), recursive);
-      LOGGER.info("Reindexing all agents under " + ModelUtils.getAgentContainerPath());
+      listResourcesUnderDirectory = storage
+        .listResourcesUnderContainer(ModelUtils.getMessageContainerPath(), recursive);
+      LOGGER.info("Reindexing all messages under " + ModelUtils.getMessageContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
           Binary binary = (Binary) resource;
           InputStream inputStream = binary.getContent().createInputStream();
           String jsonString = IOUtils.toString(inputStream);
-          Agent agent = JsonUtils.getObjectFromJson(jsonString, Agent.class);
+          Message message = JsonUtils.getObjectFromJson(jsonString, Message.class);
           IOUtils.closeQuietly(inputStream);
-          index.reindexAgent(agent);
+          index.reindexMessage(message);
         }
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing agents", e);
+      LOGGER.error("Error re-indexing messages", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -116,7 +117,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
-        index.clearIndex(RodaConstants.INDEX_AGENT);
+        index.clearIndex(RodaConstants.INDEX_MESSAGE);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
       }
@@ -131,7 +132,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
-      index.optimizeIndex(RodaConstants.INDEX_AGENT);
+      index.optimizeIndex(RodaConstants.INDEX_MESSAGE);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }
@@ -140,8 +141,8 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
-  public Plugin<Agent> cloneMe() {
-    return new ReindexAgentPlugin();
+  public Plugin<Message> cloneMe() {
+    return new ReindexMessagePlugin();
   }
 
   @Override
@@ -162,16 +163,16 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Reindex all agents";
+    return "Reindex all messages";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "All agents reindexing run successfully";
+    return "All messages reindexing run successfully";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "All agents reindexing failed";
+    return "All messages reindexing failed";
   }
 }

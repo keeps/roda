@@ -19,6 +19,8 @@ public class Agent implements IsIndexed, Serializable {
   private static final long serialVersionUID = 7178184202935641440L;
 
   private String id = null;
+  // FIXME uuid is needed but should it?
+  private String uuid = null;
   private String name = null;
   private String type = null;
   private String description = null;
@@ -242,7 +244,6 @@ public class Agent implements IsIndexed, Serializable {
   @JsonIgnore
   @Override
   public String getUUID() {
-    // FIXME 20160323 hsilva: see if this is the right way to do it
     return getId();
   }
 
