@@ -571,6 +571,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipPermissionsUpdated(AIP aip) {
+    // FIXME 20160324 hsilva: permissions must be applied to all indexes (AIP, representation, file, preservation events)
     indexAIP(aip);
   }
 

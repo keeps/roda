@@ -291,12 +291,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private List<AIP> recalculateAIPsList(ModelService model, List<AIP> aips, Map<String, Report> reports,
     Map<String, String> aipIdToTransferredResourceId, boolean removeAIPProcessingFailed) {
     List<AIP> newAips = new ArrayList<>();
-    for (int i = 0; i < aips.size(); i++) {
-      AIP aip = aips.get(i);
+    for (AIP aip : aips) {
       String transferredResourceId = aipIdToTransferredResourceId.get(aip.getId());
       Report report = reports.get(transferredResourceId);
       if (removeAIPProcessingFailed && report.getPluginState() == PluginState.FAILURE) {
-        aips.remove(i);
+        LOGGER.debug("Removing AIP {} from the list", aip.getId());
       } else {
         try {
           newAips.add(model.retrieveAIP(aip.getId()));

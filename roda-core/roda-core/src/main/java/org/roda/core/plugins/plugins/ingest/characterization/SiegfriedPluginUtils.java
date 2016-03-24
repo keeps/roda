@@ -62,7 +62,7 @@ public class SiegfriedPluginUtils {
   }
 
   private static String getSiegfriedServerEndpoint(Path sourceDirectory) {
-    String siegfriedServer = RodaCoreFactory.getRodaConfigurationAsString("tools", "siegfried", "server");
+    String siegfriedServer = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "siegfried", "server");
     String endpoint = siegfriedServer + "/identify/" + new String(Base64.encode(sourceDirectory.toString().getBytes()));
     return endpoint;
   }
