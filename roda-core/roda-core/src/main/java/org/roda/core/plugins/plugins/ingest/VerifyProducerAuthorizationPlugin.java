@@ -89,7 +89,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       String details = AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED;
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
-      LOGGER.debug("Checking producer authorization for AIingest.submitP {}", aip.getId());
+      LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
       Job currentJob = null;
       try {
         currentJob = PluginHelper.getJobFromIndex(this, index);
@@ -113,7 +113,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
                 state = PluginState.FAILURE;
                 details = NO_PERMISSION_TO_CREATE_UNDER_AIP;
               }
-            } catch (NotFoundException nfe) { // parent not found
+            } catch (NotFoundException nfe) {
               state = PluginState.FAILURE;
               details = PARENT_AIP_NOT_FOUND;
             } catch (AuthorizationDeniedException e) { // doesn't have access to

@@ -41,14 +41,17 @@ public class AkkaWorkerActor extends UntypedActor {
       plugin.init();
       try {
         returnMessage = plugin.execute(index, model, storage, message.getList());
-      } catch (Exception e) {
+        getSender().tell(returnMessage, getSelf());
+      } catch (Throwable e) {
         logger.error("Error executing action!", e);
         returnMessage = new akka.actor.Status.Failure(e);
+        getSender().tell(returnMessage, getSelf());
+        throw e;
       } finally {
         plugin.shutdown();
-        getSender().tell(returnMessage, getSelf());
       }
-
+    } else {
+      unhandled(msg);
     }
   }
 

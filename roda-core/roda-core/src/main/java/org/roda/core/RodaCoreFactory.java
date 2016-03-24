@@ -1305,7 +1305,7 @@ public class RodaCoreFactory {
       Plugin<AIP> ttp = new TikaFullTextPlugin();
 
       Map<String, String> params = new HashMap<String, String>();
-      params.put("createsPluginEvent", "false");
+      params.put(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT, "false");
       psp.setParameterValues(params);
       sfp.setParameterValues(params);
       ttp.setParameterValues(params);

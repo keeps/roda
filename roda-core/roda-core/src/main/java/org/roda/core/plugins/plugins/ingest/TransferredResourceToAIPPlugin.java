@@ -105,6 +105,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
 
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
+        LOGGER.debug("Converting {} to AIP", transferredResourcePath);
 
         boolean active = false;
         Permissions permissions = new Permissions();
@@ -142,6 +143,7 @@ public class TransferredResourceToAIPPlugin extends AbstractPlugin<TransferredRe
         reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
         createWellformedEventSuccess(model, index, transferredResource, aip);
+        LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());
       } catch (Throwable e) {
         LOGGER.error("Error converting " + transferredResource.getId() + " to AIP", e);
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());

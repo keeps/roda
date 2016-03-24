@@ -12,6 +12,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
@@ -19,6 +22,7 @@ import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -37,8 +41,10 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
@@ -77,9 +83,8 @@ public class ValidationUtils {
       if (forceDescriptiveMetadataType) {
         if (validateDescriptiveMetadata) {
           ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), fallbackMetadataType,
-            fallbackMetadataVersion, true);
-          report.setValid(report.isValid() && dmReport.isValid());
-          report.getIssues().addAll(dmReport.getIssues());
+            fallbackMetadataVersion, false);
+          consolidateReports(report, dmReport);
         }
         // XXX review why should a validation method update data
         String message = "Forcing metadata type to " + fallbackMetadataType;
@@ -91,9 +96,9 @@ public class ValidationUtils {
       } else if (validateDescriptiveMetadata) {
         String metadataType = dm.getType() != null ? dm.getType() : fallbackMetadataType;
         String metadataVersion = dm.getType() != null ? dm.getVersion() : fallbackMetadataVersion;
-        ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType, metadataVersion, true);
-        report.setValid(report.isValid() && dmReport.isValid());
-        report.getIssues().addAll(dmReport.getIssues());
+        ValidationReport dmReport = validateDescriptiveBinary(binary.getContent(), metadataType, metadataVersion,
+          false);
+        consolidateReports(report, dmReport);
       }
 
     }
@@ -101,6 +106,42 @@ public class ValidationUtils {
     // TODO handle premis...
     return report;
 
+  }
+
+  public static ValidationReport consolidateReports(ValidationReport mainReport, ValidationReport innerReport) {
+    mainReport.setValid(mainReport.isValid() && innerReport.isValid());
+    if (StringUtils.isNotBlank(mainReport.getMessage())) {
+      mainReport.setMessage(mainReport.getMessage() + "\n" + innerReport.getMessage());
+    } else {
+      mainReport.setMessage(innerReport.getMessage());
+    }
+    mainReport.getIssues().addAll(innerReport.getIssues());
+
+    return mainReport;
+  }
+
+  public static boolean isXMLValid(ContentPayload xmlPayload) {
+    boolean valid = true;
+    InputStream inputStream = null;
+
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    factory.setValidating(false);
+    factory.setNamespaceAware(true);
+
+    try {
+      inputStream = xmlPayload.createInputStream();
+      SAXParser parser = factory.newSAXParser();
+      XMLReader reader = parser.getXMLReader();
+      reader.parse(new InputSource(inputStream));
+    } catch (IOException | ParserConfigurationException | SAXException e) {
+      // xml is not valid or an error occurred while instantiating the needed
+      // objects
+      valid = false;
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+
+    return valid;
   }
 
   /**
@@ -231,7 +272,6 @@ public class ValidationUtils {
           schemaStream = RodaCoreFactory.getConfigurationFileAsStream(
             RodaConstants.CORE_SCHEMAS_FOLDER + "/" + descriptiveMetadataType.toLowerCase() + ".xsd");
         }
-
       }
 
       if (schemaStream != null) {
@@ -257,8 +297,20 @@ public class ValidationUtils {
         }
       } else {
         if (failIfNoSchema) {
+          LOGGER.error(
+            "Will fail validating descriptive metadata with type '{}' and version '{}' because couldn't find its schema",
+            descriptiveMetadataType, descriptiveMetadataVersion);
           ret.setValid(false);
           ret.setMessage("No schema to validate " + descriptiveMetadataType);
+        } else {
+          LOGGER.info("Found no schema do validate descriptive metadata but will try to validate XML syntax...");
+          if (isXMLValid(descriptiveMetadataPayload)) {
+            ret.setValid(true);
+          } else {
+            ret.setValid(false);
+            ret.setMessage("XML is syntactically invalid");
+          }
+
         }
       }
     } catch (SAXException | IOException e) {

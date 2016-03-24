@@ -409,7 +409,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void executeJob(Job job) {
     LOGGER.info("Started processing job '{}' ({})", job.getName(), job.getId());
-    Future<Object> future = Patterns.ask(jobWorkersRouter, job, DEFAULT_TIMEOUT);
+
+    Future<Object> future = Patterns.ask(jobWorkersRouter, job, getJobTimeout(job));
 
     future.onSuccess(new OnSuccess<Object>() {
       @Override
@@ -424,6 +425,19 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
     }, workersSystem.dispatcher());
 
+  }
+
+  private Timeout getJobTimeout(Job job) {
+    int objectsCount = job.getObjectIds().size();
+    int blocks = 1;
+    if (objectsCount != 0) {
+      blocks = (objectsCount / BLOCK_SIZE);
+      if (objectsCount % BLOCK_SIZE != 0) {
+        blocks += 1;
+      }
+    }
+
+    return new Timeout(Duration.create(TIMEOUT * blocks, TIMEOUT_UNIT));
   }
 
   @Override

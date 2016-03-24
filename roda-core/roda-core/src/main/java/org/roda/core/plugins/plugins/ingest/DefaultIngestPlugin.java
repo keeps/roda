@@ -64,46 +64,46 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   public static final PluginParameter PARAMETER_SIP_TO_AIP_CLASS = new PluginParameter("parameter.sip_to_aip_class",
     "Format of the Submission Information Packages", PluginParameterType.PLUGIN_SIP_TO_AIP, "", true, false,
     "Select the format of the Submission Information Packages to be ingested in this ingest process.");
-
   public static final PluginParameter PARAMETER_PARENT_ID = new PluginParameter(RodaConstants.PLUGIN_PARAMS_PARENT_ID,
     "Parent Object", PluginParameterType.AIP_ID, "", false, false,
     "Use the provided parent object if the SIPs does not provide one.");
   public static final PluginParameter PARAMETER_FORCE_PARENT_ID = new PluginParameter(
     RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, "Force parent object", PluginParameterType.BOOLEAN, "false", false,
     false, "Use the provided parent object even if the SIPs provide one.");
-
   public static final PluginParameter PARAMETER_DO_VIRUS_CHECK = new PluginParameter("parameter.do_virus_check",
     AntivirusPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
     AntivirusPlugin.getStaticDescription());
-
+  public static final PluginParameter PARAMETER_DO_DESCRIPTIVE_METADATA_VALIDATION = new PluginParameter(
+    "parameter.do_descriptive_metadata_validation", AIPValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN,
+    "true", true, true, AIPValidationPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
     "parameter.do_pdftopdfa_conversion", PdfToPdfaPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true,
     false, PdfToPdfaPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_VERAPDF_CHECK = new PluginParameter("parameter.do_verapdf_check",
     VeraPDFPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true, false,
     VeraPDFPlugin.getStaticDescription());
-
   public static final PluginParameter PARAMETER_CREATE_PREMIS_SKELETON = new PluginParameter(
     "parameter.create.premis.skeleton", PremisSkeletonPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true,
     true, PremisSkeletonPlugin.getStaticDescription());
-  public static final PluginParameter PARAMETER_DO_SIP_SYNTAX_CHECK = new PluginParameter(
-    "parameter.do_sip_syntax_check", "XXX SIP syntax check", PluginParameterType.BOOLEAN, "true", true, true,
-    "XXX Check SIP coherence. Verifies the validity and completeness of a SIP.");
   public static final PluginParameter PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK = new PluginParameter(
     "parameter.do_producer_authorization_check", VerifyProducerAuthorizationPlugin.getStaticName(),
     PluginParameterType.BOOLEAN, "true", true, true, VerifyProducerAuthorizationPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_FILE_FORMAT_IDENTIFICATION = new PluginParameter(
     "parameter.do_file_format_identification", SiegfriedPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true",
     true, false, SiegfriedPlugin.getStaticDescription());
-  public static final PluginParameter PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION = new PluginParameter(
-    "parameter.do_metadata_and_full_text_extraction", TikaFullTextPlugin.getStaticName(), PluginParameterType.BOOLEAN,
-    "true", true, false, TikaFullTextPlugin.getStaticDescription());
+  public static final PluginParameter PARAMETER_DO_FEATURE_EXTRACTION = new PluginParameter(
+    "parameter.do_feature extraction", "Feature extraction", PluginParameterType.BOOLEAN, "true", true, false,
+    "Extraction of technical metadata using Apache Tika");
+  public static final PluginParameter PARAMETER_DO_FULL_TEXT_EXTRACTION = new PluginParameter(
+    "parameter.do_feature extraction", "Full-text extraction", PluginParameterType.BOOLEAN, "false", true, false,
+    "Extraction of full-text using Apache Tika");
+
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
     AutoAcceptSIPPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
     AutoAcceptSIPPlugin.getStaticDescription());
 
   private int stepsCompleted = 0;
-  private int totalSteps = 8;
+  private int totalSteps = 9;
   private Map<String, String> aipIdToTransferredResourceId;
 
   private String successMessage;
@@ -158,11 +158,13 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     pluginParameters.add(PARAMETER_PARENT_ID);
     pluginParameters.add(PARAMETER_FORCE_PARENT_ID);
     pluginParameters.add(PARAMETER_DO_VIRUS_CHECK);
+    pluginParameters.add(PARAMETER_DO_DESCRIPTIVE_METADATA_VALIDATION);
     pluginParameters.add(PARAMETER_CREATE_PREMIS_SKELETON);
-    pluginParameters.add(PARAMETER_DO_SIP_SYNTAX_CHECK);
-    pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
     pluginParameters.add(PARAMETER_DO_FILE_FORMAT_IDENTIFICATION);
-    pluginParameters.add(PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION);
+    pluginParameters.add(PARAMETER_DO_VERAPDF_CHECK);
+    pluginParameters.add(PARAMETER_DO_FEATURE_EXTRACTION);
+    pluginParameters.add(PARAMETER_DO_FULL_TEXT_EXTRACTION);
+    pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
     pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
     return pluginParameters;
   }
@@ -193,35 +195,46 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, parentId);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID, forceParentId ? "true" : "false");
 
-    // 1) transform TransferredResource into an AIP
-    // 1.1) obtain list of AIPs that were successfully transformed from
-    // transferred resources
+    // 1) unpacking & wellformedness check (transform TransferredResource into
+    // an AIP)
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     List<AIP> aips = getAIPsFromReports(model, storage, reports);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
 
+    // this event can only be created after AIPs exist and that's why it is
+    // performed here, after transformTransferredResourceIntoAnAIP
     createIngestStartedEvent(model, index, aipIdToTransferredResourceId, startDate);
 
-    // 2) do virus check
+    // 2) virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
+      aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
     }
 
-    // 2.1) do pdftopdfa conversion
-    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_PDFTOPDFA_CONVERSION)) {
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("maxKbytes", "20000");
-      pluginReport = doPDFtoPDFAConversion(index, model, storage, aips, params);
+    // 3) descriptive metadata validation
+    pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
+    reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
+
+    // 4) create file fixity information
+    pluginReport = createFileFixityInformation(index, model, storage, aips);
+    reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
+    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
+
+    // 5) format identification (using Siegfried)
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
+      pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
     }
 
-    // 2.2) do verapdf check
+    // 6) Format validation - PDF/A format validator (using VeraPDF)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VERAPDF_CHECK)) {
       Map<String, String> params = new HashMap<String, String>();
       params.put("profile", "1b");
@@ -230,73 +243,84 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-      // aips = recalculateAIPsList(aips, reports, aipIdToObjectId);
+      aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
     }
 
-    // 3) create premis skeleton
-    pluginReport = createPremisSkeleton(index, model, storage, aips);
-    reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
+    // 7) feature extraction (using Apache Tika)
+    // 8) full-text extraction (using Apache Tika)
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FEATURE_EXTRACTION)
+      || PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FULL_TEXT_EXTRACTION)) {
+      Map<String, String> params = new HashMap<String, String>();
+      params.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
+        PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FEATURE_EXTRACTION) ? "true" : "false");
+      params.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION,
+        PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FULL_TEXT_EXTRACTION) ? "true" : "false");
+      pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
+      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
+    }
 
-    // 4) verify if AIP is well formed
-    pluginReport = verifyIfAipIsWellFormed(index, model, storage, aips);
-    reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
+    // 9) validation of digital signature
+    // FIXME
 
-    // 5) verify if the user has permissions to ingest SIPS into the specified
-    // fonds
+    // 10) verify producer authorization
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    aips = recalculateAIPsList(aips, reports, aipIdToTransferredResourceId);
+    aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
 
-    // 6) do file format identification (sieg)
-    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
-      pluginReport = doFileFormatIdentification(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    }
-
-    // 7) do metadata and full text extraction (tika)
-    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_METADATA_AND_FULL_TEXT_EXTRACTION)) {
-      pluginReport = doMetadataAndFullTextExtraction(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
-    }
-
-    // 8) do auto accept
+    // 11) Auto accept
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_AUTO_ACCEPT)) {
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     }
+
+    // 12) delete SIP from transfer
+    // FIXME
 
     createIngestEndedEvent(model, index, aips, reports, aipIdToTransferredResourceId);
 
     return report;
   }
 
-  private List<AIP> recalculateAIPsList(List<AIP> aips, Map<String, Report> reports,
-    Map<String, String> aipIdToTransferredResourceId) {
+  /**
+   * Recalculates (if failures must be noticed) and updates AIP objects (by
+   * obtaining them from model)
+   */
+  private List<AIP> recalculateAIPsList(ModelService model, List<AIP> aips, Map<String, Report> reports,
+    Map<String, String> aipIdToTransferredResourceId, boolean removeAIPProcessingFailed) {
+    List<AIP> newAips = new ArrayList<>();
     for (int i = 0; i < aips.size(); i++) {
       AIP aip = aips.get(i);
       String transferredResourceId = aipIdToTransferredResourceId.get(aip.getId());
       Report report = reports.get(transferredResourceId);
-      if (report.getPluginState() == PluginState.FAILURE) {
+      if (removeAIPProcessingFailed && report.getPluginState() == PluginState.FAILURE) {
         aips.remove(i);
+      } else {
+        try {
+          newAips.add(model.retrieveAIP(aip.getId()));
+        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+          LOGGER.error("Error while retrieving AIP", e);
+        }
       }
     }
-    return aips;
+    return newAips;
   }
 
   private int calculateEfectiveTotalSteps() {
     int effectiveTotalSteps = totalSteps;
     for (PluginParameter pluginParameter : getParameters()) {
-      if (pluginParameter.getType() == PluginParameterType.BOOLEAN && pluginParameter != PARAMETER_FORCE_PARENT_ID
+      if (pluginParameter.getType() == PluginParameterType.BOOLEAN
+        && (pluginParameter != PARAMETER_FORCE_PARENT_ID && pluginParameter != PARAMETER_DO_FEATURE_EXTRACTION
+          && pluginParameter != PARAMETER_DO_FULL_TEXT_EXTRACTION)
         && !PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
         effectiveTotalSteps--;
       }
+    }
+    if (!PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FEATURE_EXTRACTION)
+      && !PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FULL_TEXT_EXTRACTION)) {
+      effectiveTotalSteps--;
     }
     return effectiveTotalSteps;
   }
@@ -349,7 +373,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       try {
         aips.add(model.retrieveAIP(aipId));
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        LOGGER.error("Error retrieving AIPs", e);
+        LOGGER.error("Error while retrieving AIP", e);
       }
     }
     LOGGER.debug("Done retrieving AIPs");
@@ -374,7 +398,9 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     if (plugin != null) {
       for (Report reportItem : plugin.getReports()) {
         if (StringUtils.isNotBlank(reportItem.getOtherId())) {
-          aipIdToTransferredResourceId.put(reportItem.getItemId(), reportItem.getOtherId());
+          if (StringUtils.isNotBlank(reportItem.getItemId())) {
+            aipIdToTransferredResourceId.put(reportItem.getItemId(), reportItem.getOtherId());
+          }
           Report report = new Report();
           report.addReport(reportItem);
           reports.put(reportItem.getOtherId(), report);
@@ -409,7 +435,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return report;
   }
 
-  private Report createPremisSkeleton(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
+  private Report createFileFixityInformation(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
     return executePlugin(index, model, storage, aips, PremisSkeletonPlugin.class.getName());
   }
 
@@ -417,17 +444,12 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return executePlugin(index, model, storage, aips, AntivirusPlugin.class.getName());
   }
 
-  private Report doPDFtoPDFAConversion(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
-    Map<String, String> params) {
-    return executePlugin(index, model, storage, aips, PdfToPdfaPlugin.class.getName(), params);
-  }
-
   private Report doVeraPDFCheck(IndexService index, ModelService model, StorageService storage, List<AIP> aips,
     Map<String, String> params) {
     return executePlugin(index, model, storage, aips, VeraPDFPlugin.class.getName(), params);
   }
 
-  private Report verifyIfAipIsWellFormed(IndexService index, ModelService model, StorageService storage,
+  private Report doDescriptiveMetadataValidation(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
     return executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
   }
@@ -442,9 +464,9 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     return executePlugin(index, model, storage, aips, SiegfriedPlugin.class.getName());
   }
 
-  private Report doMetadataAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
-    List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, TikaFullTextPlugin.class.getName());
+  private Report doFeatureAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips, Map<String, String> params) {
+    return executePlugin(index, model, storage, aips, TikaFullTextPlugin.class.getName(), params);
   }
 
   private Report doAutoAccept(IndexService index, ModelService model, StorageService storage, List<AIP> aips) {
@@ -485,8 +507,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     try {
       plugin.setParameterValues(mergedParams);
       report = plugin.execute(index, model, storage, aips);
-    } catch (PluginException | InvalidParameterException e) {
-      // FIXME handle failure
+    } catch (Throwable e) {
       LOGGER.error("Error executing plug-in", e);
     }
 

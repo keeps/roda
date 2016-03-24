@@ -30,7 +30,7 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME rename this to SIPValidationPlugin
+// FIXME 20160324 hsilva: rename this to DescriptiveMetadataValidationPlugin
 public class AIPValidationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
 
@@ -63,14 +63,22 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
     // do nothing
   }
 
-  @Override
-  public String getName() {
+  public static String getStaticName() {
     return "Descriptive metadata validation";
   }
 
   @Override
-  public String getDescription() {
+  public String getName() {
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
     return "Checks whether the descriptive metadata is included in the SIP and if this metadata is valid according to the established policy.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override

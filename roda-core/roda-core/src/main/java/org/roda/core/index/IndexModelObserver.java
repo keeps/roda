@@ -19,6 +19,7 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
@@ -59,6 +60,8 @@ import org.xml.sax.SAXException;
  *
  */
 public class IndexModelObserver implements ModelObserver {
+
+  private static final int TEN_MB_IN_BYTES = 10485760;
 
   private static final Logger LOGGER = LoggerFactory.getLogger(IndexModelObserver.class);
 
@@ -207,13 +210,16 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private String getFileFulltext(File file) {
-    String fulltext = null;
+    String fulltext = "";
     InputStream inputStream = null;
     try {
       Binary fulltextBinary = model.retrieveOtherMetadataBinary(file.getAipId(), file.getRepresentationId(),
         file.getPath(), file.getId(), TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE);
-      inputStream = fulltextBinary.getContent().createInputStream();
-      fulltext = IOUtils.toString(inputStream);
+      if (fulltextBinary.getSizeInBytes() < RodaCoreFactory.getRodaConfigurationAsInt(TEN_MB_IN_BYTES,
+        "core.index.fulltext_threshold_in_bytes")) {
+        inputStream = fulltextBinary.getContent().createInputStream();
+        fulltext = IOUtils.toString(inputStream);
+      }
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | IOException e) {
       LOGGER.warn("Error getting fulltext for file: " + file, e);
     } catch (NotFoundException e) {
@@ -324,7 +330,9 @@ public class IndexModelObserver implements ModelObserver {
   private void preservationEventActiveFlagUpdated(PreservationMetadata pm, boolean active)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     SolrServerException, IOException {
-    SolrInputDocument premisEventDocument = SolrUtils.preservationEventActiveFlagUpdateToSolrDocument(pm.getId(), active);
+    SolrInputDocument premisEventDocument = SolrUtils.preservationEventActiveFlagUpdateToSolrDocument(pm.getId(),
+      active);
+    premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 

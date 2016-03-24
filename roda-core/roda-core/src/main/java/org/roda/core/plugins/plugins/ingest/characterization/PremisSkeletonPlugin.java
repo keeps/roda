@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.xmlbeans.XmlException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -78,8 +79,9 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey("createsPluginEvent")) {
-      createsPluginEvent = Boolean.parseBoolean(getParameterValues().get("createsPluginEvent"));
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     }
   }
 

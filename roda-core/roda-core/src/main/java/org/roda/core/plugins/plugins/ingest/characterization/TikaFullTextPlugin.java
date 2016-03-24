@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -43,6 +44,9 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
+
+  private boolean doFeatureExtraction = true;
+  private boolean doFulltextExtraction = false;
 
   @Override
   public void init() throws PluginException {
@@ -81,8 +85,19 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey("createsPluginEvent")) {
-      createsPluginEvent = Boolean.parseBoolean(getParameterValues().get("createsPluginEvent"));
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
+    }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
+      doFeatureExtraction = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
+    }
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION)) {
+      doFulltextExtraction = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
     }
   }
 
@@ -95,11 +110,12 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
 
-      LOGGER.debug("Processing AIP " + aip.getId());
+      LOGGER.debug("Processing AIP {}", aip.getId());
       try {
         for (Representation representation : aip.getRepresentations()) {
-          LOGGER.debug("Processing representation " + representation.getId() + " of AIP " + aip.getId());
-          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
+          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+          TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation,
+            doFeatureExtraction, doFulltextExtraction);
           model.notifyRepresentationUpdated(representation);
         }
         reportItem.setPluginState(PluginState.SUCCESS);

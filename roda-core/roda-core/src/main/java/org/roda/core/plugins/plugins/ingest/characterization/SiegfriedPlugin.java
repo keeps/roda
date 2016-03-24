@@ -81,8 +81,9 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     super.setParameterValues(parameters);
 
     // updates the flag responsible to allow plugin event creation
-    if (getParameterValues().containsKey("createsPluginEvent")) {
-      createsPluginEvent = Boolean.parseBoolean(getParameterValues().get("createsPluginEvent"));
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT)) {
+      createsPluginEvent = Boolean
+        .parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
     }
   }
 

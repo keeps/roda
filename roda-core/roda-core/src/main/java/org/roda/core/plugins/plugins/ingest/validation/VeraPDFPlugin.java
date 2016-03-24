@@ -124,6 +124,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
       for (Representation representation : aip.getRepresentations()) {
         List<String> resourceList = new ArrayList<String>();
+        // FIXME 20160324 hsilva: the report item should be at AIP level (and
+        // not representation level)
         Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
         PluginState pluginResultState = PluginState.SUCCESS;
         StringBuilder details = new StringBuilder();

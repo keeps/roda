@@ -44,7 +44,7 @@ public class AbstractConvertPluginUtils {
     // TODO set agent
     PremisSkeletonPluginUtils.createPremisSkeletonOnRepresentation(model, storage, aip, representationId);
     SiegfriedPluginUtils.runSiegfriedOnRepresentation(plugin, index, model, storage, aip, representation);
-    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation);
+    TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(index, model, storage, aip, representation, true, true);
   }
 
 }

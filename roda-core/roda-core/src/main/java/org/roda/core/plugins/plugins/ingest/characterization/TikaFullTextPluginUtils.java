@@ -13,6 +13,7 @@ import java.io.Reader;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.tika.Tika;
 import org.apache.tika.metadata.Metadata;
 import org.roda.core.common.IdUtils;
@@ -48,8 +49,9 @@ public class TikaFullTextPluginUtils {
   private static final Tika tika = new Tika();
 
   public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation) throws NotFoundException, GenericException, RequestNotValidException,
-      AuthorizationDeniedException, ValidationException {
+    AIP aip, Representation representation, boolean doFeatureExtraction, boolean doFulltextExtraction)
+      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
+      ValidationException {
 
     boolean recursive = true;
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
@@ -58,7 +60,7 @@ public class TikaFullTextPluginUtils {
 
     for (File file : allFiles) {
 
-      if (!file.isDirectory()) {
+      if (!file.isDirectory() && (doFeatureExtraction || doFulltextExtraction)) {
         StoragePath storagePath = ModelUtils.getFileStoragePath(file);
         Binary binary = storage.getBinary(storagePath);
 
@@ -76,8 +78,10 @@ public class TikaFullTextPluginUtils {
             }
           });
 
-          model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
-            TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, notify);
+          if (doFulltextExtraction) {
+            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+              TikaFullTextPlugin.FILE_SUFFIX_FULLTEXT, TikaFullTextPlugin.OTHER_METADATA_TYPE, payload, notify);
+          }
 
         } catch (IOException | RODAException e) {
           LOGGER.error("Error running Apache Tika", e);
@@ -86,39 +90,41 @@ public class TikaFullTextPluginUtils {
         }
 
         try {
-          if (metadata != null && metadata.size() > 0) {
+          if (doFeatureExtraction && metadata != null && metadata.size() > 0) {
             String metadataAsString = MetadataFileUtils.generateMetadataFile(metadata);
             ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
             model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(),
               TikaFullTextPlugin.FILE_SUFFIX_METADATA, TikaFullTextPlugin.OTHER_METADATA_TYPE, metadataAsPayload,
               notify);
+
+            // update PREMIS
+            String creatingApplicationName = metadata.get("Application-Name");
+            String creatingApplicationVersion = metadata.get("Application-Version");
+            String dateCreatedByApplication = metadata.get("Creation-Date");
+
+            if (StringUtils.isNotBlank(creatingApplicationName) || StringUtils.isNotBlank(creatingApplicationVersion)
+              || StringUtils.isNotBlank(dateCreatedByApplication)) {
+              Binary premisBin = model.retrievePreservationFile(file);
+
+              gov.loc.premis.v3.File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
+              PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
+                dateCreatedByApplication);
+
+              PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
+              String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
+                file.getId());
+
+              ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
+
+              model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(),
+                file.getId(), premisFilePayload, notify);
+            }
           }
         } catch (IOException e) {
           LOGGER.error("Error running Apache Tika", e);
         } finally {
           IOUtils.closeQuietly(inputStream);
         }
-
-        // update PREMIS
-        String creatingApplicationName = metadata.get("Application-Name");
-        String creatingApplicationVersion = metadata.get("Application-Version");
-        String dateCreatedByApplication = metadata.get("Creation-Date");
-
-        Binary premisBin = model.retrievePreservationFile(file);
-
-        gov.loc.premis.v3.File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
-        PremisV3Utils.updateCreatingApplication(premisFile, creatingApplicationName, creatingApplicationVersion,
-          dateCreatedByApplication);
-
-        PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-        String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), file.getPath(),
-          file.getId());
-
-        ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
-
-        model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), file.getPath(), file.getId(),
-          premisFilePayload, notify);
-
       }
     }
     IOUtils.closeQuietly(allFiles);

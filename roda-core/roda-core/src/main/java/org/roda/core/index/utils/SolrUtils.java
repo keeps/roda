@@ -1048,6 +1048,30 @@ public class SolrUtils {
     return doc;
   }
 
+  private static SolrInputDocument permissionsUpdateToSolrDocument(String idField, String idValue,
+    Permissions permissions) {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(idField, idValue);
+
+    for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
+      String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
+      List<String> value = new ArrayList<>(entry.getValue());
+      Map<String, Object> fieldModifier = new HashMap<>(1);
+      fieldModifier.put("set", value);
+      doc.addField(key, fieldModifier);
+    }
+
+    for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
+      String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
+      List<String> value = new ArrayList<>(entry.getValue());
+      Map<String, Object> fieldModifier = new HashMap<>(1);
+      fieldModifier.put("set", value);
+      doc.addField(key, fieldModifier);
+    }
+
+    return doc;
+  }
+
   private static Permissions getPermissions(SolrDocument doc) {
 
     Permissions permissions = new Permissions();
