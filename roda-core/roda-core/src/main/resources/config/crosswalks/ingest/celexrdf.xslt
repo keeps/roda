@@ -36,7 +36,7 @@
     xmlns:j1="http://www.w3.org/2004/02/skos/core#"
     xmlns:j.2="http://publications.europa.eu/ontology/cdm/cmr#"
     exclude-result-prefixes="xs cdm CMRAnnotation j.2 j1 owl rdf rdfs xsd agent numpub celex case-event case cat_resourcetype cat_role-qualifier cat_procjur-type cat_case_status cat_country cat_procresult cat_procjur cat_fd_110 cat_fd_100 cat_fd_030 cat_fd_578 cat_fd_577 cat_fd_160 cat_fd_070 cat_treaty cat_procedure cat_court_formation cat_corporate-body cat_language tdm cat_event"
-    version="1.0">
+    version="2.0">
     
     <xsl:output method="xml" indent="yes"/>
     
@@ -48,11 +48,17 @@
     </xsl:template>
     
     <xsl:template match="cdm:work_date_document">
-        <field name="dateInitial"><xsl:value-of select="."/>T00:00:00Z</field>
+     	<xsl:variable name="dateInitial" select="."/>
+        <field name="dateInitial"><xsl:value-of select="format-date($dateInitial,'[Y0001]-[M01]-[D01]T00:00:00Z')"/></field>
     </xsl:template>
     
     <xsl:template match="cdm:work_date_creation_legacy">
-        <field name="dateFinal"><xsl:value-of select="."/>T00:00:00Z</field>
+        <xsl:variable name="dateFinal" select="."/>
+        <field name="work_date_creation_legacy_dts"><xsl:value-of select="format-date($dateFinal,'[Y0001]-[M01]-[D01]T00:00:00Z')"/></field>
+    </xsl:template>
+    
+    <xsl:template match="cdm:expression_uses_language">
+        <field name="expression_uses_language_txt"><xsl:value-of select="./@resource"/></field>
     </xsl:template>
     
     <xsl:template match="cdm:expression_title[@xml:lang='en']">
