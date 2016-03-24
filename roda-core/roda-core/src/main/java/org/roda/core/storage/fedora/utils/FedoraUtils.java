@@ -7,21 +7,24 @@
  */
 package org.roda.core.storage.fedora.utils;
 
-import java.util.Date;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.fcrepo.client.FedoraDatastream;
-import org.fcrepo.client.FedoraException;
-import org.roda.core.data.exceptions.GenericException;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.storage.Binary;
-import org.roda.core.storage.BinaryVersion;
-import org.roda.core.storage.DefaultBinaryVersion;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fedora.FedoraStorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Fedora related utility class
@@ -31,6 +34,7 @@ import org.roda.core.storage.fedora.FedoraStorageService;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public final class FedoraUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(FedoraUtils.class);
 
   /**
    * Private empty constructor
@@ -43,8 +47,53 @@ public final class FedoraUtils {
    * Creates a {@code String} version of a {@code StoragePath} for Fedora
    */
   public static String createFedoraPath(StoragePath storagePath) {
-    // XXX white spaces must be URL Encoded
-    return storagePath.asString().replaceAll(" ", "%20");
+    String[] tokens = storagePath.asString().split(DefaultStoragePath.SEPARATOR_REGEX);
+    for(int i=0;i<tokens.length;i++){
+      tokens[i] = doubleURLEncode(tokens[i]);
+    }
+    return StringUtils.join(tokens,DefaultStoragePath.SEPARATOR);
+    
+  /*return storagePath.asString().replaceAll(" ", "%20");
+
+   try {
+      List<String> encodedPath = new ArrayList<String>();
+      encodedPath.add(doubleURLEncode(storagePath.getContainerName()));
+      if(!storagePath.isFromAContainer()){
+        for (String s : storagePath.getDirectoryPath()) {
+          encodedPath.add(doubleURLEncode(s));
+        }
+        encodedPath.add(doubleURLEncode(storagePath.getName()));
+      }
+
+      return DefaultStoragePath.parse(encodedPath).asString();
+    } catch (RequestNotValidException rnve) {
+      LOGGER.error(rnve.getMessage(),rnve);
+      return storagePath.asString();
+    }*/
+  }
+
+  public static String doubleURLEncode(String origin) {
+    String encoded = origin;
+    String encoding = "UTF-8";
+    try {
+      encoded = URLEncoder.encode(encoded, encoding);
+      encoded = URLEncoder.encode(encoded, encoding);
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.error(uee.getMessage(),uee);
+    }
+    return encoded;
+  }
+  
+  public static String doubleURLDecode(String origin) {
+    String decoded = origin;
+    String encoding = "UTF-8";
+    try {
+      decoded = URLDecoder.decode(decoded, encoding);
+      decoded = URLDecoder.decode(decoded, encoding);
+    } catch (UnsupportedEncodingException uee) {
+      LOGGER.error(uee.getMessage(),uee);
+    }
+    return decoded;
   }
 
   /**
@@ -137,5 +186,21 @@ public final class FedoraUtils {
       }
     }
 
+  }
+
+  public static StoragePath doubleURLDecode(StoragePath storagePath) {
+    try {
+      List<String> encodedPath = new ArrayList<String>();
+      encodedPath.add(doubleURLDecode(storagePath.getContainerName()));
+      if(!storagePath.isFromAContainer()){
+        for (String s : storagePath.getDirectoryPath()) {
+          encodedPath.add(doubleURLDecode(s));
+        }
+        encodedPath.add(doubleURLDecode(storagePath.getName()));
+      }
+      return DefaultStoragePath.parse(encodedPath);
+    } catch (RequestNotValidException rnve) {
+      return storagePath;
+    }
   }
 }

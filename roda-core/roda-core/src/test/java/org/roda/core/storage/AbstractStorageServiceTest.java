@@ -36,7 +36,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
-import org.roda.core.storage.fs.FileStorageService;
 
 import jersey.repackaged.com.google.common.collect.Iterables;
 
@@ -926,81 +925,44 @@ public abstract class AbstractStorageServiceTest<T extends StorageService> {
 
     assertEquals(3, reusableBinaryVersions.size());
 
-    if(getStorage() instanceof FileStorageService){
-      // 7) get binary version
-      BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-      assertEquals(message1, binaryVersion1.getMessage());
+    // 7) get binary version
+    System.out.println(v1.getId());
+    BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+    assertEquals(message1, binaryVersion1.getMessage());
+    if(!(getStorage() instanceof FedoraStorageService)){
       assertNotNull(binaryVersion1.getCreatedDate());
-      assertTrue(
-        IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
-  
-      // 8) revert to previous version
-      getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
-  
-      Binary binary = getStorage().getBinary(binaryStoragePath);
-      testBinaryContent(binary, payload1);
-  
-      // 9) delete binary version
-      getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
-  
-      try {
-        getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-        fail("Should have thrown NotFoundException");
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-  
-      // 10) delete binary and all its history
-      getStorage().deleteResource(binaryStoragePath);
-  
-      try {
-        getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-        fail("Should have thrown NotFoundException");
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-    }else if(getStorage() instanceof FedoraStorageService){
-      // TODO Handle tests...
-      // 7) get binary version
-      /*
-      BinaryVersion binaryVersion1 = getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-      assertEquals(message1, binaryVersion1.getMessage());
-      assertNotNull(binaryVersion1.getCreatedDate());
-      assertTrue(
-        IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
-  */
-      // 8) revert to previous version
-      /*
-      getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
-  
-      Binary binary = getStorage().getBinary(binaryStoragePath);
-      testBinaryContent(binary, payload1);
-  */
-      // 9) delete binary version
-      /*
-      getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
-  
-      try {
-        getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-        fail("Should have thrown NotFoundException");
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-  */
-      // 10) delete binary and all its history
-      /*
-      getStorage().deleteResource(binaryStoragePath);
-  
-      try {
-        getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
-        fail("Should have thrown NotFoundException");
-      } catch (NotFoundException e) {
-        // do nothing
-      }
-      */
     }
+    assertTrue(
+      IOUtils.contentEquals(payload1.createInputStream(), binaryVersion1.getBinary().getContent().createInputStream()));
+
+    // 8) revert to previous version
+    getStorage().revertBinaryVersion(binaryStoragePath, v1.getId());
+
+    Binary binary = getStorage().getBinary(binaryStoragePath);
+    testBinaryContent(binary, payload1);
+
+    // 9) delete binary version
+    getStorage().deleteBinaryVersion(binaryStoragePath, v1.getId());
+
+    try {
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+      fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
+    // 10) delete binary and all its history
+    getStorage().deleteResource(binaryStoragePath);
+
+    try {
+      getStorage().getBinaryVersion(binaryStoragePath, v1.getId());
+      fail("Should have thrown NotFoundException");
+    } catch (NotFoundException e) {
+      // do nothing
+    }
+
     // cleanup
-    getStorage().deleteContainer(containerStoragePath);
+    //getStorage().deleteContainer(containerStoragePath);
   }
 
 }

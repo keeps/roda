@@ -212,8 +212,12 @@ public class BrowserHelper {
       }
     }
 
+    try{
     bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
       .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
+    }catch(Throwable t){
+      bundle.setHasHistory(false);
+    }
     return bundle;
   }
 

@@ -9,6 +9,8 @@ package org.roda.core.storage.fedora;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
@@ -18,6 +20,7 @@ import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.BadRequestException;
+import org.fcrepo.client.FedoraContent;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
 import org.fcrepo.client.FedoraObject;
@@ -316,9 +319,11 @@ public class FedoraStorageService implements StorageService {
       throw new GenericException("Creating binary as reference not yet supported");
     } else {
       try {
-        FedoraDatastream binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
-          FedoraConversionUtils.contentPayloadToFedoraContent(payload));
-
+        String path = FedoraUtils.createFedoraPath(storagePath);
+        LOGGER.debug("PATH: " + path);
+        FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
+        FedoraDatastream binary = fedoraRepository.createDatastream(path, fedoraContentPayload);
+        IOUtils.closeQuietly(fedoraContentPayload.getContent());
         return FedoraConversionUtils.fedoraDatastreamToBinary(binary);
       } catch (ForbiddenException e) {
         throw new AuthorizationDeniedException("Error creating binary", e);
@@ -327,6 +332,7 @@ public class FedoraStorageService implements StorageService {
       } catch (org.fcrepo.client.NotFoundException e) {
         throw new NotFoundException("Error creating binary", e);
       } catch (FedoraException e) {
+        LOGGER.error(e.getMessage(), e);
         throw new GenericException("Error creating binary", e);
       }
     }
@@ -347,8 +353,9 @@ public class FedoraStorageService implements StorageService {
           try {
             // XXX may want to change create object to native Fedora method that
             // creates a random datastream
-            binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath),
-              FedoraConversionUtils.contentPayloadToFedoraContent(payload));
+            FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
+            binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath), fedoraContentPayload);
+            IOUtils.closeQuietly(fedoraContentPayload.getContent());
           } catch (org.fcrepo.client.AlreadyExistsException e) {
             binary = null;
             LOGGER.warn("Got a colision when creating random bianry", e);
@@ -376,9 +383,9 @@ public class FedoraStorageService implements StorageService {
     } else {
       try {
         FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
-
-        datastream.updateContent(FedoraConversionUtils.contentPayloadToFedoraContent(payload));
-
+        FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
+        datastream.updateContent(fedoraContentPayload);
+        IOUtils.closeQuietly(fedoraContentPayload.getContent());
         return FedoraConversionUtils.fedoraDatastreamToBinary(datastream);
       } catch (ForbiddenException e) {
         throw new AuthorizationDeniedException("Error updating binary content", e);
@@ -646,8 +653,8 @@ public class FedoraStorageService implements StorageService {
             @Override
             public BinaryVersion next() {
               String next = versionsIterator.next();
-              String message = next.substring(next.length() - 36);
-              String id = next.substring(0, next.length() - 36);
+              String id = next.substring(0, 36);
+              String message = next.substring(36);
               BinaryVersion ret;
               try {
                 FedoraDatastream version = fedoraRepository.getDatastreamVersion(fedoraPath, next);
@@ -682,16 +689,14 @@ public class FedoraStorageService implements StorageService {
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
-      FedoraDatastream ds = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      String fullVersionID = getFullVersionID(binary, version);
+      System.out.println("FULL "+fullVersionID);
+      FedoraDatastream ds = fedoraRepository.getDatastreamVersion(FedoraUtils.createFedoraPath(storagePath), fullVersionID);
       if (!isDatastream(ds)) {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
-      System.out.println("FULL: "+version);
-      String message = version.substring(36);
-      String id = version.substring(0,36);
-      System.out.println("MESSAGE: "+message);
-      System.out.println("ID: "+id);
-      return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, id,message);
+      return FedoraConversionUtils.convertDataStreamToBinaryVersion(ds, version, fullVersionID.replace(version, ""));
     } catch (ForbiddenException e) {
       throw new NotFoundException(e.getMessage(), e);
     } catch (BadRequestException e) {
@@ -712,15 +717,19 @@ public class FedoraStorageService implements StorageService {
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
       String id = UUID.randomUUID().toString();
-      String version = id+message;
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
-      binary.createVersionSnapshot(version);
-      return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id,message);
+      String versionID = id+message;
+      String versionIDEncoded = URLEncoder.encode(versionID,"UTF-8");
+      LOGGER.warn("Creating version "+versionID+" ("+versionIDEncoded+")");
+      binary.createVersionSnapshot(versionIDEncoded);
+      return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id, message);
     } catch (ForbiddenException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (org.fcrepo.client.NotFoundException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (FedoraException e) {
+      throw new GenericException(e.getMessage(), e);
+    } catch (UnsupportedEncodingException e) {
       throw new GenericException(e.getMessage(), e);
     }
   }
@@ -730,7 +739,8 @@ public class FedoraStorageService implements StorageService {
     throws NotFoundException, RequestNotValidException, GenericException {
     try {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
-      binary.revertToVersion(version);
+      String fullVersionID = getFullVersionID(binary, version);
+      binary.revertToVersion(fullVersionID);
     } catch (ForbiddenException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (org.fcrepo.client.NotFoundException e) {
@@ -745,7 +755,8 @@ public class FedoraStorageService implements StorageService {
     throws NotFoundException, GenericException, RequestNotValidException {
     try {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
-      binary.deleteVersion(version);
+      String fullVersionID = getFullVersionID(binary, version);
+      binary.deleteVersion(fullVersionID);
     } catch (ForbiddenException e) {
       throw new GenericException(e.getMessage(), e);
     } catch (org.fcrepo.client.NotFoundException e) {
@@ -753,6 +764,26 @@ public class FedoraStorageService implements StorageService {
     } catch (FedoraException e) {
       throw new GenericException(e.getMessage(), e);
     }
+  }
+
+  private String getFullVersionID(FedoraDatastream binary, String shortVersion) {
+    System.out.println("Getting full from "+shortVersion);
+    String fullID = null;
+    try {
+      List<String> versions = binary.getVersionsName();
+      if (versions != null) {
+        for (String version : versions) {
+          System.out.println("V: "+version);
+          if (version.startsWith(shortVersion)) {
+            fullID = version;
+            break;
+          }
+        }
+      }
+    } catch (FedoraException fe) {
+      fe.printStackTrace();
+    }
+    return fullID;
   }
 
 }
