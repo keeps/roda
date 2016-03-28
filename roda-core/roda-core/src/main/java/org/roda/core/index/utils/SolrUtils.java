@@ -836,8 +836,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToLogEntry(doc));
     } else if (resultClass.equals(Report.class)) {
       ret = resultClass.cast(solrDocumentToJobReport(doc));
-    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
-      || resultClass.equals(Group.class)) {
+    } else
+      if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class) || resultClass.equals(Group.class)) {
       ret = resultClass.cast(solrDocumentToRodaMember(doc));
     } else if (resultClass.equals(TransferredResource.class)) {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
@@ -1531,8 +1531,7 @@ public class SolrUtils {
   public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
     SolrInputDocument transferredResource = new SolrInputDocument();
 
-    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID,
-      UUID.nameUUIDFromBytes(resource.getId().getBytes()).toString());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
     if (resource.getParentId() != null) {

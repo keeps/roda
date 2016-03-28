@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -41,10 +42,12 @@ public class FileVisitorChecker implements FileVisitor<Path> {
   public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
     Path relativePath = basePath.relativize(dir);
     if (relativePath.getNameCount() > 1) {
+      String id = UUID.nameUUIDFromBytes(relativePath.toString().getBytes()).toString();
+
       try {
-        index.retrieve(TransferredResource.class, relativePath.toString());
+        index.retrieve(TransferredResource.class, id);
       } catch (NotFoundException e) {
-        LOGGER.error("Could not find: " + relativePath);
+        LOGGER.error("Could not find: " + id);
         this.ok = false;
         this.pathsNotFound.add(relativePath);
       } catch (GenericException e) {
@@ -64,10 +67,11 @@ public class FileVisitorChecker implements FileVisitor<Path> {
   public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
     Path relativePath = basePath.relativize(file);
     if (relativePath.getNameCount() > 1) {
+      String id = UUID.nameUUIDFromBytes(relativePath.toString().getBytes()).toString();
       try {
-        index.retrieve(TransferredResource.class, relativePath.toString());
+        index.retrieve(TransferredResource.class, id);
       } catch (NotFoundException e) {
-        LOGGER.error("Could not find: " + relativePath);
+        LOGGER.error("Could not find: " + id);
         this.ok = false;
         this.pathsNotFound.add(relativePath);
       } catch (GenericException e) {

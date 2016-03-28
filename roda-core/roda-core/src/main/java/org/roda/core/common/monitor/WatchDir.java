@@ -102,7 +102,7 @@ public class WatchDir implements Runnable {
       WatchKey key;
       try {
         key = MonitorVariables.getInstance().getWatcher().take();
-      } catch (InterruptedException x) {
+      } catch (Throwable x) {
         return;
       }
       Path dir = MonitorVariables.getInstance().getKeys().get(key);
