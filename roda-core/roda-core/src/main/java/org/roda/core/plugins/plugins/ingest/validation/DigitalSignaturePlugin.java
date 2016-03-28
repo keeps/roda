@@ -25,7 +25,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -67,8 +66,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
 
   public DigitalSignaturePlugin() {
     doVerify = true;
-    doExtract = true;
-    doStrip = true;
+    doExtract = false;
+    doStrip = false;
     verificationAffectsOnOutcome = true;
 
     applicableTo = FileFormatUtils.getInputExtensions("digitalsignature");
@@ -130,19 +129,27 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     verificationAffectsOnOutcome = affects;
   }
 
+  public static String getStaticName() {
+    return "Validation of digital signature";
+  }
+
   @Override
   public String getName() {
-    return "Validation of digital signature";
+    return getStaticName();
+  }
+
+  public static String getStaticDescription() {
+    return "Check if a digital signatures are valid.";
+  }
+
+  @Override
+  public String getDescription() {
+    return getStaticDescription();
   }
 
   @Override
   public String getVersionImpl() {
     return "1.0";
-  }
-
-  @Override
-  public String getDescription() {
-    return "Check if a digital signatures are valid.";
   }
 
   @Override
@@ -215,7 +222,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               LOGGER.debug("Running DigitalSignaturePlugin on {}", file.getId());
 
               if (doVerify) {
-                LOGGER.debug("Verying digital signatures on {}", file.getId());
+                LOGGER.debug("Verifying digital signatures on {}", file.getId());
 
                 verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
                   fileMimetype);
@@ -254,7 +261,6 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                   File f = model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload, notify);
                   alteredFiles.add(file);
                   newFiles.add(f);
-                  IOUtils.closeQuietly(directAccess);
 
                   if (pluginResultState == 1)
                     reportItem.setPluginState(PluginState.SUCCESS);
@@ -268,6 +274,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
                 }
               }
+              IOUtils.closeQuietly(directAccess);
             } else {
               unchangedFiles.add(file);
             }
@@ -285,12 +292,13 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
           }
 
+          // FIXME 20160328 hsilva: this method needs to be revised
           AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
             newRepresentationID);
         }
 
         LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
-        boolean notifyEvent = false;
+        boolean notifyEvent = true;
         createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
           newRepresentationID, model, index, pluginResultState, notifyEvent);
 
@@ -301,12 +309,6 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       }
 
       report.addReport(reportItem);
-    }
-
-    try {
-      model.notifyAIPUpdated(aipId);
-    } catch (RODAException e) {
-      LOGGER.error("Error notifying update of AIP on DigitalSignaturePlugin ", e);
     }
 
     return report;

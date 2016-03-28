@@ -39,11 +39,12 @@ import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
-import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
+import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
+import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -74,8 +75,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     AntivirusPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
     AntivirusPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_DESCRIPTIVE_METADATA_VALIDATION = new PluginParameter(
-    "parameter.do_descriptive_metadata_validation", AIPValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN,
-    "true", true, true, AIPValidationPlugin.getStaticDescription());
+    "parameter.do_descriptive_metadata_validation", DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN,
+    "true", true, true, DescriptiveMetadataValidationPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
     "parameter.do_pdftopdfa_conversion", PdfToPdfaPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true,
     false, PdfToPdfaPlugin.getStaticDescription());
@@ -92,18 +93,21 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "parameter.do_file_format_identification", SiegfriedPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true",
     true, false, SiegfriedPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_FEATURE_EXTRACTION = new PluginParameter(
-    "parameter.do_feature extraction", "Feature extraction", PluginParameterType.BOOLEAN, "true", true, false,
+    "parameter.do_feature_extraction", "Feature extraction", PluginParameterType.BOOLEAN, "true", true, false,
     "Extraction of technical metadata using Apache Tika");
   public static final PluginParameter PARAMETER_DO_FULL_TEXT_EXTRACTION = new PluginParameter(
-    "parameter.do_feature extraction", "Full-text extraction", PluginParameterType.BOOLEAN, "false", true, false,
+    "parameter.do_fulltext_extraction", "Full-text extraction", PluginParameterType.BOOLEAN, "false", true, false,
     "Extraction of full-text using Apache Tika");
+  public static final PluginParameter PARAMETER_DO_DIGITAL_SIGNATURE_VALIDATION = new PluginParameter(
+    "parameter.do_digital_signature_validation", DigitalSignaturePlugin.getStaticName(), PluginParameterType.BOOLEAN,
+    "false", true, false, DigitalSignaturePlugin.getStaticDescription());
 
   public static final PluginParameter PARAMETER_DO_AUTO_ACCEPT = new PluginParameter("parameter.do_auto_accept",
     AutoAcceptSIPPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
     AutoAcceptSIPPlugin.getStaticDescription());
 
   private int stepsCompleted = 0;
-  private int totalSteps = 9;
+  private int totalSteps = 10;
   private Map<String, String> aipIdToTransferredResourceId;
 
   private String successMessage;
@@ -164,6 +168,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     pluginParameters.add(PARAMETER_DO_VERAPDF_CHECK);
     pluginParameters.add(PARAMETER_DO_FEATURE_EXTRACTION);
     pluginParameters.add(PARAMETER_DO_FULL_TEXT_EXTRACTION);
+    pluginParameters.add(PARAMETER_DO_DIGITAL_SIGNATURE_VALIDATION);
     pluginParameters.add(PARAMETER_DO_PRODUCER_AUTHORIZATION_CHECK);
     pluginParameters.add(PARAMETER_DO_AUTO_ACCEPT);
     return pluginParameters;
@@ -262,7 +267,12 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     }
 
     // 9) validation of digital signature
-    // FIXME
+    if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_DIGITAL_SIGNATURE_VALIDATION)) {
+      pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
+      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
+      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
+    }
 
     // 10) verify producer authorization
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
@@ -450,7 +460,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
 
   private Report doDescriptiveMetadataValidation(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
-    return executePlugin(index, model, storage, aips, AIPValidationPlugin.class.getName());
+    return executePlugin(index, model, storage, aips, DescriptiveMetadataValidationPlugin.class.getName());
   }
 
   private Report verifyProducerAuthorization(IndexService index, ModelService model, StorageService storage,
@@ -461,6 +471,11 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   private Report doFileFormatIdentification(IndexService index, ModelService model, StorageService storage,
     List<AIP> aips) {
     return executePlugin(index, model, storage, aips, SiegfriedPlugin.class.getName());
+  }
+
+  private Report doDigitalSignatureValidation(IndexService index, ModelService model, StorageService storage,
+    List<AIP> aips) {
+    return executePlugin(index, model, storage, aips, DigitalSignaturePlugin.class.getName());
   }
 
   private Report doFeatureAndFullTextExtraction(IndexService index, ModelService model, StorageService storage,

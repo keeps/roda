@@ -30,9 +30,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-// FIXME 20160324 hsilva: rename this to DescriptiveMetadataValidationPlugin
-public class AIPValidationPlugin extends AbstractPlugin<AIP> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(AIPValidationPlugin.class);
+public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DescriptiveMetadataValidationPlugin.class);
 
   public static final PluginParameter PARAMETER_VALIDATE_DESCRIPTIVE_METADATA = new PluginParameter(
     "parameter.validate_descriptive_metadata", "Validate descriptive metadata", PluginParameterType.BOOLEAN, "true",
@@ -164,7 +163,7 @@ public class AIPValidationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public Plugin<AIP> cloneMe() {
-    return new AIPValidationPlugin();
+    return new DescriptiveMetadataValidationPlugin();
   }
 
   @Override

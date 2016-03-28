@@ -108,7 +108,7 @@ import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginWorker;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
-import org.roda.core.plugins.plugins.base.AIPValidationPlugin;
+import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.base.FixityPlugin;
 import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
@@ -1356,12 +1356,10 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(premisSkeletonPlugin);
   }
 
-  private static void runValidationPlugin(String force, String forceOnly, String premis, String metadataType) {
+  private static void runValidationPlugin(String premis, String metadataType) {
     try {
-      Plugin<AIP> validationPlugin = new AIPValidationPlugin();
+      Plugin<AIP> validationPlugin = new DescriptiveMetadataValidationPlugin();
       Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("parameter.validation_force", force);
-      parameters.put("parameter.validation_force_only", forceOnly);
       parameters.put("parameter.validate_premis", premis);
       parameters.put("parameter.metadata_type", metadataType);
       validationPlugin.setParameterValues(parameters);
@@ -1637,7 +1635,7 @@ public class RodaCoreFactory {
     } else if ("bagit".equals(args.get(0))) {
       runBagitPlugin();
     } else if ("validation".equals(args.get(0))) {
-      runValidationPlugin(args.get(1), args.get(2), args.get(3), args.get(3));
+      runValidationPlugin(args.get(1), args.get(2));
     } else if ("logClean".equals(args.get(0))) {
       runLogCleanPlugin();
     } else if ("exifTool".equals(args.get(0))) {
