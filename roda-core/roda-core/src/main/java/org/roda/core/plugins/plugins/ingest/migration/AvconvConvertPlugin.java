@@ -64,6 +64,13 @@ public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertP
   }
 
   @Override
+  public Map<String, String> getParameterValues() {
+    Map<String, String> params = super.getParameterValues();
+    params.put("outputArguments", outputArguments);
+    return params;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 

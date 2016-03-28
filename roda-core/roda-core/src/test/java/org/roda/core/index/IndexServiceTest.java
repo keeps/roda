@@ -742,7 +742,8 @@ public class IndexServiceTest {
       message.setFromUser("Test Message Index");
       message.setRecipientUser("recipientuser@example.com");
       model.createMessage(message, "test-email-template");
-      // Thread.sleep(2000); sleep needed to pass the test (async)
+
+      index.commit(Message.class);
 
       Message message2 = model.retrieveMessage(message.getId());
       assertNotNull(message2);

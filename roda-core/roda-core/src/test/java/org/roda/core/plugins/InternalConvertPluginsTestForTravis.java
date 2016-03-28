@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
@@ -78,6 +79,7 @@ import org.slf4j.LoggerFactory;
 public class InternalConvertPluginsTestForTravis {
   private static final Logger LOGGER = LoggerFactory.getLogger(InternalConvertPluginsTestForTravis.class);
 
+  private static final String FAKE_JOB_ID = "NONE";
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
   private static Path basePath;
   private static ModelService model;
@@ -139,12 +141,15 @@ public class InternalConvertPluginsTestForTravis {
       .resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS).resolve(reps[corporaId])
       .resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
 
-    FSUtils.copy(corpora, f.getBasePath().resolve("testt"), true);
+    String transferredResourceId = "testt";
+    FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    LOGGER.info("Waiting for soft-commit");
-    Thread.sleep(AUTO_COMMIT_TIMEOUT);
+    Thread.sleep(1000);
 
-    resources.add(index.retrieve(TransferredResource.class, "testt"));
+    index.commit(TransferredResource.class);
+
+    resources.add(index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes())
+      .toString()));
     return resources;
   }
 
@@ -155,6 +160,7 @@ public class InternalConvertPluginsTestForTravis {
 
     Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     plugin.setParameterValues(parameters);
 
@@ -163,6 +169,8 @@ public class InternalConvertPluginsTestForTravis {
 
     Assert.assertEquals(1, transferredResources.size());
     RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, transferredResources);
+
+    index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
       RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -583,6 +591,7 @@ public class InternalConvertPluginsTestForTravis {
   public void testDigitalSignaturePlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
     IOException, NoSuchAlgorithmException {
     AIP aip = ingestCorpora(1);
+    String oldRepresentationId = aip.getRepresentations().get(0).getId();
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
@@ -610,13 +619,15 @@ public class InternalConvertPluginsTestForTravis {
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
         Assert.assertEquals(1, newReusableFiles.stream().filter(o -> o.getId().equals(f.getId())).count());
 
-        Binary binary = model.retrieveOtherMetadataBinary(aip.getId(), f.getRepresentationId(), f.getPath(), filename,
-          ".txt", "DigitalSignature");
+        Binary binary = model.retrieveOtherMetadataBinary(aip.getId(), oldRepresentationId, f.getPath(), filename,
+          ".xml", "DigitalSignature");
 
         Assert.assertTrue(binary.getSizeInBytes() > 0);
 
       }
     }
+
+    index.reindexAIP(aip);
 
     for (File file : newReusableFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -677,8 +688,8 @@ public class InternalConvertPluginsTestForTravis {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
     Assert.assertEquals("PARTIAL_SUCCESS", reports.get(0).getReports().get(0).getPluginState().toString());
 
-    Plugin<AIP> plugin2 = new PdfToPdfaPlugin<AIP>();
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin2);
+    Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
 
     Plugin<AIP> plugin3 = new VeraPDFPlugin();
     plugin3.setParameterValues(parameters);

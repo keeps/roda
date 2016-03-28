@@ -16,6 +16,7 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.commons.io.FileUtils;
 import org.ghost4j.Ghostscript;
 import org.ghost4j.GhostscriptException;
 import org.verapdf.core.ValidationException;
@@ -26,6 +27,7 @@ import org.verapdf.metadata.fixer.utils.FixerConfig;
 import org.verapdf.model.ModelParser;
 import org.verapdf.pdfa.PDFAValidator;
 import org.verapdf.pdfa.flavours.PDFAFlavour;
+import org.verapdf.pdfa.results.MetadataFixerResult;
 import org.verapdf.pdfa.results.ValidationResult;
 import org.verapdf.pdfa.validation.Profiles;
 import org.verapdf.pdfa.validation.ValidationProfile;
@@ -72,11 +74,16 @@ public class PdfToPdfaPluginUtils {
       ValidationResult result = validator.validate(loader);
       is.close();
 
-      // fixing metadata
-      OutputStream fixedOutputStream = new FileOutputStream(fixed.toString());
-      FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
-      MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
-      fixedOutputStream.close();
+      if (result.isCompliant()) {
+        FileUtils.copyFile(pdfa.toFile(), fixed.toFile());
+      } else {
+        // fixing metadata
+        OutputStream fixedOutputStream = new FileOutputStream(fixed.toString());
+        FixerConfig fconf = FixerConfigImpl.getFixerConfig(loader.getPDDocument(), result);
+        MetadataFixerResult mfr = MetadataFixerImpl.fixMetadata(fixedOutputStream, fconf);
+        fixedOutputStream.close();
+      }
+
       loader.close();
 
     } catch (ValidationException | FileNotFoundException e) {
