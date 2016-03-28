@@ -670,12 +670,6 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
-  @Override
-  public void transferredResourceDeleted(String transferredResourceID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
-      "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
-  }
-
   public void riskCreatedOrUpdated(Risk risk) {
     addDocumentToIndex(RodaConstants.INDEX_RISK, SolrUtils.riskToSolrDocument(risk), "Error creating Risk");
   }
