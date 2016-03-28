@@ -29,6 +29,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -85,7 +87,7 @@ public class MonitorIndexTest {
   }
 
   @Test
-  public void testCopyFolder() throws InterruptedException, IOException, SolrServerException {
+  public void testCopyFolder() throws InterruptedException, IOException, SolrServerException, GenericException {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
@@ -108,15 +110,18 @@ public class MonitorIndexTest {
     MonitorVariables.getInstance().getTaskBlocker().release();
     Thread.sleep(AUTO_COMMIT_TIMEOUT);
     MonitorVariables.getInstance().getTaskBlocker().acquire();
-    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+
+    index.commit(TransferredResource.class);
+
     FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
     Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
     MonitorVariables.getInstance().getTaskBlocker().release();
     assertTrue("Could not find " + fvc.getPathsNotFound().size() + " paths, other errors in log", fvc.isOk());
   }
 
   @Test
-  public void testAddEmptyFolder() throws IOException, InterruptedException, SolrServerException {
+  public void testAddEmptyFolder() throws IOException, InterruptedException, SolrServerException, GenericException {
 
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
@@ -139,8 +144,11 @@ public class MonitorIndexTest {
     MonitorVariables.getInstance().getTaskBlocker().release();
     Thread.sleep(AUTO_COMMIT_TIMEOUT);
     MonitorVariables.getInstance().getTaskBlocker().acquire();
-    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+
+    index.commit(TransferredResource.class);
+
     FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
     Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
     MonitorVariables.getInstance().getTaskBlocker().release();
     assertTrue("Could not find " + fvc.getPathsNotFound().size() + " paths, other errors in log", fvc.isOk());
@@ -148,7 +156,7 @@ public class MonitorIndexTest {
   }
 
   @Test
-  public void testBase() throws IOException, InterruptedException, SolrServerException {
+  public void testBase() throws IOException, InterruptedException, SolrServerException, GenericException {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
@@ -161,8 +169,10 @@ public class MonitorIndexTest {
     Thread.sleep(AUTO_COMMIT_TIMEOUT);
     MonitorVariables.getInstance().getTaskBlocker().acquire();
 
-    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+    index.commit(TransferredResource.class);
+
     FileVisitorChecker fvc = new FileVisitorChecker(sips, index);
+    EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
     Files.walkFileTree(sips, opts, Integer.MAX_VALUE, fvc);
     MonitorVariables.getInstance().getTaskBlocker().release();
     assertTrue("Could not find " + fvc.getPathsNotFound().size() + " paths, other errors in log", fvc.isOk());

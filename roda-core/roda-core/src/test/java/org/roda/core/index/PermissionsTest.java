@@ -90,6 +90,8 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+    
+    index.commitAIPs();
 
     RodaUser user = null;
     boolean showInactive = false;
@@ -142,6 +144,8 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+    
+    index.commitAIPs();
 
     RodaUser user = null;
     boolean showInactive = false;
@@ -194,6 +198,8 @@ public class PermissionsTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
 
+    index.commitAIPs();
+    
     RodaUser user = null;
     boolean showInactive = false;
     IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
@@ -244,6 +250,8 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
+    
+    index.commitAIPs();
 
     RodaUser user = null;
     boolean showInactive = false;

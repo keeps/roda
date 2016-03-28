@@ -62,7 +62,10 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -90,6 +93,8 @@ import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
 
 public class InternalPluginsTest {
+  private static final String FAKE_JOB_ID = "NONE";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(InternalPluginsTest.class);
 
   private static final int CORPORA_FILES_COUNT = 13;
@@ -133,6 +138,13 @@ public class InternalPluginsTest {
     corporaService = new FileStorageService(corporaPath);
 
     LOGGER.info("Running internal plugins tests under storage {}", basePath);
+
+    Job fakeJob = new Job();
+    fakeJob.setId(FAKE_JOB_ID);
+    fakeJob.setPluginType(PluginType.MISC);
+    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    model.createOrUpdateJob(fakeJob);
+    index.commit(Job.class);
   }
 
   @After
@@ -232,6 +244,7 @@ public class InternalPluginsTest {
     Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);
 
     TransferredResource transferredResource = createCorpora();
@@ -272,7 +285,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> plugin = new AntivirusPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
@@ -310,7 +323,7 @@ public class InternalPluginsTest {
     }
     IOUtils.closeQuietly(preservationMetadataList);
     Assert.assertTrue(found);
-    
+
     index.commitAIPs();
 
     Filter filter = new Filter();
@@ -328,7 +341,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> plugin = new PremisSkeletonPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
@@ -376,7 +389,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     premisSkeletonPlugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
@@ -384,7 +397,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> plugin = new SiegfriedPlugin();
     Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters2);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
@@ -480,7 +493,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     premisSkeletonPlugin.setParameterValues(parameters);
 
     List<String> aipIdList = Arrays.asList(aip.getId());
@@ -488,7 +501,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> plugin = new TikaFullTextPlugin();
     Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, Boolean.TRUE.toString());
     parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, Boolean.TRUE.toString());
     plugin.setParameterValues(parameters2);
@@ -541,7 +554,7 @@ public class InternalPluginsTest {
 
     Plugin<AIP> autoAcceptPlugin = new AutoAcceptSIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     autoAcceptPlugin.setParameterValues(parameters);
 
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(autoAcceptPlugin, Arrays.asList(aip.getId()));
