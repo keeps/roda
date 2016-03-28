@@ -1120,10 +1120,10 @@ public class SolrUtils {
       groups.addAll(objectToListString(doc.get(key)));
       groupPermissions.put(type, groups);
     }
-    
+
     permissions.setUsers(userPermissions);
     permissions.setGroups(userPermissions);
-    
+
     return permissions;
   }
 
@@ -1495,8 +1495,10 @@ public class SolrUtils {
     String uuid = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_UUID));
     String fullPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH));
     String parentId = null;
+    String parentUUID = null;
     if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)) {
       parentId = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
+      parentUUID = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID));
     }
     String relativePath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH));
 
@@ -1520,6 +1522,7 @@ public class SolrUtils {
     tr.setRelativePath(relativePath);
     tr.setSize(size);
     tr.setParentId(parentId);
+    tr.setParentUUID(parentUUID);
     tr.setFile(isFile);
     tr.setAncestorsPaths(ancestorsPath);
     return tr;
@@ -1534,6 +1537,8 @@ public class SolrUtils {
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
     if (resource.getParentId() != null) {
       transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, resource.getParentId());
+      transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID,
+        UUID.nameUUIDFromBytes(resource.getParentId().getBytes()).toString());
     }
     if (resource.getRelativePath() != null) {
       transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_RELATIVEPATH, resource.getRelativePath());

@@ -291,6 +291,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_UUID = "uuid";
   public static final String TRANSFERRED_RESOURCE_FULLPATH = "fullPath";
   public static final String TRANSFERRED_RESOURCE_PARENT_ID = "parentId";
+  public static final String TRANSFERRED_RESOURCE_PARENT_UUID = "parentUUID";
   public static final String TRANSFERRED_RESOURCE_RELATIVEPATH = "relativePath";
   public static final String TRANSFERRED_RESOURCE_DATE = "date";
   public static final String TRANSFERRED_RESOURCE_ISFILE = "isFile";

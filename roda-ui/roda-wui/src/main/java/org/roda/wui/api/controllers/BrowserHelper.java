@@ -877,11 +877,11 @@ public class BrowserHelper {
   public static String createTransferredResourcesFolder(String parent, String folderName, boolean forceCommit)
     throws GenericException {
     try {
-      String id = RodaCoreFactory.getFolderMonitor().createFolder(parent, folderName);
+      String uuid = RodaCoreFactory.getFolderMonitor().createFolder(parent, folderName);
       if (forceCommit) {
         RodaCoreFactory.getFolderMonitor().commit();
       }
-      return id;
+      return uuid;
     } catch (IOException | SolrServerException e) {
       LOGGER.error("Error creating transferred resource folder", e);
       throw new GenericException("Error creating transferred resource folder: " + e.getMessage());

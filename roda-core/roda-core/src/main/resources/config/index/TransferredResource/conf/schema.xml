@@ -82,6 +82,8 @@
 		required="true" multiValued="false" />
 	<field name="parentId" type="string" indexed="true" stored="true"
 		required="false" multiValued="false" />
+	<field name="parentUUID" type="string" indexed="true" stored="true"
+		required="false" multiValued="false" />
 	<field name="ancestors" type="string" indexed="true" stored="true"
 		required="false" multiValued="true" />
 	<field name="relativePath" type="string" indexed="true" stored="true"

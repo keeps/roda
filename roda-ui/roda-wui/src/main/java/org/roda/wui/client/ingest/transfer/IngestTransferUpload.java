@@ -172,9 +172,9 @@ public class IngestTransferUpload extends Composite {
       updateUploadForm();
     } else {
       // Upload to directory
-      String transferredResourceId = IngestTransfer.getTransferredResourceIdFromPath(historyTokens);
-      if (transferredResourceId != null) {
-        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceId,
+      String transferredResourceUUID = historyTokens.get(0);
+      if (transferredResourceUUID != null) {
+        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
           new AsyncCallback<TransferredResource>() {
 
             @Override
@@ -271,7 +271,7 @@ public class IngestTransferUpload extends Composite {
 
   void historyBack() {
     if (resource != null) {
-      Tools.newHistory(IngestTransfer.RESOLVER, IngestTransfer.getPathFromTransferredResourceId(resource.getId()));
+      Tools.newHistory(IngestTransfer.RESOLVER, resource.getUUID());
     } else {
       Tools.newHistory(IngestTransfer.RESOLVER);
     }

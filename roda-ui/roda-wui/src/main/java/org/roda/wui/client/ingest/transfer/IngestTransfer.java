@@ -56,6 +56,7 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
+import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -204,7 +205,7 @@ public class IngestTransfer extends Composite {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
         if (r != null) {
           basicSearch.clearSearchInputBox();
-          Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(r.getId()));
+          Tools.newHistory(RESOLVER, r.getUUID());
         }
       }
     });
@@ -293,16 +294,22 @@ public class IngestTransfer extends Composite {
 
     ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
     if (r != null) {
-      List<String> pathBuilder = new ArrayList<String>();
-      pathBuilder.addAll(RESOLVER.getHistoryPath());
 
-      String[] parts = r.getId().split(TRANSFERRED_RESOURCE_ID_SEPARATOR);
-      for (String part : parts) {
-        SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(part);
-        pathBuilder.add(part);
-        List<String> path = new ArrayList<>(pathBuilder);
+      // add parent
+      if (r.getParentUUID() != null) {
+        List<String> path = new ArrayList<String>();
+        path.addAll(RESOLVER.getHistoryPath());
+        path.add(r.getParentUUID());
+        SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getParentId());
         ret.add(new BreadcrumbItem(breadcrumbLabel, path));
       }
+
+      // add self
+      List<String> path = new ArrayList<String>();
+      path.addAll(RESOLVER.getHistoryPath());
+      path.add(r.getUUID());
+      SafeHtml breadcrumbLabel = SafeHtmlUtils.fromString(r.getName());
+      ret.add(new BreadcrumbItem(breadcrumbLabel, path));
     }
 
     return ret;
@@ -316,9 +323,9 @@ public class IngestTransfer extends Composite {
       && historyTokens.get(0).equals(IngestTransferUpload.RESOLVER.getHistoryToken())) {
       IngestTransferUpload.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
-      String transferredResourceId = getTransferredResourceIdFromPath(historyTokens);
-      if (transferredResourceId != null) {
-        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceId,
+      String transferredResourceUUID = historyTokens.get(0);
+      if (transferredResourceUUID != null) {
+        BrowserService.Util.getInstance().retrieve(TransferredResource.class.getName(), transferredResourceUUID,
           new AsyncCallback<TransferredResource>() {
 
             @Override
@@ -361,21 +368,6 @@ public class IngestTransfer extends Composite {
 
   }
 
-  public static String getTransferredResourceIdFromPath(List<String> historyTokens) {
-    String ret;
-    if (historyTokens.size() > 0) {
-      ret = Tools.join(historyTokens, TRANSFERRED_RESOURCE_ID_SEPARATOR);
-    } else {
-      ret = null;
-    }
-
-    return ret;
-  }
-
-  public static List<String> getPathFromTransferredResourceId(String transferredResourceId) {
-    return Arrays.asList(transferredResourceId.split(TRANSFERRED_RESOURCE_ID_SEPARATOR));
-  }
-
   protected void updateVisibles() {
     uploadFiles.setEnabled(resource == null || !resource.isFile());
     createFolder.setEnabled(resource == null || !resource.isFile());
@@ -389,7 +381,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
     if (resource != null) {
-      Tools.newHistory(IngestTransferUpload.RESOLVER, getPathFromTransferredResourceId(resource.getId()));
+      Tools.newHistory(IngestTransferUpload.RESOLVER, resource.getUUID());
     } else {
       Tools.newHistory(IngestTransferUpload.RESOLVER);
     }
@@ -417,8 +409,8 @@ public class IngestTransfer extends Composite {
             }
 
             @Override
-            public void onSuccess(String newResourceId) {
-              Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(newResourceId));
+            public void onSuccess(String newResourceUUID) {
+              Tools.newHistory(RESOLVER, newResourceUUID);
             }
           });
         }
@@ -459,7 +451,7 @@ public class IngestTransfer extends Composite {
                   public void onSuccess(Void result) {
                     Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                       messages.ingestTransferRemoveSuccessMessage(1L));
-                    Tools.newHistory(RESOLVER, getPathFromTransferredResourceId(resource.getParentId()));
+                    Tools.newHistory(RESOLVER, resource.getParentUUID());
                   }
                 });
               }

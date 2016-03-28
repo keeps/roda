@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -157,12 +158,16 @@ public class FolderMonitorNIO {
     }
     tr.setFile(!Files.isDirectory(resourcePath));
     tr.setFullPath(resourcePath.toString());
-    tr.setId(relativeToBase.toString());
+    String id = relativeToBase.toString();
+    tr.setId(id);
+    tr.setUUID(UUID.nameUUIDFromBytes(id.getBytes()).toString());
     tr.setName(resourcePath.getFileName().toString());
 
     tr.setRelativePath(relativeToBase.toString());
     if (relativeToBase.getParent() != null) {
-      tr.setParentId(relativeToBase.getParent().toString());
+      String parentId = relativeToBase.getParent().toString();
+      tr.setParentId(parentId);
+      tr.setParentUUID(UUID.nameUUIDFromBytes(parentId.getBytes()).toString());
     }
 
     try {

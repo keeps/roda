@@ -768,13 +768,13 @@ public class Browser extends RodaCoreService {
 
     // delegate
     try {
-      String id = BrowserHelper.createTransferredResourcesFolder(parent, folderName, forceCommit);
+      String uuid = BrowserHelper.createTransferredResourcesFolder(parent, folderName, forceCommit);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,
         FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, true);
-      return id;
+      return uuid;
     } catch (GenericException e) {
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM, parent,

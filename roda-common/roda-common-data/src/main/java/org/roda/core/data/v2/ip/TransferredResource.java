@@ -20,6 +20,7 @@ public class TransferredResource implements IsIndexed {
   private String fullPath;
   private String relativePath;
   private String parentId;
+  private String parentUUID;
   private List<String> ancestorsPaths;
 
   private long size;
@@ -101,6 +102,14 @@ public class TransferredResource implements IsIndexed {
 
   public void setParentId(String parentId) {
     this.parentId = parentId;
+  }
+
+  public String getParentUUID() {
+    return parentUUID;
+  }
+
+  public void setParentUUID(String parentUUID) {
+    this.parentUUID = parentUUID;
   }
 
   public List<String> getAncestorsPaths() {
