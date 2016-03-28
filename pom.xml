@@ -1037,6 +1037,11 @@
 			</dependency>
 			<!-- Akka related dependencies - end -->
 			<dependency>
+				<groupId>com.github.spullara.mustache.java</groupId>
+				<artifactId>compiler</artifactId>
+				<version>0.9.1</version>
+			</dependency>
+			<dependency>
 				<groupId>org.reflections</groupId>
 				<artifactId>reflections</artifactId>
 				<version>0.9.10</version>

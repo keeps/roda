@@ -739,9 +739,9 @@ public class IndexServiceTest {
       message.setSubject("Message subject");
       message.setBody("Message body");
       message.setSentOn(new Date());
-      message.setFromUser("fromuser@example.com");
+      message.setFromUser("Test Message Index");
       message.setRecipientUser("recipientuser@example.com");
-      model.createMessage(message);
+      model.createMessage(message, "test-email-template");
       // Thread.sleep(2000); sleep needed to pass the test (async)
 
       Message message2 = model.retrieveMessage(message.getId());

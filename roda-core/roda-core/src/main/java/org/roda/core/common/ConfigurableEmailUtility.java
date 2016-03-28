@@ -18,7 +18,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.roda.core.RodaCoreFactory;
 
 import com.sun.mail.smtp.SMTPTransport;
@@ -43,7 +42,7 @@ public class ConfigurableEmailUtility {
     Message msg = new MimeMessage(session);
 
     // set the from and to address
-    InternetAddress addressFrom = new InternetAddress(from);
+    InternetAddress addressFrom = new InternetAddress(login);
     msg.setFrom(addressFrom);
 
     InternetAddress[] addressTo = new InternetAddress[recipients.length];
@@ -52,8 +51,7 @@ public class ConfigurableEmailUtility {
     }
     msg.setRecipients(Message.RecipientType.TO, addressTo);
 
-    String htmlMessage = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-      + "<html><body><pre>%s</pre></body></html>", StringEscapeUtils.escapeHtml(message));
+    String htmlMessage = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>%s", message);
 
     MimeMultipart mimeMultipart = new MimeMultipart();
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
@@ -61,6 +59,7 @@ public class ConfigurableEmailUtility {
     mimeMultipart.addBodyPart(mimeBodyPart);
 
     // Setting the Subject and Content Type
+    msg.addHeader("name", from);
     msg.setSubject(subject);
     msg.setContent(mimeMultipart);
 

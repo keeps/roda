@@ -9,6 +9,9 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,8 +19,10 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,6 +86,9 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.MustacheFactory;
 
 /**
  * Class that "relates" Model & Storage
@@ -412,6 +420,7 @@ public class ModelService extends ModelObservable {
 
   public AIP updateAIPActiveFlag(AIP aip)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+
     updateAIPMetadata(aip);
     notifyAipActiveFlagUpdated(aip);
 
@@ -1787,31 +1796,22 @@ public class ModelService extends ModelObservable {
   /***************** Message related *****************/
   /************************************************/
 
-  public void createMessage(Message message) throws GenericException {
+  public void createMessage(Message message, String templateName) throws GenericException {
     try {
       message.setId(UUID.randomUUID().toString());
       message.setAcknowledgeToken(UUID.randomUUID().toString());
 
-      // update body message with the recipient user and acknowledge URL
-      String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
-      ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
-      ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken());
-
-      String fromTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "fromTag");
-      String recipientTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "recipientTag");
-      String acknowledgeTag = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "acknowledgeTag");
-
-      String body = message.getBody();
-      body = body.replaceAll(fromTag, message.getFromUser());
-      body = body.replaceAll(recipientTag, message.getRecipientUser());
-      body = body.replaceAll(acknowledgeTag, ackUrl);
+      String body = getUpdatedMessageBody(message, templateName);
       message.setBody(body);
 
-      LOGGER.info("Sending message ...");
-      String[] recipients = {message.getRecipientUser()};
-      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility();
-      emailUtility.sendMail(message.getFromUser(), recipients, message.getSubject(), body);
-      LOGGER.info("Message sent");
+      String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
+      if (host != null && !host.equals("")) {
+        LOGGER.info("Sending email ...");
+        String[] recipients = {message.getRecipientUser()};
+        ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility();
+        emailUtility.sendMail(message.getFromUser(), recipients, message.getSubject(), message.getBody());
+        LOGGER.info("Email sent");
+      }
 
       String messageAsJson = JsonUtils.getJsonFromObject(message);
       StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
@@ -1822,6 +1822,28 @@ public class ModelService extends ModelObservable {
     }
 
     notifyMessageCreatedOrUpdated(message);
+  }
+
+  private String getUpdatedMessageBody(Message message, String templateName) {
+    // update body message with the recipient user and acknowledge URL
+    String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
+    ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
+    ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken());
+
+    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
+
+    Map<String, Object> scopes = new HashMap<String, Object>();
+    scopes.put("from", message.getFromUser());
+    scopes.put("recipient", message.getRecipientUser());
+    scopes.put("acknowledge", ackUrl);
+
+    Writer writer = new StringWriter();
+    MustacheFactory mf = new DefaultMustacheFactory();
+    com.github.mustachejava.Mustache mustache = mf.compile(new InputStreamReader(templateStream), templateName);
+    mustache.execute(writer, scopes);
+    String template = writer.toString();
+    IOUtils.closeQuietly(templateStream);
+    return template;
   }
 
   public void updateMessage(Message message) throws GenericException {

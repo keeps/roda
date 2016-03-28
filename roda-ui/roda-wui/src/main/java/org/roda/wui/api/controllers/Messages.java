@@ -47,7 +47,7 @@ public class Messages extends RodaCoreService {
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createMessage(message);
+    RodaCoreFactory.getModelService().createMessage(message, "test-email-template");
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
