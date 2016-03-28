@@ -9,6 +9,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "agent")
@@ -238,6 +239,7 @@ public class Agent implements IsIndexed, Serializable {
       + ", agentsRequired=" + agentsRequired + "]";
   }
 
+  @JsonIgnore
   @Override
   public String getUUID() {
     // FIXME 20160323 hsilva: see if this is the right way to do it

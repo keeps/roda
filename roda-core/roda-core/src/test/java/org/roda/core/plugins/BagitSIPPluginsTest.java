@@ -89,7 +89,9 @@ public class BagitSIPPluginsTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -128,8 +130,7 @@ public class BagitSIPPluginsTest {
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
 
-    logger.info("Waiting for soft-commit");
-    Thread.sleep(AUTO_COMMIT_TIMEOUT);
+    index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class, CorporaConstants.BAGIT_SIP);
     return transferredResource;

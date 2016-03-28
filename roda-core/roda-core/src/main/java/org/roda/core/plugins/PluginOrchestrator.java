@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -20,7 +21,7 @@ import org.roda.core.data.v2.jobs.Report;
 
 public interface PluginOrchestrator {
 
-  public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
 

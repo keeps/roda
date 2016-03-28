@@ -94,7 +94,9 @@ public class InternalConvertPluginsTestForTravis {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 

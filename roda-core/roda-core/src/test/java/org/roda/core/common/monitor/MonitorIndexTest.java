@@ -63,7 +63,9 @@ public class MonitorIndexTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();

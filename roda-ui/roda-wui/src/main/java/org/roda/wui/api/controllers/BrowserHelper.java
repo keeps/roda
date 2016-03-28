@@ -64,6 +64,7 @@ import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -248,24 +249,24 @@ public class BrowserHelper {
     return RodaCoreFactory.getIndexService().getAncestors(aip);
   }
 
-  protected static <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
+  protected static <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
     Sublist sublist, Facets facets, RodaUser user) throws GenericException, RequestNotValidException {
     boolean showInactive = true;
     return RodaCoreFactory.getIndexService().find(returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
-  protected static <T extends Serializable> Long count(Class<T> returnClass, Filter filter, RodaUser user)
+  protected static <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user)
     throws GenericException, RequestNotValidException {
     boolean showInactive = true;
     return RodaCoreFactory.getIndexService().count(returnClass, filter, user, showInactive);
   }
 
-  protected static <T extends Serializable> T retrieve(Class<T> returnClass, String id)
+  protected static <T extends IsIndexed> T retrieve(Class<T> returnClass, String id)
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().retrieve(returnClass, id);
   }
 
-  protected static <T extends Serializable> List<String> suggest(Class<T> returnClass, String field, String query)
+  protected static <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
     throws GenericException, NotFoundException {
     return RodaCoreFactory.getIndexService().suggest(returnClass, field, query);
   }

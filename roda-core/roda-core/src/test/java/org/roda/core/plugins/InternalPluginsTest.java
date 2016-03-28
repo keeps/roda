@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
@@ -120,7 +121,9 @@ public class InternalPluginsTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -185,10 +188,10 @@ public class InternalPluginsTest {
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
 
-    LOGGER.info("Waiting for soft-commit");
-    Thread.sleep(AUTO_COMMIT_TIMEOUT);
+    index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class, "test");
+    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
+      UUID.nameUUIDFromBytes("test".getBytes()).toString());
     return transferredResource;
   }
 
@@ -237,6 +240,8 @@ public class InternalPluginsTest {
     List<TransferredResource> items = Arrays.asList(transferredResource);
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, items);
     assertReports(reports, null, items.stream().map(tr -> tr.getId()).collect(Collectors.toList()));
+
+    index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
@@ -305,6 +310,8 @@ public class InternalPluginsTest {
     }
     IOUtils.closeQuietly(preservationMetadataList);
     Assert.assertTrue(found);
+    
+    index.commitAIPs();
 
     Filter filter = new Filter();
     filter.add(
@@ -332,9 +339,9 @@ public class InternalPluginsTest {
 
     CloseableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadata(aip.getId(), true);
 
-    // Files plus one representation + 1 SIP To AIP Event + 1 Premis Skeleton
+    // Files plus one representation + 2 SIP To AIP Event + 1 Premis Skeleton
     // Event
-    Assert.assertEquals(CORPORA_FILES_COUNT + 3, Iterables.size(preservationMetadata));
+    Assert.assertEquals(CORPORA_FILES_COUNT + 4, Iterables.size(preservationMetadata));
     preservationMetadata.close();
 
     Binary rpo_bin = model.retrievePreservationRepresentation(aip.getId(), aip.getRepresentations().get(0).getId());
@@ -413,6 +420,8 @@ public class InternalPluginsTest {
     String mimetype = "text/plain";
     Assert.assertEquals(mimetype, mimeRegistry.getFormatRegistryKey().getStringValue());
 
+    index.commitAIPs();
+
     IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
       aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
 
@@ -480,6 +489,8 @@ public class InternalPluginsTest {
     Plugin<AIP> plugin = new TikaFullTextPlugin();
     Map<String, String> parameters2 = new HashMap<>();
     parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, Boolean.TRUE.toString());
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, Boolean.TRUE.toString());
     plugin.setParameterValues(parameters2);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
@@ -511,6 +522,8 @@ public class InternalPluginsTest {
     Assert.assertEquals("15.0000", creatingApplication.getCreatingApplicationVersion());
     Assert.assertEquals(DateParser.parse("2016-02-10T15:52:00Z"),
       DateParser.parse(creatingApplication.getDateCreatedByApplication().toString()));
+
+    index.commit(IndexedFile.class);
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));

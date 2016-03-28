@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.hamcrest.Matchers;
@@ -87,7 +88,9 @@ public class EARKSIPPluginsTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
@@ -126,11 +129,10 @@ public class EARKSIPPluginsTest {
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));
 
-    LOGGER.info("Waiting for soft-commit");
-    Thread.sleep(AUTO_COMMIT_TIMEOUT);
-    // index.commit(Arrays.asList(TransferredResource.class));
+    index.commit(TransferredResource.class);
 
-    TransferredResource transferredResource = index.retrieve(TransferredResource.class, CorporaConstants.EARK_SIP);
+    TransferredResource transferredResource = index.retrieve(TransferredResource.class,
+      UUID.nameUUIDFromBytes(CorporaConstants.EARK_SIP.getBytes()).toString());
     return transferredResource;
   }
 
@@ -156,6 +158,8 @@ public class EARKSIPPluginsTest {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
       Arrays.asList(transferredResource));
     assertReports(reports);
+    
+    index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));

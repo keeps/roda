@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -131,7 +132,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
 
   }
 

@@ -21,6 +21,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -109,7 +110,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       IndexResult<T> find;

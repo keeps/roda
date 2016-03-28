@@ -60,7 +60,9 @@ public class PermissionsTest {
     boolean deployLdap = true;
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = false;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
 
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();

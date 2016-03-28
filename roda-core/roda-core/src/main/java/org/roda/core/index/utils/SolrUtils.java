@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
@@ -90,6 +91,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -744,7 +746,7 @@ public class SolrUtils {
     return ret;
   }
 
-  private static <T> String getIndexName(Class<T> resultClass) throws GenericException {
+  private static <T extends IsIndexed> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
     if (resultClass.equals(AIP.class)) {
       indexName = RodaConstants.INDEX_AIP;
@@ -803,13 +805,19 @@ public class SolrUtils {
     }
   }
 
-  public static <T> void commit(SolrClient index, List<Class<T>> resultClasses) throws GenericException {
+  public static void commit(SolrClient index, List<Class<? extends IsIndexed>> resultClasses) throws GenericException {
     List<String> collections = new ArrayList<>();
-    for (Class<T> resultClass : resultClasses) {
+    for (Class<? extends IsIndexed> resultClass : resultClasses) {
       collections.add(getIndexName(resultClass));
     }
 
     commit(index, collections.toArray(new String[] {}));
+  }
+
+  @SafeVarargs
+  public static <T extends IsIndexed> void commit(SolrClient index, Class<? extends IsIndexed>... resultClasses)
+    throws GenericException {
+    commit(index, Arrays.asList(resultClasses));
   }
 
   private static <T> boolean hasPermissionFilters(Class<T> resultClass) throws GenericException {
@@ -853,7 +861,7 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
+  public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
     throws NotFoundException, GenericException {
     T ret;
     try {
@@ -869,12 +877,12 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
+  public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, sorter, sublist, null);
   }
 
-  public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
+  public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -894,7 +902,7 @@ public class SolrUtils {
     return ret;
   }
 
-  public static <T extends Serializable> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
+  public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
       throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
@@ -938,12 +946,12 @@ public class SolrUtils {
     return fq.toString();
   }
 
-  public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
+  public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter)
     throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0)).getTotalCount();
   }
 
-  public static <T extends Serializable> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
+  public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
     RodaUser user, boolean showInactive) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, showInactive).getTotalCount();
   }
@@ -1484,6 +1492,7 @@ public class SolrUtils {
   private static TransferredResource solrDocumentToTransferredResource(SolrDocument doc) {
     TransferredResource tr = new TransferredResource();
     String id = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ID));
+    String uuid = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_UUID));
     String fullPath = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH));
     String parentId = null;
     if (doc.containsKey(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID)) {
@@ -1503,9 +1512,10 @@ public class SolrUtils {
 
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
 
+    tr.setId(id);
+    tr.setUUID(uuid);
     tr.setCreationDate(d);
     tr.setFullPath(fullPath);
-    tr.setId(id);
     tr.setName(name);
     tr.setRelativePath(relativePath);
     tr.setSize(size);
@@ -1518,7 +1528,8 @@ public class SolrUtils {
   public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
     SolrInputDocument transferredResource = new SolrInputDocument();
 
-    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID());
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID,
+      UUID.nameUUIDFromBytes(resource.getId().getBytes()).toString());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
     if (resource.getParentId() != null) {
@@ -1914,7 +1925,7 @@ public class SolrUtils {
     return jobReport;
   }
 
-  public static <T extends Serializable> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
+  public static <T extends IsIndexed> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,
     String queryString) throws GenericException {
 
     String dictionaryName = field + "Suggester";

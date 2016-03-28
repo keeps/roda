@@ -7,10 +7,11 @@
  */
 package org.roda.core.data.v2.ip.metadata;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class IndexedPreservationAgent implements Serializable {
+import org.roda.core.data.v2.index.IsIndexed;
+
+public class IndexedPreservationAgent implements IsIndexed {
   private static final long serialVersionUID = 7864328669898523851L;
   private String id;
   private String name;
@@ -84,6 +85,11 @@ public class IndexedPreservationAgent implements Serializable {
   public String toString() {
     return "IndexedPreservationAgent [id=" + id + ", name=" + name + ", type=" + type + ", note=" + note
       + ", extension=" + extension + ", roles=" + roles + "]";
+  }
+
+  @Override
+  public String getUUID() {
+    return getId();
   }
 
 }

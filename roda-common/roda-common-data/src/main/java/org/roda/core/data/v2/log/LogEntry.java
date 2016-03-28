@@ -12,6 +12,8 @@ import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Rui Castro
  * 
@@ -309,6 +311,7 @@ public class LogEntry implements IsIndexed {
     this.duration = duration;
   }
 
+  @JsonIgnore
   @Override
   public String getUUID() {
     return getId();

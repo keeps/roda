@@ -113,7 +113,9 @@ public class ModelServiceTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = false;
     boolean deployOrchestrator = false;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = false;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
 
     logPath = RodaCoreFactory.getLogPath();
     storage = RodaCoreFactory.getStorageService();

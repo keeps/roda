@@ -178,6 +178,7 @@ public class RodaCoreFactory {
   private static boolean TEST_DEPLOY_LDAP = true;
   private static boolean TEST_DEPLOY_FOLDER_MONITOR = true;
   private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
+  private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
 
   // Core related constants
   private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
@@ -239,11 +240,12 @@ public class RodaCoreFactory {
   }
 
   public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployFolderMonitor,
-    boolean deployOrchestrator) {
+    boolean deployOrchestrator, boolean deployPluginManager) {
     TEST_DEPLOY_SOLR = deploySolr;
     TEST_DEPLOY_LDAP = deployLdap;
     TEST_DEPLOY_FOLDER_MONITOR = deployFolderMonitor;
     TEST_DEPLOY_ORCHESTRATOR = deployOrchestrator;
+    TEST_DEPLOY_PLUGIN_MANAGER = deployPluginManager;
     instantiated = false;
     instantiate(NodeType.TEST);
   }
@@ -299,7 +301,7 @@ public class RodaCoreFactory {
   }
 
   private static void instantiatePluginManager() {
-    if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER) {
+    if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER || TEST_DEPLOY_PLUGIN_MANAGER) {
       try {
         pluginManager = PluginManager.getDefaultPluginManager(getConfigPath(), getPluginsPath());
       } catch (PluginManagerException e) {

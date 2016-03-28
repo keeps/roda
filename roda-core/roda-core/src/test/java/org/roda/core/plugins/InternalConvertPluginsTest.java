@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
@@ -52,6 +53,9 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -74,6 +78,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InternalConvertPluginsTest {
+  private static final String FAKE_JOB_ID = "NONE";
+
   private static final Logger LOGGER = LoggerFactory.getLogger(InternalConvertPluginsTest.class);
 
   private static final int AUTO_COMMIT_TIMEOUT = 2000;
@@ -93,7 +99,9 @@ public class InternalConvertPluginsTest {
     boolean deployLdap = false;
     boolean deployFolderMonitor = true;
     boolean deployOrchestrator = true;
-    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator);
+    boolean deployPluginManager = true;
+    RodaCoreFactory.instantiateTest(deploySolr, deployLdap, deployFolderMonitor, deployOrchestrator,
+      deployPluginManager);
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
 
@@ -101,6 +109,13 @@ public class InternalConvertPluginsTest {
     corporaPath = Paths.get(corporaURL.toURI());
 
     LOGGER.info("Running internal convert plugins tests under storage {}", basePath);
+
+    Job fakeJob = new Job();
+    fakeJob.setId(FAKE_JOB_ID);
+    fakeJob.setPluginType(PluginType.MISC);
+    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    model.createOrUpdateJob(fakeJob);
+    index.commit(Job.class);
   }
 
   @After
@@ -135,12 +150,15 @@ public class InternalConvertPluginsTest {
       .resolve(RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS).resolve(reps[corporaId])
       .resolve(RodaConstants.STORAGE_DIRECTORY_DATA);
 
-    FSUtils.copy(corpora, f.getBasePath().resolve("testt"), true);
+    String transferredResourceId = "testt";
+    FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    LOGGER.info("Waiting for soft-commit");
-    Thread.sleep(AUTO_COMMIT_TIMEOUT);
+    Thread.sleep(1000);
 
-    resources.add(index.retrieve(TransferredResource.class, "testt"));
+    index.commit(TransferredResource.class);
+
+    resources.add(
+      index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString()));
     return resources;
   }
 
@@ -151,6 +169,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     plugin.setParameterValues(parameters);
 
@@ -160,8 +179,10 @@ public class InternalConvertPluginsTest {
     Assert.assertEquals(1, transferredResources.size());
     RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, transferredResources);
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
-      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    index.commitAIPs();
+
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -183,8 +204,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testImageMagickPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -193,7 +214,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "tiff");
     plugin.setParameterValues(parameters);
 
@@ -242,7 +263,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
@@ -291,7 +312,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new AvconvConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "gif");
     parameters.put("outputArguments", "-pix_fmt rgb24");
     plugin.setParameterValues(parameters);
@@ -341,7 +362,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new UnoconvConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
@@ -380,8 +401,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGhostScriptPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -390,7 +411,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new GhostScriptConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "pdf");
     parameters.put("commandArguments", "-sDEVICE=pdfwrite");
     plugin.setParameterValues(parameters);
@@ -431,7 +452,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testPdfToPdfaPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -440,7 +462,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new PdfToPdfaPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "pdf");
     plugin.setParameterValues(parameters);
 
@@ -461,6 +483,8 @@ public class InternalConvertPluginsTest {
       }
     }
 
+    index.commit(IndexedFile.class);
+
     List<File> changedFiles = newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]pdf$"))
       .collect(Collectors.toList());
     for (File file : changedFiles) {
@@ -473,9 +497,9 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    InvalidParameterException, InterruptedException, IOException {
+  public void testMultipleRepresentations()
+    throws FileAlreadyExistsException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException {
 
     AIP aip = ingestCorpora(0);
 
@@ -485,7 +509,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("outputFormat", "ogg");
     plugin.setParameterValues(parameters);
 
@@ -496,7 +520,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin2 = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters2 = new HashMap<>();
-    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters2.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters2.put("outputFormat", "tiff");
     plugin2.setParameterValues(parameters2);
 
@@ -504,8 +528,8 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(4, aip.getRepresentations().size());
 
-    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId))
-      .count());
+    Assert.assertEquals(1,
+      aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId)).count());
 
     CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(3).getId(),
       true);
@@ -520,21 +544,19 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(
-          1,
-          newReusableAllFiles.stream()
-            .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream()
+          .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$")).count());
 
   }
 
   @Test
-  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGeneralCommandPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -543,7 +565,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new GeneralCommandConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("inputFormat", "png");
     parameters.put("outputFormat", "tiff");
     parameters.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
@@ -570,13 +592,13 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$")).count());
   }
 
   @Test
-  public void testDigitalSignaturePlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, NoSuchAlgorithmException {
+  public void testDigitalSignaturePlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, NoSuchAlgorithmException {
     AIP aip = ingestCorpora(1);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -585,7 +607,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<Representation> plugin = new DigitalSignaturePlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("doVerify", "True");
     parameters.put("doExtract", "True");
     parameters.put("doStrip", "True");
@@ -627,20 +649,20 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testDigitalSignatureDIPPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(2);
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
     File file = allFiles.iterator().next();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     String intermediatePath = "/data/storage/";
-    Assert
-      .assertEquals(0, PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
+    Assert.assertEquals(0,
+      PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
 
     Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);
 
     DigitalSignatureDIPPluginUtils.setKeystorePath(corporaPath.toString() + "/Certification/keystore.jks");
@@ -662,7 +684,7 @@ public class InternalConvertPluginsTest {
 
     Plugin<AIP> plugin = new VeraPDFPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, "NONE");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put("profile", "1b");
     parameters.put("hasFeatures", "False");
     plugin.setParameterValues(parameters);

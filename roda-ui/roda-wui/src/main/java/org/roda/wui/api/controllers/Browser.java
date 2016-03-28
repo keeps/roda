@@ -8,7 +8,6 @@
 package org.roda.wui.api.controllers;
 
 import java.io.InputStream;
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -30,11 +29,12 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.user.RodaUser;
@@ -143,7 +143,7 @@ public class Browser extends RodaCoreService {
     return bundle;
   }
 
-  public static <T extends Serializable> IndexResult<T> find(RodaUser user, Class<T> classToReturn, Filter filter,
+  public static <T extends IsIndexed> IndexResult<T> find(RodaUser user, Class<T> classToReturn, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets)
       throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Date startDate = new Date();
@@ -164,7 +164,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static <T extends Serializable> Long count(RodaUser user, Class<T> classToReturn, Filter filter)
+  public static <T extends IsIndexed> Long count(RodaUser user, Class<T> classToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -183,7 +183,7 @@ public class Browser extends RodaCoreService {
     return count;
   }
 
-  public static <T extends Serializable> T retrieve(RodaUser user, Class<T> classToReturn, String id)
+  public static <T extends IsIndexed> T retrieve(RodaUser user, Class<T> classToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 
@@ -206,7 +206,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static <T extends Serializable> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
+  public static <T extends IsIndexed> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
     String query) throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
 

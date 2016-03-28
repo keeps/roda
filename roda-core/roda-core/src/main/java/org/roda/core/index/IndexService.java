@@ -10,10 +10,8 @@ package org.roda.core.index;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -32,8 +30,12 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -88,36 +90,34 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter)
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter)
     throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
-  public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist) throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist)
+    throws GenericException, RequestNotValidException {
     Facets facets = null;
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
 
   }
 
-  public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
   }
 
-  public <T extends Serializable> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
-      throws GenericException, RequestNotValidException {
+  public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets, RodaUser user, boolean showInactive) throws GenericException, RequestNotValidException {
     return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, showInactive);
   }
 
-  public <T extends Serializable> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean showInactive)
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean showInactive)
     throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter, user, showInactive);
   }
 
-  public <T extends Serializable> T retrieve(Class<T> returnClass, String id)
-    throws NotFoundException, GenericException {
+  public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id) throws NotFoundException, GenericException {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
@@ -136,6 +136,8 @@ public class IndexService {
         }
       }
       LOGGER.info("{} > Optimizing indexes", new Date().getTime());
+
+      commitAIPs();
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());
     } finally {
@@ -147,6 +149,10 @@ public class IndexService {
         LOGGER.error("Error while while freeing up resources", e);
       }
     }
+  }
+
+  public void commitAIPs() throws GenericException {
+    commit(IndexedAIP.class, IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class);
   }
 
   public void optimizeAIPs() throws GenericException {
@@ -263,11 +269,17 @@ public class IndexService {
     }
   }
 
-  public <T> void commit(List<Class<T>> classToCommit) throws GenericException {
+  // public void commit(List<Class<? extends IsIndexed>> classToCommit) throws
+  // GenericException {
+  // SolrUtils.commit(index, classToCommit);
+  // }
+
+  @SafeVarargs
+  public final void commit(Class<? extends IsIndexed>... classToCommit) throws GenericException {
     SolrUtils.commit(index, classToCommit);
   }
 
-  public <T extends Serializable> List<String> suggest(Class<T> returnClass, String field, String query)
+  public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
     throws GenericException {
     return SolrUtils.suggest(index, returnClass, field, query);
   }

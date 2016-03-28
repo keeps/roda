@@ -815,7 +815,7 @@ public class PremisV3Utils {
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     IndexedPreservationAgent agent = null;
     Job job = PluginHelper.getJobFromIndex(plugin, index);
-    if(job!=null){
+    if(job!=null && job.getUsername() != null){
       RODAMember member = index.retrieve(RODAMember.class, job.getUsername());
       String id = job.getUsername();
       ContentPayload agentPayload;
