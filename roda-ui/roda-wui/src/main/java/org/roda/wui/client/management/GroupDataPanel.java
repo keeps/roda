@@ -116,9 +116,9 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
         GroupDataPanel.this.onChange();
       }
     };
-    
+
     KeyUpHandler keyUpHandler = new KeyUpHandler() {
-      
+
       @Override
       public void onKeyUp(KeyUpEvent event) {
         onChange();
@@ -133,11 +133,11 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
 
         if (!(keyCode >= '0' && keyCode <= '9') && !(keyCode >= 'A' && keyCode <= 'Z')
           && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_'
-          && (keyCode != (char) KeyCodes.KEY_TAB) && (keyCode != (char) KeyCodes.KEY_BACKSPACE)
-          && (keyCode != (char) KeyCodes.KEY_DELETE) && (keyCode != (char) KeyCodes.KEY_ENTER)
-          && (keyCode != (char) KeyCodes.KEY_HOME) && (keyCode != (char) KeyCodes.KEY_END)
-          && (keyCode != (char) KeyCodes.KEY_LEFT) && (keyCode != (char) KeyCodes.KEY_UP)
-          && (keyCode != (char) KeyCodes.KEY_RIGHT) && (keyCode != (char) KeyCodes.KEY_DOWN)) {
+          && (keyCode != (char) KeyCodes.KEY_TAB) && (keyCode != (char) KeyCodes.KEY_DELETE)
+          && (keyCode != (char) KeyCodes.KEY_ENTER) && (keyCode != (char) KeyCodes.KEY_HOME)
+          && (keyCode != (char) KeyCodes.KEY_END) && (keyCode != (char) KeyCodes.KEY_LEFT)
+          && (keyCode != (char) KeyCodes.KEY_UP) && (keyCode != (char) KeyCodes.KEY_RIGHT)
+          && (keyCode != (char) KeyCodes.KEY_DOWN)) {
           ((TextBox) event.getSource()).cancelKey();
         }
       }
@@ -146,7 +146,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     groupname.addKeyUpHandler(keyUpHandler);
     fullname.addChangeHandler(changeHandler);
     fullname.addKeyUpHandler(keyUpHandler);
-    
+
     permissionsPanel.addValueChangeHandler(new ValueChangeHandler<List<String>>() {
 
       @Override
@@ -278,7 +278,7 @@ public class GroupDataPanel extends Composite implements HasValueChangeHandlers<
     } else {
       fullname.removeStyleName("isWrong");
     }
-    
+
     checked = true;
 
     return valid;
