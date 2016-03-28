@@ -1487,7 +1487,7 @@ public class ModelService extends ModelObservable {
 
   public void deleteTransferredResource(TransferredResource transferredResource) {
     FSUtils.deletePathQuietly(Paths.get(transferredResource.getFullPath()));
-    notifyTransferredResourceDeleted(transferredResource.getId());
+    notifyTransferredResourceDeleted(transferredResource.getUUID());
   }
 
   /***************** Risk related *****************/

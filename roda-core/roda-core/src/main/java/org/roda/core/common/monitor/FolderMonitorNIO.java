@@ -89,7 +89,7 @@ public class FolderMonitorNIO {
     for (FolderObserver observer : observers) {
       observer.transferredResourceAdded(tr);
     }
-    return tr.getId();
+    return tr.getUUID();
   }
 
   public void remove(Path path) throws NotFoundException, GenericException {

@@ -1518,6 +1518,7 @@ public class SolrUtils {
   public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
     SolrInputDocument transferredResource = new SolrInputDocument();
 
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ID, resource.getId());
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_FULLPATH, resource.getFullPath());
     if (resource.getParentId() != null) {

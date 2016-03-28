@@ -545,7 +545,7 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getId()));
+      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
       footer.add(link);
 
     } else {

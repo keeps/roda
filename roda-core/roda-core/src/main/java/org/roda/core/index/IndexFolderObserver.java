@@ -65,8 +65,8 @@ public class IndexFolderObserver implements FolderObserver {
   public void transferredResourceDeleted(TransferredResource resource, boolean forceCommit) {
     LOGGER.debug("DELETE: " + resource.toString());
     try {
-      index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, resource.getId());
-      index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + resource.getId() + "\"");
+      index.deleteById(RodaConstants.INDEX_TRANSFERRED_RESOURCE, resource.getUUID());
+      index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, "ancestors:\"" + resource.getUUID() + "\"");
       if (forceCommit) {
         index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
       }

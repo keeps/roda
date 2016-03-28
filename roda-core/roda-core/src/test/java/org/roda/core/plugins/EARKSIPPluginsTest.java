@@ -128,6 +128,7 @@ public class EARKSIPPluginsTest {
 
     LOGGER.info("Waiting for soft-commit");
     Thread.sleep(AUTO_COMMIT_TIMEOUT);
+    // index.commit(Arrays.asList(TransferredResource.class));
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class, CorporaConstants.EARK_SIP);
     return transferredResource;

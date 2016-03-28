@@ -407,7 +407,7 @@ public class IngestTransfer extends Composite {
 
         @Override
         public void onSuccess(String folderName) {
-          String parent = resource != null ? resource.getId() : null;
+          String parent = resource != null ? resource.getUUID() : null;
           BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName,
             new AsyncCallback<String>() {
 
@@ -538,7 +538,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("download")
   public void handleDownload(ClickEvent e) {
     if (resource != null) {
-      SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getId());
+      SafeUri downloadUri = RestUtils.createTransferredResourceDownloadUri(resource.getUUID());
       Window.Location.assign(downloadUri.asString());
     }
   }

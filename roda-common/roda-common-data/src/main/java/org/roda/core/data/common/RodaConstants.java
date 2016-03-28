@@ -288,6 +288,7 @@ public final class RodaConstants {
   public static final String MEMBERS_ROLES_ALL = "rolesAll";
 
   public static final String TRANSFERRED_RESOURCE_ID = "id";
+  public static final String TRANSFERRED_RESOURCE_UUID = "uuid";
   public static final String TRANSFERRED_RESOURCE_FULLPATH = "fullPath";
   public static final String TRANSFERRED_RESOURCE_PARENT_ID = "parentId";
   public static final String TRANSFERRED_RESOURCE_RELATIVEPATH = "relativePath";
