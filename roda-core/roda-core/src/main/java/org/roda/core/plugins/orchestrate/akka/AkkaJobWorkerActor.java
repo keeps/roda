@@ -63,7 +63,6 @@ public class AkkaJobWorkerActor extends UntypedActor {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     for (String objectId : objectIds) {
       try {
-        // TODO review error handling logic
         res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
       } catch (GenericException | NotFoundException e) {
         LOGGER.error("Error retrieving TransferredResource", e);

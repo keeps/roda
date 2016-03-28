@@ -206,7 +206,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     List<AIP> aips = getAIPsFromReports(model, storage, reports);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
 
     // this event can only be created after AIPs exist and that's why it is
     // performed here, after transformTransferredResourceIntoAnAIP
@@ -216,27 +216,27 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_VIRUS_CHECK)) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
       aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
     }
 
     // 3) descriptive metadata validation
     pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
     aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
 
     // 4) create file fixity information
     pluginReport = createFileFixityInformation(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
     aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
 
     // 5) format identification (using Siegfried)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
       aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
     }
 
@@ -248,7 +248,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       params.put("maxKbytes", "20000");
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
       aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
     }
 
@@ -263,7 +263,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
         PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FULL_TEXT_EXTRACTION) ? "true" : "false");
       pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
       aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
     }
 
@@ -271,14 +271,14 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_DIGITAL_SIGNATURE_VALIDATION)) {
       pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+      stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
       aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, false);
     }
 
     // 10) verify producer authorization
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    stepsCompleted = PluginHelper.updateJobStatus(this, index, model, stepsCompleted, totalSteps);
+    stepsCompleted = PluginHelper.updateJobStatus(this, stepsCompleted, totalSteps);
     aips = recalculateAIPsList(model, aips, reports, aipIdToTransferredResourceId, true);
 
     // 11) Auto accept
@@ -306,7 +306,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       String transferredResourceId = aipIdToTransferredResourceId.get(aip.getId());
       Report report = reports.get(transferredResourceId);
       if (removeAIPProcessingFailed && report.getPluginState() == PluginState.FAILURE) {
-        LOGGER.debug("Removing AIP {} from the list", aip.getId());
+        LOGGER.trace("Removing AIP {} from the list", aip.getId());
       } else {
         try {
           newAips.add(model.retrieveAIP(aip.getId()));
@@ -349,7 +349,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, tr, PluginState.SUCCESS, "", notify, startDate);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
-        LOGGER.warn("Error creating ingest start event: " + e.getMessage(), e);
+        LOGGER.warn("Error creating ingest start event", e);
       }
     }
   }
@@ -368,7 +368,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
         PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", notify);
       } catch (NotFoundException | RequestNotValidException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
-        LOGGER.warn("Error creating ingest end event: " + e.getMessage(), e);
+        LOGGER.warn("Error creating ingest end event", e);
       }
     }
   }

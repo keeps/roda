@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.data.common.RodaConstants;
@@ -78,7 +79,7 @@ public final class PluginHelper {
     return reportItem;
   }
 
-  private static <T extends Serializable> String getJobId(Plugin<T> plugin) {
+  public static <T extends Serializable> String getJobId(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
@@ -334,15 +335,27 @@ public final class PluginHelper {
     return pm;
   }
 
-  public static <T extends Serializable> int updateJobStatus(Plugin<T> plugin, IndexService index, ModelService model,
-    int stepsCompleted, int totalSteps) {
+  public static <T extends Serializable> int updateJobStatus(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
     int newStepsCompleted = stepsCompleted + 1;
-    int percentage = (int) ((100f / totalSteps) * newStepsCompleted);
-
-    updateJobStatus(plugin, index, model, percentage);
+    // int percentage = (int) ((100f / totalSteps) * newStepsCompleted);
+    //
+    // updateJobStatus(plugin, index, model, percentage);
+    //
+    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, newStepsCompleted, totalSteps);
 
     return newStepsCompleted;
   }
+
+  // private static <T extends Serializable> int updateJobStatus(Plugin<T>
+  // plugin, IndexService index, ModelService model,
+  // int stepsCompleted, int totalSteps) {
+  // int newStepsCompleted = stepsCompleted + 1;
+  // int percentage = (int) ((100f / totalSteps) * newStepsCompleted);
+  //
+  // updateJobStatus(plugin, index, model, percentage);
+  //
+  // return newStepsCompleted;
+  // }
 
   public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, IndexService index, ModelService model,
     int newCompletionPercentage) {

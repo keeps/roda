@@ -47,4 +47,6 @@ public interface PluginOrchestrator {
 
   public void stopJob(Job job);
 
+  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int stepsCompleted, int totalSteps);
+
 }

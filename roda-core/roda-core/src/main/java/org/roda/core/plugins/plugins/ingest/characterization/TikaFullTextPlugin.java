@@ -50,6 +50,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -58,7 +59,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticName() {
-    return "Full-text extraction action";
+    return "Feature and/or full-text extraction";
   }
 
   @Override
@@ -67,7 +68,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   public static String getStaticDescription() {
-    return "Extracts the full-text from the representation files.";
+    return "Extraction of technical metadata and/or full-text using Apache Tika";
   }
 
   @Override

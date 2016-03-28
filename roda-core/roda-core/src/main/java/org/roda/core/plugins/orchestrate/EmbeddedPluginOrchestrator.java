@@ -357,4 +357,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
     // TODO
   }
 
+  @Override
+  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
+    // TODO Auto-generated method stub
+    
+  }
+
 }
