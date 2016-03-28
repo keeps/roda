@@ -46,6 +46,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -145,7 +146,7 @@ public class BagitSIPPluginsTest {
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
     FileAlreadyExistsException {
-    AIP root = model.createAIP(null);
+    AIP root = model.createAIP(null, new Permissions());
 
     Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();

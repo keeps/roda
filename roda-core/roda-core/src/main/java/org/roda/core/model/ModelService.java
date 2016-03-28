@@ -316,11 +316,9 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String parentId) throws RequestNotValidException, NotFoundException, GenericException,
+  public AIP createAIP(String parentId, Permissions permissions) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
     boolean active = true;
-    // TODO set default permissions
-    Permissions permissions = new Permissions();
     boolean notify = true;
     return createAIP(active, parentId, permissions, notify);
   }

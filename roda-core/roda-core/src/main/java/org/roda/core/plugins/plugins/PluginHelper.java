@@ -62,7 +62,7 @@ public final class PluginHelper {
 
   public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
-    return createPluginReportItem(plugin, null, transferredResource.getId());
+    return createPluginReportItem(plugin, null, transferredResource.getUUID());
   }
 
   public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String itemId,

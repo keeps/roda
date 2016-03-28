@@ -82,6 +82,9 @@ public class JobsHelper {
     // ask plugin orchestrator to execute the job
     RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob);
 
+    // force commit
+    RodaCoreFactory.getIndexService().commit(Job.class);
+
     return updatedJob;
   }
 

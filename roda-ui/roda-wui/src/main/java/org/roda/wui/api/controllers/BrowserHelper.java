@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.WebApplicationException;
@@ -713,11 +714,11 @@ public class BrowserHelper {
     return model.updateAIP(aip);
   }
 
-  public static AIP createAIP(String parentAipId) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, AlreadyExistsException {
+  public static AIP createAIP(String parentAipId, Permissions permissions) throws GenericException,
+    AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
 
-    AIP aip = model.createAIP(parentAipId);
+    AIP aip = model.createAIP(parentAipId, permissions);
     return aip;
   }
 
@@ -1074,7 +1075,8 @@ public class BrowserHelper {
           IndexedFile file = retrieve(IndexedFile.class, LinkingObjectUtils.getFileIdFromLinkingId(idValue));
           files.put(idValue, file);
         } else if (LinkingObjectType.TRANSFERRED_RESOURCE.equals(linkingType)) {
-          String uuid = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
+          String id = LinkingObjectUtils.getTransferredResourceIdFromLinkingId(idValue);
+          String uuid = UUID.nameUUIDFromBytes(id.getBytes()).toString();
           TransferredResource tr = retrieve(TransferredResource.class, uuid);
           transferredResources.put(idValue, tr);
         } else {

@@ -10,6 +10,7 @@ package org.roda.wui.api.controllers;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 
@@ -535,8 +536,11 @@ public class Browser extends RodaCoreService {
       // TODO check user role to create top-level AIPs
     }
 
+    Permissions permissions = new Permissions();
+    permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
+
     // delegate
-    AIP aip = BrowserHelper.createAIP(parentId);
+    AIP aip = BrowserHelper.createAIP(parentId, permissions);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -963,12 +967,12 @@ public class Browser extends RodaCoreService {
   public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
-    
+
     // check user permissions
     UserUtility.checkRoles(user, BROWSE_ROLE);
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
-    
+
     BrowserHelper.updateAIPPermissions(aip, permissions);
 
     long duration = new Date().getTime() - startDate.getTime();

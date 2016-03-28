@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -75,8 +76,8 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     AntivirusPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true", true, false,
     AntivirusPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_DESCRIPTIVE_METADATA_VALIDATION = new PluginParameter(
-    "parameter.do_descriptive_metadata_validation", DescriptiveMetadataValidationPlugin.getStaticName(), PluginParameterType.BOOLEAN,
-    "true", true, true, DescriptiveMetadataValidationPlugin.getStaticDescription());
+    "parameter.do_descriptive_metadata_validation", DescriptiveMetadataValidationPlugin.getStaticName(),
+    PluginParameterType.BOOLEAN, "true", true, true, DescriptiveMetadataValidationPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_PDFTOPDFA_CONVERSION = new PluginParameter(
     "parameter.do_pdftopdfa_conversion", PdfToPdfaPlugin.getStaticName(), PluginParameterType.BOOLEAN, "false", true,
     false, PdfToPdfaPlugin.getStaticDescription());
