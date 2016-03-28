@@ -1112,7 +1112,10 @@ public class SolrUtils {
       groups.addAll(objectToListString(doc.get(key)));
       groupPermissions.put(type, groups);
     }
-
+    
+    permissions.setUsers(userPermissions);
+    permissions.setGroups(userPermissions);
+    
     return permissions;
   }
 

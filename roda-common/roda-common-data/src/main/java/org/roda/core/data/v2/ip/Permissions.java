@@ -40,12 +40,32 @@ public class Permissions implements Serializable {
     return users;
   }
 
+  public Set<String> getUsernames() {
+    HashSet<String> usernames = new HashSet<>();
+
+    for (Set<String> values : users.values()) {
+      usernames.addAll(values);
+    }
+
+    return usernames;
+  }
+
   public void setUsers(Map<PermissionType, Set<String>> users) {
     this.users = users;
   }
 
   public Map<PermissionType, Set<String>> getGroups() {
     return groups;
+  }
+
+  public Set<String> getGroupnames() {
+    HashSet<String> groupnames = new HashSet<>();
+
+    for (Set<String> values : groups.values()) {
+      groupnames.addAll(values);
+    }
+
+    return groupnames;
   }
 
   public void setGroups(Map<PermissionType, Set<String>> groups) {
@@ -88,7 +108,6 @@ public class Permissions implements Serializable {
       members.add(name);
       permissionMap.put(permissionType, members);
     }
-
   }
 
   public Set<PermissionType> getUserPermissions(String username) {

@@ -20,6 +20,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -105,5 +106,7 @@ public interface BrowserServiceAsync {
 
   void createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
     Map<String, String> parameters, AsyncCallback<Job> asyncCallback);
+
+  void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
 
 }

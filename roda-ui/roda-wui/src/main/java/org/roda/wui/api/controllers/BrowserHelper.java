@@ -68,6 +68,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -1130,5 +1131,12 @@ public class BrowserHelper {
     throws NotFoundException, GenericException, RequestNotValidException {
     StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadataId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+  }
+
+  public static void updateAIPPermissions(IndexedAIP indexedAIP, Permissions permissions)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+    AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
+    aip.setPermissions(permissions);
+    RodaCoreFactory.getModelService().updateAIPPermissions(aip);
   }
 }

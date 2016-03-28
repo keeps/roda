@@ -17,12 +17,19 @@
 				<common:BasicSearch ui:field="basicSearch" />
 				<lists:SimpleRodaMemberList
 					addStyleNames="searchResults" ui:field="list" />
+				<g:FlowPanel ui:field="permissionsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h5">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
+						Save
+					</g:Button>
+					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
+						Cancel
+					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

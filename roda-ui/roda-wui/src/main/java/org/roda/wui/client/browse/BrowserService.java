@@ -22,6 +22,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -158,4 +159,7 @@ public interface BrowserService extends RemoteService {
   Job createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
     Map<String, String> parameters)
       throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
+  void updateAIPPermssions(String aipId, Permissions permissions)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 }

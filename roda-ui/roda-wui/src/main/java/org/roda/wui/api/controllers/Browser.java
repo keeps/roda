@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.user.RodaUser;
@@ -957,5 +958,21 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeDescriptiveMetadataVersion", null, duration,
       RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_METADATA_ID, descriptiveMetadataId,
       RodaConstants.API_QUERY_PARAM_VERSION, versionId);
+  }
+
+  public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    Date startDate = new Date();
+    
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    
+    BrowserHelper.updateAIPPermissions(aip, permissions);
+
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "updateAIPPermissions", null, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
+      aipId, "permissions", permissions);
   }
 }

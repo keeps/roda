@@ -31,6 +31,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -462,4 +463,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.removeDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
   }
 
+  @Override
+  public void updateAIPPermssions(String aipId, Permissions permissions)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.updateAIPPermissions(user, aipId, permissions);
+  }
 }
