@@ -696,9 +696,8 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void transferredResourceDeleted(String transferredResourceID) {
-    boolean forceCommit = false;
     deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
-      "Error deleting Transferred Resource(id=" + transferredResourceID + ")", forceCommit);
+      "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
   }
 
 }
