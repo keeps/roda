@@ -1578,12 +1578,12 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_USERNAME, job.getUsername());
     doc.addField(RodaConstants.JOB_START_DATE, job.getStartDate());
     doc.addField(RodaConstants.JOB_END_DATE, job.getEndDate());
-    doc.addField(RodaConstants.JOB_STATE, job.getState());
+    doc.addField(RodaConstants.JOB_STATE, job.getState().toString());
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
-    doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType());
+    doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
-    doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod());
+    doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod().toString());
     doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
 
     return doc;
