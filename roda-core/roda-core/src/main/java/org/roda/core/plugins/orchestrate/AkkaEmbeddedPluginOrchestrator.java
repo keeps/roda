@@ -76,7 +76,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     model = RodaCoreFactory.getModelService();
     storage = RodaCoreFactory.getStorageService();
 
-    numberOfWorkers = Runtime.getRuntime().availableProcessors() + 1;
+    numberOfWorkers = RodaCoreFactory.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
 
     Props roundRobinPoolProps = new RoundRobinPool(numberOfWorkers)

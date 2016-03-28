@@ -32,6 +32,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -571,8 +572,102 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipPermissionsUpdated(AIP aip) {
-    // FIXME 20160324 hsilva: permissions must be applied to all indexes (AIP, representation, file, preservation events)
-    indexAIP(aip);
+    try {
+      // change AIP
+      SolrInputDocument aipDoc = SolrUtils.aipPermissionsUpdateToSolrDocument(aip);
+      index.add(RodaConstants.INDEX_AIP, aipDoc);
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not do a partial update", e);
+    }
+
+    // change Representations and Files
+    representationsPermissionsUpdated(aip);
+    // change Preservation events
+    preservationEventsPermissionsUpdated(aip);
+
+  }
+
+  private void representationsPermissionsUpdated(final AIP aip) {
+    for (Representation representation : aip.getRepresentations()) {
+      representationPermissionsUpdated(aip, representation);
+    }
+  }
+
+  private void representationPermissionsUpdated(final AIP aip, final Representation representation) {
+    CloseableIterable<File> allFiles = null;
+    try {
+      SolrInputDocument repDoc = SolrUtils.representationPermissionsUpdateToSolrDocument(representation,
+        aip.getPermissions());
+      index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
+      final boolean recursive = true;
+      allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
+      for (File file : allFiles) {
+        boolean recursiveIndexFile = false;
+        filePermissionsUpdated(aip, file, recursiveIndexFile);
+      }
+
+    } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
+      | RequestNotValidException e) {
+      LOGGER.error("Could not do a partial update", e);
+    } finally {
+      IOUtils.closeQuietly(allFiles);
+    }
+  }
+
+  private void filePermissionsUpdated(AIP aip, File file, boolean recursive) {
+    SolrInputDocument fileDoc = SolrUtils.filePermissionsUpdateToSolrDocument(file, aip.getPermissions());
+    try {
+      index.add(RodaConstants.INDEX_FILE, fileDoc);
+
+    } catch (SolrServerException | IOException e) {
+      LOGGER.error("Could not index file: " + file, e);
+    }
+
+    if (recursive && file.isDirectory()) {
+      try {
+        CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
+        for (File subfile : allFiles) {
+          filePermissionsUpdated(aip, subfile, false);
+        }
+        IOUtils.closeQuietly(allFiles);
+
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not index file sub-resources: " + file, e);
+      }
+    }
+  }
+
+  private void preservationEventsPermissionsUpdated(final AIP aip) {
+
+    CloseableIterable<PreservationMetadata> preservationMetadata = null;
+    try {
+      boolean includeRepresentations = true;
+      preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
+      for (PreservationMetadata pm : preservationMetadata) {
+        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          try {
+            preservationEventPermissionsUpdated(pm, aip.getPermissions());
+          } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+            | AuthorizationDeniedException e) {
+            LOGGER.error("Could not index premis event", e);
+          }
+        }
+      }
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not index preservation events", e);
+    } finally {
+      IOUtils.closeQuietly(preservationMetadata);
+    }
+
+  }
+
+  private void preservationEventPermissionsUpdated(PreservationMetadata pm, Permissions permissions)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+    SolrServerException, IOException {
+    SolrInputDocument premisEventDocument = SolrUtils.preservationEventPermissionsUpdateToSolrDocument(pm.getId(),
+      permissions);
+    premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+    index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
   @Override

@@ -818,6 +818,12 @@ public class RodaCoreFactory {
     return pluginOrchestrator;
   }
 
+  public static int getNumberOfPluginWorkers() {
+    int defaultNumberOfWorkers = Runtime.getRuntime().availableProcessors() + 1;
+
+    return getRodaConfiguration().getInt("core.orchestrator.nr_of_workers", defaultNumberOfWorkers);
+  }
+
   public static AkkaDistributedPluginOrchestrator getAkkaDistributedPluginOrchestrator() {
     return akkaDistributedPluginOrchestrator;
   }

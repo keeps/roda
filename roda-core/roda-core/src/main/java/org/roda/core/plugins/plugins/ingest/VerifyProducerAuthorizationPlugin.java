@@ -39,8 +39,9 @@ import org.slf4j.LoggerFactory;
 
 public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VerifyProducerAuthorizationPlugin.class);
+
   private static final String CREATE_TOP_LEVEL_AIP_PERMISSION = "create.top.level.aip";
-  public static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
+  private static final String NO_PERMISSION_TO_CREATE_UNDER_AIP = "The user doesn't have permission to create under AIP";
   private static final String PARENT_AIP_NOT_FOUND = "The parent of the AIP was not found";
   private static final String NO_AIP_PERMISSION = "The user doesn't have access to the parent AIP";
   private static final String AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED = "The user permissions are valid and the AIP permissions were updated";
@@ -84,81 +85,30 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
 
+    Job currentJob = getJob(index);
+
     for (AIP aip : list) {
-      PluginState state = PluginState.SUCCESS;
-      String details = AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED;
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
-
       LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
-      Job currentJob = null;
-      try {
-        currentJob = PluginHelper.getJobFromIndex(this, index);
-      } catch (NotFoundException | GenericException e) {
-        LOGGER.error(e.getMessage(), e);
-      }
-      if (currentJob != null) {
-        try {
-          AIP parentAIP = null;
-          if (aip.getParentId() != null) {
-            LOGGER.debug("PARENT ID: " + aip.getParentId());
-            try {
-              parentAIP = model.retrieveAIP(aip.getParentId());
-              Set<PermissionType> userPermissions = parentAIP.getPermissions()
-                .getUserPermissions(currentJob.getUsername());
-              if (userPermissions.contains(PermissionType.CREATE)) {
-                LOGGER.debug("User have CREATE permission on parent... Granting user permission to this aip");
-                grantPermissionToUser(currentJob.getUsername(), aip, model);
-              } else {
-                LOGGER.debug("User doesn't have CREATE permission on parent... Error...");
-                state = PluginState.FAILURE;
-                details = NO_PERMISSION_TO_CREATE_UNDER_AIP;
-              }
-            } catch (NotFoundException nfe) {
-              state = PluginState.FAILURE;
-              details = PARENT_AIP_NOT_FOUND;
-            } catch (AuthorizationDeniedException e) { // doesn't have access to
-                                                       // AIP
-              LOGGER.debug("User doesn't have access to parent... Error...");
-              state = PluginState.FAILURE;
-              details = NO_AIP_PERMISSION;
-            }
-          } else {
-            RODAMember member = index.retrieve(RODAMember.class, currentJob.getUsername());
-            if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
-              LOGGER.debug(
-                "User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
-              grantPermissionToUser(currentJob.getUsername(), aip, model);
-            } else {
-              state = PluginState.FAILURE;
-              details = NO_CREATE_TOP_LEVEL_AIP_PERMISSION;
-              LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
-            }
-          }
-        } catch (GenericException | RequestNotValidException e) {
-          LOGGER.error("Error: " + e.getMessage(), e);
-          state = PluginState.FAILURE;
-          details = e.getMessage();
-        } catch (NotFoundException e) { // thrown if user associated to job
-                                        // doesn't exist... never thrown, i
-                                        // guess...
 
-        } catch (AuthorizationDeniedException ade) {
-          LOGGER.error("Authorization denied: " + ade.getMessage(), ade);
-          state = PluginState.FAILURE;
-          details = ade.getMessage();
-        }
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      reportItem.setPluginState(PluginState.SUCCESS)
+        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+
+      if (currentJob != null) {
+        processAIPPermissions(index, model, currentJob, aip, reportItem);
+      } else {
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Unable to determine Job");
       }
-      reportItem.setPluginState(state).setPluginDetails(details);
 
       try {
         boolean notify = true;
-        PluginHelper.createPluginEvent(this, aip.getId(), model, index, state, details, notify);
+        PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(),
+          reportItem.getPluginDetails(), notify);
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
         | ValidationException | AlreadyExistsException e) {
         throw new PluginException("Error while creating the event", e);
       }
-      reportItem.setPluginState(PluginState.SUCCESS)
-        .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
+
       LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
       report.addReport(reportItem);
@@ -168,6 +118,55 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     }
 
     return report;
+  }
+
+  private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
+    Report reportItem) {
+    try {
+      AIP parentAIP = null;
+      String jobCreatorUsername = currentJob.getUsername();
+      if (aip.getParentId() != null) {
+        try {
+          parentAIP = model.retrieveAIP(aip.getParentId());
+          Set<PermissionType> userPermissions = parentAIP.getPermissions().getUserPermissions(jobCreatorUsername);
+          if (userPermissions.contains(PermissionType.CREATE)) {
+            LOGGER.debug("User '{}' has CREATE permission on parent AIP...Granting user permission to this aip",
+              jobCreatorUsername);
+            grantPermissionToUser(jobCreatorUsername, aip, model);
+          } else {
+            LOGGER.debug("User doesn't have CREATE permission on parent... Error...");
+            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
+          }
+        } catch (NotFoundException nfe) {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(PARENT_AIP_NOT_FOUND);
+        } catch (AuthorizationDeniedException e) {
+          LOGGER.debug("User doesn't have access to parent... Error...");
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_AIP_PERMISSION);
+        }
+      } else {
+        RODAMember member = index.retrieve(RODAMember.class, jobCreatorUsername);
+        if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
+          LOGGER
+            .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
+          grantPermissionToUser(jobCreatorUsername, aip, model);
+        } else {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_CREATE_TOP_LEVEL_AIP_PERMISSION);
+          LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
+        }
+      }
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+      reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+    }
+  }
+
+  private Job getJob(IndexService index) {
+    Job currentJob = null;
+    try {
+      currentJob = PluginHelper.getJobFromIndex(this, index);
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Error retrieving Job from index", e);
+    }
+    return currentJob;
   }
 
   private void grantPermissionToUser(String username, AIP aip, ModelService model)

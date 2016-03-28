@@ -1048,6 +1048,25 @@ public class SolrUtils {
     return doc;
   }
 
+  public static SolrInputDocument aipPermissionsUpdateToSolrDocument(AIP aip) {
+    return permissionsUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.getPermissions());
+  }
+
+  public static SolrInputDocument representationPermissionsUpdateToSolrDocument(Representation representation,
+    Permissions permissions) {
+    return permissionsUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
+      IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), permissions);
+  }
+
+  public static SolrInputDocument filePermissionsUpdateToSolrDocument(File file, Permissions permissions) {
+    return permissionsUpdateToSolrDocument(RodaConstants.FILE_UUID, file.getId(), permissions);
+  }
+
+  public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
+    Permissions permissions) {
+    return permissionsUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID, permissions);
+  }
+
   private static SolrInputDocument permissionsUpdateToSolrDocument(String idField, String idValue,
     Permissions permissions) {
     SolrInputDocument doc = new SolrInputDocument();
