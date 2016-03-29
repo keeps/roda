@@ -120,28 +120,40 @@ public class ValidationUtils {
     return mainReport;
   }
 
-  public static boolean isXMLValid(ContentPayload xmlPayload) {
-    boolean valid = true;
+  public static ValidationReport isXMLValid(ContentPayload xmlPayload) {
     InputStream inputStream = null;
+    ValidationReport ret = new ValidationReport();
 
     SAXParserFactory factory = SAXParserFactory.newInstance();
     factory.setValidating(false);
     factory.setNamespaceAware(true);
 
+    RodaErrorHandler errorHandler = new RodaErrorHandler();
+
     try {
       inputStream = xmlPayload.createInputStream();
       SAXParser parser = factory.newSAXParser();
       XMLReader reader = parser.getXMLReader();
+      reader.setErrorHandler(errorHandler);
       reader.parse(new InputSource(inputStream));
-    } catch (IOException | ParserConfigurationException | SAXException e) {
-      // xml is not valid or an error occurred while instantiating the needed
-      // objects
-      valid = false;
+      ret.setValid(errorHandler.getErrors().isEmpty());
+      for (SAXParseException saxParseException : errorHandler.getErrors()) {
+        ret.addIssue(convertSAXParseException(saxParseException));
+      }
+    } catch (SAXException e) {
+      LOGGER.error("Error validating descriptive binary as XML", e);
+      ret.setValid(false);
+      for (SAXParseException saxParseException : errorHandler.getErrors()) {
+        ret.addIssue(convertSAXParseException(saxParseException));
+      }
+    } catch (IOException | ParserConfigurationException e) {
+      LOGGER.error("Error validating descriptive metadata as XML", e);
+      ret.setValid(false);
+      ret.setMessage(e.getMessage());
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
-
-    return valid;
+    return ret;
   }
 
   /**
@@ -304,13 +316,7 @@ public class ValidationUtils {
           ret.setMessage("No schema to validate " + descriptiveMetadataType);
         } else {
           LOGGER.info("Found no schema do validate descriptive metadata but will try to validate XML syntax...");
-          if (isXMLValid(descriptiveMetadataPayload)) {
-            ret.setValid(true);
-          } else {
-            ret.setValid(false);
-            ret.setMessage("XML is syntactically invalid");
-          }
-
+          ret = isXMLValid(descriptiveMetadataPayload);
         }
       }
     } catch (SAXException | IOException e) {
