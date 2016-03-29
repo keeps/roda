@@ -46,10 +46,10 @@ public class JobsHelper {
 
     validateJobPluginInformation(job);
 
+    // always set a new UUID (even if job already brings one)
+    job.setId(UUID.randomUUID().toString());
+
     // set "missing" information whenever it is not impeditive for job creation
-    if (org.apache.commons.lang3.StringUtils.isBlank(job.getId())) {
-      job.setId(UUID.randomUUID().toString());
-    }
     if (org.apache.commons.lang3.StringUtils.isBlank(job.getName())) {
       job.setName(job.getId());
     }

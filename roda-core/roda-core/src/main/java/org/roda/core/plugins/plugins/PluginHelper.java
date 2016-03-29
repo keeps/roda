@@ -222,6 +222,7 @@ public final class PluginHelper {
         Report report = reportItems.get(reportItems.size() - 1);
         if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
           reportItems.remove(reportItems.size() - 1);
+          jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
           jobReport.addReport(reportItem);
         }
       }
