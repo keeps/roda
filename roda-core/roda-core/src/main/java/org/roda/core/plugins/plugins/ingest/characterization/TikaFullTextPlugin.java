@@ -137,7 +137,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
           PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
         } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
           | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
+          LOGGER.error("Error creating preservation event", e);
         }
 
       }

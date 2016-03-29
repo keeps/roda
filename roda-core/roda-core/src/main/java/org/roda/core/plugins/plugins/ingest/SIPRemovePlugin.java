@@ -29,6 +29,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public void init() throws PluginException {
+    // do nothing
   }
 
   @Override
@@ -80,7 +81,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
         LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
       }
       report.addReport(reportItem);
-      PluginHelper.createJobReport(this, model, reportItem);
+      PluginHelper.updateJobReport(this, model, index, reportItem);
     }
 
     return report;
@@ -100,12 +101,12 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
 
   @Override
   public Plugin<TransferredResource> cloneMe() {
-    return new BagitToAIPPlugin();
+    return new SIPRemovePlugin();
   }
 
   @Override
   public PluginType getType() {
-    return PluginType.SIP_TO_AIP;
+    return PluginType.MISC;
   }
 
   @Override

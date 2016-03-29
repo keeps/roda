@@ -94,7 +94,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     "parameter.do_file_format_identification", SiegfriedPlugin.getStaticName(), PluginParameterType.BOOLEAN, "true",
     true, false, SiegfriedPlugin.getStaticDescription());
   public static final PluginParameter PARAMETER_DO_FEATURE_EXTRACTION = new PluginParameter(
-    "parameter.do_feature_extraction", "Feature extraction", PluginParameterType.BOOLEAN, "true", true, false,
+    "parameter.do_feature_extraction", "Feature extraction", PluginParameterType.BOOLEAN, "false", true, false,
     "Extraction of technical metadata using Apache Tika");
   public static final PluginParameter PARAMETER_DO_FULL_TEXT_EXTRACTION = new PluginParameter(
     "parameter.do_fulltext_extraction", "Full-text extraction", PluginParameterType.BOOLEAN, "false", true, false,

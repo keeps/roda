@@ -223,28 +223,29 @@ public class ShowJob extends Composite {
 
   private void scheduleUpdateStatus() {
     JOB_STATE state = job.getState();
-    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)
-      && autoUpdateTimer == null) {
-      autoUpdateTimer = new Timer() {
+    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+      if (autoUpdateTimer == null) {
+        autoUpdateTimer = new Timer() {
 
-        @Override
-        public void run() {
-          BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), new AsyncCallback<Job>() {
+          @Override
+          public void run() {
+            BrowserService.Util.getInstance().retrieve(Job.class.getName(), job.getId(), new AsyncCallback<Job>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              Toast.showError(caught.getClass().getName(), caught.getMessage());
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                Toast.showError(caught.getClass().getName(), caught.getMessage());
+              }
 
-            @Override
-            public void onSuccess(Job updatedJob) {
-              ShowJob.this.job = updatedJob;
-              updateStatus();
-              scheduleUpdateStatus();
-            }
-          });
-        }
-      };
+              @Override
+              public void onSuccess(Job updatedJob) {
+                ShowJob.this.job = updatedJob;
+                updateStatus();
+                scheduleUpdateStatus();
+              }
+            });
+          }
+        };
+      }
       autoUpdateTimer.schedule(PERIOD_MILLIS);
     }
   }

@@ -75,8 +75,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private ActorRef jobWorkersRouter;
   private int numberOfWorkers;
 
-  // < jobId,
+  // Map< jobId, Map <plugin, jobplugininfo>>
   private Map<String, Map<Plugin<?>, JobPluginInfo>> runningTasks;
+  // Map< jobId, total number of objects>
   private Map<String, Integer> runningTasksTotalObjects;
 
   public AkkaEmbeddedPluginOrchestrator() {
@@ -117,19 +118,22 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     innerPlugins.add(innerPlugin);
     innerPlugin.beforeExecute(index, model, storage);
 
+    // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
-    JobPluginInfo jobPluginInfo = new JobPluginInfo();
-    jobPluginInfo.setNumberOfObjects(numberOfObjects);
-    jobPluginInfo.setStepsCompleted(0);
-    synchronized (runningTasks) {
-      if (runningTasks.get(jobId) != null) {
-        runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
-        runningTasksTotalObjects.put(jobId, runningTasksTotalObjects.get(jobId) + numberOfObjects);
-      } else {
-        Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
-        inner.put(innerPlugin, jobPluginInfo);
-        runningTasks.put(jobId, inner);
-        runningTasksTotalObjects.put(jobId, numberOfObjects);
+    if (jobId != null) {
+      JobPluginInfo jobPluginInfo = new JobPluginInfo();
+      jobPluginInfo.setNumberOfObjects(numberOfObjects);
+      jobPluginInfo.setStepsCompleted(0);
+      synchronized (runningTasks) {
+        if (runningTasks.get(jobId) != null) {
+          runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
+          runningTasksTotalObjects.put(jobId, runningTasksTotalObjects.get(jobId) + numberOfObjects);
+        } else {
+          Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
+          inner.put(innerPlugin, jobPluginInfo);
+          runningTasks.put(jobId, inner);
+          runningTasksTotalObjects.put(jobId, numberOfObjects);
+        }
       }
     }
 
@@ -147,10 +151,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Plugin<T>> innerPlugins = new ArrayList<>();
       Plugin<T> innerPlugin;
       do {
-        // FIXME
-        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, innerPlugins, 0);
         // XXX block size could be recommended by plugin
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE));
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, innerPlugins,
+          (int) find.getLimit());
         offset += find.getLimit();
         multiplier++;
         futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(find.getResults(), innerPlugin), DEFAULT_TIMEOUT));
@@ -248,7 +252,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      aips.close();
+      IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
@@ -302,7 +306,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      aips.close();
+      IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
@@ -368,7 +372,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      aips.close();
+      IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
@@ -484,18 +488,20 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
     String jobId = PluginHelper.getJobId(plugin);
-    synchronized (runningTasks) {
-      Integer totalNumberOfObjects = runningTasksTotalObjects.get(jobId);
-      Map<Plugin<?>, JobPluginInfo> map = runningTasks.get(jobId);
-      map.get(plugin).setStepsCompleted(stepsCompleted);
+    if (jobId != null) {
+      synchronized (runningTasks) {
+        Integer totalNumberOfObjects = runningTasksTotalObjects.get(jobId);
+        Map<Plugin<?>, JobPluginInfo> map = runningTasks.get(jobId);
+        map.get(plugin).setStepsCompleted(stepsCompleted);
 
-      float percentage = 0f;
-      for (JobPluginInfo entry : map.values()) {
-        float partOne = ((float) entry.getStepsCompleted()) / totalSteps;
-        float partTwo = ((float) entry.getNumberOfObjects()) / totalNumberOfObjects;
-        percentage += (partOne * partTwo);
+        float percentage = 0f;
+        for (JobPluginInfo entry : map.values()) {
+          float pluginPercentage = ((float) entry.getStepsCompleted()) / totalSteps;
+          float pluginWeight = ((float) entry.getNumberOfObjects()) / totalNumberOfObjects;
+          percentage += (pluginPercentage * pluginWeight);
+        }
+        PluginHelper.updateJobStatus(plugin, index, model, Math.round((percentage * 100)));
       }
-      PluginHelper.updateJobStatus(plugin, index, model, (int) (percentage * 100));
     }
   }
 
@@ -556,10 +562,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     return ret;
   }
 
+  // FIXME 20160329 hsilva: when this class is stable, add it to its own class
+  // file
   class JobPluginInfo {
     private int numberOfObjects;
     private int stepsCompleted;
-    private int totalSteps;
 
     public JobPluginInfo() {
 
@@ -580,17 +587,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     public void setStepsCompleted(int stepsCompleted) {
       this.stepsCompleted = stepsCompleted;
     }
-
-    public int getTotalSteps() {
-      return totalSteps;
-    }
-
-    public void setTotalSteps(int totalSteps) {
-      this.totalSteps = totalSteps;
-    }
-
   }
 
+  // FIXME 20160329 hsilva: when this class is stable, add it to its own class
+  // file
   public class PluginMessage<T extends Serializable> {
     private List<T> list;
     private Plugin<T> plugin;

@@ -337,25 +337,11 @@ public final class PluginHelper {
 
   public static <T extends Serializable> int updateJobStatus(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
     int newStepsCompleted = stepsCompleted + 1;
-    // int percentage = (int) ((100f / totalSteps) * newStepsCompleted);
-    //
-    // updateJobStatus(plugin, index, model, percentage);
-    //
+
     RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, newStepsCompleted, totalSteps);
 
     return newStepsCompleted;
   }
-
-  // private static <T extends Serializable> int updateJobStatus(Plugin<T>
-  // plugin, IndexService index, ModelService model,
-  // int stepsCompleted, int totalSteps) {
-  // int newStepsCompleted = stepsCompleted + 1;
-  // int percentage = (int) ((100f / totalSteps) * newStepsCompleted);
-  //
-  // updateJobStatus(plugin, index, model, percentage);
-  //
-  // return newStepsCompleted;
-  // }
 
   public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, IndexService index, ModelService model,
     int newCompletionPercentage) {
