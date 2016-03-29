@@ -310,6 +310,10 @@ public final class RodaConstants {
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
+  public static final String JOB_OBJECTS_COUNT = "objectsCount";
+  public static final String JOB_OBJECTS_WAITING_TO_BE_PROCESSED = "objectsWaitingToBeProcessed";
+  public static final String JOB_OBJECTS_PROCESSED_WITH_SUCCESS = "objectsProcessedWithSuccess";
+  public static final String JOB_OBJECTS_PROCESSED_WITH_FAILURE = "objectsProcessedWithFailure";
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
@@ -527,12 +531,12 @@ public final class RodaConstants {
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"), NORMALIZATION(
-      "normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"), ACCESSION(
-      "accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), WELLFORMEDNESS_CHECK(
-      "wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"), AUTHORIZATION_CHECK(
-      "authorization check"), DELETION("deletion");
+    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
+    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
+    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
+    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
+    AUTHORIZATION_CHECK("authorization check"), DELETION("deletion");
 
     private final String text;
 

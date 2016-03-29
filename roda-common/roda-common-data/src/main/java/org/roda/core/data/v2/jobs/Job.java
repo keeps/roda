@@ -54,6 +54,11 @@ public class Job implements IsIndexed, Serializable {
   // 0-100 scale completion percentage
   private int completionPercentage = 0;
 
+  private int objectsCount = 0;
+  private int objectsWaitingToBeProcessed = 0;
+  private int objectsProcessedWithSuccess = 0;
+  private int objectsProcessedWithFailure = 0;
+
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
   // plugin type (e.g. ingest, maintenance, misc, etc.)
@@ -67,9 +72,6 @@ public class Job implements IsIndexed, Serializable {
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
 
-  // report id
-  private String reportId = null;
-
   public Job() {
     super();
     startDate = new Date();
@@ -77,19 +79,16 @@ public class Job implements IsIndexed, Serializable {
   }
 
   public Job(Job job) {
-    super();
+    this();
     this.id = job.getId();
     this.name = job.getName();
     this.username = job.getUsername();
-    this.startDate = job.getStartDate();
-    this.endDate = job.getEndDate();
-    this.state = job.getState();
-    this.completionPercentage = job.getCompletionPercentage();
     this.pluginType = job.getPluginType();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objectIds = new ArrayList<String>(job.getObjectIds());
+    this.objectsCount = objectIds.size();
   }
 
   public String getId() {
@@ -155,6 +154,38 @@ public class Job implements IsIndexed, Serializable {
     return this;
   }
 
+  public int getObjectsCount() {
+    return objectsCount;
+  }
+
+  public void setObjectsCount(int objectsCount) {
+    this.objectsCount = objectsCount;
+  }
+
+  public int getObjectsWaitingToBeProcessed() {
+    return objectsWaitingToBeProcessed;
+  }
+
+  public void setObjectsWaitingToBeProcessed(int objectsWaitingToBeProcessed) {
+    this.objectsWaitingToBeProcessed = objectsWaitingToBeProcessed;
+  }
+
+  public int getObjectsProcessedWithSuccess() {
+    return objectsProcessedWithSuccess;
+  }
+
+  public void setObjectsProcessedWithSuccess(int objectsProcessedWithSuccess) {
+    this.objectsProcessedWithSuccess = objectsProcessedWithSuccess;
+  }
+
+  public int getObjectsProcessedWithFailure() {
+    return objectsProcessedWithFailure;
+  }
+
+  public void setObjectsProcessedWithFailure(int objectsProcessedWithFailure) {
+    this.objectsProcessedWithFailure = objectsProcessedWithFailure;
+  }
+
   public String getPlugin() {
     return plugin;
   }
@@ -205,9 +236,11 @@ public class Job implements IsIndexed, Serializable {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + state + ", completionPercentage=" + completionPercentage + ", plugin=" + plugin
-      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
-      + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
+      + endDate + ", state=" + state + ", completionPercentage=" + completionPercentage + ", objectsCount="
+      + objectsCount + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsProcessedWithSuccess="
+      + objectsProcessedWithSuccess + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + ", plugin="
+      + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
+      + orchestratorMethod + ", objectIds=" + objectIds + "]";
   }
 
   @JsonIgnore

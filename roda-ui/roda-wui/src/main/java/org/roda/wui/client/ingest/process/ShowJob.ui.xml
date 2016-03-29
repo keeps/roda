@@ -30,9 +30,17 @@
 				</g:Label>
 				<g:Label ui:field="dateStarted" />
 				<g:Label addStyleNames="label">
+					Counters
+				</g:Label>
+				<g:Label ui:field="counters" />
+				<g:Label addStyleNames="label">
 					Status
 				</g:Label>
 				<g:Label ui:field="status" />
+				<g:Label addStyleNames="label">
+					Duration
+				</g:Label>
+				<g:Label ui:field="duration" />
 				<g:Label addStyleNames="label">
 					Plugin
 				</g:Label>

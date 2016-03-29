@@ -47,6 +47,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -201,7 +202,7 @@ public final class PluginHelper {
   }
 
   public static <T extends Serializable> void updateJobReport(Plugin<T> plugin, ModelService model, IndexService index,
-    Report reportItem, boolean replaceReportItem) {
+    Report reportItem, boolean replaceLastReportItemIfTheSame) {
     String jobId = getJobId(plugin);
     try {
       Report jobReport;
@@ -214,8 +215,7 @@ public final class PluginHelper {
         jobReport.addReport(reportItem);
       }
 
-      jobReport.setDateUpdated(new Date());
-      if (!replaceReportItem) {
+      if (!replaceLastReportItemIfTheSame) {
         jobReport.addReport(reportItem);
       } else {
         List<Report> reportItems = jobReport.getReports();
@@ -360,24 +360,38 @@ public final class PluginHelper {
     return pm;
   }
 
-  public static <T extends Serializable> int updateJobStatus(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
-    int newStepsCompleted = stepsCompleted + 1;
+  public static <T extends Serializable> JobPluginInfo updateJobStatus(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
+    jobPluginInfo.setStepsCompleted(jobPluginInfo.getStepsCompleted() + 1);
 
-    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, newStepsCompleted, totalSteps);
+    RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
 
-    return newStepsCompleted;
+    return jobPluginInfo;
   }
 
   public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, ModelService model,
-    int newCompletionPercentage) {
-    try {
-      LOGGER.debug("New job completionPercentage: {}", newCompletionPercentage);
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setCompletionPercentage(newCompletionPercentage);
+    JobPluginInfo jobPluginInfo) {
+    updateJobStatus(plugin, model, jobPluginInfo, false);
+  }
 
-      if (newCompletionPercentage == 0) {
+  public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, ModelService model,
+    JobPluginInfo jobPluginInfo, boolean justPercentage) {
+    try {
+      int completionPercentage = jobPluginInfo.getCompletionPercentage();
+      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setCompletionPercentage(completionPercentage);
+      if (!justPercentage) {
+        job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
+        job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
+        job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+        LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
+          job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
+          job.getObjectsProcessedWithFailure());
+      }
+
+      if (completionPercentage == 0) {
         job.setState(JOB_STATE.STARTED);
-      } else if (newCompletionPercentage == 100) {
+      } else if (completionPercentage == 100) {
         job.setState(JOB_STATE.COMPLETED);
         job.setEndDate(new Date());
       }

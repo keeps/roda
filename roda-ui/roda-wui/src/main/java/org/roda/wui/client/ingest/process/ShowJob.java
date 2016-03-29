@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,7 +136,13 @@ public class ShowJob extends Composite {
   Label dateStarted;
 
   @UiField
+  Label counters;
+
+  @UiField
   Label status;
+
+  @UiField
+  Label duration;
 
   @UiField
   Label plugin;
@@ -204,6 +211,7 @@ public class ShowJob extends Composite {
   }
 
   private void updateStatus() {
+    // set state
     JOB_STATE state = job.getState();
     if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
       // TODO different message for failure?
@@ -215,6 +223,17 @@ public class ShowJob extends Composite {
     } else {
       status.setText(state.toString());
     }
+
+    // set counters
+    counters.setText(messages.showJobCounters(job.getObjectsCount(), job.getObjectsProcessedWithSuccess(),
+      job.getObjectsProcessedWithFailure(), job.getObjectsWaitingToBeProcessed()));
+
+    // set duration
+    Date endDate = job.getEndDate();
+    if (endDate == null) {
+      endDate = new Date();
+    }
+    duration.setText(endDate.getTime() - job.getStartDate().getTime() + " ms");
 
     scheduleUpdateStatus();
   }

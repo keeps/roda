@@ -116,6 +116,11 @@
    <field name="pluginParameters" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    <field name="orchestratorMethod" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectIds" type="string" indexed="false" stored="true" required="false" multiValued="true" />
+   
+   <field name="objectsCount" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectsWaitingToBeProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

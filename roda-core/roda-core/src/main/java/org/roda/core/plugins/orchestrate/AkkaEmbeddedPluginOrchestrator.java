@@ -78,7 +78,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   // Map< jobId, Map <plugin, jobplugininfo>>
   private Map<String, Map<Plugin<?>, JobPluginInfo>> runningTasks;
   // Map< jobId, total number of objects>
-  private Map<String, Integer> runningTasksTotalObjects;
+  private Map<String, Integer> runningTasksObjectsCount;
 
   public AkkaEmbeddedPluginOrchestrator() {
     index = RodaCoreFactory.getIndexService();
@@ -86,7 +86,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     storage = RodaCoreFactory.getStorageService();
 
     runningTasks = new HashMap<>();
-    runningTasksTotalObjects = new HashMap<>();
+    runningTasksObjectsCount = new HashMap<>();
 
     numberOfWorkers = RodaCoreFactory.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
@@ -110,7 +110,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
-    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int numberOfObjects)
+    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
       throws InvalidParameterException, PluginException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
       pluginClass);
@@ -122,17 +122,17 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null) {
       JobPluginInfo jobPluginInfo = new JobPluginInfo();
-      jobPluginInfo.setNumberOfObjects(numberOfObjects);
-      jobPluginInfo.setStepsCompleted(0);
+      jobPluginInfo.setObjectsCount(objectsCount);
+      jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
       synchronized (runningTasks) {
         if (runningTasks.get(jobId) != null) {
           runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
-          runningTasksTotalObjects.put(jobId, runningTasksTotalObjects.get(jobId) + numberOfObjects);
+          runningTasksObjectsCount.put(jobId, runningTasksObjectsCount.get(jobId) + objectsCount);
         } else {
           Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
           inner.put(innerPlugin, jobPluginInfo);
           runningTasks.put(jobId, inner);
-          runningTasksTotalObjects.put(jobId, numberOfObjects);
+          runningTasksObjectsCount.put(jobId, objectsCount);
         }
       }
     }
@@ -486,21 +486,43 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int stepsCompleted, int totalSteps) {
+  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null) {
       synchronized (runningTasks) {
-        Integer totalNumberOfObjects = runningTasksTotalObjects.get(jobId);
-        Map<Plugin<?>, JobPluginInfo> map = runningTasks.get(jobId);
-        map.get(plugin).setStepsCompleted(stepsCompleted);
+        Integer taskObjectsCount = runningTasksObjectsCount.get(jobId);
+        Map<Plugin<?>, JobPluginInfo> jobInfo = runningTasks.get(jobId);
+        JobPluginInfo jobPluginInfo = jobInfo.get(plugin);
+        jobPluginInfo.setTotalSteps(info.getTotalSteps());
+        jobPluginInfo.setStepsCompleted(info.getStepsCompleted());
+        jobPluginInfo.setCompletionPercentage(info.getCompletionPercentage());
+        jobPluginInfo.setObjectsWaitingToBeProcessed(info.getObjectsWaitingToBeProcessed());
+        jobPluginInfo.setObjectsProcessedWithSuccess(info.getObjectsProcessedWithSuccess());
+        jobPluginInfo.setObjectsProcessedWithFailure(info.getObjectsProcessedWithFailure());
 
         float percentage = 0f;
-        for (JobPluginInfo entry : map.values()) {
-          float pluginPercentage = ((float) entry.getStepsCompleted()) / totalSteps;
-          float pluginWeight = ((float) entry.getNumberOfObjects()) / totalNumberOfObjects;
-          percentage += (pluginPercentage * pluginWeight);
+        int waitingToBeProcessed = 0;
+        int processedWithSuccess = 0;
+        int processedWithFailure = 0;
+        for (JobPluginInfo pluginInfo : jobInfo.values()) {
+          if (pluginInfo.getTotalSteps() > 0) {
+            float pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
+            float pluginWeight = ((float) pluginInfo.getObjectsCount()) / taskObjectsCount;
+            percentage += (pluginPercentage * pluginWeight);
+
+            processedWithSuccess += pluginInfo.getObjectsProcessedWithSuccess();
+            processedWithFailure += pluginInfo.getObjectsProcessedWithFailure();
+          }
+          waitingToBeProcessed += pluginInfo.getObjectsWaitingToBeProcessed();
         }
-        PluginHelper.updateJobStatus(plugin, model, Math.round((percentage * 100)));
+
+        JobPluginInfo infoUpdated = new JobPluginInfo();
+        infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
+        infoUpdated.setObjectsWaitingToBeProcessed(waitingToBeProcessed);
+        infoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
+        infoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
+
+        PluginHelper.updateJobStatus(plugin, model, infoUpdated);
       }
     }
   }
@@ -560,33 +582,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
     }
     return ret;
-  }
-
-  // FIXME 20160329 hsilva: when this class is stable, add it to its own class
-  // file
-  class JobPluginInfo {
-    private int numberOfObjects;
-    private int stepsCompleted;
-
-    public JobPluginInfo() {
-
-    }
-
-    public int getNumberOfObjects() {
-      return numberOfObjects;
-    }
-
-    public void setNumberOfObjects(int numberOfObjects) {
-      this.numberOfObjects = numberOfObjects;
-    }
-
-    public int getStepsCompleted() {
-      return stepsCompleted;
-    }
-
-    public void setStepsCompleted(int stepsCompleted) {
-      this.stepsCompleted = stepsCompleted;
-    }
   }
 
   // FIXME 20160329 hsilva: when this class is stable, add it to its own class

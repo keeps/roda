@@ -392,6 +392,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusFailedDuringCreation(Date endDate);
+  
+  @DefaultMessage("{0,number} total, {1,number} successfully processed, {2,number} failed, {3,number} waiting to be processed")
+  String showJobCounters(int objectsCount, int objectsProcessedWithSuccess, int objectsProcessedWithFailure,
+    int objectsWaitingToBeProcessed);
+  
+  @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
+  String showJobReportStatus(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
 
   /************* Browse ****************/
   @DefaultMessage("Loading...")

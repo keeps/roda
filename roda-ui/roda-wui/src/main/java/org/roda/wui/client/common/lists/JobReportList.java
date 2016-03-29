@@ -179,8 +179,8 @@ public class JobReportList extends AsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getCompletionPercentage() + "% (" + report.getStepsCompleted() + "/" + report.getTotalSteps()
-            + ")";
+          value = report.getStepsCompleted() + " of " + report.getTotalSteps() + " (" + report.getCompletionPercentage()
+            + "%)";
         }
 
         return value;
@@ -198,7 +198,7 @@ public class JobReportList extends AsyncTableCell<Report> {
     display.addColumn(updatedDateColumn, "Last updated at");
     display.addColumn(lastPluginRunColumn, "Last run task");
     display.addColumn(lastPluginRunStateColumn, SafeHtmlUtils.fromSafeConstant(STATUS_OK));
-    display.addColumn(completionStatusColumn, "Completion status");
+    display.addColumn(completionStatusColumn, "Status");
 
     display.setColumnWidth(sourceObjectColumn, "100%");
 
@@ -210,6 +210,7 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     updatedDateColumn.setCellStyleNames("nowrap");
     lastPluginRunColumn.setCellStyleNames("nowrap");
+    completionStatusColumn.setCellStyleNames("nowrap");
 
   }
 

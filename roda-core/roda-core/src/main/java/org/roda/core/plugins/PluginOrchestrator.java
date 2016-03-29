@@ -18,6 +18,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public interface PluginOrchestrator {
 
@@ -47,6 +48,6 @@ public interface PluginOrchestrator {
 
   public void stopJob(Job job);
 
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int stepsCompleted, int totalSteps);
+  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo);
 
 }

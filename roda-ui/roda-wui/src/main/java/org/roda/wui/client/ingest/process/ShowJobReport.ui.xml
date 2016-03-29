@@ -39,6 +39,14 @@
 					Date updated
 				</g:Label>
 				<g:Label ui:field="dateUpdated" />
+				<g:Label addStyleNames="label">
+					Duration
+				</g:Label>
+				<g:Label ui:field="duration" />
+				<g:Label addStyleNames="label">
+					Status
+				</g:Label>
+				<g:Label ui:field="status" />
 				<g:Label addStyleNames="h4">
 					<ui:msg>Run tasks</ui:msg>
 				</g:Label>

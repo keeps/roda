@@ -35,6 +35,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
+import config.i18n.client.BrowseMessages;
+
 /**
  * @author Luis Faria
  * 
@@ -86,8 +88,7 @@ public class ShowJobReport extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private static final BrowseMessages messages =
-  // GWT.create(BrowseMessages.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -104,6 +105,10 @@ public class ShowJobReport extends Composite {
   Label dateCreated;
   @UiField
   Label dateUpdated;
+  @UiField
+  Label duration;
+  @UiField
+  Label status;
   @UiField
   FlowPanel reportAttributes;
   @UiField
@@ -132,6 +137,9 @@ public class ShowJobReport extends Composite {
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
+    duration.setText(jobReport.getDateUpdated().getTime()-jobReport.getDateCreated().getTime()+ " ms");
+    status.setText(messages.showJobReportStatus(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
+      jobReport.getTotalSteps()));
 
     for (Report reportItem : jobReport.getReports()) {
       FlowPanel panel = new FlowPanel();

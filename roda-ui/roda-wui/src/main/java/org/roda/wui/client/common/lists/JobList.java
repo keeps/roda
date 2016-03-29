@@ -52,6 +52,10 @@ public class JobList extends AsyncTableCell<Job> {
   private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
   private TextColumn<Job> statusColumn;
+  private TextColumn<Job> objectsTotalCountColumn;
+  private TextColumn<Job> objectsSuccessCountColumn;
+  private TextColumn<Job> objectsFailureCountColumn;
+  private TextColumn<Job> objectsWaitingCountColumn;
 
   public JobList() {
     this(null, null, null, false);
@@ -111,15 +115,71 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
+    objectsTotalCountColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        String ret = null;
+        if (job != null) {
+          ret = job.getObjectsCount() + "";
+        }
+        return ret;
+      }
+    };
+
+    objectsSuccessCountColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        String ret = null;
+        if (job != null) {
+          ret = job.getObjectsProcessedWithSuccess() + "";
+        }
+        return ret;
+      }
+    };
+
+    objectsFailureCountColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        String ret = null;
+        if (job != null) {
+          ret = job.getObjectsProcessedWithFailure() + "";
+        }
+        return ret;
+      }
+    };
+
+    objectsWaitingCountColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        String ret = null;
+        if (job != null) {
+          ret = job.getObjectsWaitingToBeProcessed() + "";
+        }
+        return ret;
+      }
+    };
+
     nameColumn.setSortable(true);
     usernameColumn.setSortable(true);
     startDateColumn.setSortable(true);
     statusColumn.setSortable(true);
+    objectsTotalCountColumn.setSortable(true);
+    objectsSuccessCountColumn.setSortable(true);
+    objectsFailureCountColumn.setSortable(true);
+    objectsWaitingCountColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
     display.addColumn(usernameColumn, "Creator");
     display.addColumn(startDateColumn, "Start date");
+    display.addColumn(objectsTotalCountColumn, "Total");
+    display.addColumn(objectsSuccessCountColumn, "Success");
+    display.addColumn(objectsFailureCountColumn, "Failure");
+    display.addColumn(objectsWaitingCountColumn, "Waiting");
     display.addColumn(statusColumn, "Status");
 
     Label emptyInfo = new Label("No items to display");
@@ -143,6 +203,11 @@ public class JobList extends AsyncTableCell<Job> {
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
     columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
+    columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_COUNT));
+    columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS));
+    columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsWaitingCountColumn,
+      Arrays.asList(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
