@@ -177,13 +177,13 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("")
   String simpleDatesEmpty();
 
-  @DefaultMessage("{0,date,yyyy-MM-dd}")
+  @DefaultMessage("{0,localdatetime,predef:DATE_SHORT}")
   String simpleDatesNoFinal(Date dateInitial);
 
-  @DefaultMessage("To {0,date,yyyy-MM-dd}")
+  @DefaultMessage("To {0,localdatetime,predef:DATE_SHORT}")
   String simpleDatesNoInitial(Date dateFinal);
 
-  @DefaultMessage("{0,date,yyyy-MM-dd} to {1,date,yyyy-MM-dd}")
+  @DefaultMessage("{0,localdatetime,predef:DATE_SHORT} to {1,localdatetime,predef:DATE_SHORT}")
   String simpleDates(Date dateInitial, Date dateFinal);
 
   /****** INGEST TRANSFER **********/
