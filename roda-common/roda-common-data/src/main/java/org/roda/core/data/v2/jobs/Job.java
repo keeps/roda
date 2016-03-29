@@ -19,6 +19,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
@@ -209,6 +210,7 @@ public class Job implements IsIndexed, Serializable {
       + orchestratorMethod + ", objectIds=" + objectIds + ", reportId=" + reportId + "]";
   }
 
+  @JsonIgnore
   @Override
   public String getUUID() {
     return getId();
