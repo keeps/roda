@@ -87,12 +87,11 @@ public class EARKSIPToAIPPlugin extends AbstractPlugin<TransferredResource> {
 
     for (TransferredResource transferredResource : list) {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
+      LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
       Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
-
       SIP sip = null;
       try {
-        LOGGER.debug("Converting {} to AIP", earkSIPPath);
         sip = EARKSIP.parse(earkSIPPath);
         String parentId = PluginHelper.getParentId(this, index, sip.getParentID());
 

@@ -52,6 +52,8 @@ public class JobReportList extends AsyncTableCell<Report> {
 
   private static final String STATUS_OK = "<i class='fa fa-check-circle'></i>";
 
+  private static final String STATUS_RUNNING = "<i class='fa fa-cog fa-spin'></i>";
+
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
@@ -157,6 +159,9 @@ public class JobReportList extends AsyncTableCell<Report> {
           switch (Report.getPluginState()) {
             case SUCCESS:
               ret = SafeHtmlUtils.fromSafeConstant(STATUS_OK);
+              break;
+            case RUNNING:
+              ret = SafeHtmlUtils.fromSafeConstant(STATUS_RUNNING);
               break;
             case FAILURE:
             default:

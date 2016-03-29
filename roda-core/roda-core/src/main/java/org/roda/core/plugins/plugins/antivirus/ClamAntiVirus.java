@@ -7,12 +7,14 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.util.CommandException;
+import org.roda.core.util.CommandUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -132,43 +134,25 @@ public class ClamAntiVirus implements AntiVirus {
 
       LOGGER.debug("Executing virus scan in {}", path);
 
-      // clamscan -r -i bin/ 2> /dev/null
       String clamavBin = RodaCoreFactory.getRodaConfiguration()
         .getString("core.plugins.internal.virus_check.clamav.bin", "clamscan");
       String clamavParams = RodaCoreFactory.getRodaConfiguration()
         .getString("core.plugins.internal.virus_check.clamav.params", "-ri");
-      ProcessBuilder processBuilder = new ProcessBuilder(clamavBin, clamavParams, path.toString());
 
-      // processBuilder.redirectErrorStream();
-
-      Process process = processBuilder.start();
-
-      StringWriter outputWriter = new StringWriter();
-
-      IOUtils.copy(process.getInputStream(), outputWriter);
-
-      // Set the result report
-      result.setReport(outputWriter.toString());
-
-      int exitValue = process.waitFor();
-
-      switch (exitValue) {
-
-        case NO_VIRUS_FOUND:
-          result.setClean(true);
-          break;
-
-        default:
-          result.setClean(false);
-          break;
+      List<String> command = new ArrayList<>();
+      command.add(clamavBin);
+      for (String param : clamavParams.split(" ")) {
+        command.add(param);
       }
-
-    } catch (IOException e) {
-      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
-      throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
-    } catch (InterruptedException e) {
-      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
-      throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
+      command.add(path.toString());
+      //Arrays.asList(clamavBin, clamavParams, path.toString());
+      String commandOutput = CommandUtility.execute(command, true);
+      result.setClean(true);
+      result.setReport(commandOutput);
+    } catch (CommandException e) {
+      LOGGER.debug("Error executing virus scan command", e);
+      result.setClean(false);
+      result.setReport(e.getOutput());
     }
 
     return result;

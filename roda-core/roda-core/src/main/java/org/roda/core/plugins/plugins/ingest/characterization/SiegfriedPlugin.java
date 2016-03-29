@@ -96,6 +96,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      PluginHelper.updateJobReport(this, model, index, reportItem, false);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
@@ -131,7 +132,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
         }
       }
 
-      PluginHelper.updateJobReport(this, model, index, reportItem);
+      PluginHelper.updateJobReport(this, model, index, reportItem, true);
     }
     return report;
   }

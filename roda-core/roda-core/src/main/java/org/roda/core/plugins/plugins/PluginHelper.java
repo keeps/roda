@@ -201,7 +201,7 @@ public final class PluginHelper {
   }
 
   public static <T extends Serializable> void updateJobReport(Plugin<T> plugin, ModelService model, IndexService index,
-    Report reportItem) {
+    Report reportItem, boolean replaceReportItem) {
     String jobId = getJobId(plugin);
     try {
       Report jobReport;
@@ -215,7 +215,16 @@ public final class PluginHelper {
       }
 
       jobReport.setDateUpdated(new Date());
-      jobReport.addReport(reportItem);
+      if (!replaceReportItem) {
+        jobReport.addReport(reportItem);
+      } else {
+        List<Report> reportItems = jobReport.getReports();
+        Report report = reportItems.get(reportItems.size() - 1);
+        if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
+          reportItems.remove(reportItems.size() - 1);
+          jobReport.addReport(reportItem);
+        }
+      }
 
       model.createOrUpdateJobReport(jobReport);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {

@@ -20,7 +20,7 @@ public class Report implements Serializable, IsIndexed {
   private static final long serialVersionUID = 4316398565678538090L;
 
   public enum PluginState {
-    SUCCESS, PARTIAL_SUCCESS, FAILURE
+    SUCCESS, PARTIAL_SUCCESS, FAILURE, RUNNING
   }
 
   private String id = null;
@@ -35,7 +35,7 @@ public class Report implements Serializable, IsIndexed {
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
   private String plugin = null;
-  private PluginState pluginState = PluginState.FAILURE;
+  private PluginState pluginState = PluginState.RUNNING;
   private String pluginDetails = "";
 
   private List<Report> reports = new ArrayList<Report>();
@@ -180,16 +180,16 @@ public class Report implements Serializable, IsIndexed {
   public Report addReport(Report report) {
     // FIXME not quite sure that this is the best place for this logic but it's
     // very handy
-    if (report.getDateUpdated() == null) {
-      report.setDateUpdated(new Date());
-    }
+    // if (report.getDateUpdated() == null) {
+    report.setDateUpdated(new Date());
+    // }
     setDateUpdated(report.getDateUpdated());
     if (totalSteps == 0 && report.getTotalSteps() != 0) {
       setTotalSteps(report.getTotalSteps());
     }
     stepsCompleted = stepsCompleted + 1;
     if (totalSteps != 0) {
-      completionPercentage = (int) ((100f / totalSteps) * stepsCompleted);
+      completionPercentage = Math.round(((100f / totalSteps) * stepsCompleted));
     }
     setPlugin(report.getPlugin());
     setPluginState(report.getPluginState());

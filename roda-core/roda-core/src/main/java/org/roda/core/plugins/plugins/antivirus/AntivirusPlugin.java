@@ -103,6 +103,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      PluginHelper.updateJobReport(this, model, index, reportItem, false);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
@@ -139,7 +140,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
         report.addReport(reportItem);
 
-        PluginHelper.updateJobReport(this, model, index, reportItem);
+        PluginHelper.updateJobReport(this, model, index, reportItem, true);
 
       } catch (Throwable e) {
         LOGGER.error("Error updating event and job", e);

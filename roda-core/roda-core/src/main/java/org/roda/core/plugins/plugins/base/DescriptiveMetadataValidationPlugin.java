@@ -112,6 +112,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      PluginHelper.updateJobReport(this, model, index, reportItem, false);
       try {
         LOGGER.debug("Validating AIP {}", aip.getId());
         ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
@@ -131,7 +132,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
       }
 
       try {
-        PluginHelper.updateJobReport(this, model, index, reportItem);
+        PluginHelper.updateJobReport(this, model, index, reportItem, true);
       } catch (Throwable e) {
         LOGGER.error("Error updating job report", e);
       }

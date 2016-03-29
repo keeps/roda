@@ -75,6 +75,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
     for (AIP aip : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+
       String outcomeDetail = "";
       try {
         LOGGER.debug("Auto accepting AIP {}", aip.getId());
@@ -92,7 +94,7 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       createEvent(outcomeDetail, reportItem.getPluginState(), aip, model, index);
       report.addReport(reportItem);
 
-      PluginHelper.updateJobReport(this, model, index, reportItem);
+      PluginHelper.updateJobReport(this, model, index, reportItem, true);
     }
 
     return report;

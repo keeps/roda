@@ -123,7 +123,8 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
 
-    return null;
+    // FIXME 20160329 hsilva: this should return a better report
+    return new Report();
 
   }
 
