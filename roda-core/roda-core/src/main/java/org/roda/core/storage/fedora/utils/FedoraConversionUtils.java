@@ -16,7 +16,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.io.IOUtils;
 import org.fcrepo.client.FedoraContent;
 import org.fcrepo.client.FedoraDatastream;
 import org.fcrepo.client.FedoraException;
@@ -38,7 +37,6 @@ import org.roda.core.storage.fedora.FedoraContentPayload;
 import org.roda.core.storage.fedora.FedoraStorageService;
 
 import com.hp.hpl.jena.graph.Node;
-import com.hp.hpl.jena.graph.NodeFactory;
 import com.hp.hpl.jena.graph.Triple;
 
 /**
@@ -114,15 +112,16 @@ public final class FedoraConversionUtils {
     throws GenericException, RequestNotValidException {
     try {
       ContentPayload cp = new FedoraContentPayload(datastream);
-      //TODO version properties doesn't contain size...
+      // TODO version properties doesn't contain size...
       long sizeInBytes = 0;
-      try{
+      try {
         sizeInBytes = datastream.getContentSize();
-      }catch(NullPointerException npe){
-        
+      } catch (NullPointerException npe) {
+
       }
       URI contentDigest = datastream.getContentDigest();
-      return new DefaultBinary(FedoraUtils.doubleURLDecode(getStoragePath(datastream)), cp, sizeInBytes, false, extractContentDigest(contentDigest));
+      return new DefaultBinary(FedoraUtils.doubleURLDecode(getStoragePath(datastream)), cp, sizeInBytes, false,
+        extractContentDigest(contentDigest));
     } catch (FedoraException e) {
       throw new GenericException("Error while converting a Fedora datastream into a Binary", e);
     }
@@ -223,7 +222,7 @@ public final class FedoraConversionUtils {
     throws GenericException, RequestNotValidException {
     return new DefaultContainer(FedoraUtils.doubleURLDecode(getStoragePath(object)));
   }
-  
+
   /**
    * Converts a {@code FedoraDatastream} into a {@code BinaryVersion}
    * 
@@ -231,10 +230,12 @@ public final class FedoraConversionUtils {
    *          Fedora data stream to be converted
    * @param version
    *          The version label
-   * @param id 
-   * @throws GenericException, RequestNotValidException, FedoraException
+   * @param id
+   * @throws GenericException,
+   *           RequestNotValidException, FedoraException
    */
-  public static BinaryVersion convertDataStreamToBinaryVersion(FedoraDatastream datastream, String id, String message) throws GenericException, RequestNotValidException, FedoraException {
+  public static BinaryVersion convertDataStreamToBinaryVersion(FedoraDatastream datastream, String id, String message)
+    throws GenericException, RequestNotValidException, FedoraException {
     Binary binary = FedoraConversionUtils.fedoraDatastreamToBinary(datastream);
     return new DefaultBinaryVersion(binary, id, message, datastream.getCreatedDate());
   }

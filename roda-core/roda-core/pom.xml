@@ -125,10 +125,12 @@
 		<runSuite>AllTests.class</runSuite>
 	</properties>
 	<dependencies>
+		<!-- FEDORA CLIENT - start -->
 		<dependency>
+			<!-- available at artifactory.keep.pt -->
 			<groupId>org.fcrepo</groupId>
 			<artifactId>fcrepo-client</artifactId>
-			<version>${fcrepo.version}</version>
+			<version>${fcrepo.version}-sleroux-dev</version>
 		</dependency>
 		<dependency>
 			<!-- available at artifactory.keep.pt -->
@@ -136,6 +138,23 @@
 			<artifactId>fcrepo-client-impl</artifactId>
 			<version>${fcrepo.version}-sleroux-dev</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.jena</groupId>
+			<artifactId>jena-core</artifactId>
+			<version>${jena.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- FEDORA CLIENT - end -->
+
 		<dependency>
 			<groupId>org.yaml</groupId>
 			<artifactId>snakeyaml</artifactId>
@@ -197,8 +216,8 @@
 			<artifactId>Saxon-HE</artifactId>
 		</dependency>
 		<dependency>
-    		<groupId>org.roda-project</groupId>
-    		<artifactId>premis-v3.0</artifactId>
+			<groupId>org.roda-project</groupId>
+			<artifactId>premis-v3.0</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.w3c</groupId>
@@ -544,9 +563,9 @@
 			<artifactId>bcprov-jdk15on</artifactId>
 		</dependency>
 		<dependency>
-	        <groupId>org.bouncycastle</groupId>
-	        <artifactId>bcmail-jdk15on</artifactId>
-	    </dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcmail-jdk15on</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>com.itextpdf</groupId>
 			<artifactId>itextpdf</artifactId>

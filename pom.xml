@@ -128,7 +128,7 @@
 		<fcrepo.version>4.4.0</fcrepo.version>
 		<spring.version>4.1.1.RELEASE</spring.version>
 		<grizzly.version>2.3.16</grizzly.version>
-		<jena.version>2.12.1</jena.version>
+		<jena.version>2.13.0</jena.version>
 		<solr.version>5.5.0</solr.version>
 		<tika.version>1.11</tika.version>
 		<akka.version>2.4.2</akka.version>
