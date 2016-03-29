@@ -40,7 +40,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
       PluginHelper.setPluginParameters(plugin, job);
 
-      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(), 0);
+      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getModelService(), 0);
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
@@ -53,7 +53,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
 
-      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getIndexService(), RodaCoreFactory.getModelService(), 100);
+      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getModelService(), 100);
 
       getSender().tell(reports, getSelf());
     }

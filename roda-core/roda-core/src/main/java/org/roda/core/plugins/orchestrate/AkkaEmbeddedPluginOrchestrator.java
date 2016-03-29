@@ -500,7 +500,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           float pluginWeight = ((float) entry.getNumberOfObjects()) / totalNumberOfObjects;
           percentage += (pluginPercentage * pluginWeight);
         }
-        PluginHelper.updateJobStatus(plugin, index, model, Math.round((percentage * 100)));
+        PluginHelper.updateJobStatus(plugin, model, Math.round((percentage * 100)));
       }
     }
   }

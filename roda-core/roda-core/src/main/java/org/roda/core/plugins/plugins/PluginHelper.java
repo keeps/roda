@@ -155,11 +155,26 @@ public final class PluginHelper {
     return parentId;
   }
 
+  /**
+   * 20160329 hsilva: use this method only to get job information that most
+   * certainly won't change in time (e.g. username, etc.)
+   */
   public static <T extends Serializable> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
     throws NotFoundException, GenericException {
     String jobID = getJobId(plugin);
     if (jobID != null) {
       return index.retrieve(Job.class, jobID);
+    } else {
+      throw new NotFoundException("Job not found");
+    }
+
+  }
+
+  public static <T extends Serializable> Job getJobFromModel(Plugin<T> plugin, ModelService model)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    String jobId = getJobId(plugin);
+    if (jobId != null) {
+      return model.retrieveJob(jobId);
     } else {
       throw new NotFoundException("Job not found");
     }
@@ -343,11 +358,11 @@ public final class PluginHelper {
     return newStepsCompleted;
   }
 
-  public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, IndexService index, ModelService model,
+  public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, ModelService model,
     int newCompletionPercentage) {
     try {
       LOGGER.debug("New job completionPercentage: {}", newCompletionPercentage);
-      Job job = PluginHelper.getJobFromIndex(plugin, index);
+      Job job = PluginHelper.getJobFromModel(plugin, model);
       job.setCompletionPercentage(newCompletionPercentage);
 
       if (newCompletionPercentage == 0) {
@@ -358,8 +373,8 @@ public final class PluginHelper {
       }
 
       model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException e) {
-      LOGGER.error("Unable to get or update Job from index", e);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
     }
   }
 
