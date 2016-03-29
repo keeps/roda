@@ -158,8 +158,8 @@ public class InternalConvertPluginsTest {
 
     index.commit(TransferredResource.class);
 
-    resources.add(index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes())
-      .toString()));
+    resources.add(
+      index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString()));
     return resources;
   }
 
@@ -182,8 +182,8 @@ public class InternalConvertPluginsTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
-      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -205,8 +205,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testImageMagickPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -245,6 +245,8 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
+    
+    index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -294,6 +296,8 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
+    
+    index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -344,6 +348,8 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
+    
+    index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -394,6 +400,8 @@ public class InternalConvertPluginsTest {
 
     Assert.assertEquals(changedCounter, changedFiles.size());
 
+    index.commit(IndexedFile.class);
+
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
       String fileMimetype = ifile.getFileFormat().getMimeType();
@@ -402,8 +410,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGhostScriptPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -443,6 +451,8 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
+    
+    index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
       IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
@@ -453,7 +463,8 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testPdfToPdfaPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -497,9 +508,9 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    InvalidParameterException, InterruptedException, IOException {
+  public void testMultipleRepresentations()
+    throws FileAlreadyExistsException, RequestNotValidException, NotFoundException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException {
 
     AIP aip = ingestCorpora(0);
 
@@ -528,8 +539,8 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(4, aip.getRepresentations().size());
 
-    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId))
-      .count());
+    Assert.assertEquals(1,
+      aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId)).count());
 
     CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(3).getId(),
       true);
@@ -544,21 +555,19 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(
-          1,
-          newReusableAllFiles.stream()
-            .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream()
+          .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$")).count());
 
   }
 
   @Test
-  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testGeneralCommandPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -594,13 +603,13 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$")).count());
   }
 
   @Test
-  public void testDigitalSignaturePlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, NoSuchAlgorithmException {
+  public void testDigitalSignaturePlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, NoSuchAlgorithmException {
     AIP aip = ingestCorpora(1);
     String oldRepresentationId = aip.getRepresentations().get(0).getId();
 
@@ -653,16 +662,16 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+  public void testDigitalSignatureDIPPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
     AIP aip = ingestCorpora(2);
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
     File file = allFiles.iterator().next();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
     String intermediatePath = "/data/storage/";
-    Assert
-      .assertEquals(0, PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
+    Assert.assertEquals(0,
+      PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
 
     Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();

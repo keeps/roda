@@ -57,6 +57,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
@@ -121,7 +122,26 @@ public class IndexServiceTest {
   private void compareAIPWithIndexedAIP(final AIP aip, final IndexedAIP indexedAIP) {
     assertEquals(aip.getId(), indexedAIP.getId());
     assertEquals(aip.getParentId(), indexedAIP.getParentID());
-    assertEquals(aip.getPermissions(), indexedAIP.getPermissions());
+    for (PermissionType permissionType : PermissionType.values()) {
+      // users
+      Set<String> usersSet1 = aip.getPermissions().getUsers().get(permissionType);
+      Set<String> usersSet2 = indexedAIP.getPermissions().getUsers().get(permissionType);
+
+      usersSet1 = usersSet1 == null ? new HashSet<>() : usersSet1;
+      usersSet2 = usersSet2 == null ? new HashSet<>() : usersSet2;
+
+      assertEquals(usersSet1, usersSet2);
+      
+      // groups
+      Set<String> groupsSet1 = aip.getPermissions().getGroups().get(permissionType);
+      Set<String> groupsSet2 = indexedAIP.getPermissions().getGroups().get(permissionType);
+
+      groupsSet1 = groupsSet1 == null ? new HashSet<>() : groupsSet1;
+      groupsSet2 = groupsSet2 == null ? new HashSet<>() : groupsSet2;
+
+      assertEquals(groupsSet1, groupsSet2);
+    }
+
     assertEquals(aip.isActive(), indexedAIP.getState().equals(AIPState.ACTIVE));
   }
 
@@ -160,8 +180,8 @@ public class IndexServiceTest {
 
     // Retrieve, count and list SRO
     String rep1Id = aip.getRepresentations().get(0).getId();
-    IndexedRepresentation rep1 = index
-      .retrieve(IndexedRepresentation.class, IdUtils.getRepresentationId(aipId, rep1Id));
+    IndexedRepresentation rep1 = index.retrieve(IndexedRepresentation.class,
+      IdUtils.getRepresentationId(aipId, rep1Id));
     assertEquals(rep1Id, rep1.getId());
 
     Filter filterParentTheAIP = new Filter();
@@ -265,8 +285,8 @@ public class IndexServiceTest {
     long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null,
-      new Sublist(0, 10), null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
+      null);
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());

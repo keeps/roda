@@ -253,7 +253,7 @@ public class InternalPluginsTest {
 
     List<TransferredResource> items = Arrays.asList(transferredResource);
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, items);
-    assertReports(reports, null, items.stream().map(tr -> tr.getId()).collect(Collectors.toList()));
+    assertReports(reports, null, items.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
     index.commitAIPs();
 

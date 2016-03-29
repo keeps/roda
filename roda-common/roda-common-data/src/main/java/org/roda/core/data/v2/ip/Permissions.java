@@ -159,7 +159,7 @@ public class Permissions implements Serializable {
 
   @Override
   public String toString() {
-    return "AIPPermissions [users=" + users + ", groups=" + groups + "]";
+    return "Permissions [users=" + users + ", groups=" + groups + "]";
   }
 
 }
