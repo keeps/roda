@@ -65,15 +65,15 @@ public class WatchDir implements Runnable {
   public void run() {
     this.running = true;
     long startTime = System.currentTimeMillis();
-    try {
-      if (recursive) {
-        MonitorVariables.getInstance().registerAll(watched);
-      } else {
-        MonitorVariables.getInstance().register(watched);
-      }
-    } catch (IOException e) {
-      LOGGER.error("Error initialing watch thread: " + e.getMessage(), e);
-    }
+    // try {
+    // if (recursive) {
+    // MonitorVariables.getInstance().registerAll(watched);
+    // } else {
+    // MonitorVariables.getInstance().register(watched);
+    // }
+    // } catch (IOException e) {
+    // LOGGER.error("Error initialing watch thread: " + e.getMessage(), e);
+    // }
     LOGGER.debug("Time elapsed (initialize watch): " + ((System.currentTimeMillis() - startTime) / 1000) + " seconds");
 
     watchInitialized = true;
@@ -83,14 +83,14 @@ public class WatchDir implements Runnable {
       threadReindex.start();
     }
 
-    processEvents();
+    // processEvents();
   }
 
   public void stop() {
     this.running = false;
-    
+
     MonitorVariables.destroy();
-    
+
     if (threadReindex != null) {
       threadReindex.interrupt();
     }

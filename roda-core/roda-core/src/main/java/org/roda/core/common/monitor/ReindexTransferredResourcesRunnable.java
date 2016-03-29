@@ -30,13 +30,11 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcesRunnable.class);
 
   private Path basePath;
-  private long counter;
   private Date from;
   private SolrClient index;
 
   public ReindexTransferredResourcesRunnable(Path basePath, Date from, SolrClient index) {
     this.basePath = basePath;
-    this.counter = 0;
     this.from = from;
     this.index = index;
   }
@@ -83,43 +81,13 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   private void indexPath(Path file, BasicFileAttributes attrs) {
     Date modifiedDate = new Date(attrs.lastModifiedTime().toMillis());
     if (from == null || from.before(modifiedDate)) {
-      transferredResourceAdded(FolderMonitorNIO.createTransferredResource(file, basePath), false);
-      counter++;
-      if (counter >= 1000) {
-        try {
-          LOGGER.debug("Commiting...");
-          index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-          counter = 0;
-        } catch (IOException | SolrServerException e) {
-          LOGGER.error(e.getMessage(), e);
-        }
+      try {
+        TransferredResource resource = FolderMonitorNIO.createTransferredResource(file, basePath);
+        index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
+      } catch (IOException | SolrServerException e) {
+        LOGGER.error("Error adding path to Transferred Resources index", e);
       }
     }
   }
 
-  public void transferredResourceAdded(TransferredResource resource, boolean commit) {
-
-    try {
-      // TODO check if indexing ancestors is really needed
-      // if (resource.getAncestorsPaths() != null &&
-      // resource.getAncestorsPaths().size() > 0) {
-      // for (String ancestor : resource.getAncestorsPaths()) {
-      // TransferredResource resourceAncestor = FolderMonitorNIO
-      // .createTransferredResource(basePath.resolve(Paths.get(ancestor)),
-      // Paths.get(resource.getBasePath()));
-      // index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
-      // SolrUtils.transferredResourceToSolrDocument(resourceAncestor));
-      //
-      // }
-      // }
-
-      index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
-
-      if (commit) {
-        index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      }
-    } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error adding path to Transferred Resources index", e);
-    }
-  }
 }
