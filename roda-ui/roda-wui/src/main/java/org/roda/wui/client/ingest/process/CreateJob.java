@@ -173,7 +173,7 @@ public class CreateJob extends Composite {
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<TransferredResource>) selected).getIds();
-        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ID, ids));
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
           10);
         targetPanel.clear();

@@ -745,7 +745,8 @@ public class BrowserHelper {
         RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
           @Override
-          public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+          public void run(IndexedAIP item)
+            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
             try {
               UserUtility.checkObjectPermissions(user, item, PermissionType.DELETE);
               RodaCoreFactory.getModelService().deleteAIP(item.getId());
@@ -759,6 +760,9 @@ public class BrowserHelper {
         // already deleted
       }
     }
+
+    RodaCoreFactory.getIndexService().commitAIPs();
+
     return parentId;
   }
 

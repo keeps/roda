@@ -198,4 +198,27 @@ public class Dialogs {
     inputBox.setFocus(true);
   }
 
+  public static DialogBox showLoadingModel() {
+    final DialogBox dialogBox = new DialogBox(false, true);
+    dialogBox.setText("Loading...");
+
+    FlowPanel layout = new FlowPanel();
+    Label messageLabel = new Label("We are executing your requested task, please wait...");
+
+    layout.add(messageLabel);
+
+    dialogBox.setWidget(layout);
+
+    dialogBox.setGlassEnabled(true);
+    dialogBox.setAnimationEnabled(false);
+
+    dialogBox.addStyleName("wui-dialog-information");
+    layout.addStyleName("wui-dialog-layout");
+    messageLabel.addStyleName("wui-dialog-message");
+
+    dialogBox.center();
+    dialogBox.show();
+    return dialogBox;
+  }
+
 }

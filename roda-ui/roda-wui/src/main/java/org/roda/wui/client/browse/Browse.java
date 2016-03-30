@@ -32,6 +32,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
@@ -793,15 +794,10 @@ public class Browse extends Composite {
           Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
             messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
-            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+            messages.ingestTransferRemoveFolderConfirmDialogOk(), new LoadingAsyncCallback<Boolean>() {
 
             @Override
-            public void onFailure(Throwable caught) {
-              AsyncRequestUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
+            public void onSuccessImpl(Boolean confirmed) {
               if (confirmed) {
                 BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
