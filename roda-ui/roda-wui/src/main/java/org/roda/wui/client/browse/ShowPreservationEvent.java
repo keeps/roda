@@ -27,7 +27,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
@@ -176,7 +176,7 @@ public class ShowPreservationEvent extends Composite {
             Toast.showError("Not found", "Could not find preservation event");
             Tools.newHistory(Tools.concat(PreservationEvents.RESOLVER.getHistoryPath(), aipId));
           } else {
-            AsyncRequestUtils.defaultFailureTreatment(caught);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
         }
 

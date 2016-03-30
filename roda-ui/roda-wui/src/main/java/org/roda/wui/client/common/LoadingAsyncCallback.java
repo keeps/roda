@@ -1,6 +1,6 @@
 package org.roda.wui.client.common;
 
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.DialogBox;
@@ -26,7 +26,7 @@ public abstract class LoadingAsyncCallback<T> implements AsyncCallback<T> {
   }
 
   public void onFailureImpl(Throwable caught) {
-    AsyncRequestUtils.defaultFailureTreatment(caught);
+    AsyncCallbackUtils.defaultFailureTreatment(caught);
   }
 
   public abstract void onSuccessImpl(T result);

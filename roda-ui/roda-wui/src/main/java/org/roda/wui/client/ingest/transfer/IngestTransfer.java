@@ -31,7 +31,7 @@ import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.process.CreateJob;
 import org.roda.wui.client.main.BreadcrumbItem;
@@ -344,7 +344,7 @@ public class IngestTransfer extends Composite {
                   }
                 });
               } else {
-                AsyncRequestUtils.defaultFailureTreatment(caught);
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
                 Tools.newHistory(IngestTransfer.RESOLVER);
               }
 
@@ -403,7 +403,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              AsyncRequestUtils.defaultFailureTreatment(caught);
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
 
             @Override
@@ -431,7 +431,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              AsyncRequestUtils.defaultFailureTreatment(caught);
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
 
             @Override
@@ -442,7 +442,7 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
 
                   @Override
@@ -465,7 +465,7 @@ public class IngestTransfer extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -477,7 +477,7 @@ public class IngestTransfer extends Composite {
 
             @Override
             public void onFailure(Throwable caught) {
-              AsyncRequestUtils.defaultFailureTreatment(caught);
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
 
             @Override
@@ -487,7 +487,7 @@ public class IngestTransfer extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                     transferredResourceList.refresh();
                   }
 

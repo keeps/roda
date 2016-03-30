@@ -73,6 +73,10 @@ public class Dialogs {
     dialogBox.show();
   }
 
+  public static void showInformationDialog(String title, String message, String continueButtonText) {
+    showInformationDialog(title, message, continueButtonText, new NoAsyncCallback<Void>());
+  }
+
   public static void showInformationDialog(String title, String message, String continueButtonText,
     final AsyncCallback<Void> callback) {
     final DialogBox dialogBox = new DialogBox(false, true);

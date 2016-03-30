@@ -33,11 +33,12 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
+import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
@@ -315,7 +316,7 @@ public class Browse extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            if (!AsyncRequestUtils.treatCommonFailures(caught)) {
+            if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
               showError(id, caught);
             }
           }
@@ -437,7 +438,7 @@ public class Browse extends Composite {
 
                 @Override
                 public void onFailure(Throwable caught) {
-                  if (!AsyncRequestUtils.treatCommonFailures(caught)) {
+                  if (!AsyncCallbackUtils.treatCommonFailures(caught)) {
                     Toast.showError(messages.errorLoadingDescriptiveMetadata(caught.getMessage()));
                   }
                 }
@@ -522,6 +523,9 @@ public class Browse extends Composite {
 
     // Set button visibility
     createItem.setVisible(true);
+    moveItem.setVisible(true);
+    editPermissions.setVisible(true);
+    remove.setVisible(true);
   }
 
   private void removeHandlerRegistrations() {
@@ -724,7 +728,7 @@ public class Browse extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        AsyncRequestUtils.defaultFailureTreatment(caught);
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override
@@ -761,7 +765,7 @@ public class Browse extends Composite {
 
                   @Override
                   public void onFailure(Throwable caught) {
-                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                   }
 
                   @Override
@@ -777,6 +781,8 @@ public class Browse extends Composite {
             }
           });
 
+      } else {
+        Dialogs.showInformationDialog("Select an item", "Please select one or more items to remove", "OK");
       }
     } else {
       // Remove all selected
@@ -785,7 +791,7 @@ public class Browse extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -794,27 +800,32 @@ public class Browse extends Composite {
           Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
             messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
-            messages.ingestTransferRemoveFolderConfirmDialogOk(), new LoadingAsyncCallback<Boolean>() {
+            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
             @Override
-            public void onSuccessImpl(Boolean confirmed) {
+            public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+                BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
 
                   @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                  public void onFailureImpl(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
                     aipList.refresh();
                   }
 
                   @Override
-                  public void onSuccess(String parentId) {
+                  public void onSuccessImpl(String parentId) {
                     Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
                       messages.ingestTransferRemoveSuccessMessage(size));
                     aipList.refresh();
                   }
                 });
               }
+            }
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
             }
           });
         }

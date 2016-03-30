@@ -12,7 +12,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -35,7 +35,7 @@ public class SearchSuggestOracle<T extends IsIndexed> extends SuggestOracle {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override

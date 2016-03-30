@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.utils.AsyncRequestUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.RestErrorOverlayType;
@@ -73,7 +73,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
           @Override
           public void onFailure(Throwable caught) {
-            AsyncRequestUtils.defaultFailureTreatment(caught);
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
           }
 
           @Override
@@ -311,7 +311,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -329,7 +329,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
@@ -349,7 +349,7 @@ public class DescriptiveMetadataHistory extends Composite {
 
         @Override
         public void onFailure(Throwable caught) {
-          AsyncRequestUtils.defaultFailureTreatment(caught);
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
         }
 
         @Override
