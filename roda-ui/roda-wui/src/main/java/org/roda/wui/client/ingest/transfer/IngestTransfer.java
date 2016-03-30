@@ -12,7 +12,6 @@ package org.roda.wui.client.ingest.transfer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
 import org.roda.core.data.adapter.facet.Facets;
@@ -22,14 +21,14 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.BasicSearch;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
-import org.roda.wui.client.common.lists.SelectedItems;
-import org.roda.wui.client.common.lists.SelectedItemsSet;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
@@ -56,7 +55,6 @@ import com.google.gwt.safehtml.shared.SafeUri;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
@@ -439,7 +437,7 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItems<TransferredResource> s = new SelectedItemsSet<>(new HashSet<>(Arrays.asList(resource)));
+                SelectedItems<TransferredResource> s = new SelectedItemsList<>(Arrays.asList(resource.getUUID()));
                 BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
@@ -517,10 +515,11 @@ public class IngestTransfer extends Composite {
 
   public SelectedItems<TransferredResource> getSelected() {
     SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
-    if (selected instanceof SelectedItemsSet) {
-      SelectedItemsSet<?> selectedset = (SelectedItemsSet<?>) selected;
-      if (selectedset.getSet().isEmpty() && resource != null) {
-        selected = new SelectedItemsSet<>(new HashSet<>(Arrays.asList(resource)));
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList<?> selectedset = (SelectedItemsList<?>) selected;
+
+      if (SelectedItemsUtils.isEmpty(selectedset) && resource != null) {
+        selected = new SelectedItemsList<>(Arrays.asList(resource.getUUID()));
       }
     }
 

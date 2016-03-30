@@ -22,6 +22,8 @@ import org.apache.solr.common.SolrInputDocument;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -30,8 +32,10 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -333,9 +337,39 @@ public class IndexModelObserver implements ModelObserver {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     SolrServerException, IOException {
     SolrInputDocument premisEventDocument = SolrUtils.preservationEventActiveFlagUpdateToSolrDocument(pm.getId(),
-      active);
-    premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+      pm.getAipId(), active);
+
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
+  }
+
+  @Override
+  public void aipMoved(AIP aip, String oldParentId, String newParentId) {
+
+    try {
+      SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, model);
+      index.add(RodaConstants.INDEX_AIP, aipDoc);
+
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+
+      SolrUtils.execute(index, IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+
+        @Override
+        public void run(IndexedAIP item)
+          throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+          SolrInputDocument descendantDoc;
+          try {
+            descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), item.getParentID(), model);
+            index.add(RodaConstants.INDEX_AIP, descendantDoc);
+          } catch (SolrServerException | IOException e) {
+            LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
+          }
+        }
+      });
+
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException | SolrServerException
+      | IOException e) {
+      LOGGER.error("Error indexing moved AIP " + aip.getId() + " from " + oldParentId + " to " + newParentId, e);
+    }
   }
 
   @Override
@@ -666,8 +700,8 @@ public class IndexModelObserver implements ModelObserver {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     SolrServerException, IOException {
     SolrInputDocument premisEventDocument = SolrUtils.preservationEventPermissionsUpdateToSolrDocument(pm.getId(),
-      permissions);
-    premisEventDocument.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, pm.getAipId());
+      pm.getAipId(), permissions);
+
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 

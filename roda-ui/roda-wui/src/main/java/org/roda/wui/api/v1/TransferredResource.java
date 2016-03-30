@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -86,7 +87,9 @@ public class TransferredResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
     // TODO support remove multiple resources in one go
-    Browser.removeTransferredResources(user, Arrays.asList(path), true);
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(
+      Arrays.asList(path));
+    Browser.removeTransferredResources(user, selected);
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();
   }

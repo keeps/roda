@@ -32,6 +32,8 @@ public interface ModelObserver {
   public void aipUpdated(AIP aip);
 
   public void aipActiveFlagUpdated(AIP aip);
+  
+  public void aipMoved(AIP aip, String oldParentId, String newParentId);
 
   public void aipDeleted(String aipId);
 

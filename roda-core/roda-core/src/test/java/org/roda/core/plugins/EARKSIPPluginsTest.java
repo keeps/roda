@@ -113,23 +113,11 @@ public class EARKSIPPluginsTest {
     throws InterruptedException, IOException, FileAlreadyExistsException, NotFoundException, GenericException {
     FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
 
-    FolderObserver observer = Mockito.mock(FolderObserver.class);
-    f.addFolderObserver(observer);
-
-    while (!f.isFullyInitialized()) {
-      LOGGER.info("Waiting for folder monitor to initialize...");
-      Thread.sleep(1000);
-    }
-
-    Assert.assertTrue(f.isFullyInitialized());
-
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
 
     f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
 
-    // TODO check if 4 times is the expected
-    // Mockito.verify(observer, Mockito.times(4));
-
+    f.reindex(true);
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
@@ -159,7 +147,7 @@ public class EARKSIPPluginsTest {
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
       Arrays.asList(transferredResource));
     assertReports(reports);
-    
+
     index.commitAIPs();
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,

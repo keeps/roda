@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -549,21 +550,19 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
-  public static String removeAIP(RodaUser user, String aipId)
+  public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.DELETE);
 
     // delegate
-    String parentId = BrowserHelper.removeAIP(aipId);
+    String parentId = BrowserHelper.removeAIP(aips, user);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeAIP", aipId, duration);
+    registerAction(user, BROWSER_COMPONENT, "removeAIP", null, duration, "selected", aips);
     return parentId;
   }
 
@@ -787,21 +786,19 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  public static void removeTransferredResources(RodaUser user, List<String> ids, boolean forceCommit)
-    throws AuthorizationDeniedException, GenericException, NotFoundException {
+  public static void removeTransferredResources(RodaUser user, SelectedItems<TransferredResource> selected)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
 
-    UserUtility.checkTransferredResourceAccess(user, ids);
-
     // delegate
-    BrowserHelper.removeTransferredResources(ids, forceCommit);
+    BrowserHelper.removeTransferredResources(selected, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, PATH_PARAM, ids);
+    registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, "selected", selected);
   }
 
   public static void createTransferredResourceFile(RodaUser user, String path, String fileName, InputStream inputStream,
@@ -978,5 +975,10 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "updateAIPPermissions", null, duration, RodaConstants.API_PATH_PARAM_AIP_ID,
       aipId, "permissions", permissions);
+  }
+
+  public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
+    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 }

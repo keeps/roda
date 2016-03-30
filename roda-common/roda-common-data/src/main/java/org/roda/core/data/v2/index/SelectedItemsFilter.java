@@ -1,7 +1,6 @@
-package org.roda.wui.client.common.lists;
+package org.roda.core.data.v2.index;
 
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.v2.index.IsIndexed;
 
 public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T> {
 

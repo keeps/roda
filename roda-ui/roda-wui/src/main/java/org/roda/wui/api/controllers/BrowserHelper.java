@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.FileAlreadyExistsException;
@@ -44,6 +43,7 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.Messages;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.common.validation.ValidationUtils;
@@ -65,7 +65,11 @@ import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -74,6 +78,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -212,10 +217,10 @@ public class BrowserHelper {
       }
     }
 
-    try{
-    bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
-      .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
-    }catch(Throwable t){
+    try {
+      bundle.setHasHistory(!CloseableIterables.isEmpty(model.getStorage()
+        .listBinaryVersions(ModelUtils.getDescriptiveMetadataPath(aipId, descriptiveMetadata.getId()))));
+    } catch (Throwable t) {
       bundle.setHasHistory(false);
     }
     return bundle;
@@ -712,10 +717,7 @@ public class BrowserHelper {
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     ModelService model = RodaCoreFactory.getModelService();
 
-    AIP aip = model.retrieveAIP(aipId);
-    aip.setParentId(parentId);
-
-    return model.updateAIP(aip);
+    return model.moveAIP(aipId, parentId);
   }
 
   public static AIP createAIP(String parentAipId, Permissions permissions) throws GenericException,
@@ -726,10 +728,37 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static String removeAIP(String aipId)
+  public static String removeAIP(SelectedItems<IndexedAIP> selected, RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    String parentId = RodaCoreFactory.getModelService().retrieveAIP(aipId).getParentId();
-    RodaCoreFactory.getModelService().deleteAIP(aipId);
+    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+
+    String parentId = null;
+
+    for (final String aipId : aipIds) {
+      try {
+        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
+        parentId = aip.getParentId();
+        RodaCoreFactory.getModelService().deleteAIP(aipId);
+
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+
+        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+
+          @Override
+          public void run(IndexedAIP item) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+            try {
+              UserUtility.checkObjectPermissions(user, item, PermissionType.DELETE);
+              RodaCoreFactory.getModelService().deleteAIP(item.getId());
+            } catch (NotFoundException e) {
+              // already deleted, ignore
+            }
+          }
+        });
+
+      } catch (NotFoundException e) {
+        // already deleted
+      }
+    }
     return parentId;
   }
 
@@ -893,9 +922,32 @@ public class BrowserHelper {
     }
   }
 
-  public static void removeTransferredResources(List<String> ids, boolean forceCommit)
-    throws GenericException, NotFoundException {
-    RodaCoreFactory.getFolderMonitor().removeSync(ids, forceCommit);
+  public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
+    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    List<String> ret;
+
+    if (selected instanceof SelectedItemsList) {
+      ret = ((SelectedItemsList<T>) selected).getIds();
+    } else if (selected instanceof SelectedItemsFilter) {
+      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
+      Long count = count(classToReturn, filter, user);
+      IndexResult<T> find = find(classToReturn, filter, null, new Sublist(0, count.intValue()), null, user);
+      ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
+    } else {
+      throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
+    }
+
+    return ret;
+  }
+
+  public static void removeTransferredResources(SelectedItems<TransferredResource> selected, RodaUser user)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    List<String> ids = consolidate(user, TransferredResource.class, selected);
+
+    // check permissions
+    UserUtility.checkTransferredResourceAccess(user, ids);
+
+    RodaCoreFactory.getFolderMonitor().removeSync(ids);
   }
 
   public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream,

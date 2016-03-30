@@ -13,9 +13,13 @@ package org.roda.wui.client.ingest.process;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -23,9 +27,6 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.SelectedItems;
-import org.roda.wui.client.common.lists.SelectedItemsFilter;
-import org.roda.wui.client.common.lists.SelectedItemsSet;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -38,8 +39,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -47,7 +46,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextBox;
@@ -173,22 +171,13 @@ public class CreateJob extends Composite {
   private void updateObjectList() {
 
     if (selected != null) {
-      if (selected instanceof SelectedItemsSet) {
-        SafeHtmlBuilder b = new SafeHtmlBuilder();
-        b.append(SafeHtmlUtils.fromSafeConstant("<ul>"));
-        Set<TransferredResource> set = ((SelectedItemsSet<TransferredResource>) selected).getSet();
-        for (TransferredResource transferredResource : set) {
-          b.append(SafeHtmlUtils.fromSafeConstant("<li>"));
-          b.append(SafeHtmlUtils.fromSafeConstant(
-            transferredResource.isFile() ? "<i class='fa fa-file-o'></i>" : "<i class='fa fa-folder-o'></i>"));
-          b.append(SafeHtmlUtils.fromString(transferredResource.getName()));
-          b.append(SafeHtmlUtils.fromSafeConstant("</li>"));
-        }
-        b.append(SafeHtmlUtils.fromSafeConstant("</ul>"));
-        HTML objectList = new HTML(b.toSafeHtml());
-        objectList.addStyleName("wui-transferredResourceList");
+      if (selected instanceof SelectedItemsList) {
+        List<String> ids = ((SelectedItemsList<TransferredResource>) selected).getIds();
+        Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ID, ids));
+        TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
+          10);
         targetPanel.clear();
-        targetPanel.add(objectList);
+        targetPanel.add(list);
       } else if (selected instanceof SelectedItemsFilter) {
         Filter filter = ((SelectedItemsFilter<TransferredResource>) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,

@@ -54,6 +54,12 @@ public abstract class ModelObservable {
     }
   }
 
+  protected void notifyAipMoved(AIP aip, String oldParentId, String newParentId) {
+    for (ModelObserver observer : observers) {
+      observer.aipMoved(aip, oldParentId, newParentId);
+    }
+  }
+
   protected void notifyAipActiveFlagUpdated(AIP aip) {
     for (ModelObserver observer : observers) {
       observer.aipActiveFlagUpdated(aip);
@@ -114,7 +120,8 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
+  protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId) {
     for (ModelObserver observer : observers) {
       observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId);
     }

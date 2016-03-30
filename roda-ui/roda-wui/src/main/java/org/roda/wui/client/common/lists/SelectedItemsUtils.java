@@ -3,25 +3,27 @@ package org.roda.wui.client.common.lists;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SelectedItemsUtils {
   public static <T extends IsIndexed> boolean isEmpty(SelectedItems<T> selected) {
-    return selected instanceof SelectedItemsSet && ((SelectedItemsSet<?>) selected).getSet().isEmpty();
+    return selected instanceof SelectedItemsList && ((SelectedItemsList<?>) selected).getIds().isEmpty();
   }
 
   public static <T extends IsIndexed> void size(Class<T> classToReturn, SelectedItems<T> selected,
     final AsyncCallback<Long> callback) {
 
-    if (selected instanceof SelectedItemsSet) {
-      Long size = (long) ((SelectedItemsSet<?>) selected).getSet().size();
+    if (selected instanceof SelectedItemsList) {
+      Long size = (long) ((SelectedItemsList<?>) selected).getIds().size();
       callback.onSuccess(size);
     } else if (selected instanceof SelectedItemsFilter) {
       Filter filter = ((SelectedItemsFilter<?>) selected).getFilter();
-      BrowserService.Util.getInstance().count(TransferredResource.class.getName(), filter, new AsyncCallback<Long>() {
+      BrowserService.Util.getInstance().count(classToReturn.getName(), filter, new AsyncCallback<Long>() {
 
         @Override
         public void onFailure(Throwable caught) {

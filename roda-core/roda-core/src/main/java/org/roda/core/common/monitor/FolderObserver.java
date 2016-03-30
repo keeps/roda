@@ -17,7 +17,7 @@ public interface FolderObserver {
 
   public void transferredResourceModified(TransferredResource resource);
 
-  public void transferredResourceDeleted(TransferredResource resource, boolean forceCommit);
+  public void transferredResourceDeleted(TransferredResource resource);
 
   public void pathDeleted(Path deleted);
 

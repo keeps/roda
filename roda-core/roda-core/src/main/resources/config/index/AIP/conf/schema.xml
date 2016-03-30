@@ -105,7 +105,8 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
-   <field name="parentId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
+   <field name="parentId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="ancestors" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="dateModified" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="descriptiveMetadataId" type="string" indexed="true" stored="true" required="false" multiValued="true" /> 

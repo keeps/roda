@@ -11,12 +11,16 @@
 package org.roda.wui.client.browse;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -262,7 +266,8 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
 
-      BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<String>() {
+      SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId));
+      BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

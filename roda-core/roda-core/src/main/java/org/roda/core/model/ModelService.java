@@ -427,6 +427,19 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
+  public AIP moveAIP(String aipId, String parentId)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
+
+    AIP aip = getAIPMetadata(aipId);
+    String oldParentId = aip.getParentId();
+    aip.setParentId(parentId);
+    updateAIPMetadata(aip);
+
+    notifyAipMoved(aip, oldParentId, parentId);
+
+    return aip;
+  }
+
   public void deleteAIP(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     StoragePath aipPath = ModelUtils.getAIPStoragePath(aipId);

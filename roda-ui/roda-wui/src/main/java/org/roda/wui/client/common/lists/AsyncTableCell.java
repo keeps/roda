@@ -20,6 +20,9 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.widgets.MyCellTableResources;
 import org.roda.wui.common.client.widgets.wcag.AccessibleCellTable;
@@ -481,7 +484,12 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     if (isAllSelected()) {
       ret = new SelectedItemsFilter<T>(getFilter());
     } else {
-      ret = new SelectedItemsSet<T>(selected);
+      List<String> ids = new ArrayList<>();
+      for (T item : selected) {
+        ids.add(item.getUUID());
+      }
+      
+      ret = new SelectedItemsList<T>(ids);
     }
 
     return ret;

@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.ip;
 
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -36,7 +37,7 @@ public class IndexedAIP implements IsIndexed {
   private String description = null;
 
   private String parentID = null;
-  private int subElementsCount = 0;
+  private List<String> ancestors;
 
   private Permissions permissions = new Permissions();
 
@@ -55,8 +56,7 @@ public class IndexedAIP implements IsIndexed {
    */
   public IndexedAIP(IndexedAIP other) {
     this(other.getId(), other.getState(), other.getLevel(), other.getTitle(), other.getDateInitial(),
-      other.getDateFinal(), other.getDescription(), other.getParentID(), other.getSubElementsCount(),
-      other.getPermissions());
+      other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions());
   }
 
   /**
@@ -76,7 +76,7 @@ public class IndexedAIP implements IsIndexed {
    * @param subElementsCount
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
-    String description, String parentID, int subElementsCount, Permissions permissions) {
+    String description, String parentID, List<String> ancestors, Permissions permissions) {
 
     setId(id);
     setState(state);
@@ -88,7 +88,7 @@ public class IndexedAIP implements IsIndexed {
     setDescription(description);
 
     setParentID(parentID);
-    setSubElementsCount(subElementsCount);
+    setAncestors(ancestors);
 
     setPermissions(permissions);
   }
@@ -179,21 +179,6 @@ public class IndexedAIP implements IsIndexed {
   }
 
   /**
-   * @return the number of sub elements (description objects)
-   */
-  public int getSubElementsCount() {
-    return subElementsCount;
-  }
-
-  /**
-   * @param count
-   *          the number of sub elements (description objects) to set
-   */
-  public void setSubElementsCount(int count) {
-    this.subElementsCount = count;
-  }
-
-  /**
    * @return the description
    */
   public String getDescription() {
@@ -223,6 +208,14 @@ public class IndexedAIP implements IsIndexed {
     this.parentID = parentID;
   }
 
+  public List<String> getAncestors() {
+    return ancestors;
+  }
+
+  public void setAncestors(List<String> ancestors) {
+    this.ancestors = ancestors;
+  }
+
   public Permissions getPermissions() {
     return permissions;
   }
@@ -235,6 +228,7 @@ public class IndexedAIP implements IsIndexed {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
+    result = prime * result + ((ancestors == null) ? 0 : ancestors.hashCode());
     result = prime * result + ((dateFinal == null) ? 0 : dateFinal.hashCode());
     result = prime * result + ((dateInitial == null) ? 0 : dateInitial.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
@@ -243,7 +237,6 @@ public class IndexedAIP implements IsIndexed {
     result = prime * result + ((parentID == null) ? 0 : parentID.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((state == null) ? 0 : state.hashCode());
-    result = prime * result + subElementsCount;
     result = prime * result + ((title == null) ? 0 : title.hashCode());
     return result;
   }
@@ -257,6 +250,11 @@ public class IndexedAIP implements IsIndexed {
     if (getClass() != obj.getClass())
       return false;
     IndexedAIP other = (IndexedAIP) obj;
+    if (ancestors == null) {
+      if (other.ancestors != null)
+        return false;
+    } else if (!ancestors.equals(other.ancestors))
+      return false;
     if (dateFinal == null) {
       if (other.dateFinal != null)
         return false;
@@ -294,8 +292,6 @@ public class IndexedAIP implements IsIndexed {
       return false;
     if (state != other.state)
       return false;
-    if (subElementsCount != other.subElementsCount)
-      return false;
     if (title == null) {
       if (other.title != null)
         return false;
@@ -308,7 +304,7 @@ public class IndexedAIP implements IsIndexed {
   public String toString() {
     return "IndexedAIP [id=" + id + ", state=" + state + ", level=" + level + ", title=" + title + ", dateInitial="
       + dateInitial + ", dateFinal=" + dateFinal + ", description=" + description + ", parentID=" + parentID
-      + ", subElementsCount=" + subElementsCount + ", permissions=" + permissions + "]";
+      + ", ancestors=" + ancestors + ", permissions=" + permissions + "]";
   }
 
   @Override

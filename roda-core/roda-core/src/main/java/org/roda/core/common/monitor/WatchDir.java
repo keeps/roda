@@ -77,13 +77,21 @@ public class WatchDir implements Runnable {
     LOGGER.debug("Time elapsed (initialize watch): " + ((System.currentTimeMillis() - startTime) / 1000) + " seconds");
 
     watchInitialized = true;
-    if (index != null) {
-      reindexRunnable = new ReindexTransferredResourcesRunnable(watched, indexDate, index);
-      threadReindex = new Thread(reindexRunnable, "ReindexThread");
-      threadReindex.start();
-    }
+    reindex(false);
 
     // processEvents();
+  }
+
+  public void reindex(boolean waitToFinish) {
+    if (index != null) {
+      reindexRunnable = new ReindexTransferredResourcesRunnable(watched, indexDate, index);
+      if (waitToFinish) {
+        reindexRunnable.run();
+      } else {
+        threadReindex = new Thread(reindexRunnable, "ReindexThread");
+        threadReindex.start();
+      }
+    }
   }
 
   public void stop() {

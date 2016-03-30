@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
@@ -29,6 +28,9 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -52,9 +54,6 @@ import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
-import org.roda.wui.client.common.lists.SelectedItems;
-import org.roda.wui.client.common.lists.SelectedItemsFilter;
-import org.roda.wui.client.common.lists.SelectedItemsSet;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.search.SearchField;
@@ -242,10 +241,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String removeAIP(String aipId)
+  public String removeAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.removeAIP(user, aipId);
+    return Browser.removeAIP(user, aips);
   }
 
   @Override
@@ -293,32 +292,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void removeTransferredResources(SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-
-    List<String> ids = new ArrayList<>();
-
-    ids = consolidate(user, TransferredResource.class, selected);
-
-    Browser.removeTransferredResources(user, ids, true);
+    Browser.removeTransferredResources(user, selected);
   }
 
-  private static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
-    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    List<String> ret;
 
-    if (selected instanceof SelectedItemsSet) {
-      Set<T> set = ((SelectedItemsSet<T>) selected).getSet();
-      ret = set.stream().map(i -> i.getUUID()).collect(Collectors.toList());
-    } else if (selected instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
-      Long count = Browser.count(user, classToReturn, filter);
-      IndexResult<T> find = Browser.find(user, classToReturn, filter, null, new Sublist(0, count.intValue()), null);
-      ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
-    } else {
-      throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
-    }
-
-    return ret;
-  }
 
   @Override
   public boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException {
@@ -373,7 +350,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Job job = new Job();
     job.setName(jobName);
 
-    List<String> objectIds = consolidate(user, TransferredResource.class, selected);
+    List<String> objectIds = Browser.consolidate(user, TransferredResource.class, selected);
     job.setObjectIds(objectIds);
     job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
 

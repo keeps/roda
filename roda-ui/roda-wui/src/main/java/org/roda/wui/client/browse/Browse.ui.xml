@@ -41,7 +41,7 @@
 				<g:Label addStyleNames="h4 browseSearchListTitle" ui:field="fondsPanelTitle">
 					<ui:msg>Sublevels</ui:msg>
 				</g:Label>
-				<lists:AIPList ui:field="fondsPanel" />
+				<lists:AIPList ui:field="aipList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="sidebarData">

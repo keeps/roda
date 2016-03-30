@@ -59,7 +59,7 @@ public class DummyObserver implements FolderObserver {
   }
 
   @Override
-  public void transferredResourceDeleted(TransferredResource resource, boolean forceCommit) {
+  public void transferredResourceDeleted(TransferredResource resource) {
     LOGGER.info("TR DELETED: " + resource.getRelativePath());
   }
 

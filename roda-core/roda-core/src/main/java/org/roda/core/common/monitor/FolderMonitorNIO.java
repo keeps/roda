@@ -104,13 +104,13 @@ public class FolderMonitorNIO {
 
   }
 
-  public void removeSync(List<String> ids, boolean forceCommit) throws NotFoundException, GenericException {
+  public void removeSync(List<String> ids) throws NotFoundException, GenericException {
     for (String s : ids) {
       Path relative = Paths.get(s);
       Path fullPath = basePath.resolve(relative);
       if (Files.exists(fullPath)) {
         for (FolderObserver observer : observers) {
-          observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath), forceCommit);
+          observer.transferredResourceDeleted(createTransferredResource(fullPath, basePath));
         }
         FSUtils.deletePath(fullPath);
       } else {
@@ -193,6 +193,10 @@ public class FolderMonitorNIO {
 
   public boolean isFullyInitialized() {
     return watchDir != null && watchDir.isFullyInitialized();
+  }
+
+  public void reindex(boolean waitToFinish) {
+    watchDir.reindex(waitToFinish);
   }
 
 }

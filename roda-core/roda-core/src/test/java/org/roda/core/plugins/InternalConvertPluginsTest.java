@@ -129,16 +129,6 @@ public class InternalConvertPluginsTest {
     FileAlreadyExistsException, NotFoundException, GenericException, AlreadyExistsException {
     FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
 
-    FolderObserver observer = Mockito.mock(FolderObserver.class);
-    f.addFolderObserver(observer);
-
-    while (!f.isFullyInitialized()) {
-      LOGGER.info("Waiting for folder monitor to initialize...");
-      Thread.sleep(1000);
-    }
-
-    Assert.assertTrue(f.isFullyInitialized());
-
     List<TransferredResource> resources = new ArrayList<TransferredResource>();
 
     String[] aips = {CorporaConstants.SOURCE_AIP_CONVERTER_1, CorporaConstants.SOURCE_AIP_CONVERTER_2,
@@ -154,7 +144,7 @@ public class InternalConvertPluginsTest {
     String transferredResourceId = "testt";
     FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    Thread.sleep(1000);
+    f.reindex(true);
 
     index.commit(TransferredResource.class);
 
@@ -245,7 +235,7 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
-    
+
     index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
@@ -296,7 +286,7 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
-    
+
     index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
@@ -348,7 +338,7 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
-    
+
     index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {
@@ -451,7 +441,7 @@ public class InternalConvertPluginsTest {
       .collect(Collectors.toList());
 
     Assert.assertEquals(changedCounter, changedFiles.size());
-    
+
     index.commit(IndexedFile.class);
 
     for (File file : changedFiles) {

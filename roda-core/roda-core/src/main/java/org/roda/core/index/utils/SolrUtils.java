@@ -76,6 +76,7 @@ import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.LongRangeFilterParameter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -91,6 +92,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -346,6 +348,9 @@ public class SolrUtils {
     } else if (parameter instanceof LongRangeFilterParameter) {
       LongRangeFilterParameter param = (LongRangeFilterParameter) parameter;
       appendRange(ret, param.getName(), Long.class, param.getFromValue(), Long.class, param.getToValue());
+    } else if (parameter instanceof NotSimpleFilterParameter) {
+      NotSimpleFilterParameter notSimplePar = (NotSimpleFilterParameter) parameter;
+      appendNotExactMatch(ret, notSimplePar.getName(), notSimplePar.getValue(), true, true);
     } else {
       LOGGER.error("Unsupported filter parameter class: {}", parameter.getClass().getName());
       throw new RequestNotValidException("Unsupported filter parameter class: " + parameter.getClass().getName());
@@ -569,6 +574,11 @@ public class SolrUtils {
       ret.append("\"");
     }
     ret.append(")");
+  }
+
+  private static void appendNotExactMatch(StringBuilder ret, String key, String value, boolean appendDoubleQuotes,
+    boolean prefixWithANDOperatorIfBuilderNotEmpty) {
+    appendExactMatch(ret, "*:* -" + key, value, appendDoubleQuotes, prefixWithANDOperatorIfBuilderNotEmpty);
   }
 
   private static void appendBasicSearch(StringBuilder ret, String key, String value, String operator,
@@ -969,6 +979,7 @@ public class SolrUtils {
     final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE));
     final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
+    final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
     final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
     final List<String> descriptions = objectToListString(doc.get(RodaConstants.AIP_DESCRIPTION));
@@ -979,10 +990,7 @@ public class SolrUtils {
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
-    // FIXME 20160318 hsilva: 0??? for real???
-    final int childrenCount = 0;
-
-    return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, childrenCount,
+    return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
       permissions);
   }
 
@@ -993,6 +1001,10 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.ACTIVE, aip.isActive());
+
+    // set ancestors
+    List<String> ancestors = getAncestors(aip.getParentId(), model);
+    ret.addField(RodaConstants.AIP_ANCESTORS, ancestors);
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
@@ -1036,6 +1048,23 @@ public class SolrUtils {
     return ret;
   }
 
+  private static List<String> getAncestors(String parentId, ModelService model)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    List<String> ancestors = new ArrayList<>();
+    String nextAncestorId = parentId;
+    while (nextAncestorId != null) {
+      try {
+        AIP nextAncestor = model.retrieveAIP(nextAncestorId);
+        ancestors.add(nextAncestorId);
+        nextAncestorId = nextAncestor.getParentId();
+      } catch (NotFoundException e) {
+        LOGGER.warn("Could not find one ancestor of AIP", e);
+        nextAncestorId = null;
+      }
+    }
+    return ancestors;
+  }
+
   public static SolrInputDocument aipActiveFlagUpdateToSolrDocument(AIP aip) {
     return activeFlagUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.isActive());
   }
@@ -1051,16 +1080,18 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument preservationEventActiveFlagUpdateToSolrDocument(String preservationEventID,
-    boolean active) {
-    return activeFlagUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID, active);
+    String preservationEventAipId, boolean active) {
+    SolrInputDocument document = activeFlagUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID,
+      preservationEventID, active);
+    document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
+    return document;
+
   }
 
   private static SolrInputDocument activeFlagUpdateToSolrDocument(String idField, String idValue, boolean active) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(idField, idValue);
-    Map<String, Object> fieldModifier = new HashMap<>(1);
-    fieldModifier.put("set", active);
-    doc.addField(RodaConstants.ACTIVE, fieldModifier);
+    doc.addField(RodaConstants.ACTIVE, set(active));
     return doc;
   }
 
@@ -1079,8 +1110,11 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument preservationEventPermissionsUpdateToSolrDocument(String preservationEventID,
-    Permissions permissions) {
-    return permissionsUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID, permissions);
+    String preservationEventAipId, Permissions permissions) {
+    SolrInputDocument document = permissionsUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID,
+      preservationEventID, permissions);
+    document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
+    return document;
   }
 
   private static SolrInputDocument permissionsUpdateToSolrDocument(String idField, String idValue,
@@ -1091,17 +1125,13 @@ public class SolrUtils {
     for (Entry<PermissionType, Set<String>> entry : permissions.getUsers().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_USERS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());
-      Map<String, Object> fieldModifier = new HashMap<>(1);
-      fieldModifier.put("set", value);
-      doc.addField(key, fieldModifier);
+      doc.addField(key, set(value));
     }
 
     for (Entry<PermissionType, Set<String>> entry : permissions.getGroups().entrySet()) {
       String key = RodaConstants.INDEX_PERMISSION_GROUPS_PREFIX + entry.getKey();
       List<String> value = new ArrayList<>(entry.getValue());
-      Map<String, Object> fieldModifier = new HashMap<>(1);
-      fieldModifier.put("set", value);
-      doc.addField(key, fieldModifier);
+      doc.addField(key, set(value));
     }
 
     return doc;
@@ -1149,6 +1179,29 @@ public class SolrUtils {
 
       ret.addField(key, value);
     }
+  }
+
+  public static SolrInputDocument updateAIPParentId(String aipId, String parentId, ModelService model)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.AIP_ID, aipId);
+    doc.addField(RodaConstants.AIP_PARENT_ID, set(parentId));
+    doc.addField(RodaConstants.AIP_ANCESTORS, set(getAncestors(parentId, model)));
+    return doc;
+  }
+
+  public static SolrInputDocument updateAIPAncestors(String aipId, String parentId, ModelService model)
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    SolrInputDocument doc = new SolrInputDocument();
+    doc.addField(RodaConstants.AIP_ID, aipId);
+    doc.addField(RodaConstants.AIP_ANCESTORS, set(getAncestors(parentId, model)));
+    return doc;
+  }
+
+  private static Map<String, Object> set(Object value) {
+    Map<String, Object> fieldModifier = new HashMap<>(1);
+    fieldModifier.put("set", value);
+    return fieldModifier;
   }
 
   public static IndexedRepresentation solrDocumentToRepresentation(SolrDocument doc) {
@@ -1986,6 +2039,25 @@ public class SolrUtils {
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Could not get suggestions", e);
     }
+  }
+
+  public static <T extends IsIndexed> void execute(SolrClient index, Class<T> classToRetrieve, Filter filter,
+    IndexRunnable<T> indexRunnable) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+
+    Sorter sorter = null;
+    int offset = 0;
+    int pagesize = 1000;
+    boolean done = false;
+
+    do {
+      Sublist sublist = new Sublist(offset, pagesize);
+      IndexResult<T> find = SolrUtils.find(index, classToRetrieve, filter, sorter, sublist);
+      for (T target : find.getResults()) {
+        indexRunnable.run(target);
+      }
+      done = find.getResults().isEmpty();
+      offset += pagesize;
+    } while (!done);
   }
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,

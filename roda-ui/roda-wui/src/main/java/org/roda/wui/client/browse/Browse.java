@@ -16,13 +16,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -31,6 +35,7 @@ import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncRequestUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
@@ -176,7 +181,7 @@ public class Browse extends Composite {
   Label fondsPanelTitle;
 
   @UiField(provided = true)
-  AIPList fondsPanel;
+  AIPList aipList;
 
   @UiField
   FlowPanel sidebarData;
@@ -216,28 +221,32 @@ public class Browse extends Composite {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
 
-    fondsPanel = new AIPList();
+    Filter filter = null;
+    Facets facets = null;
+    String summary = "List of items";
+    boolean selectable = true;
+    aipList = new AIPList(filter, facets, summary, selectable);
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
 
-    fondsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
+    aipList.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedAIP aip = fondsPanel.getSelectionModel().getSelectedObject();
+        IndexedAIP aip = aipList.getSelectionModel().getSelectedObject();
         if (aip != null) {
           view(aip.getId());
         }
       }
     });
 
-    fondsPanel.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedAIP>>() {
+    aipList.addValueChangeHandler(new ValueChangeHandler<IndexResult<IndexedAIP>>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<IndexResult<IndexedAIP>> event) {
         fondsPanelTitle.setVisible(!viewingTop && event.getValue().getTotalCount() > 0);
-        fondsPanel.setVisible(viewingTop || event.getValue().getTotalCount() > 0);
+        aipList.setVisible(viewingTop || event.getValue().getTotalCount() > 0);
       }
     });
   }
@@ -272,8 +281,7 @@ public class Browse extends Composite {
     } else if (historyTokens.size() > 1
       && historyTokens.get(0).equals(DescriptiveMetadataHistory.RESOLVER.getHistoryToken())) {
       DescriptiveMetadataHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() > 1
-      && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
+    } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(EditPermissions.RESOLVER.getHistoryToken())) {
       EditPermissions.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
@@ -341,7 +349,7 @@ public class Browse extends Composite {
 
     viewingTop = false;
     fondsPanelTitle.setVisible(false);
-    fondsPanel.setVisible(false);
+    aipList.setVisible(false);
 
     downloadList.clear();
     sidebarData.setVisible(false);
@@ -469,7 +477,7 @@ public class Browse extends Composite {
       }
 
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
-      fondsPanel.setFilter(filter);
+      aipList.setFilter(filter);
 
       sidebarData.setVisible(representations.size() > 0);
       preservationSidebar.setVisible(true);
@@ -507,7 +515,7 @@ public class Browse extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    fondsPanel.setFilter(COLLECTIONS_FILTER);
+    aipList.setFilter(COLLECTIONS_FILTER);
 
     actionsSidebar.setVisible(true);
 
@@ -559,7 +567,6 @@ public class Browse extends Composite {
     SafeHtml breadcrumbLabel = builder.toSafeHtml();
     return breadcrumbLabel;
   }
-
 
   private Widget createRepresentationDownloadButton(IndexedRepresentation rep) {
     Button downloadButton = new Button();
@@ -729,37 +736,93 @@ public class Browse extends Composite {
 
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
-    if (aipId != null) {
-      Dialogs.showConfirmDialog(messages.browseRemoveConfirmDialogTitle(), messages.browseRemoveConfirmDialogMessage(),
-        messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<Boolean>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            // nothing to do
-          }
+    final SelectedItems<IndexedAIP> selected = aipList.getSelected();
 
-          @Override
-          public void onSuccess(Boolean confirmed) {
-            if (confirmed) {
-              BrowserService.Util.getInstance().removeAIP(aipId, new AsyncCallback<String>() {
+    if (SelectedItemsUtils.isEmpty(selected)) {
+      // Remove the whole folder
 
-                @Override
-                public void onFailure(Throwable caught) {
-                  AsyncRequestUtils.defaultFailureTreatment(caught);
-                }
+      if (aipId != null) {
+        Dialogs.showConfirmDialog(messages.browseRemoveConfirmDialogTitle(),
+          messages.browseRemoveConfirmDialogMessage(), messages.dialogCancel(), messages.dialogOk(),
+          new AsyncCallback<Boolean>() {
 
-                @Override
-                public void onSuccess(String parentId) {
-                  if (parentId != null) {
-                    Tools.newHistory(Browse.RESOLVER, parentId);
-                  } else {
-                    Tools.newHistory(Browse.RESOLVER);
-                  }
-                }
-              });
+            @Override
+            public void onFailure(Throwable caught) {
+              // nothing to do
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId));
+                BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                  }
+
+                  @Override
+                  public void onSuccess(String parentId) {
+                    if (parentId != null) {
+                      Tools.newHistory(Browse.RESOLVER, parentId);
+                    } else {
+                      Tools.newHistory(Browse.RESOLVER);
+                    }
+                  }
+                });
+              }
+            }
+          });
+
+      }
+    } else {
+      // Remove all selected
+
+      SelectedItemsUtils.size(IndexedAIP.class, selected, new AsyncCallback<Long>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncRequestUtils.defaultFailureTreatment(caught);
+        }
+
+        @Override
+        public void onSuccess(final Long size) {
+          // TODO update messages
+          Dialogs.showConfirmDialog(messages.ingestTransferRemoveFolderConfirmDialogTitle(),
+            messages.ingestTransferRemoveSelectedConfirmDialogMessage(size),
+            messages.ingestTransferRemoveFolderConfirmDialogCancel(),
+            messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncRequestUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncRequestUtils.defaultFailureTreatment(caught);
+                    aipList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(String parentId) {
+                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                      messages.ingestTransferRemoveSuccessMessage(size));
+                    aipList.refresh();
+                  }
+                });
+              }
+            }
+          });
+        }
+      });
 
     }
   }
@@ -778,7 +841,9 @@ public class Browse extends Composite {
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
     if (aipId != null && itemBundle != null) {
-      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), aipId);
+      Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
+        new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
       if (itemBundle.getAip().getParentID() != null) {
         selectAipDialog.setEmptyParentButtonVisible();
       }
@@ -813,7 +878,7 @@ public class Browse extends Composite {
       });
     }
   }
-  
+
   @UiHandler("editPermissions")
   void buttonEditPermissionsHandler(ClickEvent e) {
     if (aipId != null) {

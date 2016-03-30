@@ -30,6 +30,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -76,12 +77,17 @@ public class IndexService {
     List<IndexedAIP> ancestors = new ArrayList<IndexedAIP>();
     IndexedAIP parent = null, actual = aip;
 
-    while (actual != null && actual.getParentID() != null && !ancestors.contains(actual)) {
+    while (actual != null && actual.getParentID() != null) {
       try {
         parent = getParent(actual);
       } catch (NotFoundException e) {
         parent = null;
         LOGGER.warn("Ancestor not found: {}", actual.getParentID());
+      }
+
+      if (ancestors.contains(parent)) {
+        LOGGER.warn("Found a cyclic ancestor relationship: {} and {}", aip.getId(), parent.getId());
+        break;
       }
 
       ancestors.add(parent);
@@ -91,8 +97,8 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter) throws GenericException,
-    RequestNotValidException {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter)
+    throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
@@ -122,8 +128,8 @@ public class IndexService {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
-  public void reindexAIPs() throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
+  public void reindexAIPs()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<AIP> aips = null;
     try {
       LOGGER.info("{} > Listing AIPs", new Date().getTime());
@@ -195,14 +201,14 @@ public class IndexService {
     observer.messageCreatedOrUpdated(message);
   }
 
-  public void reindexActionLogs() throws GenericException, NotFoundException, AuthorizationDeniedException,
-    RequestNotValidException {
+  public void reindexActionLogs()
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     CloseableIterable<Resource> actionLogs = null;
 
     try {
       boolean recursive = false;
-      actionLogs = model.getStorage().listResourcesUnderContainer(
-        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+      actionLogs = model.getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {
@@ -287,6 +293,11 @@ public class IndexService {
   public <T extends IsIndexed> List<String> suggest(Class<T> returnClass, String field, String query)
     throws GenericException {
     return SolrUtils.suggest(index, returnClass, field, query);
+  }
+
+  public <T extends IsIndexed> void execute(Class<T> classToRetrieve, Filter filter, IndexRunnable<T> indexRunnable)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    SolrUtils.execute(index, classToRetrieve, filter, indexRunnable);
   }
 
 }

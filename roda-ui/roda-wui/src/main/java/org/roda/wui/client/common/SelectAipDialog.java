@@ -28,8 +28,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.DialogBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 
 import config.i18n.client.BrowseMessages;
 
@@ -56,28 +54,23 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   @UiField(provided = true)
   AIPList searchResultsPanel;
 
-  private String aipId;
-
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
 
   public SelectAipDialog(String title) {
-    this(title, null);
+    this(title, DEFAULT_FILTER_AIP);
   }
 
-  public SelectAipDialog(String title, String aipId) {
-    this.aipId = aipId;
-
-    basicSearch = new BasicSearch(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(),
-      false, false);
+  public SelectAipDialog(String title, Filter filter) {
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultsPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.selectAipSearchResults(), false);
+    searchResultsPanel = new AIPList(filter, facets, messages.selectAipSearchResults(), false);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(),
-      false, false);
+    basicSearch = new BasicSearch(filter, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(), false,
+      false);
     basicSearch.setList(searchResultsPanel);
+    basicSearch.setDefaultFilterIncremental(true);
 
     setWidget(binder.createAndBindUi(this));
 
@@ -90,21 +83,8 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
 
     center();
 
-    selectButton.setEnabled(false);
     emptyParentButton.setVisible(false);
 
-    searchResultsPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        IndexedAIP aip = searchResultsPanel.getSelectionModel().getSelectedObject();
-        if (aip != null && !aip.getId().equals(SelectAipDialog.this.aipId)) {
-          selectButton.setEnabled(true);
-        } else {
-          selectButton.setEnabled(false);
-        }
-      }
-    });
   }
 
   public void showAndCenter() {
