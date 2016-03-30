@@ -312,6 +312,7 @@ public final class RodaConstants {
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_OBJECTS_COUNT = "objectsCount";
   public static final String JOB_OBJECTS_WAITING_TO_BE_PROCESSED = "objectsWaitingToBeProcessed";
+  public static final String JOB_OBJECTS_BEING_PROCESSED = "objectsBeingProcessed";
   public static final String JOB_OBJECTS_PROCESSED_WITH_SUCCESS = "objectsProcessedWithSuccess";
   public static final String JOB_OBJECTS_PROCESSED_WITH_FAILURE = "objectsProcessedWithFailure";
   public static final String JOB_PLUGIN = "plugin";

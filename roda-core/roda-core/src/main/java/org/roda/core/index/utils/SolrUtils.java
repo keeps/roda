@@ -1642,6 +1642,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
     doc.addField(RodaConstants.JOB_OBJECTS_COUNT, job.getObjectsCount());
     doc.addField(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED, job.getObjectsWaitingToBeProcessed());
+    doc.addField(RodaConstants.JOB_OBJECTS_BEING_PROCESSED, job.getObjectsBeingProcessed());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS, job.getObjectsProcessedWithSuccess());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE, job.getObjectsProcessedWithFailure());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
@@ -1665,6 +1666,7 @@ public class SolrUtils {
     job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE), 0));
     job.setObjectsCount(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_COUNT), 0));
     job.setObjectsWaitingToBeProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED), 0));
+    job.setObjectsBeingProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_BEING_PROCESSED), 0));
     job.setObjectsProcessedWithSuccess(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
     job.setObjectsProcessedWithFailure(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE), 0));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));

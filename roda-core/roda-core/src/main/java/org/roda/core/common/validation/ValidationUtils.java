@@ -141,13 +141,11 @@ public class ValidationUtils {
         ret.addIssue(convertSAXParseException(saxParseException));
       }
     } catch (SAXException e) {
-      LOGGER.error("Error validating descriptive binary as XML", e);
       ret.setValid(false);
       for (SAXParseException saxParseException : errorHandler.getErrors()) {
         ret.addIssue(convertSAXParseException(saxParseException));
       }
     } catch (IOException | ParserConfigurationException e) {
-      LOGGER.error("Error validating descriptive metadata as XML", e);
       ret.setValid(false);
       ret.setMessage(e.getMessage());
     } finally {

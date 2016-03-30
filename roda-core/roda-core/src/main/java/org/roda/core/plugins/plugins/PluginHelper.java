@@ -384,6 +384,8 @@ public final class PluginHelper {
         job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
         job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
         job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+        job.setObjectsBeingProcessed(job.getObjectsCount() - job.getObjectsWaitingToBeProcessed()
+          - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
         LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
           job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
           job.getObjectsProcessedWithFailure());

@@ -56,6 +56,7 @@ public class Job implements IsIndexed, Serializable {
 
   private int objectsCount = 0;
   private int objectsWaitingToBeProcessed = 0;
+  private int objectsBeingProcessed = 0;
   private int objectsProcessedWithSuccess = 0;
   private int objectsProcessedWithFailure = 0;
 
@@ -69,6 +70,8 @@ public class Job implements IsIndexed, Serializable {
   // type of method that orchestrator should execute (e.g.
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
   private ORCHESTRATOR_METHOD orchestratorMethod = null;
+
+  // FIXME 20160330 hsilva: change this by SelectedItems<T extends IsIndexed>
   // list of object ids to act upon
   private List<String> objectIds = new ArrayList<String>();
 
@@ -168,6 +171,14 @@ public class Job implements IsIndexed, Serializable {
 
   public void setObjectsWaitingToBeProcessed(int objectsWaitingToBeProcessed) {
     this.objectsWaitingToBeProcessed = objectsWaitingToBeProcessed;
+  }
+
+  public int getObjectsBeingProcessed() {
+    return objectsBeingProcessed;
+  }
+
+  public void setObjectsBeingProcessed(int objectsBeingProcessed) {
+    this.objectsBeingProcessed = objectsBeingProcessed;
   }
 
   public int getObjectsProcessedWithSuccess() {

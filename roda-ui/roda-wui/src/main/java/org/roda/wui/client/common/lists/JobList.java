@@ -55,6 +55,7 @@ public class JobList extends AsyncTableCell<Job> {
   private TextColumn<Job> objectsTotalCountColumn;
   private TextColumn<Job> objectsSuccessCountColumn;
   private TextColumn<Job> objectsFailureCountColumn;
+  private TextColumn<Job> objectsProcessingCountColumn;
   private TextColumn<Job> objectsWaitingCountColumn;
 
   public JobList() {
@@ -163,6 +164,18 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
+    objectsProcessingCountColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        String ret = null;
+        if (job != null) {
+          ret = job.getObjectsBeingProcessed() + "";
+        }
+        return ret;
+      }
+    };
+
     nameColumn.setSortable(true);
     usernameColumn.setSortable(true);
     startDateColumn.setSortable(true);
@@ -171,6 +184,7 @@ public class JobList extends AsyncTableCell<Job> {
     objectsSuccessCountColumn.setSortable(true);
     objectsFailureCountColumn.setSortable(true);
     objectsWaitingCountColumn.setSortable(true);
+    objectsProcessingCountColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
@@ -179,6 +193,7 @@ public class JobList extends AsyncTableCell<Job> {
     display.addColumn(objectsTotalCountColumn, "Total");
     display.addColumn(objectsSuccessCountColumn, "Success");
     display.addColumn(objectsFailureCountColumn, "Failure");
+    display.addColumn(objectsProcessingCountColumn, "Processing");
     display.addColumn(objectsWaitingCountColumn, "Waiting");
     display.addColumn(statusColumn, "Status");
 
@@ -206,6 +221,7 @@ public class JobList extends AsyncTableCell<Job> {
     columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_COUNT));
     columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS));
     columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsProcessingCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_BEING_PROCESSED));
     columnSortingKeyMap.put(objectsWaitingCountColumn,
       Arrays.asList(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));

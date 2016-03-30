@@ -112,7 +112,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Preservation")
   String sidebarPreservationTitle();
-  
+
   @DefaultMessage("Risks")
   String sidebarRisksTitle();
 
@@ -392,11 +392,11 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
   String showJobStatusFailedDuringCreation(Date endDate);
-  
-  @DefaultMessage("{0,number} total, {1,number} successfully processed, {2,number} failed, {3,number} waiting to be processed")
+
+  @DefaultMessage("{0,number} total, {1,number} successfully processed, {2,number} failed, {3,number} processing, {4,number} waiting to be processed")
   String showJobCounters(int objectsCount, int objectsProcessedWithSuccess, int objectsProcessedWithFailure,
-    int objectsWaitingToBeProcessed);
-  
+    int objectsBeingProcessed, int objectsWaitingToBeProcessed);
+
   @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
   String showJobReportStatus(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
 
@@ -443,13 +443,13 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("108")
   String searchFieldNumericToPlaceHolder();
-  
+
   @DefaultMessage("Identifier")
   String searchRepresentationFieldIdentifier();
-  
+
   @DefaultMessage("Size")
   String searchRepresentationFieldSize();
-  
+
   @DefaultMessage("Number of files")
   String searchRepresentationFieldNumberOfFiles();
 
@@ -562,7 +562,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Cancel")
   String selectAipCancelButton();
-  
+
   @DefaultMessage("Move to root")
   String selectAipEmptyParentButton();
 
@@ -588,8 +588,11 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Select parent")
   String selectParentTitle();
 
-  /************* Lists 
-   * @param count ****************/
+  /*************
+   * Lists
+   * 
+   * @param count
+   ****************/
 
   @DefaultMessage("Select all {0} items")
   String listSelectAllMessage(int count);
@@ -604,21 +607,21 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Severity")
   String riskRegisterSeverity();
-  
+
   @DefaultMessage("New")
   String riskRegisterNewButton();
-  
+
   @DefaultMessage("Edit")
   String riskRegisterEditButton();
-  
+
   @DefaultMessage("Remove")
   String riskRegisterRemoveButton();
-  
+
   @DefaultMessage("Start new process")
   String riskRegisterProcessButton();
-  
+
   /************* User log ****************/
-  
+
   @DefaultMessage("Search log...")
   String userLogSearchPlaceHolder();
 }

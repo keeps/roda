@@ -119,6 +119,7 @@
    
    <field name="objectsCount" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsWaitingToBeProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectsBeingProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
 

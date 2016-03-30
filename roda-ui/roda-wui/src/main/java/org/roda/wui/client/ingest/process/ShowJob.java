@@ -226,7 +226,7 @@ public class ShowJob extends Composite {
 
     // set counters
     counters.setText(messages.showJobCounters(job.getObjectsCount(), job.getObjectsProcessedWithSuccess(),
-      job.getObjectsProcessedWithFailure(), job.getObjectsWaitingToBeProcessed()));
+      job.getObjectsProcessedWithFailure(), job.getObjectsBeingProcessed(), job.getObjectsWaitingToBeProcessed()));
 
     // set duration
     Date endDate = job.getEndDate();
