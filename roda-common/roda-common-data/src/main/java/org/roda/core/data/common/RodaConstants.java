@@ -320,8 +320,7 @@ public final class RodaConstants {
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
-  public static final String JOB_OBJECT_IDS = "objectIds";
-  public static final String JOB_OBJECT_IDS_TO_AIP_REPORT = "objectIdsToAipReport";
+  public static final String JOB_OBJECTS = "objects";
 
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
   public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";

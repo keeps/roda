@@ -33,6 +33,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.user.RodaUser;
@@ -83,8 +84,8 @@ public class ManagementTasksResource extends RodaCoreService {
     // FIXME see if this is the proper way to ensure that the user can execute
     // this task
     if (!user.getAllGroups().contains("administrators")) {
-      throw new AuthorizationDeniedException("User \"" + user.getId()
-        + "\" doesn't have permission the execute the requested task!");
+      throw new AuthorizationDeniedException(
+        "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
     }
 
     return execute(user, startDate, sub_resource, task_id, entity, params);
@@ -94,11 +95,8 @@ public class ManagementTasksResource extends RodaCoreService {
   private Response execute(RodaUser user, Date startDate, final String sub_resource, final String task_id,
     String entity, List<String> params) {
     if (!TASKS.getTasks().contains(sub_resource + "/" + task_id)) {
-      return Response
-        .serverError()
-        .entity(
-          new ApiResponseMessage(ApiResponseMessage.ERROR, "No task was found in the sub-resource \"" + sub_resource
-            + "\" with the id \"" + task_id + "\"")).build();
+      return Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
+        "No task was found in the sub-resource \"" + sub_resource + "\" with the id \"" + task_id + "\"")).build();
     } else {
       ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
       if ("index".equals(sub_resource)) {
@@ -235,7 +233,7 @@ public class ManagementTasksResource extends RodaCoreService {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
     job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
-      .setPlugin(ReindexAIPPlugin.class.getCanonicalName()).setObjectIds(params);
+      .setPlugin(ReindexAIPPlugin.class.getCanonicalName()).setObjects(new SelectedItemsList(params));
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");

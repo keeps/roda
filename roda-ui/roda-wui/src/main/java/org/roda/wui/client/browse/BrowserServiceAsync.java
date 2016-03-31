@@ -50,7 +50,7 @@ public interface BrowserServiceAsync {
 
   void createAIP(String parentId, AsyncCallback<String> callback);
 
-  void removeAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
+  void removeAIP(SelectedItems aips, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
@@ -61,7 +61,7 @@ public interface BrowserServiceAsync {
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
-  void removeTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
+  void removeTransferredResources(SelectedItems selected, AsyncCallback<Void> callback);
 
   void isTransferFullyInitialized(AsyncCallback<Boolean> callback);
 
@@ -105,8 +105,8 @@ public interface BrowserServiceAsync {
 
   void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
 
-  void createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
-    Map<String, String> parameters, AsyncCallback<Job> asyncCallback);
+  void createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters,
+    AsyncCallback<Job> asyncCallback);
 
   void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
 

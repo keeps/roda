@@ -550,7 +550,7 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
-  public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
+  public static String removeAIP(RodaUser user, SelectedItems aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
@@ -786,7 +786,7 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  public static void removeTransferredResources(RodaUser user, SelectedItems<TransferredResource> selected)
+  public static void removeTransferredResources(RodaUser user, SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -978,7 +978,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
-    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    SelectedItems selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 }

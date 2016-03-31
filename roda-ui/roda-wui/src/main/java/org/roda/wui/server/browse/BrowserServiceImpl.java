@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -29,12 +28,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
-import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -241,7 +237,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String removeAIP(SelectedItems<IndexedAIP> aips)
+  public String removeAIP(SelectedItems aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.removeAIP(user, aips);
@@ -289,13 +285,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void removeTransferredResources(SelectedItems<TransferredResource> selected)
+  public void removeTransferredResources(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Browser.removeTransferredResources(user, selected);
   }
-
-
 
   @Override
   public boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException {
@@ -341,17 +335,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
-    Map<String, String> parameters)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
     Job job = new Job();
     job.setName(jobName);
-
-    List<String> objectIds = Browser.consolidate(user, TransferredResource.class, selected);
-    job.setObjectIds(objectIds);
+    job.setObjects(selected);
     job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
 
     job.setPlugin(plugin);

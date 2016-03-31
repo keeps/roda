@@ -470,9 +470,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private Timeout getJobTimeout(Job job) {
-    int objectsCount = job.getObjectIds().size();
+    int objectsCount = job.getObjectsCount();
     int blocks = 1;
-    if (objectsCount != 0) {
+    if (objectsCount > 0) {
       blocks = (objectsCount / BLOCK_SIZE);
       if (objectsCount % BLOCK_SIZE != 0) {
         blocks += 1;

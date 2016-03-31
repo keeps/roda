@@ -9,7 +9,7 @@ package org.roda.core.data.v2.index;
 
 import java.util.List;
 
-public class SelectedItemsList<T extends IsIndexed> implements SelectedItems<T> {
+public class SelectedItemsList implements SelectedItems {
 
   private static final long serialVersionUID = -5364779540199737165L;
 

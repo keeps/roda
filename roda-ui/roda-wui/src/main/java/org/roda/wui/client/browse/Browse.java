@@ -742,7 +742,7 @@ public class Browse extends Composite {
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
 
-    final SelectedItems<IndexedAIP> selected = aipList.getSelected();
+    final SelectedItems selected = aipList.getSelected();
 
     if (SelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
@@ -760,7 +760,7 @@ public class Browse extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId));
+                SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId));
                 BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
                   @Override

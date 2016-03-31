@@ -8,16 +8,16 @@
 package org.roda.core.data.v2.jobs;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -71,9 +71,8 @@ public class Job implements IsIndexed, Serializable {
   // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
   private ORCHESTRATOR_METHOD orchestratorMethod = null;
 
-  // FIXME 20160330 hsilva: change this by SelectedItems<T extends IsIndexed>
-  // list of object ids to act upon
-  private List<String> objectIds = new ArrayList<String>();
+  // objects to act upon
+  private SelectedItems objects = null;
 
   public Job() {
     super();
@@ -90,8 +89,12 @@ public class Job implements IsIndexed, Serializable {
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.orchestratorMethod = job.getOrchestratorMethod();
-    this.objectIds = new ArrayList<String>(job.getObjectIds());
-    this.objectsCount = objectIds.size();
+    this.objects = job.getObjects();
+    if (objects instanceof SelectedItemsList) {
+      this.objectsCount = ((SelectedItemsList) objects).getIds().size();
+    } else {
+      this.objectsCount = -1000;
+    }
   }
 
   public String getId() {
@@ -225,18 +228,16 @@ public class Job implements IsIndexed, Serializable {
     return this;
   }
 
-  @XmlElement(nillable = true)
-  public List<String> getObjectIds() {
-    return objectIds;
-  }
-
-  public Job setObjectIds(List<String> objectIds) {
-    this.objectIds = objectIds;
-    return this;
-  }
-
   public PluginType getPluginType() {
     return pluginType;
+  }
+
+  public SelectedItems getObjects() {
+    return objects;
+  }
+
+  public void setObjects(SelectedItems objects) {
+    this.objects = objects;
   }
 
   public Job setPluginType(PluginType pluginType) {
@@ -248,10 +249,11 @@ public class Job implements IsIndexed, Serializable {
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", completionPercentage=" + completionPercentage + ", objectsCount="
-      + objectsCount + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsProcessedWithSuccess="
-      + objectsProcessedWithSuccess + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + ", plugin="
-      + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
-      + orchestratorMethod + ", objectIds=" + objectIds + "]";
+      + objectsCount + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsBeingProcessed="
+      + objectsBeingProcessed + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess
+      + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + ", plugin=" + plugin + ", pluginType="
+      + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod=" + orchestratorMethod
+      + ", objects=" + objects + "]";
   }
 
   @JsonIgnore

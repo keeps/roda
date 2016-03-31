@@ -208,10 +208,10 @@ public class IngestTransfer extends Composite {
       }
     });
 
-    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
+    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
 
       @Override
-      public void onSelectionChange(SelectedItems<TransferredResource> selected) {
+      public void onSelectionChange(SelectedItems selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
 
         remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()
@@ -418,7 +418,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
 
-    final SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+    final SelectedItems selected = transferredResourceList.getSelected();
 
     if (SelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
@@ -437,7 +437,7 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItems<TransferredResource> s = new SelectedItemsList<>(Arrays.asList(resource.getUUID()));
+                SelectedItems s = new SelectedItemsList(Arrays.asList(resource.getUUID()));
                 BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
@@ -513,13 +513,13 @@ public class IngestTransfer extends Composite {
     Tools.newHistory(CreateJob.RESOLVER);
   }
 
-  public SelectedItems<TransferredResource> getSelected() {
-    SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
+  public SelectedItems getSelected() {
+    SelectedItems selected = transferredResourceList.getSelected();
     if (selected instanceof SelectedItemsList) {
-      SelectedItemsList<?> selectedset = (SelectedItemsList<?>) selected;
+      SelectedItemsList selectedset = (SelectedItemsList) selected;
 
       if (SelectedItemsUtils.isEmpty(selectedset) && resource != null) {
-        selected = new SelectedItemsList<>(Arrays.asList(resource.getUUID()));
+        selected = new SelectedItemsList(Arrays.asList(resource.getUUID()));
       }
     }
 

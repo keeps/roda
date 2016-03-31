@@ -13,7 +13,10 @@ import java.util.List;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -44,11 +47,12 @@ public class AkkaJobWorkerActor extends UntypedActor {
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
-          (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjectIds()));
+          (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjects()));
       } else if (ORCHESTRATOR_METHOD.ON_ALL_AIPS == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
       } else if (ORCHESTRATOR_METHOD.ON_AIPS == job.getOrchestratorMethod()) {
-        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin, job.getObjectIds());
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
+          getAIPs(job.getObjects()));
       } else if (ORCHESTRATOR_METHOD.RUN_PLUGIN == job.getOrchestratorMethod()) {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
@@ -59,14 +63,30 @@ public class AkkaJobWorkerActor extends UntypedActor {
     }
   }
 
-  public List<TransferredResource> getTransferredResourcesFromObjectIds(List<String> objectIds) {
+  public List<TransferredResource> getTransferredResourcesFromObjectIds(SelectedItems selectedItems) {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
-    for (String objectId : objectIds) {
-      try {
-        res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
-      } catch (GenericException | NotFoundException e) {
-        LOGGER.error("Error retrieving TransferredResource", e);
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList list = (SelectedItemsList) selectedItems;
+      for (String objectId : list.getIds()) {
+        try {
+          res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
+        } catch (GenericException | NotFoundException e) {
+          LOGGER.error("Error retrieving TransferredResource", e);
+        }
       }
+    } else {
+      LOGGER.error("Still not implemented!!!!!!!!");
+    }
+    return res;
+  }
+
+  public List<String> getAIPs(SelectedItems selectedItems) {
+    List<String> res = new ArrayList<String>();
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList list = (SelectedItemsList) selectedItems;
+      res.addAll(list.getIds());
+    } else {
+      LOGGER.error("Still not implemented!!!!!!!!");
     }
     return res;
   }

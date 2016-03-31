@@ -129,7 +129,7 @@ public class AipsResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<>(Arrays.asList(aipId));
+    SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId));
     Browser.removeAIP(user, selected);
 
     // FIXME give a better answer

@@ -141,8 +141,8 @@ public class JsonUtils {
    *             marshal and unmarshal a classification plans
    */
   @Deprecated
-  public static ObjectNode aipToJSON(IndexedAIP indexedAIP) throws IOException, RequestNotValidException,
-    NotFoundException, GenericException, AuthorizationDeniedException {
+  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
+    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     JsonFactory factory = new JsonFactory();
     ObjectMapper mapper = new ObjectMapper(factory);
     ModelService model = RodaCoreFactory.getModelService();

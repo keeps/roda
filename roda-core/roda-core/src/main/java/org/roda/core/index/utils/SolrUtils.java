@@ -94,6 +94,7 @@ import org.roda.core.data.v2.index.FacetFieldResult;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -1649,7 +1650,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
     doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod().toString());
-    doc.addField(RodaConstants.JOB_OBJECT_IDS, job.getObjectIds());
+    doc.addField(RodaConstants.JOB_OBJECTS, JsonUtils.getJsonFromObject(job.getObjects()));
 
     return doc;
   }
@@ -1674,7 +1675,12 @@ public class SolrUtils {
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
     job.setOrchestratorMethod(
       ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
-    job.setObjectIds(objectToListString(doc.get(RodaConstants.JOB_OBJECT_IDS)));
+    try {
+      job.setObjects(
+        JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECTS)), SelectedItems.class));
+    } catch (GenericException e) {
+      LOGGER.error("Error parsing report in job objects", e);
+    }
 
     return job;
   }

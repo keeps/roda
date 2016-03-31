@@ -81,7 +81,7 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   private Column<T, Boolean> selectColumn;
   private Set<T> selected = new HashSet<T>();
-  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
+  private final List<CheckboxSelectionListener> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener>();
 
   private Filter filter;
   private Facets facets;
@@ -479,17 +479,17 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
     this.selectable = selectable;
   }
 
-  public SelectedItems<T> getSelected() {
-    SelectedItems<T> ret;
+  public SelectedItems getSelected() {
+    SelectedItems ret;
     if (isAllSelected()) {
-      ret = new SelectedItemsFilter<T>(getFilter());
+      ret = new SelectedItemsFilter(getFilter());
     } else {
       List<String> ids = new ArrayList<>();
       for (T item : selected) {
         ids.add(item.getUUID());
       }
-      
-      ret = new SelectedItemsList<T>(ids);
+
+      ret = new SelectedItemsList(ids);
     }
 
     return ret;
@@ -504,20 +504,20 @@ public abstract class AsyncTableCell<T extends IsIndexed> extends FlowPanel
 
   // LISTENER
 
-  public interface CheckboxSelectionListener<T extends IsIndexed> {
-    public void onSelectionChange(SelectedItems<T> selected);
+  public interface CheckboxSelectionListener {
+    public void onSelectionChange(SelectedItems selected);
   }
 
-  public void addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
+  public void addCheckboxSelectionListener(CheckboxSelectionListener checkboxSelectionListener) {
     listeners.add(checkboxSelectionListener);
   }
 
-  public void removeCheckboxSelectionListener(CheckboxSelectionListener<T> listener) {
+  public void removeCheckboxSelectionListener(CheckboxSelectionListener listener) {
     listeners.remove(listener);
   }
 
   public void fireOnCheckboxSelectionChanged() {
-    for (CheckboxSelectionListener<T> listener : listeners) {
+    for (CheckboxSelectionListener listener : listeners) {
       listener.onSelectionChange(getSelected());
     }
   }

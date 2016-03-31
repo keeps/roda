@@ -9,7 +9,7 @@ package org.roda.core.data.v2.index;
 
 import org.roda.core.data.adapter.filter.Filter;
 
-public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T> {
+public class SelectedItemsFilter implements SelectedItems {
 
   private static final long serialVersionUID = 975693329806484985L;
 
@@ -48,7 +48,7 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
       return false;
     if (getClass() != obj.getClass())
       return false;
-    SelectedItemsFilter<T> other = (SelectedItemsFilter<T>) obj;
+    SelectedItemsFilter other = (SelectedItemsFilter) obj;
     if (filter == null) {
       if (other.filter != null)
         return false;

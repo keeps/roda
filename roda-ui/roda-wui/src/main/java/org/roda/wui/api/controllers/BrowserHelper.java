@@ -75,10 +75,10 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
@@ -728,7 +728,7 @@ public class BrowserHelper {
     return aip;
   }
 
-  public static String removeAIP(SelectedItems<IndexedAIP> selected, RodaUser user)
+  public static String removeAIP(SelectedItems selected, RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
@@ -927,13 +927,13 @@ public class BrowserHelper {
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
-    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    SelectedItems selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ret;
 
     if (selected instanceof SelectedItemsList) {
-      ret = ((SelectedItemsList<T>) selected).getIds();
+      ret = ((SelectedItemsList) selected).getIds();
     } else if (selected instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
+      Filter filter = ((SelectedItemsFilter) selected).getFilter();
       Long count = count(classToReturn, filter, user);
       IndexResult<T> find = find(classToReturn, filter, null, new Sublist(0, count.intValue()), null, user);
       ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
@@ -944,7 +944,7 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static void removeTransferredResources(SelectedItems<TransferredResource> selected, RodaUser user)
+  public static void removeTransferredResources(SelectedItems selected, RodaUser user)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     List<String> ids = consolidate(user, TransferredResource.class, selected);
 

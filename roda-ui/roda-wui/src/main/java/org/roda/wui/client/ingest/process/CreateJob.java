@@ -64,7 +64,7 @@ public class CreateJob extends Composite {
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 0) {
-        final SelectedItems<TransferredResource> selected = IngestTransfer.getInstance().getSelected();
+        final SelectedItems selected = IngestTransfer.getInstance().getSelected();
         if (SelectedItemsUtils.isEmpty(selected)) {
           Tools.newHistory(IngestTransfer.RESOLVER);
           callback.onSuccess(null);
@@ -115,7 +115,7 @@ public class CreateJob extends Composite {
 
   // private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private final SelectedItems<TransferredResource> selected;
+  private final SelectedItems selected;
   private final List<PluginInfo> ingestPlugins;
 
   @UiField
@@ -141,7 +141,7 @@ public class CreateJob extends Composite {
 
   private PluginInfo selectedIngestPlugin = null;
 
-  public CreateJob(SelectedItems<TransferredResource> selected, List<PluginInfo> ingestPlugins,
+  public CreateJob(SelectedItems selected, List<PluginInfo> ingestPlugins,
     List<PluginInfo> sipToAipPlugins) {
     this.selected = selected;
     this.ingestPlugins = ingestPlugins;
@@ -172,14 +172,14 @@ public class CreateJob extends Composite {
 
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList<TransferredResource>) selected).getIds();
+        List<String> ids = ((SelectedItemsList) selected).getIds();
         Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_UUID, ids));
         TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
           10);
         targetPanel.clear();
         targetPanel.add(list);
       } else if (selected instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter<TransferredResource>) selected).getFilter();
+        Filter filter = ((SelectedItemsFilter) selected).getFilter();
         TransferredResourceList list = new TransferredResourceList(filter, null, "Transferred resources", false, 10,
           10);
         targetPanel.clear();

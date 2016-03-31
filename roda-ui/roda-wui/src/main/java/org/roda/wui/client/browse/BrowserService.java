@@ -23,9 +23,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -82,7 +80,7 @@ public interface BrowserService extends RemoteService {
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, AlreadyExistsException;
 
-  String removeAIP(SelectedItems<IndexedAIP> aips)
+  String removeAIP(SelectedItems aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
@@ -99,7 +97,7 @@ public interface BrowserService extends RemoteService {
   String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException;
 
-  void removeTransferredResources(SelectedItems<TransferredResource> selected)
+  void removeTransferredResources(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   boolean isTransferFullyInitialized() throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -157,9 +155,8 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  Job createIngestProcess(String jobName, SelectedItems<TransferredResource> selected, String plugin,
-    Map<String, String> parameters)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+  Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   void updateAIPPermssions(String aipId, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
