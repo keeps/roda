@@ -17,6 +17,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -137,7 +138,7 @@ public class ShowJobReport extends Composite {
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
-    duration.setText(jobReport.getDateUpdated().getTime()-jobReport.getDateCreated().getTime()+ " ms");
+    duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated()));
     status.setText(messages.showJobReportStatus(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
       jobReport.getTotalSteps()));
 

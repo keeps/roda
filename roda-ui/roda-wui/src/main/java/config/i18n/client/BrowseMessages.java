@@ -624,4 +624,31 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Search log...")
   String userLogSearchPlaceHolder();
+
+  /** Humanize **/
+  @DefaultMessage("{0} days")
+  @AlternateMessage({"one", "1 day"})
+  String durationDHMSDay(@PluralCount int days);
+
+  @DefaultMessage("{0} hours")
+  @AlternateMessage({"one", "1 hour"})
+  String durationDHMSHour(@PluralCount int hours);
+
+  @DefaultMessage("{0} minutes")
+  @AlternateMessage({"one", "1 minute"})
+  String durationDHMSMinutes(@PluralCount int minutes);
+
+  @DefaultMessage("{0} seconds")
+  @AlternateMessage({"one", "1 seconds"})
+  String durationDHMSSeconds(@PluralCount int seconds);
+
+  @DefaultMessage("less than a second")
+  String durationDHMSLessThanASecond();
+
+  @DefaultMessage(", ")
+  String durationDHMSSeparator();
+  
+  @DefaultMessage(" and ")
+  String durationDHMSSecondSeparator();
+
 }

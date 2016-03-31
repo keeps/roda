@@ -85,4 +85,65 @@ public class Humanize {
 
     return ret;
   }
+
+  public static String durationInDHMS(Date start, Date end) {
+    if (end == null) {
+      end = new Date();
+    }
+    return durationMillisToDHMS(end.getTime() - start.getTime());
+  }
+
+  public final static long ONE_SECOND = 1000;
+  public final static long SECONDS = 60;
+
+  public final static long ONE_MINUTE = ONE_SECOND * 60;
+  public final static long MINUTES = 60;
+
+  public final static long ONE_HOUR = ONE_MINUTE * 60;
+  public final static long HOURS = 24;
+
+  public final static long ONE_DAY = ONE_HOUR * 24;
+
+  /**
+   * converts time (in milliseconds) to human-readable format
+   * "<w> days, <x> hours, <y> minutes and (z) seconds"
+   */
+  public static String durationMillisToDHMS(long duration) {
+    StringBuffer res = new StringBuffer();
+    long temp = 0;
+    if (duration >= ONE_SECOND) {
+      temp = duration / ONE_DAY;
+      if (temp > 0) {
+        duration -= temp * ONE_DAY;
+        res.append(messages.durationDHMSDay((int) temp))
+          .append(duration >= ONE_MINUTE ? messages.durationDHMSSeparator() : "");
+      }
+
+      temp = duration / ONE_HOUR;
+      if (temp > 0) {
+        duration -= temp * ONE_HOUR;
+        res.append(messages.durationDHMSHour((int) temp))
+          .append(duration >= ONE_MINUTE ? messages.durationDHMSSeparator() : "");
+      }
+
+      temp = duration / ONE_MINUTE;
+      if (temp > 0) {
+        duration -= temp * ONE_MINUTE;
+        res.append(messages.durationDHMSMinutes((int) temp));
+      }
+
+      if (!res.toString().equals("") && duration >= ONE_SECOND) {
+        res.append(messages.durationDHMSSecondSeparator());
+      }
+
+      temp = duration / ONE_SECOND;
+      if (temp > 0) {
+        res.append(messages.durationDHMSSeconds((int) temp));
+      }
+      return res.toString();
+    } else {
+      return messages.durationDHMSLessThanASecond();
+    }
+  }
+
 }

@@ -29,6 +29,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
@@ -229,11 +230,8 @@ public class ShowJob extends Composite {
       job.getObjectsProcessedWithFailure(), job.getObjectsBeingProcessed(), job.getObjectsWaitingToBeProcessed()));
 
     // set duration
-    Date endDate = job.getEndDate();
-    if (endDate == null) {
-      endDate = new Date();
-    }
-    duration.setText(endDate.getTime() - job.getStartDate().getTime() + " ms");
+
+    duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate()));
 
     scheduleUpdateStatus();
   }
