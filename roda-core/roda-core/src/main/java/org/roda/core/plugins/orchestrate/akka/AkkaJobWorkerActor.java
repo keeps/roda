@@ -14,9 +14,9 @@ import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -46,8 +46,19 @@ public class AkkaJobWorkerActor extends UntypedActor {
       PluginHelper.updateJobPercentage(plugin, 0);
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
-        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
-          (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjects()));
+        if (job.getObjects() instanceof SelectedItemsFilter) {
+          SelectedItemsFilter selectedItems = (SelectedItemsFilter) job.getObjects();
+
+          Long objectsCount = RodaCoreFactory.getIndexService().count(TransferredResource.class,
+            selectedItems.getFilter());
+          PluginHelper.updateJobObjectsCount(plugin, RodaCoreFactory.getModelService(), objectsCount);
+
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(TransferredResource.class,
+            selectedItems.getFilter(), (Plugin<TransferredResource>) plugin);
+        } else {
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
+            (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjects()));
+        }
       } else if (ORCHESTRATOR_METHOD.ON_ALL_AIPS == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
       } else if (ORCHESTRATOR_METHOD.ON_AIPS == job.getOrchestratorMethod()) {

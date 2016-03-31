@@ -158,7 +158,6 @@ public class CreateJob extends Composite {
       @Override
       public void onChange(ChangeEvent event) {
         String selectedPluginId = ingestWorkflowList.getSelectedValue();
-        GWT.log("ingest workflow changed");
         if (selectedPluginId != null) {
           CreateJob.this.selectedIngestPlugin = lookupIngestPlugin(selectedPluginId);
         }

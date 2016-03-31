@@ -22,7 +22,7 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public interface PluginOrchestrator {
 
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
+  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
 

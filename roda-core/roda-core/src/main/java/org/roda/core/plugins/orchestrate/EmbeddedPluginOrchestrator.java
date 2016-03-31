@@ -91,7 +91,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       plugin.beforeExecute(index, model, storage);
       IndexResult<T> find;
@@ -111,6 +111,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO this exception handling should be reviewed
       LOGGER.error("Error running plugin from index", e);
     }
+
+    return null;
 
   }
 

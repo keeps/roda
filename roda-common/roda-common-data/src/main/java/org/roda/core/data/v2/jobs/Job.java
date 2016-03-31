@@ -93,7 +93,7 @@ public class Job implements IsIndexed, Serializable {
     if (objects instanceof SelectedItemsList) {
       this.objectsCount = ((SelectedItemsList) objects).getIds().size();
     } else {
-      this.objectsCount = -1000;
+      this.objectsCount = 0;
     }
   }
 

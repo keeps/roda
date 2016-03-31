@@ -9,11 +9,28 @@ package org.roda.core.data.adapter.filter;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonSubTypes.Type;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
 /**
  * This is a parameter of a {@link Filter}.
  * 
  * @author Rui Castro
  */
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({@Type(value = BasicSearchFilterParameter.class, name = "BasicSearchFilterParameter"),
+  @Type(value = EmptyKeyFilterParameter.class, name = "EmptyKeyFilterParameter"),
+  @Type(value = LikeFilterParameter.class, name = "LikeFilterParameter"),
+  @Type(value = NotSimpleFilterParameter.class, name = "NotSimpleFilterParameter"),
+  @Type(value = OneOfManyFilterParameter.class, name = "OneOfManyFilterParameter"),
+  @Type(value = DateIntervalFilterParameter.class, name = "DateIntervalFilterParameter"),
+  @Type(value = DateRangeFilterParameter.class, name = "DateRangeFilterParameter"),
+  @Type(value = LongRangeFilterParameter.class, name = "LongRangeFilterParameter"),
+  @Type(value = StringRangeFilterParameter.class, name = "StringRangeFilterParameter"),
+  @Type(value = RegexFilterParameter.class, name = "RegexFilterParameter"),
+  @Type(value = SimpleFilterParameter.class, name = "SimpleFilterParameter")})
 public abstract class FilterParameter implements Serializable {
   private static final long serialVersionUID = 3744111668897879761L;
 

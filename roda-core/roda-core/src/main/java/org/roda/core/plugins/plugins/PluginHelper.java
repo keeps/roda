@@ -411,6 +411,22 @@ public final class PluginHelper {
   /**
    * 20160331 hsilva: Only orchestrators should invoke this method
    */
+  public static <T extends Serializable> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
+    Long objectsCount) {
+    try {
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setObjectsCount(objectsCount.intValue());
+      job.setObjectsWaitingToBeProcessed(objectsCount.intValue());
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
     try {

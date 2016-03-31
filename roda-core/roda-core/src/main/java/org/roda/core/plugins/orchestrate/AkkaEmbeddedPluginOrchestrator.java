@@ -115,39 +115,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     workersSystem.shutdown();
   }
 
-  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
-    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
-      throws InvalidParameterException, PluginException {
-    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
-      pluginClass);
-    innerPlugin.setParameterValues(plugin.getParameterValues());
-    innerPlugins.add(innerPlugin);
-    innerPlugin.beforeExecute(index, model, storage);
-
-    // keep track of each job/plugin relation
-    String jobId = PluginHelper.getJobId(innerPlugin);
-    if (jobId != null) {
-      JobPluginInfo jobPluginInfo = new JobPluginInfo();
-      jobPluginInfo.setObjectsCount(objectsCount);
-      jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
-      synchronized (runningTasks) {
-        if (runningTasks.get(jobId) != null) {
-          runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
-          runningTasksObjectsCount.put(jobId, runningTasksObjectsCount.get(jobId) + objectsCount);
-        } else {
-          Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
-          inner.put(innerPlugin, jobPluginInfo);
-          runningTasks.put(jobId, inner);
-          runningTasksObjectsCount.put(jobId, objectsCount);
-        }
-      }
-    }
-
-    return innerPlugin;
-  }
-
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       IndexResult<T> find;
@@ -168,16 +137,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<T> p : innerPlugins) {
         p.afterExecute(index, model, storage);
       }
 
+      LOGGER.info("Ended {}", plugin.getName());
+      return mapToReports(reports);
+
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
     }
+
     LOGGER.info("Ended {}", plugin.getName());
+    return null;
   }
 
   @Override
@@ -517,6 +491,37 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         }
       }
     }
+  }
+
+  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
+    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
+      throws InvalidParameterException, PluginException {
+    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
+      pluginClass);
+    innerPlugin.setParameterValues(plugin.getParameterValues());
+    innerPlugins.add(innerPlugin);
+    innerPlugin.beforeExecute(index, model, storage);
+
+    // keep track of each job/plugin relation
+    String jobId = PluginHelper.getJobId(innerPlugin);
+    if (jobId != null) {
+      JobPluginInfo jobPluginInfo = new JobPluginInfo();
+      jobPluginInfo.setObjectsCount(objectsCount);
+      jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
+      synchronized (runningTasks) {
+        if (runningTasks.get(jobId) != null) {
+          runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
+          runningTasksObjectsCount.put(jobId, runningTasksObjectsCount.get(jobId) + objectsCount);
+        } else {
+          Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
+          inner.put(innerPlugin, jobPluginInfo);
+          runningTasks.put(jobId, inner);
+          runningTasksObjectsCount.put(jobId, objectsCount);
+        }
+      }
+    }
+
+    return innerPlugin;
   }
 
   @Override

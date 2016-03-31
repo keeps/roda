@@ -132,8 +132,8 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
-
+  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+    return null;
   }
 
   @Override
@@ -198,20 +198,19 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     // TODO Auto-generated method stub
-    
+
   }
 
   @Override
   public void startJobsInTheStateCreated() {
     // TODO Auto-generated method stub
-    
-  }
 
+  }
 
 }
