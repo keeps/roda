@@ -370,13 +370,27 @@ public final class PluginHelper {
   /**
    * Updates the job status
    */
-  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo,
-    boolean incrementStepsCompleted) {
+  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
+    JobPluginInfo jobPluginInfo, boolean incrementStepsCompleted) {
     if (incrementStepsCompleted) {
       jobPluginInfo.setStepsCompleted(jobPluginInfo.getStepsCompleted() + 1);
     }
     RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
     return jobPluginInfo;
+  }
+
+  private static <T extends Serializable> Job getJobAndSetPercentage(Plugin<T> plugin, ModelService model,
+    int percentage) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Job job = PluginHelper.getJobFromModel(plugin, model);
+    job.setCompletionPercentage(percentage);
+
+    if (percentage == 0) {
+      job.setState(JOB_STATE.STARTED);
+    } else if (percentage == 100) {
+      job.setState(JOB_STATE.COMPLETED);
+      job.setEndDate(new Date());
+    }
+    return job;
   }
 
   /**
@@ -386,15 +400,7 @@ public final class PluginHelper {
     int percentage) {
     LOGGER.debug("New job completionPercentage: {}", percentage);
     try {
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setCompletionPercentage(percentage);
-
-      if (percentage == 0) {
-        job.setState(JOB_STATE.STARTED);
-      } else if (percentage == 100) {
-        job.setState(JOB_STATE.COMPLETED);
-        job.setEndDate(new Date());
-      }
+      Job job = getJobAndSetPercentage(plugin, model, percentage);
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -410,8 +416,8 @@ public final class PluginHelper {
     try {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setCompletionPercentage(completionPercentage);
+      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
+
       job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
       job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
       job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
@@ -420,13 +426,6 @@ public final class PluginHelper {
       LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
         job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
         job.getObjectsProcessedWithFailure());
-
-      if (completionPercentage == 0) {
-        job.setState(JOB_STATE.STARTED);
-      } else if (completionPercentage == 100) {
-        job.setState(JOB_STATE.COMPLETED);
-        job.setEndDate(new Date());
-      }
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
