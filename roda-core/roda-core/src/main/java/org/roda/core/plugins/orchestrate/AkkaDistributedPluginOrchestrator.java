@@ -201,5 +201,11 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
     
   }
 
+  @Override
+  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+    // TODO Auto-generated method stub
+    
+  }
+
 
 }

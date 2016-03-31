@@ -19,7 +19,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,9 +40,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       Plugin<?> plugin = (Plugin<?>) RodaCoreFactory.getPluginManager().getPlugin(job.getPlugin());
       PluginHelper.setPluginParameters(plugin, job);
 
-      JobPluginInfo jobPluginInfo = new JobPluginInfo();
-      jobPluginInfo.setObjectsWaitingToBeProcessed(job.getObjectsCount());
-      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getModelService(), jobPluginInfo);
+      PluginHelper.updateJobPercentage(plugin, 0);
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
@@ -56,8 +53,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
 
-      jobPluginInfo.setCompletionPercentage(100);
-      PluginHelper.updateJobStatus(plugin, RodaCoreFactory.getModelService(), jobPluginInfo, true);
+      PluginHelper.updateJobPercentage(plugin, 100);
 
       getSender().tell(reports, getSelf());
     }

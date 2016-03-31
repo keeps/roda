@@ -194,7 +194,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     Map<String, Report> reports = new HashMap<>();
     aipIdToTransferredResourceId = new HashMap<>();
 
-    PluginHelper.updateJobStatus(this, info);
+    PluginHelper.updateJobInformation(this, info, false);
     Date startDate = new Date();
 
     // 0) process "parent id" and "force parent id" info. (because we might need
@@ -210,7 +210,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     List<AIP> aips = getAIPsFromReports(model, storage, reports);
     info.setObjectsProcessedWithFailure(resources.size() - aips.size());
-    PluginHelper.updateJobStatus(this, info);
+    PluginHelper.updateJobInformation(this, info, true);
 
     // this event can only be created after AIPs exist and that's why it is
     // performed here, after transformTransferredResourceIntoAnAIP
@@ -221,27 +221,27 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 3) descriptive metadata validation
     pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-    PluginHelper.updateJobStatus(this, info);
+    PluginHelper.updateJobInformation(this, info, true);
 
     // 4) create file fixity information
     pluginReport = createFileFixityInformation(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-    PluginHelper.updateJobStatus(this, info);
+    PluginHelper.updateJobInformation(this, info, true);
 
     // 5) format identification (using Siegfried)
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_FILE_FORMAT_IDENTIFICATION)) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 6) Format validation - PDF/A format validator (using VeraPDF)
@@ -253,7 +253,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 7) feature extraction (using Apache Tika)
@@ -268,7 +268,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 9) validation of digital signature
@@ -276,14 +276,14 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 10) verify producer authorization
     pluginReport = verifyProducerAuthorization(index, model, storage, aips);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-    PluginHelper.updateJobStatus(this, info);
+    PluginHelper.updateJobInformation(this, info, true);
 
     // 11) Auto accept
     if (PluginHelper.verifyIfStepShouldBePerformed(this, PARAMETER_DO_AUTO_ACCEPT)) {
@@ -291,7 +291,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
       info.setObjectsProcessedWithSuccess(resources.size() - info.getObjectsProcessedWithFailure());
-      PluginHelper.updateJobStatus(this, info);
+      PluginHelper.updateJobInformation(this, info, true);
     }
 
     // 12) delete SIP from transfer

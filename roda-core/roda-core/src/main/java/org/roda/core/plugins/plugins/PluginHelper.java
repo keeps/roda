@@ -360,36 +360,66 @@ public final class PluginHelper {
     return pm;
   }
 
-  public static <T extends Serializable> JobPluginInfo updateJobStatus(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
-    jobPluginInfo.setStepsCompleted(jobPluginInfo.getStepsCompleted() + 1);
+  /**
+   * Updates the job percentage
+   */
+  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, percentage);
+  }
 
+  /**
+   * Updates the job status
+   */
+  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo,
+    boolean incrementStepsCompleted) {
+    if (incrementStepsCompleted) {
+      jobPluginInfo.setStepsCompleted(jobPluginInfo.getStepsCompleted() + 1);
+    }
     RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
-
     return jobPluginInfo;
   }
 
-  public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, ModelService model,
-    JobPluginInfo jobPluginInfo) {
-    updateJobStatus(plugin, model, jobPluginInfo, false);
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   */
+  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, ModelService model,
+    int percentage) {
+    LOGGER.debug("New job completionPercentage: {}", percentage);
+    try {
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setCompletionPercentage(percentage);
+
+      if (percentage == 0) {
+        job.setState(JOB_STATE.STARTED);
+      } else if (percentage == 100) {
+        job.setState(JOB_STATE.COMPLETED);
+        job.setEndDate(new Date());
+      }
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
   }
 
-  public static <T extends Serializable> void updateJobStatus(Plugin<T> plugin, ModelService model,
-    JobPluginInfo jobPluginInfo, boolean justPercentage) {
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   */
+  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
+    JobPluginInfo jobPluginInfo) {
     try {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
       Job job = PluginHelper.getJobFromModel(plugin, model);
       job.setCompletionPercentage(completionPercentage);
-      if (!justPercentage) {
-        job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
-        job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-        job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-        job.setObjectsBeingProcessed(job.getObjectsCount() - job.getObjectsWaitingToBeProcessed()
-          - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
-        LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
-          job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
-          job.getObjectsProcessedWithFailure());
-      }
+      job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
+      job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
+      job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+      job.setObjectsBeingProcessed(job.getObjectsCount() - job.getObjectsWaitingToBeProcessed()
+        - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+      LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
+        job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
+        job.getObjectsProcessedWithFailure());
 
       if (completionPercentage == 0) {
         job.setState(JOB_STATE.STARTED);

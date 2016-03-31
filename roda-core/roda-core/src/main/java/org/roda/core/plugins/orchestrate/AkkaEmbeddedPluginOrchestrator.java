@@ -486,9 +486,23 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
+  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+    String jobId = PluginHelper.getJobId(plugin);
+    if (jobId != null) {
+      // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
+      // it should block per job)
+      synchronized (runningTasks) {
+        PluginHelper.updateJobPercentage(plugin, model, percentage);
+      }
+    }
+  }
+
+  @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null) {
+      // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
+      // it should block per job)
       synchronized (runningTasks) {
         Integer taskObjectsCount = runningTasksObjectsCount.get(jobId);
         Map<Plugin<?>, JobPluginInfo> jobInfo = runningTasks.get(jobId);
@@ -522,7 +536,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         infoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
         infoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
 
-        PluginHelper.updateJobStatus(plugin, model, infoUpdated);
+        PluginHelper.updateJobInformation(plugin, model, infoUpdated);
       }
     }
   }
