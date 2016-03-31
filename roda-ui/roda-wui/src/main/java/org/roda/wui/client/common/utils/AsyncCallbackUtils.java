@@ -11,7 +11,6 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.widgets.Toast;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.StatusCodeException;
 
 public class AsyncCallbackUtils {

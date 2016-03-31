@@ -3629,19 +3629,26 @@ td.datePickerMonth, td.datePickerYear {
 	position: absolute;
 }
 
-#upload-list li span {
+#upload-list li span:after {
+	display: inline-block;
+	font: normal normal normal 14px/1 FontAwesome;
+	font-size: 1.5rem;
+	text-rendering: auto;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 	width: 15px;
 	height: 12px;
-	background: url('images/icons.png') no-repeat;
 	position: absolute;
 	top: 20px;
 	right: 20px;
 	cursor: pointer;
+	content: "\f00c";
+	color: #24c279;
 }
 
-#upload-list li.working span {
-	height: 16px;
-	background-position: 0 -12px;
+#upload-list li.working span:after {
+	content: "\f00d";
+	color: #d11f49;
 }
 
 #upload-list li.error p {

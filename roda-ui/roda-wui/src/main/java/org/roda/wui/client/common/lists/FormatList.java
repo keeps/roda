@@ -21,7 +21,6 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.wui.client.browse.BrowserService;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -31,8 +30,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
-
-import config.i18n.client.BrowseMessages;
 
 /**
  * 
@@ -44,7 +41,8 @@ public class FormatList extends AsyncTableCell<Format> {
   private static final int PAGE_SIZE = 20;
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  // private static final BrowseMessages messages =
+  // GWT.create(BrowseMessages.class);
 
   private TextColumn<Format> nameColumn;
   private TextColumn<Format> categoryColumn;

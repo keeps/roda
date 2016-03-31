@@ -75,6 +75,7 @@ import config.i18n.client.BrowseMessages;
  */
 public class IngestTransfer extends Composite {
 
+  @SuppressWarnings("unused")
   private static final String TRANSFERRED_RESOURCE_ID_SEPARATOR = "/";
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {

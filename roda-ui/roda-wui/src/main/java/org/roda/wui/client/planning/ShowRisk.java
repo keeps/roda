@@ -32,8 +32,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.CommonMessages;
-
 /**
  * @author Luis Faria
  *
@@ -84,7 +82,7 @@ public class ShowRisk extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private static CommonMessages messages = GWT.create(CommonMessages.class);
+  // private static CommonMessages messages = GWT.create(CommonMessages.class);
 
   @UiField
   Label riskId;
