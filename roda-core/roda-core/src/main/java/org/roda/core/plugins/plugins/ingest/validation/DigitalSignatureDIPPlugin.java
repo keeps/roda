@@ -37,7 +37,6 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
-import org.roda.core.plugins.plugins.ingest.migration.AbstractConvertPluginUtils;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -179,8 +178,8 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
 
         IOUtils.closeQuietly(allFiles);
         reportItem.setPluginState(PluginState.SUCCESS);
-        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
-          newRepresentationID);
+        // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
+        // index, model, storage, aipId, newRepresentationID);
 
       } catch (Throwable e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);

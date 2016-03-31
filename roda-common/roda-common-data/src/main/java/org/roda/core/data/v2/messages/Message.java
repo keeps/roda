@@ -14,6 +14,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "message")
@@ -23,8 +24,6 @@ public class Message implements IsIndexed, Serializable {
   private static final long serialVersionUID = -585753367605901060L;
 
   private String id = null;
-  // FIXME uuid is needed but should it?
-  private String uuid = null;
   private String subject = null;
   private String body = null;
   private Date sentOn = null;
@@ -130,6 +129,7 @@ public class Message implements IsIndexed, Serializable {
       + isAcknowledged + ", acknowledgedOn=" + acknowledgedOn + "]";
   }
 
+  @JsonIgnore
   @Override
   public String getUUID() {
     return getId();

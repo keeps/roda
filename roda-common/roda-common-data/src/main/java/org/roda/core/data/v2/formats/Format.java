@@ -26,8 +26,6 @@ public class Format implements IsIndexed, Serializable {
   private static final long serialVersionUID = 7178184202935641440L;
 
   private String id = null;
-  // FIXME uuid is needed but should it?
-  private String uuid = null;
   private String name = null;
   private String definition = null;
   private String category = null;

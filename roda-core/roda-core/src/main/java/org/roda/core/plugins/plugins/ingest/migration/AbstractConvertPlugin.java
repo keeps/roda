@@ -20,8 +20,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.tika.exception.TikaException;
-import org.apache.xmlbeans.XmlException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
@@ -60,7 +58,6 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.util.CommandException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 public abstract class AbstractConvertPlugin<T extends Serializable> extends AbstractPlugin<T> {
 
@@ -277,10 +274,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       }
 
       try {
-        for (String repId : newRepresentations) {
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aip.getId(),
-            repId);
-        }
+        /*
+         * for (String repId : newRepresentations) {
+         * AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion
+         * (this, index, model, storage, aip.getId(), repId); }
+         */
 
         model.notifyAIPUpdated(aip.getId());
       } catch (Exception e) {
@@ -381,13 +379,12 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         if (!alteredFiles.isEmpty()) {
           createNewFilesOnRepresentation(storage, model, unchangedFiles, newRepresentationID, notify);
 
-          AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage, aipId,
-            newRepresentationID);
+          // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
+          // index, model, storage, aipId, newRepresentationID);
         }
 
       } catch (RuntimeException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | IOException | AlreadyExistsException | ValidationException
-        | InvalidParameterException | SAXException | TikaException | XmlException e) {
+        | AuthorizationDeniedException | IOException | AlreadyExistsException e) {
         LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
         pluginResultState = PluginState.FAILURE;
 
@@ -501,10 +498,12 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     }
 
     try {
-      for (String representation : changedRepresentationsOnAIPs.keySet()) {
-        AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this, index, model, storage,
-          changedRepresentationsOnAIPs.get(representation), representation);
-      }
+      /*
+       * for (String representation : changedRepresentationsOnAIPs.keySet()) {
+       * AbstractConvertPluginUtils
+       * .reIndexingRepresentationAfterConversion(this, index, model, storage,
+       * changedRepresentationsOnAIPs.get(representation), representation); }
+       */
     } catch (Throwable e) {
       LOGGER.debug("Error re-indexing AIPs after conversion.");
     }
