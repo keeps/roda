@@ -207,5 +207,11 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
     
   }
 
+  @Override
+  public void startJobsInTheStateCreated() {
+    // TODO Auto-generated method stub
+    
+  }
+
 
 }

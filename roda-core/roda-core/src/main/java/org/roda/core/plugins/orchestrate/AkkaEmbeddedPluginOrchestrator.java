@@ -19,9 +19,15 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -486,6 +492,34 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
+  public void startJobsInTheStateCreated() {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.toString()));
+    Sublist sublist = new Sublist(0, 100);
+    IndexResult<Job> jobs = null;
+    List<Job> jobsToBeStarted = new ArrayList<>();
+    try {
+      do {
+        jobs = index.find(Job.class, filter, null, sublist);
+        jobsToBeStarted.addAll(jobs.getResults());
+        sublist.setFirstElementIndex(sublist.getFirstElementIndex() + Math.toIntExact(jobs.getLimit()));
+      } while (jobs.getTotalCount() > jobs.getOffset() + jobs.getLimit());
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Unable to find Jobs still to be started", e);
+    }
+
+    if (!jobsToBeStarted.isEmpty()) {
+      for (Job job : jobsToBeStarted) {
+        try {
+          executeJob(model.retrieveJob(job.getId()));
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Unable to get Job", e);
+        }
+      }
+    }
+  }
+
+  @Override
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     String jobId = PluginHelper.getJobId(plugin);
     if (jobId != null) {
@@ -493,6 +527,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       // it should block per job)
       synchronized (runningTasks) {
         PluginHelper.updateJobPercentage(plugin, model, percentage);
+        if (percentage == 100) {
+          runningTasks.remove(jobId);
+          runningTasksObjectsCount.remove(jobId);
+        }
       }
     }
   }
