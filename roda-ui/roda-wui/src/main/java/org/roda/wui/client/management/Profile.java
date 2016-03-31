@@ -38,7 +38,7 @@ import config.i18n.client.UserManagementMessages;
  * @author Luis Faria
  *
  */
-public class Preferences extends Composite {
+public class Profile extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -51,7 +51,7 @@ public class Preferences extends Composite {
         }
 
         public void onSuccess(RodaUser user) {
-          Preferences preferences = new Preferences(new User(user));
+          Profile preferences = new Profile(new User(user));
           callback.onSuccess(preferences);
         }
       });
@@ -77,11 +77,11 @@ public class Preferences extends Composite {
     }
 
     public String getHistoryToken() {
-      return "preferences";
+      return "profile";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, Preferences> {
+  interface MyUiBinder extends UiBinder<Widget, Profile> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -105,7 +105,7 @@ public class Preferences extends Composite {
    * @param user
    *          the user to edit
    */
-  public Preferences(User user) {
+  public Profile(User user) {
     this.user = user;
 
     this.userDataPanel = new UserDataPanel(true, true, false, false);
@@ -155,7 +155,7 @@ public class Preferences extends Composite {
     } else if (caught instanceof AlreadyExistsException) {
       Toast.showError(messages.editUserEmailAlreadyExists(user.getEmail()));
     } else {
-      Toast.showError(messages.editUserFailure(Preferences.this.user.getName(), caught.getMessage()));
+      Toast.showError(messages.editUserFailure(Profile.this.user.getName(), caught.getMessage()));
     }
   }
 }

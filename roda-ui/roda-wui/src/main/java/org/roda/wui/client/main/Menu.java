@@ -23,7 +23,7 @@ import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.Preferences;
+import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
 import org.roda.wui.client.planning.Planning;
@@ -148,7 +148,7 @@ public class Menu extends Composite {
       createCommand(Planning.RESOLVER.getHistoryPath()));
 
     userMenu = new MenuBar(true);
-    userMenu.addItem(constants.loginPreferences(), createCommand(Preferences.RESOLVER.getHistoryPath()));
+    userMenu.addItem(constants.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));
     userMenu.addItem(constants.loginLogout(), new ScheduledCommand() {
 
       @Override

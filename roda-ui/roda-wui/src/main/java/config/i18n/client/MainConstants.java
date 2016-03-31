@@ -229,8 +229,8 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @DefaultStringValue("Recover")
   public String loginRecover();
 
-  @DefaultStringValue("Preferences")
-  public String loginPreferences();
+  @DefaultStringValue("Profile")
+  public String loginProfile();
 
   @DefaultStringValue("Logout")
   public String loginLogout();

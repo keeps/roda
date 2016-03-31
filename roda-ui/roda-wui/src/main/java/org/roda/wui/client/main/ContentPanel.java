@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.management.Preferences;
+import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.RecoverLogin;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.ResetPassword;
@@ -97,7 +97,7 @@ public class ContentPanel extends SimplePanel {
     // Planning
     resolvers.add(Planning.RESOLVER);
     // User Management
-    resolvers.add(Preferences.RESOLVER);
+    resolvers.add(Profile.RESOLVER);
     resolvers.add(Register.RESOLVER);
     resolvers.add(RecoverLogin.RESOLVER);
     resolvers.add(ResetPassword.RESOLVER);
