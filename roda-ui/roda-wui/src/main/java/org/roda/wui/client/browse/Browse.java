@@ -33,7 +33,6 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.NoAsyncCallback;
 import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
@@ -169,9 +168,9 @@ public class Browse extends Composite {
 
   @UiField
   Label itemTitle;
-
+  
   @UiField
-  Label itemDates;
+  Label itemId;
 
   @UiField
   TabPanel itemMetadata;
@@ -339,7 +338,7 @@ public class Browse extends Composite {
     itemTitle.setText(messages.browseLoading());
     itemTitle.removeStyleName("browseTitle-allCollections");
     itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-    itemDates.setText("");
+    itemId.setText("");
 
     breadcrumb.setVisible(false);
 
@@ -411,7 +410,7 @@ public class Browse extends Composite {
       itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
       itemTitle.removeStyleName("browseTitle-allCollections");
       itemIcon.getParent().removeStyleName("browseTitle-allCollections-wrapper");
-      itemDates.setText(getDatesText(aip));
+      itemId.setText(aip.getId());
 
       final List<Pair<String, HTML>> descriptiveMetadataContainers = new ArrayList<Pair<String, HTML>>();
       final Map<String, DescriptiveMetadataViewBundle> bundles = new HashMap<>();
@@ -693,6 +692,7 @@ public class Browse extends Composite {
     }
   }
 
+  @SuppressWarnings("unused")
   private String getDatesText(IndexedAIP aip) {
     return Humanize.getDatesText(aip.getDateInitial(), aip.getDateFinal(), true);
   }

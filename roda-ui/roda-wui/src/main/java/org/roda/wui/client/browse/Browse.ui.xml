@@ -28,7 +28,7 @@
 						<g:Label styleName="h1" addStyleNames="browseItemText"
 							ui:field="itemTitle" />
 					</g:FlowPanel>
-					<g:Label addStyleNames="browseItemDates" ui:field="itemDates" />
+					<g:Label addStyleNames="browseItemId" ui:field="itemId" />
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />

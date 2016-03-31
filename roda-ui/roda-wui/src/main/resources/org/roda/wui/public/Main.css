@@ -1619,6 +1619,7 @@ td.datePickerMonth, td.datePickerYear {
 	margin-bottom: 0 !important;
 }
 
+.browseItemId,
 .browseItemDates {
 	color: #a7a9ac;
 	font-size: 1.2rem;
