@@ -8,10 +8,12 @@
 package org.roda.core.plugins.plugins.base;
 
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -28,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAIPPlugin.class);
-  private boolean clearIndexes = true;
+  private boolean clearIndexes = false;
 
   @Override
   public void init() throws PluginException {
@@ -55,12 +57,12 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
     return "1.0";
   }
 
-  public boolean isClearIndexes() {
-    return clearIndexes;
-  }
-
-  public void setClearIndexes(boolean clearIndexes) {
-    this.clearIndexes = clearIndexes;
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE)) {
+      clearIndexes = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE));
+    }
   }
 
   @Override

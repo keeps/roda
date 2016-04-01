@@ -1070,12 +1070,17 @@ public class RodaCoreFactory {
    */
   public static void runReindexAipsPlugin() {
     Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE, "true");
+    try {
+      reindexPlugin.setParameterValues(parameters);
+    } catch (InvalidParameterException e) {
+    }
     getPluginOrchestrator().runPluginOnAllAIPs(reindexPlugin);
   }
 
   public static void runReindexAipsPlugin(List<String> aipIds) {
     Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
-    ((ReindexAIPPlugin) reindexPlugin).setClearIndexes(false);
     getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds);
   }
 

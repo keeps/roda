@@ -7,9 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +48,9 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.common.RodaCoreService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 
 @Api(value = ManagementTasksResource.SWAGGER_ENDPOINT)
 @Path(ManagementTasksResource.ENDPOINT)
@@ -217,6 +217,9 @@ public class ManagementTasksResource extends RodaCoreService {
     Job job = new Job();
     job.setName("Management Task | Reindex job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS)
       .setPlugin(ReindexAIPPlugin.class.getCanonicalName());
+    Map<String, String> pluginParameters = new HashMap<>();
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE, "true");
+    job.setPluginParameters(pluginParameters);
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");
