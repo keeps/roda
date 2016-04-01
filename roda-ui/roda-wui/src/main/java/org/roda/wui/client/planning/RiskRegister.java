@@ -17,10 +17,12 @@ import java.util.Map;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
+import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.common.BasicSearch;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.common.client.ClientLogger;
@@ -101,6 +103,9 @@ public class RiskRegister extends Composite {
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
+  BasicSearch basicSearch;
+  
+  @UiField(provided = true)
   RiskList riskList;
 
   @UiField(provided = true)
@@ -126,6 +131,9 @@ public class RiskRegister extends Composite {
 
   @UiField
   Button startProcess;
+  
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
 
   /**
    * Create a risk register page
@@ -137,7 +145,11 @@ public class RiskRegister extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY), new SimpleFacetParameter(
       RodaConstants.RISK_PRE_MITIGATION_SEVERITY));
 
-    riskList = new RiskList(filter, facets, "Risks", false);
+    riskList = new RiskList(filter, facets, "Risks", true);
+    
+    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.RISK_SEARCH,
+      messages.riskRegisterSearchPlaceHolder(), false, false);
+    basicSearch.setList(riskList);
 
     facetCategories = new FlowPanel();
     facetSeverities = new FlowPanel();

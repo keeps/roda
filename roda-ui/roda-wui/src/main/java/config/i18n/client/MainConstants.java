@@ -162,8 +162,8 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   public String title_planning_risk();
   
   @Key("title.planning.agents")
-  @DefaultStringValue("Agents register")
-  public String title_planning_agents();
+  @DefaultStringValue("Agent register")
+  public String title_planning_agent();
   
   @Key("title.planning.format")
   @DefaultStringValue("Format register")

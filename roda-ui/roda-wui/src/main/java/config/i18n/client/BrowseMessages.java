@@ -113,6 +113,12 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Preservation")
   String sidebarPreservationTitle();
 
+  @DefaultMessage("Agents")
+  String sidebarAgentsTitle();
+
+  @DefaultMessage("Formats")
+  String sidebarFormatsTitle();
+
   @DefaultMessage("Risks")
   String sidebarRisksTitle();
 
@@ -597,6 +603,46 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Select all {0} items")
   String listSelectAllMessage(int count);
 
+  /************* Agent register ****************/
+
+  @DefaultMessage("Agent register")
+  String agentRegisterTitle();
+
+  @DefaultMessage("New")
+  String agentRegisterNewButton();
+
+  @DefaultMessage("Edit")
+  String agentRegisterEditButton();
+
+  @DefaultMessage("Remove")
+  String agentRegisterRemoveButton();
+
+  @DefaultMessage("Start new process")
+  String agentRegisterProcessButton();
+
+  @DefaultMessage("Search agents...")
+  String agentRegisterSearchPlaceHolder();
+
+  /************* Format register ****************/
+
+  @DefaultMessage("Format register")
+  String formatRegisterTitle();
+
+  @DefaultMessage("New")
+  String formatRegisterNewButton();
+
+  @DefaultMessage("Edit")
+  String formatRegisterEditButton();
+
+  @DefaultMessage("Remove")
+  String formatRegisterRemoveButton();
+
+  @DefaultMessage("Start new process")
+  String formatRegisterProcessButton();
+
+  @DefaultMessage("Search formats...")
+  String formatRegisterSearchPlaceHolder();
+
   /************* Risk register ****************/
 
   @DefaultMessage("Risk register")
@@ -620,12 +666,16 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Start new process")
   String riskRegisterProcessButton();
 
+  @DefaultMessage("Search risks...")
+  String riskRegisterSearchPlaceHolder();
+
   /************* User log ****************/
 
   @DefaultMessage("Search log...")
   String userLogSearchPlaceHolder();
 
-  /** Humanize **/
+  /************* Humanize ****************/
+
   @DefaultMessage("{0} days")
   @AlternateMessage({"one", "1 day"})
   String durationDHMSDay(@PluralCount int days);

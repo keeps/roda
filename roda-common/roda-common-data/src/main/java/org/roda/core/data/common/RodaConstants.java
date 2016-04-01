@@ -402,6 +402,8 @@ public final class RodaConstants {
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   public static final String RISK_FILE_EXTENSION = ".json";
+  
+  public static final String RISK_SEARCH = "search";
 
   /* Agents */
   public static final String AGENT_ID = "id";
@@ -426,6 +428,8 @@ public final class RodaConstants {
   public static final String AGENT_AGENTS_REQUIRED = "agentsRequired";
 
   public static final String AGENT_FILE_EXTENSION = ".json";
+  
+  public static final String AGENT_SEARCH = "search";
 
   /* Formats */
   public static final String FORMAT_ID = "id";
@@ -446,6 +450,8 @@ public final class RodaConstants {
   public static final String FORMAT_UTIS = "utis";
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
+  
+  public static final String FORMAT_SEARCH = "search";
 
   /* Messages */
   public static final String MESSAGE_ID = "id";

@@ -26,6 +26,8 @@ import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.planning.AgentRegister;
+import org.roda.wui.client.planning.FormatRegister;
 import org.roda.wui.client.planning.Planning;
 import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.client.search.Search;
@@ -142,10 +144,10 @@ public class Menu extends Composite {
       createCommand(Planning.RESOLVER.getHistoryPath()));
     planning_risk = planningMenu.addItem(constants.title_planning_risk(),
       createCommand(RiskRegister.RESOLVER.getHistoryPath()));
-    planning_agents = planningMenu.addItem(constants.title_planning_agents(),
-      createCommand(Planning.RESOLVER.getHistoryPath()));
+    planning_agents = planningMenu.addItem(constants.title_planning_agent(),
+      createCommand(AgentRegister.RESOLVER.getHistoryPath()));
     planning_format = planningMenu.addItem(constants.title_planning_format(),
-      createCommand(Planning.RESOLVER.getHistoryPath()));
+      createCommand(FormatRegister.RESOLVER.getHistoryPath()));
 
     userMenu = new MenuBar(true);
     userMenu.addItem(constants.loginProfile(), createCommand(Profile.RESOLVER.getHistoryPath()));

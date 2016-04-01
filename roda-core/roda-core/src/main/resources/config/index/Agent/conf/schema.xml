@@ -125,6 +125,10 @@
    <field name="utis" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="formatIds" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    <field name="agentsRequired" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   
+   <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
+   
+   <copyField source="*" dest="search" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

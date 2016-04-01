@@ -83,6 +83,10 @@ public class Planning {
     if (historyTokens.size() == 0) {
       init();
       callback.onSuccess(page);
+    } else if (historyTokens.get(0).equals(AgentRegister.RESOLVER.getHistoryToken())) {
+      AgentRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.get(0).equals(FormatRegister.RESOLVER.getHistoryToken())) {
+      FormatRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.get(0).equals(RiskRegister.RESOLVER.getHistoryToken())) {
       RiskRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
     }
