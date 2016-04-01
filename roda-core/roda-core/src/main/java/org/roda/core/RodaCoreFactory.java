@@ -21,11 +21,8 @@ import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,8 +59,8 @@ import org.roda.core.common.LdapUtility;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
-import org.roda.core.common.monitor.FolderMonitorNIO;
-import org.roda.core.common.monitor.FolderObserver;
+import org.roda.core.common.monitor.TransferUpdateStatus;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -96,7 +93,6 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
-import org.roda.core.index.IndexFolderObserver;
 import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -176,12 +172,9 @@ public class RodaCoreFactory {
 
   private static boolean TEST_DEPLOY_SOLR = true;
   private static boolean TEST_DEPLOY_LDAP = true;
-  private static boolean TEST_DEPLOY_FOLDER_MONITOR = true;
+  private static boolean TEST_DEPLOY_SCANNER = true;
   private static boolean TEST_DEPLOY_ORCHESTRATOR = true;
   private static boolean TEST_DEPLOY_PLUGIN_MANAGER = true;
-
-  // Core related constants
-  private static final String TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME = ".transferredResourcesLastMonitoredDate";
 
   // Orchestrator related objects
   private static PluginManager pluginManager;
@@ -197,8 +190,7 @@ public class RodaCoreFactory {
   private static Path rodaApacheDsDataDirectory = null;
 
   // TransferredResources related objects
-  private static FolderMonitorNIO transferredResourcesFolderMonitor;
-  private static FolderObserver transferredResourcesFolderObserver;
+  private static TransferredResourcesScanner transferredResourcesScanner;
 
   // Configuration related objects
   private static CompositeConfiguration rodaConfiguration = null;
@@ -217,8 +209,8 @@ public class RodaCoreFactory {
   }
 
   public static void instantiate() {
-    NodeType nodeType = NodeType
-      .valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE, RodaConstants.DEFAULT_NODE_TYPE.name()));
+    NodeType nodeType = NodeType.valueOf(getSystemProperty(RodaConstants.CORE_NODE_TYPE,
+      RodaConstants.DEFAULT_NODE_TYPE.name()));
 
     if (nodeType == RodaConstants.NodeType.MASTER) {
       instantiateMaster();
@@ -239,11 +231,11 @@ public class RodaCoreFactory {
     instantiate(NodeType.WORKER);
   }
 
-  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployFolderMonitor,
+  public static void instantiateTest(boolean deploySolr, boolean deployLdap, boolean deployTransferredResourcesScanner,
     boolean deployOrchestrator, boolean deployPluginManager) {
     TEST_DEPLOY_SOLR = deploySolr;
     TEST_DEPLOY_LDAP = deployLdap;
-    TEST_DEPLOY_FOLDER_MONITOR = deployFolderMonitor;
+    TEST_DEPLOY_SCANNER = deployTransferredResourcesScanner;
     TEST_DEPLOY_ORCHESTRATOR = deployOrchestrator;
     TEST_DEPLOY_PLUGIN_MANAGER = deployPluginManager;
     instantiated = false;
@@ -337,8 +329,8 @@ public class RodaCoreFactory {
   }
 
   private static StorageService instantiateStorage() throws GenericException {
-    StorageType storageType = StorageType.valueOf(
-      getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE, RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
+    StorageType storageType = StorageType.valueOf(getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_TYPE,
+      RodaConstants.DEFAULT_STORAGE_TYPE.toString()));
     if (storageType == RodaConstants.StorageType.FEDORA4) {
       String url = getRodaConfiguration().getString(RodaConstants.CORE_STORAGE_FEDORA4_URL,
         "http://localhost:8983/solr/");
@@ -374,8 +366,8 @@ public class RodaCoreFactory {
    * 
    */
   private static void instantiateSolrAndIndexService() throws URISyntaxException {
-    LOGGER.info(
-      "Warnings like '2016-03-21 11:21:34,319 WARN  org.apache.solr.core.Config - Beginning with Solr 5.5, <maxMergeDocs> is deprecated, configure it on the relevant <mergePolicyFactory> instead.'"
+    LOGGER
+      .info("Warnings like '2016-03-21 11:21:34,319 WARN  org.apache.solr.core.Config - Beginning with Solr 5.5, <maxMergeDocs> is deprecated, configure it on the relevant <mergePolicyFactory> instead.'"
         + " are due to a bug, explained in https://issues.apache.org/jira/browse/SOLR-8734, as we don't declare those parameters in RODA solr configurations."
         + " The warning will be removed and as soon as that happens, this messages should be deleted as well.");
     if (nodeType == NodeType.MASTER) {
@@ -400,16 +392,16 @@ public class RodaCoreFactory {
       index = new IndexService(solr, model);
     } else if (nodeType == NodeType.TEST && TEST_DEPLOY_SOLR) {
       try {
-        URL solrConfigURL = RodaCoreFactory.class
-          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/solr.xml");
+        URL solrConfigURL = RodaCoreFactory.class.getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/"
+          + RodaConstants.CORE_INDEX_FOLDER + "/solr.xml");
         Path solrConfigPath = Paths.get(solrConfigURL.toURI());
         Files.copy(solrConfigPath, indexDataPath.resolve("solr.xml"));
         Path aipSchema = indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER);
         Files.createDirectories(aipSchema);
         Files.createFile(aipSchema.resolve("core.properties"));
 
-        Path solrHome = Paths.get(RodaCoreFactory.class
-          .getResource("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/").toURI());
+        Path solrHome = Paths.get(RodaCoreFactory.class.getResource(
+          "/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + RodaConstants.CORE_INDEX_FOLDER + "/").toURI());
 
         // instantiate solr
         solr = instantiateSolr(solrHome);
@@ -431,11 +423,11 @@ public class RodaCoreFactory {
     List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
     classLoadersList.add(ClasspathHelper.contextClassLoader());
 
-    Set<String> resources = new Reflections(
-      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
-        .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
-          .getResources(Pattern.compile(".*"));
+    Set<String> resources = new Reflections(new ConfigurationBuilder()
+      .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
+      .setScanners(new ResourcesScanner())
+      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5])))).getResources(Pattern
+      .compile(".*"));
 
     for (String resource : resources) {
       InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
@@ -461,8 +453,8 @@ public class RodaCoreFactory {
   }
 
   private static SolrClient instantiateSolr(Path solrHome) {
-    SolrType solrType = SolrType.valueOf(
-      getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
+    SolrType solrType = SolrType.valueOf(getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE,
+      RodaConstants.DEFAULT_SOLR_TYPE.toString()));
 
     if (solrType == RodaConstants.SolrType.HTTP) {
       String solrBaseUrl = getRodaConfiguration().getString(RodaConstants.CORE_SOLR_HTTP_URL,
@@ -482,21 +474,21 @@ public class RodaCoreFactory {
   private static void setSolrSystemProperties() {
     System.setProperty("solr.data.dir", indexDataPath.toString());
     System.setProperty("solr.data.dir.aip", indexDataPath.resolve(RodaConstants.CORE_AIP_FOLDER).toString());
-    System.setProperty("solr.data.dir.representations",
-      indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_FOLDER).toString());
+    System.setProperty("solr.data.dir.representations", indexDataPath.resolve(RodaConstants.CORE_REPRESENTATION_FOLDER)
+      .toString());
     System.setProperty("solr.data.dir.file", indexDataPath.resolve(RodaConstants.CORE_FILE_FOLDER).toString());
     System.setProperty("solr.data.dir.preservationevent",
       indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONEVENT_FOLDER).toString());
     System.setProperty("solr.data.dir.preservationagent",
       indexDataPath.resolve(RodaConstants.CORE_PRESERVATIONAGENT_FOLDER).toString());
-    System.setProperty("solr.data.dir.actionlog",
-      indexDataPath.resolve(RodaConstants.CORE_ACTIONLOG_FOLDER).toString());
+    System
+      .setProperty("solr.data.dir.actionlog", indexDataPath.resolve(RodaConstants.CORE_ACTIONLOG_FOLDER).toString());
     System.setProperty("solr.data.dir.members", indexDataPath.resolve(RodaConstants.CORE_MEMBERS_FOLDER).toString());
     System.setProperty("solr.data.dir.transferredresource",
       indexDataPath.resolve(RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER).toString());
     System.setProperty("solr.data.dir.job", indexDataPath.resolve(RodaConstants.CORE_JOB_FOLDER).toString());
-    System.setProperty("solr.data.dir.jobreport",
-      indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
+    System
+      .setProperty("solr.data.dir.jobreport", indexDataPath.resolve(RodaConstants.CORE_JOBREPORT_FOLDER).toString());
     System.setProperty("solr.data.dir.risk", indexDataPath.resolve(RodaConstants.CORE_RISK_FOLDER).toString());
     System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.format", indexDataPath.resolve(RodaConstants.CORE_FORMAT_FOLDER).toString());
@@ -506,41 +498,38 @@ public class RodaCoreFactory {
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {
     if (nodeType == NodeType.MASTER) {
       if (FEATURE_DISTRIBUTED_AKKA) {
-        akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(
-          getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-          getSystemProperty(RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
+        akkaDistributedPluginOrchestrator = new AkkaDistributedPluginOrchestrator(getSystemProperty(
+          RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME), getSystemProperty(
+          RodaConstants.CORE_NODE_PORT, RodaConstants.DEFAULT_NODE_PORT));
       } else {
         // pluginOrchestrator = new EmbeddedActionOrchestrator();
         pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
-        if (getRodaConfiguration().getBoolean("core.orchestrator.start_jobs_in_state_created", false)) {
-          pluginOrchestrator.startJobsInTheStateCreated();
-        }
       }
 
       startApacheDS();
 
       try {
-        startTransferredResourcesFolderMonitor();
+        startTransferredResourcesScanner();
       } catch (Exception e) {
-        LOGGER.error("Error starting Transferred Resources Monitor: " + e.getMessage(), e);
+        LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
       }
 
     } else if (nodeType == NodeType.WORKER) {
-      akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(
-        getSystemProperty(RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-        getSystemProperty(RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT),
-        getSystemProperty(RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME),
-        getSystemProperty(RodaConstants.CORE_NODE_PORT, "0"));
+      akkaDistributedPluginWorker = new AkkaDistributedPluginWorker(getSystemProperty(
+        RodaConstants.CORE_CLUSTER_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME), getSystemProperty(
+        RodaConstants.CORE_CLUSTER_PORT, RodaConstants.DEFAULT_NODE_PORT), getSystemProperty(
+        RodaConstants.CORE_NODE_HOSTNAME, RodaConstants.DEFAULT_NODE_HOSTNAME), getSystemProperty(
+        RodaConstants.CORE_NODE_PORT, "0"));
     } else if (nodeType == NodeType.TEST) {
       if (TEST_DEPLOY_LDAP) {
         startApacheDS();
       }
 
-      if (TEST_DEPLOY_FOLDER_MONITOR) {
+      if (TEST_DEPLOY_SCANNER) {
         try {
-          startTransferredResourcesFolderMonitor();
+          startTransferredResourcesScanner();
         } catch (Exception e) {
-          LOGGER.error("Error starting Transferred Resources Monitor: " + e.getMessage(), e);
+          LOGGER.error("Error starting Transferred Resources Scanner: " + e.getMessage(), e);
         }
       }
 
@@ -626,8 +615,8 @@ public class RodaCoreFactory {
     List<Path> essentialDirectories = new ArrayList<Path>();
     essentialDirectories.add(configPath);
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
-    essentialDirectories
-      .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(
+      RodaConstants.CORE_INGEST_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
       .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve(RodaConstants.CORE_HTML_FOLDER));
     essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
@@ -676,7 +665,6 @@ public class RodaCoreFactory {
         solr.close();
         stopApacheDS();
         pluginManager.shutdown();
-        transferredResourcesFolderMonitor.stopWatch();
         pluginOrchestrator.shutdown();
       } else if (nodeType == NodeType.WORKER) {
         pluginManager.shutdown();
@@ -686,9 +674,6 @@ public class RodaCoreFactory {
         }
         if (TEST_DEPLOY_LDAP) {
           stopApacheDS();
-        }
-        if (TEST_DEPLOY_FOLDER_MONITOR) {
-          transferredResourcesFolderMonitor.stopWatch();
         }
         if (TEST_DEPLOY_ORCHESTRATOR) {
           pluginOrchestrator.shutdown();
@@ -743,7 +728,7 @@ public class RodaCoreFactory {
 
   }
 
-  public static void startTransferredResourcesFolderMonitor() throws Exception {
+  public static void startTransferredResourcesScanner() throws Exception {
 
     String transferredResourcesFolder = getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
@@ -751,41 +736,17 @@ public class RodaCoreFactory {
     if (!Files.exists(transferredResourcesFolderPath)) {
       Files.createDirectories(transferredResourcesFolderPath);
     }
-    Date date = getFolderMonitorDate();
-    transferredResourcesFolderObserver = new IndexFolderObserver(solr, transferredResourcesFolderPath);
-    transferredResourcesFolderMonitor = new FolderMonitorNIO(transferredResourcesFolderPath, date, solr);
-    transferredResourcesFolderMonitor.addFolderObserver(transferredResourcesFolderObserver);
-    LOGGER.debug("Transferred resources folder monitor is fully initialized? {}",
-      getFolderMonitor().isFullyInitialized());
+
+    transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, solr);
+
   }
 
-  public static Date getFolderMonitorDate() {
-    Date folderMonitorDate = null;
-    try {
-      Path dateFile = dataPath.resolve(TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME);
-      if (Files.exists(dateFile)) {
-        String dateFromFile = new String(Files.readAllBytes(dateFile));
-        SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
-        folderMonitorDate = df.parse(dateFromFile);
-      }
-    } catch (IOException | ParseException e) {
-      LOGGER.error("Error getting last monitoring date: " + e.getMessage(), e);
-    }
-    return folderMonitorDate;
+  public static boolean getTransferredResourcesScannerUpdateStatus() {
+    return TransferUpdateStatus.getInstance().isUpdatingStatus();
   }
 
-  public static void setFolderMonitorDate(Date d) {
-    try {
-      Path dateFile = dataPath.resolve(TRANSFERRED_RESOURCES_LAST_MONITORED_DATE_FILENAME);
-      if (!Files.exists(dateFile)) {
-        Files.createFile(dateFile);
-      }
-      SimpleDateFormat df = new SimpleDateFormat(RodaConstants.SOLRDATEFORMAT);
-      String date = df.format(d);
-      Files.write(dateFile, date.getBytes());
-    } catch (IOException e) {
-      LOGGER.error("Error setting last monitoring date: " + e.getMessage(), e);
-    }
+  public static void setTransferredResourcesScannerUpdateStatus(boolean isUpdating) {
+    TransferUpdateStatus.getInstance().setUpdatingStatus(isUpdating);
   }
 
   public static void stopApacheDS() {
@@ -834,8 +795,8 @@ public class RodaCoreFactory {
     return akkaDistributedPluginOrchestrator;
   }
 
-  public static FolderMonitorNIO getFolderMonitor() {
-    return transferredResourcesFolderMonitor;
+  public static TransferredResourcesScanner getTransferredResourcesScanner() {
+    return transferredResourcesScanner;
   }
 
   public static NodeType getNodeType() {
@@ -896,8 +857,8 @@ public class RodaCoreFactory {
       rodaPropertiesReloadStrategy.setRefreshDelay(5000);
       propertiesConfiguration.setReloadingStrategy(rodaPropertiesReloadStrategy);
     } else {
-      InputStream inputStream = RodaCoreFactory.class
-        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
+      InputStream inputStream = RodaCoreFactory.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/"
+        + configurationFile);
       if (inputStream != null) {
         LOGGER.trace("Loading configuration from classpath {}", configurationFile);
         propertiesConfiguration.load(inputStream);
@@ -945,8 +906,8 @@ public class RodaCoreFactory {
       // do nothing
     }
     if (inputStream == null) {
-      inputStream = RodaUtils.class
-        .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
+      inputStream = RodaUtils.class.getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/"
+        + configurationFile);
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
     }
     return inputStream;
@@ -1009,8 +970,8 @@ public class RodaCoreFactory {
       .filterInputsBy(
         new FilterBuilder().include(FilterBuilder.prefix("" + RodaConstants.CORE_CONFIG_FOLDER + "/" + folder)))
       .setScanners(new ResourcesScanner())
-      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0]))))
-        .getResources(Pattern.compile(".*"));
+      .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[0])))).getResources(Pattern
+      .compile(".*"));
     for (String internalFilePath : internalFilesPath) {
       fileNames.add(Paths.get(internalFilePath).getFileName().toString());
     }
@@ -1519,8 +1480,8 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printCountSips(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printCountSips(Sorter sorter, Sublist sublist, Facets facets) throws GenericException,
+    RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "true"));
     long countFiles = index.count(TransferredResource.class, filter);
     filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ISFILE, "false"));
@@ -1537,8 +1498,8 @@ public class RodaCoreFactory {
     System.out.println("Total number of SIPs: " + countSIP);
   }
 
-  private static void printFiles(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printFiles(Sorter sorter, Sublist sublist, Facets facets) throws GenericException,
+    RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_SEARCH, "OLA-OLÁ-1234-XXXX_K"));
     IndexResult<IndexedFile> res = index.find(IndexedFile.class, filter, sorter, sublist);
 
@@ -1547,8 +1508,8 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printEvents(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
+  private static void printEvents(Sorter sorter, Sublist sublist, Facets facets) throws GenericException,
+    RequestNotValidException {
     Filter filter = new Filter(
       new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, "format identification"));
     IndexResult<IndexedPreservationEvent> res = index.find(IndexedPreservationEvent.class, filter, sorter, sublist);
@@ -1558,10 +1519,10 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void printAgents(Sorter sorter, Sublist sublist, Facets facets)
-    throws GenericException, RequestNotValidException {
-    Filter filter = new Filter(
-      new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE, PreservationAgentType.SOFTWARE.toString()));
+  private static void printAgents(Sorter sorter, Sublist sublist, Facets facets) throws GenericException,
+    RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.PRESERVATION_AGENT_TYPE,
+      PreservationAgentType.SOFTWARE.toString()));
     IndexResult<IndexedPreservationAgent> res = index.find(IndexedPreservationAgent.class, filter, sorter, sublist);
 
     for (IndexedPreservationAgent ipa : res.getResults()) {
@@ -1572,8 +1533,8 @@ public class RodaCoreFactory {
   private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
-        Filter filter = new Filter(
-          new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "users".equals(args.get(2)) ? "true" : "false"));
+        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER,
+          "users".equals(args.get(2)) ? "true" : "false"));
         printIndexMembers(args, filter, null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("sips".equals(args.get(2)))) {
         printCountSips(null, new Sublist(0, 10000), null);

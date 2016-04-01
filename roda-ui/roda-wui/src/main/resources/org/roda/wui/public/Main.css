@@ -513,6 +513,10 @@ pre>code {
 	content: "\f093";
 }
 
+.btn-refresh:after {
+	content: "\f021";
+}
+
 .btn-times-circle:after {
 	content: "\f057";
 }
@@ -3578,6 +3582,11 @@ td.datePickerMonth, td.datePickerYear {
 .wui-ingest-transfer .searchPanel {
 	margin-bottom: 20px;
 	margin-top: 10px;
+}
+
+.ingest-transfer-lastscanned {
+	font-size: 1.1rem;
+	color: #999;
 }
 
 #upload {

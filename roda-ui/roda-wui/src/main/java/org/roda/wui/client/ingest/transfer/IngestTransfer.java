@@ -120,8 +120,8 @@ public class IngestTransfer extends Composite {
   public static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
   public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
-  private static final Filter DEFAULT_FILTER = new Filter(
-    new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
+  private static final Filter DEFAULT_FILTER = new Filter(new EmptyKeyFilterParameter(
+    RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
 
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
@@ -154,6 +154,9 @@ public class IngestTransfer extends Composite {
   TransferredResourceList transferredResourceList;
 
   @UiField
+  Label lastScanned;
+
+  @UiField
   SimplePanel itemIcon;
 
   @UiField
@@ -163,6 +166,9 @@ public class IngestTransfer extends Composite {
   Label itemDates;
 
   // BUTTONS
+  @UiField
+  Button refresh;
+
   @UiField
   Button uploadFiles;
 
@@ -215,10 +221,10 @@ public class IngestTransfer extends Composite {
       public void onSelectionChange(SelectedItems selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
 
-        remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()
-          : messages.ingestTransferButtonRemoveSelectedItems());
-        startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder()
-          : messages.ingestTransferButtonIngestSelectedItems());
+        remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder() : messages
+          .ingestTransferButtonRemoveSelectedItems());
+        startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder() : messages
+          .ingestTransferButtonIngestSelectedItems());
         updateVisibles();
       }
 
@@ -247,8 +253,8 @@ public class IngestTransfer extends Composite {
       download.setVisible(true);
     } else {
 
-      Filter filter = new Filter(
-        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID,
+        r.getRelativePath()));
       transferredResourceList.setFilter(filter);
       basicSearch.setDefaultFilter(filter);
 
@@ -258,6 +264,8 @@ public class IngestTransfer extends Composite {
     }
     breadcrumb.updatePath(getBreadcrumbs(r));
     breadcrumb.setVisible(true);
+
+    lastScanned.setText(messages.ingestTransferLastScanned(resource.getLastScanDate()));
 
     updateVisibles();
   }
@@ -284,6 +292,9 @@ public class IngestTransfer extends Composite {
     transferredResourceList.setFilter(DEFAULT_FILTER);
     basicSearch.setDefaultFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
+
+    // TODO get date from service
+    lastScanned.setText("");
 
     updateVisibles();
   }
@@ -334,16 +345,16 @@ public class IngestTransfer extends Composite {
                   messages.ingestTransferNotFoundDialogMessage(), messages.ingestTransferNotFoundDialogButton(),
                   new AsyncCallback<Void>() {
 
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    // do nothing
-                  }
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      // do nothing
+                    }
 
-                  @Override
-                  public void onSuccess(Void result) {
-                    Tools.newHistory(IngestTransfer.RESOLVER);
-                  }
-                });
+                    @Override
+                    public void onSuccess(Void result) {
+                      Tools.newHistory(IngestTransfer.RESOLVER);
+                    }
+                  });
               } else {
                 AsyncCallbackUtils.defaultFailureTreatment(caught);
                 Tools.newHistory(IngestTransfer.RESOLVER);
@@ -377,6 +388,28 @@ public class IngestTransfer extends Composite {
     startIngest.setEnabled(resource != null || !empty);
   }
 
+  @UiHandler("refresh")
+  void buttonRefreshHandler(ClickEvent e) {
+    String uuid = resource != null ? resource.getUUID() : null;
+    refresh.setEnabled(false);
+    BrowserService.Util.getInstance().transferScanRequestUpdate(uuid, new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+        transferredResourceList.refresh();
+        refresh.setEnabled(true);
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        Toast.showInfo("Refresh", "Updated files under this folder");
+        transferredResourceList.refresh();
+        refresh.setEnabled(true);
+      }
+    });
+  }
+
   @UiHandler("uploadFiles")
   void buttonUploadFilesHandler(ClickEvent e) {
     if (resource != null) {
@@ -402,16 +435,16 @@ public class IngestTransfer extends Composite {
           BrowserService.Util.getInstance().createTransferredResourcesFolder(parent, folderName,
             new AsyncCallback<String>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
 
-            @Override
-            public void onSuccess(String newResourceUUID) {
-              Tools.newHistory(RESOLVER, newResourceUUID);
-            }
-          });
+              @Override
+              public void onSuccess(String newResourceUUID) {
+                Tools.newHistory(RESOLVER, newResourceUUID);
+              }
+            });
         }
       });
   }
@@ -476,32 +509,32 @@ public class IngestTransfer extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().removeTransferredResources(selected, new AsyncCallback<Void>() {
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    transferredResourceList.refresh();
-                  }
-
-                  @Override
-                  public void onSuccess(Void result) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
-                    transferredResourceList.refresh();
-                  }
-                });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
               }
-            }
-          });
+
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().removeTransferredResources(selected, new AsyncCallback<Void>() {
+
+                    @Override
+                    public void onFailure(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      transferredResourceList.refresh();
+                    }
+
+                    @Override
+                    public void onSuccess(Void result) {
+                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                        messages.ingestTransferRemoveSuccessMessage(size));
+                      transferredResourceList.refresh();
+                    }
+                  });
+                }
+              }
+            });
         }
       });
 

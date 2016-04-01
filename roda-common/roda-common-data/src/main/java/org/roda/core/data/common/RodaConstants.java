@@ -305,6 +305,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_NAME = "name";
   public static final String TRANSFERRED_RESOURCE_SIZE = "size";
   public static final String TRANSFERRED_RESOURCE_ANCESTORS = "ancestors";
+  public static final String TRANSFERRED_RESOURCE_LAST_SCAN_DATE = "lastScanDate";
 
   public static final String JOB_ID = "id";
   public static final String JOB_NAME = "name";
@@ -540,12 +541,12 @@ public final class RodaConstants {
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
-    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
-    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
-    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
-    AUTHORIZATION_CHECK("authorization check"), DELETION("deletion");
+    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"), NORMALIZATION(
+      "normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"), ACCESSION(
+      "accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), WELLFORMEDNESS_CHECK(
+      "wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"), AUTHORIZATION_CHECK(
+      "authorization check"), DELETION("deletion");
 
     private final String text;
 

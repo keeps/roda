@@ -13,14 +13,18 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Date;
 import java.util.EnumSet;
+import java.util.Stack;
 
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
@@ -30,64 +34,103 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcesRunnable.class);
 
   private Path basePath;
-  private Date from;
+  private TransferredResource folder;
   private SolrClient index;
 
-  public ReindexTransferredResourcesRunnable(Path basePath, Date from, SolrClient index) {
+  public ReindexTransferredResourcesRunnable(Path basePath, SolrClient index) {
     this.basePath = basePath;
-    this.from = from;
+    this.folder = null;
     this.index = index;
   }
 
-  public void run() {
-    long start = System.currentTimeMillis();
-    LOGGER.info("Start indexing transferred resources {}", basePath.toString());
+  public ReindexTransferredResourcesRunnable(Path basePath, String folderUUID, SolrClient index) {
+    this.basePath = basePath;
+    this.index = index;
+
     try {
-      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      Files.walkFileTree(basePath, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          if (!dir.equals(basePath)) {
-            indexPath(dir, attrs);
-          }
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          indexPath(file, attrs);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          return FileVisitResult.CONTINUE;
-        }
-      });
-      index.commit(RodaConstants.INDEX_TRANSFERRED_RESOURCE);
-      LOGGER.info("End indexing Transferred Resources");
-      LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
-      RodaCoreFactory.setFolderMonitorDate(new Date());
-    } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error reindexing Transferred Resources", e);
+      this.folder = RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, folderUUID);
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Specific folder is not indexed or does not exist");
     }
   }
 
-  private void indexPath(Path file, BasicFileAttributes attrs) {
-    Date modifiedDate = new Date(attrs.lastModifiedTime().toMillis());
-    if (from == null || from.before(modifiedDate)) {
+  public void run() {
+    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
+      long start = System.currentTimeMillis();
+      Date lastScanDate = new Date();
+      RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(true);
+      LOGGER.info("Start indexing transferred resources {}", basePath.toString());
       try {
-        TransferredResource resource = FolderMonitorNIO.createTransferredResource(file, basePath);
-        index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
-      } catch (IOException | SolrServerException e) {
-        LOGGER.error("Error adding path to Transferred Resources index", e);
+        EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+        Path path;
+        if (folder != null) {
+          path = basePath.resolve(Paths.get(folder.getRelativePath()));
+        } else {
+          path = basePath;
+        }
+        Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
+
+          Stack<BasicFileAttributes> actualDirectoryAttributesStack = new Stack<BasicFileAttributes>();
+          Stack<Long> fileSizeStack = new Stack<Long>();
+
+          @Override
+          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            actualDirectoryAttributesStack.push(attrs);
+            fileSizeStack.push(0L);
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            try {
+              long size = Files.size(file);
+              long actualSize = fileSizeStack.pop();
+              fileSizeStack.push(actualSize + size);
+              TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
+                basePath, lastScanDate);
+              index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
+            } catch (IOException | SolrServerException e) {
+              LOGGER.error("Error adding path to Transferred Resources index", e);
+            }
+
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+            if (!dir.equals(basePath)) {
+              try {
+                BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
+                long fileSize = fileSizeStack.pop();
+                TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
+                  actualDirectoryAttributes, fileSize, basePath, lastScanDate);
+                index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
+                  SolrUtils.transferredResourceToSolrDocument(resource));
+              } catch (IOException | SolrServerException e) {
+                LOGGER.error("Error adding path to Transferred Resources index", e);
+              }
+            }
+            return FileVisitResult.CONTINUE;
+          }
+        });
+
+        RodaCoreFactory.getIndexService().commit(TransferredResource.class);
+
+        String query = SolrUtils.getQueryToDeleteTransferredResourceIndexes(folder, lastScanDate);
+        index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, query);
+
+        RodaCoreFactory.getIndexService().commit(TransferredResource.class);
+        LOGGER.info("End indexing Transferred Resources");
+        LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
+        RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
+      } catch (IOException | SolrServerException | GenericException e) {
+        LOGGER.error("Error reindexing Transferred Resources", e);
       }
     }
   }
-
 }

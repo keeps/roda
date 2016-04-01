@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -31,7 +32,7 @@ import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.monitor.FolderMonitorNIO;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -123,8 +124,8 @@ public class InternalConvertPluginsTestForTravis {
   }
 
   private List<TransferredResource> createCorpora(int corporaId) throws InterruptedException, IOException,
-    FileAlreadyExistsException, NotFoundException, GenericException, AlreadyExistsException {
-    FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
+    FileAlreadyExistsException, NotFoundException, GenericException, AlreadyExistsException, SolrServerException {
+    TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     List<TransferredResource> resources = new ArrayList<TransferredResource>();
 
@@ -141,7 +142,7 @@ public class InternalConvertPluginsTestForTravis {
     String transferredResourceId = "testt";
     FSUtils.copy(corpora, f.getBasePath().resolve(transferredResourceId), true);
 
-    f.reindex(true);
+    f.updateAllTransferredResources(null, true);
 
     index.commit(TransferredResource.class);
 
@@ -152,7 +153,7 @@ public class InternalConvertPluginsTestForTravis {
 
   private AIP ingestCorpora(int corporaId) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException {
+    FileAlreadyExistsException, SolrServerException {
     AIP root = model.createAIP(null, new Permissions());
 
     Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
@@ -180,7 +181,8 @@ public class InternalConvertPluginsTestForTravis {
   }
 
   @Test
-  public void testIngestTransferredResource() throws IOException, InterruptedException, RODAException {
+  public void testIngestTransferredResource() throws IOException, InterruptedException, RODAException,
+    SolrServerException {
     AIP aip = ingestCorpora(0);
     Assert.assertEquals(1, aip.getRepresentations().size());
 
@@ -193,7 +195,7 @@ public class InternalConvertPluginsTestForTravis {
 
   @Test
   public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+    IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -235,7 +237,8 @@ public class InternalConvertPluginsTestForTravis {
   }
 
   @Test
-  public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -277,7 +280,8 @@ public class InternalConvertPluginsTestForTravis {
   }
 
   @Test
-  public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -321,7 +325,8 @@ public class InternalConvertPluginsTestForTravis {
 
   @Ignore
   @Test
-  public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -364,7 +369,7 @@ public class InternalConvertPluginsTestForTravis {
 
   @Test
   public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+    IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -407,7 +412,8 @@ public class InternalConvertPluginsTestForTravis {
   }
 
   @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
+    IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -441,7 +447,7 @@ public class InternalConvertPluginsTestForTravis {
   @Test
   public void testMultipleRepresentations() throws FileAlreadyExistsException, RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
-    InvalidParameterException, InterruptedException, IOException {
+    InvalidParameterException, InterruptedException, IOException, SolrServerException {
 
     AIP aip = ingestCorpora(0);
 
@@ -500,7 +506,7 @@ public class InternalConvertPluginsTestForTravis {
 
   @Test
   public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+    IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
@@ -542,7 +548,7 @@ public class InternalConvertPluginsTestForTravis {
 
   @Test
   public void testDigitalSignaturePlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, NoSuchAlgorithmException {
+    IOException, NoSuchAlgorithmException, SolrServerException {
     AIP aip = ingestCorpora(1);
     String oldRepresentationId = aip.getRepresentations().get(0).getId();
 
@@ -583,7 +589,7 @@ public class InternalConvertPluginsTestForTravis {
   @Ignore
   @Test
   public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException {
+    IOException, SolrServerException {
     AIP aip = ingestCorpora(2);
     CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
     File file = allFiles.iterator().next();
@@ -613,7 +619,8 @@ public class InternalConvertPluginsTestForTravis {
 
   @Ignore
   @Test
-  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException {
+  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
+    SolrServerException {
     AIP aip = ingestCorpora(2);
 
     Plugin<AIP> plugin = new VeraPDFPlugin();

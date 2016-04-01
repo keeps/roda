@@ -25,6 +25,7 @@ public class TransferredResource implements IsIndexed {
 
   private long size;
   private Date creationDate;
+  private Date lastScanDate;
   private String name;
   private boolean file;
 
@@ -120,6 +121,14 @@ public class TransferredResource implements IsIndexed {
     this.ancestorsPaths = ancestorsPaths;
   }
 
+  public Date getLastScanDate() {
+    return lastScanDate;
+  }
+
+  public void setLastScanDate(Date lastScanDate) {
+    this.lastScanDate = lastScanDate;
+  }
+
   @Override
   public String getUUID() {
     return uuid;
@@ -138,8 +147,10 @@ public class TransferredResource implements IsIndexed {
     result = prime * result + (file ? 1231 : 1237);
     result = prime * result + ((fullPath == null) ? 0 : fullPath.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((lastScanDate == null) ? 0 : lastScanDate.hashCode());
     result = prime * result + ((name == null) ? 0 : name.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
+    result = prime * result + ((parentUUID == null) ? 0 : parentUUID.hashCode());
     result = prime * result + ((relativePath == null) ? 0 : relativePath.hashCode());
     result = prime * result + (int) (size ^ (size >>> 32));
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
@@ -177,6 +188,11 @@ public class TransferredResource implements IsIndexed {
         return false;
     } else if (!id.equals(other.id))
       return false;
+    if (lastScanDate == null) {
+      if (other.lastScanDate != null)
+        return false;
+    } else if (!lastScanDate.equals(other.lastScanDate))
+      return false;
     if (name == null) {
       if (other.name != null)
         return false;
@@ -186,6 +202,11 @@ public class TransferredResource implements IsIndexed {
       if (other.parentId != null)
         return false;
     } else if (!parentId.equals(other.parentId))
+      return false;
+    if (parentUUID == null) {
+      if (other.parentUUID != null)
+        return false;
+    } else if (!parentUUID.equals(other.parentUUID))
       return false;
     if (relativePath == null) {
       if (other.relativePath != null)
@@ -205,8 +226,9 @@ public class TransferredResource implements IsIndexed {
   @Override
   public String toString() {
     return "TransferredResource [uuid=" + uuid + ", id=" + id + ", fullPath=" + fullPath + ", relativePath="
-      + relativePath + ", parentId=" + parentId + ", ancestorsPaths=" + ancestorsPaths + ", size=" + size
-      + ", creationDate=" + creationDate + ", name=" + name + ", file=" + file + "]";
+      + relativePath + ", parentId=" + parentId + ", parentUUID=" + parentUUID + ", ancestorsPaths=" + ancestorsPaths
+      + ", size=" + size + ", creationDate=" + creationDate + ", lastScanDate=" + lastScanDate + ", name=" + name
+      + ", file=" + file + "]";
   }
 
 }

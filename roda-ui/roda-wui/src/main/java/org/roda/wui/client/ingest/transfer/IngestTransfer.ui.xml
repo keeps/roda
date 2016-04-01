@@ -36,12 +36,16 @@
 				<g:Button addStyleNames="btn btn-download" ui:field="download">
 					<ui:text from='{messages.ingestTransferButtonDownload}' />
 				</g:Button>
+				<g:Label styleName="ingest-transfer-lastscanned" ui:field="lastScanned"/>
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarFoldersFilesTitle}' />
 					</g:Label>
+					<g:Button addStyleNames="btn btn-refresh" ui:field="refresh">
+						<ui:text from='{messages.ingestTransferButtonRefresh}' />
+					</g:Button>
 					<g:Button addStyleNames="btn btn-upload" ui:field="uploadFiles">
 						<ui:text from='{messages.ingestTransferButtonUploadFiles}' />
 					</g:Button>

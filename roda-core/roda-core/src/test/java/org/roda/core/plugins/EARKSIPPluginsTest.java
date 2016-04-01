@@ -21,17 +21,16 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.monitor.FolderMonitorNIO;
-import org.roda.core.common.monitor.FolderObserver;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -109,15 +108,15 @@ public class EARKSIPPluginsTest {
     FSUtils.deletePath(basePath);
   }
 
-  private TransferredResource createCorpora()
-    throws InterruptedException, IOException, FileAlreadyExistsException, NotFoundException, GenericException {
-    FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
+  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
+    NotFoundException, GenericException, SolrServerException {
+    TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.EARK_SIP);
 
     f.createFile(null, CorporaConstants.EARK_SIP, Files.newInputStream(sip));
 
-    f.reindex(true);
+    f.updateAllTransferredResources(null, true);
     index.commit(TransferredResource.class);
 
     TransferredResource transferredResource = index.retrieve(TransferredResource.class,
@@ -133,7 +132,7 @@ public class EARKSIPPluginsTest {
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException {
+    FileAlreadyExistsException, SolrServerException {
     AIP root = model.createAIP(null, new Permissions());
 
     Plugin<TransferredResource> plugin = new EARKSIPToAIPPlugin();
@@ -150,8 +149,8 @@ public class EARKSIPPluginsTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
+      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -161,7 +160,7 @@ public class EARKSIPPluginsTest {
   }
 
   @Test
-  public void testIngestEARKSIP() throws IOException, InterruptedException, RODAException {
+  public void testIngestEARKSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 

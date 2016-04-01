@@ -20,17 +20,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.jena.ext.com.google.common.collect.Iterables;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
-import org.roda.core.common.monitor.FolderMonitorNIO;
-import org.roda.core.common.monitor.FolderObserver;
+import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -110,19 +109,9 @@ public class BagitSIPPluginsTest {
     FSUtils.deletePath(basePath);
   }
 
-  private TransferredResource createCorpora()
-    throws InterruptedException, IOException, FileAlreadyExistsException, NotFoundException, GenericException {
-    FolderMonitorNIO f = RodaCoreFactory.getFolderMonitor();
-
-    FolderObserver observer = Mockito.mock(FolderObserver.class);
-    f.addFolderObserver(observer);
-
-    while (!f.isFullyInitialized()) {
-      logger.info("Waiting for folder monitor to initialize...");
-      Thread.sleep(1000);
-    }
-
-    Assert.assertTrue(f.isFullyInitialized());
+  private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
+    NotFoundException, GenericException, SolrServerException {
+    TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);
 
@@ -145,7 +134,7 @@ public class BagitSIPPluginsTest {
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
-    FileAlreadyExistsException {
+    FileAlreadyExistsException, SolrServerException {
     AIP root = model.createAIP(null, new Permissions());
 
     Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
@@ -160,8 +149,8 @@ public class BagitSIPPluginsTest {
       Arrays.asList(transferredResource));
     assertReports(reports);
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
+      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -171,7 +160,7 @@ public class BagitSIPPluginsTest {
   }
 
   @Test
-  public void testIngestBagitSIP() throws IOException, InterruptedException, RODAException {
+  public void testIngestBagitSIP() throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 

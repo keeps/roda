@@ -176,8 +176,8 @@ public class SolrUtils {
     if (facetFields != null) {
       for (FacetField facet : facetFields) {
         LOGGER.trace("facet:{} count:{}", facet.getName(), facet.getValueCount());
-        facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(),
-          facets.getParameters().get(facet.getName()).getValues());
+        facetResult = new FacetFieldResult(facet.getName(), facet.getValueCount(), facets.getParameters()
+          .get(facet.getName()).getValues());
         for (Count count : facet.getValues()) {
           LOGGER.trace("   value:{} value:{}", count.getName(), count.getCount());
           facetResult.addFacetValue(count.getName(), count.getName(), count.getCount());
@@ -206,12 +206,12 @@ public class SolrUtils {
             + metadataVersion;
           // FIXME 20160314 hsilva: replace hardcoded path by constant or method
           // (to support both filesystem in win/linux and classpath)
-          transformerStream = RodaCoreFactory
-            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataTypeWithVersion + ".xslt");
+          transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/"
+            + lowerCaseMetadataTypeWithVersion + ".xslt");
         }
         if (transformerStream == null) {
-          transformerStream = RodaCoreFactory
-            .getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType + ".xslt");
+          transformerStream = RodaCoreFactory.getConfigurationFileAsStream("crosswalks/ingest/" + lowerCaseMetadataType
+            + ".xslt");
         }
       }
 
@@ -268,8 +268,8 @@ public class SolrUtils {
     FactoryConfigurationError e)
 
     {
-      throw new GenericException(
-        "Could not process descriptive metadata binary " + binary.getStoragePath() + " using xslt " + xsltFilename, e);
+      throw new GenericException("Could not process descriptive metadata binary " + binary.getStoragePath()
+        + " using xslt " + xsltFilename, e);
     }
     return validateDescriptiveMetadataFields(doc);
   }
@@ -356,6 +356,10 @@ public class SolrUtils {
     }
   }
 
+  public static String getLastScanDate(Date scanDate) {
+    return DateUtil.getThreadLocalDateFormat().format(scanDate);
+  }
+
   private static String processFromDate(Date fromValue) {
     final String ret;
 
@@ -407,8 +411,8 @@ public class SolrUtils {
     return ret;
   }
 
-  private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue, Date toValue,
-    DateGranularity granularity) {
+  private static void appendRangeInterval(StringBuilder ret, String fromKey, String toKey, Date fromValue,
+    Date toValue, DateGranularity granularity) {
     if (fromValue != null || toValue != null) {
       appendANDOperator(ret, true);
       ret.append("(");
@@ -917,8 +921,8 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
-      throws GenericException, RequestNotValidException {
+    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean showInactive) throws GenericException,
+    RequestNotValidException {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
@@ -1047,8 +1051,8 @@ public class SolrUtils {
     return ret;
   }
 
-  private static List<String> getAncestors(String parentId, ModelService model)
-    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+  private static List<String> getAncestors(String parentId, ModelService model) throws RequestNotValidException,
+    GenericException, AuthorizationDeniedException {
     List<String> ancestors = new ArrayList<>();
     String nextAncestorId = parentId;
     while (nextAncestorId != null) {
@@ -1197,7 +1201,7 @@ public class SolrUtils {
     return doc;
   }
 
-  private static Map<String, Object> set(Object value) {
+  public static Map<String, Object> set(Object value) {
     Map<String, Object> fieldModifier = new HashMap<>(1);
     fieldModifier.put("set", value);
     return fieldModifier;
@@ -1384,15 +1388,15 @@ public class SolrUtils {
     final String eventDetail = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_DETAIL));
     final String eventType = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_TYPE));
     final String eventOutcome = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME));
-    final String eventOutcomeDetailExtension = objectToString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
+    final String eventOutcomeDetailExtension = objectToString(doc
+      .get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_EXTENSION));
 
     final String eventOutcomeDetailNote = objectToString(doc.get(RodaConstants.PRESERVATION_EVENT_OUTCOME_DETAIL_NOTE));
     final List<String> agents = objectToListString(doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_AGENT_IDENTIFIER));
-    final List<String> outcomes = objectToListString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
-    final List<String> sources = objectToListString(
-      doc.get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
+    final List<String> outcomes = objectToListString(doc
+      .get(RodaConstants.PRESERVATION_EVENT_LINKING_OUTCOME_OBJECT_IDENTIFIER));
+    final List<String> sources = objectToListString(doc
+      .get(RodaConstants.PRESERVATION_EVENT_LINKING_SOURCE_OBJECT_IDENTIFIER));
     IndexedPreservationEvent ipe = new IndexedPreservationEvent();
     ipe.setId(id);
     ipe.setAipId(aipID);
@@ -1574,6 +1578,8 @@ public class SolrUtils {
 
     List<String> ancestorsPath = objectToListString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS));
 
+    Date lastScanDate = objectToDate(doc.get(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE));
+
     tr.setId(id);
     tr.setUUID(uuid);
     tr.setCreationDate(d);
@@ -1585,6 +1591,7 @@ public class SolrUtils {
     tr.setParentUUID(parentUUID);
     tr.setFile(isFile);
     tr.setAncestorsPaths(ancestorsPath);
+    tr.setLastScanDate(lastScanDate);
     return tr;
   }
 
@@ -1609,6 +1616,8 @@ public class SolrUtils {
     if (resource.getAncestorsPaths() != null && !resource.getAncestorsPaths().isEmpty()) {
       transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, resource.getAncestorsPaths());
     }
+    transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, resource.getLastScanDate());
+
     return transferredResource;
   }
 
@@ -1671,11 +1680,11 @@ public class SolrUtils {
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
-    job.setOrchestratorMethod(
-      ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
+    job
+      .setOrchestratorMethod(ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     try {
-      job.setObjects(
-        JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECTS)), SelectedItems.class));
+      job.setObjects(JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECTS)),
+        SelectedItems.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job objects", e);
     }
@@ -1741,10 +1750,10 @@ public class SolrUtils {
     risk.setMitigationStrategy(objectToString(doc.get(RodaConstants.RISK_MITIGATION_STRATEGY)));
     risk.setMitigationOwnerType(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER_TYPE)));
     risk.setMitigationOwner(objectToString(doc.get(RodaConstants.RISK_MITIGATION_OWNER)));
-    risk.setMitigationRelatedEventIdentifierType(
-      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE)));
-    risk.setMitigationRelatedEventIdentifierValue(
-      objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
+    risk.setMitigationRelatedEventIdentifierType(objectToString(doc
+      .get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE)));
+    risk.setMitigationRelatedEventIdentifierValue(objectToString(doc
+      .get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
 
     risk.setAffectedObjects(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.RISK_AFFECTED_OBJECTS))));
 
@@ -1979,8 +1988,8 @@ public class SolrUtils {
 
     }
 
-    FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom, extension,
-      formatRegistries);
+    FileFormat fileFormat = new FileFormat(formatDesignationName, formatDesignationVersion, mimetype, pronom,
+      extension, formatRegistries);
 
     file = new IndexedFile(uuid, parentUUID, aipId, representationId, representationUUID, path, fileId, false,
       fileFormat, originalName, size, isDirectory, creatingApplicationName, creatingApplicationVersion,
@@ -2027,8 +2036,8 @@ public class SolrUtils {
     jobReport.setPluginState(PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE))));
     jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS)));
     try {
-      jobReport
-        .setReports(JsonUtils.getListFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORTS)), Report.class));
+      jobReport.setReports(JsonUtils.getListFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORTS)),
+        Report.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job report", e);
     }
@@ -2075,10 +2084,11 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument addOtherPropertiesToIndexedFile(String prefix, OtherMetadata otherMetadataBinary,
-    ModelService model, SolrClient index)
-      throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-      ParserConfigurationException, SAXException, IOException, XPathExpressionException, SolrServerException {
-    SolrDocument solrDocument = index.getById(RodaConstants.INDEX_FILE,
+    ModelService model, SolrClient index) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, ParserConfigurationException, SAXException, IOException, XPathExpressionException,
+    SolrServerException {
+    SolrDocument solrDocument = index.getById(
+      RodaConstants.INDEX_FILE,
       IdUtils.getFileId(otherMetadataBinary.getAipId(), otherMetadataBinary.getRepresentationId(),
         otherMetadataBinary.getFileDirectoryPath(), otherMetadataBinary.getFileId()));
 
@@ -2100,4 +2110,39 @@ public class SolrUtils {
     return doc;
   }
 
+  public static String getQueryToDeleteTransferredResourceIndexes(TransferredResource folder, Date lastScanDate)
+    throws SolrServerException, IOException {
+
+    String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
+    StringBuilder sb = new StringBuilder();
+
+    if (folder == null) {
+      sb.append("NOT ").append(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE).append(":\"").append(formattedDate)
+        .append("\"");
+    } else {
+      sb.append("(").append(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS).append(":\"")
+        .append(folder.getRelativePath()).append("\")").append(" AND ").append(" NOT (")
+        .append(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE).append(":\"").append(formattedDate).append("\")");
+    }
+
+    return sb.toString();
+  }
+
+  public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, List<String> ids)
+    throws GenericException {
+    try {
+      index.deleteById(getIndexName(classToDelete), ids);
+    } catch (SolrServerException | IOException e) {
+      throw new GenericException("Could not delete items", e);
+    }
+  }
+
+  public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, Filter filter)
+    throws GenericException, RequestNotValidException {
+    try {
+      index.deleteByQuery(getIndexName(classToDelete), parseFilter(filter));
+    } catch (SolrServerException | IOException e) {
+      throw new GenericException("Could not delete items", e);
+    }
+  }
 }

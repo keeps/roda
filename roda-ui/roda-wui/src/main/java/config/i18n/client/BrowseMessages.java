@@ -227,8 +227,14 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Successfully removed {0} items")
   String ingestTransferRemoveSuccessMessage(Long size);
 
+  @DefaultMessage("Last checked at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String ingestTransferLastScanned(Date lastScanDate);
+
   @DefaultMessage("Upload")
   String ingestTransferButtonUploadFiles();
+
+  @DefaultMessage("Refresh")
+  String ingestTransferButtonRefresh();
 
   @DefaultMessage("Download")
   String ingestTransferButtonDownload();

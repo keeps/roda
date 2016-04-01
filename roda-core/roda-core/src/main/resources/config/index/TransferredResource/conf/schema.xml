@@ -90,6 +90,8 @@
 		required="true" multiValued="false" />
 	<field name="date" type="tdate" indexed="true" stored="true"
 		required="true" multiValued="false" />
+	<field name="lastScanDate" type="tdate" indexed="true" stored="true"
+		required="false" multiValued="false" />
 	<field name="isFile" type="boolean" indexed="true" stored="true"
 		required="false" multiValued="false" />
 	<field name="name" type="text_general" indexed="true" stored="true"
