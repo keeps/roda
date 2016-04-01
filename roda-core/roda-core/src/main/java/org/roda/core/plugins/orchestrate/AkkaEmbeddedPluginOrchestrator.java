@@ -505,10 +505,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null) {
-      JobPluginInfo jobPluginInfo = new JobPluginInfo();
-      jobPluginInfo.setObjectsCount(objectsCount);
-      jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
       synchronized (runningTasks) {
+        JobPluginInfo jobPluginInfo = new JobPluginInfo();
+        jobPluginInfo.setObjectsCount(objectsCount);
+        jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
         if (runningTasks.get(jobId) != null) {
           runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
           runningTasksObjectsCount.put(jobId, runningTasksObjectsCount.get(jobId) + objectsCount);
@@ -549,16 +549,18 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       synchronized (runningTasks) {
         Integer taskObjectsCount = runningTasksObjectsCount.get(jobId);
         Map<Plugin<?>, JobPluginInfo> jobInfo = runningTasks.get(jobId);
+        boolean pluginIsDone = (info.getStepsCompleted() == info.getTotalSteps());
         JobPluginInfo jobPluginInfo = jobInfo.get(plugin);
         jobPluginInfo.setTotalSteps(info.getTotalSteps());
         jobPluginInfo.setStepsCompleted(info.getStepsCompleted());
         jobPluginInfo.setCompletionPercentage(info.getCompletionPercentage());
-        jobPluginInfo.setObjectsWaitingToBeProcessed(info.getObjectsWaitingToBeProcessed());
+        jobPluginInfo.setObjectsBeingProcessed(pluginIsDone ? 0 : info.getObjectsBeingProcessed());
+        jobPluginInfo.setObjectsWaitingToBeProcessed(pluginIsDone ? 0 : info.getObjectsWaitingToBeProcessed());
         jobPluginInfo.setObjectsProcessedWithSuccess(info.getObjectsProcessedWithSuccess());
         jobPluginInfo.setObjectsProcessedWithFailure(info.getObjectsProcessedWithFailure());
 
         float percentage = 0f;
-        int waitingToBeProcessed = 0;
+        int beingProcessed = 0;
         int processedWithSuccess = 0;
         int processedWithFailure = 0;
         for (JobPluginInfo pluginInfo : jobInfo.values()) {
@@ -570,12 +572,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
             processedWithSuccess += pluginInfo.getObjectsProcessedWithSuccess();
             processedWithFailure += pluginInfo.getObjectsProcessedWithFailure();
           }
-          waitingToBeProcessed += pluginInfo.getObjectsWaitingToBeProcessed();
+          beingProcessed += pluginInfo.getObjectsBeingProcessed();
         }
 
         JobPluginInfo infoUpdated = new JobPluginInfo();
         infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
-        infoUpdated.setObjectsWaitingToBeProcessed(waitingToBeProcessed);
+        infoUpdated.setObjectsBeingProcessed(beingProcessed);
         infoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
         infoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
 

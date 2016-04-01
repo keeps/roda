@@ -12,6 +12,7 @@ public class JobPluginInfo {
   private int totalSteps = 0;
   private int completionPercentage = 0;
   private int objectsCount = 0;
+  private int objectsBeingProcessed = 0;
   private int objectsWaitingToBeProcessed = 0;
   private int objectsProcessedWithSuccess = 0;
   private int objectsProcessedWithFailure = 0;
@@ -56,6 +57,14 @@ public class JobPluginInfo {
     this.objectsCount = objectsCount;
   }
 
+  public int getObjectsBeingProcessed() {
+    return objectsBeingProcessed;
+  }
+
+  public void setObjectsBeingProcessed(int objectsBeingProcessed) {
+    this.objectsBeingProcessed = objectsBeingProcessed;
+  }
+
   public int getObjectsWaitingToBeProcessed() {
     return objectsWaitingToBeProcessed;
   }
@@ -83,8 +92,9 @@ public class JobPluginInfo {
   @Override
   public String toString() {
     return "JobPluginInfo [stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", completionPercentage="
-      + completionPercentage + ", objectsCount=" + objectsCount + ", objectsWaitingToBeProcessed="
-      + objectsWaitingToBeProcessed + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess
-      + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + "]";
+      + completionPercentage + ", objectsCount=" + objectsCount + ", objectsBeingProcessed=" + objectsBeingProcessed
+      + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsProcessedWithSuccess="
+      + objectsProcessedWithSuccess + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + "]";
   }
+
 }

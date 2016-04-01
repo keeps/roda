@@ -180,7 +180,6 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
     totalSteps = calculateEfectiveTotalSteps();
-    info.setTotalSteps(totalSteps);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, totalSteps + "");
   }
 
@@ -194,6 +193,9 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     Map<String, Report> reports = new HashMap<>();
     aipIdToTransferredResourceId = new HashMap<>();
 
+    info.setTotalSteps(totalSteps);
+    info.setObjectsCount(resources.size());
+    info.setObjectsBeingProcessed(info.getObjectsCount());
     PluginHelper.updateJobInformation(this, info, false);
     Date startDate = new Date();
 
@@ -209,6 +211,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
     List<AIP> aips = getAIPsFromReports(model, storage, reports);
+    info.setObjectsBeingProcessed(aips.size());
     info.setObjectsProcessedWithFailure(resources.size() - aips.size());
     PluginHelper.updateJobInformation(this, info, true);
 
@@ -323,6 +326,7 @@ public class DefaultIngestPlugin extends AbstractPlugin<TransferredResource> {
       }
     }
     info.setObjectsProcessedWithFailure(resources.size() - newAips.size());
+    info.setObjectsBeingProcessed(newAips.size());
     return newAips;
   }
 

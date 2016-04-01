@@ -185,7 +185,13 @@ public final class PluginHelper {
   public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
     String jobId = getJobId(plugin);
     Report jobReport = new Report(reportItem);
-    jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
+    String itemId = reportItem.getItemId();
+    if (itemId == null) {
+      // 20160401 hsilva: this way, when there is no AIP created but still want
+      // to create a job report, we will not get a null in the job report Id
+      itemId = reportItem.getOtherId();
+    }
+    jobReport.setId(IdUtils.getJobReportId(jobId, itemId));
     jobReport.setJobId(jobId);
     if (reportItem.getTotalSteps() != 0) {
       jobReport.setTotalSteps(reportItem.getTotalSteps());
@@ -434,14 +440,11 @@ public final class PluginHelper {
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
       Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
 
-      job.setObjectsWaitingToBeProcessed(jobPluginInfo.getObjectsWaitingToBeProcessed());
+      job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
       job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
       job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-      job.setObjectsBeingProcessed(job.getObjectsCount() - job.getObjectsWaitingToBeProcessed()
+      job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
         - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
-      LOGGER.trace("New job waitingToBeProcessed: {}, processedWithSuccess: {}, processedWithFailure: {}",
-        job.getObjectsWaitingToBeProcessed(), job.getObjectsProcessedWithSuccess(),
-        job.getObjectsProcessedWithFailure());
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
