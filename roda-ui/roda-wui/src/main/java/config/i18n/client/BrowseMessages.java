@@ -384,21 +384,21 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Waiting to start")
   String showJobStatusCreated();
 
-  @DefaultMessage("Processing ({0}%)")
-  String showJobStatusStarted(int completionPercentage);
+  @DefaultMessage("RUNNING")
+  String showJobStatusStarted();
 
-  @DefaultMessage("Completed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
-  String showJobStatusCompleted(Date endDate);
+  @DefaultMessage("DONE")
+  String showJobStatusCompleted();
 
-  @DefaultMessage("Failed at {0,localdatetime,predef:DATE_TIME_MEDIUM}")
-  String showJobStatusFailedDuringCreation(Date endDate);
+  @DefaultMessage("FAILED")
+  String showJobStatusFailedDuringCreation();
 
-  @DefaultMessage("{0,number} total, {1,number} successfully processed, {2,number} failed, {3,number} processing, {4,number} waiting to be processed")
-  String showJobCounters(int objectsCount, int objectsProcessedWithSuccess, int objectsProcessedWithFailure,
-    int objectsBeingProcessed, int objectsWaitingToBeProcessed);
+  @DefaultMessage("<span class='label-default'>{0}% done</span> <span class='label-default'>{1,number} total</span> <span class='label-success'>{2,number} successful</span> <span class='label-danger'>{3,number} failed</span> <span class='label-info'>{4,number} processing</span> <span class='label-warning'>{5,number} waiting</span>")
+  SafeHtml showJobProgress(int completionPercentage, int objectsCount, int objectsProcessedWithSuccess,
+    int objectsProcessedWithFailure, int objectsBeingProcessed, int objectsWaitingToBeProcessed);
 
   @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
-  String showJobReportStatus(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
+  String showJobReportProgress(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
 
   /************* Browse ****************/
   @DefaultMessage("Loading...")
@@ -647,8 +647,20 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage(", ")
   String durationDHMSSeparator();
-  
+
   @DefaultMessage(" and ")
   String durationDHMSSecondSeparator();
+
+  @DefaultMessage("{0}d{1,number,##}h{2,number,##}m{3,number,##}s")
+  String durationDHMSShortDays(int days, int hours, int minutes, int seconds);
+
+  @DefaultMessage("{0,number,##}h{1,number,##}m{2,number,##}s")
+  String durationDHMSShortHours(int hours, int minutes, int seconds);
+
+  @DefaultMessage("{0,number,##}m{1,number,##}s")
+  String durationDHMSShortMinutes(int minutes, int seconds);
+
+  @DefaultMessage("{0,number,##}s")
+  String durationDHMSShortSeconds(int seconds);
 
 }

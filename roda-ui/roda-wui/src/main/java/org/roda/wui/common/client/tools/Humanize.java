@@ -93,6 +93,13 @@ public class Humanize {
     return durationMillisToDHMS(end.getTime() - start.getTime());
   }
 
+  public static String durationInShortDHMS(Date start, Date end) {
+    if (end == null) {
+      end = new Date();
+    }
+    return durationMillisToShortDHMS(end.getTime() - start.getTime());
+  }
+
   public final static long ONE_SECOND = 1000;
   public final static long SECONDS = 60;
 
@@ -144,6 +151,34 @@ public class Humanize {
     } else {
       return messages.durationDHMSLessThanASecond();
     }
+  }
+
+  /**
+   * converts time (in milliseconds) to human-readable format "<dd:>hh:mm:ss"
+   */
+  public static String durationMillisToShortDHMS(long duration) {
+    duration /= ONE_SECOND;
+    int seconds = (int) (duration % SECONDS);
+    duration /= SECONDS;
+    int minutes = (int) (duration % MINUTES);
+    duration /= MINUTES;
+    int hours = (int) (duration % HOURS);
+    int days = (int) (duration / HOURS);
+
+    String ret;
+
+    if (days > 0) {
+      ret = messages.durationDHMSShortDays(days, hours, minutes, seconds);
+    } else if (hours > 0) {
+      ret = messages.durationDHMSShortHours(hours, minutes, seconds);
+    } else if (minutes > 0) {
+      ret = messages.durationDHMSShortMinutes(minutes, seconds);
+    } else {
+      ret = messages.durationDHMSShortSeconds(seconds);
+    }
+
+    return ret;
+
   }
 
 }

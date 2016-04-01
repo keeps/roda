@@ -46,7 +46,11 @@
 				<g:Label addStyleNames="label">
 					Status
 				</g:Label>
-				<g:Label ui:field="status" />
+				<g:HTML ui:field="status" />
+				<g:Label addStyleNames="label">
+					Progress
+				</g:Label>
+				<g:Label ui:field="progress" />
 				<g:Label addStyleNames="h4">
 					<ui:msg>Run tasks</ui:msg>
 				</g:Label>

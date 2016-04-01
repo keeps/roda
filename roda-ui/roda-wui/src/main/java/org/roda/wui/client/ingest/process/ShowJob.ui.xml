@@ -29,18 +29,23 @@
 					Start date
 				</g:Label>
 				<g:Label ui:field="dateStarted" />
-				<g:Label addStyleNames="label">
-					Counters
+				<g:Label addStyleNames="label" ui:field="dateEndedLabel">
+					End date
 				</g:Label>
-				<g:Label ui:field="counters" />
-				<g:Label addStyleNames="label">
-					Status
-				</g:Label>
-				<g:Label ui:field="status" />
+				<g:Label ui:field="dateEnded" />
 				<g:Label addStyleNames="label">
 					Duration
 				</g:Label>
 				<g:Label ui:field="duration" />
+				<g:Label addStyleNames="label">
+					Status
+				</g:Label>
+				<g:HTML ui:field="status" />
+				<g:Label addStyleNames="label">
+					Progress
+				</g:Label>
+				<g:HTML ui:field="progress" />
+
 				<g:Label addStyleNames="label">
 					Plugin
 				</g:Label>

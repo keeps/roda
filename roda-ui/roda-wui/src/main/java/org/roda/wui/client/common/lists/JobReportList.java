@@ -48,12 +48,6 @@ import config.i18n.client.BrowseMessages;
  */
 public class JobReportList extends AsyncTableCell<Report> {
 
-  private static final String STATUS_ERROR = "<i class='fa fa-exclamation-triangle error'></i>";
-
-  private static final String STATUS_OK = "<i class='fa fa-check-circle'></i>";
-
-  private static final String STATUS_RUNNING = "<i class='fa fa-cog fa-spin'></i>";
-
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
@@ -152,20 +146,22 @@ public class JobReportList extends AsyncTableCell<Report> {
 
     lastPluginRunStateColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Report Report) {
+      public SafeHtml getValue(Report report) {
         SafeHtml ret = null;
-        if (Report != null) {
+        if (report != null) {
 
-          switch (Report.getPluginState()) {
+          switch (report.getPluginState()) {
             case SUCCESS:
-              ret = SafeHtmlUtils.fromSafeConstant(STATUS_OK);
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-success'>" + report.getPluginState() + "</span>");
               break;
             case RUNNING:
-              ret = SafeHtmlUtils.fromSafeConstant(STATUS_RUNNING);
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-default'>" + report.getPluginState() + "</span>");
               break;
             case FAILURE:
             default:
-              ret = SafeHtmlUtils.fromSafeConstant(STATUS_ERROR);
+              ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + report.getPluginState() + "</span>");
               break;
           }
         }
@@ -197,8 +193,8 @@ public class JobReportList extends AsyncTableCell<Report> {
     display.addColumn(sourceObjectColumn, "Submission Information Package");
     display.addColumn(updatedDateColumn, "Last updated at");
     display.addColumn(lastPluginRunColumn, "Last run task");
-    display.addColumn(lastPluginRunStateColumn, SafeHtmlUtils.fromSafeConstant(STATUS_OK));
-    display.addColumn(completionStatusColumn, "Status");
+    display.addColumn(lastPluginRunStateColumn, "Status");
+    display.addColumn(completionStatusColumn, "Progress");
 
     display.setColumnWidth(sourceObjectColumn, "100%");
 

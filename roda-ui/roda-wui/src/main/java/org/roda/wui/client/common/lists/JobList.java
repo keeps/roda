@@ -22,12 +22,16 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.DateCell;
+import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -51,7 +55,9 @@ public class JobList extends AsyncTableCell<Job> {
   private TextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
   private Column<Job, Date> startDateColumn;
-  private TextColumn<Job> statusColumn;
+  private TextColumn<Job> durationColumn;
+  private Column<Job, SafeHtml> statusColumn;
+  private TextColumn<Job> progressColumn;
   private TextColumn<Job> objectsTotalCountColumn;
   private TextColumn<Job> objectsSuccessCountColumn;
   private TextColumn<Job> objectsFailureCountColumn;
@@ -92,23 +98,34 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    statusColumn = new TextColumn<Job>() {
+    durationColumn = new TextColumn<Job>() {
 
       @Override
       public String getValue(Job job) {
-        String ret = null;
+        return job != null ? Humanize.durationInShortDHMS(job.getStartDate(), job.getEndDate()) : null;
+      }
+    };
+
+    statusColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
+      @Override
+      public SafeHtml getValue(Job job) {
+        SafeHtml ret = null;
         if (job != null) {
           JOB_STATE state = job.getState();
           if (JOB_STATE.COMPLETED.equals(state)) {
-            ret = messages.showJobStatusCompleted(job.getEndDate());
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
           } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-            ret = messages.showJobStatusFailedDuringCreation(job.getEndDate());
+            ret = SafeHtmlUtils.fromSafeConstant(
+              "<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
           } else if (JOB_STATE.CREATED.equals(state)) {
-            ret = messages.showJobStatusCreated();
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
           } else if (JOB_STATE.STARTED.equals(state)) {
-            ret = messages.showJobStatusStarted(job.getCompletionPercentage());
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusStarted() + "</span>");
           } else {
-            ret = state.toString();
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + state + "</span>");
           }
         }
 
@@ -176,6 +193,14 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
+    progressColumn = new TextColumn<Job>() {
+
+      @Override
+      public String getValue(Job job) {
+        return job != null ? job.getCompletionPercentage() + "%" : null;
+      }
+    };
+
     nameColumn.setSortable(true);
     usernameColumn.setSortable(true);
     startDateColumn.setSortable(true);
@@ -185,17 +210,20 @@ public class JobList extends AsyncTableCell<Job> {
     objectsFailureCountColumn.setSortable(true);
     objectsWaitingCountColumn.setSortable(true);
     objectsProcessingCountColumn.setSortable(true);
+    progressColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
     display.addColumn(usernameColumn, "Creator");
     display.addColumn(startDateColumn, "Start date");
+    display.addColumn(durationColumn, "Duration");
+    display.addColumn(statusColumn, "Status");
+    display.addColumn(progressColumn, "Progress");
     display.addColumn(objectsTotalCountColumn, "Total");
-    display.addColumn(objectsSuccessCountColumn, "Success");
-    display.addColumn(objectsFailureCountColumn, "Failure");
+    display.addColumn(objectsSuccessCountColumn, "Successful");
+    display.addColumn(objectsFailureCountColumn, "Failed");
     display.addColumn(objectsProcessingCountColumn, "Processing");
     display.addColumn(objectsWaitingCountColumn, "Waiting");
-    display.addColumn(statusColumn, "Status");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -204,9 +232,11 @@ public class JobList extends AsyncTableCell<Job> {
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
 
+    nameColumn.setCellStyleNames("nowrap");
     startDateColumn.setCellStyleNames("nowrap");
     statusColumn.setCellStyleNames("nowrap");
     usernameColumn.setCellStyleNames("nowrap");
+    durationColumn.setCellStyleNames("nowrap");
   }
 
   @Override
@@ -217,7 +247,8 @@ public class JobList extends AsyncTableCell<Job> {
     Map<Column<Job, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Job, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.JOB_NAME));
     columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
-    columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
+    columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_STATE));
+    columnSortingKeyMap.put(progressColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
     columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_COUNT));
     columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS));
     columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE));

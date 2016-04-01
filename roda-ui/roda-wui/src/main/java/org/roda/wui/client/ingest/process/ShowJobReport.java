@@ -13,6 +13,7 @@ package org.roda.wui.client.ingest.process;
 import java.util.List;
 
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -25,6 +26,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -33,6 +36,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -109,7 +113,9 @@ public class ShowJobReport extends Composite {
   @UiField
   Label duration;
   @UiField
-  Label status;
+  HTML status;
+  @UiField
+  Label progress;
   @UiField
   FlowPanel reportAttributes;
   @UiField
@@ -139,7 +145,8 @@ public class ShowJobReport extends Composite {
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
     duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated()));
-    status.setText(messages.showJobReportStatus(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
+    status.setHTML(getPluginStateHTML(jobReport.getPluginState()));
+    progress.setText(messages.showJobReportProgress(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
       jobReport.getTotalSteps()));
 
     for (Report reportItem : jobReport.getReports()) {
@@ -181,8 +188,8 @@ public class ShowJobReport extends Composite {
       attributeLabel = new Label("Outcome");
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      attributeValue = new Label(reportItem.getPluginState().toString());
-      panelBody.add(attributeValue);
+      HTML outcomeHTML = new HTML(getPluginStateHTML(reportItem.getPluginState()));
+      panelBody.add(outcomeHTML);
 
       if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
         attributeLabel = new Label("Outcome details");
@@ -193,6 +200,23 @@ public class ShowJobReport extends Composite {
         panelBody.add(attributeValue);
       }
     }
+  }
+
+  private SafeHtml getPluginStateHTML(PluginState pluginState) {
+    SafeHtml pluginStateHTML;
+    switch (pluginState) {
+      case SUCCESS:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + pluginState + "</span>");
+        break;
+      case RUNNING:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + pluginState + "</span>");
+        break;
+      case FAILURE:
+      default:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + pluginState + "</span>");
+        break;
+    }
+    return pluginStateHTML;
   }
 
   @UiHandler("buttonBack")

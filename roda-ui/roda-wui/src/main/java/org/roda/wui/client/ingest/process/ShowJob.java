@@ -10,7 +10,6 @@
  */
 package org.roda.wui.client.ingest.process;
 
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -46,6 +47,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -137,13 +139,16 @@ public class ShowJob extends Composite {
   Label dateStarted;
 
   @UiField
-  Label counters;
-
-  @UiField
-  Label status;
+  Label dateEndedLabel, dateEnded;
 
   @UiField
   Label duration;
+
+  @UiField
+  HTML progress;
+
+  @UiField
+  HTML status;
 
   @UiField
   Label plugin;
@@ -157,6 +162,8 @@ public class ShowJob extends Composite {
   @UiField
   Button buttonBack;
 
+  private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_LONG);
+
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
@@ -169,9 +176,8 @@ public class ShowJob extends Composite {
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
-    DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
-    updateStatus();
+    update();
 
     if (isJobRunning()) {
       jobReports.autoUpdate(PERIOD_MILLIS);
@@ -211,27 +217,41 @@ public class ShowJob extends Composite {
       && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState());
   }
 
-  private void updateStatus() {
-    // set state
-    JOB_STATE state = job.getState();
-    if (JOB_STATE.COMPLETED.equals(state) || JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-      // TODO different message for failure?
-      status.setText(messages.showJobStatusCompleted(job.getEndDate()));
-    } else if (JOB_STATE.CREATED.equals(state)) {
-      status.setText(messages.showJobStatusCreated());
-    } else if (JOB_STATE.STARTED.equals(state)) {
-      status.setText(messages.showJobStatusStarted(job.getCompletionPercentage()));
-    } else {
-      status.setText(state.toString());
+  private void update() {
+    // set end date
+    dateEndedLabel.setVisible(job.getEndDate() != null);
+    dateEnded.setVisible(job.getEndDate() != null);
+    if (job.getEndDate() != null) {
+      dateEnded.setText(dateTimeFormat.format(job.getEndDate()));
     }
 
-    // set counters
-    counters.setText(messages.showJobCounters(job.getObjectsCount(), job.getObjectsProcessedWithSuccess(),
-      job.getObjectsProcessedWithFailure(), job.getObjectsBeingProcessed(), job.getObjectsWaitingToBeProcessed()));
-
     // set duration
-
     duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate()));
+
+    // set state
+    JOB_STATE state = job.getState();
+    SafeHtml statusHtml;
+    if (JOB_STATE.COMPLETED.equals(state)) {
+      statusHtml = SafeHtmlUtils
+        .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
+    } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+      statusHtml = SafeHtmlUtils
+        .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
+    } else if (JOB_STATE.CREATED.equals(state)) {
+      statusHtml = SafeHtmlUtils
+        .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
+    } else if (JOB_STATE.STARTED.equals(state)) {
+      statusHtml = SafeHtmlUtils
+        .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusStarted() + "</span>");
+    } else {
+      statusHtml = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + state + "</span>");
+    }
+    status.setHTML(statusHtml);
+
+    // set counters
+    progress.setHTML(messages.showJobProgress(job.getCompletionPercentage(), job.getObjectsCount(),
+      job.getObjectsProcessedWithSuccess(), job.getObjectsProcessedWithFailure(), job.getObjectsBeingProcessed(),
+      job.getObjectsWaitingToBeProcessed()));
 
     scheduleUpdateStatus();
   }
@@ -256,7 +276,7 @@ public class ShowJob extends Composite {
               @Override
               public void onSuccess(Job updatedJob) {
                 ShowJob.this.job = updatedJob;
-                updateStatus();
+                update();
                 scheduleUpdateStatus();
               }
             });
