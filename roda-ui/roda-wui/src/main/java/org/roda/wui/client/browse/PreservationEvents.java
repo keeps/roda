@@ -56,8 +56,6 @@ import config.i18n.client.BrowseMessages;
  */
 public class PreservationEvents extends Composite {
 
-  private static final String TOP_ICON = "<span class='roda-logo'></span>";
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -174,7 +172,7 @@ public class PreservationEvents extends Composite {
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), Browse.RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), Browse.RESOLVER.getHistoryPath()));
     for (IndexedAIP ancestor : aipAncestors) {
       SafeHtml breadcrumbLabel = getBreadcrumbLabel(ancestor);
       BreadcrumbItem ancestorBreadcrumb = new BreadcrumbItem(breadcrumbLabel,

@@ -38,6 +38,7 @@ import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
@@ -61,6 +62,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -114,8 +116,6 @@ public class IngestTransfer extends Composite {
     }
     return instance;
   }
-
-  private static final String TOP_ICON = "<span class='roda-logo'></span>";
 
   public static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
   public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
@@ -268,7 +268,7 @@ public class IngestTransfer extends Composite {
     ingestTransferTitle.setVisible(true);
     ingestTransferDescription.setVisible(true);
 
-    HTML itemIconHtmlPanel = new HTML(TOP_ICON);
+    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
     itemIconHtmlPanel.addStyleName("browseItemIcon-all");
 
     itemIcon.setWidget(itemIconHtmlPanel);
@@ -291,7 +291,7 @@ public class IngestTransfer extends Composite {
   private List<BreadcrumbItem> getBreadcrumbs(TransferredResource r) {
     List<BreadcrumbItem> ret = new ArrayList<BreadcrumbItem>();
 
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
     if (r != null) {
 
       // add parent

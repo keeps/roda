@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -28,6 +29,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -48,6 +50,7 @@ import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.Widget;
@@ -204,6 +207,8 @@ public class ShowJob extends Composite {
         createStringLayout(parameter);
       } else if (PluginParameterType.PLUGIN_SIP_TO_AIP.equals(parameter.getType())) {
         createPluginSipToAipLayout(parameter);
+      } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
+        createSelectAipLayout(parameter);
       } else {
         // TODO log a warning
         createStringLayout(parameter);
@@ -301,6 +306,52 @@ public class ShowJob extends Composite {
       autoUpdateTimer.scheduleRepeating(PERIOD_MILLIS);
     }
     super.onLoad();
+  }
+
+  private void createSelectAipLayout(PluginParameter parameter) {
+    Label parameterName = new Label(parameter.getName());
+    final FlowPanel aipPanel = new FlowPanel();
+    final String value = job.getPluginParameters().get(parameter.getId());
+
+    if (value != null && !value.isEmpty()) {
+      BrowserService.Util.getInstance().retrieve(IndexedAIP.class.getName(), value, new AsyncCallback<IndexedAIP>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          if (caught instanceof NotFoundException) {
+            Label itemTitle = new Label(value);
+            itemTitle.addStyleName("itemText");
+            aipPanel.clear();
+            aipPanel.add(itemTitle);  
+          } else {
+            Toast.showError(caught.getClass().getName(), caught.getMessage());
+          }
+        }
+
+        @Override
+        public void onSuccess(IndexedAIP aip) {
+          Label itemTitle = new Label();
+          HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+          itemIconHtmlPanel.addStyleName("itemIcon");
+          itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+          itemTitle.addStyleName("itemText");
+
+          aipPanel.clear();
+          aipPanel.add(itemIconHtmlPanel);
+          aipPanel.add(itemTitle);
+        }
+      });
+    } else {
+      HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
+      aipPanel.clear();
+      aipPanel.add(itemIconHtmlPanel);
+    }
+
+    pluginOptions.add(parameterName);
+    pluginOptions.add(aipPanel);
+
+    parameterName.addStyleName("form-label itemLabel");
+    aipPanel.addStyleName("itemPanel itemPanelShow");
   }
 
   private void createBooleanLayout(PluginParameter parameter) {

@@ -373,17 +373,23 @@ pre>code {
 
 .itemPanel {
 	padding-top: 2px;
-	padding-bottom: 5px;
+	padding-bottom: 5px;	
+}
+
+.itemPanelShow {
+	padding-left: 20px;
 }
 
 .itemPanel .itemIcon,
 .itemPanel .itemText {
 	display: inline;
+	color: #777;
+	margin-right: 5px;
 }
 
 .itemPanel .itemText {
-	margin-left: 5px;
 	font-size: 1.2rem;
+	color: #999;
 }
 
 .itemButtonsPanel {

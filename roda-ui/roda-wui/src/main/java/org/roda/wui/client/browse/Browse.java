@@ -95,8 +95,6 @@ import config.i18n.client.BrowseMessages;
  */
 public class Browse extends Composite {
 
-  private static final String TOP_ICON = "<span class='roda-logo'></span>";
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
@@ -168,7 +166,7 @@ public class Browse extends Composite {
 
   @UiField
   Label itemTitle;
-  
+
   @UiField
   Label itemId;
 
@@ -332,7 +330,7 @@ public class Browse extends Composite {
     browseTitle.setVisible(false);
     browseDescription.setVisible(false);
 
-    HTMLPanel itemIconHtmlPanel = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
+    HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getTopIconHTMLPanel();
     itemIconHtmlPanel.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(itemIconHtmlPanel);
     itemTitle.setText(messages.browseLoading());
@@ -507,9 +505,9 @@ public class Browse extends Composite {
     browseDescription.setVisible(true);
 
     breadcrumb.updatePath(
-      Arrays.asList(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath())));
+      Arrays.asList(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath())));
 
-    HTMLPanel topIcon = new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
+    HTMLPanel topIcon = DescriptionLevelUtils.getTopIconHTMLPanel();
     topIcon.addStyleName("browseItemIcon-all");
     itemIcon.setWidget(topIcon);
     itemTitle.setText(messages.allCollectionsTitle());
@@ -536,7 +534,7 @@ public class Browse extends Composite {
 
   private List<BreadcrumbItem> getBreadcrumbsFromAncestors(List<IndexedAIP> aipAncestors, IndexedAIP aip) {
     List<BreadcrumbItem> ret = new ArrayList<>();
-    ret.add(new BreadcrumbItem(SafeHtmlUtils.fromSafeConstant(TOP_ICON), RESOLVER.getHistoryPath()));
+    ret.add(new BreadcrumbItem(DescriptionLevelUtils.getTopIconSafeHtml(), RESOLVER.getHistoryPath()));
     if (aipAncestors != null) {
       for (IndexedAIP ancestor : aipAncestors) {
         if (ancestor != null) {
@@ -625,8 +623,7 @@ public class Browse extends Composite {
             }
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
-            String editLinkHtml = "<a href='" + editLink
-              + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link
@@ -664,8 +661,7 @@ public class Browse extends Composite {
 
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
-            String editLinkHtml = "<a href='" + editLink
-              + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
+            String editLinkHtml = "<a href='" + editLink + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));

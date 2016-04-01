@@ -59,9 +59,6 @@ import config.i18n.client.BrowseMessages;
  */
 public class ShowPreservationEvent extends Composite {
 
-  @SuppressWarnings("unused")
-  private static final String TOP_ICON = "<span class='roda-logo'></span>";
-
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override

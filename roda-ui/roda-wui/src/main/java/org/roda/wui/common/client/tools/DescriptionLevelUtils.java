@@ -21,6 +21,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.HTMLPanel;
 
 public class DescriptionLevelUtils {
+  
+  private static final String TOP_ICON = "<span class='roda-logo'></span>";
 
   private static ClientLogger logger = new ClientLogger(DescriptionLevelUtils.class.getName());
 
@@ -70,13 +72,15 @@ public class DescriptionLevelUtils {
     }
     return ret;
   }
-
-  /**
-   * Get description level icon
-   * 
-   * @param level
-   * @return the icon message
-   */
+  
+  public static SafeHtml getTopIconSafeHtml() {
+    return SafeHtmlUtils.fromSafeConstant(TOP_ICON);
+  }
+  
+  public static HTMLPanel getTopIconHTMLPanel() {
+    return new HTMLPanel(SafeHtmlUtils.fromSafeConstant(TOP_ICON));
+  }
+  
   public static HTMLPanel getElementLevelIconHTMLPanel(String level) {
     return new HTMLPanel(getElementLevelIconSafeHtml(level));
   }
