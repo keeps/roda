@@ -44,16 +44,16 @@
 							<m:BreadcrumbPanel ui:field="breadcrumb"
 								addStyleNames="viewRepresentationBreadcrumb" />
 							<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
-								<g:FocusPanel ui:field="infoFileButton"
-									addStyleNames="filePreviewToolbarIcon filePreviewToolbarInfoIcon">
-									<g:HTML>
-										<i class="fa fa-info-circle"></i>
-									</g:HTML>
-								</g:FocusPanel>
 								<g:FocusPanel ui:field="downloadFileButton"
-									addStyleNames="filePreviewToolbarIcon filePreviewToolbarDownloadIcon">
+									addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
 									<g:HTML>
 										<i class="fa fa-download"></i>
+									</g:HTML>
+								</g:FocusPanel>
+								<g:FocusPanel ui:field="infoFileButton"
+									addStyleNames="toolbarLink filePreviewToolbarInfoIcon">
+									<g:HTML>
+										<i class="fa fa-info-circle"></i>
 									</g:HTML>
 								</g:FocusPanel>
 							</g:FlowPanel>

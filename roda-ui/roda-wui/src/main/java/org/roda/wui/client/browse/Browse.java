@@ -620,19 +620,19 @@ public class Browse extends Composite {
               // History link
               String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
               String historyLinkHtml = "<a href='" + historyLink
-                + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
+                + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink
-              + "' class='descriptiveMetadataLink'><i class='fa fa-edit'></i></a>";
+              + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             // Download link
             SafeUri downloadUri = RestUtils.createDescriptiveMetadataDownloadUri(aipId, descId);
             String downloadLinkHtml = "<a href='" + downloadUri.asString()
-              + "' class='descriptiveMetadataLink'><i class='fa fa-download'></i></a>";
+              + "' class='toolbarLink'><i class='fa fa-download'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(downloadLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
@@ -658,14 +658,14 @@ public class Browse extends Composite {
               // History link
               String historyLink = Tools.createHistoryHashLink(DescriptiveMetadataHistory.RESOLVER, aipId, descId);
               String historyLinkHtml = "<a href='" + historyLink
-                + "' class='descriptiveMetadataLink'><i class='fa fa-history'></i></a>";
+                + "' class='toolbarLink'><i class='fa fa-history'></i></a>";
               b.append(SafeHtmlUtils.fromSafeConstant(historyLinkHtml));
             }
 
             // Edit link
             String editLink = Tools.createHistoryHashLink(EditDescriptiveMetadata.RESOLVER, aipId, descId);
             String editLinkHtml = "<a href='" + editLink
-              + "' class='descriptiveMetadataLink'><i class='fa fa-edit'></i></a>";
+              + "' class='toolbarLink'><i class='fa fa-edit'></i></a>";
             b.append(SafeHtmlUtils.fromSafeConstant(editLinkHtml));
 
             b.append(SafeHtmlUtils.fromSafeConstant("</div>"));

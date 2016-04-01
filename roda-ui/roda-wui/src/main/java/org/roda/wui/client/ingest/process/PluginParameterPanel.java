@@ -23,14 +23,16 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.RadioButton;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.BrowseMessages;
@@ -73,53 +75,81 @@ public class PluginParameterPanel extends Composite {
       createStringLayout();
     }
   }
-  
+
   private void createSelectAipLayout() {
     Label parameterName = new Label(parameter.getName());
+    final HorizontalPanel editPanel = new HorizontalPanel();
     final FlowPanel aipPanel = new FlowPanel();
-    Button button = new Button(messages.pluginAipIdButton());
-    
-    aipPanel.setVisible(false);
-    
-    button.addClickHandler(new ClickHandler() {
-      
+    final Button button = new Button(messages.pluginAipIdButton());
+    final FlowPanel buttonsPanel = new FlowPanel();
+    final Anchor editButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-edit\"></i>"));
+    final Anchor removeButton = new Anchor(SafeHtmlUtils.fromSafeConstant("<i class=\"fa fa-remove\"></i>"));
+
+    buttonsPanel.add(editButton);
+    buttonsPanel.add(removeButton);
+
+    ClickHandler editClickHandler = new ClickHandler() {
+
       @Override
       public void onClick(ClickEvent event) {
-       SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
-       selectAipDialog.showAndCenter();
-       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+        SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
+        selectAipDialog.showAndCenter();
+        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
-         @Override
-         public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-           IndexedAIP aip = event.getValue();
-           
-           SimplePanel itemIcon = new SimplePanel();
-           Label itemTitle = new Label();
-           
-           HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
-           itemIcon.setWidget(itemIconHtmlPanel);
-           itemIcon.addStyleName("itemIcon");
-           itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
-           itemTitle.addStyleName("itemText");
-           
-           aipPanel.clear();
-           aipPanel.add(itemIcon);
-           aipPanel.add(itemTitle);
-           aipPanel.setVisible(true);
-           
-           value = aip.getId();
-         }
-       });
+          @Override
+          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+            IndexedAIP aip = event.getValue();
+
+            Label itemTitle = new Label();
+
+            HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());
+            itemIconHtmlPanel.addStyleName("itemIcon");
+            itemTitle.setText(aip.getTitle() != null ? aip.getTitle() : aip.getId());
+            itemTitle.addStyleName("itemText");
+
+            aipPanel.clear();
+            aipPanel.add(itemIconHtmlPanel);
+            aipPanel.add(itemTitle);
+
+            editPanel.add(aipPanel);
+            editPanel.add(buttonsPanel);
+
+            editPanel.setCellWidth(aipPanel, "100%");
+
+            editPanel.setVisible(true);
+            button.setVisible(false);
+
+            value = aip.getId();
+          }
+        });
       }
-    });
-    
+    };
+
+    ClickHandler removeClickHandler = new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+        editPanel.setVisible(false);
+        button.setVisible(true);
+
+        value = null;
+      }
+    };
+
+    button.addClickHandler(editClickHandler);
+    editButton.addClickHandler(editClickHandler);
+    removeButton.addClickHandler(removeClickHandler);
+
     layout.add(parameterName);
-    layout.add(aipPanel);
     layout.add(button);
-    
+    layout.add(editPanel);
+
     parameterName.addStyleName("form-label");
     aipPanel.addStyleName("itemPanel");
-    button.addStyleName("form-button btn btn-plus");
+    button.addStyleName("form-button btn btn-play");
+    buttonsPanel.addStyleName("itemButtonsPanel");
+    editButton.addStyleName("toolbarLink toolbarLinkSmall");
+    removeButton.addStyleName("toolbarLink toolbarLinkSmall");
   }
 
   private void createPluginSipToAipLayout() {

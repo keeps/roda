@@ -20,7 +20,7 @@
 				<g:ListBox ui:field="list" />
 				<g:Label styleName="wui-browse-metadata-descriptive-versions-type"
 					ui:field="descriptiveMetadataType" />
-				<g:FocusPanel ui:field="showXml" styleName="descriptiveMetadataLink">
+				<g:FocusPanel ui:field="showXml" styleName="toolbarLink">
 					<g:HTML>
 						<i class="fa fa-code"></i>
 					</g:HTML>

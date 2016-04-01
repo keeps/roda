@@ -292,9 +292,9 @@ public class DescriptiveMetadataHistory extends Composite {
   public void setInHTML(boolean inHTML) {
     this.inHTML = inHTML;
     if (inHTML) {
-      showXml.removeStyleName("descriptiveMetadataLink-selected");
+      showXml.removeStyleName("toolbarLink-selected");
     } else {
-      showXml.addStyleName("descriptiveMetadataLink-selected");
+      showXml.addStyleName("toolbarLink-selected");
     }
   }
 

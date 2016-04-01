@@ -23,10 +23,10 @@
 			<g:Button addStyleNames="btn btn-ban" ui:field="cancelButton">
 				<ui:text from='{messages.selectAipCancelButton}' />
 			</g:Button>
-			<g:Button addStyleNames="pull-right btn btn-edit" ui:field="selectButton">
+			<g:Button addStyleNames="pull-right btn btn-play" ui:field="selectButton">
 				<ui:text from='{messages.selectAipSelectButton}' />
 			</g:Button>
-			<g:Button addStyleNames="pull-right btn btn-edit" ui:field="emptyParentButton">
+			<g:Button addStyleNames="pull-right btn btn-play" ui:field="emptyParentButton">
 				<ui:text from='{messages.selectAipEmptyParentButton}' />
 			</g:Button>
 		</g:FlowPanel>

@@ -371,7 +371,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
 
-  @DefaultMessage("Browse")
+  @DefaultMessage("Select")
   String pluginAipIdButton();
 
   @DefaultMessage("Missing mandatory information")
