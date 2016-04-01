@@ -25,7 +25,7 @@ import org.roda.core.storage.fs.FileStorageServiceTest;
 @RunWith(Suite.class)
 @SuiteClasses({JsonUtilsTest.class, IndexServiceTest.class, ModelServiceTest.class, FileStorageServiceTest.class,
   FedoraStorageServiceTest.class, SolrUtilsTest.class, InternalPluginsTest.class, InternalConvertPluginsTest.class,
-  EARKSIPPluginsTest.class, MonitorIndexTest.class, PermissionsTest.class})
+  EARKSIPPluginsTest.class, PermissionsTest.class})
 public class AllTestsPlusExtra {
 
 }
