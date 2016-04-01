@@ -132,7 +132,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           (int) find.getLimit());
         offset += find.getLimit();
         multiplier++;
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(find.getResults(), innerPlugin), DEFAULT_TIMEOUT));
+
+        // FIXME 20160401 hsilva: this is not the right way to set the timeout
+        Timeout timeout = getTimeout(new Long(find.getTotalCount()).intValue());
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(find.getResults(), innerPlugin), timeout));
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
@@ -444,7 +447,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   private Timeout getJobTimeout(Job job) {
-    int objectsCount = job.getObjectsCount();
+    return getTimeout(job.getObjectsCount());
+  }
+
+  private Timeout getTimeout(int objectsCount) {
     int blocks = 1;
     if (objectsCount > 0) {
       blocks = (objectsCount / BLOCK_SIZE);
