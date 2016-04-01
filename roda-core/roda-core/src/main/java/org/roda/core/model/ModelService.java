@@ -1464,7 +1464,7 @@ public class ModelService extends ModelObservable {
 
   public Report retrieveJobReport(String jobId, String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(IdUtils.getJobReportId(jobId, aipId));
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, aipId);
     Binary binary = storage.getBinary(jobReportPath);
     Report ret;
     InputStream inputStream = null;
@@ -1480,10 +1480,21 @@ public class ModelService extends ModelObservable {
   }
 
   public void createOrUpdateJobReport(Report jobReport) throws GenericException {
+
+    // try to create directory associated with the job
+    try {
+      StoragePath jobReportsPath = ModelUtils.getJobReportsStoragePath(jobReport.getJobId());
+      storage.createDirectory(jobReportsPath);
+    } catch (AlreadyExistsException e) {
+      // do nothing & carry on
+    } catch (RequestNotValidException | AuthorizationDeniedException e) {
+      throw new GenericException("Error creating/updating job report", e);
+    }
+
     // create job report in storage
     try {
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
-      StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getId());
+      StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReport.getJobId(), jobReport.getId());
       storage.updateBinaryContent(jobReportPath, new StringContentPayload(jobReportAsJson), false, true);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
       LOGGER.error("Error creating/updating job report in storage", e);
@@ -1493,9 +1504,9 @@ public class ModelService extends ModelObservable {
     notifyJobReportCreatedOrUpdated(jobReport);
   }
 
-  public void deleteJobReport(String jobReportId)
+  public void deleteJobReport(String jobId, String jobReportId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobReportId);
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, jobReportId);
 
     // remove it from storage
     storage.deleteResource(jobReportPath);

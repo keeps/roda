@@ -136,7 +136,7 @@ public class JobsHelper {
       IndexResult<Report> jobReports = index.find(Report.class, filter, null, sublist);
       for (Report report : jobReports.getResults()) {
         try {
-          model.deleteJobReport(report.getId());
+          model.deleteJobReport(report.getJobId(), report.getId());
         } catch (NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Error while deleting Job Report", e);
         }

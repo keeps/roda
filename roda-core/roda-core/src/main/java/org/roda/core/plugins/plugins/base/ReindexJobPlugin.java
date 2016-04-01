@@ -104,16 +104,18 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     }
 
     try {
-      boolean recursive = false;
+      boolean recursive = true;
       listResourcesUnderDirectory = storage.listResourcesUnderDirectory(ModelUtils.getJobReportContainerPath(),
         recursive);
 
       for (Resource resource : listResourcesUnderDirectory) {
-        Binary binary = storage.getBinary(resource.getStoragePath());
-        InputStream inputStream = binary.getContent().createInputStream();
-        Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
-        IOUtils.closeQuietly(inputStream);
-        index.reindexJobReport(objectFromJson);
+        if (!resource.isDirectory()) {
+          Binary binary = storage.getBinary(resource.getStoragePath());
+          InputStream inputStream = binary.getContent().createInputStream();
+          Report objectFromJson = JsonUtils.getObjectFromJson(inputStream, Report.class);
+          IOUtils.closeQuietly(inputStream);
+          index.reindexJobReport(objectFromJson);
+        }
       }
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException

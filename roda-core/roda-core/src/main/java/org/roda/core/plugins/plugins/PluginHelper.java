@@ -70,6 +70,7 @@ public final class PluginHelper {
   public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String itemId,
     String otherId) {
     Report reportItem = new Report();
+    reportItem.setJobId(getJobId(plugin));
     reportItem.setItemId(itemId);
     reportItem.setOtherId(otherId);
     reportItem.setTitle(plugin.getName());
@@ -191,7 +192,7 @@ public final class PluginHelper {
       // to create a job report, we will not get a null in the job report Id
       itemId = reportItem.getOtherId();
     }
-    jobReport.setId(IdUtils.getJobReportId(jobId, itemId));
+    jobReport.setId(itemId);
     jobReport.setJobId(jobId);
     if (reportItem.getTotalSteps() != 0) {
       jobReport.setTotalSteps(reportItem.getTotalSteps());
@@ -216,8 +217,8 @@ public final class PluginHelper {
         jobReport = model.retrieveJobReport(jobId, reportItem.getItemId());
       } catch (NotFoundException e) {
         jobReport = createPluginReportItem(plugin, reportItem.getItemId(), reportItem.getOtherId());
-        // XXX check this
-        jobReport.setId(IdUtils.getJobReportId(jobId, reportItem.getItemId()));
+        
+        jobReport.setId(reportItem.getItemId());
         jobReport.addReport(reportItem);
       }
 
