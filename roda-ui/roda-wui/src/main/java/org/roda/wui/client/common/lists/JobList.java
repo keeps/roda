@@ -237,6 +237,12 @@ public class JobList extends AsyncTableCell<Job> {
     statusColumn.setCellStyleNames("nowrap");
     usernameColumn.setCellStyleNames("nowrap");
     durationColumn.setCellStyleNames("nowrap");
+    progressColumn.setCellStyleNames("nowrap");
+    objectsTotalCountColumn.setCellStyleNames("nowrap");
+    objectsSuccessCountColumn.setCellStyleNames("nowrap");
+    objectsFailureCountColumn.setCellStyleNames("nowrap");
+    objectsProcessingCountColumn.setCellStyleNames("nowrap");
+    objectsWaitingCountColumn.setCellStyleNames("nowrap");
   }
 
   @Override
