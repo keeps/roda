@@ -39,6 +39,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -254,9 +255,36 @@ public class ShowJob extends Composite {
     status.setHTML(statusHtml);
 
     // set counters
-    progress.setHTML(messages.showJobProgress(job.getCompletionPercentage(), job.getObjectsCount(),
-      job.getObjectsProcessedWithSuccess(), job.getObjectsProcessedWithFailure(), job.getObjectsBeingProcessed(),
-      job.getObjectsWaitingToBeProcessed()));
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+    b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-default'>"));
+    b.append(messages.showJobProgressCompletionPercentage(job.getCompletionPercentage()));
+    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    if (job.getObjectsCount() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-default'>"));
+      b.append(messages.showJobProgressTotalCount(job.getObjectsCount()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    if (job.getObjectsProcessedWithSuccess() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-success'>"));
+      b.append(messages.showJobProgressSuccessfulCount(job.getObjectsProcessedWithSuccess()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    if (job.getObjectsProcessedWithFailure() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-danger'>"));
+      b.append(messages.showJobProgressFailedCount(job.getObjectsProcessedWithFailure()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    if (job.getObjectsBeingProcessed() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-info'>"));
+      b.append(messages.showJobProgressProcessingCount(job.getObjectsBeingProcessed()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    if (job.getObjectsWaitingToBeProcessed() > 0) {
+      b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
+      b.append(messages.showJobProgressWaitingCount(job.getObjectsWaitingToBeProcessed()));
+      b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+    }
+    progress.setHTML(b.toSafeHtml());
 
     scheduleUpdateStatus();
   }

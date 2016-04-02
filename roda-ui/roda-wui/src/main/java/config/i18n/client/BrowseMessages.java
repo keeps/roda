@@ -398,10 +398,24 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("FAILED")
   String showJobStatusFailedDuringCreation();
+  
+  @DefaultMessage("{0}% done")
+  SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 
-  @DefaultMessage("<span class='label-default'>{0}% done</span> <span class='label-default'>{1,number} total</span> <span class='label-success'>{2,number} successful</span> <span class='label-danger'>{3,number} failed</span> <span class='label-info'>{4,number} processing</span> <span class='label-warning'>{5,number} waiting</span>")
-  SafeHtml showJobProgress(int completionPercentage, int objectsCount, int objectsProcessedWithSuccess,
-    int objectsProcessedWithFailure, int objectsBeingProcessed, int objectsWaitingToBeProcessed);
+  @DefaultMessage("{0,number} total")
+  SafeHtml showJobProgressTotalCount(int objectsCount);
+
+  @DefaultMessage("{0,number} successful")
+  SafeHtml showJobProgressSuccessfulCount(int objectsProcessedWithSuccess);
+
+  @DefaultMessage("{0,number} failed")
+  SafeHtml showJobProgressFailedCount(int objectsProcessedWithFailure);
+
+  @DefaultMessage("{0,number} processing")
+  SafeHtml showJobProgressProcessingCount(int objectsBeingProcessed);
+
+  @DefaultMessage("{0,number} waiting")
+  SafeHtml showJobProgressWaitingCount(int objectsWaitingToBeProcessed);
 
   @DefaultMessage("Executed {1} of {2} tasks ({0}%)")
   String showJobReportProgress(Integer completionPercentage, Integer stepsCompleted, Integer totalSteps);
@@ -712,5 +726,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0,number,##}s")
   String durationDHMSShortSeconds(int seconds);
+
+  
 
 }
