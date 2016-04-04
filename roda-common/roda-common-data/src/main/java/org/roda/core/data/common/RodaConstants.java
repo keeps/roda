@@ -35,7 +35,8 @@ public final class RodaConstants {
    */
   public static final String INSTALL_FOLDER_ENVIRONEMNT_VARIABLE = "RODA_HOME";
   public static final String ISO8601 = "yyyy-MM-dd'T'HH:mm:ss.SSSZ";
-  public static final String SOLRDATEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
+  @Deprecated
+  public static final String SOLRDATEFORMAT = ISO8601;
   public static final String SHA1 = "SHA-1";
   public static final String SHA256 = "SHA-256";
   public static final String MD5 = "MD5";
@@ -402,7 +403,7 @@ public final class RodaConstants {
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   public static final String RISK_FILE_EXTENSION = ".json";
-  
+
   public static final String RISK_SEARCH = "search";
 
   /* Agents */
@@ -428,7 +429,7 @@ public final class RodaConstants {
   public static final String AGENT_AGENTS_REQUIRED = "agentsRequired";
 
   public static final String AGENT_FILE_EXTENSION = ".json";
-  
+
   public static final String AGENT_SEARCH = "search";
 
   /* Formats */
@@ -450,7 +451,7 @@ public final class RodaConstants {
   public static final String FORMAT_UTIS = "utis";
 
   public static final String FORMAT_FILE_EXTENSION = ".json";
-  
+
   public static final String FORMAT_SEARCH = "search";
 
   /* Messages */
