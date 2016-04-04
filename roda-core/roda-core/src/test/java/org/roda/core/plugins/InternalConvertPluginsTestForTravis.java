@@ -112,7 +112,7 @@ public class InternalConvertPluginsTestForTravis {
     fakeJob.setId(FAKE_JOB_ID);
     fakeJob.setPluginType(PluginType.MISC);
     fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
-    model.createOrUpdateJob(fakeJob);
+    model.createJob(fakeJob);
     index.commit(Job.class);
   }
 

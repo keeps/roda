@@ -79,7 +79,7 @@ public class JobsHelper {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
-    RodaCoreFactory.getModelService().createOrUpdateJob(updatedJob);
+    RodaCoreFactory.getModelService().createJob(updatedJob);
 
     // ask plugin orchestrator to execute the job
     RodaCoreFactory.getPluginOrchestrator().executeJob(updatedJob);

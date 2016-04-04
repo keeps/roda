@@ -217,7 +217,7 @@ public final class PluginHelper {
         jobReport = model.retrieveJobReport(jobId, reportItem.getItemId());
       } catch (NotFoundException e) {
         jobReport = createPluginReportItem(plugin, reportItem.getItemId(), reportItem.getOtherId());
-        
+
         jobReport.setId(reportItem.getItemId());
         jobReport.addReport(reportItem);
       }

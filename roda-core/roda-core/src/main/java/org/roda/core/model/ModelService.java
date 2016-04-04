@@ -1418,6 +1418,19 @@ public class ModelService extends ModelObservable {
 
   /***************** Jobs related *****************/
   /************************************************/
+  public void createJob(Job job) throws GenericException {
+    createOrUpdateJob(job);
+
+    // try to create directory for this job in job report container
+    try {
+      StoragePath jobReportsPath = ModelUtils.getJobReportsStoragePath(job.getId());
+      storage.createDirectory(jobReportsPath);
+    } catch (AlreadyExistsException e) {
+      // do nothing & carry on
+    } catch (RequestNotValidException | AuthorizationDeniedException e) {
+      throw new GenericException("Error creating/updating job report", e);
+    }
+  }
 
   public void createOrUpdateJob(Job job) throws GenericException {
     // create or update job in storage
@@ -1480,17 +1493,6 @@ public class ModelService extends ModelObservable {
   }
 
   public void createOrUpdateJobReport(Report jobReport) throws GenericException {
-
-    // try to create directory associated with the job
-    try {
-      StoragePath jobReportsPath = ModelUtils.getJobReportsStoragePath(jobReport.getJobId());
-      storage.createDirectory(jobReportsPath);
-    } catch (AlreadyExistsException e) {
-      // do nothing & carry on
-    } catch (RequestNotValidException | AuthorizationDeniedException e) {
-      throw new GenericException("Error creating/updating job report", e);
-    }
-
     // create job report in storage
     try {
       String jobReportAsJson = JsonUtils.getJsonFromObject(jobReport);
