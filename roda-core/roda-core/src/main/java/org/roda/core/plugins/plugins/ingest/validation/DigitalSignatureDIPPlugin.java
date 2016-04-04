@@ -50,8 +50,8 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   private boolean doEmbeddedSignature;
 
   public DigitalSignatureDIPPlugin() {
-    doEmbeddedSignature = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature",
-      "doEmbeddedSignature"));
+    doEmbeddedSignature = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "signature", "doEmbeddedSignature"));
   }
 
   public boolean getDoEmbeddedSignature() {
@@ -199,12 +199,14 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
@@ -241,6 +243,19 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "Failed to digitally sign some files.";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

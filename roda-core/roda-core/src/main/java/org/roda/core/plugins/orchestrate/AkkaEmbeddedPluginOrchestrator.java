@@ -125,6 +125,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<T>> innerPlugins = new ArrayList<>();
       Plugin<T> innerPlugin;
+
+      plugin.beforeAllExecute(index, model, storage);
+
       do {
         // XXX block size could be recommended by plugin
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE));
@@ -143,8 +146,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<T> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -167,6 +172,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
       String aipId;
+
+      plugin.beforeAllExecute(index, model, storage);
 
       List<AIP> block = new ArrayList<AIP>();
       while (iter.hasNext()) {
@@ -192,8 +199,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<AIP> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -216,6 +225,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
+
+      plugin.beforeAllExecute(index, model, storage);
 
       List<AIP> block = new ArrayList<AIP>();
       while (iter.hasNext()) {
@@ -241,8 +252,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<AIP> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -264,6 +277,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<Representation>> innerPlugins = new ArrayList<>();
       Plugin<Representation> innerPlugin;
+
+      plugin.beforeAllExecute(index, model, storage);
 
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
@@ -295,8 +310,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<Representation> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -320,6 +337,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<File>> innerPlugins = new ArrayList<>();
       Plugin<File> innerPlugin;
+
+      plugin.beforeAllExecute(index, model, storage);
 
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
@@ -361,8 +380,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<File> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -384,6 +405,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<TransferredResource>> innerPlugins = new ArrayList<>();
       Plugin<TransferredResource> innerPlugin;
+
+      plugin.beforeAllExecute(index, model, storage);
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
       for (TransferredResource resource : resources) {
@@ -411,8 +434,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
 
       for (Plugin<TransferredResource> p : innerPlugins) {
-        p.afterExecute(index, model, storage);
+        p.afterBlockExecute(index, model, storage);
       }
+
+      plugin.afterAllExecute(index, model, storage);
 
       LOGGER.info("Ended {}", plugin.getName());
       return mapToReports(reports);
@@ -506,7 +531,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());
     innerPlugins.add(innerPlugin);
-    innerPlugin.beforeExecute(index, model, storage);
+    innerPlugin.beforeBlockExecute(index, model, storage);
 
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
@@ -596,7 +621,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeAllExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
 
       // FIXME what to do with the askFuture???
       Future<Object> future = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
@@ -611,7 +637,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
             LOGGER.info("Success running plugin: {}", (List<Report>) msg);
           }
 
-          plugin.afterExecute(index, model, storage);
+          plugin.afterBlockExecute(index, model, storage);
+          plugin.afterAllExecute(index, model, storage);
+          PluginHelper.updateJobPercentage(plugin, 100);
           LOGGER.info("Ended {}", plugin.getName());
         }
       }, workersSystem.dispatcher());
@@ -620,7 +648,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         public void onFailure(Throwable error) throws Throwable {
           LOGGER.error("Failure running plugin: {}", error);
 
-          plugin.afterExecute(index, model, storage);
+          plugin.afterBlockExecute(index, model, storage);
+          plugin.afterAllExecute(index, model, storage);
+          PluginHelper.updateJobPercentage(plugin, 100);
           LOGGER.info("Ended {}", plugin.getName());
         }
       }, workersSystem.dispatcher());

@@ -59,16 +59,23 @@ public class AkkaJobWorkerActor extends UntypedActor {
           reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
             (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjects()));
         }
+        // FIXME 20160404 hsilva: this should be done inside the orchestrator
+        // method
+        PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.ON_ALL_AIPS == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs((Plugin<AIP>) plugin);
+        // FIXME 20160404 hsilva: this should be done inside the orchestrator
+        // method
+        PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.ON_AIPS == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
           getAIPs(job.getObjects()));
+        // FIXME 20160404 hsilva: this should be done inside the orchestrator
+        // method
+        PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.RUN_PLUGIN == job.getOrchestratorMethod()) {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
-
-      PluginHelper.updateJobPercentage(plugin, 100);
 
       getSender().tell(reports, getSelf());
     }

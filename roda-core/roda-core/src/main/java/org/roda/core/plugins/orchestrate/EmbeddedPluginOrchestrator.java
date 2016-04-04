@@ -93,7 +93,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
       IndexResult<T> find;
       int offset = 0;
       do {
@@ -105,7 +105,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (PluginException | GenericException | RequestNotValidException e) {
       // TODO this exception handling should be reviewed
@@ -148,7 +148,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
       String aipId;
 
@@ -168,7 +168,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (PluginException | RequestNotValidException | NotFoundException | GenericException
       | AuthorizationDeniedException e) {
@@ -183,7 +183,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> iter = aips.iterator();
 
@@ -204,7 +204,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
@@ -220,7 +220,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
 
@@ -244,7 +244,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
@@ -259,7 +259,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<AIP> aips = model.listAIPs();
       Iterator<AIP> aipIter = aips.iterator();
 
@@ -293,7 +293,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       aips.close();
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (IOException | PluginException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
@@ -309,7 +309,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
     List<TransferredResource> resources) {
     try {
-      plugin.beforeExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
       for (TransferredResource resource : resources) {
@@ -325,7 +325,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       finishedSubmit();
-      plugin.afterExecute(index, model, storage);
+      plugin.afterBlockExecute(index, model, storage);
 
     } catch (PluginException e) {
       // TODO review this exception handling

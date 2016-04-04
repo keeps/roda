@@ -599,11 +599,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     }
   }
 
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
   }
 
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     return new Report();
   }
 

@@ -89,8 +89,8 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
               boolean fixityOK = true;
               for (Fixity f : fixities) {
                 try {
-                  Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary,
-                    f.getMessageDigestAlgorithm(), "FixityCheck action");
+                  Fixity currentFixity = PremisV3Utils.calculateFixity(currentFileBinary, f.getMessageDigestAlgorithm(),
+                    "FixityCheck action");
 
                   if (!f.getMessageDigest().trim().equalsIgnoreCase(currentFixity.getMessageDigest().trim())) {
                     fixityOK = false;
@@ -158,7 +158,8 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     return null;
   }
 
-  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event, String message) {
+  private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
+    String message) {
     // TODO Auto-generated method stub
 
   }
@@ -176,13 +177,15 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
 
     return null;
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
 
     return null;
   }
@@ -221,5 +224,18 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

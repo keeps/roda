@@ -137,7 +137,10 @@ public interface Plugin<T extends Serializable> {
    */
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
 
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException;
+
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
    * Executes the {@link Plugin}.
@@ -149,7 +152,10 @@ public interface Plugin<T extends Serializable> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException;
 
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException;
+
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
 
   /**
    * Method to return Plugin type (so it can be grouped for different purposes)

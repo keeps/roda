@@ -182,13 +182,15 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     // do nothing
     return null;
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     // do nothing
     return null;
   }
@@ -226,5 +228,18 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "The producer does not have enough permissions to deposit the AIP under the designated node of the classification scheme";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }

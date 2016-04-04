@@ -214,8 +214,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
             String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
             if (((filePronom != null && pronomToExtension.containsKey(filePronom))
-              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype)) || (applicableTo
-                .contains(fileFormat)))) {
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))) {
 
               fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
               StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
@@ -225,8 +225,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               if (doVerify) {
                 LOGGER.debug("Verifying digital signatures on {}", file.getId());
 
-                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
-                  fileFormat, fileMimetype);
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
+                  fileMimetype);
                 verifiedFiles.put(file.getId(), verification);
 
                 if (!verification.equals("Passed") && verificationAffectsOnOutcome)
@@ -271,9 +271,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     representation.getId(), aipId);
                   pluginResultState = 0;
 
-                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(
-                    "Convert process failed on file " + file.getId() + " of representation " + representation.getId()
-                      + " from AIP " + aipId);
+                  reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Convert process failed on file "
+                    + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
                 }
               }
               IOUtils.closeQuietly(directAccess);
@@ -389,12 +388,14 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
@@ -431,6 +432,19 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "Failed to validate and/or strip digital signatures.";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

@@ -80,7 +80,8 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
@@ -103,8 +104,8 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
           String fileMimetype = ifile.getFileFormat().getMimeType();
           String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.'));
 
-          CloseableIterable<Resource> allFormats = storage.listResourcesUnderDirectory(
-            ModelUtils.getFormatContainerPath(), true);
+          CloseableIterable<Resource> allFormats = storage
+            .listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(), true);
 
           for (Resource resource : allFormats) {
             String resourceName = resource.getStoragePath().getName();
@@ -154,7 +155,8 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     return new Report();
   }
 
@@ -176,6 +178,19 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

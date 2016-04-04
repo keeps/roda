@@ -15,7 +15,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.index.IndexService;
+import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.PluginException;
+import org.roda.core.storage.StorageService;
 import org.roda.core.util.CommandException;
 import org.slf4j.LoggerFactory;
 
@@ -48,8 +53,8 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
     return new ImageMagickConvertPlugin<T>();
   }
 
-  public String executePlugin(Path inputPath, Path outputPath, String fileFormat) throws UnsupportedOperationException,
-    IOException, CommandException {
+  public String executePlugin(Path inputPath, Path outputPath, String fileFormat)
+    throws UnsupportedOperationException, IOException, CommandException {
 
     return ImageMagickConvertPluginUtils.executeImageMagick(inputPath, outputPath, super.getOutputFormat(),
       super.getCommandArguments());
@@ -77,6 +82,19 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
   public Map<String, List<String>> getMimetypeToExtension() {
     // TODO add missing mimetypes
     return FileFormatUtils.getMimetypeToExtension(TOOLNAME);
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

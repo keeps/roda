@@ -86,8 +86,8 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
     CloseableIterable<Resource> listResourcesUnderDirectory = null;
     try {
       boolean recursive = false;
-      listResourcesUnderDirectory = storage
-        .listResourcesUnderContainer(ModelUtils.getMessageContainerPath(), recursive);
+      listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getMessageContainerPath(),
+        recursive);
       LOGGER.info("Reindexing all messages under " + ModelUtils.getMessageContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
@@ -113,7 +113,8 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
   }
 
   @Override
-  public Report beforeExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
@@ -129,7 +130,8 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
   }
 
   @Override
-  public Report afterExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_MESSAGE);
@@ -174,5 +176,18 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "All messages reindexing failed";
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // TODO Auto-generated method stub
+    return null;
   }
 }
