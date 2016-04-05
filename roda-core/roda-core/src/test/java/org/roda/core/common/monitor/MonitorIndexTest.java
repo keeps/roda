@@ -20,7 +20,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.solr.client.solrj.SolrClient;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,7 +46,6 @@ public class MonitorIndexTest {
   private static Path logPath;
   private static ModelService model;
   private static IndexService index;
-  private static SolrClient solr;
 
   private static Path corporaPath;
   private static StorageService corporaService;
@@ -70,7 +68,6 @@ public class MonitorIndexTest {
     logPath = RodaCoreFactory.getLogPath();
     model = RodaCoreFactory.getModelService();
     index = RodaCoreFactory.getIndexService();
-    solr = RodaCoreFactory.getSolr();
 
     URL corporaURL = InternalPluginsTest.class.getResource("/corpora");
     corporaPath = Paths.get(corporaURL.toURI());
@@ -92,7 +89,7 @@ public class MonitorIndexTest {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, solr);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
     monitor.updateAllTransferredResources(null, true);
 
@@ -128,7 +125,7 @@ public class MonitorIndexTest {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, solr);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
     monitor.updateAllTransferredResources(null, true);
 
@@ -173,7 +170,7 @@ public class MonitorIndexTest {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, solr);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
     monitor.updateAllTransferredResources(null, true);
 
@@ -206,7 +203,7 @@ public class MonitorIndexTest {
     String transferredResourcesFolder = RodaCoreFactory.getRodaConfiguration().getString("transferredResources.folder",
       RodaConstants.CORE_TRANSFERREDRESOURCE_FOLDER);
     Path sips = RodaCoreFactory.getDataPath().resolve(transferredResourcesFolder);
-    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, solr);
+    TransferredResourcesScanner monitor = new TransferredResourcesScanner(sips, index);
     populate(sips);
 
     monitor.updateAllTransferredResources(null, true);

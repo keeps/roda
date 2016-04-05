@@ -95,7 +95,7 @@ public interface BrowserService extends RemoteService {
     AlreadyExistsException, ValidationException;
 
   String createTransferredResourcesFolder(String parent, String folderName) throws AuthorizationDeniedException,
-    GenericException;
+    GenericException, RequestNotValidException;
 
   void removeTransferredResources(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException;

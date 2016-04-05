@@ -110,7 +110,7 @@ public class BagitSIPPluginsTest {
   }
 
   private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, SolrServerException {
+    NotFoundException, GenericException, RequestNotValidException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     Path sip = corporaPath.resolve(CorporaConstants.SIP_FOLDER).resolve(CorporaConstants.BAGIT_SIP);

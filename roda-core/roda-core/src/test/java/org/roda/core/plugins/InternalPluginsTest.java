@@ -157,7 +157,7 @@ public class InternalPluginsTest {
   }
 
   private TransferredResource createCorpora() throws InterruptedException, IOException, FileAlreadyExistsException,
-    NotFoundException, GenericException, SolrServerException {
+    NotFoundException, GenericException, RequestNotValidException {
     TransferredResourcesScanner f = RodaCoreFactory.getTransferredResourcesScanner();
 
     // Path corpora = corporaPath.resolve(RodaConstants.STORAGE_CONTAINER_AIP)

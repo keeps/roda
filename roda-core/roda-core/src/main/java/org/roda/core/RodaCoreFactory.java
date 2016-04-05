@@ -737,7 +737,7 @@ public class RodaCoreFactory {
       Files.createDirectories(transferredResourcesFolderPath);
     }
 
-    transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, solr);
+    transferredResourcesScanner = new TransferredResourcesScanner(transferredResourcesFolderPath, getIndexService());
 
   }
 

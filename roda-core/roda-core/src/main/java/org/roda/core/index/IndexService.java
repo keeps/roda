@@ -309,4 +309,9 @@ public class IndexService {
     SolrUtils.delete(index, classToRetrieve, filter);
   }
 
+  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance) throws GenericException,
+    RequestNotValidException {
+    SolrUtils.create(index, classToCreate, instance);
+  }
+
 }

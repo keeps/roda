@@ -19,13 +19,16 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.Stack;
 
-import org.apache.solr.client.solrj.SolrClient;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.index.IndexService;
 import org.roda.core.index.utils.SolrUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,20 +38,18 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
 
   private Path basePath;
   private TransferredResource folder;
-  private SolrClient index;
+  private IndexService index;
 
-  public ReindexTransferredResourcesRunnable(Path basePath, SolrClient index) {
-    this.basePath = basePath;
-    this.folder = null;
-    this.index = index;
-  }
-
-  public ReindexTransferredResourcesRunnable(Path basePath, String folderUUID, SolrClient index) {
+  public ReindexTransferredResourcesRunnable(Path basePath, String folderUUID, IndexService index) {
     this.basePath = basePath;
     this.index = index;
 
     try {
-      this.folder = RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, folderUUID);
+      if (folderUUID != null) {
+        this.folder = index.retrieve(TransferredResource.class, folderUUID);
+      } else {
+        folder = null;
+      }
     } catch (NotFoundException | GenericException e) {
       LOGGER.error("Specific folder is not indexed or does not exist");
     }
@@ -88,8 +89,8 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
               fileSizeStack.push(actualSize + size);
               TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
                 basePath, lastScanDate);
-              index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE, SolrUtils.transferredResourceToSolrDocument(resource));
-            } catch (IOException | SolrServerException e) {
+              index.create(TransferredResource.class, resource);
+            } catch (GenericException | RequestNotValidException e) {
               LOGGER.error("Error adding path to Transferred Resources index", e);
             }
 
@@ -104,14 +105,13 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
           @Override
           public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
             if (!dir.equals(basePath)) {
+              BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
+              long fileSize = fileSizeStack.pop();
+              TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
+                actualDirectoryAttributes, fileSize, basePath, lastScanDate);
               try {
-                BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
-                long fileSize = fileSizeStack.pop();
-                TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
-                  actualDirectoryAttributes, fileSize, basePath, lastScanDate);
-                index.add(RodaConstants.INDEX_TRANSFERRED_RESOURCE,
-                  SolrUtils.transferredResourceToSolrDocument(resource));
-              } catch (IOException | SolrServerException e) {
+                index.create(TransferredResource.class, resource);
+              } catch (GenericException | RequestNotValidException e) {
                 LOGGER.error("Error adding path to Transferred Resources index", e);
               }
             }
@@ -119,16 +119,25 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
           }
         });
 
-        RodaCoreFactory.getIndexService().commit(TransferredResource.class);
+        index.commit(TransferredResource.class);
 
-        String query = SolrUtils.getQueryToDeleteTransferredResourceIndexes(folder, lastScanDate);
-        index.deleteByQuery(RodaConstants.INDEX_TRANSFERRED_RESOURCE, query);
+        Filter filter;
+        String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
+        if (folder == null) {
+          filter = new Filter(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+            formattedDate));
+        } else {
+          filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS,
+            folder.getRelativePath()), new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+            formattedDate));
+        }
 
-        RodaCoreFactory.getIndexService().commit(TransferredResource.class);
+        index.delete(TransferredResource.class, filter);
+        index.commit(TransferredResource.class);
         LOGGER.info("End indexing Transferred Resources");
         LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
         RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
-      } catch (IOException | SolrServerException | GenericException e) {
+      } catch (IOException | GenericException | RequestNotValidException e) {
         LOGGER.error("Error reindexing Transferred Resources", e);
       }
     }

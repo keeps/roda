@@ -33,6 +33,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import javax.transaction.NotSupportedException;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
@@ -879,6 +880,54 @@ public class SolrUtils {
     return ret;
   }
 
+  private static <T> SolrInputDocument toSolrDocument(Class<T> resultClass, T object) throws GenericException,
+    NotSupportedException {
+
+    SolrInputDocument ret = null;
+    if (resultClass.equals(IndexedAIP.class)) {
+      throw new NotSupportedException();
+    } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
+      throw new NotSupportedException();
+    } else if (resultClass.equals(LogEntry.class)) {
+      ret = logEntryToSolrDocument((LogEntry) object);
+    } else if (resultClass.equals(Report.class)) {
+      ret = jobReportToSolrDocument((Report) object);
+    } else if (resultClass.equals(RODAMember.class) || resultClass.equals(User.class)
+      || resultClass.equals(Group.class)) {
+      ret = rodaMemberToSolrDocument((RODAMember) object);
+    } else if (resultClass.equals(TransferredResource.class)) {
+      ret = transferredResourceToSolrDocument((TransferredResource) object);
+    } else if (resultClass.equals(Job.class)) {
+      ret = jobToSolrDocument((Job) object);
+    } else if (resultClass.equals(Risk.class)) {
+      ret = riskToSolrDocument((Risk) object);
+    } else if (resultClass.equals(Agent.class)) {
+      ret = agentToSolrDocument((Agent) object);
+    } else if (resultClass.equals(Format.class)) {
+      ret = formatToSolrDocument((Format) object);
+    } else if (resultClass.equals(Message.class)) {
+      ret = messageToSolrDocument((Message) object);
+    } else if (resultClass.equals(IndexedFile.class)) {
+      throw new NotSupportedException();
+    } else if (resultClass.equals(IndexedPreservationEvent.class)) {
+      throw new NotSupportedException();
+    } else if (resultClass.equals(IndexedPreservationAgent.class)) {
+      throw new NotSupportedException();
+    } else {
+      throw new GenericException("Cannot find class index name: " + resultClass.getName());
+    }
+    return ret;
+  }
+
+  public static <T extends IsIndexed> void create(SolrClient index, Class<T> classToCreate, T instance)
+    throws GenericException {
+    try {
+      index.add(getIndexName(classToCreate), toSolrDocument(classToCreate, instance));
+    } catch (SolrServerException | IOException | NotSupportedException e) {
+      throw new GenericException("Error adding instance to index", e);
+    }
+  }
+
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
     throws NotFoundException, GenericException {
     T ret;
@@ -1595,7 +1644,7 @@ public class SolrUtils {
     return tr;
   }
 
-  public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) throws IOException {
+  public static SolrInputDocument transferredResourceToSolrDocument(TransferredResource resource) {
     SolrInputDocument transferredResource = new SolrInputDocument();
 
     transferredResource.addField(RodaConstants.TRANSFERRED_RESOURCE_UUID, resource.getUUID());
@@ -2108,24 +2157,6 @@ public class SolrUtils {
       doc.addField(name, d.getFieldValue(name));
     }
     return doc;
-  }
-
-  public static String getQueryToDeleteTransferredResourceIndexes(TransferredResource folder, Date lastScanDate)
-    throws SolrServerException, IOException {
-
-    String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
-    StringBuilder sb = new StringBuilder();
-
-    if (folder == null) {
-      sb.append("NOT ").append(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE).append(":\"").append(formattedDate)
-        .append("\"");
-    } else {
-      sb.append("(").append(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS).append(":\"")
-        .append(folder.getRelativePath()).append("\")").append(" AND ").append(" NOT (")
-        .append(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE).append(":\"").append(formattedDate).append("\")");
-    }
-
-    return sb.toString();
   }
 
   public static <T extends IsIndexed> void delete(SolrClient index, Class<T> classToDelete, List<String> ids)

@@ -763,7 +763,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static String createTransferredResourcesFolder(RodaUser user, String parent, String folderName,
-    boolean forceCommit) throws AuthorizationDeniedException, GenericException {
+    boolean forceCommit) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date startDate = new Date();
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
@@ -804,7 +804,7 @@ public class Browser extends RodaCoreService {
 
   public static void createTransferredResourceFile(RodaUser user, String path, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
-    AlreadyExistsException {
+    AlreadyExistsException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
@@ -849,7 +849,7 @@ public class Browser extends RodaCoreService {
 
   public static void createTransferredResource(RodaUser user, String parentId, String fileName,
     InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
-    AlreadyExistsException {
+    AlreadyExistsException, RequestNotValidException {
     if (name == null) {
       Browser.createTransferredResourceFile(user, parentId, fileName, inputStream, forceCommit);
     } else {

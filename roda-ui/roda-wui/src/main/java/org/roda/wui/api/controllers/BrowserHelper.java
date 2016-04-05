@@ -15,7 +15,6 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -37,7 +36,6 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
@@ -913,17 +911,12 @@ public class BrowserHelper {
   // }
 
   public static String createTransferredResourcesFolder(String parent, String folderName, boolean forceCommit)
-    throws GenericException {
-    try {
-      String uuid = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parent, folderName);
-      if (forceCommit) {
-        RodaCoreFactory.getTransferredResourcesScanner().commit();
-      }
-      return uuid;
-    } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error creating transferred resource folder", e);
-      throw new GenericException("Error creating transferred resource folder: " + e.getMessage());
+    throws GenericException, RequestNotValidException {
+    String uuid = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parent, folderName);
+    if (forceCommit) {
+      RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
+    return uuid;
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
@@ -955,18 +948,11 @@ public class BrowserHelper {
   }
 
   public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream,
-    boolean forceCommit) throws GenericException, AlreadyExistsException {
-    try {
-      LOGGER.debug("createTransferredResourceFile(path={}, name={})", path, fileName);
-      RodaCoreFactory.getTransferredResourcesScanner().createFile(path, fileName, inputStream);
-      if (forceCommit) {
-        RodaCoreFactory.getTransferredResourcesScanner().commit();
-      }
-    } catch (FileAlreadyExistsException e) {
-      throw new AlreadyExistsException("Error creating transferred resource file", e);
-    } catch (IOException | SolrServerException e) {
-      LOGGER.error("Error creating transferred resource", e);
-      throw new GenericException("Error creating transferred resource file: " + e.getMessage());
+    boolean forceCommit) throws GenericException, AlreadyExistsException, RequestNotValidException {
+    LOGGER.debug("createTransferredResourceFile(path={}, name={})", path, fileName);
+    RodaCoreFactory.getTransferredResourcesScanner().createFile(path, fileName, inputStream);
+    if (forceCommit) {
+      RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
 
   }

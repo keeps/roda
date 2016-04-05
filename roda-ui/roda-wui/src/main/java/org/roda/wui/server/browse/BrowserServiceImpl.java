@@ -279,7 +279,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   public String createTransferredResourcesFolder(String parent, String folderName) throws AuthorizationDeniedException,
-    GenericException {
+    GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.createTransferredResourcesFolder(user, parent, folderName, false);
   }

@@ -110,6 +110,7 @@ public class TransferredResource {
 
     Browser.updateAllTransferredResources(null, true);
 
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Message acknowledged"), mediaType).build();
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Transferred Resources updated"), mediaType)
+      .build();
   }
 }
