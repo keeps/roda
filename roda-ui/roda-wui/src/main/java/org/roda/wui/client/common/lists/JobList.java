@@ -91,7 +91,7 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    startDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+    startDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(Job job) {
         return job != null ? job.getStartDate() : null;

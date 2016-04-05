@@ -69,7 +69,7 @@ public class PreservationEventList extends AsyncTableCell<IndexedPreservationEve
   protected void configureDisplay(CellTable<IndexedPreservationEvent> display) {
 
     eventDateTimeColumn = new Column<IndexedPreservationEvent, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(IndexedPreservationEvent event) {
         return event != null ? event.getEventDateTime() : null;

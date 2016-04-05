@@ -193,7 +193,7 @@ public class ShowPreservationEvent extends Composite {
     eventTypeLabel.setText(event.getEventType());
     eventDetailLabel.setText(event.getEventDetail());
     eventDatetimeLabel
-      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(event.getEventDateTime()));
+      .setText(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT).format(event.getEventDateTime()));
 
     // AGENTS
     Map<String, IndexedPreservationAgent> agents = bundle.getAgents();

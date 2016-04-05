@@ -73,36 +73,6 @@ public class JobReportList extends AsyncTableCell<Report> {
   @Override
   protected void configureDisplay(CellTable<Report> display) {
 
-    // objectIdColumn = new Column<Report, SafeHtml>(new SafeHtmlCell()) {
-    // @Override
-    // public SafeHtml getValue(Report Report) {
-    // SafeHtml ret = null;
-    // if (Report != null) {
-    // SafeHtmlBuilder b = new SafeHtmlBuilder();
-    // String objId = Report.getOtherId();
-    // if (objId != null) {
-    // b.append(SafeHtmlUtils.fromSafeConstant("<div
-    // class='job-report-object-input'>"));
-    // b.append(SafeHtmlUtils.fromString(objId));
-    // b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-    // }
-    //
-    // String aipId = Report.getItemId();
-    // if (aipId != null) {
-    // b.append(SafeHtmlUtils.fromSafeConstant("<div
-    // class='job-report-object-output'>"));
-    // b.append(SafeHtmlUtils.fromSafeConstant("<span
-    // class='job-report-object-output-icon'>&#10551;</span>"));
-    // b.append(SafeHtmlUtils.fromString(aipId));
-    // b.append(SafeHtmlUtils.fromSafeConstant("</div>"));
-    // }
-    // ret = b.toSafeHtml();
-    //
-    // }
-    // return ret;
-    // }
-    // };
-
     sourceObjectColumn = new TextColumn<Report>() {
 
       @Override
@@ -117,7 +87,7 @@ public class JobReportList extends AsyncTableCell<Report> {
     };
 
     updatedDateColumn = new Column<Report, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(Report job) {
         return job != null ? job.getDateUpdated() : null;

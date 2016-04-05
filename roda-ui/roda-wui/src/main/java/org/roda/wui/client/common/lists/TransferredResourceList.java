@@ -103,7 +103,7 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
     };
 
     creationDateColumn = new Column<TransferredResource, Date>(
-      new DateCell(DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss"))) {
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(TransferredResource r) {
         return r != null ? r.getCreationDate() : null;

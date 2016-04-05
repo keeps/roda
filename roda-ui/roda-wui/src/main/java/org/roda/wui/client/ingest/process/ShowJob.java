@@ -166,7 +166,7 @@ public class ShowJob extends Composite {
   @UiField
   Button buttonBack;
 
-  private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_LONG);
+  private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
 
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;

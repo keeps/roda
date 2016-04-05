@@ -3387,16 +3387,14 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar {
-	height: 35px;
+	min-height: 35px;
 	background-color: #eee;
+	position: relative;
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .viewRepresentationBreadcrumb {
-	padding-top: 5px;
-	margin-left: 20px;
-	float: left;
-	margin-top: 0px;
-	margin-bottom: 0px;
+	padding: 5px 70px 5px 20px;
+	margin: 0;
 }
 
 .viewRepresentationFilePreviewPanel.single .filePreviewToolbar .viewRepresentationBreadcrumb {
@@ -3404,8 +3402,9 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .viewRepresentationFilePreviewPanel .filePreviewToolbar .filePreviewToolbarIcons {
-	float: right;
-	margin-right: 0px;
+	position: absolute;
+	bottom: 0;
+	right: 0;
 }
 
 .viewRepresentationFilePreview {

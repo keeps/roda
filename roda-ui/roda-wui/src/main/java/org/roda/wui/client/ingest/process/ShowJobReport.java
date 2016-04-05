@@ -12,6 +12,7 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.Browse;
@@ -141,7 +142,7 @@ public class ShowJobReport extends Composite {
       // TODO show better message
       aip.setText("No AIP created");
     }
-    DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL);
+    DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
     duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated()));

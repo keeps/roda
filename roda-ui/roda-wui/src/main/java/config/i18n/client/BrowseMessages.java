@@ -171,25 +171,25 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("")
   String titleDatesEmpty();
 
-  @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM}")
+  @DefaultMessage("From {0,localdatetime,predef:DATE_LONG}")
   String titleDatesNoFinal(Date dateInitial);
 
-  @DefaultMessage("Up to {0,localdatetime,predef:DATE_MEDIUM}")
+  @DefaultMessage("Up to {0,localdatetime,predef:DATE_LONG}")
   String titleDatesNoInitial(Date dateFinal);
 
-  @DefaultMessage("From {0,localdatetime,predef:DATE_MEDIUM} to {1,localdatetime,predef:DATE_MEDIUM}")
+  @DefaultMessage("From {0,localdatetime,predef:DATE_LONG} to {1,localdatetime,predef:DATE_LONG}")
   String titleDates(Date dateInitial, Date dateFinal);
 
   @DefaultMessage("")
   String simpleDatesEmpty();
 
-  @DefaultMessage("{0,localdatetime,predef:DATE_SHORT}")
+  @DefaultMessage("{0,date,yyyy-MM-dd}")
   String simpleDatesNoFinal(Date dateInitial);
 
-  @DefaultMessage("To {0,localdatetime,predef:DATE_SHORT}")
+  @DefaultMessage("To {0,date,yyyy-MM-dd}")
   String simpleDatesNoInitial(Date dateFinal);
 
-  @DefaultMessage("{0,localdatetime,predef:DATE_SHORT} to {1,localdatetime,predef:DATE_SHORT}")
+  @DefaultMessage("{0,date,yyyy-MM-dd} to {1,date,yyyy-MM-dd}")
   String simpleDates(Date dateInitial, Date dateFinal);
 
   /****** INGEST TRANSFER **********/
@@ -715,13 +715,13 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage(" and ")
   String durationDHMSSecondSeparator();
 
-  @DefaultMessage("{0}d{1,number,##}h{2,number,##}m{3,number,##}s")
+  @DefaultMessage("{0}d {1,number,##}h {2,number,##}m {3,number,##}s")
   String durationDHMSShortDays(int days, int hours, int minutes, int seconds);
 
-  @DefaultMessage("{0,number,##}h{1,number,##}m{2,number,##}s")
+  @DefaultMessage("{0,number,##}h {1,number,##}m {2,number,##}s")
   String durationDHMSShortHours(int hours, int minutes, int seconds);
 
-  @DefaultMessage("{0,number,##}m{1,number,##}s")
+  @DefaultMessage("{0,number,##}m {1,number,##}s")
   String durationDHMSShortMinutes(int minutes, int seconds);
 
   @DefaultMessage("{0,number,##}s")
