@@ -7,8 +7,6 @@
  */
 package org.roda.core.data.common;
 
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-
 public final class RodaConstants {
 
   /*
@@ -541,12 +539,12 @@ public final class RodaConstants {
 
   public enum PreservationEventType {
     FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"), NORMALIZATION(
-      "normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"), ACCESSION(
-      "accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), WELLFORMEDNESS_CHECK(
-      "wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"), AUTHORIZATION_CHECK(
-      "authorization check"), DELETION("deletion");
+    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
+    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
+    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
+    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
+    AUTHORIZATION_CHECK("authorization check"), DELETION("deletion");
 
     private final String text;
 
@@ -593,7 +591,7 @@ public final class RodaConstants {
   public static final String SEARCH_FIELD_TYPE_SUGGEST = "suggest";
 
   public static final String METADATA_VERSION_SEPARATOR = "_";
-  
+
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
 }
