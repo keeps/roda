@@ -217,7 +217,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Producer permissions have been checked to insure that he has suficient authorization to store the AIP under the desired node of the classification scheme.";
+    return "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.";
   }
 
   @Override

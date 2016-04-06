@@ -41,12 +41,12 @@ public class BagitToAIPPlugin extends AbstractPlugin<TransferredResource> {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
 
   public static String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
-  public static String UNPACK_SUCCESS_MESSAGE = "The SIP has been successfuly unpacked.";
+  public static String UNPACK_SUCCESS_MESSAGE = "The SIP has been successfully unpacked.";
   public static String UNPACK_FAILURE_MESSAGE = "The ingest process failed to unpack the SIP.";
   public static String UNPACK_PARTIAL_MESSAGE = null;
   public static PreservationEventType UNPACK_EVENT_TYPE = PreservationEventType.UNPACKING;
 
-  public static String WELLFORMED_DESCRIPTION = "Checked that the received SIP is well formed, complete and that no unexepected files were included.";
+  public static String WELLFORMED_DESCRIPTION = "Checked that the received SIP is well formed, complete and that no unexpected files were included.";
   public static String WELLFORMED_SUCCESS_MESSAGE = "The SIP was well formed and complete.";
   public static String WELLFORMED_FAILURE_MESSAGE = "The SIP was not well formed or some files were missing.";
   public static String WELLFORMED_PARTIAL_MESSAGE = null;
