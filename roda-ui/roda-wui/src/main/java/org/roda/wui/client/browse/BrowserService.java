@@ -66,8 +66,8 @@ public interface BrowserService extends RemoteService {
     }
   }
 
-  BrowseItemBundle getItemBundle(String aipId, String localeString) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException;
+  BrowseItemBundle getItemBundle(String aipId, String localeString)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -80,11 +80,11 @@ public interface BrowserService extends RemoteService {
   String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
     RequestNotValidException, AlreadyExistsException;
 
-  String removeAIP(SelectedItems aips) throws AuthorizationDeniedException, GenericException, NotFoundException,
-    RequestNotValidException;
+  String removeAIP(SelectedItems aips)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
-  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException;
+  void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, ValidationException, NotFoundException,
@@ -94,18 +94,18 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException;
 
-  String createTransferredResourcesFolder(String parent, String folderName) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException;
+  String createTransferredResourcesFolder(String parent, String folderName)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  void removeTransferredResources(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException;
+  void removeTransferredResources(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   boolean transferScanIsUpdating();
 
   void transferScanRequestUpdate(String transferredResourceUUID);
 
-  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-    GenericException;
+  Job createJob(Job job)
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
 
   List<PluginInfo> getPluginsInfo(PluginType type);
 
@@ -115,8 +115,8 @@ public interface BrowserService extends RemoteService {
 
   Viewers getViewersProperties() throws GenericException;
 
-  List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale) throws AuthorizationDeniedException,
-    GenericException;
+  List<SupportedMetadataTypeBundle> getSupportedMetadata(String locale)
+    throws AuthorizationDeniedException, GenericException;
 
   boolean isCookiesMessageActive();
 
@@ -132,12 +132,12 @@ public interface BrowserService extends RemoteService {
    */
   String getGoogleReCAPTCHAAccount();
 
-  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException;
+  PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId,
-    String localeString) throws AuthorizationDeniedException, RequestNotValidException, GenericException,
-    NotFoundException;
+    String localeString)
+      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
   void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -148,11 +148,11 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
-  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException;
+  <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  <T extends IsIndexed> T retrieve(String classNameToReturn, String id) throws AuthorizationDeniedException,
-    GenericException, NotFoundException;
+  <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
@@ -160,6 +160,6 @@ public interface BrowserService extends RemoteService {
   Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  void updateAIPPermssions(String aipId, Permissions permissions) throws GenericException,
-    AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+  void updateAIPPermssions(String aipId, Permissions permissions)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 }

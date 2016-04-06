@@ -9,6 +9,7 @@ package org.roda.core.common.monitor;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,32 +51,52 @@ public class TransferredResourcesScanner {
     return basePath;
   }
 
-  public String createFolder(String parent, String folderName) throws GenericException, RequestNotValidException {
-    Path parentPath = parent != null ? basePath.resolve(parent) : basePath;
-    Path createdPath;
+  public String createFolder(String parentUUID, String folderName)
+    throws GenericException, RequestNotValidException, NotFoundException {
+    Path parentPath;
+    if (parentUUID != null) {
+      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
+      parentPath = basePath.resolve(parent.getRelativePath());
+    } else {
+      parentPath = basePath;
+    }
+
     try {
-      createdPath = Files.createDirectories(parentPath.resolve(folderName));
+      Path createdPath = Files.createDirectories(parentPath.resolve(folderName));
       BasicFileAttributes attrs = Files.readAttributes(createdPath, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(createdPath, attrs, 0L, basePath, new Date());
       index.create(TransferredResource.class, resource);
       return resource.getUUID();
     } catch (IOException e) {
+      LOGGER.error("Cannot create folder", e);
       throw new GenericException("Cannot create folder", e);
     }
   }
 
-  public String createFile(String path, String fileName, InputStream inputStream) throws GenericException,
-    RequestNotValidException {
-    Path parent = path != null ? basePath.resolve(path) : basePath;
+  public String createFile(String parentUUID, String fileName, InputStream inputStream)
+    throws GenericException, RequestNotValidException, NotFoundException {
+    Path parentPath;
+    if (parentUUID != null) {
+      TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
+      parentPath = basePath.resolve(parent.getRelativePath());
+    } else {
+      parentPath = basePath;
+    }
+
     try {
-      Files.createDirectories(parent);
-      Path file = parent.resolve(fileName);
+      try {
+        Files.createDirectories(parentPath);
+      } catch (FileAlreadyExistsException e) {
+        // do nothing and carry on
+      }
+      Path file = parentPath.resolve(fileName);
       Files.copy(inputStream, file);
       BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(file, attrs, attrs.size(), basePath, new Date());
       index.create(TransferredResource.class, resource);
       return resource.getUUID();
     } catch (IOException e) {
+      LOGGER.error("Cannot create file", e);
       throw new GenericException("Cannot create file", e);
     }
   }
@@ -138,8 +159,8 @@ public class TransferredResourcesScanner {
     return tr;
   }
 
-  public void removeTransferredResource(List<String> ids) throws NotFoundException, GenericException,
-    RequestNotValidException {
+  public void removeTransferredResource(List<String> ids)
+    throws NotFoundException, GenericException, RequestNotValidException {
     for (String uuid : ids) {
       TransferredResource tr = index.retrieve(TransferredResource.class, uuid);
       Path relative = Paths.get(tr.getRelativePath());
@@ -147,8 +168,8 @@ public class TransferredResourcesScanner {
       if (Files.exists(fullPath)) {
         FSUtils.deletePath(fullPath);
 
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS,
-          relative.toString()));
+        Filter filter = new Filter(
+          new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, relative.toString()));
         index.delete(TransferredResource.class, filter);
       } else {
         throw new NotFoundException("Path does not exist: " + fullPath);

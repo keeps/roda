@@ -7,10 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
@@ -46,6 +42,10 @@ import org.roda.wui.api.v1.utils.StreamResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 @Path(TransferredResource.ENDPOINT)
 @Api(value = TransferredResource.SWAGGER_ENDPOINT)
 public class TransferredResource {
@@ -61,7 +61,7 @@ public class TransferredResource {
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+      throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -73,15 +73,15 @@ public class TransferredResource {
 
   @POST
   public Response createResource(
-    @ApiParam(value = "The id of the parent", required = true) @QueryParam("parentId") String parentId,
+    @ApiParam(value = "The id of the parent", required = true) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
     @ApiParam(value = "The name of the directory to create", required = false) @QueryParam("name") String name,
     @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
-    throws RODAException {
+      throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.createTransferredResource(user, parentId, fileDetail.getFileName(), inputStream, name, true);
+    Browser.createTransferredResource(user, parentUUID, fileDetail.getFileName(), inputStream, name, true);
 
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();

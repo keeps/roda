@@ -135,8 +135,7 @@ public class IngestTransferUpload extends Composite {
       // upload to root
       ret = RestUtils.createTransferredResourceUploadUri(null);
     } else if (resource != null && !resource.isFile()) {
-      String id = resource.getId();
-      ret = RestUtils.createTransferredResourceUploadUri(id);
+      ret = RestUtils.createTransferredResourceUploadUri(resource.getUUID());
     } else {
       ret = null;
     }

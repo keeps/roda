@@ -925,9 +925,9 @@ public class BrowserHelper {
   // transferredResourceId);
   // }
 
-  public static String createTransferredResourcesFolder(String parent, String folderName, boolean forceCommit)
-    throws GenericException, RequestNotValidException {
-    String uuid = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parent, folderName);
+  public static String createTransferredResourcesFolder(String parentUUID, String folderName, boolean forceCommit)
+    throws GenericException, RequestNotValidException, NotFoundException {
+    String uuid = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parentUUID, folderName);
     if (forceCommit) {
       RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
@@ -962,10 +962,10 @@ public class BrowserHelper {
     RodaCoreFactory.getTransferredResourcesScanner().removeTransferredResource(ids);
   }
 
-  public static void createTransferredResourceFile(String path, String fileName, InputStream inputStream,
-    boolean forceCommit) throws GenericException, AlreadyExistsException, RequestNotValidException {
-    LOGGER.debug("createTransferredResourceFile(path={}, name={})", path, fileName);
-    RodaCoreFactory.getTransferredResourcesScanner().createFile(path, fileName, inputStream);
+  public static void createTransferredResourceFile(String parentUUID, String fileName, InputStream inputStream,
+    boolean forceCommit) throws GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+    LOGGER.debug("createTransferredResourceFile(path={}, name={})", parentUUID, fileName);
+    RodaCoreFactory.getTransferredResourcesScanner().createFile(parentUUID, fileName, inputStream);
     if (forceCommit) {
       RodaCoreFactory.getTransferredResourcesScanner().commit();
     }

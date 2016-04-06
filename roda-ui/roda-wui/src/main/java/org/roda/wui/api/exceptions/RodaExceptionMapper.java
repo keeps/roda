@@ -38,30 +38,32 @@ public class RodaExceptionMapper implements ExceptionMapper<RODAException> {
     // request.getHeader("Accept"));
 
     Response response;
+    String message = e.getClass().getSimpleName() + ": " + e.getMessage();
+    if (e.getCause() != null) {
+      message += ", caused by " + e.getCause().getClass().getCanonicalName() + ": " + e.getCause().getMessage();
+    }
     if (e instanceof AuthorizationDeniedException) {
-      response = Response.status(Status.UNAUTHORIZED)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      response = Response.status(Status.UNAUTHORIZED).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message))
+        .build();
     } else if (e instanceof NotImplementedException) {
       response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, "Not yet implemented"))
         .build();
     } else if (e instanceof RequestNotValidException) {
-      response = Response.status(Status.BAD_REQUEST)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
-    } else if (e instanceof GenericException) {
-      response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
+      response = Response.status(Status.BAD_REQUEST).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message))
         .build();
+    } else if (e instanceof GenericException) {
+      response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
     } else if (e instanceof NotFoundException) {
-      response = Response.status(Status.NOT_FOUND)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      response = Response.status(Status.NOT_FOUND).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message))
+        .build();
     } else if (e instanceof AlreadyExistsException) {
-      response = Response.status(Status.CONFLICT)
-        .entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage())).build();
+      response = Response.status(Status.CONFLICT).entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message))
+        .build();
     } else {
       // response = Response.serverError().type(mediaType)
       // .entity(new ApiResponseMessage(ApiResponseMessage.ERROR,
       // e.getMessage())).build();
-      response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, e.getMessage()))
-        .build();
+      response = Response.serverError().entity(new ApiResponseMessage(ApiResponseMessage.ERROR, message)).build();
     }
     return response;
   }

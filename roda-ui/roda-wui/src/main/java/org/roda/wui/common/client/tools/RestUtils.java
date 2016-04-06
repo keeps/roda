@@ -153,15 +153,15 @@ public class RestUtils {
     return b.toString();
   }
 
-  public static String createTransferredResourceUploadUri(String parentId) {
-    // api/v1/transferred/?parentId={parentId}
+  public static String createTransferredResourceUploadUri(String parentUUID) {
+    // api/v1/transferred/?parentUUID={parentUUID}
     StringBuilder b = new StringBuilder();
     // base uri
     b.append(RodaConstants.API_REST_V1_TRANSFERRED);
 
-    if (parentId != null) {
-      b.append(RodaConstants.API_QUERY_START).append("parentId").append(RodaConstants.API_QUERY_ASSIGN_SYMBOL)
-        .append(parentId);
+    if (parentUUID != null) {
+      b.append(RodaConstants.API_QUERY_START).append(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID)
+        .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(parentUUID);
     }
 
     return b.toString();
