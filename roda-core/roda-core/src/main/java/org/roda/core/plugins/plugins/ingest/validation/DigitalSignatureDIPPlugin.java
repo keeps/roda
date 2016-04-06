@@ -23,6 +23,7 @@ import org.roda.core.common.IdUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -101,16 +102,16 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
       Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
-        LOGGER.debug("Processing representation: " + representation);
+        LOGGER.debug("Processing representation {}", representation);
         boolean recursive = true;
-        CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
-          recursive);
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+          representation.getId(), recursive);
 
         newRepresentations.add(newRepresentationID);
         model.createRepresentation(aipId, newRepresentationID, false, notify);
         List<String> filePath = null;
         Path resultFile = null;
-        List<File> fileList = IteratorUtils.toList(allFiles.iterator());
+        List<OptionalWithCause<File>> fileList = IteratorUtils.toList(allFiles.iterator());
         int countFiles = fileList.size();
         String newFileId = representation.getId() + ".zip";
 
@@ -119,30 +120,35 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           OutputStream os = new FileOutputStream(representationZipFile.toString());
           ZipOutputStream zout = new ZipOutputStream(os);
 
-          for (File file : fileList) {
-            LOGGER.debug("Processing file: " + file);
-            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-            String fileMimetype = ifile.getFileFormat().getMimeType();
-            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+          for (OptionalWithCause<File> oFile : fileList) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              LOGGER.debug("Processing file {}", file);
+              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+              String fileMimetype = ifile.getFileFormat().getMimeType();
+              String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
 
-            if (!file.isDirectory()) {
-              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-              LOGGER.debug("Running DigitalSignaturePluginDIP on " + file.getId());
+              if (!file.isDirectory()) {
+                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                LOGGER.debug("Running DigitalSignaturePluginDIP on {}", file.getId());
 
-              if (doEmbeddedSignature == true) {
-                Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
-                  fileFormat, fileMimetype);
-                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile,
-                  ifile.getOriginalName());
-              } else {
-                DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath(),
-                  ifile.getOriginalName());
+                if (doEmbeddedSignature == true) {
+                  Path embeddedFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(),
+                    fileFormat, fileMimetype);
+                  DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, embeddedFile,
+                    ifile.getOriginalName());
+                } else {
+                  DigitalSignatureDIPPluginUtils.addElementToRepresentationZip(zout, directAccess.getPath(),
+                    ifile.getOriginalName());
+                }
+
+                IOUtils.closeQuietly(directAccess);
+                if (filePath == null)
+                  filePath = file.getPath();
               }
-
-              IOUtils.closeQuietly(directAccess);
-              if (filePath == null)
-                filePath = file.getPath();
+            } else {
+              LOGGER.error("Cannot process representation file", oFile.getCause());
             }
           }
 
@@ -152,23 +158,28 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(representationZipFile);
 
         } else if (countFiles == 1) {
-          File file = fileList.get(0);
-          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-          String fileMimetype = ifile.getFileFormat().getMimeType();
-          String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
-          StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-          DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-          filePath = file.getPath();
+          OptionalWithCause<File> oFile = fileList.get(0);
+          if (oFile.isPresent()) {
+            File file = oFile.get();
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String fileMimetype = ifile.getFileFormat().getMimeType();
+            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+            StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+            DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+            filePath = file.getPath();
 
-          if (doEmbeddedSignature == true) {
-            newFileId = file.getId();
-            resultFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
-              fileMimetype);
+            if (doEmbeddedSignature == true) {
+              newFileId = file.getId();
+              resultFile = DigitalSignatureDIPPluginUtils.addEmbeddedSignature(directAccess.getPath(), fileFormat,
+                fileMimetype);
+            } else {
+              resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
+            }
+
+            IOUtils.closeQuietly(directAccess);
           } else {
-            resultFile = DigitalSignatureDIPPluginUtils.runZipDigitalSigner(directAccess.getPath());
+            LOGGER.error("Cannot process representation file", oFile.getCause());
           }
-
-          IOUtils.closeQuietly(directAccess);
         }
 
         // add zip file (or single file) on a new representation

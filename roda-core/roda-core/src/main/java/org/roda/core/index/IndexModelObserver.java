@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
@@ -106,7 +107,7 @@ public class IndexModelObserver implements ModelObserver {
         safemode = true;
         indexAIP(aip, safemode);
       } else {
-        LOGGER.error("Could not index created AIP", e);
+        LOGGER.error("Cannot index created AIP", e);
       }
 
     }
@@ -114,22 +115,27 @@ public class IndexModelObserver implements ModelObserver {
 
   private void indexPreservationsEvents(final AIP aip) {
 
-    CloseableIterable<PreservationMetadata> preservationMetadata = null;
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
       boolean includeRepresentations = true;
       preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
-      for (PreservationMetadata pm : preservationMetadata) {
-        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          try {
-            indexPreservationEvent(pm);
-          } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-            | AuthorizationDeniedException e) {
-            LOGGER.error("Could not index premis event", e);
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            try {
+              indexPreservationEvent(pm);
+            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+              | AuthorizationDeniedException e) {
+              LOGGER.error("Cannot index premis event", e);
+            }
           }
+        } else {
+          LOGGER.error("Cannot index premis event", opm.getCause());
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not index preservation events", e);
+      LOGGER.error("Cannot index preservation events", e);
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }
@@ -157,25 +163,36 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void indexRepresentation(final AIP aip, final Representation representation) {
-    CloseableIterable<File> allFiles = null;
+    CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation);
       index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
-      for (File file : allFiles) {
-        boolean recursiveIndexFile = false;
-        indexFile(aip, file, recursiveIndexFile);
+      for (OptionalWithCause<File> file : allFiles) {
+        if (file.isPresent()) {
+          boolean recursiveIndexFile = false;
+          indexFile(aip, file.get(), recursiveIndexFile);
+        } else {
+          LOGGER.error("Cannot index representation file", file.getCause());
+        }
       }
       allFiles.close();
 
     } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
-      LOGGER.error("Could not index representation", e);
+      LOGGER.error("Cannot index representation", e);
     } finally {
       IOUtils.closeQuietly(allFiles);
     }
   }
+
+  // private void indexFile(OptionalWithCause<AIP> aip, OptionalWithCause<File>
+  // file, boolean recursive) {
+  // if (aip.isPresent() && file.isPresent()) {
+  // indexFile(aip.get(), file.get(), recursive);
+  // }
+  // }
 
   private void indexFile(AIP aip, File file, boolean recursive) {
     Binary premisFile = getFilePremisFile(file);
@@ -186,19 +203,23 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index file: " + file, e);
+      LOGGER.error("Cannot index file: " + file, e);
     }
 
     if (recursive && file.isDirectory()) {
       try {
-        CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
-        for (File subfile : allFiles) {
-          indexFile(aip, subfile, false);
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
+        for (OptionalWithCause<File> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            indexFile(aip, subfile.get(), false);
+          } else {
+            LOGGER.error("Cannot index file", subfile.getCause());
+          }
         }
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: " + file, e);
       }
     }
   }
@@ -250,7 +271,7 @@ public class IndexModelObserver implements ModelObserver {
       SolrInputDocument aipDoc = SolrUtils.aipActiveFlagUpdateToSolrDocument(aip);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not do a partial update", e);
+      LOGGER.error("Cannot do a partial update", e);
     }
 
     // change Representations and Files
@@ -267,20 +288,24 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void representationActiveFlagUpdated(final AIP aip, final Representation representation) {
-    CloseableIterable<File> allFiles = null;
+    CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       SolrInputDocument repDoc = SolrUtils.representationActiveFlagUpdateToSolrDocument(representation, aip.isActive());
       index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
-      for (File file : allFiles) {
-        boolean recursiveIndexFile = false;
-        fileActiveFlagUpdated(aip, file, recursiveIndexFile);
+      for (OptionalWithCause<File> file : allFiles) {
+        if (file.isPresent()) {
+          boolean recursiveIndexFile = false;
+          fileActiveFlagUpdated(aip, file.get(), recursiveIndexFile);
+        } else {
+          LOGGER.error("Cannot do a partial update on File", file.getCause());
+        }
       }
 
     } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
       | RequestNotValidException e) {
-      LOGGER.error("Could not do a partial update", e);
+      LOGGER.error("Cannot do a partial update", e);
     } finally {
       IOUtils.closeQuietly(allFiles);
     }
@@ -292,41 +317,50 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDoc);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index file: " + file, e);
+      LOGGER.error("Cannot index file: " + file, e);
     }
 
     if (recursive && file.isDirectory()) {
       try {
-        CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
-        for (File subfile : allFiles) {
-          fileActiveFlagUpdated(aip, subfile, false);
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
+        for (OptionalWithCause<File> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            fileActiveFlagUpdated(aip, subfile.get(), false);
+          } else {
+            LOGGER.error("Cannot index file sub-resources", subfile.getCause());
+          }
         }
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: " + file, e);
       }
     }
   }
 
   private void preservationEventsActiveFlagUpdated(final AIP aip) {
 
-    CloseableIterable<PreservationMetadata> preservationMetadata = null;
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
       boolean includeRepresentations = true;
       preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
-      for (PreservationMetadata pm : preservationMetadata) {
-        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          try {
-            preservationEventActiveFlagUpdated(pm, aip.isActive());
-          } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-            | AuthorizationDeniedException e) {
-            LOGGER.error("Could not index premis event", e);
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            try {
+              preservationEventActiveFlagUpdated(pm, aip.isActive());
+            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+              | AuthorizationDeniedException e) {
+              LOGGER.error("Cannot index premis event", e);
+            }
           }
+        } else {
+          LOGGER.error("Cannot index premis event", opm.getCause());
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not index preservation events", e);
+      LOGGER.error("Cannot index preservation events", e);
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }
@@ -417,7 +451,7 @@ public class IndexModelObserver implements ModelObserver {
       indexRepresentation(model.retrieveAIP(representation.getAipId()), representation);
 
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not index representation: " + representation, e);
+      LOGGER.error("Cannot index representation: " + representation, e);
     }
 
   }
@@ -612,7 +646,7 @@ public class IndexModelObserver implements ModelObserver {
       SolrInputDocument aipDoc = SolrUtils.aipPermissionsUpdateToSolrDocument(aip);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not do a partial update", e);
+      LOGGER.error("Cannot do a partial update", e);
     }
 
     // change Representations and Files
@@ -629,21 +663,25 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   private void representationPermissionsUpdated(final AIP aip, final Representation representation) {
-    CloseableIterable<File> allFiles = null;
+    CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
       SolrInputDocument repDoc = SolrUtils.representationPermissionsUpdateToSolrDocument(representation,
         aip.getPermissions());
       index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
-      for (File file : allFiles) {
-        boolean recursiveIndexFile = false;
-        filePermissionsUpdated(aip, file, recursiveIndexFile);
+      for (OptionalWithCause<File> file : allFiles) {
+        if (file.isPresent()) {
+          boolean recursiveIndexFile = false;
+          filePermissionsUpdated(aip, file.get(), recursiveIndexFile);
+        } else {
+          LOGGER.error("Cannot do a partial update on file", file.getCause());
+        }
       }
 
     } catch (SolrServerException | AuthorizationDeniedException | IOException | NotFoundException | GenericException
       | RequestNotValidException e) {
-      LOGGER.error("Could not do a partial update", e);
+      LOGGER.error("Cannot do a partial update", e);
     } finally {
       IOUtils.closeQuietly(allFiles);
     }
@@ -655,41 +693,50 @@ public class IndexModelObserver implements ModelObserver {
       index.add(RodaConstants.INDEX_FILE, fileDoc);
 
     } catch (SolrServerException | IOException e) {
-      LOGGER.error("Could not index file: " + file, e);
+      LOGGER.error("Cannot index file: " + file, e);
     }
 
     if (recursive && file.isDirectory()) {
       try {
-        CloseableIterable<File> allFiles = model.listFilesUnder(file, true);
-        for (File subfile : allFiles) {
-          filePermissionsUpdated(aip, subfile, false);
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
+        for (OptionalWithCause<File> subfile : allFiles) {
+          if (subfile.isPresent()) {
+            filePermissionsUpdated(aip, subfile.get(), false);
+          } else {
+            LOGGER.error("Cannot index file sub-resources file", subfile.getCause());
+          }
         }
         IOUtils.closeQuietly(allFiles);
 
       } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not index file sub-resources: " + file, e);
+        LOGGER.error("Cannot index file sub-resources: " + file, e);
       }
     }
   }
 
   private void preservationEventsPermissionsUpdated(final AIP aip) {
 
-    CloseableIterable<PreservationMetadata> preservationMetadata = null;
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
       boolean includeRepresentations = true;
       preservationMetadata = model.listPreservationMetadata(aip.getId(), includeRepresentations);
-      for (PreservationMetadata pm : preservationMetadata) {
-        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-          try {
-            preservationEventPermissionsUpdated(pm, aip.getPermissions());
-          } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
-            | AuthorizationDeniedException e) {
-            LOGGER.error("Could not index premis event", e);
+      for (OptionalWithCause<PreservationMetadata> opm : preservationMetadata) {
+        if (opm.isPresent()) {
+          PreservationMetadata pm = opm.get();
+          if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+            try {
+              preservationEventPermissionsUpdated(pm, aip.getPermissions());
+            } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
+              | AuthorizationDeniedException e) {
+              LOGGER.error("Cannot index premis event", e);
+            }
           }
+        } else {
+          LOGGER.error("Cannot index premis event", opm.getCause());
         }
       }
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-      LOGGER.error("Could not index preservation events", e);
+      LOGGER.error("Cannot index preservation events", e);
     } finally {
       IOUtils.closeQuietly(preservationMetadata);
     }

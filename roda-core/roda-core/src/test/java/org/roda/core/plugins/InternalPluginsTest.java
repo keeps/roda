@@ -14,6 +14,7 @@ import gov.loc.premis.v3.FormatRegistryComplexType;
 import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
 import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
 import gov.loc.premis.v3.Representation;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,6 +61,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -116,9 +118,10 @@ public class InternalPluginsTest {
   @Before
   public void setUp() throws Exception {
 
-    basePath = Files.createTempDirectory("indexTests", PosixFilePermissions.asFileAttribute(new HashSet<>(Arrays
-      .asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE, PosixFilePermission.OWNER_EXECUTE,
-        PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
+    basePath = Files.createTempDirectory("indexTests",
+      PosixFilePermissions
+        .asFileAttribute(new HashSet<>(Arrays.asList(PosixFilePermission.OWNER_READ, PosixFilePermission.OWNER_WRITE,
+          PosixFilePermission.OWNER_EXECUTE, PosixFilePermission.OTHERS_READ, PosixFilePermission.OTHERS_EXECUTE))));
     System.setProperty("roda.home", basePath.toString());
 
     boolean deploySolr = true;
@@ -245,8 +248,8 @@ public class InternalPluginsTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
-      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -256,22 +259,24 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testIngestTransferredResource() throws IOException, InterruptedException, RODAException,
-    SolrServerException {
+  public void testIngestTransferredResource()
+    throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     // All folders and files
     Assert.assertEquals(CORPORA_FOLDERS_COUNT + CORPORA_FILES_COUNT, reusableAllFiles.size());
   }
 
   @Test
-  public void testVirusCheck() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testVirusCheck()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
     Plugin<AIP> plugin = new AntivirusPlugin();
@@ -287,28 +292,31 @@ public class InternalPluginsTest {
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
-    CloseableIterable<PreservationMetadata> preservationMetadataList = model
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
       .listPreservationMetadata(aip.getId(), true);
-    for (PreservationMetadata pm : preservationMetadataList) {
-      if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-        try {
-          EventComplexType event = PremisV3Utils.binaryToEvent(model
-            .retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId()).getContent()
-            .createInputStream());
-          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-              if (laict.getLinkingAgentIdentifierValue() != null
-                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                found = true;
+    for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
+      if (opm.isPresent()) {
+        PreservationMetadata pm = opm.get();
+        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          try {
+            EventComplexType event = PremisV3Utils
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+                .getContent().createInputStream());
+            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+                if (laict.getLinkingAgentIdentifierValue() != null
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  found = true;
+                  break;
+                }
+              }
+              if (found) {
                 break;
               }
             }
-            if (found) {
-              break;
-            }
-          }
-        } catch (XmlException | IOException e) {
+          } catch (XmlException | IOException e) {
 
+          }
         }
       }
     }
@@ -318,8 +326,8 @@ public class InternalPluginsTest {
     index.commitAIPs();
 
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, PreservationEventType.VIRUS_CHECK
-      .toString()));
+    filter.add(
+      new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_TYPE, PreservationEventType.VIRUS_CHECK.toString()));
     filter.add(new SimpleFilterParameter(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId()));
     IndexResult<IndexedPreservationEvent> events = index.find(IndexedPreservationEvent.class, filter, null,
       new Sublist(0, 10));
@@ -327,8 +335,8 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testPremisSkeleton() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testPremisSkeleton()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
     Plugin<AIP> plugin = new PremisSkeletonPlugin();
@@ -342,7 +350,8 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    CloseableIterable<PreservationMetadata> preservationMetadata = model.listPreservationMetadata(aip.getId(), true);
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = model
+      .listPreservationMetadata(aip.getId(), true);
 
     // Files plus one representation + 2 SIP To AIP Event + 1 Premis Skeleton
     // Event
@@ -376,8 +385,8 @@ public class InternalPluginsTest {
   }
 
   @Test
-  public void testSiegfried() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testSiegfried()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
@@ -402,9 +411,9 @@ public class InternalPluginsTest {
     Assert.assertEquals(CORPORA_FILES_COUNT,
       Iterables.size(model.listOtherMetadata(aip.getId(), SiegfriedPlugin.OTHER_METADATA_TYPE, true)));
 
-    Binary om = model
-      .retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1),
-        CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE);
+    Binary om = model.retrieveOtherMetadataBinary(aip.getId(), aip.getRepresentations().get(0).getId(),
+      Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT, SiegfriedPlugin.FILE_SUFFIX,
+      SiegfriedPlugin.OTHER_METADATA_TYPE);
 
     Assert.assertNotNull(om);
 
@@ -417,8 +426,8 @@ public class InternalPluginsTest {
     Assert.assertEquals("Plain Text File", format.getFormatDesignation().getFormatName().getStringValue());
     FormatRegistryComplexType pronomRegistry = PremisV3Utils.getFormatRegistry(fpo,
       RodaConstants.PRESERVATION_REGISTRY_PRONOM);
-    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM, pronomRegistry.getFormatRegistryName()
-      .getStringValue());
+    Assert.assertEquals(RodaConstants.PRESERVATION_REGISTRY_PRONOM,
+      pronomRegistry.getFormatRegistryName().getStringValue());
     Assert.assertEquals("x-fmt/111", pronomRegistry.getFormatRegistryKey().getStringValue());
 
     FormatRegistryComplexType mimeRegistry = PremisV3Utils.getFormatRegistry(fpo,
@@ -428,8 +437,8 @@ public class InternalPluginsTest {
 
     index.commitAIPs();
 
-    IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(), aip.getRepresentations()
-      .get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
+    IndexedFile indFile = index.retrieve(IndexedFile.class, IdUtils.getFileId(aip.getId(),
+      aip.getRepresentations().get(0).getId(), Arrays.asList(CORPORA_TEST1), CORPORA_TEST1_TXT));
 
     Assert.assertEquals(mimetype, indFile.getFileFormat().getMimeType());
     Assert.assertEquals("x-fmt/111", indFile.getFileFormat().getPronom());
@@ -441,28 +450,31 @@ public class InternalPluginsTest {
 
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
-    CloseableIterable<PreservationMetadata> preservationMetadataList = model
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
       .listPreservationMetadata(aip.getId(), true);
-    for (PreservationMetadata pm : preservationMetadataList) {
-      if (pm.getType().equals(PreservationMetadataType.EVENT)) {
-        try {
-          EventComplexType event = PremisV3Utils.binaryToEvent(model
-            .retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId()).getContent()
-            .createInputStream());
-          if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
-            for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
-              if (laict.getLinkingAgentIdentifierValue() != null
-                && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
-                found = true;
+    for (OptionalWithCause<PreservationMetadata> opm : preservationMetadataList) {
+      if (opm.isPresent()) {
+        PreservationMetadata pm = opm.get();
+        if (pm.getType().equals(PreservationMetadataType.EVENT)) {
+          try {
+            EventComplexType event = PremisV3Utils
+              .binaryToEvent(model.retrievePreservationEvent(pm.getAipId(), pm.getRepresentationId(), pm.getId())
+                .getContent().createInputStream());
+            if (event.getLinkingAgentIdentifierArray() != null && event.getLinkingAgentIdentifierArray().length > 0) {
+              for (LinkingAgentIdentifierComplexType laict : event.getLinkingAgentIdentifierArray()) {
+                if (laict.getLinkingAgentIdentifierValue() != null
+                  && laict.getLinkingAgentIdentifierValue().equalsIgnoreCase(agentID)) {
+                  found = true;
+                  break;
+                }
+              }
+              if (found) {
                 break;
               }
             }
-            if (found) {
-              break;
-            }
-          }
-        } catch (XmlException | IOException e) {
+          } catch (XmlException | IOException e) {
 
+          }
         }
       }
     }
@@ -533,8 +545,8 @@ public class InternalPluginsTest {
 
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.FILE_FULLTEXT, "Test"));
-    filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID, IdUtils.getFileId(aip.getId(), aip
-      .getRepresentations().get(0).getId(), new ArrayList<>(), CORPORA_PDF)));
+    filter.add(new SimpleFilterParameter(RodaConstants.FILE_UUID,
+      IdUtils.getFileId(aip.getId(), aip.getRepresentations().get(0).getId(), new ArrayList<>(), CORPORA_PDF)));
 
     IndexResult<IndexedFile> files = index.find(IndexedFile.class, filter, null, new Sublist(0, 10));
     Assert.assertEquals(1, files.getTotalCount());

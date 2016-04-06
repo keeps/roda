@@ -29,6 +29,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -134,43 +135,48 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
 
           boolean recursive = true;
-          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
+          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+            representation.getId(), recursive);
 
-          for (File file : allFiles) {
-            LOGGER.debug("Processing file: {}", file);
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              LOGGER.debug("Processing file: {}", file);
+              if (!file.isDirectory()) {
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                String fileMimetype = ifile.getFileFormat().getMimeType();
+                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
 
-            if (!file.isDirectory()) {
-              IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-              String fileMimetype = ifile.getFileFormat().getMimeType();
-              String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+                if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
+                  LOGGER.debug("Running veraPDF validator on {}", file.getId());
+                  StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                  DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                  Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
 
-              if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
-                LOGGER.debug("Running veraPDF validator on {}", file.getId());
-                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-                DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-                Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+                  if (veraPDFResult != null) {
+                    ContentPayload payload = new FSPathContentPayload(veraPDFResult);
+                    InputStream inputStream = payload.createInputStream();
+                    String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                    IOUtils.closeQuietly(inputStream);
 
-                if (veraPDFResult != null) {
-                  ContentPayload payload = new FSPathContentPayload(veraPDFResult);
-                  InputStream inputStream = payload.createInputStream();
-                  String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                  IOUtils.closeQuietly(inputStream);
+                    Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
+                    Matcher matcher = pattern.matcher(xmlReport);
 
-                  Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
-                  Matcher matcher = pattern.matcher(xmlReport);
+                    if (matcher.find()) {
+                      resourceList.add(file.getId());
+                      pluginResultState = PluginState.PARTIAL_SUCCESS;
+                      details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
+                    }
 
-                  if (matcher.find()) {
-                    resourceList.add(file.getId());
+                  } else {
                     pluginResultState = PluginState.PARTIAL_SUCCESS;
-                    details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                   }
 
-                } else {
-                  pluginResultState = PluginState.PARTIAL_SUCCESS;
+                  IOUtils.closeQuietly(directAccess);
                 }
-
-                IOUtils.closeQuietly(directAccess);
               }
+            } else {
+              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
             }
           }
 

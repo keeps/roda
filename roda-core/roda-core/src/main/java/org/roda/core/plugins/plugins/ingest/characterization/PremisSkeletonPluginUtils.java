@@ -19,6 +19,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -42,15 +43,21 @@ public class PremisSkeletonPluginUtils {
     boolean notifyInSteps = false;
 
     boolean recursive = true;
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representationId, recursive);
-    for (File file : allFiles) {
-      if (!file.isDirectory()) {
-        LOGGER.debug("Processing {}", file);
-        ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model);
-        model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
-          file.getPath(), file.getId(), filePreservation, notifyInSteps);
-        PremisV3Utils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
-          RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representationId,
+      recursive);
+    for (OptionalWithCause<File> oFile : allFiles) {
+      if (oFile.isPresent()) {
+        File file = oFile.get();
+        if (!file.isDirectory()) {
+          LOGGER.debug("Processing {}", file);
+          ContentPayload filePreservation = PremisV3Utils.createBaseFile(file, model);
+          model.createPreservationMetadata(PreservationMetadataType.OBJECT_FILE, aip.getId(), representationId,
+            file.getPath(), file.getId(), filePreservation, notifyInSteps);
+          PremisV3Utils.linkFileToRepresentation(file, RodaConstants.PREMIS_RELATIONSHIP_TYPE_STRUCTURAL,
+            RodaConstants.PREMIS_RELATIONSHIP_SUBTYPE_HASPART, representation);
+        }
+      } else {
+        LOGGER.error("Cannot process File", oFile.getCause());
       }
     }
     IOUtils.closeQuietly(allFiles);

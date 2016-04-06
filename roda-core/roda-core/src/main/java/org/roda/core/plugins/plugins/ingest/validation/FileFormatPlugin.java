@@ -16,6 +16,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -95,50 +96,55 @@ public class FileFormatPlugin extends AbstractPlugin<Representation> {
 
       try {
         boolean recursive = true;
-        CloseableIterable<File> allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(),
-          recursive);
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+          representation.getId(), recursive);
 
-        for (File file : allFiles) {
-          IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-          String filePronom = ifile.getFileFormat().getPronom();
-          String fileMimetype = ifile.getFileFormat().getMimeType();
-          String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.'));
+        for (OptionalWithCause<File> oFile : allFiles) {
+          if (oFile.isPresent()) {
+            File file = oFile.get();
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String filePronom = ifile.getFileFormat().getPronom();
+            String fileMimetype = ifile.getFileFormat().getMimeType();
+            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.'));
 
-          CloseableIterable<Resource> allFormats = storage
-            .listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(), true);
+            CloseableIterable<Resource> allFormats = storage
+              .listResourcesUnderDirectory(ModelUtils.getFormatContainerPath(), true);
 
-          for (Resource resource : allFormats) {
-            String resourceName = resource.getStoragePath().getName();
-            Format format = model.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
-            boolean hasAgent = false;
+            for (Resource resource : allFormats) {
+              String resourceName = resource.getStoragePath().getName();
+              Format format = model.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
+              boolean hasAgent = false;
 
-            if (format.getPronoms().contains(filePronom)) {
-              if (!format.getMimetypes().contains(fileMimetype)) {
+              if (format.getPronoms().contains(filePronom)) {
+                if (!format.getMimetypes().contains(fileMimetype)) {
+                  // create risk ?
+                }
+
+                if (!format.getExtensions().contains(fileFormat)) {
+                  // create risk ?
+                }
+
+                if (model.retrieveAgentsFromFormat(format).size() > 0) {
+                  hasAgent = true;
+                }
+              }
+
+              if (format.getMimetypes().contains(fileMimetype)) {
+                if (!format.getExtensions().contains(fileFormat)) {
+                  // create risk ?
+                }
+
+                if (hasAgent == false && model.retrieveAgentsFromFormat(format).size() > 0) {
+                  hasAgent = true;
+                }
+              }
+
+              if (hasAgent == false) {
                 // create risk ?
               }
-
-              if (!format.getExtensions().contains(fileFormat)) {
-                // create risk ?
-              }
-
-              if (model.retrieveAgentsFromFormat(format).size() > 0) {
-                hasAgent = true;
-              }
             }
-
-            if (format.getMimetypes().contains(fileMimetype)) {
-              if (!format.getExtensions().contains(fileFormat)) {
-                // create risk ?
-              }
-
-              if (hasAgent == false && model.retrieveAgentsFromFormat(format).size() > 0) {
-                hasAgent = true;
-              }
-            }
-
-            if (hasAgent == false) {
-              // create risk ?
-            }
+          } else {
+            LOGGER.error("Cannot process representation file", oFile.getCause());
           }
         }
 

@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -73,18 +74,24 @@ public class JHOVEPlugin extends AbstractPlugin<AIP> {
         for (Representation representation : aip.getRepresentations()) {
           LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
           boolean recursive = true;
-          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
-          for (File file : allFiles) {
-            if (!file.isDirectory()) {
-              LOGGER.debug("Processing file: {}", file);
-              StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-              Binary binary = storage.getBinary(storagePath);
+          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+            representation.getId(), recursive);
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              if (!file.isDirectory()) {
+                LOGGER.debug("Processing file: {}", file);
+                StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+                Binary binary = storage.getBinary(storagePath);
 
-              Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
-              ContentPayload payload = new FSPathContentPayload(jhoveResults);
-              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                "JHOVE", payload, inotify);
-              jhoveResults.toFile().delete();
+                Path jhoveResults = JHOVEPluginUtils.runJhove(file, binary, getParameterValues());
+                ContentPayload payload = new FSPathContentPayload(jhoveResults);
+                model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                  "JHOVE", payload, inotify);
+                jhoveResults.toFile().delete();
+              }
+            } else {
+              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
             }
           }
           IOUtils.closeQuietly(allFiles);

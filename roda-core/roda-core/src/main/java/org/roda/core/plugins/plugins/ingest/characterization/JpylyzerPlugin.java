@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -74,22 +75,28 @@ public class JpylyzerPlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Processing representation {} from AIP {}", representation.getId(), aip.getId());
         try {
           boolean recursive = true;
-          CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
-          for (File file : allFiles) {
-            if (!file.isDirectory()) {
-              // TODO check if file is JPEG2000
-              try {
-                LOGGER.debug("Processing file: {}", file);
-                StoragePath storagePath = ModelUtils.getFileStoragePath(file);
-                Binary binary = storage.getBinary(storagePath);
+          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+            representation.getId(), recursive);
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              if (!file.isDirectory()) {
+                // TODO check if file is JPEG2000
+                try {
+                  LOGGER.debug("Processing file: {}", file);
+                  StoragePath storagePath = ModelUtils.getFileStoragePath(file);
+                  Binary binary = storage.getBinary(storagePath);
 
-                String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
-                ContentPayload payload = new StringContentPayload(jpylyzerResults);
-                model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
-                  "jpylyzer", payload, inotify);
-              } catch (RODAException | IOException sse) {
-                LOGGER.error("Error processing AIP {}: {}", aip.getId(), sse.getMessage());
+                  String jpylyzerResults = JpylyzerPluginUtils.runJpylyzer(file, binary, getParameterValues());
+                  ContentPayload payload = new StringContentPayload(jpylyzerResults);
+                  model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                    "jpylyzer", payload, inotify);
+                } catch (RODAException | IOException sse) {
+                  LOGGER.error("Error processing AIP {}: {}", aip.getId(), sse.getMessage());
+                }
               }
+            } else {
+              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
             }
           }
           IOUtils.closeQuietly(allFiles);

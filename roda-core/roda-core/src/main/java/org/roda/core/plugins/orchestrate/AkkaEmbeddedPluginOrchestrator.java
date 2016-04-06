@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -220,8 +221,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> iter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
@@ -236,8 +237,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           block = new ArrayList<AIP>();
           multiplier++;
         }
-
-        block.add(iter.next());
+        OptionalWithCause<AIP> nextAIP = iter.next();
+        if (nextAIP.isPresent()) {
+          block.add(nextAIP.get());
+        } else {
+          LOGGER.error("Cannot process AIP", nextAIP.getCause());
+        }
       }
 
       if (!block.isEmpty()) {
@@ -272,8 +277,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> aipIter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<Representation>> innerPlugins = new ArrayList<>();
       Plugin<Representation> innerPlugin;
@@ -282,18 +287,21 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
-        AIP aip = aipIter.next();
-        for (Representation representation : aip.getRepresentations()) {
-          if (block.size() == BLOCK_SIZE) {
-            innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins,
-              BLOCK_SIZE);
-            futures
-              .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
-            block = new ArrayList<Representation>();
-            multiplier++;
+        OptionalWithCause<AIP> aip = aipIter.next();
+        if (aip.isPresent()) {
+          for (Representation representation : aip.get().getRepresentations()) {
+            if (block.size() == BLOCK_SIZE) {
+              innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins,
+                BLOCK_SIZE);
+              futures.add(
+                Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+              block = new ArrayList<Representation>();
+              multiplier++;
+            }
+            block.add(representation);
           }
-
-          block.add(representation);
+        } else {
+          LOGGER.error("Cannot process AIP", aip.getCause());
         }
       }
 
@@ -332,8 +340,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int multiplier = 0;
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> aipIter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<File>> innerPlugins = new ArrayList<>();
       Plugin<File> innerPlugin;
@@ -342,30 +350,37 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
-        AIP aip = aipIter.next();
-        for (Representation representation : aip.getRepresentations()) {
-          boolean recursive = true;
-          CloseableIterable<File> files = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
-          Iterator<File> fileIter = files.iterator();
+        OptionalWithCause<AIP> aip = aipIter.next();
+        if (aip.isPresent()) {
+          for (Representation representation : aip.get().getRepresentations()) {
+            boolean recursive = true;
+            CloseableIterable<OptionalWithCause<File>> files = model.listFilesUnder(aip.get().getId(),
+              representation.getId(), recursive);
+            Iterator<OptionalWithCause<File>> fileIter = files.iterator();
 
-          while (fileIter.hasNext()) {
+            while (fileIter.hasNext()) {
 
-            if (block.size() == BLOCK_SIZE) {
-              innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, BLOCK_SIZE);
-              futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
-              block = new ArrayList<File>();
-              multiplier++;
+              if (block.size() == BLOCK_SIZE) {
+                innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, BLOCK_SIZE);
+                futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+                block = new ArrayList<File>();
+                multiplier++;
+              }
+
+              OptionalWithCause<File> file = fileIter.next();
+              if (file.isPresent()) {
+                if (!file.get().isDirectory()) {
+                  block.add(file.get());
+                }
+              } else {
+                LOGGER.error("Cannot process File", file.getCause());
+              }
             }
-
-            File file = fileIter.next();
-            if (!file.isDirectory()) {
-              block.add(file);
-            }
+            IOUtils.closeQuietly(files);
           }
-          IOUtils.closeQuietly(files);
-
+        } else {
+          LOGGER.error("Cannot process AIP", aip.getCause());
         }
-
       }
 
       if (!block.isEmpty()) {

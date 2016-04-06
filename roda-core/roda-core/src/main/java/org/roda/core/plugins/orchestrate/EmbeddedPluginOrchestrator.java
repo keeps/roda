@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
@@ -184,8 +185,8 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> iter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
 
       List<AIP> block = new ArrayList<AIP>();
       while (iter.hasNext()) {
@@ -194,7 +195,12 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
           block = new ArrayList<AIP>();
         }
 
-        block.add(iter.next());
+        OptionalWithCause<AIP> nextAIP = iter.next();
+        if (nextAIP.isPresent()) {
+          block.add(nextAIP.get());
+        } else {
+          LOGGER.error("Cannot process AIP", nextAIP.getCause());
+        }
       }
 
       if (!block.isEmpty()) {
@@ -221,19 +227,23 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> aipIter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
 
       List<Representation> block = new ArrayList<Representation>();
       while (aipIter.hasNext()) {
-        AIP aip = aipIter.next();
-        for (Representation representation : aip.getRepresentations()) {
-          if (block.size() == BLOCK_SIZE) {
-            submitPlugin(block, plugin);
-            block = new ArrayList<Representation>();
-          }
+        OptionalWithCause<AIP> aip = aipIter.next();
+        if (aip.isPresent()) {
+          for (Representation representation : aip.get().getRepresentations()) {
+            if (block.size() == BLOCK_SIZE) {
+              submitPlugin(block, plugin);
+              block = new ArrayList<Representation>();
+            }
 
-          block.add(representation);
+            block.add(representation);
+          }
+        } else {
+          LOGGER.error("Cannot process AIP", aip.getCause());
         }
       }
 
@@ -260,29 +270,38 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
-      CloseableIterable<AIP> aips = model.listAIPs();
-      Iterator<AIP> aipIter = aips.iterator();
+      CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
+      Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
 
       List<File> block = new ArrayList<File>();
       while (aipIter.hasNext()) {
-        AIP aip = aipIter.next();
-        for (Representation rep : aip.getRepresentations()) {
-          boolean recursive = true;
-          CloseableIterable<File> files = model.listFilesUnder(aip.getId(), rep.getId(), recursive);
-          Iterator<File> fileIter = files.iterator();
+        OptionalWithCause<AIP> aip = aipIter.next();
+        for (Representation rep : aip.get().getRepresentations()) {
+          if (aip.isPresent()) {
+            boolean recursive = true;
+            CloseableIterable<OptionalWithCause<File>> files = model.listFilesUnder(aip.get().getId(), rep.getId(),
+              recursive);
+            Iterator<OptionalWithCause<File>> fileIter = files.iterator();
 
-          while (fileIter.hasNext()) {
-            if (block.size() == BLOCK_SIZE) {
-              submitPlugin(block, plugin);
-              block = new ArrayList<File>();
-            }
+            while (fileIter.hasNext()) {
+              if (block.size() == BLOCK_SIZE) {
+                submitPlugin(block, plugin);
+                block = new ArrayList<File>();
+              }
 
-            File file = fileIter.next();
-            if (!file.isDirectory()) {
-              block.add(file);
+              OptionalWithCause<File> file = fileIter.next();
+              if (file.isPresent()) {
+                if (!file.get().isDirectory()) {
+                  block.add(file.get());
+                }
+              } else {
+                LOGGER.error("Cannot process AIP representation file", file.getCause());
+              }
             }
+            IOUtils.closeQuietly(files);
+          } else {
+            LOGGER.error("Cannot process AIP", aip.getCause());
           }
-          IOUtils.closeQuietly(files);
         }
       }
 

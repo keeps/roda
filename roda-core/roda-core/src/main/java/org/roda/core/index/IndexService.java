@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
@@ -97,8 +98,8 @@ public class IndexService {
     return ancestors;
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter) throws GenericException,
-    RequestNotValidException {
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter)
+    throws GenericException, RequestNotValidException {
     return SolrUtils.count(index, returnClass, filter);
   }
 
@@ -128,16 +129,16 @@ public class IndexService {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
-  public void reindexAIPs() throws RequestNotValidException, GenericException, NotFoundException,
-    AuthorizationDeniedException {
-    CloseableIterable<AIP> aips = null;
+  public void reindexAIPs()
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<AIP>> aips = null;
     try {
       LOGGER.info("{} > Listing AIPs", new Date().getTime());
       aips = model.listAIPs();
-      for (AIP aip : aips) {
-        if (aip != null) {
-          LOGGER.info("{} > Reindexing AIP {}", new Date().getTime(), aip.getId());
-          reindexAIP(aip);
+      for (OptionalWithCause<AIP> aip : aips) {
+        if (aip.isPresent()) {
+          LOGGER.info("{} > Reindexing AIP {}", new Date().getTime(), aip.get().getId());
+          reindexAIP(aip.get());
         } else {
           LOGGER.error("{} > An error occurred. See log for more details.", new Date().getTime());
         }
@@ -201,14 +202,14 @@ public class IndexService {
     observer.messageCreatedOrUpdated(message);
   }
 
-  public void reindexActionLogs() throws GenericException, NotFoundException, AuthorizationDeniedException,
-    RequestNotValidException {
+  public void reindexActionLogs()
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     CloseableIterable<Resource> actionLogs = null;
 
     try {
       boolean recursive = false;
-      actionLogs = model.getStorage().listResourcesUnderContainer(
-        DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
+      actionLogs = model.getStorage()
+        .listResourcesUnderContainer(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_ACTIONLOG), recursive);
 
       for (Resource resource : actionLogs) {
         if (resource instanceof Binary) {
@@ -279,11 +280,6 @@ public class IndexService {
     }
   }
 
-  // public void commit(List<Class<? extends IsIndexed>> classToCommit) throws
-  // GenericException {
-  // SolrUtils.commit(index, classToCommit);
-  // }
-
   @SafeVarargs
   public final void commit(Class<? extends IsIndexed>... classToCommit) throws GenericException {
     SolrUtils.commit(index, classToCommit);
@@ -299,18 +295,18 @@ public class IndexService {
     SolrUtils.execute(index, classToRetrieve, filter, indexRunnable);
   }
 
-  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids) throws GenericException,
-    RequestNotValidException {
+  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, List<String> ids)
+    throws GenericException, RequestNotValidException {
     SolrUtils.delete(index, classToRetrieve, ids);
   }
 
-  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter) throws GenericException,
-    RequestNotValidException {
+  public <T extends IsIndexed> void delete(Class<T> classToRetrieve, Filter filter)
+    throws GenericException, RequestNotValidException {
     SolrUtils.delete(index, classToRetrieve, filter);
   }
 
-  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance) throws GenericException,
-    RequestNotValidException {
+  public <T extends IsIndexed> void create(Class<T> classToCreate, T instance)
+    throws GenericException, RequestNotValidException {
     SolrUtils.create(index, classToCreate, instance);
   }
 

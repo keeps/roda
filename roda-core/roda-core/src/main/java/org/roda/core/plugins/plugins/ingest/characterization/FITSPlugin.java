@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -75,7 +76,7 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
       boolean inotify = false;
       for (Representation representation : aip.getRepresentations()) {
         LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-        CloseableIterable<File> allFiles = null;
+        CloseableIterable<OptionalWithCause<File>> allFiles = null;
         DirectResourceAccess directAccess = null;
         try {
           StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
@@ -87,14 +88,19 @@ public class FITSPlugin extends AbstractPlugin<AIP> {
 
           boolean recursive = true;
           allFiles = model.listFilesUnder(aip.getId(), representation.getId(), recursive);
-          for (File file : allFiles) {
-            // TODO the following path is not expecting folders
-            Path p = output.resolve(file.getId() + ".fits.xml");
-            ContentPayload payload = new FSPathContentPayload(p);
-            LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
-              representation.getId(), file.getId());
-            model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml", "FITS",
-              payload, inotify);
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              // TODO the following path is not expecting folders
+              Path p = output.resolve(file.getId() + ".fits.xml");
+              ContentPayload payload = new FSPathContentPayload(p);
+              LOGGER.debug("Creating other metadata (AIP: {}, REPRESENTATION: {}, FILE: {})", aip.getId(),
+                representation.getId(), file.getId());
+              model.createOtherMetadata(aip.getId(), representation.getId(), file.getPath(), file.getId(), ".xml",
+                "FITS", payload, inotify);
+            } else {
+              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
+            }
           }
 
           FSUtils.deletePath(output);

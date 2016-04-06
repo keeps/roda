@@ -43,6 +43,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -74,6 +75,8 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class InternalConvertPluginsTest {
   private static final String FAKE_JOB_ID = "NONE";
@@ -145,8 +148,8 @@ public class InternalConvertPluginsTest {
 
     index.commit(TransferredResource.class);
 
-    resources.add(index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes())
-      .toString()));
+    resources.add(
+      index.retrieve(TransferredResource.class, UUID.nameUUIDFromBytes(transferredResourceId.getBytes()).toString()));
     return resources;
   }
 
@@ -169,8 +172,8 @@ public class InternalConvertPluginsTest {
 
     index.commitAIPs();
 
-    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class, new Filter(new SimpleFilterParameter(
-      RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
+    IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, root.getId())), null, new Sublist(0, 10));
 
     Assert.assertEquals(1L, find.getTotalCount());
     IndexedAIP indexedAIP = find.getResults().get(0);
@@ -180,26 +183,30 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testIngestTransferredResource() throws IOException, InterruptedException, RODAException,
-    SolrServerException {
+  public void testIngestTransferredResource()
+    throws IOException, InterruptedException, RODAException, SolrServerException {
     AIP aip = ingestCorpora(0);
     Assert.assertEquals(1, aip.getRepresentations().size());
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, reusableAllFiles.size());
   }
 
   @Test
-  public void testImageMagickPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException {
+  public void testImageMagickPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -212,10 +219,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -236,13 +244,15 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testSoxPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testSoxPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -255,10 +265,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -279,13 +290,15 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testAvconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testAvconvPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new AvconvConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -299,10 +312,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -323,13 +337,15 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testUnoconvPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testUnoconvPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new UnoconvConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -342,10 +358,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -366,13 +383,15 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testGhostScriptPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException {
+  public void testGhostScriptPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new GhostScriptConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -386,10 +405,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -410,13 +430,15 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testPdfToPdfaPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException {
+  public void testPdfToPdfaPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new PdfToPdfaPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -428,10 +450,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
     for (File f : reusableAllFiles) {
@@ -449,9 +472,11 @@ public class InternalConvertPluginsTest {
 
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -474,13 +499,14 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(4, aip.getRepresentations().size());
 
-    Assert.assertEquals(1, aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId))
-      .count());
+    Assert.assertEquals(1,
+      aip.getRepresentations().stream().filter(o -> o.getId().equals(editedRepresentationId)).count());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(3).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(3).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -490,26 +516,26 @@ public class InternalConvertPluginsTest {
       if (f.getId().matches(".*[.](jpg|png|mp3)$")) {
         changedCounter++;
         String filename = f.getId().substring(0, f.getId().lastIndexOf('.'));
-        Assert.assertEquals(
-          1,
-          newReusableAllFiles.stream()
-            .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
+        Assert.assertEquals(1, newReusableAllFiles.stream()
+          .filter(o -> o.getId().equals(filename + ".tiff") || o.getId().equals(filename + ".ogg")).count());
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.](tiff|ogg)$")).count());
 
   }
 
   @Test
-  public void testGeneralCommandPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException {
+  public void testGeneralCommandPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(0);
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new GeneralCommandConvertPlugin<Representation>();
     Map<String, String> parameters = new HashMap<>();
@@ -523,10 +549,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newAllFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
+    CloseableIterable<OptionalWithCause<File>> newAllFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableAllFiles = new ArrayList<>();
-    Iterables.addAll(newReusableAllFiles, newAllFiles);
+    Iterables.addAll(newReusableAllFiles, Lists.newArrayList(newAllFiles).stream().filter(f -> f.isPresent())
+      .map(f -> f.get()).collect(Collectors.toList()));
 
     Assert.assertEquals(numberOfConvertableFiles, newReusableAllFiles.size());
 
@@ -540,8 +567,8 @@ public class InternalConvertPluginsTest {
       }
     }
 
-    Assert.assertEquals(changedCounter, newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$"))
-      .count());
+    Assert.assertEquals(changedCounter,
+      newReusableAllFiles.stream().filter(o -> o.getId().matches(".*[.]tiff$")).count());
   }
 
   @Test
@@ -550,9 +577,11 @@ public class InternalConvertPluginsTest {
     AIP aip = ingestCorpora(1);
     String oldRepresentationId = aip.getRepresentations().get(0).getId();
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
     List<File> reusableAllFiles = new ArrayList<>();
-    Iterables.addAll(reusableAllFiles, allFiles);
+    Iterables.addAll(reusableAllFiles,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     Plugin<Representation> plugin = new DigitalSignaturePlugin();
     Map<String, String> parameters = new HashMap<>();
@@ -567,9 +596,11 @@ public class InternalConvertPluginsTest {
     aip = model.retrieveAIP(aip.getId());
     Assert.assertEquals(2, aip.getRepresentations().size());
 
-    CloseableIterable<File> newFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(), true);
+    CloseableIterable<OptionalWithCause<File>> newFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
     List<File> newReusableFiles = new ArrayList<>();
-    Iterables.addAll(newReusableFiles, newFiles);
+    Iterables.addAll(newReusableFiles,
+      Lists.newArrayList(newFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     for (File f : reusableAllFiles) {
       if (f.getId().matches(".*[.](pdf)$")) {
@@ -585,16 +616,17 @@ public class InternalConvertPluginsTest {
   }
 
   @Test
-  public void testDigitalSignatureDIPPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException,
-    IOException, SolrServerException {
+  public void testDigitalSignatureDIPPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(2);
-    CloseableIterable<File> allFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(0).getId(), true);
-    File file = allFiles.iterator().next();
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(0).getId(), true);
+    OptionalWithCause<File> file = allFiles.iterator().next();
 
-    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
     String intermediatePath = "/data/storage/";
-    Assert
-      .assertEquals(0, PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
+    Assert.assertEquals(0,
+      PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
 
     Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
@@ -605,18 +637,18 @@ public class InternalConvertPluginsTest {
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
 
     aip = model.retrieveAIP(aip.getId());
-    CloseableIterable<File> allNewFiles = model.listFilesUnder(aip.getId(), aip.getRepresentations().get(1).getId(),
-      true);
-    File newFile = allNewFiles.iterator().next();
+    CloseableIterable<OptionalWithCause<File>> allNewFiles = model.listFilesUnder(aip.getId(),
+      aip.getRepresentations().get(1).getId(), true);
+    OptionalWithCause<File> newFile = allNewFiles.iterator().next();
 
-    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile);
+    StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
     Assert.assertEquals(1,
       PDFSignatureUtils.countSignaturesPDF(basePath, newFileStoragePath.asString(), intermediatePath));
   }
 
   @Test
-  public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
-    SolrServerException {
+  public void testVeraPDFPlugin()
+    throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora(2);
 
     Plugin<AIP> plugin = new VeraPDFPlugin();

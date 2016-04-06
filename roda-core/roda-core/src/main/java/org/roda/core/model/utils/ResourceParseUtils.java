@@ -8,26 +8,33 @@
 package org.roda.core.model.utils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultDirectory;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Resource;
+import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,8 +46,8 @@ public class ResourceParseUtils {
 
   }
 
-  private static File convertResourceToFile(Resource resource) throws GenericException, NotFoundException,
-    AuthorizationDeniedException, RequestNotValidException {
+  public static File convertResourceToFile(Resource resource)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     File ret;
 
     if (resource == null) {
@@ -135,9 +142,9 @@ public class ResourceParseUtils {
     String representationId = ModelUtils.extractRepresentationId(resourcePath);
     String type = representationId != null ? ModelUtils.extractTypeFromRepresentationOtherMetadata(resourcePath)
       : ModelUtils.extractTypeFromAipOtherMetadata(resourcePath);
-    List<String> fileDirectoryPath = representationId != null ? ModelUtils
-      .extractFilePathFromRepresentationOtherMetadata(resourcePath) : ModelUtils
-      .extractFilePathFromAipOtherMetadata(resourcePath);
+    List<String> fileDirectoryPath = representationId != null
+      ? ModelUtils.extractFilePathFromRepresentationOtherMetadata(resourcePath)
+      : ModelUtils.extractFilePathFromAipOtherMetadata(resourcePath);
     String fileId = filename.substring(0, filename.lastIndexOf('.'));
 
     om.setAipId(aipId);
@@ -149,28 +156,72 @@ public class ResourceParseUtils {
     return om;
   }
 
-  public static <T extends Serializable> T convertResourceTo(Resource resource, Class<T> classToReturn)
-    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
-    T ret;
-    if (classToReturn.equals(File.class)) {
-      ret = classToReturn.cast(convertResourceToFile(resource));
-    } else if (classToReturn.equals(PreservationMetadata.class)) {
-      ret = classToReturn.cast(convertResourceToPreservationMetadata(resource));
-    } else if (classToReturn.equals(OtherMetadata.class)) {
-      ret = classToReturn.cast(convertResourceToOtherMetadata(resource));
-    } else {
-      throw new RequestNotValidException("Cannot convert a resource to " + classToReturn.getName());
+  public static <T extends Serializable> OptionalWithCause<T> convertResourceTo(StorageService storage,
+    Resource resource, Class<T> classToReturn) {
+    OptionalWithCause<T> ret;
+
+    try {
+      if (classToReturn.equals(AIP.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(getAIPMetadata(storage, resource.getStoragePath())));
+      } else if (classToReturn.equals(File.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(convertResourceToFile(resource)));
+      } else if (classToReturn.equals(PreservationMetadata.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(convertResourceToPreservationMetadata(resource)));
+      } else if (classToReturn.equals(OtherMetadata.class)) {
+        ret = OptionalWithCause.of(classToReturn.cast(convertResourceToOtherMetadata(resource)));
+      } else {
+        ret = OptionalWithCause
+          .empty(new RequestNotValidException("Cannot convert a resource to " + classToReturn.getName()));
+      }
+    } catch (RODAException e) {
+      ret = OptionalWithCause.empty(e);
     }
 
     return ret;
   }
 
-  private static <T extends Serializable> boolean isDirectoryAcceptable(Class<T> classToReturn) {
-    return classToReturn.equals(File.class);
+  public static AIP getAIPMetadata(StorageService storage, String aipId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return getAIPMetadata(storage, aipId, ModelUtils.getAIPStoragePath(aipId));
   }
 
-  public static <T extends Serializable> CloseableIterable<T> convert(final CloseableIterable<Resource> iterable,
-    final Class<T> classToReturn) {
+  public static AIP getAIPMetadata(StorageService storage, StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return getAIPMetadata(storage, storagePath.getName(), storagePath);
+  }
+
+  public static AIP getAIPMetadata(StorageService storage, String aipId, StoragePath storagePath)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    DefaultStoragePath metadataStoragePath = DefaultStoragePath.parse(storagePath,
+      RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+    Binary binary = storage.getBinary(metadataStoragePath);
+
+    String json;
+    AIP aip;
+    InputStream inputStream = null;
+    try {
+      inputStream = binary.getContent().createInputStream();
+      json = IOUtils.toString(inputStream);
+      aip = JsonUtils.getObjectFromJson(json, AIP.class);
+    } catch (IOException | GenericException e) {
+      throw new GenericException("Could not parse AIP metadata of " + aipId + " at " + metadataStoragePath, e);
+    } finally {
+      IOUtils.closeQuietly(inputStream);
+    }
+
+    // Setting information that does not come in JSON
+    aip.setId(aipId);
+
+    return aip;
+  }
+
+  private static <T extends Serializable> boolean isDirectoryAcceptable(Class<T> classToReturn) {
+    return classToReturn.equals(File.class) || classToReturn.equals(AIP.class);
+  }
+
+  public static <T extends Serializable> CloseableIterable<OptionalWithCause<T>> convert(final StorageService storage,
+    final CloseableIterable<Resource> iterable, final Class<T> classToReturn) {
 
     final CloseableIterable<Resource> filtered;
     if (isDirectoryAcceptable(classToReturn)) {
@@ -179,14 +230,14 @@ public class ResourceParseUtils {
       filtered = CloseableIterables.filter(iterable, p -> !p.isDirectory());
     }
 
-    CloseableIterable<T> it = null;
+    CloseableIterable<OptionalWithCause<T>> it = null;
 
     final Iterator<Resource> iterator = filtered.iterator();
-    it = new CloseableIterable<T>() {
+    it = new CloseableIterable<OptionalWithCause<T>>() {
 
       @Override
-      public Iterator<T> iterator() {
-        return new Iterator<T>() {
+      public Iterator<OptionalWithCause<T>> iterator() {
+        return new Iterator<OptionalWithCause<T>>() {
 
           @Override
           public boolean hasNext() {
@@ -197,14 +248,8 @@ public class ResourceParseUtils {
           }
 
           @Override
-          public T next() {
-            try {
-              return ResourceParseUtils.convertResourceTo(iterator.next(), classToReturn);
-            } catch (GenericException | NoSuchElementException | NotFoundException | AuthorizationDeniedException
-              | RequestNotValidException e) {
-              LOGGER.error("Error converting into " + classToReturn.getName(), e);
-              return null;
-            }
+          public OptionalWithCause<T> next() {
+            return ResourceParseUtils.convertResourceTo(storage, iterator.next(), classToReturn);
           }
 
           @Override

@@ -47,6 +47,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -173,9 +174,10 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_1_ID, representation1.getId());
     assertEquals(CorporaConstants.REPRESENTATION_1_ORIGINAL, representation1.isOriginal());
 
-    CloseableIterable<File> allRep1Files = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_1_ID, true);
-    List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().map(f -> f.getId())
-      .collect(Collectors.toList());
+    CloseableIterable<OptionalWithCause<File>> allRep1Files = model.listFilesUnder(aipId,
+      CorporaConstants.REPRESENTATION_1_ID, true);
+    List<String> allRep1FileIds = Lists.newArrayList(allRep1Files).stream().filter(f -> f.isPresent())
+      .map(f -> f.get().getId()).collect(Collectors.toList());
     allRep1Files.close();
 
     assertThat(allRep1FileIds,
@@ -186,9 +188,10 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.REPRESENTATION_2_ID, representation2.getId());
     assertEquals(CorporaConstants.REPRESENTATION_2_ORIGINAL, representation2.isOriginal());
 
-    CloseableIterable<File> allRep2Files = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_2_ID, true);
-    List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().map(f -> f.getId())
-      .collect(Collectors.toList());
+    CloseableIterable<OptionalWithCause<File>> allRep2Files = model.listFilesUnder(aipId,
+      CorporaConstants.REPRESENTATION_2_ID, true);
+    List<String> allRep2FileIds = Lists.newArrayList(allRep2Files).stream().filter(f -> f.isPresent())
+      .map(f -> f.get().getId()).collect(Collectors.toList());
     allRep2Files.close();
 
     assertThat(allRep2FileIds,
@@ -269,7 +272,7 @@ public class ModelServiceTest {
     assertEquals(CorporaConstants.SUCCESS,
       event_premis.getEventOutcomeInformationArray(0).getEventOutcome().getStringValue());
   }
-  
+
   @Test
   public void testCreateAIPVersionEAD3() throws RODAException, ParseException, IOException, XmlException {
 
@@ -311,7 +314,7 @@ public class ModelServiceTest {
     assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
       IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
   }
-  
+
   @Test
   public void testCreateAIPVersionUnknown() throws RODAException, ParseException, IOException, XmlException {
 
@@ -353,7 +356,7 @@ public class ModelServiceTest {
     assertEquals(descMetadataBinary.getSizeInBytes().intValue(),
       IOUtils.toByteArray(descMetadataBinary.getContent().createInputStream()).length);
   }
-  
+
   @Test
   public void testCreateAIPWithSubFolders() throws RODAException, ParseException, IOException {
 
@@ -364,10 +367,12 @@ public class ModelServiceTest {
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_REP_WITH_SUBFOLDERS));
 
-    CloseableIterable<File> allFiles = model.listFilesUnder(aipId, CorporaConstants.REPRESENTATION_1_ID, true);
+    CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aipId,
+      CorporaConstants.REPRESENTATION_1_ID, true);
 
     List<File> reusableList = new ArrayList<>();
-    Iterables.addAll(reusableList, allFiles);
+    Iterables.addAll(reusableList,
+      Lists.newArrayList(allFiles).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
     allFiles.close();
 
     assertTrue(reusableList.contains(
@@ -453,9 +458,10 @@ public class ModelServiceTest {
     final AIP aip3 = model.createAIP(aip3Id, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_ID));
 
-    Iterable<AIP> listAIPs = model.listAIPs();
+    Iterable<OptionalWithCause<AIP>> listAIPs = model.listAIPs();
     List<AIP> reusableList = new ArrayList<>();
-    Iterables.addAll(reusableList, listAIPs);
+    Iterables.addAll(reusableList,
+      Lists.newArrayList(listAIPs).stream().filter(f -> f.isPresent()).map(f -> f.get()).collect(Collectors.toList()));
 
     assertThat(reusableList, containsInAnyOrder(aip1, aip2, aip3));
 

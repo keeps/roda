@@ -215,6 +215,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";
+  public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
 
   /*
    * Permissions
