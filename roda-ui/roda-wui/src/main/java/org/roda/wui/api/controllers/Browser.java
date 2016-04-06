@@ -19,6 +19,7 @@ import javax.xml.transform.TransformerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -861,7 +862,8 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.getScanUpdateStatus();
   }
 
-  public static void updateAllTransferredResources(String subFolderUUID, boolean waitToFinish) {
+  public static void updateAllTransferredResources(String subFolderUUID, boolean waitToFinish)
+    throws IsStillUpdatingException {
     BrowserHelper.runTransferredResourceScan(subFolderUUID, waitToFinish);
   }
 

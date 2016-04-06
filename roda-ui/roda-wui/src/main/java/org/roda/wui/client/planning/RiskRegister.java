@@ -32,11 +32,13 @@ import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -104,7 +106,7 @@ public class RiskRegister extends Composite {
 
   @UiField(provided = true)
   BasicSearch basicSearch;
-  
+
   @UiField(provided = true)
   RiskList riskList;
 
@@ -131,7 +133,7 @@ public class RiskRegister extends Composite {
 
   @UiField
   Button startProcess;
-  
+
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
 
@@ -146,9 +148,9 @@ public class RiskRegister extends Composite {
       RodaConstants.RISK_PRE_MITIGATION_SEVERITY));
 
     riskList = new RiskList(filter, facets, "Risks", true);
-    
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.RISK_SEARCH,
-      messages.riskRegisterSearchPlaceHolder(), false, false);
+
+    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
+      false, false);
     basicSearch.setList(riskList);
 
     facetCategories = new FlowPanel();
@@ -217,6 +219,8 @@ public class RiskRegister extends Composite {
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
       ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRisk.RESOLVER.getHistoryToken())) {
+      CreateRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -227,5 +231,10 @@ public class RiskRegister extends Composite {
     // TODO selection control
     buttonEdit.setEnabled(true);
     buttonRemove.setEnabled(true);
+  }
+
+  @UiHandler("buttonAdd")
+  void buttonAddRiskHandler(ClickEvent e) {
+    Tools.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
   }
 }

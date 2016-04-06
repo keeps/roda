@@ -44,6 +44,7 @@ import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.iterables.CloseableIterables;
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -976,7 +977,8 @@ public class BrowserHelper {
     return RodaCoreFactory.getTransferredResourcesScannerUpdateStatus();
   }
 
-  public static void runTransferredResourceScan(String subFolderUUID, boolean waitToFinish) {
+  public static void runTransferredResourceScan(String subFolderUUID, boolean waitToFinish)
+    throws IsStillUpdatingException {
     RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(subFolderUUID, waitToFinish);
   }
 

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
@@ -396,7 +397,12 @@ public class IngestTransfer extends Composite {
 
       @Override
       public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
+        if (caught instanceof IsStillUpdatingException) {
+          Toast.showInfo("Refresh", "Another update is currently running. Try again later");
+        } else {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+        }
+
         transferredResourceList.refresh();
         refresh.setEnabled(true);
       }

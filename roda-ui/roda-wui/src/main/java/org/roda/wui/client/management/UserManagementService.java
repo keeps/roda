@@ -232,6 +232,17 @@ public interface UserManagementService extends RemoteService {
   public Risk retrieveRisk(String riskId) throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   /**
+   * Add risk
+   *
+   * @param risk
+   * @return
+   * @throws AuthorizationDeniedException
+   * @throws GenericException
+   * @throws RequestNotValidException
+   */
+  public void addRisk(Risk risk) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
+
+  /**
    * Send the email challenge to a user email
    *
    * @param username

@@ -184,6 +184,12 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
+  public void addRisk(Risk risk) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.addRisk(user, risk);
+  }
+
+  @Override
   public void sendEmailVerification(String username) throws GenericException, NotFoundException {
     String servletPath = getServletUrl(getThreadLocalRequest());
     UserManagement.sendEmailVerification(servletPath, username);

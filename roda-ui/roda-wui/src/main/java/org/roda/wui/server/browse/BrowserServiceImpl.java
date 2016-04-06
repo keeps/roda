@@ -16,6 +16,7 @@ import java.util.Map;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -297,7 +298,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void transferScanRequestUpdate(String transferredResourceUUID) {
+  public void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException {
     Browser.updateAllTransferredResources(transferredResourceUUID, true);
   }
 

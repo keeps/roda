@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
@@ -179,17 +180,21 @@ public class TransferredResourcesScanner {
     index.commit(TransferredResource.class);
   }
 
-  public void updateAllTransferredResources(String folderUUID, boolean waitToFinish) {
-    if (index != null) {
-      ReindexTransferredResourcesRunnable reindexRunnable;
-      reindexRunnable = new ReindexTransferredResourcesRunnable(basePath, folderUUID, index);
+  public void updateAllTransferredResources(String folderUUID, boolean waitToFinish) throws IsStillUpdatingException {
+    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
+      if (index != null) {
+        ReindexTransferredResourcesRunnable reindexRunnable;
+        reindexRunnable = new ReindexTransferredResourcesRunnable(basePath, folderUUID, index);
 
-      if (waitToFinish) {
-        reindexRunnable.run();
-      } else {
-        Thread threadReindex = new Thread(reindexRunnable, "ReindexThread");
-        threadReindex.start();
+        if (waitToFinish) {
+          reindexRunnable.run();
+        } else {
+          Thread threadReindex = new Thread(reindexRunnable, "ReindexThread");
+          threadReindex.start();
+        }
       }
+    } else {
+      throw new IsStillUpdatingException();
     }
   }
 

@@ -55,6 +55,11 @@ public class UserManagementHelper {
     return RodaCoreFactory.getIndexService().retrieve(Risk.class, riskId);
   }
 
+  public static void addRisk(Risk risk) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().createRisk(risk);
+    RodaCoreFactory.getIndexService().create(Risk.class, risk);
+  }
+
   protected static Long countMembers(Filter filter) throws GenericException, RequestNotValidException {
     return RodaCoreFactory.getIndexService().count(RODAMember.class, filter);
   }
@@ -141,4 +146,5 @@ public class UserManagementHelper {
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().resetUserPassword(username, password, resetPasswordToken, true, true);
   }
+
 }

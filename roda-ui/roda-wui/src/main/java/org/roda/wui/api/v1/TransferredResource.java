@@ -22,11 +22,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.solr.client.solrj.SolrServerException;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -105,7 +105,7 @@ public class TransferredResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Updates Resources", notes = "Updates all transferred resources", response = TransferredResource.class)
   public Response updateResources(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException, IOException, SolrServerException {
+    throws RODAException, IOException, IsStillUpdatingException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     Browser.updateAllTransferredResources(null, true);

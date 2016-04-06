@@ -185,6 +185,14 @@ public interface UserManagementServiceAsync {
   void retrieveRisk(String riskId, AsyncCallback<Risk> callback);
 
   /**
+   * Add risk
+   *
+   * @param risk
+   * @throws RODAException
+   */
+  void addRisk(Risk risk, AsyncCallback<Void> callback);
+
+  /**
    * Resend the email challenge to a user email
    *
    * @param username

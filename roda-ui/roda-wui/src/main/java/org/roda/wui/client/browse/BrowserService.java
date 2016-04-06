@@ -10,6 +10,7 @@ package org.roda.wui.client.browse;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.monitor.IsStillUpdatingException;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -102,7 +103,7 @@ public interface BrowserService extends RemoteService {
 
   boolean transferScanIsUpdating();
 
-  void transferScanRequestUpdate(String transferredResourceUUID);
+  void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException;
 
   Job createJob(Job job)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;

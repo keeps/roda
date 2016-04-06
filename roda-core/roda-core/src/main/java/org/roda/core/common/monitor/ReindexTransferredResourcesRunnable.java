@@ -56,96 +56,95 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
   }
 
   public void run() {
-    if (!RodaCoreFactory.getTransferredResourcesScannerUpdateStatus()) {
-      long start = System.currentTimeMillis();
-      Date lastScanDate = new Date();
-      RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(true);
-      LOGGER.info("Start indexing transferred resources {}", basePath.toString());
-      try {
-        EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-        Path path;
-        if (folder != null) {
-          path = basePath.resolve(Paths.get(folder.getRelativePath()));
-        } else {
-          path = basePath;
+
+    long start = System.currentTimeMillis();
+    Date lastScanDate = new Date();
+    RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(true);
+    LOGGER.info("Start indexing transferred resources {}", basePath.toString());
+    try {
+      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
+      Path path;
+      if (folder != null) {
+        path = basePath.resolve(Paths.get(folder.getRelativePath()));
+      } else {
+        path = basePath;
+      }
+      Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
+
+        Stack<BasicFileAttributes> actualDirectoryAttributesStack = new Stack<BasicFileAttributes>();
+        Stack<Long> fileSizeStack = new Stack<Long>();
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+          actualDirectoryAttributesStack.push(attrs);
+          fileSizeStack.push(0L);
+          return FileVisitResult.CONTINUE;
         }
-        Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
 
-          Stack<BasicFileAttributes> actualDirectoryAttributesStack = new Stack<BasicFileAttributes>();
-          Stack<Long> fileSizeStack = new Stack<Long>();
-
-          @Override
-          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            actualDirectoryAttributesStack.push(attrs);
-            fileSizeStack.push(0L);
-            return FileVisitResult.CONTINUE;
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+          try {
+            long size = Files.size(file);
+            long actualSize = fileSizeStack.pop();
+            fileSizeStack.push(actualSize + size);
+            TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
+              basePath, lastScanDate);
+            index.create(TransferredResource.class, resource);
+          } catch (GenericException | RequestNotValidException e) {
+            LOGGER.error("Error adding path to Transferred Resources index", e);
           }
 
-          @Override
-          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            try {
-              long size = Files.size(file);
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+          return FileVisitResult.CONTINUE;
+        }
+
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+          if (!dir.equals(basePath)) {
+            BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
+            long fileSize = fileSizeStack.pop();
+            TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
+              actualDirectoryAttributes, fileSize, basePath, lastScanDate);
+
+            if (fileSizeStack.size() > 0) {
               long actualSize = fileSizeStack.pop();
-              fileSizeStack.push(actualSize + size);
-              TransferredResource resource = TransferredResourcesScanner.createTransferredResource(file, attrs, size,
-                basePath, lastScanDate);
+              fileSizeStack.push(actualSize + fileSize);
+            }
+
+            try {
               index.create(TransferredResource.class, resource);
             } catch (GenericException | RequestNotValidException e) {
               LOGGER.error("Error adding path to Transferred Resources index", e);
             }
-
-            return FileVisitResult.CONTINUE;
           }
-
-          @Override
-          public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-            return FileVisitResult.CONTINUE;
-          }
-
-          @Override
-          public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-            if (!dir.equals(basePath)) {
-              BasicFileAttributes actualDirectoryAttributes = actualDirectoryAttributesStack.pop();
-              long fileSize = fileSizeStack.pop();
-              TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
-                actualDirectoryAttributes, fileSize, basePath, lastScanDate);
-
-              if (fileSizeStack.size() > 0) {
-                long actualSize = fileSizeStack.pop();
-                fileSizeStack.push(actualSize + fileSize);
-              }
-
-              try {
-                index.create(TransferredResource.class, resource);
-              } catch (GenericException | RequestNotValidException e) {
-                LOGGER.error("Error adding path to Transferred Resources index", e);
-              }
-            }
-            return FileVisitResult.CONTINUE;
-          }
-        });
-
-        index.commit(TransferredResource.class);
-
-        Filter filter;
-        String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
-        if (folder == null) {
-          filter = new Filter(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
-            formattedDate));
-        } else {
-          filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS,
-            folder.getRelativePath()), new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
-            formattedDate));
+          return FileVisitResult.CONTINUE;
         }
+      });
 
-        index.delete(TransferredResource.class, filter);
-        index.commit(TransferredResource.class);
-        LOGGER.info("End indexing Transferred Resources");
-        LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
-        RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
-      } catch (IOException | GenericException | RequestNotValidException e) {
-        LOGGER.error("Error reindexing Transferred Resources", e);
+      index.commit(TransferredResource.class);
+
+      Filter filter;
+      String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
+      if (folder == null) {
+        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+          formattedDate));
+      } else {
+        filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS,
+          folder.getRelativePath()), new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
+          formattedDate));
       }
+
+      index.delete(TransferredResource.class, filter);
+      index.commit(TransferredResource.class);
+      LOGGER.info("End indexing Transferred Resources");
+      LOGGER.info("Time elapsed: {} seconds", ((System.currentTimeMillis() - start) / 1000));
+      RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(false);
+    } catch (IOException | GenericException | RequestNotValidException e) {
+      LOGGER.error("Error reindexing Transferred Resources", e);
     }
   }
 }

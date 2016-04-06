@@ -115,6 +115,20 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
+  public static void addRisk(RodaUser user, Risk risk) throws GenericException, AuthorizationDeniedException,
+    RequestNotValidException {
+    Date start = new Date();
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    UserManagementHelper.addRisk(risk);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "addRisk", null, duration, "risk", risk);
+  }
+
   public static Long countMembers(RodaUser user, Filter filter) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException {
     Date start = new Date();
