@@ -109,6 +109,12 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
               long fileSize = fileSizeStack.pop();
               TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
                 actualDirectoryAttributes, fileSize, basePath, lastScanDate);
+
+              if (fileSizeStack.size() > 0) {
+                long actualSize = fileSizeStack.pop();
+                fileSizeStack.push(actualSize + fileSize);
+              }
+
               try {
                 index.create(TransferredResource.class, resource);
               } catch (GenericException | RequestNotValidException e) {

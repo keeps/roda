@@ -98,12 +98,12 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
 
       @Override
       public String getValue(TransferredResource r) {
-        return r != null && r.isFile() ? Humanize.readableFileSize(r.getSize()) : "";
+        return r != null ? Humanize.readableFileSize(r.getSize()) : "";
       }
     };
 
-    creationDateColumn = new Column<TransferredResource, Date>(
-      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+    creationDateColumn = new Column<TransferredResource, Date>(new DateCell(
+      DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(TransferredResource r) {
         return r != null ? r.getCreationDate() : null;
