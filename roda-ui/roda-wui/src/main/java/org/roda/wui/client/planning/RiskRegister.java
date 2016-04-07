@@ -21,15 +21,23 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskList;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -49,6 +57,7 @@ import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
+import config.i18n.client.RiskMessages;
 
 /**
  * @author Luis Faria
@@ -99,7 +108,8 @@ public class RiskRegister extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final BrowseMessages defaultMessages = GWT.create(BrowseMessages.class);
+  private static final RiskMessages messages = GWT.create(RiskMessages.class);
 
   @UiField
   FlowPanel riskRegisterDescription;
@@ -124,9 +134,6 @@ public class RiskRegister extends Composite {
 
   @UiField
   Button buttonAdd;
-
-  @UiField
-  Button buttonEdit;
 
   @UiField
   Button buttonRemove;
@@ -172,11 +179,24 @@ public class RiskRegister extends Composite {
       }
     });
 
+    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+
+      @Override
+      public void onSelectionChange(SelectedItems selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        if (empty) {
+          buttonRemove.setEnabled(false);
+        } else {
+          buttonRemove.setEnabled(true);
+        }
+      }
+
+    });
+
     initWidget(uiBinder.createAndBindUi(this));
 
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
 
-    buttonEdit.setEnabled(false);
     buttonRemove.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -199,8 +219,8 @@ public class RiskRegister extends Composite {
     inputDateFinal.setFireNullValues(true);
     inputDateFinal.addValueChangeHandler(valueChangeHandler);
 
-    inputDateInitial.getElement().setPropertyString("placeholder", messages.sidebarFilterFromDatePlaceHolder());
-    inputDateFinal.getElement().setPropertyString("placeholder", messages.sidebarFilterToDatePlaceHolder());
+    inputDateInitial.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterFromDatePlaceHolder());
+    inputDateFinal.getElement().setPropertyString("placeholder", defaultMessages.sidebarFilterToDatePlaceHolder());
   }
 
   private void updateDateFilter() {
@@ -221,20 +241,63 @@ public class RiskRegister extends Composite {
       ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRisk.RESOLVER.getHistoryToken())) {
       CreateRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
+      EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
     }
   }
 
-  protected void updateVisibles() {
-    // TODO selection control
-    buttonEdit.setEnabled(true);
-    buttonRemove.setEnabled(true);
-  }
-
   @UiHandler("buttonAdd")
   void buttonAddRiskHandler(ClickEvent e) {
     Tools.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
+  }
+
+  @UiHandler("buttonRemove")
+  void buttonRemoveRiskHandler(ClickEvent e) {
+
+    final SelectedItems selected = riskList.getSelected();
+
+    SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+      }
+
+      @Override
+      public void onSuccess(final Long size) {
+        Dialogs.showConfirmDialog(messages.riskRemoveFolderConfirmDialogTitle(),
+          messages.riskRemoveSelectedConfirmDialogMessage(size), messages.riskRemoveFolderConfirmDialogCancel(),
+          messages.riskRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+              AsyncCallbackUtils.defaultFailureTreatment(caught);
+            }
+
+            @Override
+            public void onSuccess(Boolean confirmed) {
+              if (confirmed) {
+                BrowserService.Util.getInstance().removeRisk(selected, new AsyncCallback<Void>() {
+
+                  @Override
+                  public void onFailure(Throwable caught) {
+                    AsyncCallbackUtils.defaultFailureTreatment(caught);
+                    riskList.refresh();
+                  }
+
+                  @Override
+                  public void onSuccess(Void result) {
+                    Toast.showInfo(messages.riskRemoveSuccessTitle(), messages.riskRemoveSuccessMessage(size));
+                    riskList.refresh();
+                  }
+                });
+              }
+            }
+          });
+      }
+    });
   }
 }

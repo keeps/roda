@@ -19,7 +19,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						Actions
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
 						Apply

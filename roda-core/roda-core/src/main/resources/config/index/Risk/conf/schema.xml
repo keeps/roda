@@ -106,7 +106,7 @@
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="name" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="identifiedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="identifiedBy" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="category" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />

@@ -42,25 +42,7 @@ public class ShowRisk extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 1) {
-        String riskId = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
-
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
-
-          @Override
-          public void onSuccess(Risk result) {
-            ShowRisk riskPanel = new ShowRisk(result);
-            callback.onSuccess(riskPanel);
-          }
-        });
-      } else {
-        Tools.newHistory(RiskRegister.RESOLVER);
-        callback.onSuccess(null);
-      }
+      getInstance().resolve(historyTokens, callback);
     }
 
     @Override
@@ -76,6 +58,15 @@ public class ShowRisk extends Composite {
       return "risk";
     }
   };
+
+  private static ShowRisk instance = null;
+
+  public static ShowRisk getInstance() {
+    if (instance == null) {
+      instance = new ShowRisk();
+    }
+    return instance;
+  }
 
   interface MyUiBinder extends UiBinder<Widget, ShowRisk> {
   }
@@ -106,7 +97,51 @@ public class ShowRisk extends Composite {
   Label riskNotes;
 
   @UiField
+  Label riskPreMitigationProbability;
+
+  @UiField
+  Label riskPreMitigationImpact;
+
+  @UiField
+  Label riskPreMitigationSeverity;
+
+  @UiField
+  Label riskPreMitigationNotes;
+
+  @UiField
+  Label riskPosMitigationProbability;
+
+  @UiField
+  Label riskPosMitigationImpact;
+
+  @UiField
+  Label riskPosMitigationSeverity;
+
+  @UiField
+  Label riskPosMitigationNotes;
+
+  @UiField
+  Label riskMitigationStrategy;
+
+  @UiField
+  Label riskMitigationOwnerType;
+
+  @UiField
+  Label riskMitigationOwner;
+
+  @UiField
+  Label riskMitigationRelatedEventIdentifierType;
+
+  @UiField
+  Label riskMitigationRelatedEventIdentifierValue;
+
+  @UiField
+  Button buttonEdit;
+
+  @UiField
   Button buttonCancel;
+
+  private Risk risk;
 
   /**
    * Create a new panel to view a risk
@@ -115,11 +150,13 @@ public class ShowRisk extends Composite {
    */
 
   public ShowRisk() {
+    this.risk = new Risk();
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public ShowRisk(Risk risk) {
     initWidget(uiBinder.createAndBindUi(this));
+    this.risk = risk;
 
     riskId.setText(risk.getId());
     riskName.setText(risk.getName());
@@ -128,6 +165,50 @@ public class ShowRisk extends Composite {
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
     riskCategory.setText(risk.getCategory());
     riskNotes.setText(risk.getNotes());
+
+    riskPreMitigationProbability.setText(Integer.toString(risk.getPreMitigationProbability()));
+    riskPreMitigationImpact.setText(Integer.toString(risk.getPreMitigationImpact()));
+    riskPreMitigationSeverity.setText(Integer.toString(risk.getPreMitigationSeverity()));
+    riskPreMitigationNotes.setText(risk.getPreMitigationNotes());
+
+    riskPosMitigationProbability.setText(Integer.toString(risk.getPosMitigationProbability()));
+    riskPosMitigationImpact.setText(Integer.toString(risk.getPosMitigationImpact()));
+    riskPosMitigationSeverity.setText(Integer.toString(risk.getPosMitigationSeverity()));
+    riskPosMitigationNotes.setText(risk.getPosMitigationNotes());
+
+    riskMitigationStrategy.setText(risk.getMitigationStrategy());
+    riskMitigationOwnerType.setText(risk.getMitigationOwnerType());
+    riskMitigationOwner.setText(risk.getMitigationOwner());
+    riskMitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
+    riskMitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
+  }
+
+  void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+
+    if (historyTokens.size() == 1) {
+      String riskId = historyTokens.get(0);
+      UserManagementService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          callback.onFailure(caught);
+        }
+
+        @Override
+        public void onSuccess(Risk result) {
+          ShowRisk riskPanel = new ShowRisk(result);
+          callback.onSuccess(riskPanel);
+        }
+      });
+    } else {
+      Tools.newHistory(RiskRegister.RESOLVER);
+      callback.onSuccess(null);
+    }
+  }
+
+  @UiHandler("buttonEdit")
+  void handleButtonEdit(ClickEvent e) {
+    Tools.newHistory(RiskRegister.RESOLVER, EditRisk.RESOLVER.getHistoryToken(), risk.getId());
   }
 
   @UiHandler("buttonCancel")

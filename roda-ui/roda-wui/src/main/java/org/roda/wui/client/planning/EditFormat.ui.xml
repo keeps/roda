@@ -13,13 +13,13 @@
 				<g:Label styleName="h1">
 					Title
 				</g:Label>
-				<u:RiskDataPanel ui:field="riskDataPanel" />
+				<u:FormatDataPanel ui:field="formatDataPanel" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						Actions
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
 						Apply

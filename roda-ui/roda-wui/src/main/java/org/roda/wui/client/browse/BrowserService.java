@@ -163,4 +163,13 @@ public interface BrowserService extends RemoteService {
 
   void updateAIPPermssions(String aipId, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
+  void removeRisk(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void removeAgent(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void removeFormat(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

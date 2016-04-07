@@ -26,6 +26,8 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.Risk;
@@ -182,7 +184,7 @@ public interface UserManagementServiceAsync {
    * @return
    * @throws RODAException
    */
-  void retrieveRisk(String riskId, AsyncCallback<Risk> callback);
+  public void retrieveRisk(String riskId, AsyncCallback<Risk> callback);
 
   /**
    * Add risk
@@ -190,7 +192,15 @@ public interface UserManagementServiceAsync {
    * @param risk
    * @throws RODAException
    */
-  void addRisk(Risk risk, AsyncCallback<Void> callback);
+  public void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
+
+  /**
+   * Edit risk
+   *
+   * @param risk
+   * @throws RODAException
+   */
+  public void modifyRisk(Risk risk, AsyncCallback<Void> asyncCallback);
 
   /**
    * Resend the email challenge to a user email
@@ -262,4 +272,52 @@ public interface UserManagementServiceAsync {
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken,
     AsyncCallback<Void> callback);
+
+  /**
+   * Get agent
+   *
+   * @param agentId
+   * @throws RODAException
+   */
+  public void retrieveAgent(String agentId, AsyncCallback<Agent> asyncCallback);
+
+  /**
+   * Add agent
+   *
+   * @param agent
+   * @throws RODAException
+   */
+  public void addAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
+
+  /**
+   * Edit agent
+   *
+   * @param agent
+   * @throws RODAException
+   */
+  public void modifyAgent(Agent agent, AsyncCallback<Void> asyncCallback);
+
+  /**
+   * Get format
+   *
+   * @param formatId
+   * @throws RODAException
+   */
+  public void retrieveFormat(String formatId, AsyncCallback<Format> asyncCallback);
+
+  /**
+   * Add format
+   *
+   * @param format
+   * @throws RODAException
+   */
+  public void addFormat(Format format, AsyncCallback<Format> asyncCallback);
+
+  /**
+   * Edit format
+   *
+   * @param format
+   * @throws RODAException
+   */
+  public void modifyFormat(Format format, AsyncCallback<Void> asyncCallback);
 }

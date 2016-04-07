@@ -13,7 +13,7 @@
 				<g:Label styleName="h1">
 					Title
 				</g:Label>
-				<u:RiskDataPanel ui:field="riskDataPanel" />
+				<u:AgentDataPanel ui:field="agentDataPanel" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

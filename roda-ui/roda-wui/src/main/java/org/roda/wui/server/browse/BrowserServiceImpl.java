@@ -448,4 +448,25 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.updateAIPPermissions(user, aipId, permissions);
   }
 
+  @Override
+  public void removeRisk(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.removeRisk(user, selected);
+  }
+
+  @Override
+  public void removeAgent(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.removeAgent(user, selected);
+  }
+
+  @Override
+  public void removeFormat(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.removeFormat(user, selected);
+  }
+
 }

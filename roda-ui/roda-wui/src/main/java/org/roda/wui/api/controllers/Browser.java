@@ -990,4 +990,49 @@ public class Browser extends RodaCoreService {
     SelectedItems selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
+
+  public static void removeRisk(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.removeRisk(selected, user);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "removeRisk", null, duration, "selected", selected);
+  }
+
+  public static void removeAgent(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.removeAgent(selected, user);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "removeAgent", null, duration, "selected", selected);
+  }
+
+  public static void removeFormat(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
+    GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.removeFormat(selected, user);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "removeFormat", null, duration, "selected", selected);
+  }
 }

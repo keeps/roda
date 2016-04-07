@@ -2,6 +2,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
@@ -22,15 +23,31 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.RiskMessages;
 
-public class CreateRisk extends Composite {
+public class EditRisk extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Risk risk = new Risk();
-      CreateRisk createRisk = new CreateRisk(risk);
-      callback.onSuccess(createRisk);
+      if (historyTokens.size() == 1) {
+        String riskId = historyTokens.get(0);
+        UserManagementService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            callback.onFailure(caught);
+          }
+
+          @Override
+          public void onSuccess(Risk risk) {
+            EditRisk editRisk = new EditRisk(risk);
+            callback.onSuccess(editRisk);
+          }
+        });
+      } else {
+        Tools.newHistory(RiskRegister.RESOLVER);
+        callback.onSuccess(null);
+      }
     }
 
     @Override
@@ -43,11 +60,11 @@ public class CreateRisk extends Composite {
     }
 
     public String getHistoryToken() {
-      return "create_risk";
+      return "edit_risk";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateRisk> {
+  interface MyUiBinder extends UiBinder<Widget, EditRisk> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -70,7 +87,7 @@ public class CreateRisk extends Composite {
    * @param user
    *          the user to create
    */
-  public CreateRisk(Risk risk) {
+  public EditRisk(Risk risk) {
     this.risk = risk;
 
     this.riskDataPanel = new RiskDataPanel(true, false);
@@ -81,20 +98,25 @@ public class CreateRisk extends Composite {
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (riskDataPanel.isValid()) {
-      risk = riskDataPanel.getRisk();
-      UserManagementService.Util.getInstance().addRisk(risk, new AsyncCallback<Risk>() {
+    if (riskDataPanel.isChanged()) {
+      if (riskDataPanel.isValid()) {
+        String riskId = risk.getId();
+        risk = riskDataPanel.getRisk();
+        risk.setId(riskId);
+        UserManagementService.Util.getInstance().modifyRisk(risk, new AsyncCallback<Void>() {
 
-        public void onFailure(Throwable caught) {
-          errorMessage(caught);
-        }
+          @Override
+          public void onFailure(Throwable caught) {
+            errorMessage(caught);
+          }
 
-        @Override
-        public void onSuccess(Risk result) {
-          Tools.newHistory(ShowRisk.RESOLVER, result.getId());
-        }
+          @Override
+          public void onSuccess(Void result) {
+            Tools.newHistory(ShowRisk.RESOLVER, risk.getId());
+          }
 
-      });
+        });
+      }
     }
   }
 
@@ -108,7 +130,12 @@ public class CreateRisk extends Composite {
   }
 
   private void errorMessage(Throwable caught) {
-    Toast.showError(messages.createRiskFailure(caught.getMessage()));
+    if (caught instanceof NotFoundException) {
+      Toast.showError(messages.editRiskNotFound(risk.getName()));
+      cancel();
+    } else {
+      Toast.showError(messages.editRiskFailure(caught.getMessage()));
+    }
   }
 
 }

@@ -27,6 +27,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.risks.Risk;
@@ -184,9 +186,15 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void addRisk(Risk risk) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+  public Risk addRisk(Risk risk) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    UserManagement.addRisk(user, risk);
+    return UserManagement.addRisk(user, risk);
+  }
+
+  @Override
+  public void modifyRisk(Risk risk) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyRisk(user, risk);
   }
 
   @Override
@@ -250,5 +258,44 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
     }
 
     return url;
+  }
+
+  @Override
+  public Agent retrieveAgent(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.retrieveAgent(user, agentId);
+  }
+
+  @Override
+  public Agent addAgent(Agent agent) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.addAgent(user, agent);
+  }
+
+  @Override
+  public void modifyAgent(Agent agent) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyAgent(user, agent);
+  }
+
+  @Override
+  public Format retrieveFormat(String formatId) throws NotFoundException, GenericException,
+    AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.retrieveFormat(user, formatId);
+  }
+
+  @Override
+  public Format addFormat(Format format) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.addFormat(user, format);
+  }
+
+  @Override
+  public void modifyFormat(Format format) throws GenericException, RequestNotValidException,
+    AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    UserManagement.modifyFormat(user, format);
   }
 }

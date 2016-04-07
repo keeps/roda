@@ -2,7 +2,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.UserManagementService;
@@ -20,17 +20,17 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
 
-import config.i18n.client.RiskMessages;
+import config.i18n.client.FormatMessages;
 
-public class CreateRisk extends Composite {
+public class CreateFormat extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Risk risk = new Risk();
-      CreateRisk createRisk = new CreateRisk(risk);
-      callback.onSuccess(createRisk);
+      Format format = new Format();
+      CreateFormat createFormat = new CreateFormat(format);
+      callback.onSuccess(createFormat);
     }
 
     @Override
@@ -39,21 +39,21 @@ public class CreateRisk extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(FormatRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
-      return "create_risk";
+      return "create_format";
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, CreateRisk> {
+  interface MyUiBinder extends UiBinder<Widget, CreateFormat> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private Risk risk;
-  private static RiskMessages messages = GWT.create(RiskMessages.class);
+  private Format format;
+  private static FormatMessages messages = GWT.create(FormatMessages.class);
 
   @UiField
   Button buttonApply;
@@ -62,7 +62,7 @@ public class CreateRisk extends Composite {
   Button buttonCancel;
 
   @UiField(provided = true)
-  RiskDataPanel riskDataPanel;
+  FormatDataPanel formatDataPanel;
 
   /**
    * Create a new panel to create a user
@@ -70,28 +70,28 @@ public class CreateRisk extends Composite {
    * @param user
    *          the user to create
    */
-  public CreateRisk(Risk risk) {
-    this.risk = risk;
+  public CreateFormat(Format format) {
+    this.format = format;
 
-    this.riskDataPanel = new RiskDataPanel(true, false);
-    this.riskDataPanel.setRisk(risk);
+    this.formatDataPanel = new FormatDataPanel(true, false);
+    this.formatDataPanel.setFormat(format);
 
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    if (riskDataPanel.isValid()) {
-      risk = riskDataPanel.getRisk();
-      UserManagementService.Util.getInstance().addRisk(risk, new AsyncCallback<Risk>() {
+    if (formatDataPanel.isValid()) {
+      format = formatDataPanel.getFormat();
+      UserManagementService.Util.getInstance().addFormat(format, new AsyncCallback<Format>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);
         }
 
         @Override
-        public void onSuccess(Risk result) {
-          Tools.newHistory(ShowRisk.RESOLVER, result.getId());
+        public void onSuccess(Format result) {
+          Tools.newHistory(ShowFormat.RESOLVER, result.getId());
         }
 
       });
@@ -104,11 +104,11 @@ public class CreateRisk extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(RiskRegister.RESOLVER);
+    Tools.newHistory(FormatRegister.RESOLVER);
   }
 
   private void errorMessage(Throwable caught) {
-    Toast.showError(messages.createRiskFailure(caught.getMessage()));
+    Toast.showError(messages.createFormatFailure(caught.getMessage()));
   }
 
 }

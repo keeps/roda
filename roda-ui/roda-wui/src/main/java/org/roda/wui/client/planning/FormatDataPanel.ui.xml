@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:u="urn:import:org.roda.wui.client.management">
+
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	
+	<ui:style>
+		.postalAddress {
+		min-height: 84px;
+		}
+
+		.section {
+		margin-top: 20px;
+		}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:Label addStyleNames="form-label">
+					Name
+				</g:Label>
+				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Definition
+				</g:Label>
+				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Category
+				</g:Label>
+				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Latest Version
+				</g:Label>
+				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Popularity
+				</g:Label>
+				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Developer
+				</g:Label>
+				<g:TextBox ui:field="developer" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Initial Release
+				</g:Label>
+				<d:DateBox ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">
+					Standard
+				</g:Label>
+				<g:TextBox ui:field="standard" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Open Format
+				</g:Label>
+				<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Website
+				</g:Label>
+				<g:TextBox ui:field="website" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Provenance Information
+				</g:Label>
+				<g:TextBox ui:field="provenanceInformation" addStyleNames="form-textbox" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

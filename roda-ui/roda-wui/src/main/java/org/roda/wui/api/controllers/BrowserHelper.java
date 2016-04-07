@@ -63,7 +63,9 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.common.OptionalWithCause;
+import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -85,6 +87,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
@@ -1209,5 +1212,38 @@ public class BrowserHelper {
     AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
     RodaCoreFactory.getModelService().updateAIPPermissions(aip);
+  }
+
+  public static void removeRisk(SelectedItems selected, RodaUser user)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> riskIds = consolidate(user, Risk.class, selected);
+
+    for (String riskId : riskIds) {
+      RodaCoreFactory.getModelService().deleteRisk(riskId);
+    }
+
+    RodaCoreFactory.getIndexService().delete(Risk.class, riskIds);
+  }
+
+  public static void removeAgent(SelectedItems selected, RodaUser user)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> agentIds = consolidate(user, Agent.class, selected);
+
+    for (String agentId : agentIds) {
+      RodaCoreFactory.getModelService().deleteAgent(agentId);
+    }
+
+    RodaCoreFactory.getIndexService().delete(Agent.class, agentIds);
+  }
+
+  public static void removeFormat(SelectedItems selected, RodaUser user)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> formatIds = consolidate(user, Format.class, selected);
+
+    for (String formatId : formatIds) {
+      RodaCoreFactory.getModelService().deleteFormat(formatId);
+    }
+
+    RodaCoreFactory.getIndexService().delete(Format.class, formatIds);
   }
 }

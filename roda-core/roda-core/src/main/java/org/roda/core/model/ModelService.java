@@ -1460,7 +1460,7 @@ public class ModelService extends ModelObservable {
   /***************** Risk related *****************/
   /************************************************/
 
-  public void createRisk(Risk risk) throws GenericException {
+  public Risk createRisk(Risk risk) throws GenericException {
     try {
       risk.setId(UUID.randomUUID().toString());
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
@@ -1472,6 +1472,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyRiskCreatedOrUpdated(risk);
+    return risk;
   }
 
   public void updateRisk(Risk risk) throws GenericException {
@@ -1514,7 +1515,7 @@ public class ModelService extends ModelObservable {
   /***************** Agent related *****************/
   /************************************************/
 
-  public void createAgent(Agent agent) throws GenericException {
+  public Agent createAgent(Agent agent) throws GenericException {
     try {
       agent.setId(UUID.randomUUID().toString());
       String agentAsJson = JsonUtils.getJsonFromObject(agent);
@@ -1526,6 +1527,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyAgentCreatedOrUpdated(agent);
+    return agent;
   }
 
   public void updateAgent(Agent agent) throws GenericException {
@@ -1569,7 +1571,7 @@ public class ModelService extends ModelObservable {
   /***************** Format related *****************/
   /************************************************/
 
-  public void createFormat(Format format) throws GenericException {
+  public Format createFormat(Format format) throws GenericException {
     try {
       format.setId(UUID.randomUUID().toString());
       String formatAsJson = JsonUtils.getJsonFromObject(format);
@@ -1581,6 +1583,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyFormatCreatedOrUpdated(format);
+    return format;
   }
 
   public void updateFormat(Format format) throws GenericException {
@@ -1751,7 +1754,7 @@ public class ModelService extends ModelObservable {
   /***************** Message related *****************/
   /************************************************/
 
-  public void createMessage(Message message, String templateName) throws GenericException {
+  public Message createMessage(Message message, String templateName) throws GenericException {
     try {
       message.setId(UUID.randomUUID().toString());
       message.setAcknowledgeToken(UUID.randomUUID().toString());
@@ -1777,6 +1780,7 @@ public class ModelService extends ModelObservable {
     }
 
     notifyMessageCreatedOrUpdated(message);
+    return message;
   }
 
   private String getUpdatedMessageBody(Message message, String templateName) {

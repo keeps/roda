@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
+	xmlns:u="urn:import:org.roda.wui.client.management">
+
+	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
+	
+	<ui:style>
+		.postalAddress {
+		min-height: 84px;
+		}
+
+		.section {
+		margin-top: 20px;
+		}
+	</ui:style>
+
+	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width no_padding">
+			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:Label addStyleNames="form-label">
+					Name
+				</g:Label>
+				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Description
+				</g:Label>
+				<g:TextArea ui:field="description" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Identified On
+				</g:Label>
+				<d:DateBox ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">
+					Identified By
+				</g:Label>
+				<g:TextBox ui:field="identifiedBy" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Category
+				</g:Label>
+				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Notes
+				</g:Label>
+				<g:TextArea ui:field="notes" addStyleNames="form-textbox" />
+				
+				<g:Label addStyleNames="form-label">
+					Pre Mitigation Probability
+				</g:Label>
+				<g:IntegerBox ui:field="preMitigationProbability" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pre Mitigation Impact
+				</g:Label>
+				<g:IntegerBox ui:field="preMitigationImpact" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pre Mitigation Severity
+				</g:Label>
+				<g:IntegerBox ui:field="preMitigationSeverity" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pre Mitigation Notes
+				</g:Label>
+				<g:TextArea ui:field="preMitigationNotes" addStyleNames="form-textbox" />
+				
+				<g:Label addStyleNames="form-label">
+					Pos Mitigation Probability
+				</g:Label>
+				<g:IntegerBox ui:field="posMitigationProbability" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pos Mitigation Impact
+				</g:Label>
+				<g:IntegerBox ui:field="posMitigationImpact" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pos Mitigation Severity
+				</g:Label>
+				<g:IntegerBox ui:field="posMitigationSeverity" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Pos Mitigation Notes
+				</g:Label>
+				<g:TextArea ui:field="posMitigationNotes" addStyleNames="form-textbox" />
+				
+				<g:Label addStyleNames="form-label">
+					Mitigation Strategy
+				</g:Label>
+				<g:TextBox ui:field="mitigationStrategy" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Mitigation Owner Type
+				</g:Label>
+				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Mitigation Owner
+				</g:Label>
+				<g:TextBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Mitigation Related Event Identifier Type
+				</g:Label>
+				<g:TextBox ui:field="mitigationRelatedEventIdentifierType" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">
+					Mitigation Related Event Identifier Value
+				</g:Label>
+				<g:TextBox ui:field="mitigationRelatedEventIdentifierValue" addStyleNames="form-textbox" />
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

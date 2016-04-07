@@ -110,4 +110,10 @@ public interface BrowserServiceAsync {
 
   void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
 
+  void removeRisk(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
+  void removeAgent(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
+  void removeFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
 }

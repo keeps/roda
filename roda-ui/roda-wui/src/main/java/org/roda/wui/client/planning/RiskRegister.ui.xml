@@ -54,9 +54,6 @@
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
 						<ui:text from='{messages.riskRegisterNewButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
-						<ui:text from='{messages.riskRegisterEditButton}' />
-					</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
 						<ui:text from='{messages.riskRegisterRemoveButton}' />
 					</g:Button>

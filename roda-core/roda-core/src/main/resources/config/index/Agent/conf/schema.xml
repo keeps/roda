@@ -107,7 +107,7 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="name" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="type" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="true" /> 
+   <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="category" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="version" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="license" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />

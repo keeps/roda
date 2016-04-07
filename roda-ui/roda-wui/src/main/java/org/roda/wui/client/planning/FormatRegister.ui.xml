@@ -25,15 +25,22 @@
 					ui:field="formatList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:Label addStyleNames="h5 sidebar-facet-title">
+					Filter Dates
+				</g:Label>
+				<d:DateBox
+					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+					ui:field="inputDateInitial" />
+				<g:Label addStyleNames="sidebar-facet-date-separator">-</g:Label>
+				<d:DateBox
+					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
+					ui:field="inputDateFinal" />
 				<g:FlowPanel ui:field="formatsSidebar">
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarFormatsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
 						<ui:text from='{messages.formatRegisterNewButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
-						<ui:text from='{messages.formatRegisterEditButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
 						<ui:text from='{messages.formatRegisterRemoveButton}' />
