@@ -6,12 +6,14 @@
 	xmlns:u="urn:import:org.roda.wui.client.planning">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
-
+	
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+	
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">
-					Title
+					Edit Risk
 				</g:Label>
 				<u:RiskDataPanel ui:field="riskDataPanel" />
 			</g:FlowPanel>
@@ -19,13 +21,13 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						Actions
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						Apply
+						Save
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						Cancel
+						<ui:text from='{constants.editUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

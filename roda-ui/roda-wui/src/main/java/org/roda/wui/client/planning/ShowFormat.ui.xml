@@ -11,10 +11,12 @@
 
 	</ui:style>
 
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Risk</g:Label>
+				<g:Label styleName="h1">Format</g:Label>
 				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
 				<g:Label ui:field="formatId" />
 				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
@@ -39,18 +41,27 @@
 				<g:Label ui:field="formatWebsite" />
 				<g:Label styleName="descriptiveMetadata-field-key">Provenance Information</g:Label>
 				<g:Label ui:field="formatProvenanceInformation" />
+				
+				<g:Label styleName="descriptiveMetadata-field-key">Extensions</g:Label>
+				<g:FlowPanel ui:field="formatExtensions" />
+				<g:Label styleName="descriptiveMetadata-field-key">Mimetypes</g:Label>
+				<g:FlowPanel ui:field="formatMimetypes" />
+				<g:Label styleName="descriptiveMetadata-field-key">Pronoms</g:Label>
+				<g:FlowPanel ui:field="formatPronoms" />
+				<g:Label styleName="descriptiveMetadata-field-key">UTIs</g:Label>
+				<g:FlowPanel ui:field="formatUtis" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonEdit">
-						Edit
+						<ui:text from='{messages.formatRegisterEditButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						Cancel
+						<ui:text from='{constants.editUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

@@ -29,8 +29,12 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.FormatMessages;
 
 /**
  * @author Luis Faria
@@ -73,7 +77,7 @@ public class ShowFormat extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private static CommonMessages messages = GWT.create(CommonMessages.class);
+  private static FormatMessages messages = GWT.create(FormatMessages.class);
 
   @UiField
   Label formatId;
@@ -112,6 +116,18 @@ public class ShowFormat extends Composite {
   Label formatProvenanceInformation;
 
   @UiField
+  FlowPanel formatExtensions;
+
+  @UiField
+  FlowPanel formatMimetypes;
+
+  @UiField
+  FlowPanel formatPronoms;
+
+  @UiField
+  FlowPanel formatUtis;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -147,6 +163,50 @@ public class ShowFormat extends Composite {
     formatIsOpenFormat.setText(Boolean.toString(format.isOpenFormat()));
     formatWebsite.setText(format.getWebsite());
     formatProvenanceInformation.setText(format.getProvenanceInformation());
+
+    List<String> extensionsList = format.getExtensions();
+    formatExtensions.setVisible(extensionsList != null && !extensionsList.isEmpty());
+
+    if (extensionsList != null) {
+      for (String extension : extensionsList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(extension));
+        formatExtensions.add(parPanel);
+      }
+    }
+
+    List<String> mimetypesList = format.getMimetypes();
+    formatMimetypes.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+
+    if (mimetypesList != null) {
+      for (String mimetype : mimetypesList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(mimetype));
+        formatMimetypes.add(parPanel);
+      }
+    }
+
+    List<String> pronomsList = format.getPronoms();
+    formatPronoms.setVisible(pronomsList != null && !pronomsList.isEmpty());
+
+    if (pronomsList != null) {
+      for (String pronom : pronomsList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(pronom));
+        formatPronoms.add(parPanel);
+      }
+    }
+
+    List<String> utisList = format.getUtis();
+    formatUtis.setVisible(utisList != null && !utisList.isEmpty());
+
+    if (utisList != null) {
+      for (String uti : utisList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.formatListItems(uti));
+        formatUtis.add(parPanel);
+      }
+    }
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {

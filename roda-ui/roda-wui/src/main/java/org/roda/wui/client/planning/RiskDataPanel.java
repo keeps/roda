@@ -190,8 +190,11 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     preMitigationNotes.addChangeHandler(changeHandler);
 
     posMitigationProbability.addChangeHandler(changeHandler);
+    posMitigationProbability.addKeyUpHandler(keyUpHandler);
     posMitigationImpact.addChangeHandler(changeHandler);
+    posMitigationImpact.addKeyUpHandler(keyUpHandler);
     posMitigationSeverity.addChangeHandler(changeHandler);
+    posMitigationSeverity.addKeyUpHandler(keyUpHandler);
     posMitigationNotes.addChangeHandler(changeHandler);
 
     mitigationStrategy.addChangeHandler(changeHandler);
@@ -251,6 +254,54 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       preMitigationSeverity.addStyleName("isWrong");
     } else {
       preMitigationSeverity.removeStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(preMitigationProbability.getText());
+      preMitigationProbability.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      preMitigationProbability.addStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(preMitigationImpact.getText());
+      preMitigationImpact.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      preMitigationImpact.addStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(preMitigationSeverity.getText());
+      preMitigationSeverity.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      preMitigationSeverity.addStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(posMitigationProbability.getText());
+      posMitigationProbability.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      posMitigationProbability.addStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(posMitigationImpact.getText());
+      posMitigationImpact.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      posMitigationImpact.addStyleName("isWrong");
+    }
+
+    try {
+      Integer.parseInt(posMitigationSeverity.getText());
+      posMitigationSeverity.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      posMitigationSeverity.addStyleName("isWrong");
     }
 
     checked = true;

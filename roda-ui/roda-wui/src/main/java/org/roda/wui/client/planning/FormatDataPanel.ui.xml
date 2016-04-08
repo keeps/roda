@@ -20,50 +20,40 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label addStyleNames="form-label">
-					Name
-				</g:Label>
+				<g:Label addStyleNames="form-label">Name</g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Definition
-				</g:Label>
+				<g:Label addStyleNames="form-label">Definition</g:Label>
 				<g:TextArea ui:field="definition" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Category
-				</g:Label>
+				<g:Label addStyleNames="form-label">Category</g:Label>
 				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Latest Version
-				</g:Label>
-				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Popularity
-				</g:Label>
-				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Developer
-				</g:Label>
+				<g:Label addStyleNames="form-label">Latest Version</g:Label>
+				<g:TextBox ui:field="latestVersion" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">Popularity</g:Label>
+				<g:IntegerBox ui:field="popularity" addStyleNames="form-textbox form-textbox-small" />
+				<g:Label addStyleNames="form-label">Developer</g:Label>
 				<g:TextBox ui:field="developer" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Initial Release
-				</g:Label>
+				<g:Label addStyleNames="form-label">Initial Release</g:Label>
 				<d:DateBox ui:field="initialRelease" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">
-					Standard
-				</g:Label>
+				<g:Label addStyleNames="form-label">Standard</g:Label>
 				<g:TextBox ui:field="standard" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Open Format
-				</g:Label>
-				<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Website
-				</g:Label>
+				<g:FlowPanel>
+					<g:Label addStyleNames="form-label">Open Format</g:Label>
+					<g:CheckBox ui:field="isOpenFormat" addStyleNames="form-checkbox" />
+				</g:FlowPanel>
+				<g:Label addStyleNames="form-label">Website</g:Label>
 				<g:TextBox ui:field="website" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
-					Provenance Information
-				</g:Label>
-				<g:TextBox ui:field="provenanceInformation" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">Provenance Information</g:Label>
+				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
+				
+				
+				<g:Label addStyleNames="form-label">Extensions</g:Label>
+				<g:TextArea ui:field="extensions" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">Mimetypes</g:Label>
+				<g:TextArea ui:field="mimetypes" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">Pronoms</g:Label>
+				<g:TextArea ui:field="pronoms" addStyleNames="form-textbox" />
+				<g:Label addStyleNames="form-label">UTIs</g:Label>
+				<g:TextArea ui:field="utis" addStyleNames="form-textbox" />
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

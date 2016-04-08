@@ -307,6 +307,15 @@ pre>code {
 	
 }
 
+.form-integerbox {
+	color: #58595b;
+	padding: 5px;
+	border: 1px solid #ccc;
+	border-radius: 1px;
+	box-sizing: border-box;
+	margin-bottom: 5px;
+}
+
 .fieldTextBox, .form-textbox {
 	width: 100%;
 	color: #58595b;
@@ -4642,6 +4651,19 @@ td.datePickerMonth, td.datePickerYear {
 	.selectAip .selectAipResultsPanel {
 		width: 100%;
 	}
+}
+
+
+/**********************************************
+				RISKS & AGENT & FORMAT
+************************************************/
+
+.form-risk-mitigation-inline {
+	display: inline-flex;
+}
+
+.form-risk-mitigation-margin {
+	margin-right: 150px;
 }
 
 /**********************************************

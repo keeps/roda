@@ -10,6 +10,8 @@
 	<ui:style>
 
 	</ui:style>
+	
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
@@ -30,47 +32,49 @@
 				<g:Label styleName="descriptiveMetadata-field-key">Notes</g:Label>
 				<g:Label ui:field="riskNotes" />
 				
-				<g:Label styleName="descriptiveMetadata-field-key">Pre Mitigation Probability</g:Label>
+				<g:Label styleName="h4">Pre Mitigation</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Probability</g:Label>
 				<g:Label ui:field="riskPreMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pre Mitigation Impact</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
 				<g:Label ui:field="riskPreMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pre Mitigation Severity</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Severity</g:Label>
 				<g:Label ui:field="riskPreMitigationSeverity" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pre Mitigation Notes</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Notes</g:Label>
 				<g:Label ui:field="riskPreMitigationNotes" />
 				
-				<g:Label styleName="descriptiveMetadata-field-key">Pos Mitigation Probability</g:Label>
-				<g:Label ui:field="riskPosMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pos Mitigation Impact</g:Label>
-				<g:Label ui:field="riskPosMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pos Mitigation Severity</g:Label>
-				<g:Label ui:field="riskPosMitigationSeverity" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pos Mitigation Notes</g:Label>
-				<g:Label ui:field="riskPosMitigationNotes" />
-				
-				
-				<g:Label styleName="descriptiveMetadata-field-key">Mitigation Strategy</g:Label>
+				<g:Label styleName="h4">Mitigation</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Strategy</g:Label>
 				<g:Label ui:field="riskMitigationStrategy" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mitigation Owner Type</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Owner Type</g:Label>
 				<g:Label ui:field="riskMitigationOwnerType" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mitigation Owner</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Owner</g:Label>
 				<g:Label ui:field="riskMitigationOwner" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mitigation Related Event Identifier Type</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Related Event Identifier Type</g:Label>
 				<g:Label ui:field="riskMitigationRelatedEventIdentifierType" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mitigation Related Event Identifier Value</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Related Event Identifier Value</g:Label>
 				<g:Label ui:field="riskMitigationRelatedEventIdentifierValue" />
+				
+				<g:Label styleName="h4">Pos Mitigation</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Probability</g:Label>
+				<g:Label ui:field="riskPosMitigationProbability" />
+				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
+				<g:Label ui:field="riskPosMitigationImpact" />
+				<g:Label styleName="descriptiveMetadata-field-key">Severity</g:Label>
+				<g:Label ui:field="riskPosMitigationSeverity" />
+				<g:Label styleName="descriptiveMetadata-field-key">Notes</g:Label>
+				<g:Label ui:field="riskPosMitigationNotes" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel>
 					<g:Label addStyleNames="h4">
-						<ui:msg>Actions</ui:msg>
+						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonEdit">
-						Edit
+						<ui:text from='{messages.riskRegisterEditButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
-						Cancel
+						<ui:text from='{constants.editUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

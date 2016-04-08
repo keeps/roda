@@ -8,7 +8,9 @@
 
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.common.client.ClientLogger;
@@ -81,7 +83,19 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   TextBox website;
 
   @UiField
-  TextBox provenanceInformation;
+  TextArea provenanceInformation;
+
+  @UiField
+  TextArea extensions;
+
+  @UiField
+  TextArea mimetypes;
+
+  @UiField
+  TextArea pronoms;
+
+  @UiField
+  TextArea utis;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -156,6 +170,11 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     standard.addChangeHandler(changeHandler);
     website.addChangeHandler(changeHandler);
     provenanceInformation.addChangeHandler(changeHandler);
+
+    extensions.addChangeHandler(changeHandler);
+    mimetypes.addChangeHandler(changeHandler);
+    pronoms.addChangeHandler(changeHandler);
+    utis.addChangeHandler(changeHandler);
   }
 
   public boolean isValid() {
@@ -182,6 +201,14 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
       category.removeStyleName("isWrong");
     }
 
+    try {
+      Integer.parseInt(popularity.getText());
+      popularity.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      popularity.addStyleName("isWrong");
+    }
+
     checked = true;
     return valid;
   }
@@ -198,6 +225,26 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     this.isOpenFormat.setValue(format.isOpenFormat());
     this.website.setText(format.getWebsite());
     this.provenanceInformation.setText(format.getProvenanceInformation());
+
+    this.extensions.setText(getListString(format.getExtensions()));
+    this.mimetypes.setText(getListString(format.getMimetypes()));
+    this.pronoms.setText(getListString(format.getPronoms()));
+    this.utis.setText(getListString(format.getUtis()));
+  }
+
+  // FIXME to delete after create list component
+  private String getListString(List<String> itemList) {
+    StringBuilder list = new StringBuilder();
+    for (String item : itemList) {
+      list.append(item);
+      list.append("\n");
+    }
+    return list.length() > 0 ? list.substring(0, list.length() - 1) : "";
+  }
+
+  // FIXME to delete after create list component
+  private List<String> setListString(String list) {
+    return Arrays.asList(list.split("\\s*\n\\s*"));
   }
 
   public Format getFormat() {
@@ -214,6 +261,12 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     format.setOpenFormat(isOpenFormat.getValue());
     format.setWebsite(website.getText());
     format.setProvenanceInformation(provenanceInformation.getText());
+
+    format.setExtensions(setListString(extensions.getText()));
+    format.setMimetypes(setListString(mimetypes.getText()));
+    format.setPronoms(setListString(pronoms.getText()));
+    format.setUtis(setListString(utis.getText()));
+
     return format;
   }
 
@@ -227,6 +280,11 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     standard.setText("");
     website.setText("");
     provenanceInformation.setText("");
+
+    extensions.setText("");
+    mimetypes.setText("");
+    pronoms.setText("");
+    utis.setText("");
   }
 
   /**

@@ -32,4 +32,7 @@ public interface AgentMessages extends Messages {
 
   @DefaultMessage("Search agent...")
   String agentRegisterSearchPlaceHolder();
+
+  @DefaultMessage("{0}")
+  String agentListItems(String item);
 }

@@ -32,4 +32,7 @@ public interface FormatMessages extends Messages {
 
   @DefaultMessage("Search formats...")
   String formatRegisterSearchPlaceHolder();
+
+  @DefaultMessage("{0}")
+  String formatListItems(String item);
 }

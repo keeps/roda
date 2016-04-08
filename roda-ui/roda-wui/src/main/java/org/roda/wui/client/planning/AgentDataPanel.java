@@ -8,7 +8,9 @@
 
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.wui.common.client.ClientLogger;
@@ -80,7 +82,22 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
   TextBox download;
 
   @UiField
-  TextBox provenanceInformation;
+  TextArea provenanceInformation;
+
+  @UiField
+  TextArea platforms;
+
+  @UiField
+  TextArea extensions;
+
+  @UiField
+  TextArea mimetypes;
+
+  @UiField
+  TextArea pronoms;
+
+  @UiField
+  TextArea utis;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -157,6 +174,12 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     website.addChangeHandler(changeHandler);
     download.addChangeHandler(changeHandler);
     provenanceInformation.addChangeHandler(changeHandler);
+
+    platforms.addChangeHandler(changeHandler);
+    extensions.addChangeHandler(changeHandler);
+    mimetypes.addChangeHandler(changeHandler);
+    pronoms.addChangeHandler(changeHandler);
+    utis.addChangeHandler(changeHandler);
   }
 
   public boolean isValid() {
@@ -183,6 +206,14 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
       category.removeStyleName("isWrong");
     }
 
+    try {
+      Integer.parseInt(popularity.getText());
+      popularity.removeStyleName("isWrong");
+    } catch (NumberFormatException e) {
+      valid = false;
+      popularity.addStyleName("isWrong");
+    }
+
     checked = true;
     return valid;
   }
@@ -199,6 +230,27 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     this.website.setText(agent.getWebsite());
     this.download.setText(agent.getDownload());
     this.provenanceInformation.setText(agent.getProvenanceInformation());
+
+    this.platforms.setText(getListString(agent.getPlatforms()));
+    this.extensions.setText(getListString(agent.getExtensions()));
+    this.mimetypes.setText(getListString(agent.getMimetypes()));
+    this.pronoms.setText(getListString(agent.getPronoms()));
+    this.utis.setText(getListString(agent.getUtis()));
+  }
+
+  // FIXME to delete after create list component
+  private String getListString(List<String> itemList) {
+    StringBuilder result = new StringBuilder();
+    for (String string : itemList) {
+      result.append(string);
+      result.append("\n");
+    }
+    return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
+  }
+
+  // FIXME to delete after create list component
+  private List<String> setListString(String list) {
+    return Arrays.asList(list.split("\\s*\n\\s*"));
   }
 
   public Agent getAgent() {
@@ -215,6 +267,13 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     agent.setWebsite(website.getText());
     agent.setDownload(download.getText());
     agent.setProvenanceInformation(provenanceInformation.getText());
+
+    agent.setPlatforms(setListString(platforms.getText()));
+    agent.setExtensions(setListString(extensions.getText()));
+    agent.setMimetypes(setListString(mimetypes.getText()));
+    agent.setPronoms(setListString(pronoms.getText()));
+    agent.setUtis(setListString(utis.getText()));
+
     return agent;
   }
 
@@ -229,6 +288,12 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     website.setText("");
     download.setText("");
     provenanceInformation.setText("");
+
+    platforms.setText("");
+    extensions.setText("");
+    mimetypes.setText("");
+    pronoms.setText("");
+    utis.setText("");
   }
 
   /**

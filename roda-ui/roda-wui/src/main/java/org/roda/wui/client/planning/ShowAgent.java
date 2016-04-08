@@ -29,8 +29,12 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.AgentMessages;
 
 /**
  * @author Luis Faria
@@ -73,7 +77,7 @@ public class ShowAgent extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  // private static CommonMessages messages = GWT.create(CommonMessages.class);
+  private static AgentMessages messages = GWT.create(AgentMessages.class);
 
   @UiField
   Label agentId;
@@ -112,6 +116,21 @@ public class ShowAgent extends Composite {
   Label agentProvenanceInformation;
 
   @UiField
+  FlowPanel platforms;
+
+  @UiField
+  FlowPanel extensions;
+
+  @UiField
+  FlowPanel mimetypes;
+
+  @UiField
+  FlowPanel pronoms;
+
+  @UiField
+  FlowPanel utis;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -141,6 +160,61 @@ public class ShowAgent extends Composite {
     agentWebsite.setText(agent.getWebsite());
     agentDownload.setText(agent.getDownload());
     agentProvenanceInformation.setText(agent.getProvenanceInformation());
+
+    List<String> platformsList = agent.getPlatforms();
+    platforms.setVisible(platformsList != null && !platformsList.isEmpty());
+
+    if (platformsList != null) {
+      for (String platform : platformsList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.agentListItems(platform));
+        platforms.add(parPanel);
+      }
+    }
+
+    List<String> extensionsList = agent.getExtensions();
+    extensions.setVisible(extensionsList != null && !extensionsList.isEmpty());
+
+    if (extensionsList != null) {
+      for (String extension : extensionsList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.agentListItems(extension));
+        extensions.add(parPanel);
+      }
+    }
+
+    List<String> mimetypesList = agent.getMimetypes();
+    mimetypes.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+
+    if (mimetypesList != null) {
+      for (String mimetype : mimetypesList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.agentListItems(mimetype));
+        mimetypes.add(parPanel);
+      }
+    }
+
+    List<String> pronomsList = agent.getPronoms();
+    pronoms.setVisible(pronomsList != null && !pronomsList.isEmpty());
+
+    if (pronomsList != null) {
+      for (String pronom : pronomsList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.agentListItems(pronom));
+        pronoms.add(parPanel);
+      }
+    }
+
+    List<String> utisList = agent.getUtis();
+    utis.setVisible(utisList != null && !utisList.isEmpty());
+
+    if (utisList != null) {
+      for (String uti : utisList) {
+        HTML parPanel = new HTML();
+        parPanel.setHTML(messages.agentListItems(uti));
+        utis.add(parPanel);
+      }
+    }
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
