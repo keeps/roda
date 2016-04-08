@@ -18,6 +18,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -26,7 +27,6 @@ import org.roda.wui.common.client.tools.Tools;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -66,6 +66,7 @@ public class ShowJobReport extends Composite {
           public void onSuccess(Report jobReport) {
             ShowJobReport showJob = new ShowJobReport(jobReport);
             callback.onSuccess(showJob);
+            JavascriptUtils.scrollToHeader();
           }
         });
       } else {

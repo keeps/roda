@@ -169,25 +169,25 @@ public class InternalPluginsTest {
     //
     // FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
 
-    f.createFolder(null, "test");
-    f.createFolder("test", CORPORA_TEST1);
-    f.createFolder("test", "test2");
-    f.createFolder("test", "test3");
+    String parentUUID = f.createFolder(null, "test");
+    String test1UUID = f.createFolder(parentUUID, CORPORA_TEST1);
+    String test2UUID = f.createFolder(parentUUID, "test2");
+    String test3UUID = f.createFolder(parentUUID, "test3");
 
-    f.createFile("test", CORPORA_TEST1_TXT, generateContentData());
-    f.createFile("test", "test2.txt", generateContentData());
-    f.createFile("test", "test3.txt", generateContentData());
-    f.createFile("test/test1", CORPORA_TEST1_TXT, generateContentData());
-    f.createFile("test/test1", "test2.txt", generateContentData());
-    f.createFile("test/test1", "test3.txt", generateContentData());
-    f.createFile("test/test2", CORPORA_TEST1_TXT, generateContentData());
-    f.createFile("test/test2", "test2.txt", generateContentData());
-    f.createFile("test/test2", "test3.txt", generateContentData());
-    f.createFile("test/test3", CORPORA_TEST1_TXT, generateContentData());
-    f.createFile("test/test3", "test2.txt", generateContentData());
-    f.createFile("test/test3", "test3.txt", generateContentData());
+    f.createFile(parentUUID, CORPORA_TEST1_TXT, generateContentData());
+    f.createFile(parentUUID, "test2.txt", generateContentData());
+    f.createFile(parentUUID, "test3.txt", generateContentData());
+    f.createFile(test1UUID, CORPORA_TEST1_TXT, generateContentData());
+    f.createFile(test1UUID, "test2.txt", generateContentData());
+    f.createFile(test1UUID, "test3.txt", generateContentData());
+    f.createFile(test2UUID, CORPORA_TEST1_TXT, generateContentData());
+    f.createFile(test2UUID, "test2.txt", generateContentData());
+    f.createFile(test2UUID, "test3.txt", generateContentData());
+    f.createFile(test3UUID, CORPORA_TEST1_TXT, generateContentData());
+    f.createFile(test3UUID, "test2.txt", generateContentData());
+    f.createFile(test3UUID, "test3.txt", generateContentData());
 
-    f.createFile("test", CORPORA_PDF, getClass().getResourceAsStream("/corpora/Media/" + CORPORA_PDF));
+    f.createFile(parentUUID, CORPORA_PDF, getClass().getResourceAsStream("/corpora/Media/" + CORPORA_PDF));
 
     // TODO check if 4 times is the expected
     // Mockito.verify(observer, Mockito.times(4));

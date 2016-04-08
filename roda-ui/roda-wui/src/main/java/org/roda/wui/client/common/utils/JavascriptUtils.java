@@ -89,6 +89,13 @@ public class JavascriptUtils {
       scrollTop : target.offset().top
     }, 1000);
   }-*/;
+  
+  public static native void scrollToHeader() /*-{
+    var target = $wnd.jQuery('.h1');
+    $wnd.jQuery('html, body').animate({
+      scrollTop : target.offset().top
+    }, 10);
+  }-*/;
 
   public static native void runMiniUploadForm() /*-{
     $wnd.console.log("running mini upload form");
