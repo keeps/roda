@@ -13,9 +13,14 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileAttribute;
+import java.nio.file.attribute.PosixFilePermission;
+import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -320,7 +325,7 @@ public class FedoraStorageService implements StorageService {
     } else {
       try {
         String path = FedoraUtils.createFedoraPath(storagePath);
-        LOGGER.debug("PATH: " + path);
+        LOGGER.debug("PATH {}", path);
         FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
         FedoraDatastream binary = fedoraRepository.createDatastream(path, fedoraContentPayload);
         IOUtils.closeQuietly(fedoraContentPayload.getContent());
@@ -596,7 +601,7 @@ public class FedoraStorageService implements StorageService {
         Class<? extends Entity> entity = getEntity(storagePath);
         Path path;
         try {
-          temp = Files.createTempDirectory("temp");
+          temp = Files.createTempDirectory("temp", getTempDirFilePermissions());
           if (entity.equals(Container.class) || entity.equals(Directory.class)) {
             StorageService tempStorage = new FileStorageService(temp);
             tempStorage.copy(FedoraStorageService.this, storagePath, storagePath);
@@ -625,6 +630,23 @@ public class FedoraStorageService implements StorageService {
 
     };
     return ret;
+  }
+
+  private static FileAttribute<Set<PosixFilePermission>> getTempDirFilePermissions() {
+    Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+    // add owners permission
+    perms.add(PosixFilePermission.OWNER_READ);
+    perms.add(PosixFilePermission.OWNER_WRITE);
+    perms.add(PosixFilePermission.OWNER_EXECUTE);
+    // add group permissions
+    perms.add(PosixFilePermission.GROUP_READ);
+    perms.add(PosixFilePermission.GROUP_WRITE);
+    perms.add(PosixFilePermission.GROUP_EXECUTE);
+    // add others permissions
+    perms.add(PosixFilePermission.OTHERS_READ);
+    perms.add(PosixFilePermission.OTHERS_EXECUTE);
+    FileAttribute<Set<PosixFilePermission>> asFileAttribute = PosixFilePermissions.asFileAttribute(perms);
+    return asFileAttribute;
   }
 
   @Override
@@ -691,8 +713,9 @@ public class FedoraStorageService implements StorageService {
     try {
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
-      System.out.println("FULL "+fullVersionID);
-      FedoraDatastream ds = fedoraRepository.getDatastreamVersion(FedoraUtils.createFedoraPath(storagePath), fullVersionID);
+      LOGGER.debug("FULL {}", fullVersionID);
+      FedoraDatastream ds = fedoraRepository.getDatastreamVersion(FedoraUtils.createFedoraPath(storagePath),
+        fullVersionID);
       if (!isDatastream(ds)) {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
       }
@@ -718,9 +741,9 @@ public class FedoraStorageService implements StorageService {
     try {
       String id = UUID.randomUUID().toString();
       FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
-      String versionID = id+message;
-      String versionIDEncoded = URLEncoder.encode(versionID,"UTF-8");
-      LOGGER.warn("Creating version "+versionID+" ("+versionIDEncoded+")");
+      String versionID = id + message;
+      String versionIDEncoded = URLEncoder.encode(versionID, "UTF-8");
+      LOGGER.warn("Creating version {} ({})", versionID, versionIDEncoded);
       binary.createVersionSnapshot(versionIDEncoded);
       return FedoraConversionUtils.convertDataStreamToBinaryVersion(binary, id, message);
     } catch (ForbiddenException e) {
@@ -767,21 +790,21 @@ public class FedoraStorageService implements StorageService {
   }
 
   private String getFullVersionID(FedoraDatastream binary, String shortVersion) {
-    System.out.println("Getting full from "+shortVersion);
+    LOGGER.debug("Getting full from {}", shortVersion);
     String fullID = null;
     try {
       List<String> versions = binary.getVersionsName();
       if (versions != null) {
         for (String version : versions) {
-          System.out.println("V: "+version);
+          LOGGER.debug("V: {}", version);
           if (version.startsWith(shortVersion)) {
             fullID = version;
             break;
           }
         }
       }
-    } catch (FedoraException fe) {
-      fe.printStackTrace();
+    } catch (FedoraException e) {
+      LOGGER.error("Error getting full version Id", e);
     }
     return fullID;
   }

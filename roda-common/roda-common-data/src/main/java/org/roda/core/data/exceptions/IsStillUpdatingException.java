@@ -1,6 +1,6 @@
-package org.roda.core.common.monitor;
+package org.roda.core.data.exceptions;
 
-public class IsStillUpdatingException extends Exception {
+public class IsStillUpdatingException extends RODAException {
 
   private static final long serialVersionUID = 7420264596411093449L;
 
