@@ -132,6 +132,7 @@
 		<solr.version>5.5.0</solr.version>
 		<tika.version>1.11</tika.version>
 		<akka.version>2.4.2</akka.version>
+		<httpcomponents.version>4.5.2</httpcomponents.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>
@@ -686,9 +687,9 @@
 				<version>1.0.0</version>
 			</dependency>
 			<dependency>
-    			<groupId>org.roda-project</groupId>
-    			<artifactId>premis-v3.0</artifactId>
-    			<version>1.0.0</version>
+				<groupId>org.roda-project</groupId>
+				<artifactId>premis-v3.0</artifactId>
+				<version>1.0.0</version>
 			</dependency>
 			<dependency>
 				<groupId>org.roda-project</groupId>
@@ -987,7 +988,7 @@
 				<artifactId>jodconverter</artifactId>
 				<version>2.2.1</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>xalan</groupId>
 				<artifactId>xalan</artifactId>
@@ -1051,6 +1052,11 @@
 				<groupId>org.roda-project</groupId>
 				<artifactId>commons-ip</artifactId>
 				<version>1.0.0-alpha10</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.httpcomponents</groupId>
+				<artifactId>httpclient</artifactId>
+				<version>${httpcomponents.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

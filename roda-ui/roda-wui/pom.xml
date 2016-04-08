@@ -339,6 +339,10 @@
 			<artifactId>compiler</artifactId>
 			<version>0.9.1</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>

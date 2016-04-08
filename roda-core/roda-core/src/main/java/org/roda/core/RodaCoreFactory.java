@@ -295,6 +295,8 @@ public class RodaCoreFactory {
         LOGGER.error("Error instantiating solr/index model", e);
       } catch (GenericException e) {
         LOGGER.error("Error instantiating storage model", e);
+      } catch (Throwable e) {
+        LOGGER.error("Error instantiating " + RodaCoreFactory.class.getSimpleName(), e);
       }
 
     }
