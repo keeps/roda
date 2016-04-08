@@ -22,8 +22,10 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.tika.metadata.Metadata;
+import org.jdom2.Element;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
@@ -37,42 +39,61 @@ import gov.loc.repository.bagit.BagInfoTxt;
 public class MetadataFileUtils {
 
   public static String generateMetadataFile(Metadata metadata) throws IOException {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
     String[] names = metadata.names();
+    Element root = new Element("metadata");
+    org.jdom2.Document doc = new org.jdom2.Document();
+
     for (String name : names) {
       String[] values = metadata.getValues(name);
       if (values != null && values.length > 0) {
         for (String value : values) {
-          b.append("<field name='").append(name).append("'>").append(StringEscapeUtils.escapeXml11(value))
-            .append("</field>");
+          Element child = new Element("field");
+          child.setAttribute("name", name);
+          child.addContent(value);
+          root.addContent(child);
         }
       }
 
     }
-    b.append("</metadata>");
-    return b.toString();
+    doc.setRootElement(root);
+    XMLOutputter outter = new XMLOutputter();
+    outter.setFormat(Format.getPrettyFormat());
+    outter.outputString(doc);
+    return outter.outputString(doc);
   }
 
   public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>");
+    Element root = new Element("metadata");
+    org.jdom2.Document doc = new org.jdom2.Document();
+
     for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
       if (!entry.getKey().equalsIgnoreCase("parent")) {
-        b.append("<field name='").append(entry.getKey()).append("'>")
-          .append(StringEscapeUtils.escapeXml11(entry.getValue())).append("</field>");
+        Element child = new Element("field");
+        child.setAttribute("name", entry.getKey());
+        child.addContent(entry.getValue());
+        root.addContent(child);
       }
     }
-    b.append("</metadata>");
-    return b.toString();
+
+    doc.setRootElement(root);
+    XMLOutputter outter = new XMLOutputter();
+    outter.setFormat(Format.getPrettyFormat());
+    outter.outputString(doc);
+    return outter.outputString(doc);
   }
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
-    StringBuilder b = new StringBuilder();
-    b.append("<metadata>").append("<field name='title'>")
-      .append(StringEscapeUtils.escapeXml11(transferredResource.getName())).append("</field>").append("</metadata>");
-
-    return new StringContentPayload(b.toString());
+    Element root = new Element("metadata");
+    org.jdom2.Document doc = new org.jdom2.Document();
+    Element child = new Element("field");
+    child.setAttribute("name", "title");
+    child.addContent(transferredResource.getName());
+    root.addContent(child);
+    doc.setRootElement(root);
+    XMLOutputter outter = new XMLOutputter();
+    outter.setFormat(Format.getPrettyFormat());
+    outter.outputString(doc);
+    return new StringContentPayload(outter.outputString(doc));
   }
 
   public static Map<String, List<String>> parseBinary(Binary binary)
