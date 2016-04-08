@@ -86,49 +86,64 @@ public class ShowAgent extends Composite {
   Label agentName;
 
   @UiField
-  Label agentType;
+  Label agentTypeKey, agentTypeValue;
 
   @UiField
-  Label agentDescription;
+  Label agentDescriptionKey, agentDescriptionValue;
 
   @UiField
   Label agentCategory;
 
   @UiField
-  Label agentVersion;
+  Label agentVersionKey, agentVersionValue;
 
   @UiField
-  Label agentLicense;
+  Label agentLicenseKey, agentLicenseValue;
 
   @UiField
-  Label agentPopularity;
+  Label agentPopularityKey, agentPopularityValue;
 
   @UiField
   Label agentInitialRelease;
 
   @UiField
-  Label agentWebsite;
+  Label agentWebsiteKey, agentWebsiteValue;
 
   @UiField
-  Label agentDownload;
+  Label agentDownloadKey, agentDownloadValue;
 
   @UiField
-  Label agentProvenanceInformation;
+  Label agentProvenanceInformationKey, agentProvenanceInformationValue;
 
   @UiField
-  FlowPanel platforms;
+  Label platformsKey;
 
   @UiField
-  FlowPanel extensions;
+  FlowPanel platformsValue;
 
   @UiField
-  FlowPanel mimetypes;
+  Label extensionsKey;
 
   @UiField
-  FlowPanel pronoms;
+  FlowPanel extensionsValue;
 
   @UiField
-  FlowPanel utis;
+  Label mimetypesKey;
+
+  @UiField
+  FlowPanel mimetypesValue;
+
+  @UiField
+  Label pronomsKey;
+
+  @UiField
+  FlowPanel pronomsValue;
+
+  @UiField
+  Label utisKey;
+
+  @UiField
+  FlowPanel utisValue;
 
   @UiField
   Button buttonEdit;
@@ -149,70 +164,93 @@ public class ShowAgent extends Composite {
 
     agentId.setText(agent.getId());
     agentName.setText(agent.getName());
-    agentType.setText(agent.getType());
-    agentDescription.setText(agent.getDescription());
+
+    agentTypeValue.setText(agent.getType());
+    agentTypeKey.setVisible(agent.getType().length() > 0);
+
+    agentDescriptionValue.setText(agent.getDescription());
+    agentDescriptionKey.setVisible(agent.getDescription().length() > 0);
+
     agentCategory.setText(agent.getCategory());
-    agentVersion.setText(agent.getVersion());
-    agentLicense.setText(agent.getLicense());
-    agentPopularity.setText(Integer.toString(agent.getPopularity()));
-    agentInitialRelease.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(
-      agent.getInitialRelease()));
-    agentWebsite.setText(agent.getWebsite());
-    agentDownload.setText(agent.getDownload());
-    agentProvenanceInformation.setText(agent.getProvenanceInformation());
+
+    agentVersionValue.setText(agent.getVersion());
+    agentVersionKey.setVisible(agent.getVersion().length() > 0);
+
+    agentLicenseValue.setText(agent.getLicense());
+    agentLicenseKey.setVisible(agent.getLicense().length() > 0);
+
+    agentPopularityValue.setText(Integer.toString(agent.getPopularity()));
+    agentPopularityKey.setVisible(Integer.toString(agent.getPopularity()).length() > 0);
+
+    agentInitialRelease
+      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(agent.getInitialRelease()));
+
+    agentWebsiteValue.setText(agent.getWebsite());
+    agentWebsiteKey.setVisible(agent.getWebsite().length() > 0);
+
+    agentDownloadValue.setText(agent.getDownload());
+    agentDownloadKey.setVisible(agent.getDownload().length() > 0);
+
+    agentProvenanceInformationValue.setText(agent.getProvenanceInformation());
+    agentProvenanceInformationKey.setVisible(agent.getProvenanceInformation().length() > 0);
 
     List<String> platformsList = agent.getPlatforms();
-    platforms.setVisible(platformsList != null && !platformsList.isEmpty());
+    platformsValue.setVisible(platformsList != null && !platformsList.isEmpty());
+    platformsKey.setVisible(platformsList != null && !platformsList.isEmpty());
 
     if (platformsList != null) {
       for (String platform : platformsList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.agentListItems(platform));
-        platforms.add(parPanel);
+        platformsValue.add(parPanel);
       }
     }
 
     List<String> extensionsList = agent.getExtensions();
-    extensions.setVisible(extensionsList != null && !extensionsList.isEmpty());
+    extensionsValue.setVisible(extensionsList != null && !extensionsList.isEmpty());
+    extensionsKey.setVisible(extensionsList != null && !extensionsList.isEmpty());
 
     if (extensionsList != null) {
       for (String extension : extensionsList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.agentListItems(extension));
-        extensions.add(parPanel);
+        extensionsValue.add(parPanel);
       }
     }
 
     List<String> mimetypesList = agent.getMimetypes();
-    mimetypes.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+    mimetypesValue.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+    mimetypesKey.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
 
     if (mimetypesList != null) {
       for (String mimetype : mimetypesList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.agentListItems(mimetype));
-        mimetypes.add(parPanel);
+        mimetypesValue.add(parPanel);
       }
     }
 
     List<String> pronomsList = agent.getPronoms();
-    pronoms.setVisible(pronomsList != null && !pronomsList.isEmpty());
+    pronomsValue.setVisible(pronomsList != null && !pronomsList.isEmpty());
+    pronomsKey.setVisible(pronomsList != null && !pronomsList.isEmpty());
 
     if (pronomsList != null) {
       for (String pronom : pronomsList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.agentListItems(pronom));
-        pronoms.add(parPanel);
+        pronomsValue.add(parPanel);
       }
     }
 
     List<String> utisList = agent.getUtis();
-    utis.setVisible(utisList != null && !utisList.isEmpty());
+    utisValue.setVisible(utisList != null && !utisList.isEmpty());
+    utisKey.setVisible(utisList != null && !utisList.isEmpty());
 
     if (utisList != null) {
       for (String uti : utisList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.agentListItems(uti));
-        utis.add(parPanel);
+        utisValue.add(parPanel);
       }
     }
   }

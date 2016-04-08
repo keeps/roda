@@ -82,7 +82,7 @@ public class ShowRisk extends Composite {
   Label riskName;
 
   @UiField
-  Label riskDescription;
+  Label riskDescriptionKey, riskDescriptionValue;
 
   @UiField
   Label riskIdentifiedOn;
@@ -94,7 +94,10 @@ public class ShowRisk extends Composite {
   Label riskCategory;
 
   @UiField
-  Label riskNotes;
+  Label riskNotesKey, riskNotesValue;
+
+  @UiField
+  Label riskPreMitigationKey;
 
   @UiField
   Label riskPreMitigationProbability;
@@ -106,34 +109,40 @@ public class ShowRisk extends Composite {
   Label riskPreMitigationSeverity;
 
   @UiField
-  Label riskPreMitigationNotes;
+  Label riskPreMitigationNotesKey, riskPreMitigationNotesValue;
 
   @UiField
-  Label riskPosMitigationProbability;
+  Label riskPosMitigationKey;
 
   @UiField
-  Label riskPosMitigationImpact;
+  Label riskPosMitigationProbabilityKey, riskPosMitigationProbabilityValue;
 
   @UiField
-  Label riskPosMitigationSeverity;
+  Label riskPosMitigationImpactKey, riskPosMitigationImpactValue;
 
   @UiField
-  Label riskPosMitigationNotes;
+  Label riskPosMitigationSeverityKey, riskPosMitigationSeverityValue;
 
   @UiField
-  Label riskMitigationStrategy;
+  Label riskPosMitigationNotesKey, riskPosMitigationNotesValue;
 
   @UiField
-  Label riskMitigationOwnerType;
+  Label riskMitigationKey;
 
   @UiField
-  Label riskMitigationOwner;
+  Label riskMitigationStrategyKey, riskMitigationStrategyValue;
 
   @UiField
-  Label riskMitigationRelatedEventIdentifierType;
+  Label riskMitigationOwnerTypeKey, riskMitigationOwnerTypeValue;
 
   @UiField
-  Label riskMitigationRelatedEventIdentifierValue;
+  Label riskMitigationOwnerKey, riskMitigationOwnerValue;
+
+  @UiField
+  Label riskMitigationRelatedEventIdentifierTypeKey, riskMitigationRelatedEventIdentifierTypeValue;
+
+  @UiField
+  Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
 
   @UiField
   Button buttonEdit;
@@ -160,27 +169,96 @@ public class ShowRisk extends Composite {
 
     riskId.setText(risk.getId());
     riskName.setText(risk.getName());
-    riskDescription.setText(risk.getDescription());
+
+    riskDescriptionValue.setText(risk.getDescription());
+    riskDescriptionKey.setVisible(risk.getDescription().length() > 0);
+
     riskIdentifiedOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(risk.getIdentifiedOn()));
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
     riskCategory.setText(risk.getCategory());
-    riskNotes.setText(risk.getNotes());
+    riskNotesValue.setText(risk.getNotes());
 
     riskPreMitigationProbability.setText(Integer.toString(risk.getPreMitigationProbability()));
     riskPreMitigationImpact.setText(Integer.toString(risk.getPreMitigationImpact()));
     riskPreMitigationSeverity.setText(Integer.toString(risk.getPreMitigationSeverity()));
-    riskPreMitigationNotes.setText(risk.getPreMitigationNotes());
 
-    riskPosMitigationProbability.setText(Integer.toString(risk.getPosMitigationProbability()));
-    riskPosMitigationImpact.setText(Integer.toString(risk.getPosMitigationImpact()));
-    riskPosMitigationSeverity.setText(Integer.toString(risk.getPosMitigationSeverity()));
-    riskPosMitigationNotes.setText(risk.getPosMitigationNotes());
+    riskPreMitigationNotesValue.setText(risk.getPreMitigationNotes());
+    riskPreMitigationNotesKey.setVisible(risk.getPreMitigationNotes().length() > 0);
 
-    riskMitigationStrategy.setText(risk.getMitigationStrategy());
-    riskMitigationOwnerType.setText(risk.getMitigationOwnerType());
-    riskMitigationOwner.setText(risk.getMitigationOwner());
-    riskMitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
-    riskMitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
+    int posMitigationCounter = 0;
+
+    if (Integer.toString(risk.getPosMitigationProbability()).length() > 0) {
+      posMitigationCounter++;
+      riskPosMitigationProbabilityValue.setText(Integer.toString(risk.getPosMitigationProbability()));
+    } else {
+      riskPosMitigationProbabilityKey.setVisible(false);
+    }
+
+    if (Integer.toString(risk.getPosMitigationImpact()).length() > 0) {
+      posMitigationCounter++;
+      riskPosMitigationImpactValue.setText(Integer.toString(risk.getPosMitigationImpact()));
+    } else {
+      riskPosMitigationImpactKey.setVisible(false);
+    }
+
+    if (Integer.toString(risk.getPosMitigationSeverity()).length() > 0) {
+      posMitigationCounter++;
+      riskPosMitigationSeverityValue.setText(Integer.toString(risk.getPosMitigationSeverity()));
+    } else {
+      riskPosMitigationSeverityKey.setVisible(false);
+    }
+
+    if (risk.getPosMitigationNotes().length() > 0) {
+      posMitigationCounter++;
+      riskPosMitigationNotesValue.setText(risk.getPosMitigationNotes());
+    } else {
+      riskPosMitigationNotesKey.setVisible(false);
+    }
+
+    if (posMitigationCounter == 0) {
+      riskMitigationKey.setVisible(false);
+    }
+
+    int mitigationCounter = 0;
+
+    if (risk.getMitigationStrategy().length() > 0) {
+      mitigationCounter++;
+      riskMitigationStrategyValue.setText(risk.getMitigationStrategy());
+    } else {
+      riskMitigationStrategyKey.setVisible(false);
+    }
+
+    if (risk.getMitigationOwnerType().length() > 0) {
+      mitigationCounter++;
+      riskMitigationOwnerTypeValue.setText(risk.getMitigationOwnerType());
+    } else {
+      riskMitigationOwnerTypeKey.setVisible(false);
+    }
+
+    if (risk.getMitigationOwner().length() > 0) {
+      mitigationCounter++;
+      riskMitigationOwnerValue.setText(risk.getMitigationOwner());
+    } else {
+      riskMitigationOwnerKey.setVisible(false);
+    }
+
+    if (risk.getMitigationRelatedEventIdentifierType().length() > 0) {
+      mitigationCounter++;
+      riskMitigationRelatedEventIdentifierTypeValue.setText(risk.getMitigationRelatedEventIdentifierType());
+    } else {
+      riskMitigationRelatedEventIdentifierTypeKey.setVisible(false);
+    }
+
+    if (risk.getMitigationRelatedEventIdentifierValue().length() > 0) {
+      mitigationCounter++;
+      riskMitigationRelatedEventIdentifierValueValue.setText(risk.getMitigationRelatedEventIdentifierValue());
+    } else {
+      riskMitigationRelatedEventIdentifierValueKey.setVisible(false);
+    }
+
+    if (mitigationCounter == 0) {
+      riskMitigationKey.setVisible(false);
+    }
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {

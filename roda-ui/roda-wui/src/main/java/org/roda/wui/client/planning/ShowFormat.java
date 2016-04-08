@@ -86,46 +86,58 @@ public class ShowFormat extends Composite {
   Label formatName;
 
   @UiField
-  Label formatDefinition;
+  Label formatDefinitionKey, formatDefinitionValue;
 
   @UiField
   Label formatCategory;
 
   @UiField
-  Label formatLatestVersion;
+  Label formatLatestVersionKey, formatLatestVersionValue;
 
   @UiField
-  Label formatPopularity;
+  Label formatPopularityKey, formatPopularityValue;
 
   @UiField
-  Label formatDeveloper;
+  Label formatDeveloperKey, formatDeveloperValue;
 
   @UiField
   Label formatInitialRelease;
 
   @UiField
-  Label formatStandard;
+  Label formatStandardKey, formatStandardValue;
 
   @UiField
   Label formatIsOpenFormat;
 
   @UiField
-  Label formatWebsite;
+  Label formatWebsiteKey, formatWebsiteValue;
 
   @UiField
-  Label formatProvenanceInformation;
+  Label formatProvenanceInformationKey, formatProvenanceInformationValue;
 
   @UiField
-  FlowPanel formatExtensions;
+  Label formatExtensionsKey;
 
   @UiField
-  FlowPanel formatMimetypes;
+  FlowPanel formatExtensionsValue;
 
   @UiField
-  FlowPanel formatPronoms;
+  Label formatMimetypesKey;
 
   @UiField
-  FlowPanel formatUtis;
+  FlowPanel formatMimetypesValue;
+
+  @UiField
+  Label formatPronomsKey;
+
+  @UiField
+  FlowPanel formatPronomsValue;
+
+  @UiField
+  Label formatUtisKey;
+
+  @UiField
+  FlowPanel formatUtisValue;
 
   @UiField
   Button buttonEdit;
@@ -152,59 +164,79 @@ public class ShowFormat extends Composite {
 
     formatId.setText(format.getId());
     formatName.setText(format.getName());
-    formatDefinition.setText(format.getDefinition());
+
+    formatDefinitionValue.setText(format.getDefinition());
+    formatDefinitionKey.setVisible(format.getDefinition().length() > 0);
+
     formatCategory.setText(format.getCategory());
-    formatLatestVersion.setText(format.getLatestVersion());
-    formatPopularity.setText(Integer.toString(format.getPopularity()));
-    formatDeveloper.setText(format.getDeveloper());
-    formatInitialRelease.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(
-      format.getInitialRelease()));
-    formatStandard.setText(format.getStandard());
+
+    formatLatestVersionValue.setText(format.getLatestVersion());
+    formatLatestVersionKey.setVisible(format.getLatestVersion().length() > 0);
+
+    formatPopularityValue.setText(Integer.toString(format.getPopularity()));
+    formatPopularityKey.setVisible(Integer.toString(format.getPopularity()).length() > 0);
+
+    formatDeveloperValue.setText(format.getDeveloper());
+    formatDeveloperKey.setVisible(format.getDeveloper().length() > 0);
+
+    formatInitialRelease
+      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(format.getInitialRelease()));
     formatIsOpenFormat.setText(Boolean.toString(format.isOpenFormat()));
-    formatWebsite.setText(format.getWebsite());
-    formatProvenanceInformation.setText(format.getProvenanceInformation());
+
+    formatStandardValue.setText(format.getStandard());
+    formatStandardKey.setVisible(format.getStandard().length() > 0);
+
+    formatWebsiteValue.setText(format.getWebsite());
+    formatWebsiteKey.setVisible(format.getWebsite().length() > 0);
+
+    formatProvenanceInformationValue.setText(format.getProvenanceInformation());
+    formatProvenanceInformationKey.setVisible(format.getProvenanceInformation().length() > 0);
 
     List<String> extensionsList = format.getExtensions();
-    formatExtensions.setVisible(extensionsList != null && !extensionsList.isEmpty());
+    formatExtensionsValue.setVisible(extensionsList != null && !extensionsList.isEmpty());
+    formatExtensionsKey.setVisible(extensionsList != null && !extensionsList.isEmpty());
 
     if (extensionsList != null) {
       for (String extension : extensionsList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.formatListItems(extension));
-        formatExtensions.add(parPanel);
+        formatExtensionsValue.add(parPanel);
       }
     }
 
     List<String> mimetypesList = format.getMimetypes();
-    formatMimetypes.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+    formatMimetypesValue.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
+    formatMimetypesKey.setVisible(mimetypesList != null && !mimetypesList.isEmpty());
 
     if (mimetypesList != null) {
       for (String mimetype : mimetypesList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.formatListItems(mimetype));
-        formatMimetypes.add(parPanel);
+        formatMimetypesValue.add(parPanel);
       }
     }
 
     List<String> pronomsList = format.getPronoms();
-    formatPronoms.setVisible(pronomsList != null && !pronomsList.isEmpty());
+    formatPronomsValue.setVisible(pronomsList != null && !pronomsList.isEmpty());
+    formatPronomsKey.setVisible(pronomsList != null && !pronomsList.isEmpty());
 
     if (pronomsList != null) {
       for (String pronom : pronomsList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.formatListItems(pronom));
-        formatPronoms.add(parPanel);
+        formatPronomsValue.add(parPanel);
       }
     }
 
     List<String> utisList = format.getUtis();
-    formatUtis.setVisible(utisList != null && !utisList.isEmpty());
+    formatUtisValue.setVisible(utisList != null && !utisList.isEmpty());
+    formatUtisKey.setVisible(utisList != null && !utisList.isEmpty());
 
     if (utisList != null) {
       for (String uti : utisList) {
         HTML parPanel = new HTML();
         parPanel.setHTML(messages.formatListItems(uti));
-        formatUtis.add(parPanel);
+        formatUtisValue.add(parPanel);
       }
     }
   }

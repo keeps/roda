@@ -21,35 +21,35 @@
 				<g:Label ui:field="formatId" />
 				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
 				<g:Label ui:field="formatName" />
-				<g:Label styleName="descriptiveMetadata-field-key">Definition</g:Label>
-				<g:Label ui:field="formatDefinition" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatDefinitionKey">Definition</g:Label>
+				<g:Label ui:field="formatDefinitionValue" />
 				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
 				<g:Label ui:field="formatCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key">Latest Version</g:Label>
-				<g:Label ui:field="formatLatestVersion" />
-				<g:Label styleName="descriptiveMetadata-field-key">Popularity</g:Label>
-				<g:Label ui:field="formatPopularity" />
-				<g:Label styleName="descriptiveMetadata-field-key">Developer</g:Label>
-				<g:Label ui:field="formatDeveloper" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatLatestVersionKey">Latest Version</g:Label>
+				<g:Label ui:field="formatLatestVersionValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatPopularityKey">Popularity</g:Label>
+				<g:Label ui:field="formatPopularityValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatDeveloperKey">Developer</g:Label>
+				<g:Label ui:field="formatDeveloperValue" />
 				<g:Label styleName="descriptiveMetadata-field-key">Initial Release</g:Label>
 				<g:Label ui:field="formatInitialRelease" />
-				<g:Label styleName="descriptiveMetadata-field-key">Standard</g:Label>
-				<g:Label ui:field="formatStandard" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatStandardKey">Standard</g:Label>
+				<g:Label ui:field="formatStandardValue" />
 				<g:Label styleName="descriptiveMetadata-field-key">Open Format</g:Label>
 				<g:Label ui:field="formatIsOpenFormat" />
-				<g:Label styleName="descriptiveMetadata-field-key">Website</g:Label>
-				<g:Label ui:field="formatWebsite" />
-				<g:Label styleName="descriptiveMetadata-field-key">Provenance Information</g:Label>
-				<g:Label ui:field="formatProvenanceInformation" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatWebsiteKey">Website</g:Label>
+				<g:Label ui:field="formatWebsiteValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatProvenanceInformationKey">Provenance Information</g:Label>
+				<g:Label ui:field="formatProvenanceInformationValue" />
 				
-				<g:Label styleName="descriptiveMetadata-field-key">Extensions</g:Label>
-				<g:FlowPanel ui:field="formatExtensions" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mimetypes</g:Label>
-				<g:FlowPanel ui:field="formatMimetypes" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pronoms</g:Label>
-				<g:FlowPanel ui:field="formatPronoms" />
-				<g:Label styleName="descriptiveMetadata-field-key">UTIs</g:Label>
-				<g:FlowPanel ui:field="formatUtis" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatExtensionsKey">Extensions</g:Label>
+				<g:FlowPanel ui:field="formatExtensionsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatMimetypesKey">Mimetypes</g:Label>
+				<g:FlowPanel ui:field="formatMimetypesValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatPronomsKey">Pronoms</g:Label>
+				<g:FlowPanel ui:field="formatPronomsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatUtisKey">UTIs</g:Label>
+				<g:FlowPanel ui:field="formatUtisValue" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

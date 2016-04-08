@@ -21,37 +21,37 @@
 				<g:Label ui:field="agentId" />
 				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
 				<g:Label ui:field="agentName" />
-				<g:Label styleName="descriptiveMetadata-field-key">Type</g:Label>
-				<g:Label ui:field="agentType" />
-				<g:Label styleName="descriptiveMetadata-field-key">Description</g:Label>
-				<g:Label ui:field="agentDescription" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentTypeKey">Type</g:Label>
+				<g:Label ui:field="agentTypeValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentDescriptionKey">Description</g:Label>
+				<g:Label ui:field="agentDescriptionValue" />
 				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
 				<g:Label ui:field="agentCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key">Version</g:Label>
-				<g:Label ui:field="agentVersion" />
-				<g:Label styleName="descriptiveMetadata-field-key">License</g:Label>
-				<g:Label ui:field="agentLicense" />		
-				<g:Label styleName="descriptiveMetadata-field-key">Popularity</g:Label>
-				<g:Label ui:field="agentPopularity" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentVersionKey">Version</g:Label>
+				<g:Label ui:field="agentVersionValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentLicenseKey">License</g:Label>
+				<g:Label ui:field="agentLicenseValue" />		
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentPopularityKey">Popularity</g:Label>
+				<g:Label ui:field="agentPopularityValue" />
 				<g:Label styleName="descriptiveMetadata-field-key">Initial Release</g:Label>
 				<g:Label ui:field="agentInitialRelease" />
-				<g:Label styleName="descriptiveMetadata-field-key">Website</g:Label>
-				<g:Label ui:field="agentWebsite" />
-				<g:Label styleName="descriptiveMetadata-field-key">Download</g:Label>
-				<g:Label ui:field="agentDownload" />		
-				<g:Label styleName="descriptiveMetadata-field-key">Provenance Information</g:Label>
-				<g:Label ui:field="agentProvenanceInformation" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentWebsiteKey">Website</g:Label>
+				<g:Label ui:field="agentWebsiteValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentDownloadKey">Download</g:Label>
+				<g:Label ui:field="agentDownloadValue" />		
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentProvenanceInformationKey">Provenance Information</g:Label>
+				<g:Label ui:field="agentProvenanceInformationValue" />
 				
-				<g:Label styleName="descriptiveMetadata-field-key">Platforms</g:Label>
-				<g:FlowPanel ui:field="platforms" />
-				<g:Label styleName="descriptiveMetadata-field-key">Extensions</g:Label>
-				<g:FlowPanel ui:field="extensions" />
-				<g:Label styleName="descriptiveMetadata-field-key">Mimetypes</g:Label>
-				<g:FlowPanel ui:field="mimetypes" />
-				<g:Label styleName="descriptiveMetadata-field-key">Pronoms</g:Label>
-				<g:FlowPanel ui:field="pronoms" />
-				<g:Label styleName="descriptiveMetadata-field-key">UTIs</g:Label>
-				<g:FlowPanel ui:field="utis" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="platformsKey">Platforms</g:Label>
+				<g:FlowPanel ui:field="platformsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="extensionsKey">Extensions</g:Label>
+				<g:FlowPanel ui:field="extensionsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="mimetypesKey">Mimetypes</g:Label>
+				<g:FlowPanel ui:field="mimetypesValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="pronomsKey">Pronoms</g:Label>
+				<g:FlowPanel ui:field="pronomsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="utisKey">UTIs</g:Label>
+				<g:FlowPanel ui:field="utisValue" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
