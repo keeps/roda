@@ -31,6 +31,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -71,8 +72,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public Long getMemberCount(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.countMembers(user, filter);
   }
@@ -104,11 +105,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void registerUser(User user, String password, String captcha) throws GenericException,
-    UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
+  public void registerUser(User user, String password, String captcha)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException {
     if (captcha != null) {
-      RecaptchaUtils.recaptchaVerify(
-        RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
+      RecaptchaUtils
+        .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
     UserManagement.registerUser(user, password);
 
@@ -129,8 +130,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void modifyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, GenericException {
+  public void modifyUser(User modifiedUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     UserManagement.modifyUser(user, modifiedUser, password);
   }
@@ -173,8 +174,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public LogEntry retrieveLogEntry(String logEntryId) throws AuthorizationDeniedException, GenericException,
-    NotFoundException {
+  public LogEntry retrieveLogEntry(String logEntryId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveLogEntry(user, logEntryId);
   }
@@ -204,8 +205,8 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void confirmUserEmail(String username, String emailConfirmationToken) throws InvalidTokenException,
-    NotFoundException, GenericException {
+  public void confirmUserEmail(String username, String emailConfirmationToken)
+    throws InvalidTokenException, NotFoundException, GenericException {
     UserManagement.confirmUserEmail(username, emailConfirmationToken);
   }
 
@@ -229,11 +230,11 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public void requestPasswordReset(String usernameOrEmail, String captcha) throws GenericException, NotFoundException,
-    IllegalOperationException, RecaptchaException {
+  public void requestPasswordReset(String usernameOrEmail, String captcha)
+    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException {
     if (captcha != null) {
-      RecaptchaUtils.recaptchaVerify(
-        RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
+      RecaptchaUtils
+        .recaptchaVerify(RodaCoreFactory.getRodaConfiguration().getString(RECAPTCHA_CODE_SECRET_PROPERTY, ""), captcha);
     }
     String servletPath = getServletUrl(getThreadLocalRequest());
     UserManagement.requestPasswordReset(servletPath, usernameOrEmail);
@@ -279,23 +280,37 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   }
 
   @Override
-  public Format retrieveFormat(String formatId) throws NotFoundException, GenericException,
-    AuthorizationDeniedException {
+  public Format retrieveFormat(String formatId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.retrieveFormat(user, formatId);
   }
 
   @Override
-  public Format addFormat(Format format) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public Format addFormat(Format format)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return UserManagement.addFormat(user, format);
   }
 
   @Override
-  public void modifyFormat(Format format) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException {
+  public void modifyFormat(Format format)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     UserManagement.modifyFormat(user, format);
+  }
+
+  @Override
+  public IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.findMessages(user, filter, sorter, sublist, facets);
+  }
+
+  @Override
+  public Message retrieveMessage(String messageId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return UserManagement.retrieveMessage(user, messageId);
   }
 }

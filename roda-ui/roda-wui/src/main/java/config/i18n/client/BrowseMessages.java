@@ -404,7 +404,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("FAILED")
   String showJobStatusFailedDuringCreation();
-  
+
   @DefaultMessage("{0}% done")
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 
@@ -694,6 +694,17 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Search log...")
   String userLogSearchPlaceHolder();
 
+  /************* Notification messages ****************/
+
+  @DefaultMessage("Search message...")
+  String messageSearchPlaceHolder();
+
+  @DefaultMessage("YES")
+  String showMessageAcknowledged();
+
+  @DefaultMessage("NO")
+  String showMessageNotAcknowledged();
+
   /************* Humanize ****************/
 
   @DefaultMessage("{0} days")
@@ -732,7 +743,5 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0,number,##}s")
   String durationDHMSShortSeconds(int seconds);
-
-  
 
 }

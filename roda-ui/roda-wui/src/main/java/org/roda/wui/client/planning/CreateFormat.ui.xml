@@ -24,7 +24,7 @@
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						Save
+						<ui:text from='{constants.createUserCreate}' />ave
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">
 						<ui:text from='{constants.editUserCancel}' />

@@ -46,6 +46,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  @SuppressWarnings("unused")
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 

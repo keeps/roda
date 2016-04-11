@@ -30,6 +30,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -92,8 +93,8 @@ public class UserManagementHelper {
     }
   }
 
-  protected static Group retrieveGroup(String groupname) throws AuthorizationDeniedException, GenericException,
-    NotFoundException {
+  protected static Group retrieveGroup(String groupname)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     try {
       return UserUtility.getLdapUtility().getGroup(groupname);
     } catch (LdapUtilityException e) {
@@ -111,8 +112,8 @@ public class UserManagementHelper {
     }
   }
 
-  public static void registerUser(User user, String password) throws GenericException, UserAlreadyExistsException,
-    EmailAlreadyExistsException {
+  public static void registerUser(User user, String password)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     RodaCoreFactory.getModelService().registerUser(user, password, true, true);
   }
 
@@ -121,8 +122,8 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().addUser(user, password, true, true);
   }
 
-  public static void modifyUser(User user, String password) throws GenericException, AlreadyExistsException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void modifyUser(User user, String password)
+    throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
   }
 
@@ -147,8 +148,8 @@ public class UserManagementHelper {
     return RodaCoreFactory.getModelService().confirmUserEmail(username, email, emailConfirmationToken, true, true);
   }
 
-  public static User requestPasswordReset(String username, String email) throws IllegalOperationException,
-    NotFoundException, GenericException {
+  public static User requestPasswordReset(String username, String email)
+    throws IllegalOperationException, NotFoundException, GenericException {
     return RodaCoreFactory.getModelService().requestPasswordReset(username, email, true, true);
   }
 
@@ -187,6 +188,15 @@ public class UserManagementHelper {
     RodaCoreFactory.getModelService().updateFormat(format);
     RodaCoreFactory.getIndexService().delete(Format.class, Arrays.asList(format.getId()));
     RodaCoreFactory.getIndexService().create(Format.class, format);
+  }
+
+  protected static IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(Message.class, filter, sorter, sublist, facets);
+  }
+
+  public static Message retrieveMessage(String messageId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Message.class, messageId);
   }
 
 }

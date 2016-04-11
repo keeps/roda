@@ -30,6 +30,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -320,4 +321,9 @@ public interface UserManagementServiceAsync {
    * @throws RODAException
    */
   public void modifyFormat(Format format, AsyncCallback<Void> asyncCallback);
+
+  void findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
+    AsyncCallback<IndexResult<Message>> callback);
+
+  public void retrieveMessage(String messageId, AsyncCallback<Message> asyncCallback);
 }

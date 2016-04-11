@@ -8,6 +8,7 @@
 
 package org.roda.wui.client.planning;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -49,6 +50,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  @SuppressWarnings("unused")
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
@@ -244,7 +246,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
 
   // FIXME to delete after create list component
   private List<String> setListString(String list) {
-    return Arrays.asList(list.split("\\s*\n\\s*"));
+    return !list.equals("") ? Arrays.asList(list.split("\\s*\n\\s*")) : new ArrayList<String>();
   }
 
   public Format getFormat() {

@@ -177,6 +177,7 @@ public class ShowRisk extends Composite {
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
     riskCategory.setText(risk.getCategory());
     riskNotesValue.setText(risk.getNotes());
+    riskNotesKey.setVisible(risk.getNotes().length() > 0);
 
     riskPreMitigationProbability.setText(Integer.toString(risk.getPreMitigationProbability()));
     riskPreMitigationImpact.setText(Integer.toString(risk.getPreMitigationImpact()));

@@ -34,6 +34,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -50,8 +51,8 @@ public class UserManagement extends RodaCoreService {
     super();
   }
 
-  public static Long countLogEntries(RodaUser user, Filter filter) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException {
+  public static Long countLogEntries(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -85,8 +86,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static LogEntry retrieveLogEntry(RodaUser user, String logEntryId) throws GenericException,
-    AuthorizationDeniedException, NotFoundException {
+  public static LogEntry retrieveLogEntry(RodaUser user, String logEntryId)
+    throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -101,8 +102,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Risk retrieveRisk(RodaUser user, String riskId) throws GenericException, AuthorizationDeniedException,
-    NotFoundException {
+  public static Risk retrieveRisk(RodaUser user, String riskId)
+    throws GenericException, AuthorizationDeniedException, NotFoundException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -117,8 +118,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Risk addRisk(RodaUser user, Risk risk) throws GenericException, AuthorizationDeniedException,
-    RequestNotValidException {
+  public static Risk addRisk(RodaUser user, Risk risk)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -132,8 +133,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void modifyRisk(RodaUser user, Risk risk) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public static void modifyRisk(RodaUser user, Risk risk)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -146,8 +147,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "modifyRisk", null, duration, "risk", risk);
   }
 
-  public static Long countMembers(RodaUser user, Filter filter) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public static Long countMembers(RodaUser user, Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -175,13 +176,14 @@ public class UserManagement extends RodaCoreService {
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter,
-      "sublist", sublist);
+    registerAction(user, "UserManagement", "findMembers", null, duration, "filter", filter, "sorter", sorter, "sublist",
+      sublist);
 
     return ret;
   }
 
-  public static User retrieveUser(RodaUser user, String username) throws AuthorizationDeniedException, GenericException {
+  public static User retrieveUser(RodaUser user, String username)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -197,8 +199,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static RodaUser retrieveRodaUser(RodaUser user, String username) throws AuthorizationDeniedException,
-    GenericException, NotFoundException {
+  public static RodaUser retrieveRodaUser(RodaUser user, String username)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -214,8 +216,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Group retrieveGroup(RodaUser user, String groupname) throws AuthorizationDeniedException,
-    GenericException, NotFoundException {
+  public static Group retrieveGroup(RodaUser user, String groupname)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -247,8 +249,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void registerUser(User user, String password) throws GenericException, UserAlreadyExistsException,
-    EmailAlreadyExistsException {
+  public static void registerUser(User user, String password)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     Date start = new Date();
 
     // delegate
@@ -259,9 +261,9 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "registerUser", null, duration, "user", user);
   }
 
-  public static User addUser(RodaUser user, User newUser, String password) throws AuthorizationDeniedException,
-    NotFoundException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
-    IllegalOperationException {
+  public static User addUser(RodaUser user, User newUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, EmailAlreadyExistsException,
+    UserAlreadyExistsException, IllegalOperationException {
     Date start = new Date();
 
     // check user permissions
@@ -297,8 +299,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "modifyUser", null, duration, "user", modifiedUser);
   }
 
-  public static void modifyUser(RodaUser user, User modifiedUser, String password) throws AuthorizationDeniedException,
-    NotFoundException, AlreadyExistsException, GenericException {
+  public static void modifyUser(RodaUser user, User modifiedUser, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -325,8 +327,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "removeUser", null, duration, "username", username);
   }
 
-  public static void addGroup(RodaUser user, Group group) throws AuthorizationDeniedException, GenericException,
-    AlreadyExistsException {
+  public static void addGroup(RodaUser user, Group group)
+    throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
     Date start = new Date();
 
     // check user permissions
@@ -340,8 +342,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "addGroup", null, duration, "group", group);
   }
 
-  public static void modifyGroup(RodaUser user, Group group) throws AuthorizationDeniedException, GenericException,
-    NotFoundException {
+  public static void modifyGroup(RodaUser user, Group group)
+    throws AuthorizationDeniedException, GenericException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -355,7 +357,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "modifyGroup", null, duration, "group", group);
   }
 
-  public static void removeGroup(RodaUser user, String groupname) throws AuthorizationDeniedException, GenericException {
+  public static void removeGroup(RodaUser user, String groupname)
+    throws AuthorizationDeniedException, GenericException {
     Date start = new Date();
 
     // check user permissions
@@ -368,8 +371,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "removeGroup", null, duration, "groupname", groupname);
   }
 
-  public static void sendEmailVerification(String servletPath, String username) throws GenericException,
-    NotFoundException {
+  public static void sendEmailVerification(String servletPath, String username)
+    throws GenericException, NotFoundException {
     Date start = new Date();
 
     User user = UserManagementHelper.retrieveUser(username);
@@ -387,8 +390,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "resendEmailVerification", null, duration, "user", user);
   }
 
-  public static void confirmUserEmail(String username, String emailConfirmationToken) throws InvalidTokenException,
-    NotFoundException, GenericException {
+  public static void confirmUserEmail(String username, String emailConfirmationToken)
+    throws InvalidTokenException, NotFoundException, GenericException {
     Date start = new Date();
 
     User user = UserManagementHelper.confirmUserEmail(username, null, emailConfirmationToken);
@@ -398,15 +401,15 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "confirmUserEmail", null, duration, "user", user);
   }
 
-  public static void requestPasswordReset(String servletPath, String usernameOrEmail) throws GenericException,
-    NotFoundException, IllegalOperationException {
+  public static void requestPasswordReset(String servletPath, String usernameOrEmail)
+    throws GenericException, NotFoundException, IllegalOperationException {
     Date start = new Date();
 
     String username = null;
     String email = null;
 
-    if (usernameOrEmail
-      .matches("^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$")) {
+    if (usernameOrEmail.matches(
+      "^[\\w-]+(\\.[\\w-]+)*@([a-z0-9-]+(\\.[a-z0-9-]+)*?\\.[a-z]{2,6}|(\\d{1,3}\\.){3}\\d{1,3})(:\\d{4})?$")) {
       email = usernameOrEmail;
     } else {
       username = usernameOrEmail;
@@ -475,8 +478,8 @@ public class UserManagement extends RodaCoreService {
     }
   }
 
-  public static Agent retrieveAgent(RodaUser user, String agentId) throws AuthorizationDeniedException,
-    NotFoundException, GenericException {
+  public static Agent retrieveAgent(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -491,8 +494,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Agent addAgent(RodaUser user, Agent agent) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public static Agent addAgent(RodaUser user, Agent agent)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -506,8 +509,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void modifyAgent(RodaUser user, Agent agent) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException {
+  public static void modifyAgent(RodaUser user, Agent agent)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -520,8 +523,8 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "modifyAgent", null, duration, "agent", agent);
   }
 
-  public static Format retrieveFormat(RodaUser user, String formatId) throws NotFoundException, GenericException,
-    AuthorizationDeniedException {
+  public static Format retrieveFormat(RodaUser user, String formatId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -536,8 +539,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static Format addFormat(RodaUser user, Format format) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException {
+  public static Format addFormat(RodaUser user, Format format)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -551,8 +554,8 @@ public class UserManagement extends RodaCoreService {
     return ret;
   }
 
-  public static void modifyFormat(RodaUser user, Format format) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException {
+  public static void modifyFormat(RodaUser user, Format format)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
     Date start = new Date();
     // check user permissions
     UserUtility.checkRoles(user, ROLE);
@@ -563,5 +566,39 @@ public class UserManagement extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, "UserManagement", "modifyFormat", null, duration, "format", format);
+  }
+
+  public static IndexResult<Message> findMessages(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    IndexResult<Message> ret = UserManagementHelper.findMessages(filter, sorter, sublist, facets);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "findMessages", null, duration, "filter", filter, "sorter", sorter,
+      "sublist", sublist);
+
+    return ret;
+  }
+
+  public static Message retrieveMessage(RodaUser user, String messageId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+    // check user permissions
+    UserUtility.checkRoles(user, ROLE);
+
+    // delegate
+    Message ret = UserManagementHelper.retrieveMessage(messageId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "retrieveMessage", null, duration, "messageId", messageId);
+
+    return ret;
   }
 }

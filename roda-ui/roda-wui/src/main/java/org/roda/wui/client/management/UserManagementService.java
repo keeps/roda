@@ -31,6 +31,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -71,8 +72,8 @@ public interface UserManagementService extends RemoteService {
     }
   }
 
-  public Long getMemberCount(Filter filter) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException;
+  public Long getMemberCount(Filter filter)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -115,8 +116,8 @@ public interface UserManagementService extends RemoteService {
    * @throws EmailAlreadyExistsException
    * @throws RecaptchaException
    */
-  public void registerUser(User user, String password, String captcha) throws GenericException,
-    UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
+  public void registerUser(User user, String password, String captcha)
+    throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException, RecaptchaException;
 
   /**
    * Create a new user
@@ -147,8 +148,8 @@ public interface UserManagementService extends RemoteService {
    * @throws AlreadyExistsException
    * @throws GenericException
    */
-  public void modifyUser(User user, String password) throws AuthorizationDeniedException, NotFoundException,
-    AlreadyExistsException, GenericException;
+  public void modifyUser(User user, String password)
+    throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException;
 
   /**
    * Modify the authenticated user
@@ -221,8 +222,11 @@ public interface UserManagementService extends RemoteService {
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  public LogEntry retrieveLogEntry(String logEntryId) throws AuthorizationDeniedException, GenericException,
-    NotFoundException;
+  public LogEntry retrieveLogEntry(String logEntryId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException;
+
+  public IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   /**
    * Get risk
@@ -278,8 +282,8 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws GenericException
    */
-  public void confirmUserEmail(String username, String emailConfirmationToken) throws InvalidTokenException,
-    NotFoundException, GenericException;
+  public void confirmUserEmail(String username, String emailConfirmationToken)
+    throws InvalidTokenException, NotFoundException, GenericException;
 
   /**
    * Change the email of a user that is still not active due to a email
@@ -309,8 +313,8 @@ public interface UserManagementService extends RemoteService {
    * @throws LdapUtilityException
    * @throws RecaptchaException
    */
-  public void requestPasswordReset(String usernameOrEmail, String captcha) throws GenericException, NotFoundException,
-    IllegalOperationException, RecaptchaException;
+  public void requestPasswordReset(String usernameOrEmail, String captcha)
+    throws GenericException, NotFoundException, IllegalOperationException, RecaptchaException;
 
   /**
    * Reset a user password
@@ -371,8 +375,8 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public Format retrieveFormat(String formatId) throws NotFoundException, GenericException,
-    AuthorizationDeniedException;
+  public Format retrieveFormat(String formatId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException;
 
   /**
    * Add format
@@ -384,8 +388,8 @@ public interface UserManagementService extends RemoteService {
    * @throws NotFoundException
    * @throws AuthorizationDeniedException
    */
-  public Format addFormat(Format format) throws AuthorizationDeniedException, GenericException,
-    RequestNotValidException;
+  public Format addFormat(Format format)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   /**
    * Edit format
@@ -395,7 +399,9 @@ public interface UserManagementService extends RemoteService {
    * @throws GenericException
    * @throws AuthorizationDeniedException
    */
-  public void modifyFormat(Format format) throws GenericException, RequestNotValidException,
-    AuthorizationDeniedException;
+  public void modifyFormat(Format format)
+    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
+
+  Message retrieveMessage(String messageId) throws NotFoundException, GenericException, AuthorizationDeniedException;
 
 }

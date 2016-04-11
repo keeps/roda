@@ -468,6 +468,7 @@ public final class RodaConstants {
   public static final String MESSAGE_ACKNOWLEDGED_ON = "acknowledgedOn";
 
   public static final String MESSAGE_FILE_EXTENSION = ".json";
+  public static final String MESSAGE_SEARCH = "search";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
