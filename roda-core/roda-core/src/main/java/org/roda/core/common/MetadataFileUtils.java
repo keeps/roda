@@ -24,12 +24,15 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.tika.metadata.Metadata;
 import org.jdom2.Element;
+import org.jdom2.IllegalDataException;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StringContentPayload;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
@@ -37,63 +40,79 @@ import org.xml.sax.SAXException;
 import gov.loc.repository.bagit.BagInfoTxt;
 
 public class MetadataFileUtils {
+  private static Logger LOGGER = LoggerFactory.getLogger(MetadataFileUtils.class);
 
   public static String generateMetadataFile(Metadata metadata) throws IOException {
-    String[] names = metadata.names();
-    Element root = new Element("metadata");
-    org.jdom2.Document doc = new org.jdom2.Document();
+    try {
+      String[] names = metadata.names();
+      Element root = new Element("metadata");
+      org.jdom2.Document doc = new org.jdom2.Document();
 
-    for (String name : names) {
-      String[] values = metadata.getValues(name);
-      if (values != null && values.length > 0) {
-        for (String value : values) {
+      for (String name : names) {
+        String[] values = metadata.getValues(name);
+        if (values != null && values.length > 0) {
+          for (String value : values) {
+            Element child = new Element("field");
+            child.setAttribute("name", name);
+            child.addContent(value);
+            root.addContent(child);
+          }
+        }
+
+      }
+      doc.setRootElement(root);
+      XMLOutputter outter = new XMLOutputter();
+      outter.setFormat(Format.getPrettyFormat());
+      outter.outputString(doc);
+      return outter.outputString(doc);
+    } catch (IllegalDataException e) {
+      LOGGER.debug("Error generating Tika metadata file {}", e.getMessage());
+      return "";
+    }
+  }
+
+  public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
+    try {
+      Element root = new Element("metadata");
+      org.jdom2.Document doc = new org.jdom2.Document();
+
+      for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
+        if (!entry.getKey().equalsIgnoreCase("parent")) {
           Element child = new Element("field");
-          child.setAttribute("name", name);
-          child.addContent(value);
+          child.setAttribute("name", entry.getKey());
+          child.addContent(entry.getValue());
           root.addContent(child);
         }
       }
 
+      doc.setRootElement(root);
+      XMLOutputter outter = new XMLOutputter();
+      outter.setFormat(Format.getPrettyFormat());
+      outter.outputString(doc);
+      return outter.outputString(doc);
+    } catch (IllegalDataException e) {
+      LOGGER.debug("Error generating Bagit metadata file {}", e.getMessage());
+      return "";
     }
-    doc.setRootElement(root);
-    XMLOutputter outter = new XMLOutputter();
-    outter.setFormat(Format.getPrettyFormat());
-    outter.outputString(doc);
-    return outter.outputString(doc);
-  }
-
-  public static String generateMetadataFile(BagInfoTxt bagInfoTxt) throws IOException {
-    Element root = new Element("metadata");
-    org.jdom2.Document doc = new org.jdom2.Document();
-
-    for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
-      if (!entry.getKey().equalsIgnoreCase("parent")) {
-        Element child = new Element("field");
-        child.setAttribute("name", entry.getKey());
-        child.addContent(entry.getValue());
-        root.addContent(child);
-      }
-    }
-
-    doc.setRootElement(root);
-    XMLOutputter outter = new XMLOutputter();
-    outter.setFormat(Format.getPrettyFormat());
-    outter.outputString(doc);
-    return outter.outputString(doc);
   }
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
-    Element root = new Element("metadata");
-    org.jdom2.Document doc = new org.jdom2.Document();
-    Element child = new Element("field");
-    child.setAttribute("name", "title");
-    child.addContent(transferredResource.getName());
-    root.addContent(child);
-    doc.setRootElement(root);
-    XMLOutputter outter = new XMLOutputter();
-    outter.setFormat(Format.getPrettyFormat());
-    outter.outputString(doc);
-    return new StringContentPayload(outter.outputString(doc));
+    try {
+      Element root = new Element("metadata");
+      org.jdom2.Document doc = new org.jdom2.Document();
+      Element child = new Element("field");
+      child.setAttribute("name", "title");
+      child.addContent(transferredResource.getName());
+      root.addContent(child);
+      doc.setRootElement(root);
+      XMLOutputter outter = new XMLOutputter();
+      outter.setFormat(Format.getPrettyFormat());
+      outter.outputString(doc);
+      return new StringContentPayload(outter.outputString(doc));
+    } catch (IllegalDataException e) {
+      LOGGER.debug("Error generating TransferredResource metadata file {}", e.getMessage());
+      return new StringContentPayload("");
+    }
   }
 
   public static Map<String, List<String>> parseBinary(Binary binary)
