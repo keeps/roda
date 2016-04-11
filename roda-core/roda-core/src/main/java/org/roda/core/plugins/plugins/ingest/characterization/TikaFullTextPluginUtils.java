@@ -9,7 +9,9 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
+import java.io.StringWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.ReaderInputStream;
@@ -31,6 +33,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -49,10 +52,10 @@ public class TikaFullTextPluginUtils {
 
   private static final Tika tika = new Tika();
 
-  public static void runTikaFullTextOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    AIP aip, Representation representation, boolean doFeatureExtraction, boolean doFulltextExtraction)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException,
-      ValidationException {
+  public static Report runTikaFullTextOnRepresentation(Report reportItem, IndexService index, ModelService model,
+    StorageService storage, AIP aip, Representation representation, boolean doFeatureExtraction,
+    boolean doFulltextExtraction) throws NotFoundException, GenericException, RequestNotValidException,
+      AuthorizationDeniedException, ValidationException {
 
     boolean recursive = true;
     CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
@@ -87,7 +90,20 @@ public class TikaFullTextPluginUtils {
             }
 
           } catch (IOException | RODAException e) {
-            LOGGER.error("Error running Apache Tika", e);
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            if (reportItem != null) {
+              String details = reportItem.getPluginDetails();
+              if (details == null) {
+                details = "";
+              }
+              details += sw.toString();
+              reportItem.setPluginDetails(details);
+              pw.close();
+            } else {
+              LOGGER.error("Error running Apache Tika", e);
+            }
           } finally {
             IOUtils.closeQuietly(inputStream);
           }
@@ -134,6 +150,7 @@ public class TikaFullTextPluginUtils {
       }
     }
     IOUtils.closeQuietly(allFiles);
+    return reportItem;
   }
 
 }

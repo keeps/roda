@@ -539,13 +539,15 @@ public final class RodaConstants {
   public static final String PRESERVATION_LINKING_OBJECT_OUTCOME = "outcome";
 
   public enum PreservationEventType {
-    FIXITY_CHECK("fixity check"), FORMAT_IDENTIFICATION("format identification"),
-    FORMAT_VALIDATION("format validation"), INGESTION("ingestion"), MIGRATION("migration"),
-    NORMALIZATION("normalization"), VIRUS_CHECK("virus check"), INGEST_START("ingest start"), INGEST_END("ingest end"),
-    MESSAGE_DIGEST_CALCULATION("message digest calculation"), METADATA_EXTRACTION("metadata extraction"),
-    ACCESSION("accession"), DIGITAL_SIGNATURE_VALIDATION("digital signature validation"),
-    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), OBJECT_VALIDATION("object validation"),
-    AUTHORIZATION_CHECK("authorization check"), DELETION("deletion");
+    CREATION("creation"), DEACCESSION("deaccession"), DECOMPRESSION("decompression"), NORMALIZATION("normalization"),
+    FIXITY_CHECK("fixity check"), VALIDATION("validation"), CAPTURE("capture"), REPLICATION("replication"),
+    MESSAGE_DIGEST_CALCULATION("message digest calculation"), VIRUS_CHECK("virus check"),
+    DIGITAL_SIGNATURE_VALIDATION("digital signature validation"), COMPRESSION("compression"), DELETION("deletion"),
+    MIGRATION("migration"), INGESTION("ingestion"), DECRYPTION("decryption"),
+    // extra types...
+    WELLFORMEDNESS_CHECK("wellformedness check"), UNPACKING("unpacking"), METADATA_EXTRACTION("metadata extraction"),
+    ACCESSION("accession"), AUTHORIZATION_CHECK("authorization check"), FORMAT_IDENTIFICATION("format identification"),
+    FORMAT_VALIDATION("format validation"), INGEST_START("ingest start"), INGEST_END("ingest end");
 
     private final String text;
 
