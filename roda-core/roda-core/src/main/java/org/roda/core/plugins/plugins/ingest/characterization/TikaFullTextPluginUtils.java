@@ -90,10 +90,10 @@ public class TikaFullTextPluginUtils {
             }
 
           } catch (IOException | RODAException e) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            e.printStackTrace(pw);
             if (reportItem != null) {
+              StringWriter sw = new StringWriter();
+              PrintWriter pw = new PrintWriter(sw);
+              e.printStackTrace(pw);
               String details = reportItem.getPluginDetails();
               if (details == null) {
                 details = "";
