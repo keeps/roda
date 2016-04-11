@@ -82,11 +82,15 @@ public class DescriptionLevelUtils {
   }
   
   public static HTMLPanel getElementLevelIconHTMLPanel(String level) {
-    return new HTMLPanel(getElementLevelIconSafeHtml(level));
+    return new HTMLPanel(getElementLevelIconSafeHtml(level,false));
   }
 
-  public static SafeHtml getElementLevelIconSafeHtml(String level) {
-    return SafeHtmlUtils.fromSafeConstant("<i class='" + getElementLevelIconClasses(level) + "'></i>");
+  public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
+    String html = "<i class='" + getElementLevelIconClasses(level) + "'></i>";
+    if(showText){
+      html+="<span class='levelText'>"+level+"</span>";
+    }
+    return SafeHtmlUtils.fromSafeConstant(html);
   }
 
   public static String getElementLevelIconClasses(String level) {

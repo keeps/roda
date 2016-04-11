@@ -39,7 +39,6 @@ import com.google.gwt.user.client.ui.Label;
 
 public class AIPList extends AsyncTableCell<IndexedAIP> {
 
-
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
   private Column<IndexedAIP, SafeHtml> levelColumn;
@@ -64,7 +63,7 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
           logger.error("Trying to display a NULL item");
           ret = null;
         } else {
-          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel());
+          ret = DescriptionLevelUtils.getElementLevelIconSafeHtml(aip.getLevel(), true);
         }
         return ret;
       }

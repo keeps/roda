@@ -565,7 +565,7 @@ public class Browse extends Composite {
   }
 
   private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel());
+    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(),false);
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
     builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
