@@ -210,6 +210,9 @@ public class Browse extends Composite {
   Button remove;
 
   @UiField
+  Button newProcess;
+
+  @UiField
   Button editPermissions;
 
   private boolean viewingTop;
@@ -880,6 +883,11 @@ public class Browse extends Composite {
         }
       });
     }
+  }
+  
+  @UiHandler("newProcess")
+  void buttonNewProcessHandler(ClickEvent e) {
+    Toast.showInfo("Sorry", "Feature not yet implemented");
   }
 
   @UiHandler("editPermissions")
