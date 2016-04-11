@@ -634,7 +634,7 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="normalize-space(ead:scopecontent/ead:p/text())!=''">
+		<xsl:if test="normalize-space(string-join(ead:scopecontent/ead:p/text(),''))!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="$i18n.description" />
@@ -742,7 +742,7 @@
 				</div>
 			</div>
 		</xsl:if>
-		<xsl:if test="normalize-space(ead:relatedmaterial/ead:p/text())!=''">
+		<xsl:if test="normalize-space(string-join(ead:relatedmaterial/ead:p/text(),''))!=''">
 			<div class="descriptiveMetadata-field">
 				<div class="descriptiveMetadata-field-key">
 					<xsl:value-of select="$i18n.relatedmaterials" />
@@ -852,7 +852,7 @@
 				</xsl:if>
 				
 			</xsl:if>
-			<xsl:if test="normalize-space(ead:filedesc/ead:publicationstmt/text())!=''">
+			<xsl:if test="normalize-space(string-join(ead:filedesc/ead:publicationstmt/text(),''))!=''">
 				<div class="descriptiveMetadata-field">
 					<div class="descriptiveMetadata-field-key">
 						<xsl:value-of select="$i18n.control.filedesc.publicationstmt" />
