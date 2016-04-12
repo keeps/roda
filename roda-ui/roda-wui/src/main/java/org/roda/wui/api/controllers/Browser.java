@@ -1065,4 +1065,29 @@ public class Browser extends RodaCoreService {
       throw new NotFoundException("No AIPs match filter");
     }
   }
+
+  public static void deleteAIPs(RodaUser user, Filter filter)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // find the aips
+    List<IndexedAIP> aips = BrowserHelper.matchAIP(filter, user);
+
+    if (aips != null && aips.size() > 0) {
+      // check object permissions
+      UserUtility.checkObjectPermissions(user, aips, PermissionType.DELETE);
+
+      // delegate
+      BrowserHelper.removeAIPs(aips);
+
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "deleteAIPs", null, duration);
+    } else {
+      throw new NotFoundException("No AIPs match filter");
+    }
+  }
 }

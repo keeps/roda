@@ -1325,4 +1325,12 @@ public class BrowserHelper {
       throw new GenericException("Error exporting AIPS", e);
     }
   }
+
+  public static void removeAIPs(List<IndexedAIP> aips)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    ModelService model = RodaCoreFactory.getModelService();
+    for (IndexedAIP aip : aips) {
+      model.deleteAIP(aip.getId());
+    }
+  }
 }
