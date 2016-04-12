@@ -14,7 +14,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Edit permissions</g:Label>
-				<common:BasicSearch ui:field="basicSearch" />
+				<common:SearchPanel ui:field="searchPanel" />
 				<lists:SimpleRodaMemberList
 					addStyleNames="searchResults" ui:field="list" />
 				<g:FlowPanel ui:field="permissionsPanel" />

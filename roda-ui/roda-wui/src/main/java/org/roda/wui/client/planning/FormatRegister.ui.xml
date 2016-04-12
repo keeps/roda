@@ -20,7 +20,7 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="formatRegisterDescription">
 				</g:FlowPanel>
-				<common:BasicSearch ui:field="basicSearch" />
+				<common:SearchPanel ui:field="searchPanel" />
 				<lists:FormatList addStyleNames="searchResults"
 					ui:field="formatList" />
 			</g:FlowPanel>

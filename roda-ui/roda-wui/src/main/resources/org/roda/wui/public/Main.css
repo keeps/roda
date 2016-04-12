@@ -3530,6 +3530,10 @@ td.datePickerMonth, td.datePickerYear {
 	background-color: transparent;
 }
 
+.viewRepresentation .searchPanelRight {
+	position: absolute;
+}
+
 .viewRepresentation .searchButton-html {
 	font-size: 14px;
 }

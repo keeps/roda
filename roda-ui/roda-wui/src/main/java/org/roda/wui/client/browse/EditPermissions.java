@@ -16,7 +16,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SimpleRodaMemberList;
 import org.roda.wui.common.client.HistoryResolver;
@@ -90,7 +90,7 @@ public class EditPermissions extends Composite {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   SimpleRodaMemberList list;
@@ -106,8 +106,8 @@ public class EditPermissions extends Composite {
     Filter filter = null;
     list = new SimpleRodaMemberList(filter, null, "Users and groups", false);
 
-    basicSearch = new BasicSearch(null, null, "", false, false);
-    basicSearch.setList(list);
+    searchPanel = new SearchPanel(null, null, "", false, false);
+    searchPanel.setList(list);
 
     initWidget(uiBinder.createAndBindUi(this));
 

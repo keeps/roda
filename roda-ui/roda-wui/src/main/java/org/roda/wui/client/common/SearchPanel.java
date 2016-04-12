@@ -34,10 +34,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class BasicSearch extends Composite implements HasValueChangeHandlers<String> {
+public class SearchPanel extends Composite implements HasValueChangeHandlers<String> {
   private static final Binder binder = GWT.create(Binder.class);
 
-  interface Binder extends UiBinder<Widget, BasicSearch> {
+  interface Binder extends UiBinder<Widget, SearchPanel> {
   }
 
   @UiField
@@ -75,7 +75,7 @@ public class BasicSearch extends Composite implements HasValueChangeHandlers<Str
   private FlowPanel fieldsPanel;
   private AsyncTableCell<?> list;
 
-  public BasicSearch(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
+  public SearchPanel(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
     boolean showSearchAdvancedDisclosureButton) {
     this.defaultFilter = defaultFilter;
     this.allFilter = allFilter;

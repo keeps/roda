@@ -22,7 +22,7 @@ import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.LogEntryList;
 import org.roda.wui.common.client.ClientLogger;
@@ -103,7 +103,7 @@ public class UserLog extends Composite {
   FlowPanel userLogDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField
   DateBox inputDateInitial;
@@ -137,9 +137,9 @@ public class UserLog extends Composite {
       new SimpleFacetParameter(RodaConstants.LOG_ACTION_METHOD), new SimpleFacetParameter(RodaConstants.LOG_USERNAME));
     logList = new LogEntryList(filter, facets, "Logs", false);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.LOG_SEARCH, messages.userLogSearchPlaceHolder(), false,
       false);
-    basicSearch.setList(logList);
+    searchPanel.setList(logList);
 
     facetComponents = new FlowPanel();
     facetMethods = new FlowPanel();

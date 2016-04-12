@@ -16,7 +16,7 @@
 
 	<g:FlowPanel addStyleNames="selectAip wui-dialog-confirm wrapper skip_padding">
 		<g:FlowPanel addStyleNames="wui-dialog-layout">
-			<common:BasicSearch ui:field="basicSearch" />
+			<common:SearchPanel ui:field="searchPanel" />
 			<g:ScrollPanel addStyleNames="selectAipResultsPanel">
 				<lists:AIPList ui:field="searchResultsPanel" />
 			</g:ScrollPanel>

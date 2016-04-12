@@ -4,7 +4,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:m="urn:import:org.roda.wui.client.main"
 	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
-	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
+	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
@@ -20,20 +20,7 @@
 				<g:HorizontalPanel ui:field="previewPanel">
 					<!-- LEFT PANEL -->
 					<g:FlowPanel ui:field="filesPanel">
-						<g:FlowPanel styleName="searchPanel">
-							<wcag:AccessibleFocusPanel styleName="searchButton"
-								ui:field="searchInputButton">
-								<g:HTML addStyleNames="searchButton-html">
-									<span class="fa-stack fa-lg">
-										<i class="fa fa-circle fa-stack-2x"></i>
-										<i class="fa fa-search fa-stack-1x"></i>
-									</span>
-								</g:HTML>
-							</wcag:AccessibleFocusPanel>
-							<g:FlowPanel styleName="searchPanelLeft">
-								<g:TextBox ui:field="searchInputBox" addStyleNames="searchBox" />
-							</g:FlowPanel>
-						</g:FlowPanel>
+						<common:SearchPanel ui:field="searchPanel" />
 						<g:FlowPanel addStyleNames="fileListScroll">
 							<lists:SimpleFileList ui:field="filesList" />
 						</g:FlowPanel>

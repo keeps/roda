@@ -15,10 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.httpclient.HttpStatus;
-import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
@@ -27,6 +25,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.FileFormat;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.SimpleFileList;
 import org.roda.wui.client.common.utils.JavascriptUtils;
@@ -38,7 +37,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
-import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -79,7 +77,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
@@ -229,12 +226,9 @@ public class ViewRepresentation extends Composite {
 
   @UiField
   FlowPanel filesPanel;
-
-  @UiField
-  TextBox searchInputBox;
-
-  @UiField
-  AccessibleFocusPanel searchInputButton;
+  
+  @UiField(provided = true)
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   SimpleFileList filesList;
@@ -312,13 +306,16 @@ public class ViewRepresentation extends Composite {
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
     filesList = new SimpleFileList(defaultFilter, null, null, false);
+    
+    searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH, messages.viewRepresentationSearchPlaceHolder(), false,
+      false);
+    searchPanel.setList(filesList);
+    searchPanel.setDefaultFilterIncremental(false);
 
     initWidget(uiBinder.createAndBindUi(this));
 
     breadcrumb.updatePath(getBreadcrumbs());
     breadcrumb.setVisible(true);
-
-    searchInputBox.getElement().setPropertyString("placeholder", messages.viewRepresentationSearchPlaceHolder());
 
     infoFileButton.setVisible(false);
     downloadFileButton.setVisible(false);
@@ -384,22 +381,6 @@ public class ViewRepresentation extends Composite {
     });
 
     filePreview();
-
-    this.searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
-      @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        doSearch();
-      }
-    });
-
-    this.searchInputButton.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        doSearch();
-      }
-    });
 
     focusPanel.setFocus(true);
     focusPanel.addKeyDownHandler(new KeyDownHandler() {
@@ -845,20 +826,6 @@ public class ViewRepresentation extends Composite {
 
   private String encode(String string) {
     return string.replace("?", "%3F").replace("=", "%3D");
-  }
-
-  public void doSearch() {
-    List<FilterParameter> parameters = new ArrayList<FilterParameter>();
-
-    String basicQuery = searchInputBox.getText();
-    if (!basicQuery.isEmpty()) {
-      parameters.add(new BasicSearchFilterParameter(RodaConstants.FILE_SEARCH, basicQuery));
-    }
-
-    Filter filter = new Filter(defaultFilter);
-    filter.add(parameters);
-
-    filesList.setFilter(filter);
   }
 
   public void changeInfoFile() {

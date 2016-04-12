@@ -30,7 +30,7 @@
 				</g:FlowPanel>
 				<m:BreadcrumbPanel ui:field="breadcrumb"
 					addStyleNames="browseBreadcrumb" />
-				<common:BasicSearch ui:field="basicSearch" />
+				<common:SearchPanel ui:field="searchPanel" />
 				<lists:TransferredResourceList
 					addStyleNames="transferredResourceList" ui:field="transferredResourceList" />
 				<g:Button addStyleNames="btn btn-download" ui:field="download">

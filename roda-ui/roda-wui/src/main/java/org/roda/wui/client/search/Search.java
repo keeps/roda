@@ -28,7 +28,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
@@ -117,7 +117,7 @@ public class Search extends Composite {
   FlowPanel searchDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField
   FlowPanel searchResultPanel;
@@ -163,7 +163,7 @@ public class Search extends Composite {
     filesSearchAdvancedFieldsPanel = new FlowPanel();
     representationsSearchAdvancedFieldsPanel = new FlowPanel();
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true,
+    searchPanel = new SearchPanel(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true,
       true);
 
     searchAdvancedFieldOptions = new ListBox();
@@ -172,27 +172,27 @@ public class Search extends Composite {
 
     searchDescription.add(new HTMLWidgetWrapper("SearchDescription.html"));
 
-    basicSearch.setDropdownLabel(messages.searchListBoxItems());
-    basicSearch.addDropdownItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
-    basicSearch.addDropdownItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
-    basicSearch.addDropdownItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
+    searchPanel.setDropdownLabel(messages.searchListBoxItems());
+    searchPanel.addDropdownItem(messages.searchListBoxItems(), RodaConstants.SEARCH_LIST_BOX_ITEMS);
+    searchPanel.addDropdownItem(messages.searchListBoxRepresentations(), RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS);
+    searchPanel.addDropdownItem(messages.searchListBoxFiles(), RodaConstants.SEARCH_LIST_BOX_FILES);
 
-    basicSearch.addValueChangeHandler(new ValueChangeHandler<String>() {
+    searchPanel.addValueChangeHandler(new ValueChangeHandler<String>() {
 
       @Override
       public void onValueChange(ValueChangeEvent<String> event) {
-        if (basicSearch.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
+        if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_ITEMS)) {
           showSearchAdvancedFieldsPanel();
-        } else if (basicSearch.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
+        } else if (searchPanel.getDropdownSelectedValue().equals(RodaConstants.SEARCH_LIST_BOX_REPRESENTATIONS)) {
           showRepresentationsSearchAdvancedFieldsPanel();
         } else {
           showFilesSearchAdvancedFieldsPanel();
         }
-        basicSearch.doSearch();
+        searchPanel.doSearch();
       }
     });
 
-    basicSearch.addDropdownPopupStyleName("searchInputListBoxPopup");
+    searchPanel.addDropdownPopupStyleName("searchInputListBoxPopup");
 
     BrowserService.Util.getInstance().getSearchFields(LocaleInfo.getCurrentLocale().getLocaleName(),
       new AsyncCallback<List<SearchField>>() {
@@ -222,7 +222,7 @@ public class Search extends Composite {
         }
       });
 
-    basicSearch.addSearchAdvancedFieldAddHandler(new ClickHandler() {
+    searchPanel.addSearchAdvancedFieldAddHandler(new ClickHandler() {
 
       @Override
       public void onClick(ClickEvent event) {
@@ -340,7 +340,7 @@ public class Search extends Composite {
     itemsSearchAdvancedFieldsPanel.add(searchFieldPanel);
     itemsSearchAdvancedFieldsPanel.removeStyleName("empty");
 
-    basicSearch.setSearchAdvancedGoEnabled(true);
+    searchPanel.setSearchAdvancedGoEnabled(true);
 
     ClickHandler clickHandler = new ClickHandler() {
 
@@ -349,7 +349,7 @@ public class Search extends Composite {
         itemsSearchAdvancedFieldsPanel.remove(searchFieldPanel);
         if (itemsSearchAdvancedFieldsPanel.getWidgetCount() == 0) {
           itemsSearchAdvancedFieldsPanel.addStyleName("empty");
-          basicSearch.setSearchAdvancedGoEnabled(false);
+          searchPanel.setSearchAdvancedGoEnabled(false);
         }
       }
     };
@@ -362,9 +362,9 @@ public class Search extends Composite {
       createItemsSearchResultPanel();
     }
 
-    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
+    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
-    basicSearch.setSearchAdvancedFieldOptionsAddVisible(true);
+    searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
 
     searchResultPanel.clear();
     searchResultPanel.add(itemsSearchResultPanel);
@@ -378,9 +378,9 @@ public class Search extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
-    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH,
+    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH,
       representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
-    basicSearch.setSearchAdvancedFieldOptionsAddVisible(false);
+    searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
 
     searchResultPanel.clear();
     searchResultPanel.add(representationsSearchResultPanel);
@@ -394,9 +394,9 @@ public class Search extends Composite {
       createFilesSearchResultPanel();
     }
 
-    basicSearch.setVariables(DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
+    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
       filesSearchAdvancedFieldsPanel);
-    basicSearch.setSearchAdvancedFieldOptionsAddVisible(false);
+    searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
 
     searchResultPanel.clear();
     searchResultPanel.add(filesSearchResultPanel);

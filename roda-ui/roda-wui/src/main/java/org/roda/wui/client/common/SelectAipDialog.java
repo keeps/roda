@@ -40,7 +40,7 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField
   Button cancelButton;
@@ -67,10 +67,10 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
     searchResultsPanel = new AIPList(filter, facets, messages.selectAipSearchResults(), false);
 
-    basicSearch = new BasicSearch(filter, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(), false,
+    searchPanel = new SearchPanel(filter, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(), false,
       false);
-    basicSearch.setList(searchResultsPanel);
-    basicSearch.setDefaultFilterIncremental(true);
+    searchPanel.setList(searchResultsPanel);
+    searchPanel.setDefaultFilterIncremental(true);
 
     setWidget(binder.createAndBindUi(this));
 

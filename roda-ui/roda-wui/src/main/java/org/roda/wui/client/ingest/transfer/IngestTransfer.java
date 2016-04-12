@@ -26,7 +26,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
@@ -146,7 +146,7 @@ public class IngestTransfer extends Composite {
   BreadcrumbPanel breadcrumb;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField
   Button download;
@@ -187,10 +187,10 @@ public class IngestTransfer extends Composite {
 
     transferredResourceList = new TransferredResourceList(DEFAULT_FILTER, facets, messages.ingestTransferList(), true);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.TRANSFERRED_RESOURCE_NAME,
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.TRANSFERRED_RESOURCE_NAME,
       messages.ingestTransferSearchPlaceHolder(), false, false);
-    basicSearch.setList(transferredResourceList);
-    basicSearch.setDefaultFilterIncremental(true);
+    searchPanel.setList(transferredResourceList);
+    searchPanel.setDefaultFilterIncremental(true);
 
     initWidget(uiBinder.createAndBindUi(this));
 
@@ -210,7 +210,7 @@ public class IngestTransfer extends Composite {
       public void onSelectionChange(SelectionChangeEvent event) {
         TransferredResource r = transferredResourceList.getSelectionModel().getSelectedObject();
         if (r != null) {
-          basicSearch.clearSearchInputBox();
+          searchPanel.clearSearchInputBox();
           Tools.newHistory(RESOLVER, r.getUUID());
         }
       }
@@ -249,7 +249,7 @@ public class IngestTransfer extends Composite {
 
     if (r.isFile()) {
       // TODO add big download button
-      basicSearch.setVisible(false);
+      searchPanel.setVisible(false);
       transferredResourceList.setVisible(false);
       download.setVisible(true);
     } else {
@@ -257,9 +257,9 @@ public class IngestTransfer extends Composite {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID,
         r.getRelativePath()));
       transferredResourceList.setFilter(filter);
-      basicSearch.setDefaultFilter(filter);
+      searchPanel.setDefaultFilter(filter);
 
-      basicSearch.setVisible(true);
+      searchPanel.setVisible(true);
       transferredResourceList.setVisible(true);
       download.setVisible(false);
     }
@@ -286,12 +286,12 @@ public class IngestTransfer extends Composite {
     itemTitle.addStyleName("browseTitle-allCollections");
     itemIcon.getParent().addStyleName("browseTitle-allCollections-wrapper");
 
-    basicSearch.setVisible(true);
+    searchPanel.setVisible(true);
     transferredResourceList.setVisible(true);
     download.setVisible(false);
 
     transferredResourceList.setFilter(DEFAULT_FILTER);
-    basicSearch.setDefaultFilter(DEFAULT_FILTER);
+    searchPanel.setDefaultFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
     // TODO get date from service

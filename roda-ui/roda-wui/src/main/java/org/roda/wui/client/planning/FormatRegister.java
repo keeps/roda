@@ -22,7 +22,7 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
@@ -111,7 +111,7 @@ public class FormatRegister extends Composite {
   FlowPanel formatRegisterDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   FormatList formatList;
@@ -145,9 +145,9 @@ public class FormatRegister extends Composite {
 
     formatList = new FormatList(filter, facets, "Formats", true);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.FORMAT_SEARCH,
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.FORMAT_SEARCH,
       messages.formatRegisterSearchPlaceHolder(), false, false);
-    basicSearch.setList(formatList);
+    searchPanel.setList(formatList);
 
     formatList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 

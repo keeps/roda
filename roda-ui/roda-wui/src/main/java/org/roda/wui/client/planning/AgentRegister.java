@@ -22,7 +22,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AgentList;
@@ -111,7 +111,7 @@ public class AgentRegister extends Composite {
   FlowPanel agentRegisterDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   AgentList agentList;
@@ -145,9 +145,9 @@ public class AgentRegister extends Composite {
 
     agentList = new AgentList(filter, facets, "Agents", true);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH,
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH,
       messages.agentRegisterSearchPlaceHolder(), false, false);
-    basicSearch.setList(agentList);
+    searchPanel.setList(agentList);
 
     agentList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 

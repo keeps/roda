@@ -25,7 +25,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
@@ -115,7 +115,7 @@ public class RiskRegister extends Composite {
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField(provided = true)
   RiskList riskList;
@@ -156,9 +156,9 @@ public class RiskRegister extends Composite {
 
     riskList = new RiskList(filter, facets, "Risks", true);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.RISK_SEARCH, messages.riskRegisterSearchPlaceHolder(),
       false, false);
-    basicSearch.setList(riskList);
+    searchPanel.setList(riskList);
 
     facetCategories = new FlowPanel();
     facetSeverities = new FlowPanel();
