@@ -97,6 +97,7 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
@@ -1279,8 +1280,12 @@ public class BrowserHelper {
       StorageService storage = RodaCoreFactory.getStorageService();
       for (IndexedAIP aip : aips) {
 
-        LOGGER.warn("AIP: " + aip.getId());
         AIP fullAIP = model.retrieveAIP(aip.getId());
+
+        StoragePath aipJsonPath = DefaultStoragePath.parse(ModelUtils.getAIPStoragePath(aip.getId()),
+          RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+        addToZip(zipEntries, storage.getBinary(aipJsonPath));
+
         for (DescriptiveMetadata dm : fullAIP.getDescriptiveMetadata()) {
           Binary dmBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
           addToZip(zipEntries, dmBinary);
