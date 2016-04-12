@@ -62,8 +62,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
-import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
@@ -327,7 +327,7 @@ public class BrowserHelper {
         representationId, recursive);
       for (OptionalWithCause<org.roda.core.data.v2.ip.File> file : allFiles) {
         if (file.isPresent()) {
-          addToZip(zipEntries, file.get());
+          addToZip(zipEntries, file.get(), false);
         } else {
           LOGGER.error("Cannot get AIP representation file", file.getCause());
         }
@@ -342,18 +342,24 @@ public class BrowserHelper {
 
   }
 
-  private static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file)
+  private static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file, boolean flat)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
     StorageService storage = RodaCoreFactory.getStorageService();
 
     if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(filePath.getName(), binary.getContent());
+      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : filePath.asString(), binary.getContent());
       zipEntries.add(info);
     } else {
       // TODO add directory zip entry
     }
+  }
+
+  private static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    ZipEntryInfo info = new ZipEntryInfo(binary.getStoragePath().asString(), binary.getContent());
+    zipEntries.add(info);
   }
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -1245,5 +1251,73 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().delete(Format.class, formatIds);
+  }
+
+  public static void validateExportAipParams(String acceptFormat) throws RequestNotValidException {
+    if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
+      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
+        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+    }
+  }
+
+  public static List<IndexedAIP> matchAIP(Filter filter, RodaUser user)
+    throws GenericException, RequestNotValidException {
+    List<IndexedAIP> aips = new ArrayList<IndexedAIP>();
+    long count = count(IndexedAIP.class, filter, user);
+    for (int i = 0; i < count; i += 100) {
+      Sorter sorter = new Sorter(new SortParameter(RodaConstants.AIP_ID, true));
+      IndexResult<IndexedAIP> res = find(IndexedAIP.class, filter, sorter, new Sublist(i, 100), null, user);
+      aips.addAll(res.getResults());
+    }
+    return aips;
+  }
+
+  public static StreamResponse exportAIP(List<IndexedAIP> aips, String acceptFormat) throws GenericException {
+    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    try {
+      ModelService model = RodaCoreFactory.getModelService();
+      StorageService storage = RodaCoreFactory.getStorageService();
+      for (IndexedAIP aip : aips) {
+
+        LOGGER.warn("AIP: " + aip.getId());
+        AIP fullAIP = model.retrieveAIP(aip.getId());
+        for (DescriptiveMetadata dm : fullAIP.getDescriptiveMetadata()) {
+          Binary dmBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
+          addToZip(zipEntries, dmBinary);
+        }
+
+        CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata>> preservations = model
+          .listPreservationMetadata(aip.getId(), true);
+        for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata> preservation : preservations) {
+          if (preservation.isPresent()) {
+            PreservationMetadata pm = preservation.get();
+            StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
+            addToZip(zipEntries, storage.getBinary(filePath));
+          } else {
+            LOGGER.error("Cannot get AIP representation file", preservation.getCause());
+          }
+        }
+        IOUtils.closeQuietly(preservations);
+
+        for (Representation rep : fullAIP.getRepresentations()) {
+          boolean recursive = true;
+          CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model
+            .listFilesUnder(aip.getId(), rep.getId(), recursive);
+          for (OptionalWithCause<org.roda.core.data.v2.ip.File> file : allFiles) {
+            if (file.isPresent()) {
+              addToZip(zipEntries, file.get(), false);
+            } else {
+              LOGGER.error("Cannot get AIP representation file", file.getCause());
+            }
+          }
+          IOUtils.closeQuietly(allFiles);
+        }
+
+      }
+      return createZipStreamResponse(zipEntries, "export");
+    } catch (IOException | RequestNotValidException | GenericException | NotFoundException
+      | AuthorizationDeniedException e) {
+      throw new GenericException("Error exporting AIPS", e);
+    }
   }
 }

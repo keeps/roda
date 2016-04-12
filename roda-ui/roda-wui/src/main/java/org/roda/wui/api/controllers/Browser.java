@@ -991,8 +991,8 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 
-  public static void removeRisk(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, NotFoundException {
+  public static void removeRisk(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -1006,8 +1006,8 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeRisk", null, duration, "selected", selected);
   }
 
-  public static void removeAgent(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, NotFoundException {
+  public static void removeAgent(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -1021,8 +1021,8 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeAgent", null, duration, "selected", selected);
   }
 
-  public static void removeFormat(RodaUser user, SelectedItems selected) throws AuthorizationDeniedException,
-    GenericException, RequestNotValidException, NotFoundException {
+  public static void removeFormat(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
     // check user permissions
@@ -1034,5 +1034,35 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "removeFormat", null, duration, "selected", selected);
+  }
+
+  public static StreamResponse exportAIP(RodaUser user, Filter filter, String acceptFormat)
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateExportAipParams(acceptFormat);
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+
+    // find the aips
+    List<IndexedAIP> aips = BrowserHelper.matchAIP(filter, user);
+
+    if (aips != null && aips.size() > 0) {
+      // check object permissions
+      UserUtility.checkObjectPermissions(user, aips, PermissionType.READ);
+
+      // delegate
+      StreamResponse aipExport = BrowserHelper.exportAIP(aips, acceptFormat);
+
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, BROWSER_COMPONENT, "exportAIP", null, duration);
+
+      return aipExport;
+    } else {
+      throw new NotFoundException("No AIPs match filter");
+    }
   }
 }

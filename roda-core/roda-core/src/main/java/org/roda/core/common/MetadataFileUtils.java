@@ -22,6 +22,7 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.tika.metadata.Metadata;
 import org.jdom2.Element;
 import org.jdom2.IllegalDataException;
@@ -53,12 +54,12 @@ public class MetadataFileUtils {
         if (values != null && values.length > 0) {
           for (String value : values) {
             Element child = new Element("field");
-            child.setAttribute("name", name);
-            child.addContent(value);
+            child.setAttribute("name", StringEscapeUtils.escapeXml11(name));
+            child.addContent(StringEscapeUtils.escapeXml11(value));
             root.addContent(child);
           }
-        }
 
+        }
       }
       doc.setRootElement(root);
       XMLOutputter outter = new XMLOutputter();
@@ -79,12 +80,11 @@ public class MetadataFileUtils {
       for (Map.Entry<String, String> entry : bagInfoTxt.entrySet()) {
         if (!entry.getKey().equalsIgnoreCase("parent")) {
           Element child = new Element("field");
-          child.setAttribute("name", entry.getKey());
-          child.addContent(entry.getValue());
+          child.setAttribute("name", StringEscapeUtils.escapeXml11(entry.getKey()));
+          child.addContent(StringEscapeUtils.escapeXml11(entry.getValue()));
           root.addContent(child);
         }
       }
-
       doc.setRootElement(root);
       XMLOutputter outter = new XMLOutputter();
       outter.setFormat(Format.getPrettyFormat());
@@ -97,22 +97,17 @@ public class MetadataFileUtils {
   }
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
-    try {
-      Element root = new Element("metadata");
-      org.jdom2.Document doc = new org.jdom2.Document();
-      Element child = new Element("field");
-      child.setAttribute("name", "title");
-      child.addContent(transferredResource.getName());
-      root.addContent(child);
-      doc.setRootElement(root);
-      XMLOutputter outter = new XMLOutputter();
-      outter.setFormat(Format.getPrettyFormat());
-      outter.outputString(doc);
-      return new StringContentPayload(outter.outputString(doc));
-    } catch (IllegalDataException e) {
-      LOGGER.debug("Error generating TransferredResource metadata file {}", e.getMessage());
-      return new StringContentPayload("");
-    }
+    Element root = new Element("metadata");
+    org.jdom2.Document doc = new org.jdom2.Document();
+    Element child = new Element("field");
+    child.setAttribute("name", "title");
+    child.addContent(StringEscapeUtils.escapeXml11(transferredResource.getName()));
+    root.addContent(child);
+    doc.setRootElement(root);
+    XMLOutputter outter = new XMLOutputter();
+    outter.setFormat(Format.getPrettyFormat());
+    outter.outputString(doc);
+    return new StringContentPayload(outter.outputString(doc));
   }
 
   public static Map<String, List<String>> parseBinary(Binary binary)

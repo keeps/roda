@@ -90,7 +90,7 @@ public class AIPList extends AsyncTableCell<IndexedAIP> {
     datesColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>"));
+    display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'>&nbsp;Level</i>"));
     display.addColumn(titleColumn, "Title");
     display.addColumn(datesColumn, "Dates");
     display.setColumnWidth(levelColumn, "35px");

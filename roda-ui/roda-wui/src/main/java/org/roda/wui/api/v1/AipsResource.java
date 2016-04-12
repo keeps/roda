@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,11 +31,12 @@ import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
@@ -85,8 +85,15 @@ public class AipsResource {
     @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
-    // TODO
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+
+    // delegate action to controller (export to zip)
+    StreamResponse aipRepresentation = Browser.exportAIP(user, filter, acceptFormat);
+
+    return ApiUtils.okResponse(aipRepresentation);
   }
 
   @PUT
@@ -466,7 +473,6 @@ public class AipsResource {
   @Path("/{aip_id}/preservation_metadata/{representation_id}/{file_id}")
   @ApiOperation(value = "Delete representation preservation file", notes = "Delete a preservation file for a representation.", response = PreservationMetadata.class)
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = PreservationMetadata.class)})
-
   public Response aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,

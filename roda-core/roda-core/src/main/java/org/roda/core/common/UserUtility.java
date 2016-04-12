@@ -216,6 +216,12 @@ public class UserUtility {
         "The user '" + user.getId() + "' does not have permissions to " + permissionType);
     }
   }
+  
+  public static void checkObjectPermissions(RodaUser user, List<IndexedAIP> aips, PermissionType permissionType) throws AuthorizationDeniedException {
+    for(IndexedAIP aip : aips){
+      checkObjectPermissions(user, aip, permissionType);
+    }    
+  }
 
   private static boolean iterativeDisjoint(Set<String> set1, Set<String> set2) {
     boolean noCommonElement = true;
@@ -250,5 +256,4 @@ public class UserUtility {
     // TODO Auto-generated method stub
 
   }
-
 }
