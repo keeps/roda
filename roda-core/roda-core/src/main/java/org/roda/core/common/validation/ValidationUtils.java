@@ -313,7 +313,7 @@ public class ValidationUtils {
           ret.setValid(false);
           ret.setMessage("No schema to validate " + descriptiveMetadataType);
         } else {
-          LOGGER.info("Found no schema do validate descriptive metadata but will try to validate XML syntax...");
+          LOGGER.debug("Found no schema do validate descriptive metadata but will try to validate XML syntax...");
           ret = isXMLValid(descriptiveMetadataPayload);
         }
       }

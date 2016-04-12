@@ -50,6 +50,8 @@ public interface PluginOrchestrator {
 
   public void startJobsInTheStateCreated();
 
+  public void cleanUnfinishedJobs();
+
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo);
 
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage);

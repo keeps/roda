@@ -213,4 +213,10 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public void cleanUnfinishedJobs() {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

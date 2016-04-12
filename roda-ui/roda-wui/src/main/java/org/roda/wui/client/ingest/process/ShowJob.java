@@ -220,7 +220,8 @@ public class ShowJob extends Composite {
 
   private boolean isJobRunning() {
     return job != null && !JOB_STATE.COMPLETED.equals(job.getState())
-      && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState());
+      && !JOB_STATE.FAILED_DURING_CREATION.equals(job.getState())
+      && !JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState());
   }
 
   private void update() {
@@ -243,6 +244,9 @@ public class ShowJob extends Composite {
     } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
       statusHtml = SafeHtmlUtils
         .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
+    } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
+      statusHtml = SafeHtmlUtils
+        .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedToComplete() + "</span>");
     } else if (JOB_STATE.CREATED.equals(state)) {
       statusHtml = SafeHtmlUtils
         .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
@@ -293,7 +297,8 @@ public class ShowJob extends Composite {
 
   private void scheduleUpdateStatus() {
     JOB_STATE state = job.getState();
-    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
+    if (!JOB_STATE.COMPLETED.equals(state) && !JOB_STATE.FAILED_DURING_CREATION.equals(state)
+      && !JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
       if (autoUpdateTimer == null) {
         autoUpdateTimer = new Timer() {
 
@@ -350,7 +355,7 @@ public class ShowJob extends Composite {
             Label itemTitle = new Label(value);
             itemTitle.addStyleName("itemText");
             aipPanel.clear();
-            aipPanel.add(itemTitle);  
+            aipPanel.add(itemTitle);
           } else {
             Toast.showError(caught.getClass().getName(), caught.getMessage());
           }

@@ -31,7 +31,7 @@ public class Job implements IsIndexed, Serializable {
   private static final long serialVersionUID = 615993757726175203L;
 
   public static enum JOB_STATE {
-    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION;
+    CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE;
   }
 
   public static enum ORCHESTRATOR_METHOD {

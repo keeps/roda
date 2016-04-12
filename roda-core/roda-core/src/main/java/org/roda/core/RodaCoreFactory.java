@@ -520,6 +520,7 @@ public class RodaCoreFactory {
       } else {
         // pluginOrchestrator = new EmbeddedActionOrchestrator();
         pluginOrchestrator = new AkkaEmbeddedPluginOrchestrator();
+        pluginOrchestrator.cleanUnfinishedJobs();
       }
 
       startApacheDS();

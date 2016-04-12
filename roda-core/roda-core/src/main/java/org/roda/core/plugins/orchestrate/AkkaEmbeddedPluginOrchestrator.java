@@ -36,6 +36,7 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -53,7 +54,9 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Kill;
 import akka.actor.Props;
+import akka.actor.Terminated;
 import akka.dispatch.Futures;
+import akka.dispatch.OnComplete;
 import akka.dispatch.OnFailure;
 import akka.dispatch.OnSuccess;
 import akka.pattern.Patterns;
@@ -98,12 +101,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     numberOfWorkers = RodaCoreFactory.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
 
-    Props roundRobinPoolProps = new RoundRobinPool(numberOfWorkers)
+    Props workersProps = new RoundRobinPool(numberOfWorkers)
       .props(Props.create(AkkaWorkerActor.class, storage, model, index));
-    workersRouter = workersSystem.actorOf(roundRobinPoolProps, "WorkersRouter");
+    workersRouter = workersSystem.actorOf(workersProps, "WorkersRouter");
 
-    Props roundRobinPoolProps2 = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
-    jobWorkersRouter = workersSystem.actorOf(roundRobinPoolProps2, "JobWorkersRouter");
+    Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
+    jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
   }
 
   @Override
@@ -113,7 +116,17 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public void shutdown() {
-    workersSystem.shutdown();
+    LOGGER.info("Going to shutdown actor system");
+    Future<Terminated> terminate = workersSystem.terminate();
+    terminate.onComplete(new OnComplete<Terminated>() {
+      public void onComplete(Throwable failure, Terminated result) {
+        if (failure != null) {
+          LOGGER.error("Error while shutting down actor system", failure);
+        } else {
+          LOGGER.info("Done shutting down actor system");
+        }
+      }
+    }, workersSystem.dispatcher());
   }
 
   @Override
@@ -534,6 +547,36 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           executeJob(model.retrieveJob(job.getId()));
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get Job", e);
+        }
+      }
+    }
+  }
+
+  @Override
+  public void cleanUnfinishedJobs() {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.STARTED.toString()));
+    Sublist sublist = new Sublist(0, 100);
+    IndexResult<Job> jobs = null;
+    List<Job> jobsToBeCleaned = new ArrayList<>();
+    try {
+      do {
+        jobs = index.find(Job.class, filter, null, sublist);
+        jobsToBeCleaned.addAll(jobs.getResults());
+        sublist.setFirstElementIndex(sublist.getFirstElementIndex() + Math.toIntExact(jobs.getLimit()));
+      } while (jobs.getTotalCount() > jobs.getOffset() + jobs.getLimit());
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Unable to find Jobs still to be cleaned", e);
+    }
+
+    if (!jobsToBeCleaned.isEmpty()) {
+      for (Job job : jobsToBeCleaned) {
+        try {
+          Job jobToBeCleaned = model.retrieveJob(job.getId());
+          jobToBeCleaned.setState(JOB_STATE.FAILED_TO_COMPLETE);
+          model.createOrUpdateJob(jobToBeCleaned);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Unable to get/update Job", e);
         }
       }
     }

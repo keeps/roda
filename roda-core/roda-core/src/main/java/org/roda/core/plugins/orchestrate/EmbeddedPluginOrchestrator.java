@@ -396,4 +396,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
+  @Override
+  public void cleanUnfinishedJobs() {
+    // TODO Auto-generated method stub
+    
+  }
+
 }

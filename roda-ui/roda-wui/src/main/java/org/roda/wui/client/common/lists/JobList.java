@@ -28,7 +28,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -91,7 +90,8 @@ public class JobList extends AsyncTableCell<Job> {
       }
     };
 
-    startDateColumn = new Column<Job, Date>(new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+    startDateColumn = new Column<Job, Date>(
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(Job job) {
         return job != null ? job.getStartDate() : null;
@@ -102,7 +102,11 @@ public class JobList extends AsyncTableCell<Job> {
 
       @Override
       public String getValue(Job job) {
-        return job != null ? Humanize.durationInShortDHMS(job.getStartDate(), job.getEndDate()) : null;
+        if (job == null || JOB_STATE.FAILED_DURING_CREATION.equals(job.getState())
+          || JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState())) {
+          return null;
+        }
+        return Humanize.durationInShortDHMS(job.getStartDate(), job.getEndDate());
       }
     };
 
@@ -118,6 +122,9 @@ public class JobList extends AsyncTableCell<Job> {
           } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
             ret = SafeHtmlUtils.fromSafeConstant(
               "<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
+          } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
+            ret = SafeHtmlUtils
+              .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedToComplete() + "</span>");
           } else if (JOB_STATE.CREATED.equals(state)) {
             ret = SafeHtmlUtils
               .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");

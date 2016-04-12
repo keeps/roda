@@ -405,6 +405,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("FAILED")
   String showJobStatusFailedDuringCreation();
 
+  @DefaultMessage("FAILED")
+  String showJobStatusFailedToComplete();
+
   @DefaultMessage("{0}% done")
   SafeHtml showJobProgressCompletionPercentage(int completionPercentage);
 
