@@ -8,12 +8,10 @@
 
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
+import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -88,16 +86,16 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
   TextArea provenanceInformation;
 
   @UiField
-  TextArea extensions;
+  IncrementalList extensions;
 
   @UiField
-  TextArea mimetypes;
+  IncrementalList mimetypes;
 
   @UiField
-  TextArea pronoms;
+  IncrementalList pronoms;
 
   @UiField
-  TextArea utis;
+  IncrementalList utis;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -228,25 +226,10 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     this.website.setText(format.getWebsite());
     this.provenanceInformation.setText(format.getProvenanceInformation());
 
-    this.extensions.setText(getListString(format.getExtensions()));
-    this.mimetypes.setText(getListString(format.getMimetypes()));
-    this.pronoms.setText(getListString(format.getPronoms()));
-    this.utis.setText(getListString(format.getUtis()));
-  }
-
-  // FIXME to delete after create list component
-  private String getListString(List<String> itemList) {
-    StringBuilder list = new StringBuilder();
-    for (String item : itemList) {
-      list.append(item);
-      list.append("\n");
-    }
-    return list.length() > 0 ? list.substring(0, list.length() - 1) : "";
-  }
-
-  // FIXME to delete after create list component
-  private List<String> setListString(String list) {
-    return !list.equals("") ? Arrays.asList(list.split("\\s*\n\\s*")) : new ArrayList<String>();
+    this.extensions.setTextBoxList(format.getExtensions());
+    this.mimetypes.setTextBoxList(format.getMimetypes());
+    this.pronoms.setTextBoxList(format.getPronoms());
+    this.utis.setTextBoxList(format.getUtis());
   }
 
   public Format getFormat() {
@@ -264,10 +247,10 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     format.setWebsite(website.getText());
     format.setProvenanceInformation(provenanceInformation.getText());
 
-    format.setExtensions(setListString(extensions.getText()));
-    format.setMimetypes(setListString(mimetypes.getText()));
-    format.setPronoms(setListString(pronoms.getText()));
-    format.setUtis(setListString(utis.getText()));
+    format.setExtensions(extensions.getTextBoxesValue());
+    format.setMimetypes(mimetypes.getTextBoxesValue());
+    format.setPronoms(pronoms.getTextBoxesValue());
+    format.setUtis(utis.getTextBoxesValue());
 
     return format;
   }
@@ -283,10 +266,10 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     website.setText("");
     provenanceInformation.setText("");
 
-    extensions.setText("");
-    mimetypes.setText("");
-    pronoms.setText("");
-    utis.setText("");
+    extensions.clearTextBoxes();
+    mimetypes.clearTextBoxes();
+    pronoms.clearTextBoxes();
+    utis.clearTextBoxes();
   }
 
   /**

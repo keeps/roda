@@ -558,6 +558,12 @@ pre>code {
 	content: "\f0a8";
 }
 
+.btn-incremental-list-add {
+	margin-top: 2px;
+	margin-bottom: 10px;
+	padding: 3px 10px;
+}
+
 .toolbarLink {
 	display: inline-block;
 	font-size: 20px;

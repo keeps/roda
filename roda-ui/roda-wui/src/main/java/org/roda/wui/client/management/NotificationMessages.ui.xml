@@ -17,7 +17,7 @@
 				<g:Label styleName="h1">Notification</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="notificationDescription">
 				</g:FlowPanel>
-				<common:BasicSearch ui:field="basicSearch" />
+				<common:SearchPanel ui:field="searchPanel" />
 				<lists:NotificationList addStyleNames="searchResults"
 					ui:field="notificationList" />
 			</g:FlowPanel>

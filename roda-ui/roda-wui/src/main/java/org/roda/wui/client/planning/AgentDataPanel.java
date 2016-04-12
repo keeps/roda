@@ -8,12 +8,10 @@
 
 package org.roda.wui.client.planning;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -87,19 +85,19 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
   TextArea provenanceInformation;
 
   @UiField
-  TextArea platforms;
+  IncrementalList platforms;
 
   @UiField
-  TextArea extensions;
+  IncrementalList extensions;
 
   @UiField
-  TextArea mimetypes;
+  IncrementalList mimetypes;
 
   @UiField
-  TextArea pronoms;
+  IncrementalList pronoms;
 
   @UiField
-  TextArea utis;
+  IncrementalList utis;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -233,26 +231,11 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     this.download.setText(agent.getDownload());
     this.provenanceInformation.setText(agent.getProvenanceInformation());
 
-    this.platforms.setText(getListString(agent.getPlatforms()));
-    this.extensions.setText(getListString(agent.getExtensions()));
-    this.mimetypes.setText(getListString(agent.getMimetypes()));
-    this.pronoms.setText(getListString(agent.getPronoms()));
-    this.utis.setText(getListString(agent.getUtis()));
-  }
-
-  // FIXME to delete after create list component
-  private String getListString(List<String> itemList) {
-    StringBuilder result = new StringBuilder();
-    for (String string : itemList) {
-      result.append(string);
-      result.append("\n");
-    }
-    return result.length() > 0 ? result.substring(0, result.length() - 1) : "";
-  }
-
-  // FIXME to delete after create list component
-  private List<String> setListString(String list) {
-    return !list.equals("") ? Arrays.asList(list.split("\\s*\n\\s*")) : new ArrayList<String>();
+    this.platforms.setTextBoxList(agent.getPlatforms());
+    this.extensions.setTextBoxList(agent.getExtensions());
+    this.mimetypes.setTextBoxList(agent.getMimetypes());
+    this.pronoms.setTextBoxList(agent.getPronoms());
+    this.utis.setTextBoxList(agent.getUtis());
   }
 
   public Agent getAgent() {
@@ -270,11 +253,11 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     agent.setDownload(download.getText());
     agent.setProvenanceInformation(provenanceInformation.getText());
 
-    agent.setPlatforms(setListString(platforms.getText()));
-    agent.setExtensions(setListString(extensions.getText()));
-    agent.setMimetypes(setListString(mimetypes.getText()));
-    agent.setPronoms(setListString(pronoms.getText()));
-    agent.setUtis(setListString(utis.getText()));
+    agent.setPlatforms(platforms.getTextBoxesValue());
+    agent.setExtensions(extensions.getTextBoxesValue());
+    agent.setMimetypes(mimetypes.getTextBoxesValue());
+    agent.setPronoms(pronoms.getTextBoxesValue());
+    agent.setUtis(utis.getTextBoxesValue());
 
     return agent;
   }
@@ -291,11 +274,11 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     download.setText("");
     provenanceInformation.setText("");
 
-    platforms.setText("");
-    extensions.setText("");
-    mimetypes.setText("");
-    pronoms.setText("");
-    utis.setText("");
+    platforms.clearTextBoxes();
+    extensions.clearTextBoxes();
+    mimetypes.clearTextBoxes();
+    pronoms.clearTextBoxes();
+    utis.clearTextBoxes();
   }
 
   /**

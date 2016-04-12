@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.client.management">
+	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:l="urn:import:org.roda.wui.client.common">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 	
@@ -45,15 +45,14 @@
 				<g:Label addStyleNames="form-label">Provenance Information</g:Label>
 				<g:TextArea ui:field="provenanceInformation" addStyleNames="form-textbox" />
 				
-				
 				<g:Label addStyleNames="form-label">Extensions</g:Label>
-				<g:TextArea ui:field="extensions" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="extensions"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">Mimetypes</g:Label>
-				<g:TextArea ui:field="mimetypes" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="mimetypes"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">Pronoms</g:Label>
-				<g:TextArea ui:field="pronoms" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="pronoms"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">UTIs</g:Label>
-				<g:TextArea ui:field="utis" addStyleNames="form-textbox" />
+				<l:IncrementalList ui:field="utis"></l:IncrementalList>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

@@ -22,7 +22,7 @@ import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.messages.Message;
-import org.roda.wui.client.common.BasicSearch;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.NotificationList;
 import org.roda.wui.common.client.ClientLogger;
@@ -103,7 +103,7 @@ public class NotificationMessages extends Composite {
   FlowPanel notificationDescription;
 
   @UiField(provided = true)
-  BasicSearch basicSearch;
+  SearchPanel searchPanel;
 
   @UiField
   DateBox inputDateInitial;
@@ -134,9 +134,9 @@ public class NotificationMessages extends Composite {
       new SimpleFacetParameter(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));
     notificationList = new NotificationList(filter, facets, "Notifications", false);
 
-    basicSearch = new BasicSearch(DEFAULT_FILTER, RodaConstants.MESSAGE_SEARCH, messages.messageSearchPlaceHolder(),
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MESSAGE_SEARCH, messages.messageSearchPlaceHolder(),
       false, false);
-    basicSearch.setList(notificationList);
+    searchPanel.setList(notificationList);
 
     facetRecipientUser = new FlowPanel();
     facetAcknowledged = new FlowPanel();
