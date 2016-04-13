@@ -1036,6 +1036,19 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeFormat", null, duration, "selected", selected);
   }
 
+  /**
+   * @param user
+   *          The user
+   * @param filter
+   *          The filter to select the AIPs to export
+   * @param acceptFormat
+   *          The output format (currently only zip is supported)
+   * @return
+   * @throws GenericException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   */
   public static StreamResponse exportAIP(RodaUser user, Filter filter, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
@@ -1066,7 +1079,22 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  public static void deleteAIPs(RodaUser user, Filter filter)
+  /**
+   * Batch disposal of AIP (AIP selection via filter)
+   * 
+   * @param user
+   *          The user
+   * @param filter
+   *          The filter used to select the AIPs to remove
+   * @param deleteOnlyRepresentation
+   *          If this flag is active, only the representations are deleted (via
+   *          model.deleteRepresentation(... ) )
+   * @throws GenericException
+   * @throws AuthorizationDeniedException
+   * @throws NotFoundException
+   * @throws RequestNotValidException
+   */
+  public static void deleteAIPs(RodaUser user, Filter filter, boolean deleteOnlyRepresentation)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -1081,7 +1109,7 @@ public class Browser extends RodaCoreService {
       UserUtility.checkObjectPermissions(user, aips, PermissionType.DELETE);
 
       // delegate
-      BrowserHelper.removeAIPs(aips);
+      BrowserHelper.removeAIPs(aips, deleteOnlyRepresentation);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();

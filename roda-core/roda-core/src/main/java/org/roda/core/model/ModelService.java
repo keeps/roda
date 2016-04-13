@@ -1018,6 +1018,24 @@ public class ModelService extends ModelObservable {
 
   }
 
+  public CloseableIterable<OptionalWithCause<OtherMetadata>> listOtherMetadata(String aipId, String representationId)
+    throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
+    StoragePath storagePath = ModelUtils.getRepresentationOtherMetadataFolderStoragePath(aipId, representationId);
+
+    boolean recursive = true;
+    CloseableIterable<OptionalWithCause<OtherMetadata>> ret;
+    try {
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, recursive);
+      ret = ResourceParseUtils.convert(getStorage(), resources, OtherMetadata.class);
+    } catch (NotFoundException e) {
+      // check if Representation exists
+      storage.getDirectory(ModelUtils.getRepresentationStoragePath(aipId, representationId));
+      // if no exception was sent by above method, return empty list
+      ret = new EmptyClosableIterable<OptionalWithCause<OtherMetadata>>();
+    }
+    return ret;
+  }
+
   public CloseableIterable<OptionalWithCause<OtherMetadata>> listOtherMetadata(String aipId, String representationId,
     String type) throws NotFoundException, GenericException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath storagePath = ModelUtils.getRepresentationOtherMetadataStoragePath(aipId, representationId, type);

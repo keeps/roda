@@ -85,6 +85,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.risks.Risk;
@@ -1316,8 +1317,22 @@ public class BrowserHelper {
             }
           }
           IOUtils.closeQuietly(allFiles);
-        }
 
+          recursive = false;
+          CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata>> allOtherMetadata = model
+            .listOtherMetadata(aip.getId(), rep.getId());
+          for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata> otherMetadata : allOtherMetadata) {
+            if (otherMetadata.isPresent()) {
+              OtherMetadata o = otherMetadata.get();
+              StoragePath otherMetadataStoragePath = ModelUtils.getOtherMetadataStoragePath(aip.getId(), rep.getId(),
+                o.getFileDirectoryPath(), o.getFileId(), o.getFileSuffix(), o.getType());
+              addToZip(zipEntries, storage.getBinary(otherMetadataStoragePath));
+            } else {
+              LOGGER.error("Cannot get Representation other metadata file", otherMetadata.getCause());
+            }
+          }
+          IOUtils.closeQuietly(allFiles);
+        }
       }
       return createZipStreamResponse(zipEntries, "export");
     } catch (IOException | RequestNotValidException | GenericException | NotFoundException
@@ -1326,11 +1341,19 @@ public class BrowserHelper {
     }
   }
 
-  public static void removeAIPs(List<IndexedAIP> aips)
+  public static void removeAIPs(List<IndexedAIP> aips, boolean deleteOnlyRepresentation)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     ModelService model = RodaCoreFactory.getModelService();
     for (IndexedAIP aip : aips) {
-      model.deleteAIP(aip.getId());
+      if (deleteOnlyRepresentation) {
+        AIP fullAIP = model.retrieveAIP(aip.getId());
+        for (Representation r : fullAIP.getRepresentations()) {
+          model.deleteRepresentation(aip.getId(), r.getId());
+        }
+      } else {
+        model.deleteAIP(aip.getId());
+      }
+
     }
   }
 }

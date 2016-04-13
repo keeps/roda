@@ -137,7 +137,7 @@ public class AipsResource {
     // delegate action to controller
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-    Browser.deleteAIPs(user, filter);
+    Browser.deleteAIPs(user, filter, false);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();

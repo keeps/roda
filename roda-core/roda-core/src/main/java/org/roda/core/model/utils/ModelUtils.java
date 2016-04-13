@@ -103,8 +103,17 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getRepresentationPreservationMetadataPath(aipId, representationId));
   }
 
+  private static List<String> getRepresentationOtherMetadataFolderPath(String aipId, String representationId) {
+    return build(getRepresentationMetadataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_OTHER);
+  }
+
   private static List<String> getRepresentationOtherMetadataPath(String aipId, String representationId, String type) {
     return build(getRepresentationMetadataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_OTHER, type);
+  }
+
+  public static StoragePath getRepresentationOtherMetadataFolderStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getRepresentationOtherMetadataFolderPath(aipId, representationId));
   }
 
   public static StoragePath getRepresentationOtherMetadataStoragePath(String aipId, String representationId,
@@ -430,6 +439,11 @@ public final class ModelUtils {
       messageId + RodaConstants.MESSAGE_FILE_EXTENSION);
   }
 
+  public static StoragePath getOtherMetadataFolderStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getRepresentationOtherMetadataFolderPath(aipId, representationId));
+  }
+
   public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId,
     List<String> directoryPath, String fileName, String fileSuffix, String type) throws RequestNotValidException {
 
@@ -481,4 +495,11 @@ public final class ModelUtils {
     }
   }
 
+  public static StoragePath getOtherMetadataStoragePath(String aipId, String representationId, String type,
+    List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
+    List<String> path = getRepresentationOtherMetadataPath(aipId, representationId, type);
+    path.addAll(fileDirectoryPath);
+    path.add(fileId);
+    return DefaultStoragePath.parse(path);
+  }
 }

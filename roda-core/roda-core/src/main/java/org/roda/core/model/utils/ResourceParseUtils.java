@@ -146,13 +146,14 @@ public class ResourceParseUtils {
       ? ModelUtils.extractFilePathFromRepresentationOtherMetadata(resourcePath)
       : ModelUtils.extractFilePathFromAipOtherMetadata(resourcePath);
     String fileId = filename.substring(0, filename.lastIndexOf('.'));
+    String suffix = filename.substring(filename.lastIndexOf('.'), filename.length());
 
     om.setAipId(aipId);
     om.setRepresentationId(representationId);
     om.setFileDirectoryPath(fileDirectoryPath);
     om.setFileId(fileId);
     om.setType(type);
-
+    om.setFileSuffix(suffix);
     return om;
   }
 
