@@ -2966,6 +2966,19 @@ td.datePickerMonth, td.datePickerYear {
 	color: rgba(0,0,0, 0.5);
 }
 
+.search-field-dialog {
+	font-size: 1.2rem;
+	width: 20px;
+	margin-right: -20px;
+	margin-left: 20px;
+	margin-top: 7px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	cursor: hand;
+	color: rgba(0,0,0, 0.5);
+}
+
 .search-field-left-panel .form-textbox-small {
 	max-width: 85px;
 	vertical-align: top;

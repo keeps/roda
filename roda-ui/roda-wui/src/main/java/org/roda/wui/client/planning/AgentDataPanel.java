@@ -9,8 +9,14 @@
 package org.roda.wui.client.planning;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.IncrementalIdList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -26,6 +32,7 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.IntegerBox;
 import com.google.gwt.user.client.ui.TextArea;
@@ -98,6 +105,9 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
 
   @UiField
   IncrementalList utis;
+
+  @UiField
+  IncrementalIdList formatIds;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -180,6 +190,8 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     mimetypes.addChangeHandler(changeHandler);
     pronoms.addChangeHandler(changeHandler);
     utis.addChangeHandler(changeHandler);
+
+    formatIds.addChangeHandler(changeHandler);
   }
 
   public boolean isValid() {
@@ -236,6 +248,26 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     this.mimetypes.setTextBoxList(agent.getMimetypes());
     this.pronoms.setTextBoxList(agent.getPronoms());
     this.utis.setTextBoxList(agent.getUtis());
+
+    final Map<String, String> formatInfo = new HashMap<String, String>();
+    final String agentId = agent.getId();
+
+    BrowserService.Util.getInstance().retrieveFormats(agentId, new AsyncCallback<List<Format>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(List<Format> result) {
+        for (Format f : result) {
+          formatInfo.put(f.getId(), f.getName());
+        }
+        AgentDataPanel.this.formatIds.setTextBoxList(formatInfo);
+      }
+    });
+
   }
 
   public Agent getAgent() {
@@ -258,6 +290,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     agent.setMimetypes(mimetypes.getTextBoxesValue());
     agent.setPronoms(pronoms.getTextBoxesValue());
     agent.setUtis(utis.getTextBoxesValue());
+    agent.setFormatIds(formatIds.getTextBoxesValue());
 
     return agent;
   }
@@ -279,6 +312,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     mimetypes.clearTextBoxes();
     pronoms.clearTextBoxes();
     utis.clearTextBoxes();
+    formatIds.clearTextBoxes();
   }
 
   /**

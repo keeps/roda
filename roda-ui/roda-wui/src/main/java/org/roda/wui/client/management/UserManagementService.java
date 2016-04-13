@@ -27,12 +27,8 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -225,42 +221,6 @@ public interface UserManagementService extends RemoteService {
   public LogEntry retrieveLogEntry(String logEntryId)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  public IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  /**
-   * Get risk
-   *
-   * @param riskId
-   * @return
-   * @throws RODAException
-   */
-  public Risk retrieveRisk(String riskId) throws AuthorizationDeniedException, GenericException, NotFoundException;
-
-  /**
-   * Add risk
-   *
-   * @param risk
-   * @return
-   * @throws RequestNotValidException
-   * @throws AuthorizationDeniedException
-   * @throws GenericException
-   * @throws RODAException
-   */
-  Risk addRisk(Risk risk) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
-
-  /**
-   * Edit risk
-   *
-   * @param risk
-   * @return
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   * 
-   */
-  public void modifyRisk(Risk risk) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
   /**
    * Send the email challenge to a user email
    *
@@ -333,75 +293,5 @@ public interface UserManagementService extends RemoteService {
    */
   public void resetUserPassword(String username, String password, String resetPasswordToken)
     throws InvalidTokenException, IllegalOperationException, NotFoundException, GenericException;
-
-  /**
-   * Get agent
-   *
-   * @param agentId
-   * @return
-   * @throws GenericException
-   * @throws NotFoundException
-   * @throws AuthorizationDeniedException
-   */
-  public Agent retrieveAgent(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  /**
-   * Add agent
-   *
-   * @param agent
-   * @return
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  public Agent addAgent(Agent agent) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  /**
-   * Edit agent
-   *
-   * @param agent
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  public void modifyAgent(Agent agent) throws GenericException, RequestNotValidException, AuthorizationDeniedException;
-
-  /**
-   * Get format
-   *
-   * @param formatId
-   * @return
-   * @throws GenericException
-   * @throws NotFoundException
-   * @throws AuthorizationDeniedException
-   */
-  public Format retrieveFormat(String formatId)
-    throws NotFoundException, GenericException, AuthorizationDeniedException;
-
-  /**
-   * Add format
-   *
-   * @param format
-   * @return
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws NotFoundException
-   * @throws AuthorizationDeniedException
-   */
-  public Format addFormat(Format format)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  /**
-   * Edit format
-   *
-   * @param format
-   * @throws RequestNotValidException
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   */
-  public void modifyFormat(Format format)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException;
-
-  Message retrieveMessage(String messageId) throws NotFoundException, GenericException, AuthorizationDeniedException;
 
 }

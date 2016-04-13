@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -38,7 +38,7 @@ public class EditAgent extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String agentId = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveAgent(agentId, new AsyncCallback<Agent>() {
+        BrowserService.Util.getInstance().retrieveAgent(agentId, new AsyncCallback<Agent>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -88,12 +88,6 @@ public class EditAgent extends Composite {
   @UiField(provided = true)
   AgentDataPanel agentDataPanel;
 
-  /**
-   * Create a new panel to create a user
-   *
-   * @param user
-   *          the user to create
-   */
   public EditAgent(Agent agent) {
     this.agent = agent;
 
@@ -110,7 +104,7 @@ public class EditAgent extends Composite {
         String agentId = agent.getId();
         agent = agentDataPanel.getAgent();
         agent.setId(agentId);
-        UserManagementService.Util.getInstance().modifyAgent(agent, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().modifyAgent(agent, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

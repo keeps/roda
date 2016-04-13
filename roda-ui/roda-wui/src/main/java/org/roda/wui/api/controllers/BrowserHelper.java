@@ -89,6 +89,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -437,6 +438,7 @@ public class BrowserHelper {
           printStream.print(htmlDescriptive);
           printStream.close();
         }
+
       };
       ret = new StreamResponse(filename, mediaType, stream);
 
@@ -487,6 +489,7 @@ public class BrowserHelper {
           printStream.print(htmlDescriptive);
           printStream.close();
         }
+
       };
       ret = new StreamResponse(filename, mediaType, stream);
 
@@ -1218,6 +1221,58 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateAIPPermissions(aip);
   }
 
+  public static Risk retrieveRisk(String riskId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Risk.class, riskId);
+  }
+
+  public static Risk addRisk(Risk risk) throws GenericException, RequestNotValidException {
+    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk);
+    RodaCoreFactory.getIndexService().create(Risk.class, createdRisk);
+    return createdRisk;
+  }
+
+  public static void modifyRisk(Risk risk) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateRisk(risk);
+    RodaCoreFactory.getIndexService().delete(Risk.class, Arrays.asList(risk.getId()));
+    RodaCoreFactory.getIndexService().create(Risk.class, risk);
+  }
+
+  public static Agent retrieveAgent(String agentId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Agent.class, agentId);
+  }
+
+  public static Agent addAgent(Agent agent) throws GenericException, RequestNotValidException {
+    Agent createdAgent = RodaCoreFactory.getModelService().createAgent(agent);
+    RodaCoreFactory.getIndexService().create(Agent.class, createdAgent);
+    return createdAgent;
+  }
+
+  public static void modifyAgent(Agent agent) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateAgent(agent);
+    RodaCoreFactory.getIndexService().delete(Agent.class, Arrays.asList(agent.getId()));
+    RodaCoreFactory.getIndexService().create(Agent.class, agent);
+  }
+
+  public static Format retrieveFormat(String formatId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Format.class, formatId);
+  }
+
+  public static Format addFormat(Format format) throws GenericException, RequestNotValidException {
+    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format);
+    RodaCoreFactory.getIndexService().create(Format.class, createdFormat);
+    return createdFormat;
+  }
+
+  public static void modifyFormat(Format format) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateFormat(format);
+    RodaCoreFactory.getIndexService().delete(Format.class, Arrays.asList(format.getId()));
+    RodaCoreFactory.getIndexService().create(Format.class, format);
+  }
+
+  public static List<Format> retrieveFormats(String agentId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getModelService().retrieveFormatsFromAgent(agentId);
+  }
+
   public static void removeRisk(SelectedItems selected, RodaUser user)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> riskIds = consolidate(user, Risk.class, selected);
@@ -1350,5 +1405,14 @@ public class BrowserHelper {
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
+  }
+
+  public static IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws GenericException, RequestNotValidException {
+    return RodaCoreFactory.getIndexService().find(Message.class, filter, sorter, sublist, facets);
+  }
+
+  public static Message retrieveMessage(String messageId) throws NotFoundException, GenericException {
+    return RodaCoreFactory.getIndexService().retrieve(Message.class, messageId);
   }
 }

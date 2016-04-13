@@ -55,6 +55,9 @@
 				<l:IncrementalList ui:field="pronoms"></l:IncrementalList>
 				<g:Label addStyleNames="form-label">UTIs</g:Label>
 				<l:IncrementalList ui:field="utis"></l:IncrementalList>
+				
+				<g:Label addStyleNames="form-label">Formats</g:Label>
+				<l:IncrementalIdList ui:field="formatIds"></l:IncrementalIdList>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

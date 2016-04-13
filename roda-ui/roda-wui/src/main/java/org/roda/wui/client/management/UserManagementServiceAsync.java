@@ -26,12 +26,8 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -179,31 +175,6 @@ public interface UserManagementServiceAsync {
   void retrieveLogEntry(String logEntryId, AsyncCallback<LogEntry> callback);
 
   /**
-   * Get risk
-   *
-   * @param riskId
-   * @return
-   * @throws RODAException
-   */
-  public void retrieveRisk(String riskId, AsyncCallback<Risk> callback);
-
-  /**
-   * Add risk
-   *
-   * @param risk
-   * @throws RODAException
-   */
-  public void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
-
-  /**
-   * Edit risk
-   *
-   * @param risk
-   * @throws RODAException
-   */
-  public void modifyRisk(Risk risk, AsyncCallback<Void> asyncCallback);
-
-  /**
    * Resend the email challenge to a user email
    *
    * @param username
@@ -274,56 +245,4 @@ public interface UserManagementServiceAsync {
   public void resetUserPassword(String username, String password, String resetPasswordToken,
     AsyncCallback<Void> callback);
 
-  /**
-   * Get agent
-   *
-   * @param agentId
-   * @throws RODAException
-   */
-  public void retrieveAgent(String agentId, AsyncCallback<Agent> asyncCallback);
-
-  /**
-   * Add agent
-   *
-   * @param agent
-   * @throws RODAException
-   */
-  public void addAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
-
-  /**
-   * Edit agent
-   *
-   * @param agent
-   * @throws RODAException
-   */
-  public void modifyAgent(Agent agent, AsyncCallback<Void> asyncCallback);
-
-  /**
-   * Get format
-   *
-   * @param formatId
-   * @throws RODAException
-   */
-  public void retrieveFormat(String formatId, AsyncCallback<Format> asyncCallback);
-
-  /**
-   * Add format
-   *
-   * @param format
-   * @throws RODAException
-   */
-  public void addFormat(Format format, AsyncCallback<Format> asyncCallback);
-
-  /**
-   * Edit format
-   *
-   * @param format
-   * @throws RODAException
-   */
-  public void modifyFormat(Format format, AsyncCallback<Void> asyncCallback);
-
-  void findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<Message>> callback);
-
-  public void retrieveMessage(String messageId, AsyncCallback<Message> asyncCallback);
 }

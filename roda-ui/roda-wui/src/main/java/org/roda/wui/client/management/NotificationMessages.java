@@ -24,7 +24,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.NotificationList;
+import org.roda.wui.client.common.lists.MessageList;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -112,7 +112,7 @@ public class NotificationMessages extends Composite {
   DateBox inputDateFinal;
 
   @UiField(provided = true)
-  NotificationList notificationList;
+  MessageList messageList;
 
   @UiField(provided = true)
   FlowPanel facetRecipientUser;
@@ -132,11 +132,11 @@ public class NotificationMessages extends Composite {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MESSAGE_RECIPIENT_USER),
       new SimpleFacetParameter(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));
-    notificationList = new NotificationList(filter, facets, "Notifications", false);
+    messageList = new MessageList(filter, facets, "Notifications", false);
 
     searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MESSAGE_SEARCH, messages.messageSearchPlaceHolder(),
       false, false);
-    searchPanel.setList(notificationList);
+    searchPanel.setList(messageList);
 
     facetRecipientUser = new FlowPanel();
     facetAcknowledged = new FlowPanel();
@@ -144,13 +144,13 @@ public class NotificationMessages extends Composite {
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.MESSAGE_RECIPIENT_USER, facetRecipientUser);
     facetPanels.put(RodaConstants.MESSAGE_IS_ACKNOWLEDGED, facetAcknowledged);
-    FacetUtils.bindFacets(notificationList, facetPanels);
+    FacetUtils.bindFacets(messageList, facetPanels);
 
-    notificationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    messageList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        Message selected = notificationList.getSelectionModel().getSelectedObject();
+        Message selected = messageList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           Tools.newHistory(ShowNotificationMessage.RESOLVER, selected.getId());
         }
@@ -193,12 +193,12 @@ public class NotificationMessages extends Composite {
     DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.MESSAGE_SENT_ON, dateInitial,
       dateFinal, RodaConstants.DateGranularity.DAY);
 
-    notificationList.setFilter(new Filter(filterParameter));
+    messageList.setFilter(new Filter(filterParameter));
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      notificationList.refresh();
+      messageList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1
       && ShowNotificationMessage.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {

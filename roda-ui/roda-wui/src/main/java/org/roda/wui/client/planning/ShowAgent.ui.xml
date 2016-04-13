@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
@@ -52,6 +52,10 @@
 				<g:FlowPanel ui:field="pronomsValue" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="utisKey">UTIs</g:Label>
 				<g:FlowPanel ui:field="utisValue" />
+				
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatIdsKey">Formats</g:Label>
+				<g:FlowPanel ui:field="formatIdsValue" />
+				
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

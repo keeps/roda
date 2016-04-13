@@ -30,12 +30,8 @@ import org.roda.core.data.exceptions.InvalidTokenException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.exceptions.UserAlreadyExistsException;
-import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaUser;
@@ -100,51 +96,6 @@ public class UserManagement extends RodaCoreService {
     registerAction(user, "UserManagement", "retrieveLogEntry", null, duration, "logEntryId", logEntryId);
 
     return ret;
-  }
-
-  public static Risk retrieveRisk(RodaUser user, String riskId)
-    throws GenericException, AuthorizationDeniedException, NotFoundException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Risk ret = UserManagementHelper.retrieveRisk(riskId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveRisk", null, duration, "riskId", riskId);
-
-    return ret;
-  }
-
-  public static Risk addRisk(RodaUser user, Risk risk)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Risk ret = UserManagementHelper.addRisk(risk);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addRisk", null, duration, "risk", risk);
-    return ret;
-  }
-
-  public static void modifyRisk(RodaUser user, Risk risk)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    UserManagementHelper.modifyRisk(risk);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyRisk", null, duration, "risk", risk);
   }
 
   public static Long countMembers(RodaUser user, Filter filter)
@@ -478,127 +429,4 @@ public class UserManagement extends RodaCoreService {
     }
   }
 
-  public static Agent retrieveAgent(RodaUser user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Agent ret = UserManagementHelper.retrieveAgent(agentId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveAgent", null, duration, "agentId", agentId);
-
-    return ret;
-  }
-
-  public static Agent addAgent(RodaUser user, Agent agent)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Agent ret = UserManagementHelper.addAgent(agent);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addAgent", null, duration, "agent", agent);
-    return ret;
-  }
-
-  public static void modifyAgent(RodaUser user, Agent agent)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    UserManagementHelper.modifyAgent(agent);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyAgent", null, duration, "agent", agent);
-  }
-
-  public static Format retrieveFormat(RodaUser user, String formatId)
-    throws NotFoundException, GenericException, AuthorizationDeniedException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Format ret = UserManagementHelper.retrieveFormat(formatId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveFormat", null, duration, "formatId", formatId);
-
-    return ret;
-  }
-
-  public static Format addFormat(RodaUser user, Format format)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Format ret = UserManagementHelper.addFormat(format);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "addFormat", null, duration, "format", format);
-    return ret;
-  }
-
-  public static void modifyFormat(RodaUser user, Format format)
-    throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    UserManagementHelper.modifyFormat(format);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "modifyFormat", null, duration, "format", format);
-  }
-
-  public static IndexResult<Message> findMessages(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    IndexResult<Message> ret = UserManagementHelper.findMessages(filter, sorter, sublist, facets);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMessages", null, duration, "filter", filter, "sorter", sorter,
-      "sublist", sublist);
-
-    return ret;
-  }
-
-  public static Message retrieveMessage(RodaUser user, String messageId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-    // check user permissions
-    UserUtility.checkRoles(user, ROLE);
-
-    // delegate
-    Message ret = UserManagementHelper.retrieveMessage(messageId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "retrieveMessage", null, duration, "messageId", messageId);
-
-    return ret;
-  }
 }

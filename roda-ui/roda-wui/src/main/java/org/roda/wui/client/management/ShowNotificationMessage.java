@@ -13,6 +13,7 @@ package org.roda.wui.client.management;
 import java.util.List;
 
 import org.roda.core.data.v2.messages.Message;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -42,7 +43,7 @@ public class ShowNotificationMessage extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String messageId = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveMessage(messageId, new AsyncCallback<Message>() {
+        BrowserService.Util.getInstance().retrieveMessage(messageId, new AsyncCallback<Message>() {
 
           @Override
           public void onFailure(Throwable caught) {

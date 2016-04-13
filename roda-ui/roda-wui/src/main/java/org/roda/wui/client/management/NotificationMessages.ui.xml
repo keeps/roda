@@ -18,8 +18,8 @@
 				<g:FlowPanel addStyleNames="page-description" ui:field="notificationDescription">
 				</g:FlowPanel>
 				<common:SearchPanel ui:field="searchPanel" />
-				<lists:NotificationList addStyleNames="searchResults"
-					ui:field="notificationList" />
+				<lists:MessageList addStyleNames="searchResults"
+					ui:field="messageList" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

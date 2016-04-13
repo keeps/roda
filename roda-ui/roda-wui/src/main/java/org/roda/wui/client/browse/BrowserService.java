@@ -21,6 +21,8 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -29,6 +31,8 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
@@ -174,4 +178,35 @@ public interface BrowserService extends RemoteService {
 
   void removeFormat(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  Risk retrieveRisk(String riskId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  Format retrieveFormat(String formatId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  List<Format> retrieveFormats(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  Agent retrieveAgent(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  void modifyRisk(Risk risk)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void modifyFormat(Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  void modifyAgent(Agent agent)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Risk addRisk(Risk risk)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Format addFormat(Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Agent addAgent(Agent agent)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  Message retrieveMessage(String messageId) throws AuthorizationDeniedException, NotFoundException, GenericException;
 }

@@ -13,9 +13,9 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -266,7 +266,7 @@ public class ShowRisk extends Composite {
 
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
-      UserManagementService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
+      BrowserService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
 
         @Override
         public void onFailure(Throwable caught) {

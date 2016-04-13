@@ -31,6 +31,8 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -41,6 +43,8 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
@@ -992,6 +996,163 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 
+  public static Risk retrieveRisk(RodaUser user, String riskId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Risk ret = BrowserHelper.retrieveRisk(riskId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveRisk", null, duration, "riskId", riskId);
+    return ret;
+  }
+
+  public static Format retrieveFormat(RodaUser user, String formatId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Format ret = BrowserHelper.retrieveFormat(formatId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveFormat", null, duration, "formatId", formatId);
+    return ret;
+  }
+
+  public static List<Format> retrieveFormats(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<Format> ret = BrowserHelper.retrieveFormats(agentId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveFormats", null, duration, "agentId", agentId);
+    return ret;
+  }
+
+  public static Agent retrieveAgent(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Agent ret = BrowserHelper.retrieveAgent(agentId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveAgent", null, duration, "agentId", agentId);
+    return ret;
+  }
+
+  public static void modifyRisk(RodaUser user, Risk risk)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.modifyRisk(risk);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "modifyRisk", null, duration, "risk", risk);
+  }
+
+  public static void modifyFormat(RodaUser user, Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.modifyFormat(format);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "modifyFormat", null, duration, "format", format);
+  }
+
+  public static void modifyAgent(RodaUser user, Agent agent)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.modifyAgent(agent);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "modifyAgent", null, duration, "agent", agent);
+  }
+
+  public static Risk addRisk(RodaUser user, Risk risk)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Risk ret = BrowserHelper.addRisk(risk);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "addRisk", null, duration, "risk", risk);
+    return ret;
+  }
+
+  public static Format addFormat(RodaUser user, Format format)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Format ret = BrowserHelper.addFormat(format);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "addFormat", null, duration, "format", format);
+    return ret;
+  }
+
+  public static Agent addAgent(RodaUser user, Agent agent)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Agent ret = BrowserHelper.addAgent(agent);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "addAgent", null, duration, "agent", agent);
+    return ret;
+  }
+
   public static void removeRisk(RodaUser user, SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
@@ -1093,5 +1254,38 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "getAIP", aipId, duration);
 
     return aip;
+
+  public static IndexResult<Message> findMessages(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
+    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    IndexResult<Message> ret = BrowserHelper.findMessages(filter, sorter, sublist, facets);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, "UserManagement", "findMessages", null, duration, "filter", filter, "sorter", sorter,
+      "sublist", sublist);
+
+    return ret;
+  }
+
+  public static Message retrieveMessage(RodaUser user, String messageId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Message ret = BrowserHelper.retrieveMessage(messageId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveMessage", null, duration, "messageId", messageId);
+    return ret;
   }
 }

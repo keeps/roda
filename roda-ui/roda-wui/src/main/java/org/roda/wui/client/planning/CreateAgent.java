@@ -10,9 +10,9 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -90,7 +90,7 @@ public class CreateAgent extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (agentDataPanel.isValid()) {
       agent = agentDataPanel.getAgent();
-      UserManagementService.Util.getInstance().addAgent(agent, new AsyncCallback<Agent>() {
+      BrowserService.Util.getInstance().addAgent(agent, new AsyncCallback<Agent>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);

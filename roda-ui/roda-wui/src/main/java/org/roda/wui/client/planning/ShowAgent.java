@@ -13,9 +13,10 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 
@@ -146,6 +147,12 @@ public class ShowAgent extends Composite {
   FlowPanel utisValue;
 
   @UiField
+  Label formatIdsKey;
+
+  @UiField
+  FlowPanel formatIdsValue;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -253,13 +260,36 @@ public class ShowAgent extends Composite {
         utisValue.add(parPanel);
       }
     }
+
+    List<String> formats = agent.getFormatIds();
+    formatIdsValue.setVisible(formats != null && !formats.isEmpty());
+    formatIdsKey.setVisible(formats != null && !formats.isEmpty());
+
+    final String agentId = agent.getId();
+    BrowserService.Util.getInstance().retrieveFormats(agentId, new AsyncCallback<List<Format>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(List<Format> result) {
+        for (Format f : result) {
+          HTML parPanel = new HTML();
+          parPanel.setHTML(messages.agentListItems(f.getName()));
+          ShowAgent.this.formatIdsValue.add(parPanel);
+        }
+      }
+    });
+
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
 
     if (historyTokens.size() == 1) {
       String agentId = historyTokens.get(0);
-      UserManagementService.Util.getInstance().retrieveAgent(agentId, new AsyncCallback<Agent>() {
+      BrowserService.Util.getInstance().retrieveAgent(agentId, new AsyncCallback<Agent>() {
 
         @Override
         public void onFailure(Throwable caught) {

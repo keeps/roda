@@ -11,9 +11,9 @@ import java.util.List;
 
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -38,7 +38,7 @@ public class EditFormat extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String formatId = historyTokens.get(0);
-        UserManagementService.Util.getInstance().retrieveFormat(formatId, new AsyncCallback<Format>() {
+        BrowserService.Util.getInstance().retrieveFormat(formatId, new AsyncCallback<Format>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -110,7 +110,7 @@ public class EditFormat extends Composite {
         String agentId = format.getId();
         format = formatDataPanel.getFormat();
         format.setId(agentId);
-        UserManagementService.Util.getInstance().modifyFormat(format, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().modifyFormat(format, new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

@@ -10,9 +10,9 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.v2.formats.Format;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.UserManagementService;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -90,7 +90,7 @@ public class CreateFormat extends Composite {
   void buttonApplyHandler(ClickEvent e) {
     if (formatDataPanel.isValid()) {
       format = formatDataPanel.getFormat();
-      UserManagementService.Util.getInstance().addFormat(format, new AsyncCallback<Format>() {
+      BrowserService.Util.getInstance().addFormat(format, new AsyncCallback<Format>() {
 
         public void onFailure(Throwable caught) {
           errorMessage(caught);
