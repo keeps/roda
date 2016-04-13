@@ -59,7 +59,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
 
   @Override
   public String getDescription() {
-    return "Clean-up indexes and re-create them from data in storage";
+    return "Cleanup indexes and recreate them from data in storage";
   }
 
   @Override
@@ -87,7 +87,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
     try {
       boolean recursive = false;
       listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getFormatContainerPath(), recursive);
-      LOGGER.info("Reindexing all formats under " + ModelUtils.getFormatContainerPath());
+      LOGGER.debug("Reindexing all formats under {}", ModelUtils.getFormatContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -102,7 +102,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing formats", e);
+      LOGGER.error("Error reindexing formats", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -112,7 +112,7 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -129,8 +129,21 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_FORMAT);
@@ -177,16 +190,4 @@ public class ReindexFormatPlugin extends AbstractPlugin<Format> {
     return "All formats reindexing failed";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

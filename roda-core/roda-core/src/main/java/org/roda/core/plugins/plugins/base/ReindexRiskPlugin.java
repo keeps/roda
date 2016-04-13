@@ -59,7 +59,7 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
 
   @Override
   public String getDescription() {
-    return "Clean-up indexes and re-create them from data in storage";
+    return "Cleanup indexes and recreate them from data in storage";
   }
 
   @Override
@@ -87,7 +87,7 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
     try {
       boolean recursive = false;
       listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getRiskContainerPath(), recursive);
-      LOGGER.info("Reindexing all risks under " + ModelUtils.getRiskContainerPath());
+      LOGGER.info("Reindexing all risks under {}", ModelUtils.getRiskContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -102,7 +102,7 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing risks", e);
+      LOGGER.error("Error reindexing risks", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -112,7 +112,7 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -129,8 +129,21 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_RISK);
@@ -177,16 +190,4 @@ public class ReindexRiskPlugin extends AbstractPlugin<Risk> {
     return "All risks reindexing failed";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

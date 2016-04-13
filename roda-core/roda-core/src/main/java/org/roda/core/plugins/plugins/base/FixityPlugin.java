@@ -169,19 +169,16 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
     String message) {
     // TODO Auto-generated method stub
-
   }
 
   private void notifyUserOfFixityCheckSucess(String representationID, List<String> okFileIDS, List<String> koFileIDS,
     PreservationMetadata event) {
     // TODO Auto-generated method stub
-
   }
 
   private void notifyUserOfFixityCheckError(String representationID, List<String> okFileIDS, List<String> koFileIDS,
     PreservationMetadata event) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
@@ -237,13 +234,13 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 }

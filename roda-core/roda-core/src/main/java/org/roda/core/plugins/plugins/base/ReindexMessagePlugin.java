@@ -59,7 +59,7 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
 
   @Override
   public String getDescription() {
-    return "Clean-up indexes and re-create them from data in storage";
+    return "Cleanup indexes and recreate them from data in storage";
   }
 
   @Override
@@ -88,7 +88,7 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
       boolean recursive = false;
       listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getMessageContainerPath(),
         recursive);
-      LOGGER.info("Reindexing all messages under " + ModelUtils.getMessageContainerPath());
+      LOGGER.debug("Reindexing all messages under {}", ModelUtils.getMessageContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -103,7 +103,7 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing messages", e);
+      LOGGER.error("Error reindexing messages", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -113,7 +113,7 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -130,8 +130,21 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_MESSAGE);
@@ -178,16 +191,4 @@ public class ReindexMessagePlugin extends AbstractPlugin<Message> {
     return "All messages reindexing failed";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

@@ -80,12 +80,6 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    return new Report();
-  }
-
-  @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
@@ -106,6 +100,18 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    return new Report();
+  }
+
+  @Override
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    return new Report();
+  }
+
+  @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
@@ -117,12 +123,6 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
       throw new PluginException("Error optimizing index", e);
     }
 
-    return new Report();
-  }
-
-  @Override
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
     return new Report();
   }
 

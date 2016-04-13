@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Luis Faria
  */
 public class CommandUtility {
-  private static final Logger logger = LoggerFactory.getLogger(CommandUtility.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(CommandUtility.class);
 
   /**
    * Execute the given command line.
@@ -59,9 +59,9 @@ public class CommandUtility {
 
       StringBuilder builder = new StringBuilder();
       for (String arg : args) {
-        builder.append(arg + " "); //$NON-NLS-1$
+        builder.append(arg + " ");
       }
-      logger.debug("Executing '" + builder.toString() + "'"); //$NON-NLS-1$ //$NON-NLS-2$
+      LOGGER.debug("Executing {}", builder);
 
       // create and execute process
       ProcessBuilder processBuilder = new ProcessBuilder(args);
@@ -81,12 +81,12 @@ public class CommandUtility {
 
         // Wait until the CaptureOutputThread notifies that is finished
         // reading the input stream.
-        logger.debug("Waiting until CaptureOutputThread notifies");
+        LOGGER.debug("Waiting until CaptureOutputThread notifies");
         is.wait();
 
       }
 
-      logger.debug("CaptureOutputThread notified. Getting output...");
+      LOGGER.debug("CaptureOutputThread notified. Getting output...");
 
       output = captureOutputThread.output;
 
@@ -97,7 +97,7 @@ public class CommandUtility {
       // "java.io.IOException: Too many open files" in roda-migrator
       is.close();
 
-      logger.debug("Command " + Arrays.toString(args) + " terminated with value " + exitValue);
+      LOGGER.debug("Command {} terminated with value {}", Arrays.toString(args), exitValue);
 
       if (exitValue == 0) {
         return output.toString();
@@ -108,12 +108,12 @@ public class CommandUtility {
 
     } catch (IOException e) {
 
-      logger.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
+      LOGGER.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
       throw new CommandException("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
 
     } catch (InterruptedException e) {
 
-      logger.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
+      LOGGER.debug("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
       throw new CommandException("Error executing command " + Arrays.toString(args) + " - " + e.getMessage(), e);
     }
   }
@@ -160,13 +160,12 @@ class CaptureOutputThread extends Thread {
       String line = null;
 
       while ((line = reader.readLine()) != null) {
-        outputBuffer.append(line + "\n"); //$NON-NLS-1$
+        outputBuffer.append(line + "\n");
         logger.trace(line);
       }
 
     } catch (IOException e) {
-      logger.error("Exception reading from input stream - " //$NON-NLS-1$
-        + e.getMessage(), e);
+      logger.error("Exception reading from input stream - " + e.getMessage(), e);
     }
 
     output = outputBuffer.toString();

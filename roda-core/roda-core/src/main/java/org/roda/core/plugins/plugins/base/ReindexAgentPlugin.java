@@ -59,7 +59,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
   @Override
   public String getDescription() {
-    return "Clean-up indexes and re-create them from data in storage";
+    return "Cleanup indexes and recreate them from data in storage";
   }
 
   @Override
@@ -87,7 +87,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
     try {
       boolean recursive = false;
       listResourcesUnderDirectory = storage.listResourcesUnderContainer(ModelUtils.getAgentContainerPath(), recursive);
-      LOGGER.info("Reindexing all agents under " + ModelUtils.getAgentContainerPath());
+      LOGGER.debug("Reindexing all agents under {}", ModelUtils.getAgentContainerPath());
 
       for (Resource resource : listResourcesUnderDirectory) {
         if (!resource.isDirectory()) {
@@ -102,7 +102,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
 
     } catch (NotFoundException | GenericException | AuthorizationDeniedException | RequestNotValidException
       | IOException e) {
-      LOGGER.error("Error re-indexing agents", e);
+      LOGGER.error("Error reindexing agents", e);
     } finally {
       IOUtils.closeQuietly(listResourcesUnderDirectory);
     }
@@ -112,7 +112,7 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -129,8 +129,21 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_AGENT);
@@ -177,16 +190,4 @@ public class ReindexAgentPlugin extends AbstractPlugin<Agent> {
     return "All agents reindexing failed";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

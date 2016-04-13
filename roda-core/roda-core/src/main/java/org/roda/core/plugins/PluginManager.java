@@ -230,13 +230,13 @@ public class PluginManager {
           && attrs.lastModifiedTime().toMillis() == jarPluginCache.get(jarFile).lastModified) {
           // The plugin already exists
 
-          LOGGER.debug(jarFile.getFileName() + " is already loaded");
+          LOGGER.debug("{} is already loaded", jarFile.getFileName());
 
         } else {
           // The plugin doesn't exist or the modification date is
           // different. Let's load the Plugin
 
-          LOGGER.debug(jarFile.getFileName() + " is not loaded or modification dates differ. Inspecting Jar...");
+          LOGGER.debug("{} is not loaded or modification dates differ. Inspecting Jar...", jarFile.getFileName());
 
           Plugin<?> plugin = loadPlugin(jarFile, jarURLs);
 
@@ -246,11 +246,11 @@ public class PluginManager {
               plugin.init();
               externalPluginChache.put(plugin.getName(), plugin);
               addPluginToPluginTypeMapping(plugin);
-              LOGGER.debug("Plugin started " + plugin.getName() + " (version " + plugin.getVersion() + ")");
+              LOGGER.debug("Plugin started {} (version {})", plugin.getName(), plugin.getVersion());
 
             } else {
 
-              LOGGER.trace(jarFile.getFileName() + " is not a Plugin");
+              LOGGER.trace("{} is not a Plugin", jarFile.getFileName());
 
             }
 
@@ -319,7 +319,7 @@ public class PluginManager {
       Manifest manifest = jar.getManifest();
 
       if (manifest == null) {
-        LOGGER.trace(jarFile.getFileName() + " doesn't have a MANIFEST file");
+        LOGGER.trace("{} doesn't have a MANIFEST file", jarFile.getFileName());
       } else {
 
         Attributes mainAttributes = manifest.getMainAttributes();
@@ -328,10 +328,9 @@ public class PluginManager {
 
         if (pluginClassName != null) {
 
-          LOGGER.trace(jarFile.getFileName() + " has plugin " + pluginClassName);
-
-          LOGGER.trace("Adding jar " + jarFile.getFileName() + " to classpath and loading " + pluginClassName
-            + " with ClassLoader " + URLClassLoader.class.getSimpleName());
+          LOGGER.trace("{} has plugin {}", jarFile.getFileName(), pluginClassName);
+          LOGGER.trace("Adding jar {} to classpath and loading {} with ClassLoader {}", jarFile.getFileName(),
+            pluginClassName, URLClassLoader.class.getSimpleName());
 
           Object object = ClassLoaderUtility.createObject(jarURLs.toArray(new URL[jarURLs.size()]), pluginClassName);
 
@@ -340,12 +339,12 @@ public class PluginManager {
             plugin = (Plugin<?>) object;
 
           } else {
-            LOGGER.error(pluginClassName + " is not a valid Plugin");
+            LOGGER.error("{} is not a valid Plugin", pluginClassName);
           }
 
         } else {
-          LOGGER.trace(
-            jarFile.getFileName() + " MANIFEST file doesn't have a '" + RODA_PLUGIN_MANIFEST_KEY + "' attribute");
+          LOGGER.trace("{} MANIFEST file doesn't have a '{}' attribute", jarFile.getFileName(),
+            RODA_PLUGIN_MANIFEST_KEY);
         }
 
       }
@@ -377,15 +376,15 @@ public class PluginManager {
 
       loadPlugins();
 
-      LOGGER.debug("Search complete - " + jarPluginCache.size() + " jar files");
+      LOGGER.debug("Search complete - {} jar files", jarPluginCache.size());
 
       for (Path jarFile : jarPluginCache.keySet()) {
 
         Plugin<?> plugin = jarPluginCache.get(jarFile).plugin;
 
         if (plugin != null) {
-          LOGGER.debug("- " + jarFile.getFileName());
-          LOGGER.debug("--- " + plugin.getName() + " - " + plugin.getVersion() + " - " + plugin.getDescription());
+          LOGGER.debug("- {}", jarFile.getFileName());
+          LOGGER.debug("--- {} - {} - {}", plugin.getName(), plugin.getVersion(), plugin.getDescription());
         }
       }
     }

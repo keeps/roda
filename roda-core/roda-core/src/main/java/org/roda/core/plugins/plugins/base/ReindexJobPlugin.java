@@ -131,7 +131,7 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
@@ -149,8 +149,21 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   }
 
   @Override
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
     try {
       index.optimizeIndex(RodaConstants.INDEX_JOB);
@@ -198,16 +211,4 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

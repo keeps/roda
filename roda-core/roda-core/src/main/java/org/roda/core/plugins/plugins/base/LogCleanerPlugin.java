@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -85,12 +86,19 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
       try {
         index.deleteActionLog(until);
       } catch (SolrServerException | IOException e) {
-        LOGGER.error("Error deleting actionlog until " + until);
+        LOGGER.error("Error deleting actionlog until {}", until);
       }
     } else {
       // do nothing
     }
 
+    return null;
+  }
+
+  @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
     return null;
   }
 
@@ -105,6 +113,17 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
     // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    LOGGER.debug("Optimizing indexes");
+    try {
+      index.optimizeIndex(RodaConstants.INDEX_ACTION_LOG);
+    } catch (GenericException e) {
+      throw new PluginException("Error optimizing index", e);
+    }
     return null;
   }
 
@@ -144,16 +163,4 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

@@ -67,33 +67,45 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
 
     for (IndexedAIP indexedAIP : list) {
       try {
-        LOGGER.debug("Processing AIP " + indexedAIP.getId());
+        LOGGER.debug("Processing AIP {}", indexedAIP.getId());
         if (indexedAIP.getLevel() == null || !indexedAIP.getLevel().trim().equalsIgnoreCase("fonds")) {
           AIP aip = model.retrieveAIP(indexedAIP.getId());
           aip.setParentId(newParent.getId());
           model.updateAIP(aip);
         } else {
-          LOGGER.debug("  AIP doesn't need to be moved... Level: " + indexedAIP.getLevel());
+          LOGGER.debug("  AIP doesn't need to be moved... Level: {}", indexedAIP.getLevel());
         }
       } catch (RODAException e) {
-        LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)");
-        LOGGER.error(e.getMessage(), e);
+        LOGGER.error("Error processing AIP " + indexedAIP.getId() + " (RemoveOrphansAction)", e);
       }
     }
     return null;
   }
 
   @Override
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException {
+    // do nothing
+    return null;
+  }
+
+  @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    LOGGER.debug("End");
+    // do nothing
+    return null;
+  }
+
+  @Override
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
+    // do nothing
     return null;
   }
 
@@ -133,16 +145,4 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
-  @Override
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
-    return null;
-  }
 }

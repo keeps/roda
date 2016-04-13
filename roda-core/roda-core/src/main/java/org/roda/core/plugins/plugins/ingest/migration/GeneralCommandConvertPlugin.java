@@ -77,13 +77,13 @@ public class GeneralCommandConvertPlugin<T extends Serializable> extends Command
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 

@@ -87,13 +87,13 @@ public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlug
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // TODO Auto-generated method stub
+    // do nothing
     return null;
   }
 
