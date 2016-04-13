@@ -1049,7 +1049,7 @@ public class RodaCoreFactory {
   public static void runReindexAipsPlugin() {
     Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
-    parameters.put(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE, "true");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
     try {
       reindexPlugin.setParameterValues(parameters);
     } catch (InvalidParameterException e) {

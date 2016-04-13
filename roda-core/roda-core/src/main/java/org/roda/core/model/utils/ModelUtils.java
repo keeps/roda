@@ -7,6 +7,7 @@
  */
 package org.roda.core.model.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -14,11 +15,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.storage.DefaultStoragePath;
 
 /**
@@ -374,7 +379,7 @@ public final class ModelUtils {
   }
 
   public static StoragePath getJobStoragePath(String jobId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId);
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB, jobId + RodaConstants.JOB_FILE_EXTENSION);
   }
 
   public static StoragePath getJobReportContainerPath() throws RequestNotValidException {
@@ -386,7 +391,8 @@ public final class ModelUtils {
   }
 
   public static StoragePath getJobReportStoragePath(String jobId, String jobReportId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT, jobId, jobReportId);
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_JOB_REPORT, jobId,
+      jobReportId + RodaConstants.JOB_REPORT_FILE_EXTENSION);
   }
 
   public static StoragePath getRiskContainerPath() throws RequestNotValidException {
@@ -459,6 +465,20 @@ public final class ModelUtils {
       throw new RequestNotValidException("AIP id cannot be null");
     }
     return DefaultStoragePath.parse(path);
+  }
+
+  public static <T extends Serializable> StoragePath getContainerPath(Class<T> clazz) throws RequestNotValidException {
+    if (clazz.equals(Agent.class)) {
+      return getAgentContainerPath();
+    } else if (clazz.equals(Format.class)) {
+      return getFormatContainerPath();
+    } else if (clazz.equals(Message.class)) {
+      return getMessageContainerPath();
+    } else if (clazz.equals(Risk.class)) {
+      return getRiskContainerPath();
+    } else {
+      throw new RequestNotValidException("Unknown class for getting container path: " + clazz.getCanonicalName());
+    }
   }
 
 }

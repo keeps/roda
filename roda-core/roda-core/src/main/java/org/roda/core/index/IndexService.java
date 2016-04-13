@@ -10,6 +10,7 @@ package org.roda.core.index;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -200,6 +201,20 @@ public class IndexService {
 
   public void reindexMessage(Message message) {
     observer.messageCreatedOrUpdated(message);
+  }
+
+  public <T extends Serializable> void reindex(Class<T> objectClass, T object) {
+    if (Agent.class.equals(objectClass)) {
+      reindexAgent(Agent.class.cast(object));
+    } else if (Format.class.equals(objectClass)) {
+      reindexFormat(Format.class.cast(object));
+    } else if (Message.class.equals(objectClass)) {
+      reindexMessage(Message.class.cast(object));
+    } else if (Risk.class.equals(objectClass)) {
+      reindexRisk(Risk.class.cast(object));
+    } else {
+      LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getCanonicalName());
+    }
   }
 
   public void reindexActionLogs()

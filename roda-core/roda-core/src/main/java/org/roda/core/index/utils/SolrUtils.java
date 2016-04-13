@@ -761,7 +761,7 @@ public class SolrUtils {
     return ret;
   }
 
-  private static <T extends IsIndexed> String getIndexName(Class<T> resultClass) throws GenericException {
+  public static <T extends Serializable> String getIndexName(Class<T> resultClass) throws GenericException {
     String indexName;
     if (resultClass.equals(AIP.class)) {
       indexName = RodaConstants.INDEX_AIP;

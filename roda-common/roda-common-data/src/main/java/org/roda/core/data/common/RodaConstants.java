@@ -324,6 +324,7 @@ public final class RodaConstants {
   public static final String JOB_RESOURCE_TYPE = "resourceType";
   public static final String JOB_ORCHESTRATOR_METHOD = "orchestratorMethod";
   public static final String JOB_OBJECTS = "objects";
+  public static final String JOB_FILE_EXTENSION = ".json";
 
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
   public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
@@ -334,6 +335,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
+  public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
+  public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
 
   /* Job Report */
@@ -351,6 +354,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_PLUGIN_STATE = "pluginState";
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
   public static final String JOB_REPORT_REPORTS = "reports";
+  public static final String JOB_REPORT_FILE_EXTENSION = ".json";
 
   public static final String FILE_UUID = "uuid";
   public static final String FILE_PATH = "path";

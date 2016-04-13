@@ -70,12 +70,8 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE) != null) {
-      try {
-        clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE));
-      } catch (NumberFormatException e) {
-        // do nothing
-      }
+    if (parameters != null && parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES) != null) {
+      clearIndexes = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     }
   }
 

@@ -60,8 +60,8 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE)) {
-      clearIndexes = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_BOOLEAN_VALUE));
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
+      clearIndexes = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     }
   }
 
