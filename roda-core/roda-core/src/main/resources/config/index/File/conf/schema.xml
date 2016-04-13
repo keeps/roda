@@ -574,14 +574,17 @@
 
    <fieldType name="search" class="solr.TextField" positionIncrementGap="100">
       <analyzer type="index">
-         <tokenizer class="solr.PatternTokenizerFactory" pattern="[^\p{L}\p{N}]+"/>
+         <tokenizer class="solr.StandardTokenizerFactory" />
+         <filter class="solr.ASCIIFoldingFilterFactory" />
          <filter class="solr.LowerCaseFilterFactory"/>
-         <filter class="solr.ASCIIFoldingFilterFactory"/>
+         <filter class="solr.PatternCaptureGroupFilterFactory" pattern="[^\p{L}\p{N}]+" preserve_original="true"/>
+         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
       </analyzer>
       <analyzer type="query">
-         <tokenizer class="solr.PatternTokenizerFactory" pattern="[^\p{L}\p{N}]+"/>
+         <tokenizer class="solr.StandardTokenizerFactory" />
+         <filter class="solr.ASCIIFoldingFilterFactory" />
          <filter class="solr.LowerCaseFilterFactory"/>
-         <filter class="solr.ASCIIFoldingFilterFactory"/>
+         <filter class="solr.PatternCaptureGroupFilterFactory" pattern="[^\p{L}\p{N}]+" preserve_original="true"/>
       </analyzer>
    </fieldType>
    

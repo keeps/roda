@@ -305,6 +305,7 @@ public final class RodaConstants {
   public static final String TRANSFERRED_RESOURCE_SIZE = "size";
   public static final String TRANSFERRED_RESOURCE_ANCESTORS = "ancestors";
   public static final String TRANSFERRED_RESOURCE_LAST_SCAN_DATE = "lastScanDate";
+  public static final String TRANSFERRED_RESOURCE_SEARCH = "search";
 
   public static final String JOB_ID = "id";
   public static final String JOB_NAME = "name";

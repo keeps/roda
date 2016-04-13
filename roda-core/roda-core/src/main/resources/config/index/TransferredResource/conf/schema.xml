@@ -94,10 +94,16 @@
 		required="false" multiValued="false" />
 	<field name="isFile" type="boolean" indexed="true" stored="true"
 		required="false" multiValued="false" />
-	<field name="name" type="text_general" indexed="true" stored="true"
+	<field name="name" type="string" indexed="true" stored="true"
 		required="true" multiValued="false" />
 	<field name="size" type="long" indexed="true" stored="true"
 		required="true" multiValued="false" />
+	<field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
+	
+	<defaultSearchField>search</defaultSearchField>
+	<copyField source="name" dest="search"/>
+		
+	
 
 	<!-- Dynamic field definitions allow using convention over configuration 
 		for fields via the specification of patterns to match field names. EXAMPLE: 
@@ -527,5 +533,21 @@
 		1440, min: 60) -->
 	<fieldType name="currency" class="solr.CurrencyField"
 		precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
+		
+	<fieldType name="search" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+         <tokenizer class="solr.StandardTokenizerFactory" />
+         <filter class="solr.ASCIIFoldingFilterFactory" />
+         <filter class="solr.LowerCaseFilterFactory"/>
+         <filter class="solr.PatternCaptureGroupFilterFactory" pattern="[^\p{L}\p{N}]+" preserve_original="true"/>
+         <filter class="solr.RemoveDuplicatesTokenFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+         <tokenizer class="solr.StandardTokenizerFactory" />
+         <filter class="solr.ASCIIFoldingFilterFactory" />
+         <filter class="solr.LowerCaseFilterFactory"/>
+         <filter class="solr.PatternCaptureGroupFilterFactory" pattern="[^\p{L}\p{N}]+" preserve_original="true"/>
+      </analyzer>
+   </fieldType>
 
 </schema>

@@ -606,7 +606,7 @@ public class IndexModelObserver implements ModelObserver {
   private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage) {
     try {
       index.add(indexName, document);
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error(errorLogMessage, e);
     }
   }
