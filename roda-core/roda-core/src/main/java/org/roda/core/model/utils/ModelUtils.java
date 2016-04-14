@@ -12,19 +12,36 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.model.ModelService;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.StorageService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Model related utility class
@@ -33,6 +50,8 @@ import org.roda.core.storage.DefaultStoragePath;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public final class ModelUtils {
+
+  private static final Logger LOGGER = LoggerFactory.getLogger(ModelUtils.class);
 
   /**
    * Private empty constructor
@@ -501,5 +520,85 @@ public final class ModelUtils {
     path.addAll(fileDirectoryPath);
     path.add(fileId);
     return DefaultStoragePath.parse(path);
+  }
+
+  public static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file, boolean flat)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StorageService storage = RodaCoreFactory.getStorageService();
+
+    if (!file.isDirectory()) {
+      StoragePath filePath = ModelUtils.getFileStoragePath(file);
+      Binary binary = storage.getBinary(filePath);
+      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : filePath.asString(), binary.getContent());
+      zipEntries.add(info);
+    } else {
+      // TODO add directory zip entry
+    }
+  }
+
+  public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    ZipEntryInfo info = new ZipEntryInfo(binary.getStoragePath().asString(), binary.getContent());
+    zipEntries.add(info);
+  }
+
+  public static List<ZipEntryInfo> zipAIP(List<IndexedAIP> aips)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
+    ModelService model = RodaCoreFactory.getModelService();
+    StorageService storage = RodaCoreFactory.getStorageService();
+    for (IndexedAIP aip : aips) {
+
+      AIP fullAIP = model.retrieveAIP(aip.getId());
+
+      StoragePath aipJsonPath = DefaultStoragePath.parse(ModelUtils.getAIPStoragePath(aip.getId()),
+        RodaConstants.STORAGE_AIP_METADATA_FILENAME);
+      addToZip(zipEntries, storage.getBinary(aipJsonPath));
+      for (DescriptiveMetadata dm : fullAIP.getDescriptiveMetadata()) {
+        Binary dmBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(), dm.getId());
+        addToZip(zipEntries, dmBinary);
+      }
+      CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata>> preservations = model
+        .listPreservationMetadata(aip.getId(), true);
+      for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.PreservationMetadata> preservation : preservations) {
+        if (preservation.isPresent()) {
+          PreservationMetadata pm = preservation.get();
+          StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(pm);
+          addToZip(zipEntries, storage.getBinary(filePath));
+        } else {
+          LOGGER.error("Cannot get AIP representation file", preservation.getCause());
+        }
+      }
+      IOUtils.closeQuietly(preservations);
+      for (Representation rep : fullAIP.getRepresentations()) {
+        boolean recursive = true;
+        CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model.listFilesUnder(aip.getId(),
+          rep.getId(), recursive);
+        for (OptionalWithCause<org.roda.core.data.v2.ip.File> file : allFiles) {
+          if (file.isPresent()) {
+            addToZip(zipEntries, file.get(), false);
+          } else {
+            LOGGER.error("Cannot get AIP representation file", file.getCause());
+          }
+        }
+        IOUtils.closeQuietly(allFiles);
+
+        recursive = false;
+        CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata>> allOtherMetadata = model
+          .listOtherMetadata(aip.getId(), rep.getId());
+        for (OptionalWithCause<org.roda.core.data.v2.ip.metadata.OtherMetadata> otherMetadata : allOtherMetadata) {
+          if (otherMetadata.isPresent()) {
+            OtherMetadata o = otherMetadata.get();
+            StoragePath otherMetadataStoragePath = ModelUtils.getOtherMetadataStoragePath(aip.getId(), rep.getId(),
+              o.getFileDirectoryPath(), o.getFileId(), o.getFileSuffix(), o.getType());
+            addToZip(zipEntries, storage.getBinary(otherMetadataStoragePath));
+          } else {
+            LOGGER.error("Cannot get Representation other metadata file", otherMetadata.getCause());
+          }
+        }
+        IOUtils.closeQuietly(allFiles);
+      }
+    }
+    return zipEntries;
   }
 }

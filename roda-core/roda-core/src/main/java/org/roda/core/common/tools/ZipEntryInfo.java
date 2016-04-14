@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.disseminators.common.tools;
+package org.roda.core.common.tools;
 
 import java.io.FileNotFoundException;
 import java.nio.file.Path;

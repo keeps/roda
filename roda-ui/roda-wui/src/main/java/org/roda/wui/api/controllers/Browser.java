@@ -7,6 +7,7 @@
  */
 package org.roda.wui.api.controllers;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Date;
@@ -1048,9 +1049,10 @@ public class Browser extends RodaCoreService {
    * @throws AuthorizationDeniedException
    * @throws NotFoundException
    * @throws RequestNotValidException
+   * @throws IOException
    */
   public static StreamResponse exportAIP(RodaUser user, Filter filter, String acceptFormat)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
     Date startDate = new Date();
 
     // validate input
@@ -1067,7 +1069,7 @@ public class Browser extends RodaCoreService {
       UserUtility.checkObjectPermissions(user, aips, PermissionType.READ);
 
       // delegate
-      StreamResponse aipExport = BrowserHelper.exportAIP(aips, acceptFormat);
+      StreamResponse aipExport = BrowserHelper.getAips(aips, acceptFormat);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();

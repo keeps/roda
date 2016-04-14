@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.disseminators.common.tools;
+package org.roda.core.common.tools;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,8 +14,6 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.httpclient.HttpStatus;
-import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 
 /**
@@ -49,8 +47,6 @@ public class ZipTools {
     IOUtils.closeQuietly(out);
   }
 
-  
-
   private static String createFileName(String original, int append) {
     String ret;
     int dotIndex = original.lastIndexOf('.');
@@ -62,18 +58,6 @@ public class ZipTools {
       ret = original + "_" + append;
     }
     return ret;
-  }
-
-  private static void addEntryToZip(ZipOutputStream zos, GetMethod method, String originalName) throws IOException {
-    ZipEntry entry = new ZipEntry(originalName);
-    zos.putNextEntry(entry);
-    int status = method.getStatusCode();
-    if (status == HttpStatus.SC_OK) {
-      sendToZip(method.getResponseBodyAsStream(), zos);
-    } else {
-      throw new IOException("Error getting stream, HTTP Code: " + status);
-    }
-    zos.closeEntry();
   }
 
   private static void sendToZip(InputStream in, ZipOutputStream zos) throws IOException {
