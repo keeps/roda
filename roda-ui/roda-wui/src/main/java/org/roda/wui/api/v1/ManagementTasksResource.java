@@ -29,18 +29,21 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
+import org.roda.core.plugins.plugins.base.RemoveAIPPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.RodaCoreService;
@@ -97,7 +100,26 @@ public class ManagementTasksResource extends RodaCoreService {
     }
 
     return Response.ok().entity(createJobForRunningActionlogCleaner(user, params, startDate)).build();
+  }
 
+  @POST
+  @Path("/model/batch_removal")
+  public Response executeTask(@QueryParam("onlyRepresentations") boolean onlyRepresentation,
+    @QueryParam("selected") String selected) throws AuthorizationDeniedException {
+    Date startDate = new Date();
+
+    // get user & check permissions
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // FIXME see if this is the proper way to ensure that the user can execute
+    // this task
+    if (!user.getAllGroups().contains("administrators")) {
+      throw new AuthorizationDeniedException(
+        "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
+    }
+
+    ApiResponseMessage response = createJobToRemoveAIPs(user, startDate, onlyRepresentation, selected);
+
+    return Response.ok().entity(response).build();
   }
 
   private Response executeReindex(RodaUser user, Date startDate, String entity, List<String> params) {
@@ -124,6 +146,29 @@ public class ManagementTasksResource extends RodaCoreService {
       response = createJobToReindexActionlogs(user, startDate, params);
     }
     return Response.ok().entity(response).build();
+  }
+
+  private ApiResponseMessage createJobToRemoveAIPs(RodaUser user, Date startDate, boolean onlyRepresentation,
+    String selected) {
+    ApiResponseMessage response;
+    response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
+    try {
+      Job job = new Job();
+      SelectedItems selectedItems = JsonUtils.getObjectFromJson(selected, SelectedItems.class);
+      job.setName("Management Task | Remove 'AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
+        .setPlugin(RemoveAIPPlugin.class.getCanonicalName()).setObjects(selectedItems);
+      Map<String, String> parameters = new HashMap<String, String>();
+      parameters.put(RemoveAIPPlugin.ONLY_REPRESENTATIONS, onlyRepresentation ? "true" : "false");
+      job.setPluginParameters(parameters);
+      Job jobCreated = Jobs.createJob(user, job);
+      response.setMessage("Remove AIPs job created (" + jobCreated + ")");
+      // register action
+      long duration = new Date().getTime() - startDate.getTime();
+      registerAction(user, "ManagementTasks", "remove aips", null, duration);
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+      LOGGER.error("Error creating remove AIPs job", e);
+    }
+    return response;
   }
 
   private ApiResponseMessage createJobToReindexAllJobs(RodaUser user, Date startDate) {

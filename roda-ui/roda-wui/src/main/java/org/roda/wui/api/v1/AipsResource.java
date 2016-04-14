@@ -34,6 +34,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -64,7 +65,7 @@ public class AipsResource {
   @ApiResponses(value = {
     @ApiResponse(code = 200, message = "Successful response", response = AIP.class, responseContainer = "List")})
 
-  public Response aipsGet(
+  public Response listAIPs(
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
       throws RODAException {
@@ -79,17 +80,15 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = AIP.class),
     @ApiResponse(code = 404, message = "Not found", response = AIP.class)})
 
-  public Response aipsAipIdGet(
+  public Response getAIP(
     @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "Choose format in which to get the AIP", allowableValues = "json, zip", defaultValue = RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON) @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
 
-    // delegate action to controller (export to zip)
-    StreamResponse aipRepresentation = Browser.exportAIP(user, filter, acceptFormat);
+    // delegate action to controller
+    StreamResponse aipRepresentation = Browser.getAIP(user, aipId, acceptFormat);
 
     return ApiUtils.okResponse(aipRepresentation);
   }
@@ -100,7 +99,7 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = AIP.class),
     @ApiResponse(code = 404, message = "Not found", response = AIP.class)})
 
-  public Response aipsAipIdPut(
+  public Response updateAIP(
     @ApiParam(value = "The ID of the existing AIP to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
@@ -114,7 +113,7 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = AIP.class),
     @ApiResponse(code = 409, message = "Already exists", response = AIP.class)})
 
-  public Response aipsAipIdPost(
+  public Response createAIP(
     @ApiParam(value = "The requested ID of the new AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The path to the directory in the shared file system where the AIP should be provided.", required = true) @FormParam("filepath") String filepath)
       throws RODAException {
@@ -128,7 +127,7 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
     @ApiResponse(code = 404, message = "Not found", response = Void.class)})
 
-  public Response aipsAipIdDelete(
+  public Response deleteAIP(
     @ApiParam(value = "The ID of the AIP to delete.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId)
       throws RODAException {
     // get user
@@ -137,7 +136,9 @@ public class AipsResource {
     // delegate action to controller
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-    Browser.deleteAIPs(user, filter, false);
+
+    SelectedItemsFilter sif = new SelectedItemsFilter(filter);
+    Browser.removeAIP(user, sif);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();
@@ -150,7 +151,7 @@ public class AipsResource {
     @ApiResponse(code = 200, message = "OK", response = Representation.class, responseContainer = "List"),
     @ApiResponse(code = 404, message = "AIP not found", response = Representation.class, responseContainer = "List")})
 
-  public Response aipsAipIdDataGet(
+  public Response listRepresentations(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
@@ -166,7 +167,7 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
     @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
 
-  public Response getAipRepresentation(
+  public Response getRepresentation(
     @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
@@ -185,7 +186,7 @@ public class AipsResource {
   @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
     @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
 
-  public Response aipsAipIdDataRepresentationIdPut(
+  public Response updateRepresentation(
     @ApiParam(value = "The ID of the AIP where to update the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
     @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
     @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)

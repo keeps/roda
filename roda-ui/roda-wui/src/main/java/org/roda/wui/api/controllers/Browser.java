@@ -559,7 +559,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    String parentId = BrowserHelper.removeAIP(aips, user);
+    String parentId = BrowserHelper.removeAIP(aips, user, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1079,43 +1079,25 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  /**
-   * Batch disposal of AIP (AIP selection via filter)
-   * 
-   * @param user
-   *          The user
-   * @param filter
-   *          The filter used to select the AIPs to remove
-   * @param deleteOnlyRepresentation
-   *          If this flag is active, only the representations are deleted (via
-   *          model.deleteRepresentation(... ) )
-   * @throws GenericException
-   * @throws AuthorizationDeniedException
-   * @throws NotFoundException
-   * @throws RequestNotValidException
-   */
-  public static void deleteAIPs(RodaUser user, Filter filter, boolean deleteOnlyRepresentation)
-    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException {
+  public static StreamResponse getAIP(RodaUser user, String aipId, String acceptFormat)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
     Date startDate = new Date();
+
+    // validate input
+    BrowserHelper.validateGetAipParams(acceptFormat);
 
     // check user permissions
     UserUtility.checkRoles(user, BROWSE_ROLE);
+    IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
-    // find the aips
-    List<IndexedAIP> aips = BrowserHelper.matchAIP(filter, user);
+    // delegate
+    StreamResponse aip = BrowserHelper.getAip(indexedAIP, acceptFormat);
 
-    if (aips != null && aips.size() > 0) {
-      // check object permissions
-      UserUtility.checkObjectPermissions(user, aips, PermissionType.DELETE);
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getAIP", aipId, duration);
 
-      // delegate
-      BrowserHelper.removeAIPs(aips, deleteOnlyRepresentation);
-
-      // register action
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "deleteAIPs", null, duration);
-    } else {
-      throw new NotFoundException("No AIPs match filter");
-    }
+    return aip;
   }
 }
