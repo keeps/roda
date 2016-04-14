@@ -7,11 +7,14 @@
  */
 package org.roda.core.plugins.plugins.antivirus;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.io.IOUtils;
+import org.roda.core.RodaCoreFactory;
+import org.roda.core.util.CommandException;
+import org.roda.core.util.CommandUtility;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,53 +95,42 @@ public class AVGAntiVirus implements AntiVirus {
 
     try {
 
-      LOGGER.debug("Executing virus scan in " + path.toString());
+      LOGGER.debug("Executing virus scan in {}", path);
 
-      ProcessBuilder processBuilder = new ProcessBuilder("/usr/bin/avgscan", "-repok", "-arc", path.toString());
-      processBuilder.redirectErrorStream();
-      Process process = processBuilder.start();
+      String avgBin = RodaCoreFactory.getRodaConfiguration().getString("core.plugins.internal.virus_check.avg.bin",
+        "/usr/bin/avgscan");
+      String avgParams = RodaCoreFactory.getRodaConfiguration()
+        .getString("core.plugins.internal.virus_check.avg.params", "-repok -arc");
 
-      StringWriter outputWriter = new StringWriter();
-
-      IOUtils.copy(process.getInputStream(), outputWriter);
-
-      // Set the result report
-      result.setReport(outputWriter.toString());
-
-      int exitValue = process.waitFor();
-
-      switch (exitValue) {
-
-        case NO_ERRORS:
-          result.setClean(true);
-          break;
-
-        case INTERRUPTED_BY_USER:
-        case ERROR_OCCURED_DURING_TEST:
-        case FS_CHANGES_DETECTED:
-        case SUSPECT_OBJECT_FOUND_BY_HEURISTIC_ANALYSIS:
-        case VIRUS_FOUND_BY_HEURISTIC_ANALYSIS:
-        case PARTICULAR_VIRUS_FOUND:
-        case ACTIVE_VIRUS_FOUND_IN_MEMORY:
-        case CORRUPTION_OF_SOME_AVG_COMPONENTS:
-        case ARCHIVE_CONTAINS_PASSWD_PROTECTED_FILES:
-        default:
-          result.setClean(false);
-          break;
+      List<String> command = new ArrayList<>();
+      command.add(avgBin);
+      for (String param : avgParams.split(" ")) {
+        command.add(param);
       }
-
-      LOGGER.debug("Virus checker exit value: " + exitValue);
-      LOGGER.debug("Virus checker output:\n" + outputWriter.toString());
-
-    } catch (IOException e) {
-      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
-      throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
-    } catch (InterruptedException e) {
-      LOGGER.debug("Error executing virus scan command - " + e.getMessage(), e);
-      throw new RuntimeException("Error executing virus scan command - " + e.getMessage(), e);
+      command.add(path.toString());
+      // Arrays.asList(clamavBin, clamavParams, path.toString());
+      String commandOutput = CommandUtility.execute(command, true);
+      result.setClean(true);
+      result.setReport(commandOutput);
+    } catch (CommandException e) {
+      LOGGER.debug("Error executing virus scan command", e);
+      result.setClean(false);
+      result.setReport(e.getOutput());
     }
 
     return result;
+  }
+
+  @Override
+  public String getVersion() {
+    String avgGetVersion = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.plugins.internal.virus_check.avg.get_version", "/usr/bin/avgscan --version");
+    List<String> command = new ArrayList<String>(Arrays.asList(avgGetVersion.split(" ")));
+    try {
+      return CommandUtility.execute(command);
+    } catch (CommandException e) {
+      return "1.0";
+    }
   }
 
 }

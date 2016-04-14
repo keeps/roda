@@ -93,6 +93,9 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getVersionImpl() {
+    if (antiVirus != null) {
+      return antiVirus.getVersion();
+    }
     return "1.0";
   }
 

@@ -29,4 +29,6 @@ public interface AntiVirus {
    */
   public VirusCheckResult checkForVirus(Path path) throws RuntimeException;
 
+  public String getVersion();
+
 }

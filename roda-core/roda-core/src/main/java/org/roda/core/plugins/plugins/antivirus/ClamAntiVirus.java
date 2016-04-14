@@ -145,7 +145,7 @@ public class ClamAntiVirus implements AntiVirus {
         command.add(param);
       }
       command.add(path.toString());
-      //Arrays.asList(clamavBin, clamavParams, path.toString());
+      // Arrays.asList(clamavBin, clamavParams, path.toString());
       String commandOutput = CommandUtility.execute(command, true);
       result.setClean(true);
       result.setReport(commandOutput);
@@ -156,6 +156,18 @@ public class ClamAntiVirus implements AntiVirus {
     }
 
     return result;
+  }
+
+  @Override
+  public String getVersion() {
+    String clamavGetVersion = RodaCoreFactory.getRodaConfiguration()
+      .getString("core.plugins.internal.virus_check.clamav.get_version", "clamscan --version");
+    List<String> command = new ArrayList<String>(Arrays.asList(clamavGetVersion.split(" ")));
+    try {
+      return CommandUtility.execute(command);
+    } catch (CommandException e) {
+      return "1.0";
+    }
   }
 
 }
