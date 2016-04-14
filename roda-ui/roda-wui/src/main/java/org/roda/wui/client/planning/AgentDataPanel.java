@@ -8,15 +8,17 @@
 
 package org.roda.wui.client.planning;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.IncrementalIdList;
+import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.IncrementalList;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -41,6 +43,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
+import config.i18n.client.AgentMessages;
 import config.i18n.client.UserManagementConstants;
 
 /**
@@ -57,6 +60,8 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
   @SuppressWarnings("unused")
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
+
+  private static AgentMessages messages = GWT.create(AgentMessages.class);
 
   @UiField
   TextBox name;
@@ -106,8 +111,11 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
   @UiField
   IncrementalList utis;
 
-  @UiField
-  IncrementalIdList formatIds;
+  @UiField(provided = true)
+  IncrementalAssociativeList formatIds;
+
+  @UiField(provided = true)
+  IncrementalAssociativeList requiredAgents;
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
@@ -134,6 +142,13 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
    * @param editmode
    */
   public AgentDataPanel(boolean visible, boolean editmode) {
+
+    formatIds = new IncrementalAssociativeList(Format.class, RodaConstants.FORMAT_ID, RodaConstants.FORMAT_SEARCH,
+      messages.getFormatsDialogName());
+
+    requiredAgents = new IncrementalAssociativeList(Agent.class, RodaConstants.AGENT_ID, RodaConstants.AGENT_SEARCH,
+      messages.getAgentsDialogName());
+
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
@@ -192,6 +207,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     utis.addChangeHandler(changeHandler);
 
     formatIds.addChangeHandler(changeHandler);
+    requiredAgents.addChangeHandler(changeHandler);
   }
 
   public boolean isValid() {
@@ -268,6 +284,28 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
       }
     });
 
+    if (agent.getId() != null) {
+      requiredAgents.setExcludedIds(Arrays.asList(agent.getId()));
+    }
+
+    final Map<String, String> agentInfo = new HashMap<String, String>();
+
+    BrowserService.Util.getInstance().retrieveRequiredAgents(agentId, new AsyncCallback<List<Agent>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(List<Agent> result) {
+        for (Agent a : result) {
+          agentInfo.put(a.getId(), a.getName());
+        }
+        AgentDataPanel.this.requiredAgents.setTextBoxList(agentInfo);
+      }
+    });
+
   }
 
   public Agent getAgent() {
@@ -291,6 +329,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     agent.setPronoms(pronoms.getTextBoxesValue());
     agent.setUtis(utis.getTextBoxesValue());
     agent.setFormatIds(formatIds.getTextBoxesValue());
+    agent.setAgentsRequired(requiredAgents.getTextBoxesValue());
 
     return agent;
   }
@@ -313,6 +352,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     pronoms.clearTextBoxes();
     utis.clearTextBoxes();
     formatIds.clearTextBoxes();
+    requiredAgents.clearTextBoxes();
   }
 
   /**

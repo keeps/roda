@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,12 +22,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "agent")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Agent implements IsIndexed, Serializable {
+public class Agent extends NamedIndexedModel implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = 7178184202935641440L;
 
-  private String id = null;
-  private String name = null;
   private String type = null;
   private String description = null;
   private String category = null;
@@ -53,8 +52,7 @@ public class Agent implements IsIndexed, Serializable {
   }
 
   public Agent(Agent agent) {
-    this.id = agent.getId();
-    this.name = agent.getName();
+    super(agent.getId(), agent.getName());
     this.type = agent.getType();
     this.description = agent.getDescription();
     this.category = agent.getCategory();
@@ -77,19 +75,19 @@ public class Agent implements IsIndexed, Serializable {
   }
 
   public String getId() {
-    return id;
+    return super.getId();
   }
 
   public void setId(String id) {
-    this.id = id;
+    super.setId(id);
   }
 
   public String getName() {
-    return name;
+    return super.getName();
   }
 
   public void setName(String name) {
-    this.name = name;
+    super.setName(name);
   }
 
   public String getType() {
@@ -238,12 +236,12 @@ public class Agent implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Agent [id=" + id + ", name=" + name + ", type=" + type + ", description=" + description + ", category="
-      + category + ", version=" + version + ", license=" + license + ", popularity=" + popularity + ", developer="
-      + developer + ", initialRelease=" + initialRelease + ", website=" + website + ", download=" + download
-      + ", provenanceInformation=" + provenanceInformation + ", platforms=" + platforms + ", extensions=" + extensions
-      + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + ", formatIds=" + formatIds
-      + ", agentsRequired=" + agentsRequired + "]";
+    return "Agent [id=" + super.getId() + ", name=" + super.getName() + ", type=" + type + ", description="
+      + description + ", category=" + category + ", version=" + version + ", license=" + license + ", popularity="
+      + popularity + ", developer=" + developer + ", initialRelease=" + initialRelease + ", website=" + website
+      + ", download=" + download + ", provenanceInformation=" + provenanceInformation + ", platforms=" + platforms
+      + ", extensions=" + extensions + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis
+      + ", formatIds=" + formatIds + ", agentsRequired=" + agentsRequired + "]";
   }
 
   @JsonIgnore

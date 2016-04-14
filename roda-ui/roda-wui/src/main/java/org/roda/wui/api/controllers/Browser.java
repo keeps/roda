@@ -1288,4 +1288,20 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "retrieveMessage", null, duration, "messageId", messageId);
     return ret;
   }
+
+  public static List<Agent> retrieveRequiredAgents(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveRequiredAgents", null, duration, "agentId", agentId);
+    return ret;
+  }
 }

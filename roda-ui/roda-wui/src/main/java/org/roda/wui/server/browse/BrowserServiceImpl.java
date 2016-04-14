@@ -556,4 +556,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.retrieveMessage(user, messageId);
   }
 
+  @Override
+  public List<Agent> retrieveRequiredAgents(String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveRequiredAgents(user, agentId);
+  }
+
 }

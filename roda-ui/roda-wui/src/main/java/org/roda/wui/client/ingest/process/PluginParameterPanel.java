@@ -9,11 +9,12 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
-import org.roda.wui.client.common.SelectAipDialog;
+import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -94,11 +95,11 @@ public class PluginParameterPanel extends Composite {
       public void onClick(ClickEvent event) {
         SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
         selectAipDialog.showAndCenter();
-        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IsIndexed>() {
 
           @Override
-          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-            IndexedAIP aip = event.getValue();
+          public void onValueChange(ValueChangeEvent<IsIndexed> event) {
+            IndexedAIP aip = (IndexedAIP) event.getValue();
 
             Label itemTitle = new Label();
             HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());

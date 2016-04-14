@@ -5,19 +5,20 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.wui.client.common.lists.AIPList;
+import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.SearchPanel;
+import org.roda.wui.client.common.lists.FormatList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -31,10 +32,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 
-public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers<IndexedAIP> {
+public class SelectFormatDialog extends DialogBox implements SelectDialog {
   private static final Binder binder = GWT.create(Binder.class);
 
-  interface Binder extends UiBinder<Widget, SelectAipDialog> {
+  interface Binder extends UiBinder<Widget, SelectFormatDialog> {
   }
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
@@ -52,22 +53,21 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   Button emptyParentButton;
 
   @UiField(provided = true)
-  AIPList searchResultsPanel;
+  FormatList searchResultsPanel;
 
-  private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_FORMAT = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
 
-  public SelectAipDialog(String title) {
-    this(title, DEFAULT_FILTER_AIP);
+  public SelectFormatDialog(String title) {
+    this(title, DEFAULT_FILTER_FORMAT);
   }
 
-  public SelectAipDialog(String title, Filter filter) {
+  public SelectFormatDialog(String title, Filter filter) {
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
-      new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    searchResultsPanel = new AIPList(filter, facets, messages.selectAipSearchResults(), false);
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FORMAT_NAME));
+    searchResultsPanel = new FormatList(filter, facets, "Formats", false);
 
-    searchPanel = new SearchPanel(filter, RodaConstants.AIP_SEARCH, messages.selectAipSearchPlaceHolder(), false,
+    searchPanel = new SearchPanel(filter, RodaConstants.FORMAT_SEARCH, messages.selectAipSearchPlaceHolder(), false,
       false);
     searchPanel.setList(searchResultsPanel);
     searchPanel.setDefaultFilterIncremental(true);
@@ -115,15 +115,15 @@ public class SelectAipDialog extends DialogBox implements HasValueChangeHandlers
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IndexedAIP> handler) {
-    return addHandler(handler, ValueChangeEvent.getType());
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IsIndexed> valueChangeHandler) {
+    return addHandler(valueChangeHandler, ValueChangeEvent.getType());
   }
 
   protected void onChange() {
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public IndexedAIP getValue() {
+  public Format getValue() {
     return searchResultsPanel.getSelectionModel().getSelectedObject();
   }
 

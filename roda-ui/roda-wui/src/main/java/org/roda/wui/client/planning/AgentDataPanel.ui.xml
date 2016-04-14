@@ -57,7 +57,9 @@
 				<l:IncrementalList ui:field="utis"></l:IncrementalList>
 				
 				<g:Label addStyleNames="form-label">Formats</g:Label>
-				<l:IncrementalIdList ui:field="formatIds"></l:IncrementalIdList>
+				<l:IncrementalAssociativeList ui:field="formatIds"></l:IncrementalAssociativeList>
+				<g:Label addStyleNames="form-label">Required Agents</g:Label>
+				<l:IncrementalAssociativeList ui:field="requiredAgents"></l:IncrementalAssociativeList>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

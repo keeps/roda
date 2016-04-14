@@ -55,6 +55,8 @@
 				
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatIdsKey">Formats</g:Label>
 				<g:FlowPanel ui:field="formatIdsValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="requiredAgentsKey">Required Agents</g:Label>
+				<g:FlowPanel ui:field="requiredAgentsValue" />
 				
 			</g:FlowPanel>
 

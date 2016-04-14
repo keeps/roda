@@ -14,6 +14,7 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,12 +22,10 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "risk")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Risk implements IsIndexed, Serializable {
+public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
 
-  private String id = null;
-  private String name = null;
   private String description = null;
   private Date identifiedOn = null;
   private String identifiedBy = null;
@@ -57,8 +56,7 @@ public class Risk implements IsIndexed, Serializable {
   }
 
   public Risk(Risk risk) {
-    this.id = risk.getId();
-    this.name = risk.getName();
+    super(risk.getId(), risk.getName());
     this.description = risk.getDescription();
     this.identifiedOn = risk.getIdentifiedOn();
     this.identifiedBy = risk.getIdentifiedBy();
@@ -85,19 +83,19 @@ public class Risk implements IsIndexed, Serializable {
   }
 
   public String getId() {
-    return id;
+    return super.getId();
   }
 
   public void setId(String id) {
-    this.id = id;
+    super.setId(id);
   }
 
   public String getName() {
-    return name;
+    return super.getName();
   }
 
   public void setName(String name) {
-    this.name = name;
+    super.setName(name);
   }
 
   public String getDescription() {
@@ -254,14 +252,14 @@ public class Risk implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", name=" + name + ", description=" + description + ", identifiedOn=" + identifiedOn
-      + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes=" + notes
-      + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact=" + preMitigationImpact
-      + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes=" + preMitigationNotes
-      + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact=" + posMitigationImpact
-      + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes=" + posMitigationNotes
-      + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType=" + mitigationOwnerType
-      + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
+    return "Format [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
+      + ", identifiedOn=" + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes="
+      + notes + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact="
+      + preMitigationImpact + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes="
+      + preMitigationNotes + ", posMitigationProbability=" + posMitigationProbability + ", posMitigationImpact="
+      + posMitigationImpact + ", posMitigationSeverity=" + posMitigationSeverity + ", posMitigationNotes="
+      + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
+      + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
       + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
   }

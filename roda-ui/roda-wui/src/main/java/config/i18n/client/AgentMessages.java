@@ -42,4 +42,10 @@ public interface AgentMessages extends Messages {
 
   @DefaultMessage("{0}")
   String agentListItems(String item);
+
+  @DefaultMessage("Formats")
+  String getFormatsDialogName();
+
+  @DefaultMessage("Agents")
+  String getAgentsDialogName();
 }

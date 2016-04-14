@@ -1415,4 +1415,15 @@ public class BrowserHelper {
   public static Message retrieveMessage(String messageId) throws NotFoundException, GenericException {
     return RodaCoreFactory.getIndexService().retrieve(Message.class, messageId);
   }
+
+  public static List<Agent> retrieveRequiredAgents(String agentId) throws NotFoundException, GenericException {
+    Agent agent = RodaCoreFactory.getIndexService().retrieve(Agent.class, agentId);
+    List<Agent> agentList = new ArrayList<Agent>();
+
+    for (String otherAgentId : agent.getAgentsRequired()) {
+      agentList.add(RodaCoreFactory.getIndexService().retrieve(Agent.class, otherAgentId));
+    }
+
+    return agentList;
+  }
 }

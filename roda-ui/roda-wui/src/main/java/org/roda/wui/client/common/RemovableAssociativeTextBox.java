@@ -13,10 +13,10 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
-public class RemovableTextBoxForIDs extends Composite implements HasHandlers {
+public class RemovableAssociativeTextBox extends Composite implements HasHandlers {
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  interface MyUiBinder extends UiBinder<Widget, RemovableTextBoxForIDs> {
+  interface MyUiBinder extends UiBinder<Widget, RemovableAssociativeTextBox> {
   }
 
   @UiField
@@ -31,12 +31,12 @@ public class RemovableTextBoxForIDs extends Composite implements HasHandlers {
   @UiField
   Button dialogButton;
 
-  public RemovableTextBoxForIDs() {
+  public RemovableAssociativeTextBox() {
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
   }
 
-  public RemovableTextBoxForIDs(String id, String name) {
+  public RemovableAssociativeTextBox(String id, String name) {
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
     if (id != null) {

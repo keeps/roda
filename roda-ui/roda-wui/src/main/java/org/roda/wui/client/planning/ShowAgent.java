@@ -153,6 +153,12 @@ public class ShowAgent extends Composite {
   FlowPanel formatIdsValue;
 
   @UiField
+  Label requiredAgentsKey;
+
+  @UiField
+  FlowPanel requiredAgentsValue;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -279,6 +285,27 @@ public class ShowAgent extends Composite {
           HTML parPanel = new HTML();
           parPanel.setHTML(messages.agentListItems(f.getName()));
           ShowAgent.this.formatIdsValue.add(parPanel);
+        }
+      }
+    });
+
+    List<String> requiredAgents = agent.getAgentsRequired();
+    requiredAgentsValue.setVisible(requiredAgents != null && !requiredAgents.isEmpty());
+    requiredAgentsKey.setVisible(requiredAgents != null && !requiredAgents.isEmpty());
+
+    BrowserService.Util.getInstance().retrieveRequiredAgents(agentId, new AsyncCallback<List<Agent>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(List<Agent> result) {
+        for (Agent a : result) {
+          HTML parPanel = new HTML();
+          parPanel.setHTML(messages.agentListItems(a.getName()));
+          ShowAgent.this.requiredAgentsValue.add(parPanel);
         }
       }
     });

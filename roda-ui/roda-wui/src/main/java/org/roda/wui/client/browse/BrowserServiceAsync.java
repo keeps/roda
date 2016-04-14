@@ -145,4 +145,6 @@ public interface BrowserServiceAsync {
 
   void retrieveMessage(String messageId, AsyncCallback<Message> asyncCallback);
 
+  void retrieveRequiredAgents(String agentId, AsyncCallback<List<Agent>> asyncCallback);
+
 }

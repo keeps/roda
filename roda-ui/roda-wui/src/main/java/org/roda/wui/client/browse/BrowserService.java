@@ -209,4 +209,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   Message retrieveMessage(String messageId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  List<Agent> retrieveRequiredAgents(String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException;
 }

@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -21,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "format")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Format implements IsIndexed, Serializable {
+public class Format extends NamedIndexedModel implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = 7178184202935641440L;
 
@@ -49,8 +50,7 @@ public class Format implements IsIndexed, Serializable {
   }
 
   public Format(Format format) {
-    this.id = format.getId();
-    this.name = format.getName();
+    super(format.getId(), format.getName());
     this.definition = format.getDefinition();
     this.category = format.getCategory();
     this.latestVersion = format.getLatestVersion();
@@ -69,19 +69,19 @@ public class Format implements IsIndexed, Serializable {
   }
 
   public String getId() {
-    return id;
+    return super.getId();
   }
 
   public void setId(String id) {
-    this.id = id;
+    super.setId(id);
   }
 
   public String getName() {
-    return name;
+    return super.getName();
   }
 
   public void setName(String name) {
-    this.name = name;
+    super.setName(name);
   }
 
   public String getDefinition() {
@@ -198,8 +198,8 @@ public class Format implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", name=" + name + ", definition=" + definition + ", category=" + category
-      + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
+    return "Format [id=" + super.getId() + ", name=" + super.getName() + ", definition=" + definition + ", category="
+      + category + ", latestVersion=" + latestVersion + ", popularity=" + popularity + ", developer=" + developer
       + ", initialRelease=" + initialRelease + ", standard=" + standard + ", isOpenFormat=" + isOpenFormat
       + ", website=" + website + ", provenanceInformation=" + provenanceInformation + ", extensions=" + extensions
       + ", mimetypes=" + mimetypes + ", pronoms=" + pronoms + ", utis=" + utis + "]";

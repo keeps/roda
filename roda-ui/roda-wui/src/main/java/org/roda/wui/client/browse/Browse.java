@@ -25,6 +25,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -33,8 +34,8 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
-import org.roda.wui.client.common.SelectAipDialog;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -854,11 +855,11 @@ public class Browse extends Composite {
         selectAipDialog.setEmptyParentButtonVisible();
       }
       selectAipDialog.showAndCenter();
-      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IsIndexed>() {
 
         @Override
-        public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
-          final IndexedAIP parentAIP = event.getValue();
+        public void onValueChange(ValueChangeEvent<IsIndexed> event) {
+          final IndexedAIP parentAIP = (IndexedAIP) event.getValue();
           final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
           BrowserService.Util.getInstance().moveInHierarchy(aipId, parentId, new AsyncCallback<AIP>() {

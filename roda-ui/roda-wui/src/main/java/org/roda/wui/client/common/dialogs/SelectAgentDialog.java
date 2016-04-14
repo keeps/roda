@@ -5,19 +5,20 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.common;
+package org.roda.wui.client.common.dialogs;
 
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.formats.Format;
-import org.roda.wui.client.common.lists.FormatList;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.wui.client.common.SearchPanel;
+import org.roda.wui.client.common.lists.AgentList;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -31,10 +32,10 @@ import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 
-public class SelectFormatDialog extends DialogBox implements HasValueChangeHandlers<Format> {
+public class SelectAgentDialog extends DialogBox implements SelectDialog {
   private static final Binder binder = GWT.create(Binder.class);
 
-  interface Binder extends UiBinder<Widget, SelectFormatDialog> {
+  interface Binder extends UiBinder<Widget, SelectAgentDialog> {
   }
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
@@ -52,21 +53,21 @@ public class SelectFormatDialog extends DialogBox implements HasValueChangeHandl
   Button emptyParentButton;
 
   @UiField(provided = true)
-  FormatList searchResultsPanel;
+  AgentList searchResultsPanel;
 
-  private static final Filter DEFAULT_FILTER_FORMAT = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
+  private static final Filter DEFAULT_FILTER_AGENT = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.AGENT_SEARCH, "*"));
 
-  public SelectFormatDialog(String title) {
-    this(title, DEFAULT_FILTER_FORMAT);
+  public SelectAgentDialog(String title) {
+    this(title, DEFAULT_FILTER_AGENT);
   }
 
-  public SelectFormatDialog(String title, Filter filter) {
+  public SelectAgentDialog(String title, Filter filter) {
 
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FORMAT_NAME));
-    searchResultsPanel = new FormatList(filter, facets, "Formats", false);
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AGENT_NAME));
+    searchResultsPanel = new AgentList(filter, facets, "Agents", false);
 
-    searchPanel = new SearchPanel(filter, RodaConstants.FORMAT_SEARCH, messages.selectAipSearchPlaceHolder(), false,
+    searchPanel = new SearchPanel(filter, RodaConstants.AGENT_SEARCH, messages.selectAipSearchPlaceHolder(), false,
       false);
     searchPanel.setList(searchResultsPanel);
     searchPanel.setDefaultFilterIncremental(true);
@@ -114,7 +115,7 @@ public class SelectFormatDialog extends DialogBox implements HasValueChangeHandl
   }
 
   @Override
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Format> valueChangeHandler) {
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IsIndexed> valueChangeHandler) {
     return addHandler(valueChangeHandler, ValueChangeEvent.getType());
   }
 
@@ -122,7 +123,7 @@ public class SelectFormatDialog extends DialogBox implements HasValueChangeHandl
     ValueChangeEvent.fire(this, getValue());
   }
 
-  public Format getValue() {
+  public Agent getValue() {
     return searchResultsPanel.getSelectionModel().getSelectedObject();
   }
 
