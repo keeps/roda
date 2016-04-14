@@ -337,6 +337,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_STRING_VALUE = "parameter.string_value";
   public static final String PLUGIN_PARAMS_BOOLEAN_VALUE = "parameter.boolean_value";
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
+  public static final String PLUGIN_PARAMS_RECURSIVE_LISTING = "parameter.recursive_listing";
   public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
 

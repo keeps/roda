@@ -39,8 +39,6 @@ import org.roda.wui.api.controllers.Browser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,16 +50,13 @@ public class TransferredResource {
   public static final String ENDPOINT = "/v1/transferred";
   public static final String SWAGGER_ENDPOINT = "v1 transferred";
 
-  @SuppressWarnings("unused")
-  private Logger logger = LoggerFactory.getLogger(getClass());
-
   @Context
   private HttpServletRequest request;
 
   @GET
   public Response getResource(
     @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId)
-      throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
+    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
@@ -76,7 +71,7 @@ public class TransferredResource {
     @ApiParam(value = "The id of the parent", required = true) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
     @ApiParam(value = "The name of the directory to create", required = false) @QueryParam("name") String name,
     @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
-      throws RODAException {
+    throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());

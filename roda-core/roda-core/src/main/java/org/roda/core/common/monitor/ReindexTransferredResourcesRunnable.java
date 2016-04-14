@@ -60,7 +60,6 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
     long start = System.currentTimeMillis();
     Date lastScanDate = new Date();
     RodaCoreFactory.setTransferredResourcesScannerUpdateStatus(true);
-    LOGGER.info("Start indexing transferred resources {}", basePath.toString());
     try {
       EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
       Path path;
@@ -69,6 +68,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       } else {
         path = basePath;
       }
+      LOGGER.info("Start indexing transferred resources {}", path);
       Files.walkFileTree(path, opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
 
         Stack<BasicFileAttributes> actualDirectoryAttributesStack = new Stack<BasicFileAttributes>();
@@ -110,7 +110,7 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
             TransferredResource resource = TransferredResourcesScanner.createTransferredResource(dir,
               actualDirectoryAttributes, fileSize, basePath, lastScanDate);
 
-            if (fileSizeStack.size() > 0) {
+            if (!fileSizeStack.isEmpty()) {
               long actualSize = fileSizeStack.pop();
               fileSizeStack.push(actualSize + fileSize);
             }
@@ -130,12 +130,12 @@ public class ReindexTransferredResourcesRunnable implements Runnable {
       Filter filter;
       String formattedDate = SolrUtils.getLastScanDate(lastScanDate);
       if (folder == null) {
-        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
-          formattedDate));
+        filter = new Filter(
+          new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
       } else {
-        filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS,
-          folder.getRelativePath()), new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE,
-          formattedDate));
+        filter = new Filter(
+          new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_ANCESTORS, folder.getRelativePath()),
+          new NotSimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_LAST_SCAN_DATE, formattedDate));
       }
 
       index.delete(TransferredResource.class, filter);

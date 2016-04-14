@@ -9,12 +9,11 @@ package org.roda.core;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
-import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +22,6 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -56,6 +54,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.reflections.util.FilterBuilder;
 import org.roda.core.common.ApacheDS;
 import org.roda.core.common.LdapUtility;
+import org.roda.core.common.LdapUtilityException;
 import org.roda.core.common.Messages;
 import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
@@ -75,21 +74,26 @@ import org.roda.core.data.common.RodaConstants.PreservationAgentType;
 import org.roda.core.data.common.RodaConstants.SolrType;
 import org.roda.core.data.common.RodaConstants.StorageType;
 import org.roda.core.data.descriptionLevels.DescriptionLevelManager;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
+import org.roda.core.data.exceptions.EmailAlreadyExistsException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.IllegalOperationException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.exceptions.UserAlreadyExistsException;
+import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.log.LogEntry;
+import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -104,35 +108,14 @@ import org.roda.core.plugins.orchestrate.AkkaDistributedPluginOrchestrator;
 import org.roda.core.plugins.orchestrate.AkkaDistributedPluginWorker;
 import org.roda.core.plugins.orchestrate.AkkaEmbeddedPluginOrchestrator;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
-import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
 import org.roda.core.plugins.plugins.base.FixityPlugin;
-import org.roda.core.plugins.plugins.base.LogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
+import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
+import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
+import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
+import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
 import org.roda.core.plugins.plugins.base.RemoveOrphansPlugin;
-import org.roda.core.plugins.plugins.ingest.BagitToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.EARKSIPToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.TransferredResourceToAIPPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.DroidPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.ExifToolPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.FFProbePlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.FITSPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.JHOVEPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.JpylyzerPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.MediaInfoPlugin;
 import org.roda.core.plugins.plugins.ingest.characterization.PremisSkeletonPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.SiegfriedPlugin;
-import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.AvconvConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.GeneralCommandConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.GhostScriptConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.ImageMagickConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.PdfToPdfaPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.SoxConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.migration.UnoconvConvertPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
-import org.roda.core.plugins.plugins.ingest.validation.FileFormatPlugin;
-import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.roda.core.storage.fs.FSUtils;
@@ -198,10 +181,6 @@ public class RodaCoreFactory {
   private static Map<String, Map<String, String>> propertiesCache = null;
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
   private static DescriptionLevelManager descriptionLevelManager = null;
-
-  // 20160211 hsilva: this constant should be deleted
-  // Test objects
-  private static String aipId = "8785acb5-9dc2-450d-a65e-048a83d5f1ed";
 
   /** Private empty constructor */
   private RodaCoreFactory() {
@@ -726,14 +705,7 @@ public class RodaCoreFactory {
         Files.createDirectories(rodaApacheDsDataDirectory);
         ldap.initDirectoryService(rodaApacheDsConfigDirectory, rodaApacheDsDataDirectory, ldapAdminPassword);
         ldap.startServer(ldapUtility, ldapPort);
-        for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
-          LOGGER.debug("User to be indexed: {}", user);
-          RodaCoreFactory.getModelService().addUser(user, false, true);
-        }
-        for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
-          LOGGER.debug("Group to be indexed: {}", group);
-          RodaCoreFactory.getModelService().addGroup(group, false, true);
-        }
+        createUsersAndGroupsFromLDAP();
       } else {
         ldap.instantiateDirectoryService(rodaApacheDsDataDirectory);
         ldap.startServer(ldapUtility, ldapPort);
@@ -743,6 +715,19 @@ public class RodaCoreFactory {
       LOGGER.error("Error starting up embedded ApacheDS", e);
     }
 
+  }
+
+  private static void createUsersAndGroupsFromLDAP()
+    throws LdapUtilityException, GenericException, EmailAlreadyExistsException, UserAlreadyExistsException,
+    IllegalOperationException, NotFoundException, AlreadyExistsException {
+    for (User user : UserUtility.getLdapUtility().getUsers(new Filter())) {
+      LOGGER.debug("User to be indexed: {}", user);
+      RodaCoreFactory.getModelService().addUser(user, false, true);
+    }
+    for (Group group : UserUtility.getLdapUtility().getGroups(new Filter())) {
+      LOGGER.debug("Group to be indexed: {}", group);
+      RodaCoreFactory.getModelService().addGroup(group, false, true);
+    }
   }
 
   public static void startTransferredResourcesScanner() throws Exception {
@@ -1057,9 +1042,71 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(reindexPlugin);
   }
 
+  public static void runReindexJobPlugin() {
+    ReindexJobPlugin plugin = new ReindexJobPlugin();
+    getPluginOrchestrator().runPlugin(plugin);
+  }
+
+  public static <T extends Serializable> void runReindexRodaEntityPlugin(Class<T> clazz) {
+    ReindexRodaEntityPlugin<T> plugin = new ReindexRodaEntityPlugin<T>();
+    Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
+    parameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, clazz.getCanonicalName());
+    try {
+      plugin.setParameterValues(parameters);
+      getPluginOrchestrator().runPlugin(plugin);
+    } catch (InvalidParameterException e) {
+      LOGGER.error("Error while running reindex RODA entity plugin", e);
+    }
+  }
+
+  public static void runReindexTransferredResourcesPlugin() {
+    ReindexTransferredResourcePlugin plugin = new ReindexTransferredResourcePlugin();
+    getPluginOrchestrator().runPlugin(plugin);
+  }
+
+  public static void runReindexActionLogPlugin() {
+    ReindexActionLogPlugin plugin = new ReindexActionLogPlugin();
+    getPluginOrchestrator().runPlugin(plugin);
+  }
+
   public static void runReindexAipsPlugin(List<String> aipIds) {
     Plugin<AIP> reindexPlugin = new ReindexAIPPlugin();
     getPluginOrchestrator().runPluginOnAIPs(reindexPlugin, aipIds);
+  }
+
+  public static void runReindex(List<String> args) {
+    String entity = args.get(2);
+    if (StringUtils.isNotBlank(entity)) {
+      if ("aip".equalsIgnoreCase(entity)) {
+        if (args.size() >= 3) {
+          runReindexAipsPlugin(args.subList(2, args.size()));
+        } else {
+          runReindexAipsPlugin();
+        }
+      } else if ("job".equalsIgnoreCase(entity)) {
+        runReindexJobPlugin();
+      } else if ("risk".equalsIgnoreCase(entity)) {
+        runReindexRodaEntityPlugin(Risk.class);
+      } else if ("agent".equalsIgnoreCase(entity)) {
+        runReindexRodaEntityPlugin(Agent.class);
+      } else if ("format".equalsIgnoreCase(entity)) {
+        runReindexRodaEntityPlugin(Format.class);
+      } else if ("message".equalsIgnoreCase(entity)) {
+        runReindexRodaEntityPlugin(Message.class);
+      } else if ("transferred_resources".equalsIgnoreCase(entity)) {
+        runReindexTransferredResourcesPlugin();
+      } else if ("actionlogs".equalsIgnoreCase(entity)) {
+        runReindexActionLogPlugin();
+      } else if ("users_and_groups".equalsIgnoreCase(entity)) {
+        try {
+          createUsersAndGroupsFromLDAP();
+        } catch (EmailAlreadyExistsException | UserAlreadyExistsException | IllegalOperationException
+          | LdapUtilityException | GenericException | NotFoundException | AlreadyExistsException e) {
+          LOGGER.error("Unable to reindex users & groups from LDAP.", e);
+        }
+      }
+    }
   }
 
   public static void runRemoveOrphansPlugin(String parentId) {
@@ -1083,354 +1130,9 @@ public class RodaCoreFactory {
     getPluginOrchestrator().runPluginOnAllAIPs(antivirusPlugin);
   }
 
-  private static void runDroidPlugin() {
-    Plugin<AIP> droidPlugin = new DroidPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(droidPlugin);
-  }
-
-  private static void runFulltextPlugin() {
-    Plugin<AIP> fulltextPlugin = new TikaFullTextPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(fulltextPlugin);
-  }
-
-  private static void runVeraPDFPlugin(String profile, String hasFeatures) {
-    try {
-      Plugin<AIP> veraPDFPlugin = new VeraPDFPlugin();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("profile", profile);
-      params.put("hasFeatures", hasFeatures);
-      veraPDFPlugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllAIPs(veraPDFPlugin);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error while running PDF validation plugin", e);
-    }
-  }
-
-  private static void runPDFtoPDFAPlugin() {
-    Plugin<AIP> plugin = new PdfToPdfaPlugin<AIP>();
-    getPluginOrchestrator().runPluginOnAllAIPs(plugin);
-  }
-
-  private static void runImageMagickConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-
-      Plugin<AIP> plugin = new ImageMagickConvertPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runImageMagickConvertRepresentationPlugin(String inputFormat, String outputFormat) {
-    try {
-
-      Plugin<Representation> plugin = new ImageMagickConvertPlugin<Representation>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runImageMagickConvertFilePlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<File> plugin = new ImageMagickConvertPlugin<File>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllFiles(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runSoxConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<AIP> plugin = new SoxConvertPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runSoxConvertRepresentationPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<Representation> plugin = new SoxConvertPlugin<Representation>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runGhostScriptConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<AIP> plugin = new GhostScriptConvertPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runUnoconvConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<AIP> plugin = new UnoconvConvertPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runUnoconvConvertRepresentationPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<Representation> plugin = new UnoconvConvertPlugin<Representation>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runAvconvConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<Representation> plugin = new AvconvConvertPlugin<Representation>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "");
-      params.put("outputFormat", outputFormat);
-      params.put("commandArguments", "");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations((Plugin<Representation>) plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runGeneralCommandConvertPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<AIP> plugin = new GeneralCommandConvertPlugin<AIP>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "png");
-      params.put("outputFormat", "tiff");
-      params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAIPs(plugin, Arrays.asList(aipId));
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runGeneralCommandConvertRepresentationPlugin(String inputFormat, String outputFormat) {
-    try {
-      Plugin<Representation> plugin = new GeneralCommandConvertPlugin<Representation>();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("inputFormat", "png");
-      params.put("outputFormat", "tiff");
-      params.put("commandArguments", "/usr/bin/convert -regard-warnings {input_file} {output_file}");
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runDigitalSignaturePlugin(String doVerify, String doExtract, String doStrip,
-    String verificationAffectsOnOutcome) {
-    try {
-      Plugin<Representation> plugin = new DigitalSignaturePlugin();
-      Map<String, String> params = new HashMap<String, String>();
-      params.put("doVerify", doVerify);
-      params.put("doExtract", doExtract);
-      params.put("doStrip", doStrip);
-      params.put("verificationAffectsOnOutcome", verificationAffectsOnOutcome);
-      plugin.setParameterValues(params);
-      getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-    } catch (InvalidParameterException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runDigitalSignatureDIPPlugin() {
-    Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
-    getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-  }
-
-  private static void runFileFormatPlugin() {
-    Plugin<Representation> plugin = new FileFormatPlugin();
-    getPluginOrchestrator().runPluginOnAllRepresentations(plugin);
-  }
-
-  private static void runReindexingPlugins() {
-    try {
-      Plugin<AIP> psp = new PremisSkeletonPlugin();
-      Plugin<AIP> sfp = new SiegfriedPlugin();
-      Plugin<AIP> ttp = new TikaFullTextPlugin();
-
-      Map<String, String> params = new HashMap<String, String>();
-      params.put(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT, "false");
-      psp.setParameterValues(params);
-      sfp.setParameterValues(params);
-      ttp.setParameterValues(params);
-
-      getPluginOrchestrator().runPluginOnAIPs(psp, Arrays.asList(aipId));
-      getPluginOrchestrator().runPluginOnAIPs(sfp, Arrays.asList(aipId));
-      getPluginOrchestrator().runPluginOnAIPs(ttp, Arrays.asList(aipId));
-
-      model.notifyAIPUpdated(aipId);
-
-    } catch (InvalidParameterException | RequestNotValidException | GenericException | NotFoundException
-      | AuthorizationDeniedException ipe) {
-      LOGGER.error(ipe.getMessage(), ipe);
-    }
-  }
-
-  private static void runJhovePlugin() {
-    Plugin<AIP> jhovePlugin = new JHOVEPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(jhovePlugin);
-  }
-
-  private static void runFitsPlugin() {
-    Plugin<AIP> fitsPlugin = new FITSPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(fitsPlugin);
-  }
-
-  private static void runBagitPlugin() {
-    // Path bagitFolder = RodaCoreFactory.getDataPath().resolve("bagit");
-    Plugin<TransferredResource> bagitPlugin = new BagitToAIPPlugin();
-    // FIXME collect proper list of transferred resources
-    List<TransferredResource> bagitsList = new ArrayList<TransferredResource>();
-    // Stream<Path> bagits = Files.list(bagitFolder);
-    // List<Path> bagitsList = bagits.collect(Collectors.toList());
-    // bagits.close();
-    getPluginOrchestrator().runPluginOnTransferredResources(bagitPlugin, bagitsList);
-  }
-
   private static void runPremisSkeletonPlugin() {
     Plugin<AIP> premisSkeletonPlugin = new PremisSkeletonPlugin();
     getPluginOrchestrator().runPluginOnAllAIPs(premisSkeletonPlugin);
-  }
-
-  private static void runValidationPlugin(String premis, String metadataType) {
-    try {
-      Plugin<AIP> validationPlugin = new DescriptiveMetadataValidationPlugin();
-      Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put("parameter.validate_premis", premis);
-      parameters.put("parameter.metadata_type", metadataType);
-      validationPlugin.setParameterValues(parameters);
-      getPluginOrchestrator().runPluginOnAllAIPs(validationPlugin);
-    } catch (Exception e) {
-      LOGGER.error("Error while running validation plugin", e);
-    }
-  }
-
-  private static void runLogCleanPlugin() {
-    Plugin<LogEntry> logCleanPlugin = new LogCleanerPlugin();
-    getPluginOrchestrator().runPlugin(logCleanPlugin);
-  }
-
-  private static void runExifToolPlugin() {
-    Plugin<AIP> exifToolPlugin = new ExifToolPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(exifToolPlugin);
-  }
-
-  private static void runMediaInfoPlugin() {
-    Plugin<AIP> mediaInfoPlugin = new MediaInfoPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(mediaInfoPlugin);
-  }
-
-  private static void runFFProbePlugin() {
-    Plugin<AIP> ffProbePlugin = new FFProbePlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(ffProbePlugin);
-  }
-
-  private static void runJpylyzerPlugin() {
-    Plugin<AIP> jpylyzerPlugin = new JpylyzerPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(jpylyzerPlugin);
-  }
-
-  private static void runSiegfriedPlugin() {
-    Plugin<AIP> siegfriedPlugin = new SiegfriedPlugin();
-    getPluginOrchestrator().runPluginOnAllAIPs(siegfriedPlugin);
-  }
-
-  private static void runEARKPlugin() {
-    try {
-      EARKSIPToAIPPlugin eark = new EARKSIPToAIPPlugin();
-      eark.setParameterValues(new HashMap<String, String>());
-      List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
-      EnumSet<FileVisitOption> opts = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
-      Files.walkFileTree(Paths.get("/home/sleroux/earksip"), opts, Integer.MAX_VALUE, new FileVisitor<Path>() {
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          TransferredResource tr = new TransferredResource();
-          tr.setFullPath(file.toAbsolutePath().toString());
-          transferredResourceList.add(tr);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          return FileVisitResult.CONTINUE;
-        }
-      });
-      getPluginOrchestrator().runPluginOnTransferredResources(eark, transferredResourceList);
-    } catch (InvalidParameterException | IOException e) {
-      LOGGER.error(e.getMessage(), e);
-    }
-  }
-
-  private static void runTransferredResourceToAIPPlugin() {
-    try {
-      TransferredResourceToAIPPlugin converter = new TransferredResourceToAIPPlugin();
-      converter.setParameterValues(new HashMap<String, String>());
-      List<TransferredResource> transferredResourceList = new ArrayList<TransferredResource>();
-      getPluginOrchestrator().runPluginOnTransferredResources(converter, transferredResourceList);
-    } catch (InvalidParameterException e) {
-      LOGGER.error("Error while running Transferred resources to AIP plugin", e);
-    }
   }
 
   private static void runSolrQuery(List<String> args) {
@@ -1446,42 +1148,6 @@ public class RodaCoreFactory {
     } catch (SolrServerException | IOException e) {
       e.printStackTrace();
     }
-  }
-
-  private static void printMainUsage() {
-    System.err.println("Syntax:");
-    System.err.println("java -jar x.jar index reindex");
-    System.err.println("java -jar x.jar index list users|groups|sips|file");
-    System.err.println("java -jar x.jar orphans [newParentID]");
-    System.err.println("java -jar x.jar fixity");
-    System.err.println("java -jar x.jar antivirus");
-    System.err.println("java -jar x.jar premisskeleton");
-    System.err.println("java -jar x.jar droid");
-    System.err.println("java -jar x.jar fulltext");
-    System.err.println("java -jar x.jar jhove");
-    System.err.println("java -jar x.jar fits");
-    System.err.println("java -jar x.jar validation");
-    System.err.println("java -jar x.jar logClean");
-    System.err.println("java -jar x.jar exifTool");
-    System.err.println("java -jar x.jar mediaInfo");
-    System.err.println("java -jar x.jar ffprobe");
-    System.err.println("java -jar x.jar jpylyzer");
-    System.err.println("java -jar x.jar premisupdate");
-    System.err.println("java -jar x.jar fastcharacterization");
-    System.err.println("java -jar x.jar eark");
-    System.err.println("java -jar x.jar siegfried");
-    System.err.println("java -jar x.jar verapdf");
-    System.err.println("java -jar x.jar pdftopdfa");
-    System.err.println("java -jar x.jar imagemagickconvert");
-    System.err.println("java -jar x.jar soxconvert");
-    System.err.println("java -jar x.jar ffmpegconvert");
-    System.err.println("java -jar x.jar jodconverter");
-    System.err.println("java -jar x.jar ghostscriptconvert");
-    System.err.println("java -jar x.jar mencoderconvert");
-    System.err.println("java -jar x.jar unoconvconvert");
-    System.err.println("java -jar x.jar generalcommandconvert");
-    System.err.println("java -jar x.jar digitalsignature");
-    System.err.println("java -jar x.jar fileformat");
   }
 
   private static void printIndexMembers(List<String> args, Filter filter, Sorter sorter, Sublist sublist, Facets facets)
@@ -1543,6 +1209,19 @@ public class RodaCoreFactory {
     }
   }
 
+  private static void printMainUsage() {
+    System.err.println("WARNING: if using Apache Solr embedded, the index related commands");
+    System.err.println("cannot be run with RODA running (i.e. deployed in Tomcat for example)");
+    System.err.println("Syntax:");
+    System.err.println(
+      "java -jar x.jar index reindex aip|job|risk|agent|format|message|transferred_resources|actionlogs|users_and_groups");
+    System.err.println("java -jar x.jar index list users|groups|sips|file");
+    System.err.println("java -jar x.jar orphans [newParentID]");
+    System.err.println("java -jar x.jar fixity");
+    System.err.println("java -jar x.jar antivirus");
+    System.err.println("java -jar x.jar premisskeleton");
+  }
+
   private static void mainMasterTasks(List<String> args) throws GenericException, RequestNotValidException {
     if ("index".equals(args.get(0))) {
       if ("list".equals(args.get(1)) && ("users".equals(args.get(2)) || "groups".equals(args.get(2)))) {
@@ -1557,13 +1236,11 @@ public class RodaCoreFactory {
         printEvents(null, new Sublist(0, 10000), null);
       } else if ("list".equals(args.get(1)) && ("agent".equals(args.get(2)))) {
         printAgents(null, new Sublist(0, 10000), null);
-      } else if ("reindex".equals(args.get(1)) && args.size() == 2) {
-        runReindexAipsPlugin();
-      } else if ("reindex".equals(args.get(1)) && args.size() >= 3) {
-        runReindexAipsPlugin(args.subList(2, args.size()));
       } else if ("query".equals(args.get(1)) && args.size() == 4 && StringUtils.isNotBlank(args.get(2))
         && StringUtils.isNotBlank(args.get(3))) {
         runSolrQuery(args);
+      } else if ("reindex".equals(args.get(1))) {
+        runReindex(args);
       }
     } else if ("orphans".equals(args.get(0)) && args.size() == 2 && StringUtils.isNotBlank(args.get(1))) {
       runRemoveOrphansPlugin(args.get(1));
@@ -1573,68 +1250,6 @@ public class RodaCoreFactory {
       runAntivirusPlugin();
     } else if ("premisskeleton".equals(args.get(0))) {
       runPremisSkeletonPlugin();
-    } else if ("droid".equals(args.get(0))) {
-      runDroidPlugin();
-    } else if ("fulltext".equals(args.get(0))) {
-      runFulltextPlugin();
-    } else if ("verapdf".equals(args.get(0))) {
-      runVeraPDFPlugin(args.get(1), args.get(2));
-    } else if ("pdftopdfa".equals(args.get(0))) {
-      runPDFtoPDFAPlugin();
-    } else if ("imagemagickconvert".equals(args.get(0))) {
-      runImageMagickConvertPlugin(args.get(1), args.get(2));
-    } else if ("imagemagickrepresentationconvert".equals(args.get(0))) {
-      runImageMagickConvertRepresentationPlugin(args.get(1), args.get(2));
-    } else if ("imagemagickfileconvert".equals(args.get(0))) {
-      runImageMagickConvertFilePlugin(args.get(1), args.get(2));
-    } else if ("soxconvert".equals(args.get(0))) {
-      runSoxConvertPlugin(args.get(1), args.get(2));
-    } else if ("soxrepresentationconvert".equals(args.get(0))) {
-      runSoxConvertRepresentationPlugin(args.get(1), args.get(2));
-    } else if ("ghostscriptconvert".equals(args.get(0))) {
-      runGhostScriptConvertPlugin(args.get(1), args.get(2));
-    } else if ("unoconvconvert".equals(args.get(0))) {
-      runUnoconvConvertPlugin(args.get(1), args.get(2));
-    } else if ("unoconvrepresentationconvert".equals(args.get(0))) {
-      runUnoconvConvertRepresentationPlugin(args.get(1), args.get(2));
-    } else if ("avconvconvert".equals(args.get(0))) {
-      runAvconvConvertPlugin(args.get(1), args.get(2));
-    } else if ("generalcommandconvert".equals(args.get(0))) {
-      runGeneralCommandConvertPlugin(args.get(1), args.get(2));
-    } else if ("generalcommandrepresentationconvert".equals(args.get(0))) {
-      runGeneralCommandConvertRepresentationPlugin(args.get(1), args.get(2));
-    } else if ("digitalsignature".equals(args.get(0))) {
-      runDigitalSignaturePlugin(args.get(1), args.get(2), args.get(3), args.get(4));
-    } else if ("digitalsignaturedip".equals(args.get(0))) {
-      runDigitalSignatureDIPPlugin();
-    } else if ("fileformat".equals(args.get(0))) {
-      runFileFormatPlugin();
-    } else if ("reindexer".equals(args.get(0))) {
-      runReindexingPlugins();
-    } else if ("jhove".equals(args.get(0))) {
-      runJhovePlugin();
-    } else if ("fits".equals(args.get(0))) {
-      runFitsPlugin();
-    } else if ("bagit".equals(args.get(0))) {
-      runBagitPlugin();
-    } else if ("validation".equals(args.get(0))) {
-      runValidationPlugin(args.get(1), args.get(2));
-    } else if ("logClean".equals(args.get(0))) {
-      runLogCleanPlugin();
-    } else if ("exifTool".equals(args.get(0))) {
-      runExifToolPlugin();
-    } else if ("mediaInfo".equals(args.get(0))) {
-      runMediaInfoPlugin();
-    } else if ("ffprobe".equals(args.get(0))) {
-      runFFProbePlugin();
-    } else if ("jpylyzer".equals(args.get(0))) {
-      runJpylyzerPlugin();
-    } else if ("eark".equals(args.get(0))) {
-      runEARKPlugin();
-    } else if ("transferredResource".equals(args.get(0))) {
-      runTransferredResourceToAIPPlugin();
-    } else if ("siegfried".equals(args.get(0))) {
-      runSiegfriedPlugin();
     } else {
       printMainUsage();
     }

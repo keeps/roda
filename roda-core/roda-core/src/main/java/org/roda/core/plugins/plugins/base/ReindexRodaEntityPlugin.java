@@ -43,7 +43,6 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexRodaEntityPlugin.class);
   private boolean clearIndexes = true;
-  // FIXME 20160413 hsilva: see if this should be parameterized
   private boolean recursiveListing = false;
   private Class<T> clazz = null;
 
@@ -86,6 +85,9 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
         } catch (ClassNotFoundException e) {
           // do nothing
         }
+      }
+      if (parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE_LISTING) != null) {
+        recursiveListing = Boolean.parseBoolean(parameters.get(RodaConstants.PLUGIN_PARAMS_RECURSIVE_LISTING));
       }
     }
   }

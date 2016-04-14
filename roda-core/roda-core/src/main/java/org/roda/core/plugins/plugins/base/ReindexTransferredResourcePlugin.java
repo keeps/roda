@@ -10,13 +10,16 @@ package org.roda.core.plugins.plugins.base;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
-import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -27,10 +30,10 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
+public class ReindexTransferredResourcePlugin extends AbstractPlugin<TransferredResource> {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAIPPlugin.class);
-  private boolean clearIndexes = false;
+  private static final Logger LOGGER = LoggerFactory.getLogger(ReindexTransferredResourcePlugin.class);
+  private String folderUUID = null;
 
   @Override
   public void init() throws PluginException {
@@ -44,7 +47,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getName() {
-    return "Reindex AIP";
+    return "Reindex TransferredResource";
   }
 
   @Override
@@ -60,73 +63,60 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
-      clearIndexes = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_STRING_VALUE)
+      && StringUtils.isNotBlank(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_STRING_VALUE))) {
+      folderUUID = getParameterValues().get(RodaConstants.PLUGIN_PARAMS_STRING_VALUE);
     }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
+    LOGGER.debug("Reindexing transferred resources");
+    Report pluginReport = PluginHelper.createPluginReport(this);
 
-    for (AIP aip : list) {
-      LOGGER.debug("Reindexing AIP {}", aip.getId());
-      index.reindexAIP(aip);
+    try {
+      RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID, true);
+    } catch (IsStillUpdatingException e) {
+      pluginReport.setPluginState(PluginState.FAILURE)
+        .setPluginDetails("Transferred resources are already being reindexed");
+      LOGGER.error(pluginReport.getPluginDetails());
     }
 
-    return PluginHelper.createPluginReport(this);
+    LOGGER.debug("Done reindexing transferred resources");
+    return pluginReport;
   }
 
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    if (clearIndexes) {
-      LOGGER.debug("Clearing indexes");
-      try {
-        index.clearIndex(RodaConstants.INDEX_AIP);
-        index.clearIndex(RodaConstants.INDEX_REPRESENTATION);
-        index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
-        index.clearIndex(RodaConstants.INDEX_FILE);
-      } catch (GenericException e) {
-        throw new PluginException("Error clearing index", e);
-      }
-    } else {
-      LOGGER.debug("Skipping clear indexes");
-    }
-
-    return new Report();
+    // do nothing
+    return null;
   }
 
   @Override
   public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    return new Report();
+    // do nothing
+    return null;
   }
 
   @Override
   public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
-    return new Report();
+    // do nothing
+    return null;
   }
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    LOGGER.debug("Optimizing indexes");
-    try {
-      index.optimizeIndex(RodaConstants.INDEX_AIP);
-      index.optimizeIndex(RodaConstants.INDEX_REPRESENTATION);
-      index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
-      index.optimizeIndex(RodaConstants.INDEX_FILE);
-    } catch (GenericException e) {
-      throw new PluginException("Error optimizing index", e);
-    }
-
-    return new Report();
+    // do nothing
+    return null;
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
-    return new ReindexAIPPlugin();
+  public Plugin<TransferredResource> cloneMe() {
+    return new ReindexTransferredResourcePlugin();
   }
 
   @Override

@@ -1041,8 +1041,8 @@ public class ModelService extends ModelObservable {
   public void addLogEntry(LogEntry logEntry, Path logDirectory, boolean notify)
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-    String date = sdf.format(new Date()) + ".log";
-    logFile = logDirectory.resolve(date);
+    String datePlusExtension = sdf.format(new Date()) + ".log";
+    logFile = logDirectory.resolve(datePlusExtension);
     synchronized (logFile) {
 
       // verify if file exists and if not, if older files exist (in that case,

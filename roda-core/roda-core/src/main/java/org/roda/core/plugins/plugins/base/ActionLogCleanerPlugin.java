@@ -31,8 +31,8 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
-  private static final Logger LOGGER = LoggerFactory.getLogger(LogCleanerPlugin.class);
+public class ActionLogCleanerPlugin extends AbstractPlugin<LogEntry> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ActionLogCleanerPlugin.class);
   private int deleteOlderThanXDays = RodaCoreFactory.getRodaConfigurationAsInt(0, "core", "actionlogs",
     "delete_older_than_x_days");
 
@@ -129,7 +129,7 @@ public class LogCleanerPlugin extends AbstractPlugin<LogEntry> {
 
   @Override
   public Plugin<LogEntry> cloneMe() {
-    return new LogCleanerPlugin();
+    return new ActionLogCleanerPlugin();
   }
 
   @Override

@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.util.DateUtil;
@@ -236,17 +237,11 @@ public class IndexService {
     } catch (IOException e) {
       throw new GenericException("Error retrieving/processing logs from storage", e);
     } finally {
-      if (actionLogs != null) {
-        try {
-          actionLogs.close();
-        } catch (IOException e) {
-          LOGGER.error("Error while while freeing up resources", e);
-        }
-      }
+      IOUtils.closeQuietly(actionLogs);
     }
   }
 
-  private void reindexActionLog(BufferedReader br) throws GenericException {
+  public void reindexActionLog(BufferedReader br) throws GenericException {
     String line;
     try {
       while ((line = br.readLine()) != null) {
