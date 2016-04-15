@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -185,7 +186,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public void executeJob(Job job) {
+  public void executeJob(Job job) throws JobAlreadyStartedException {
     // TODO Auto-generated method stub
 
   }
@@ -216,7 +217,7 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   @Override
   public void cleanUnfinishedJobs() {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

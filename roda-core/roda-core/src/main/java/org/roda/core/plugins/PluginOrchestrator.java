@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -43,8 +44,12 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
+  /*
+   * Job related methods
+   * _________________________________________________________________________________________________________________
+   */
   /** 201603 hsilva: this method should be async */
-  public void executeJob(Job job);
+  public void executeJob(Job job) throws JobAlreadyStartedException;
 
   public void stopJob(Job job);
 

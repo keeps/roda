@@ -19,6 +19,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -75,7 +76,7 @@ public class JobsHelper {
     }
   }
 
-  protected static Job createJob(Job job) throws NotFoundException, GenericException {
+  protected static Job createJob(Job job) throws NotFoundException, GenericException, JobAlreadyStartedException {
     Job updatedJob = new Job(job);
 
     // serialize job to file & index it
@@ -98,6 +99,17 @@ public class JobsHelper {
     }
 
     return jobs;
+  }
+
+  public static Job startJob(String jobId) throws RequestNotValidException, GenericException, NotFoundException,
+    AuthorizationDeniedException, JobAlreadyStartedException {
+    // get job
+    Job job = RodaCoreFactory.getModelService().retrieveJob(jobId);
+
+    // ask plugin orchestrator to execute the job
+    RodaCoreFactory.getPluginOrchestrator().executeJob(job);
+    
+    return job;
   }
 
   public static Job stopJob(String jobId)

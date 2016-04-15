@@ -12,6 +12,7 @@ import java.util.Date;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.jobs.Job;
@@ -36,8 +37,8 @@ public class Jobs extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Job createJob(RodaUser user, Job job)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+  public static Job createJob(RodaUser user, Job job) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, JobAlreadyStartedException {
     Date startDate = new Date();
 
     // validate input and set missing information when possible
@@ -54,6 +55,23 @@ public class Jobs extends RodaCoreService {
     registerAction(user, JOBS_COMPONENT, "createJob", null, duration, "job", updatedJob);
 
     return updatedJob;
+  }
+
+  public static Job startJob(RodaUser user, String jobId) throws RequestNotValidException, GenericException,
+    NotFoundException, AuthorizationDeniedException, JobAlreadyStartedException {
+    Date startDate = new Date();
+
+    // check user permissions
+    // FIXME
+
+    // delegate
+    Job job = JobsHelper.startJob(jobId);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, JOBS_COMPONENT, "startJob", null, duration, "jobId", jobId);
+
+    return job;
   }
 
   public static void stopJob(RodaUser user, String jobId)

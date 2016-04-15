@@ -58,10 +58,9 @@ public class JobsResource {
   @GET
   @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Job.class, responseContainer = "List")
   public Response listJobs(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
-    @QueryParam("job_type") String jobType,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
-      throws RODAException {
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
@@ -94,11 +93,28 @@ public class JobsResource {
     return Response.created(ApiUtils.getUriFromRequest(request)).entity(updatedJob).type(mediaType).build();
   }
 
+  @POST
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "Starts an already created Job", notes = "Starts Job.", response = Job.class)
+  public Response startJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
+
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    Job job = org.roda.wui.api.controllers.Jobs.startJob(user, jobId);
+
+    return Response.created(ApiUtils.getUriFromRequest(request)).entity(job).type(mediaType).build();
+  }
+
   @GET
-  @Path("/{jobId}")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Get Job", notes = "Gets a particular Job.", response = Job.class)
-  public Response getJob(@PathParam("jobId") String jobId,
+  public Response getJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -111,10 +127,10 @@ public class JobsResource {
   }
 
   @DELETE
-  @Path("/{jobId}")
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Delete Job", notes = "Delete a particular Job, stoping it if still running.", response = ApiResponseMessage.class)
-  public Response deleteJob(@PathParam("jobId") String jobId,
+  public Response deleteJob(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
@@ -128,8 +144,8 @@ public class JobsResource {
 
   // FIXME WIP - not working yet
   @GET
-  @Path("/{jobId}/reports")
-  public Response getReport(@PathParam("jobId") String jobId,
+  @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reports")
+  public Response getReport(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
 
     try {

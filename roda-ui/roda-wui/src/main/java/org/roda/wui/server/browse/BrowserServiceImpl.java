@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -334,14 +335,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public Job createJob(Job job)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException {
+    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, JobAlreadyStartedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.createJob(user, job);
   }
 
   @Override
   public Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, JobAlreadyStartedException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 

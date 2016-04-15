@@ -26,6 +26,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -479,23 +480,28 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void executeJob(Job job) {
-    LOGGER.info("Started processing job '{}' ({})", job.getName(), job.getId());
+  public void executeJob(Job job) throws JobAlreadyStartedException {
+    LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
 
-    Future<Object> future = Patterns.ask(jobWorkersRouter, job, getJobTimeout(job));
+    if (runningTasks.containsKey(job.getId())) {
+      throw new JobAlreadyStartedException();
+    } else {
 
-    future.onSuccess(new OnSuccess<Object>() {
-      @Override
-      public void onSuccess(Object msg) throws Throwable {
-        LOGGER.info("Success executing job '{}' ({})", job.getName(), job.getId());
-      }
-    }, workersSystem.dispatcher());
-    future.onFailure(new OnFailure() {
-      @Override
-      public void onFailure(Throwable error) throws Throwable {
-        LOGGER.error("Failure executing job '{}' ({}): {}", job.getName(), job.getId(), error);
-      }
-    }, workersSystem.dispatcher());
+      Future<Object> future = Patterns.ask(jobWorkersRouter, job, getJobTimeout(job));
+
+      future.onSuccess(new OnSuccess<Object>() {
+        @Override
+        public void onSuccess(Object msg) throws Throwable {
+          LOGGER.info("Success executing job '{}' ({})", job.getName(), job.getId());
+        }
+      }, workersSystem.dispatcher());
+      future.onFailure(new OnFailure() {
+        @Override
+        public void onFailure(Throwable error) throws Throwable {
+          LOGGER.error("Failure executing job '{}' ({}): {}", job.getName(), job.getId(), error);
+        }
+      }, workersSystem.dispatcher());
+    }
 
   }
 
@@ -545,7 +551,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       for (Job job : jobsToBeStarted) {
         try {
           executeJob(model.retrieveJob(job.getId()));
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        } catch (JobAlreadyStartedException | RequestNotValidException | GenericException | NotFoundException
+          | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get Job", e);
         }
       }
@@ -584,7 +591,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
     Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
-      throws InvalidParameterException, PluginException {
+    throws InvalidParameterException, PluginException {
     Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
       pluginClass);
     innerPlugin.setParameterValues(plugin.getParameterValues());

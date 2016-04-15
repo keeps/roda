@@ -25,24 +25,10 @@ import org.roda.core.storage.StorageService;
  * This interface should be implemented by any class that want to be a RODA
  * plugin.
  * 
- * @author Rui Castro
  * @author Luis Faria<lfaria@keep.p>
+ * @author Hélder Silva <hsilva@keep.pt>
  */
 public interface Plugin<T extends Serializable> {
-
-  /**
-   * Initializes this {@link Plugin}. This method is called by the
-   * {@link PluginManager} before any other methods in the plugin.
-   * 
-   * @throws PluginException
-   */
-  public void init() throws PluginException;
-
-  /**
-   * Stops all {@link Plugin} activity. This is the last method to be called by
-   * {@link PluginManager} on the {@link Plugin}.
-   */
-  public void shutdown();
 
   /**
    * Returns the name of this {@link Plugin}.
@@ -137,26 +123,6 @@ public interface Plugin<T extends Serializable> {
    */
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException;
 
-  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
-
-  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
-
-  /**
-   * Executes the {@link Plugin}.
-   * 
-   * @return a {@link Report} of the actions performed.
-   * 
-   * @throws PluginException
-   */
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
-    throws PluginException;
-
-  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
-    throws PluginException;
-
-  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
-
   /**
    * Method to return Plugin type (so it can be grouped for different purposes)
    */
@@ -175,6 +141,65 @@ public interface Plugin<T extends Serializable> {
    */
   public boolean areParameterValuesValid();
 
-  // TODO 20160222 hsilva: do we need this???
-  // public Report getReport();
+  /*
+   * "Working methods"
+   * ___________________________________________________________________________________________________________
+   */
+
+  /**
+   * Initializes this {@link Plugin}. This method is called by the
+   * {@link PluginManager} before any other methods in the plugin.
+   * 
+   * @throws PluginException
+   */
+  public void init() throws PluginException;
+
+  /**
+   * Method executed by {@link PluginOrchestrator} before splitting the workload
+   * (if it makes sense) by N workers
+   * 
+   * @throws PluginException
+   */
+  public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+
+  /**
+   * Method executed by a worker before starting its work ( {@link #execute})
+   * 
+   * @throws PluginException
+   */
+  public Report beforeBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException;
+
+  /**
+   * Executes the {@link Plugin}.
+   * 
+   * @return a {@link Report} of the actions performed.
+   * 
+   * @throws PluginException
+   */
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
+    throws PluginException;
+
+  /**
+   * Method executed by a worker after doing its work ( {@link #execute})
+   * 
+   * @throws PluginException
+   */
+  public Report afterBlockExecute(IndexService index, ModelService model, StorageService storage)
+    throws PluginException;
+
+  /**
+   * Method executed by {@link PluginOrchestrator} after all workers have
+   * finished their work
+   * 
+   * @throws PluginException
+   */
+  public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException;
+
+  /**
+   * Stops all {@link Plugin} activity. This is the last method to be called by
+   * {@link PluginManager} on the {@link Plugin}.
+   */
+  public void shutdown();
+
 }

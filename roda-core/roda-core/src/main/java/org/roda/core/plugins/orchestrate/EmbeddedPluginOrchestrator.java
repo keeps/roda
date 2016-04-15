@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
@@ -369,7 +370,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public void executeJob(Job job) {
+  public void executeJob(Job job) throws JobAlreadyStartedException {
     // TODO
   }
 
@@ -399,7 +400,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void cleanUnfinishedJobs() {
     // TODO Auto-generated method stub
-    
+
   }
 
 }

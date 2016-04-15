@@ -35,10 +35,7 @@ public class AkkaWorkerActor extends UntypedActor {
     Object returnMessage = null;
     if (msg instanceof PluginMessage) {
       PluginMessage message = (PluginMessage) msg;
-      // TODO should be init be done here as well as it is already being done in
-      // the plugin manager???
       Plugin<?> plugin = message.getPlugin();
-      plugin.init();
       try {
         returnMessage = plugin.execute(index, model, storage, message.getList());
         getSender().tell(returnMessage, getSelf());
@@ -47,8 +44,6 @@ public class AkkaWorkerActor extends UntypedActor {
         returnMessage = new akka.actor.Status.Failure(e);
         getSender().tell(returnMessage, getSelf());
         throw e;
-      } finally {
-        plugin.shutdown();
       }
     } else {
       unhandled(msg);

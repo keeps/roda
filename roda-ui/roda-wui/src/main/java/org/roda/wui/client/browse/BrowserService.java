@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
@@ -105,8 +106,8 @@ public interface BrowserService extends RemoteService {
 
   void transferScanRequestUpdate(String transferredResourceUUID) throws IsStillUpdatingException;
 
-  Job createJob(Job job)
-    throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException;
+  Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    GenericException, JobAlreadyStartedException;
 
   List<PluginInfo> getPluginsInfo(PluginType type);
 
@@ -138,7 +139,7 @@ public interface BrowserService extends RemoteService {
 
   DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId, String descriptiveMetadataId,
     String localeString)
-      throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
 
   void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
@@ -159,7 +160,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
   Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    JobAlreadyStartedException;
 
   void updateAIPPermssions(String aipId, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;

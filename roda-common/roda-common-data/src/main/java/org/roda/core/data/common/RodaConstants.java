@@ -126,6 +126,8 @@ public final class RodaConstants {
   public static final String API_QUERY_PARAM_VERSION = "version";
   // http headers used
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
+  // job related params
+  public static final String API_PATH_PARAM_JOB_ID = "jobId";
 
   /*
    * Controllers related
