@@ -1040,7 +1040,7 @@ public class Browser extends RodaCoreService {
   /**
    * @param user
    *          The user
-   * @param filter
+   * @param selected
    *          The filter to select the AIPs to export
    * @param acceptFormat
    *          The output format (currently only zip is supported)
@@ -1051,7 +1051,7 @@ public class Browser extends RodaCoreService {
    * @throws RequestNotValidException
    * @throws IOException
    */
-  public static StreamResponse exportAIP(RodaUser user, Filter filter, String acceptFormat)
+  public static StreamResponse exportAIP(RodaUser user, SelectedItems selected, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
     Date startDate = new Date();
 
@@ -1061,24 +1061,16 @@ public class Browser extends RodaCoreService {
     // check user permissions
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
-    // find the aips
-    List<IndexedAIP> aips = BrowserHelper.matchAIP(filter, user);
+    UserUtility.checkObjectPermissions(user, selected, PermissionType.READ);
 
-    if (aips != null && aips.size() > 0) {
-      // check object permissions
-      UserUtility.checkObjectPermissions(user, aips, PermissionType.READ);
+    // delegate
+    StreamResponse aipExport = BrowserHelper.getAips(selected, acceptFormat);
 
-      // delegate
-      StreamResponse aipExport = BrowserHelper.getAips(aips, acceptFormat);
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "exportAIP", null, duration);
 
-      // register action
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, BROWSER_COMPONENT, "exportAIP", null, duration);
-
-      return aipExport;
-    } else {
-      throw new NotFoundException("No AIPs match filter");
-    }
+    return aipExport;
   }
 
   public static StreamResponse getAIP(RodaUser user, String aipId, String acceptFormat)

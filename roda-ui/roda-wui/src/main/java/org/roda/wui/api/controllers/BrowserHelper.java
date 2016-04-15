@@ -133,6 +133,7 @@ import com.github.mustachejava.MustacheFactory;
 public class BrowserHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(BrowserHelper.class);
 
+  private static final int PAGINATION = 50;
   private static final int BUNDLE_MAX_REPRESENTATION_COUNT = 10;
   private static final int BUNDLE_MAX_ADDED_ORIGINAL_REPRESENTATION_COUNT = 1;
 
@@ -1302,7 +1303,7 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     StreamResponse ret = null;
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = ModelUtils.zipAIP(Arrays.asList(indexedAIP));
+      List<ZipEntryInfo> zipEntries = ModelUtils.zipIndexedAIP(Arrays.asList(indexedAIP));
       ret = createZipStreamResponse(zipEntries, "export");
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
       final StreamingOutput stream;
@@ -1329,13 +1330,23 @@ public class BrowserHelper {
     return ret;
   }
 
-  public static StreamResponse getAips(List<IndexedAIP> indexedAIPs, String acceptFormat)
+  public static StreamResponse getAips(SelectedItems selected, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException, IOException {
     StreamResponse ret = null;
+    IndexService index = RodaCoreFactory.getIndexService();
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      for (IndexedAIP indexedAIP : indexedAIPs) {
-        zipEntries.addAll(ModelUtils.zipAIP(Arrays.asList(indexedAIP)));
+      if (selected instanceof SelectedItemsFilter) {
+        SelectedItemsFilter selectedItems = (SelectedItemsFilter) selected;
+        long count = index.count(IndexedAIP.class, selectedItems.getFilter());
+        for (int i = 0; i < count; i += PAGINATION) {
+          List<IndexedAIP> aips = index
+            .find(IndexedAIP.class, selectedItems.getFilter(), null, new Sublist(i, PAGINATION), null).getResults();
+          zipEntries.addAll(ModelUtils.zipIndexedAIP(aips));
+        }
+      } else {
+        SelectedItemsList selectedItems = (SelectedItemsList) selected;
+        zipEntries.addAll(ModelUtils.zipIndexedAIP(ModelUtils.getIndexedAIPsFromObjectIds(selectedItems)));
       }
       ret = createZipStreamResponse(zipEntries, "export");
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {

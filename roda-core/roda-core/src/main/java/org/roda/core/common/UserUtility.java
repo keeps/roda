@@ -18,6 +18,7 @@ import java.util.function.Function;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -28,18 +29,23 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
+import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
+  public static final int PAGINATION = 50;
 
   private static LdapUtility LDAP_UTILITY;
 
@@ -216,12 +222,6 @@ public class UserUtility {
         "The user '" + user.getId() + "' does not have permissions to " + permissionType);
     }
   }
-  
-  public static void checkObjectPermissions(RodaUser user, List<IndexedAIP> aips, PermissionType permissionType) throws AuthorizationDeniedException {
-    for(IndexedAIP aip : aips){
-      checkObjectPermissions(user, aip, permissionType);
-    }    
-  }
 
   private static boolean iterativeDisjoint(Set<String> set1, Set<String> set2) {
     boolean noCommonElement = true;
@@ -254,6 +254,29 @@ public class UserUtility {
 
   public static void checkRoles(Function<?, ?> function) {
     // TODO Auto-generated method stub
+
+  }
+
+  public static void checkObjectPermissions(RodaUser user, SelectedItems selected, PermissionType permission)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    IndexService index = RodaCoreFactory.getIndexService();
+    if (selected instanceof SelectedItemsFilter) {
+      SelectedItemsFilter selectedItems = (SelectedItemsFilter) selected;
+      long count = index.count(IndexedAIP.class, selectedItems.getFilter());
+      for (int i = 0; i < count; i += PAGINATION) {
+        List<IndexedAIP> aips = index
+          .find(IndexedAIP.class, selectedItems.getFilter(), null, new Sublist(i, PAGINATION), null).getResults();
+        for (IndexedAIP aip : aips) {
+          checkObjectPermissions(user, aip, permission);
+        }
+      }
+    } else {
+      SelectedItemsList selectedItems = (SelectedItemsList) selected;
+      List<IndexedAIP> aips = ModelUtils.getIndexedAIPsFromObjectIds(selectedItems);
+      for (IndexedAIP aip : aips) {
+        checkObjectPermissions(user, aip, permission);
+      }
+    }
 
   }
 }
