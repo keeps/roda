@@ -7,6 +7,8 @@
  */
 package config.i18n.client;
 
+import java.util.Date;
+
 import com.google.gwt.i18n.client.Messages;
 
 public interface RiskMessages extends Messages {
@@ -39,4 +41,10 @@ public interface RiskMessages extends Messages {
 
   @DefaultMessage("Search risks...")
   String riskRegisterSearchPlaceHolder();
+
+  @DefaultMessage("Risk was modified")
+  String modifyRiskMessage();
+
+  @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
+  String riskHistoryLabel(String versionKey, Date createdDate);
 }

@@ -43,7 +43,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -53,6 +52,7 @@ import org.roda.wui.client.browse.BrowseItemBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
+import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.common.RodaCoreService;
 
@@ -212,6 +212,21 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "retrieve", aipId, duration, "class", classToReturn.getSimpleName());
 
     return ret;
+  }
+
+  public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems ids)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+    // TODO check object level permissions
+
+    // delegate
+    BrowserHelper.delete(user, classToReturn, ids);
+
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "delete", null, duration, "class", classToReturn.getSimpleName());
   }
 
   public static <T extends IsIndexed> List<String> suggest(RodaUser user, Class<T> classToReturn, String field,
@@ -996,71 +1011,7 @@ public class Browser extends RodaCoreService {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 
-  public static Risk retrieveRisk(RodaUser user, String riskId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    Risk ret = BrowserHelper.retrieveRisk(riskId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveRisk", null, duration, "riskId", riskId);
-    return ret;
-  }
-
-  public static Format retrieveFormat(RodaUser user, String formatId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    Format ret = BrowserHelper.retrieveFormat(formatId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveFormat", null, duration, "formatId", formatId);
-    return ret;
-  }
-
-  public static List<Format> retrieveFormats(RodaUser user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    List<Format> ret = BrowserHelper.retrieveFormats(agentId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveFormats", null, duration, "agentId", agentId);
-    return ret;
-  }
-
-  public static Agent retrieveAgent(RodaUser user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    Agent ret = BrowserHelper.retrieveAgent(agentId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveAgent", null, duration, "agentId", agentId);
-    return ret;
-  }
-
-  public static void modifyRisk(RodaUser user, Risk risk)
+  public static void modifyRisk(RodaUser user, Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
     Date start = new Date();
 
@@ -1068,7 +1019,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.modifyRisk(risk);
+    BrowserHelper.modifyRisk(risk, message);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1153,49 +1104,52 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static void removeRisk(RodaUser user, SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public static List<Format> retrieveFormats(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.removeRisk(selected, user);
+    List<Format> ret = BrowserHelper.retrieveFormats(agentId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeRisk", null, duration, "selected", selected);
+    registerAction(user, BROWSER_COMPONENT, "retrieveFormats", null, duration, "agentId", agentId);
+    return ret;
   }
 
-  public static void removeAgent(RodaUser user, SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public static List<Agent> retrieveRequiredAgents(RodaUser user, String agentId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.removeAgent(selected, user);
+    List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeAgent", null, duration, "selected", selected);
+    registerAction(user, BROWSER_COMPONENT, "retrieveRequiredAgents", null, duration, "agentId", agentId);
+    return ret;
   }
 
-  public static void removeFormat(RodaUser user, SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public static void revertRiskVersion(RodaUser user, String riskId, String versionId, String message)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.removeFormat(selected, user);
+    BrowserHelper.revertRiskVersion(riskId, versionId, message);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeFormat", null, duration, "selected", selected);
+    registerAction(user, BROWSER_COMPONENT, "revertRiskVersion", versionId, duration, "riskId", riskId, "versionId",
+      versionId, "message", message);
   }
 
   /**
@@ -1254,54 +1208,38 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "getAIP", aipId, duration);
 
     return aip;
+  }
 
-  public static IndexResult<Message> findMessages(RodaUser user, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public static void removeRiskVersion(RodaUser user, String riskId, String versionId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    IndexResult<Message> ret = BrowserHelper.findMessages(filter, sorter, sublist, facets);
+    BrowserHelper.removeRiskVersion(riskId, versionId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, "UserManagement", "findMessages", null, duration, "filter", filter, "sorter", sorter,
-      "sublist", sublist);
-
-    return ret;
+    registerAction(user, BROWSER_COMPONENT, "removeRiskVersion", versionId, duration, "riskId", riskId, "versionId",
+      versionId);
   }
 
-  public static Message retrieveMessage(RodaUser user, String messageId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
+  public static RiskVersionsBundle retrieveRiskVersions(RodaUser user, String riskId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Message ret = BrowserHelper.retrieveMessage(messageId);
+    RiskVersionsBundle ret = BrowserHelper.retrieveRiskVersions(riskId);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveMessage", null, duration, "messageId", messageId);
+    registerAction(user, BROWSER_COMPONENT, "retrieveRiskVersions", null, duration, "riskId", riskId);
     return ret;
   }
 
-  public static List<Agent> retrieveRequiredAgents(RodaUser user, String agentId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    List<Agent> ret = BrowserHelper.retrieveRequiredAgents(agentId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "retrieveRequiredAgents", null, duration, "agentId", agentId);
-    return ret;
-  }
 }

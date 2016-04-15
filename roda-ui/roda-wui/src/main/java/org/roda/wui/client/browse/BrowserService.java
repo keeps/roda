@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.browse;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -160,6 +160,9 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems ids)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
+
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
@@ -170,24 +173,7 @@ public interface BrowserService extends RemoteService {
   void updateAIPPermssions(String aipId, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  void removeRisk(SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  void removeAgent(SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  void removeFormat(SelectedItems selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
-
-  Risk retrieveRisk(String riskId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  Format retrieveFormat(String formatId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  List<Format> retrieveFormats(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  Agent retrieveAgent(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
-
-  void modifyRisk(Risk risk)
+  void modifyRisk(Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
   void modifyFormat(Format format)
@@ -205,11 +191,17 @@ public interface BrowserService extends RemoteService {
   Agent addAgent(Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 
-  IndexResult<Message> findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
-
-  Message retrieveMessage(String messageId) throws AuthorizationDeniedException, NotFoundException, GenericException;
+  List<Format> retrieveFormats(String agentId) throws AuthorizationDeniedException, NotFoundException, GenericException;
 
   List<Agent> retrieveRequiredAgents(String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException;
+
+  void revertRiskVersion(String riskId, String versionId, String message)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  void removeRiskVersion(String riskId, String versionId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  RiskVersionsBundle retrieveRiskVersions(String riskId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
 }

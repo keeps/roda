@@ -27,7 +27,6 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
@@ -103,6 +102,8 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString, AsyncCallback<IndexResult<T>> callback);
 
+  void delete(String classNameToReturn, SelectedItems ids, AsyncCallback<Void> callback);
+
   void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
 
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
@@ -114,37 +115,25 @@ public interface BrowserServiceAsync {
 
   void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
 
-  void retrieveRisk(String riskId, AsyncCallback<Risk> asyncCallback);
-
   void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 
-  void modifyRisk(Risk risk, AsyncCallback<Void> asyncCallback);
-
-  void removeRisk(SelectedItems selected, AsyncCallback<Void> asyncCallback);
-
-  void retrieveAgent(String agentId, AsyncCallback<Agent> asyncCallback);
+  void modifyRisk(Risk risk, String message, AsyncCallback<Void> asyncCallback);
 
   void addAgent(Agent agent, AsyncCallback<Agent> asyncCallback);
 
   void modifyAgent(Agent agent, AsyncCallback<Void> asyncCallback);
 
-  void removeAgent(SelectedItems selected, AsyncCallback<Void> asyncCallback);
-
-  void retrieveFormat(String formatId, AsyncCallback<Format> asyncCallback);
-
   void addFormat(Format format, AsyncCallback<Format> asyncCallback);
 
   void modifyFormat(Format format, AsyncCallback<Void> asyncCallback);
 
-  void removeFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
-
   void retrieveFormats(String agentId, AsyncCallback<List<Format>> asyncCallback);
-
-  void findMessages(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
-    AsyncCallback<IndexResult<Message>> callback);
-
-  void retrieveMessage(String messageId, AsyncCallback<Message> asyncCallback);
 
   void retrieveRequiredAgents(String agentId, AsyncCallback<List<Agent>> asyncCallback);
 
+  void revertRiskVersion(String riskId, String versionId, String message, AsyncCallback<Void> callback);
+
+  void removeRiskVersion(String riskId, String versionId, AsyncCallback<Void> callback);
+
+  void retrieveRiskVersions(String riskId, AsyncCallback<RiskVersionsBundle> callback);
 }

@@ -245,7 +245,7 @@ public class ShowFormat extends Composite {
 
     if (historyTokens.size() == 1) {
       String formatId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieveFormat(formatId, new AsyncCallback<Format>() {
+      BrowserService.Util.getInstance().retrieve(Format.class.getName(), formatId, new AsyncCallback<Format>() {
 
         @Override
         public void onFailure(Throwable caught) {

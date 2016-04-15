@@ -25,8 +25,8 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RiskList;
@@ -151,8 +151,8 @@ public class RiskRegister extends Composite {
    */
   public RiskRegister() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY), new SimpleFacetParameter(
-      RodaConstants.RISK_PRE_MITIGATION_SEVERITY));
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
+      new SimpleFacetParameter(RodaConstants.RISK_PRE_MITIGATION_SEVERITY));
 
     riskList = new RiskList(filter, facets, "Risks", true);
 
@@ -243,6 +243,8 @@ public class RiskRegister extends Composite {
       CreateRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(EditRisk.RESOLVER.getHistoryToken())) {
       EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
+      RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);
@@ -280,7 +282,7 @@ public class RiskRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().removeRisk(selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().delete(Risk.class.getName(), selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {

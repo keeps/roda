@@ -14,6 +14,7 @@ import java.util.List;
 
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
@@ -145,6 +146,9 @@ public class ShowRisk extends Composite {
   Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
 
   @UiField
+  Button buttonHistory;
+
+  @UiField
   Button buttonEdit;
 
   @UiField
@@ -260,13 +264,30 @@ public class ShowRisk extends Composite {
     if (mitigationCounter == 0) {
       riskMitigationKey.setVisible(false);
     }
+
+    BrowserService.Util.getInstance().retrieveRiskVersions(risk.getId(), new AsyncCallback<RiskVersionsBundle>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        buttonHistory.setVisible(false);
+      }
+
+      @Override
+      public void onSuccess(RiskVersionsBundle bundle) {
+        if (bundle.getVersions().isEmpty()) {
+          buttonHistory.setVisible(false);
+        } else {
+          buttonHistory.setVisible(true);
+        }
+      }
+    });
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
 
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
+      BrowserService.Util.getInstance().retrieve(Risk.class.getName(), riskId, new AsyncCallback<Risk>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -283,6 +304,11 @@ public class ShowRisk extends Composite {
       Tools.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
     }
+  }
+
+  @UiHandler("buttonHistory")
+  void handleButtonHistory(ClickEvent e) {
+    Tools.newHistory(RiskRegister.RESOLVER, RiskHistory.RESOLVER.getHistoryToken(), risk.getId());
   }
 
   @UiHandler("buttonEdit")

@@ -131,7 +131,7 @@ public class IndexServiceTest {
       usersSet2 = usersSet2 == null ? new HashSet<>() : usersSet2;
 
       assertEquals(usersSet1, usersSet2);
-      
+
       // groups
       Set<String> groupsSet1 = aip.getPermissions().getGroups().get(permissionType);
       Set<String> groupsSet2 = indexedAIP.getPermissions().getGroups().get(permissionType);
@@ -598,7 +598,7 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk3.getName());
 
       risk3.setName("Risk New Name");
-      model.updateRisk(risk3);
+      model.updateRisk(risk3, "Risk updated");
 
       Risk risk4 = index.retrieve(Risk.class, risk.getId());
       assertNotNull(risk4);

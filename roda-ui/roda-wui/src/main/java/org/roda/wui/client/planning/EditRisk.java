@@ -38,7 +38,7 @@ public class EditRisk extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String riskId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveRisk(riskId, new AsyncCallback<Risk>() {
+        BrowserService.Util.getInstance().retrieve(Risk.class.getName(), riskId, new AsyncCallback<Risk>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -110,7 +110,7 @@ public class EditRisk extends Composite {
         String riskId = risk.getId();
         risk = riskDataPanel.getRisk();
         risk.setId(riskId);
-        BrowserService.Util.getInstance().modifyRisk(risk, new AsyncCallback<Void>() {
+        BrowserService.Util.getInstance().modifyRisk(risk, messages.modifyRiskMessage(), new AsyncCallback<Void>() {
 
           @Override
           public void onFailure(Throwable caught) {

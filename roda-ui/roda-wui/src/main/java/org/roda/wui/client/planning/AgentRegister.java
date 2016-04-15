@@ -22,8 +22,8 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AgentList;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
@@ -131,8 +131,8 @@ public class AgentRegister extends Composite {
   @UiField
   Button startProcess;
 
-  private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.AGENT_SEARCH,
-    "*"));
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.AGENT_SEARCH, "*"));
 
   /**
    * Create a agent register page
@@ -145,8 +145,8 @@ public class AgentRegister extends Composite {
 
     agentList = new AgentList(filter, facets, "Agents", true);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH,
-      messages.agentRegisterSearchPlaceHolder(), false, false);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.AGENT_SEARCH, messages.agentRegisterSearchPlaceHolder(),
+      false, false);
     searchPanel.setList(agentList);
 
     agentList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -261,7 +261,7 @@ public class AgentRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().removeAgent(selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().delete(Agent.class.getName(), selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {

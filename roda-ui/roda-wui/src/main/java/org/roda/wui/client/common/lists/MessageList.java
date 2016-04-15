@@ -27,6 +27,7 @@ import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -151,7 +152,8 @@ public class MessageList extends AsyncTableCell<Message> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().findMessages(filter, sorter, sublist, getFacets(), callback);
+    BrowserService.Util.getInstance().find(Message.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
 
   }
 

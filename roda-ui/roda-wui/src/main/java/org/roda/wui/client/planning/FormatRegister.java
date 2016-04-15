@@ -22,8 +22,8 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.FormatList;
@@ -131,8 +131,8 @@ public class FormatRegister extends Composite {
   @UiField
   Button startProcess;
 
-  private static final Filter DEFAULT_FILTER = new Filter(new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH,
-    "*"));
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new BasicSearchFilterParameter(RodaConstants.FORMAT_SEARCH, "*"));
 
   /**
    * Create a format register page
@@ -261,7 +261,7 @@ public class FormatRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().removeFormat(selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().delete(Format.class.getName(), selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {

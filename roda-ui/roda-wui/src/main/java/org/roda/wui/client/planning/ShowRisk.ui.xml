@@ -70,7 +70,10 @@
 					<g:Label addStyleNames="h4">
 						<ui:text from='{messages.sidebarActionsTitle}' />
 					</g:Label>
-					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonEdit">
+					<g:Button addStyleNames="btn btn-clock" ui:field="buttonHistory">
+						History
+					</g:Button>
+					<g:Button addStyleNames="btn btn-edit" ui:field="buttonEdit">
 						<ui:text from='{messages.riskRegisterEditButton}' />
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonCancel">

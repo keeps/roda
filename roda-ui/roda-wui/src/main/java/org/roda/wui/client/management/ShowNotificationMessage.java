@@ -43,7 +43,7 @@ public class ShowNotificationMessage extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String messageId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveMessage(messageId, new AsyncCallback<Message>() {
+        BrowserService.Util.getInstance().retrieve(Message.class.getName(), messageId, new AsyncCallback<Message>() {
 
           @Override
           public void onFailure(Throwable caught) {

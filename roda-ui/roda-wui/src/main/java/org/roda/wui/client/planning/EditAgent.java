@@ -38,7 +38,7 @@ public class EditAgent extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String agentId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieveAgent(agentId, new AsyncCallback<Agent>() {
+        BrowserService.Util.getInstance().retrieve(Agent.class.getName(), agentId, new AsyncCallback<Agent>() {
 
           @Override
           public void onFailure(Throwable caught) {
