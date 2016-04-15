@@ -84,8 +84,8 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.poifs.crypt.dsig.KeyInfoKeySelector;
-import org.apache.poi.util.IOUtils;
 import org.apache.xml.security.Init;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;

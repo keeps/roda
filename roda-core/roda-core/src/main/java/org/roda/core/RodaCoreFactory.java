@@ -29,9 +29,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
+
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
@@ -60,6 +65,7 @@ import org.roda.core.common.RodaUtils;
 import org.roda.core.common.UserUtility;
 import org.roda.core.common.monitor.TransferUpdateStatus;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
+import org.roda.core.common.validation.ResourceResolver;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
@@ -122,6 +128,7 @@ import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -178,7 +185,8 @@ public class RodaCoreFactory {
   // Configuration related objects
   private static CompositeConfiguration rodaConfiguration = null;
   private static List<String> configurationFiles = null;
-  private static Map<String, Map<String, String>> propertiesCache = null;
+  private static Map<String, Map<String, String>> rodaPropertiesCache = null;
+  private static Map<String, Schema> rodaSchemasCache = new HashMap<String, Schema>();
   private static Map<Locale, Messages> i18nMessages = new HashMap<Locale, Messages>();
   private static DescriptionLevelManager descriptionLevelManager = null;
 
@@ -242,7 +250,7 @@ public class RodaCoreFactory {
         // load core configurations
         rodaConfiguration = new CompositeConfiguration();
         configurationFiles = new ArrayList<String>();
-        propertiesCache = new HashMap<String, Map<String, String>>();
+        rodaPropertiesCache = new HashMap<String, Map<String, String>>();
         addConfiguration("roda-core.properties");
         addConfiguration("roda-core-formats.properties");
         LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
@@ -281,6 +289,150 @@ public class RodaCoreFactory {
     }
   }
 
+  private static Path determineRodaHomePath() {
+    Path rodaHomePath;
+    if (System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY) != null) {
+      rodaHomePath = Paths.get(System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY));
+    } else if (System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE) != null) {
+      rodaHomePath = Paths.get(System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE));
+    } else {
+      // last attempt (using user home and hidden directory called .roda)
+      String userHome = System.getProperty("user.home");
+      rodaHomePath = Paths.get(userHome, ".roda");
+      if (!Files.exists(rodaHomePath)) {
+        try {
+          Files.createDirectories(rodaHomePath);
+        } catch (IOException e) {
+          throw new RuntimeException("Unable to create RODA HOME " + rodaHomePath + ". Aborting...", e);
+        }
+      }
+
+      // set roda.home in order to correctly configure logging even if no
+      // property has been defined
+      System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
+    }
+
+    // instantiate essential directories
+    configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
+    dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
+    logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
+    storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
+    indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
+    themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
+    exampleThemePath = configPath.resolve(RodaConstants.CORE_EXAMPLE_THEME_FOLDER);
+
+    // configure logback
+    if (nodeType != NodeType.TEST) {
+      configureLogback();
+    }
+
+    return rodaHomePath;
+  }
+
+  private static void configureLogback() {
+    try {
+      LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
+      JoranConfigurator configurator = new JoranConfigurator();
+      configurator.setContext(context);
+      context.reset();
+      configurator.doConfigure(getConfigurationFile("logback.xml"));
+    } catch (JoranException e) {
+      LOGGER.error("Error configuring logback", e);
+    }
+  }
+
+  private static void instantiateEssentialDirectories() {
+    // make sure all essential directories exist
+    ensureAllEssentialDirectoriesExist();
+  }
+
+  public static void ensureAllEssentialDirectoriesExist() {
+    List<Path> essentialDirectories = new ArrayList<Path>();
+    essentialDirectories.add(configPath);
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
+    essentialDirectories
+      .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
+      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve(RodaConstants.CORE_HTML_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
+    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
+    essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
+    essentialDirectories.add(dataPath);
+    essentialDirectories.add(logPath);
+    essentialDirectories.add(storagePath);
+    essentialDirectories.add(indexDataPath);
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
+    essentialDirectories.add(themePath);
+
+    for (Path path : essentialDirectories) {
+      try {
+        if (!Files.exists(path)) {
+          Files.createDirectories(path);
+        }
+      } catch (IOException e) {
+        LOGGER.error("Unable to create " + path + ". Aborting...", e);
+        throw new RuntimeException("Unable to create " + path + ". Aborting...", e);
+      }
+    }
+
+    // FIXME the following block should be invoked/injected from RodaWuiServlet
+    // (and avoid any cyclic dependency)
+    try {
+      try {
+        FSUtils.deletePath(exampleThemePath);
+      } catch (NotFoundException e) {
+        // do nothing and carry on
+      }
+      Files.createDirectories(exampleThemePath);
+      copyFilesFromClasspath(RodaConstants.THEME_RESOURCES_PATH.replaceFirst("/", ""), exampleThemePath, true);
+    } catch (GenericException | IOException e) {
+      LOGGER.error("Unable to create " + exampleThemePath, e);
+    }
+  }
+
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory,
+    boolean removeClasspathPrefixFromFinalPath) {
+    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
+    classLoadersList.add(ClasspathHelper.contextClassLoader());
+
+    Set<String> resources = new Reflections(
+      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
+        .setScanners(new ResourcesScanner())
+        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
+          .getResources(Pattern.compile(".*"));
+
+    for (String resource : resources) {
+      InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
+      Path destinyPath;
+      if (removeClasspathPrefixFromFinalPath) {
+        destinyPath = destionationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
+      } else {
+        destinyPath = destionationDirectory.resolve(resource);
+      }
+
+      try {
+        // create all parent directories
+        Files.createDirectories(destinyPath.getParent());
+        // copy file
+        Files.copy(originStream, destinyPath, StandardCopyOption.REPLACE_EXISTING);
+      } catch (IOException e) {
+        LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
+          e.getMessage());
+      } finally {
+        IOUtils.closeQuietly(originStream);
+      }
+    }
+  }
+
+  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory) {
+    copyFilesFromClasspath(classpathPrefix, destionationDirectory, false);
+  }
+
   private static void instantiatePluginManager() {
     if (nodeType == NodeType.MASTER || nodeType == NodeType.WORKER || TEST_DEPLOY_PLUGIN_MANAGER) {
       try {
@@ -305,11 +457,6 @@ public class RodaCoreFactory {
     } catch (RequestNotValidException e) {
       LOGGER.error("Error loading description levels", e);
     }
-  }
-
-  private static void instantiateEssentialDirectories() {
-    // make sure all essential directories exist
-    ensureAllEssentialDirectoriesExist();
   }
 
   private static void instantiateStorageAndModel() throws GenericException {
@@ -409,44 +556,6 @@ public class RodaCoreFactory {
     }
   }
 
-  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory) {
-    copyFilesFromClasspath(classpathPrefix, destionationDirectory, false);
-  }
-
-  private static void copyFilesFromClasspath(String classpathPrefix, Path destionationDirectory,
-    boolean removeClasspathPrefixFromFinalPath) {
-    List<ClassLoader> classLoadersList = new LinkedList<ClassLoader>();
-    classLoadersList.add(ClasspathHelper.contextClassLoader());
-
-    Set<String> resources = new Reflections(
-      new ConfigurationBuilder().filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(classpathPrefix)))
-        .setScanners(new ResourcesScanner())
-        .setUrls(ClasspathHelper.forClassLoader(classLoadersList.toArray(new ClassLoader[5]))))
-          .getResources(Pattern.compile(".*"));
-
-    for (String resource : resources) {
-      InputStream originStream = RodaCoreFactory.class.getClassLoader().getResourceAsStream(resource);
-      Path destinyPath;
-      if (removeClasspathPrefixFromFinalPath) {
-        destinyPath = destionationDirectory.resolve(resource.replaceFirst(classpathPrefix, ""));
-      } else {
-        destinyPath = destionationDirectory.resolve(resource);
-      }
-
-      try {
-        // create all parent directories
-        Files.createDirectories(destinyPath.getParent());
-        // copy file
-        Files.copy(originStream, destinyPath, StandardCopyOption.REPLACE_EXISTING);
-      } catch (IOException e) {
-        LOGGER.error("Error copying file from classpath: {} to {} (reason: {})", originStream, destinyPath,
-          e.getMessage());
-      } finally {
-        IOUtils.closeQuietly(originStream);
-      }
-    }
-  }
-
   private static SolrClient instantiateSolr(Path solrHome) {
     SolrType solrType = SolrType.valueOf(
       getRodaConfiguration().getString(RodaConstants.CORE_SOLR_TYPE, RodaConstants.DEFAULT_SOLR_TYPE.toString()));
@@ -537,60 +646,6 @@ public class RodaCoreFactory {
     }
   }
 
-  private static Path determineRodaHomePath() {
-    Path rodaHomePath;
-    if (System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY) != null) {
-      rodaHomePath = Paths.get(System.getProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY));
-    } else if (System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE) != null) {
-      rodaHomePath = Paths.get(System.getenv(RodaConstants.INSTALL_FOLDER_ENVIRONEMNT_VARIABLE));
-    } else {
-      // last attempt (using user home and hidden directory called .roda)
-      String userHome = System.getProperty("user.home");
-      rodaHomePath = Paths.get(userHome, ".roda");
-      if (!Files.exists(rodaHomePath)) {
-        try {
-          Files.createDirectories(rodaHomePath);
-        } catch (IOException e) {
-          throw new RuntimeException("Unable to create RODA HOME " + rodaHomePath + ". Aborting...", e);
-        }
-      }
-
-      // set roda.home in order to correctly configure logging even if no
-      // property has been defined
-      System.setProperty(RodaConstants.INSTALL_FOLDER_SYSTEM_PROPERTY, rodaHomePath.toString());
-    }
-
-    // instantiate essential directories
-    configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
-    dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
-    logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
-    storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
-    indexDataPath = dataPath.resolve(RodaConstants.CORE_INDEX_FOLDER);
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
-    // (and avoid any cyclic dependency)
-    themePath = configPath.resolve(RodaConstants.CORE_THEME_FOLDER);
-    exampleThemePath = configPath.resolve(RodaConstants.CORE_EXAMPLE_THEME_FOLDER);
-
-    // configure logback
-    if (nodeType != NodeType.TEST) {
-      configureLogback();
-    }
-
-    return rodaHomePath;
-  }
-
-  private static void configureLogback() {
-    try {
-      LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-      JoranConfigurator configurator = new JoranConfigurator();
-      configurator.setContext(context);
-      context.reset();
-      configurator.doConfigure(getConfigurationFile("logback.xml"));
-    } catch (JoranException e) {
-      LOGGER.error("Error configuring logback", e);
-    }
-  }
-
   public static void addLogger(String loggerConfigurationFile) {
     URL loggerConfigurationFileUrl = getConfigurationFile(loggerConfigurationFile);
     if (loggerConfigurationFileUrl != null) {
@@ -605,53 +660,6 @@ public class RodaCoreFactory {
       ret = System.getProperty(property);
     }
     return ret;
-  }
-
-  public static void ensureAllEssentialDirectoriesExist() {
-    List<Path> essentialDirectories = new ArrayList<Path>();
-    essentialDirectories.add(configPath);
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER));
-    essentialDirectories
-      .add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER).resolve(RodaConstants.CORE_INGEST_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_CROSSWALKS_FOLDER)
-      .resolve(RodaConstants.CORE_DISSEMINATION_FOLDER).resolve(RodaConstants.CORE_HTML_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_I18N_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_LDAP_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_PLUGINS_FOLDER));
-    essentialDirectories.add(configPath.resolve(RodaConstants.CORE_SCHEMAS_FOLDER));
-    essentialDirectories.add(rodaHomePath.resolve(RodaConstants.CORE_LOG_FOLDER));
-    essentialDirectories.add(dataPath);
-    essentialDirectories.add(logPath);
-    essentialDirectories.add(storagePath);
-    essentialDirectories.add(indexDataPath);
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
-    // (and avoid any cyclic dependency)
-    essentialDirectories.add(themePath);
-
-    for (Path path : essentialDirectories) {
-      try {
-        if (!Files.exists(path)) {
-          Files.createDirectories(path);
-        }
-      } catch (IOException e) {
-        LOGGER.error("Unable to create " + path + ". Aborting...", e);
-        throw new RuntimeException("Unable to create " + path + ". Aborting...", e);
-      }
-    }
-
-    // FIXME the following block should be invoked/injected from RodaWuiServlet
-    // (and avoid any cyclic dependency)
-    try {
-      try {
-        FSUtils.deletePath(exampleThemePath);
-      } catch (NotFoundException e) {
-        // do nothing and carry on
-      }
-      Files.createDirectories(exampleThemePath);
-      copyFilesFromClasspath(RodaConstants.THEME_RESOURCES_PATH.replaceFirst("/", ""), exampleThemePath, true);
-    } catch (GenericException | IOException e) {
-      LOGGER.error("Unable to create " + exampleThemePath, e);
-    }
   }
 
   public static void shutdown() throws IOException {
@@ -908,17 +916,66 @@ public class RodaCoreFactory {
       // do nothing
     }
     if (inputStream == null) {
-      inputStream = RodaUtils.class
+      inputStream = RodaCoreFactory.class
         .getResourceAsStream("/" + RodaConstants.CORE_CONFIG_FOLDER + "/" + configurationFile);
       LOGGER.trace("Loading configuration from classpath {}", configurationFile);
     }
     return inputStream;
   }
 
-  public static void reloadRodaConfigurationsAfterFileChange() {
-    propertiesCache.clear();
+  public static void clearRodaCachableObjectsAfterConfigurationChange() {
+    rodaPropertiesCache.clear();
+    rodaSchemasCache.clear();
     i18nMessages.clear();
     LOGGER.info("Reloaded roda configurations after file change!");
+  }
+
+  public static Optional<Schema> getRodaSchema(String metadataType, String metadataVersion) {
+    Optional<Schema> schema = Optional.empty();
+    InputStream schemaStream = null;
+
+    String type = metadataType != null ? metadataType.toLowerCase() : "";
+    String version = metadataVersion != null ? metadataVersion.toLowerCase() : "";
+    String schemaPathWithVersion = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + type
+      + RodaConstants.METADATA_VERSION_SEPARATOR + version + ".xsd";
+    String schemaPathWithoutVersion = RodaConstants.CORE_SCHEMAS_FOLDER + "/" + type + ".xsd";
+
+    if (rodaSchemasCache.containsKey(schemaPathWithVersion)) {
+      schema = Optional.ofNullable(rodaSchemasCache.get(schemaPathWithVersion));
+    } else if (rodaSchemasCache.containsKey(schemaPathWithoutVersion)) {
+      schema = Optional.ofNullable(rodaSchemasCache.get(schemaPathWithoutVersion));
+    } else {
+
+      if (!"".equals(type)) {
+        boolean withVersion = true;
+        synchronized (rodaSchemasCache) {
+          if (!"".equals(version)) {
+            LOGGER.debug("Trying to load XML Schema '{}'", schemaPathWithVersion);
+            schemaStream = RodaCoreFactory.getConfigurationFileAsStream(schemaPathWithVersion);
+          }
+
+          if (schemaStream == null) {
+            LOGGER.debug("Trying to load XML Schema '{}'", schemaPathWithoutVersion);
+            schemaStream = RodaCoreFactory.getConfigurationFileAsStream(schemaPathWithoutVersion);
+            withVersion = false;
+          }
+
+          if (schemaStream != null) {
+            SchemaFactory schemaFactory = SchemaFactory.newInstance(RodaConstants.W3C_XML_SCHEMA_NS_URI);
+            schemaFactory.setResourceResolver(new ResourceResolver());
+            try {
+              Schema xmlSchema = schemaFactory.newSchema(new StreamSource(schemaStream));
+              rodaSchemasCache.put(withVersion ? schemaPathWithVersion : schemaPathWithoutVersion, xmlSchema);
+              schema = Optional.ofNullable(xmlSchema);
+            } catch (SAXException e) {
+              LOGGER.error("Error while loading XML Schema", e);
+            }
+          }
+        }
+      }
+    }
+    return schema;
+
   }
 
   public static Configuration getRodaConfiguration() {
@@ -982,14 +1039,14 @@ public class RodaCoreFactory {
   }
 
   public static Map<String, String> getPropertiesFromCache(String cacheName, List<String> prefixesToCache) {
-    if (propertiesCache.get(cacheName) == null) {
+    if (rodaPropertiesCache.get(cacheName) == null) {
       fillInPropertiesToCache(cacheName, prefixesToCache);
     }
-    return propertiesCache.get(cacheName);
+    return rodaPropertiesCache.get(cacheName);
   }
 
   private static void fillInPropertiesToCache(String cacheName, List<String> prefixesToCache) {
-    if (propertiesCache.get(cacheName) == null) {
+    if (rodaPropertiesCache.get(cacheName) == null) {
       HashMap<String, String> newCacheEntry = new HashMap<String, String>();
 
       Configuration configuration = RodaCoreFactory.getRodaConfiguration();
@@ -1004,7 +1061,7 @@ public class RodaCoreFactory {
           }
         }
       }
-      propertiesCache.put(cacheName, newCacheEntry);
+      rodaPropertiesCache.put(cacheName, newCacheEntry);
     }
   }
 

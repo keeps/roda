@@ -626,6 +626,8 @@ public class InternalConvertPluginsTest {
     OptionalWithCause<File> file = allFiles.iterator().next();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
+    // FIXME 20160415 hsilva: this should not be hardcoded (must certainly
+    // constants already exist)
     String intermediatePath = "/data/storage/";
     Assert.assertEquals(0,
       PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));

@@ -13,7 +13,7 @@ public class RodaPropertiesReloadStrategy extends FileChangedReloadingStrategy {
 
   @Override
   public void reloadingPerformed() {
-    RodaCoreFactory.reloadRodaConfigurationsAfterFileChange();
+    RodaCoreFactory.clearRodaCachableObjectsAfterConfigurationChange();
     super.updateLastModified();
   }
 

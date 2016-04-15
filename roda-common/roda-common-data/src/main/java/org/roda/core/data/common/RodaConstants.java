@@ -41,6 +41,7 @@ public final class RodaConstants {
   public static final String SHA256 = "SHA-256";
   public static final String MD5 = "MD5";
   public static final String LOCALE = "locale";
+  public static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND

@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -18,13 +19,11 @@ import javax.xml.parsers.SAXParserFactory;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -63,7 +62,6 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ValidationUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(ValidationUtils.class);
-  private static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
 
   /** Private empty constructor */
   private ValidationUtils() {
@@ -73,7 +71,7 @@ public class ValidationUtils {
   public static ValidationReport isAIPMetadataValid(boolean forceDescriptiveMetadataType,
     boolean validateDescriptiveMetadata, String fallbackMetadataType, String fallbackMetadataVersion,
     boolean validatePremis, ModelService model, String aipId) throws GenericException, RequestNotValidException,
-      AuthorizationDeniedException, NotFoundException, ValidationException {
+    AuthorizationDeniedException, NotFoundException, ValidationException {
     ValidationReport report = new ValidationReport();
     report.setValid(true);
     List<DescriptiveMetadata> descriptiveMetadata = model.retrieveAIP(aipId).getDescriptiveMetadata();
@@ -210,7 +208,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isDescriptiveMetadataValid(ModelService model, DescriptiveMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     ValidationReport ret;
     if (metadata != null) {
       StoragePath storagePath = ModelUtils.getDescriptiveMetadataPath(metadata.getAipId(), metadata.getId());
@@ -247,7 +245,7 @@ public class ValidationUtils {
    */
   public static ValidationReport isPreservationMetadataValid(ModelService model, PreservationMetadata metadata,
     boolean failIfNoSchema)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
 
     StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(metadata);
     Binary binary = model.getStorage().getBinary(storagePath);
@@ -267,29 +265,12 @@ public class ValidationUtils {
     String descriptiveMetadataType, String descriptiveMetadataVersion, boolean failIfNoSchema) {
     ValidationReport ret = new ValidationReport();
     InputStream inputStream = null;
-    InputStream schemaStream = null;
+    Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema(descriptiveMetadataType, descriptiveMetadataVersion);
     try {
-      inputStream = descriptiveMetadataPayload.createInputStream();
-
-      if (descriptiveMetadataType != null) {
-        if (descriptiveMetadataVersion != null) {
-          schemaStream = RodaCoreFactory.getConfigurationFileAsStream(
-            RodaConstants.CORE_SCHEMAS_FOLDER + "/" + descriptiveMetadataType.toLowerCase()
-              + RodaConstants.METADATA_VERSION_SEPARATOR + descriptiveMetadataVersion.toLowerCase() + ".xsd");
-        }
-
-        if (schemaStream == null) {
-          schemaStream = RodaCoreFactory.getConfigurationFileAsStream(
-            RodaConstants.CORE_SCHEMAS_FOLDER + "/" + descriptiveMetadataType.toLowerCase() + ".xsd");
-        }
-      }
-
-      if (schemaStream != null) {
+      if (xmlSchema.isPresent()) {
+        inputStream = descriptiveMetadataPayload.createInputStream();
         Source xmlFile = new StreamSource(inputStream);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-        schemaFactory.setResourceResolver(new ResourceResolver());
-        Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
-        Validator validator = schema.newValidator();
+        Validator validator = xmlSchema.get().newValidator();
         RodaErrorHandler errorHandler = new RodaErrorHandler();
         validator.setErrorHandler(errorHandler);
         try {
@@ -317,13 +298,12 @@ public class ValidationUtils {
           ret = isXMLValid(descriptiveMetadataPayload);
         }
       }
-    } catch (SAXException | IOException e) {
+    } catch (IOException e) {
       LOGGER.error("Error validating descriptive metadata", e);
       ret.setValid(false);
       ret.setMessage(e.getMessage());
     } finally {
       IOUtils.closeQuietly(inputStream);
-      IOUtils.closeQuietly(schemaStream);
     }
 
     return ret;
@@ -343,15 +323,13 @@ public class ValidationUtils {
    */
   public static ValidationReport validatePreservationBinary(Binary binary, boolean failIfNoSchema) {
     ValidationReport report = new ValidationReport();
+    InputStream inputStream = null;
     try {
-      InputStream inputStream = binary.getContent().createInputStream();
-      InputStream schemaStream = RodaCoreFactory
-        .getConfigurationFileAsStream(RodaConstants.CORE_SCHEMAS_FOLDER + "/premis-v2-0.xsd");
-      if (schemaStream != null) {
+      Optional<Schema> xmlSchema = RodaCoreFactory.getRodaSchema("premis-v2-0", null);
+      if (xmlSchema.isPresent()) {
+        inputStream = binary.getContent().createInputStream();
         Source xmlFile = new StreamSource(inputStream);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(W3C_XML_SCHEMA_NS_URI);
-        Schema schema = schemaFactory.newSchema(new StreamSource(schemaStream));
-        Validator validator = schema.newValidator();
+        Validator validator = xmlSchema.get().newValidator();
         RodaErrorHandler errorHandler = new RodaErrorHandler();
         validator.setErrorHandler(errorHandler);
         try {
@@ -373,11 +351,11 @@ public class ValidationUtils {
         report.setMessage("No schema to validate PREMIS");
       }
 
-      IOUtils.closeQuietly(inputStream);
-      IOUtils.closeQuietly(schemaStream);
-    } catch (SAXException | IOException e) {
+    } catch (IOException e) {
       report.setValid(false);
       report.setMessage(e.getMessage());
+    } finally {
+      IOUtils.closeQuietly(inputStream);
     }
     return report;
 

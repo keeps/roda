@@ -518,10 +518,6 @@
 			<artifactId>fits</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jdom</groupId>
-			<artifactId>jdom</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>edu.harvard.hul.ois</groupId>
 			<artifactId>ots-schemas</artifactId>
 		</dependency>
