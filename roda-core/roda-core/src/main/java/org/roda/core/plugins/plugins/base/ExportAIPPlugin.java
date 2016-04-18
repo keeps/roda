@@ -9,20 +9,23 @@ package org.roda.core.plugins.plugins.base;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.tools.ZipTools;
+import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -32,14 +35,18 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   public static final String EXPORT_FOLDER_PARAMETER = "outputFolder";
+  public static final String EXPORT_TYPE = "exportType";
   private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
   private String outputFolder;
+  private ExportType exportType;
 
   @Override
   public void init() throws PluginException {
@@ -72,19 +79,47 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     if (parameters.containsKey(EXPORT_FOLDER_PARAMETER)) {
       outputFolder = parameters.get(EXPORT_FOLDER_PARAMETER);
     }
+    if (parameters.containsKey(EXPORT_TYPE)) {
+      try {
+        exportType = ExportType.valueOf(parameters.get(EXPORT_TYPE));
+      } catch (Exception e) {
+        LOGGER.error(e.getMessage(), e);
+        exportType = ExportType.SINGLE_ZIP;
+      }
+    }
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
+    Report report = PluginHelper.createPluginReport(this);
     FileOutputStream fos = null;
     try {
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      zipEntries.addAll(ModelUtils.zipAIP(aips));
-      java.io.File outputFolderFile = new java.io.File(outputFolder);
-      fos = new FileOutputStream(new java.io.File(outputFolderFile, "aips.zip"));
-      ZipTools.zip(zipEntries, fos);
-      Report report = PluginHelper.createPluginReport(this);
+      if (exportType == ExportType.SINGLE_ZIP) {
+        List<ZipEntryInfo> zipEntries = ModelUtils.zipAIP(aips);
+        java.io.File outputFolderFile = new java.io.File(outputFolder);
+        fos = new FileOutputStream(new java.io.File(outputFolderFile, "aips.zip"));
+        ZipTools.zip(zipEntries, fos);
+      } else if (exportType == ExportType.MULTI_ZIP) {
+        for (AIP aip : aips) {
+          List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntrie(aip);
+          java.io.File outputFolderFile = new java.io.File(outputFolder);
+          fos = new FileOutputStream(new java.io.File(outputFolderFile, aip.getId() + ".zip"));
+          ZipTools.zip(zipEntries, fos);
+          IOUtils.closeQuietly(fos);
+        }
+      } else if (exportType == ExportType.FOLDER) {
+        FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
+        for (AIP aip : aips) {
+          try {
+            StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+            localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
+          } catch (AlreadyExistsException e) {
+            LOGGER.error("Already exist: " + aip.getId());
+          }
+        }
+      }
+
       return report;
     } catch (AuthorizationDeniedException | RequestNotValidException | GenericException | NotFoundException
       | IOException e) {
@@ -132,24 +167,23 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
-    return null;
+    return PreservationEventType.MIGRATION;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "XXXXXXXXXX";
+    return "Exports AIPS to a local folder";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXX";
+    return "The AIPs were successfully exported";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
+    return "The AIPs were not exported";
   }
 }

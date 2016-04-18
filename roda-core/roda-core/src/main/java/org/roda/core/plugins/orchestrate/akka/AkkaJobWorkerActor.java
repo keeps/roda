@@ -11,16 +11,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.slf4j.Logger;
@@ -104,7 +107,21 @@ public class AkkaJobWorkerActor extends UntypedActor {
       SelectedItemsList list = (SelectedItemsList) selectedItems;
       res.addAll(list.getIds());
     } else {
-      LOGGER.error("Still not implemented!!!!!!!!");
+      try {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += 50) {
+          List<IndexedAIP> aips = index
+            .find(IndexedAIP.class, selectedItemsFilter.getFilter(), null, new Sublist(i, 50), null).getResults();
+          for (IndexedAIP aip : aips) {
+            res.add(aip.getId());
+          }
+        }
+      } catch (Throwable t) {
+        LOGGER.error(t.getMessage(), t);
+      }
+      // LOGGER.error("Still not implemented!!!!!!!!");
     }
     return res;
   }

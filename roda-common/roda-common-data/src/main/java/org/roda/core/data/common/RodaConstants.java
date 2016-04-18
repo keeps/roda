@@ -584,6 +584,21 @@ public final class RodaConstants {
     }
   }
 
+  public enum ExportType {
+    SINGLE_ZIP("singleZip"), MULTI_ZIP("multiZip"), FOLDER("folder");
+
+    private final String text;
+
+    private ExportType(final String text) {
+      this.text = text;
+    }
+
+    @Override
+    public String toString() {
+      return text;
+    }
+  }
+
   public enum PreservationAgentType {
     HARDWARE("hardware"), ORGANIZATION("organization"), PERSON("person"), SOFTWARE("software");
 

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
@@ -38,12 +39,12 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
+import org.roda.core.plugins.plugins.base.ExportAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
-import org.roda.core.plugins.plugins.base.RemoveAIPPlugin;
 import org.roda.wui.api.controllers.Jobs;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.common.RodaCoreService;
@@ -103,9 +104,12 @@ public class ManagementTasksResource extends RodaCoreService {
   }
 
   @POST
-  @Path("/model/batch_removal")
-  public Response executeTask(@QueryParam("onlyRepresentations") boolean onlyRepresentation,
-    @QueryParam("selected") String selected) throws AuthorizationDeniedException {
+  @Path("/model/export")
+  public Response export(
+    @ApiParam(value = "", defaultValue = "") @QueryParam("outputFolder") @DefaultValue("") String outputFolder,
+    @ApiParam(value = "", defaultValue = "") @QueryParam("selected") @DefaultValue("") String selected,
+    @ApiParam(value = "", allowableValues = "SINGLE_ZIP,MULTI_ZIP,FOLDER", defaultValue = "SINGLE_ZIP") @QueryParam("type") @DefaultValue("singleZip") String type)
+    throws AuthorizationDeniedException {
     Date startDate = new Date();
 
     // get user & check permissions
@@ -117,7 +121,7 @@ public class ManagementTasksResource extends RodaCoreService {
         "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
     }
 
-    ApiResponseMessage response = createJobToRemoveAIPs(user, startDate, onlyRepresentation, selected);
+    ApiResponseMessage response = createJobToExportAIPs(user, startDate, outputFolder, selected, type);
 
     return Response.ok().entity(response).build();
   }
@@ -148,25 +152,26 @@ public class ManagementTasksResource extends RodaCoreService {
     return Response.ok().entity(response).build();
   }
 
-  private ApiResponseMessage createJobToRemoveAIPs(RodaUser user, Date startDate, boolean onlyRepresentation,
-    String selected) {
+  private ApiResponseMessage createJobToExportAIPs(RodaUser user, Date startDate, String outputFolder, String selected,
+    String type) {
     ApiResponseMessage response;
     response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
       Job job = new Job();
       SelectedItems selectedItems = JsonUtils.getObjectFromJson(selected, SelectedItems.class);
-      job.setName("Management Task | Remove 'AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
-        .setPlugin(RemoveAIPPlugin.class.getCanonicalName()).setObjects(selectedItems);
+      job.setName("Management Task | Export 'AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
+        .setPlugin(ExportAIPPlugin.class.getCanonicalName()).setObjects(selectedItems);
       Map<String, String> parameters = new HashMap<String, String>();
-      parameters.put(RemoveAIPPlugin.ONLY_REPRESENTATIONS, onlyRepresentation ? "true" : "false");
+      parameters.put(ExportAIPPlugin.EXPORT_FOLDER_PARAMETER, outputFolder);
+      parameters.put(ExportAIPPlugin.EXPORT_TYPE, type);
       job.setPluginParameters(parameters);
       Job jobCreated = Jobs.createJob(user, job);
-      response.setMessage("Remove AIPs job created (" + jobCreated + ")");
+      response.setMessage("Export AIPs job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "remove aips", null, duration);
+      registerAction(user, "ManagementTasks", "export aips", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
-      LOGGER.error("Error creating remove AIPs job", e);
+      LOGGER.error("Error creating export AIPs job", e);
     }
     return response;
   }

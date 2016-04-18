@@ -10,7 +10,6 @@ package org.roda.core.model.utils;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.io.IOUtils;
@@ -18,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.tools.ZipEntryInfo;
+import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -27,6 +27,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
@@ -39,6 +40,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
@@ -557,7 +559,7 @@ public final class ModelUtils {
     return zipEntries;
   }
 
-  private static List<ZipEntryInfo> aipToZipEntrie(AIP aip)
+  public static List<ZipEntryInfo> aipToZipEntrie(AIP aip)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     StorageService storage = RodaCoreFactory.getStorageService();
@@ -614,8 +616,10 @@ public final class ModelUtils {
     return zipEntries;
   }
 
-  public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems selectedItems) {
+  public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems selectedItems)
+    throws GenericException, RequestNotValidException {
     List<IndexedAIP> res = new ArrayList<IndexedAIP>();
+    final int PAGINATION = 100;
     if (selectedItems instanceof SelectedItemsList) {
       SelectedItemsList list = (SelectedItemsList) selectedItems;
       for (String objectId : list.getIds()) {
@@ -625,16 +629,24 @@ public final class ModelUtils {
           LOGGER.error("Error retrieving TransferredResource", e);
         }
       }
-    } else {
-      LOGGER.error("Still not implemented!!!!!!!!");
+    } else if (selectedItems instanceof SelectedItemsFilter) {
+      IndexService index = RodaCoreFactory.getIndexService();
+      SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+      long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
+      for (int i = 0; i < count; i += PAGINATION) {
+        List<IndexedAIP> aips = index
+          .find(IndexedAIP.class, selectedItemsFilter.getFilter(), null, new Sublist(i, PAGINATION), null).getResults();
+        res.addAll(aips);
+      }
     }
     return res;
   }
 
-  public static Collection<? extends ZipEntryInfo> zipAIP(List<AIP> aips)
+  public static List<ZipEntryInfo> zipAIP(List<AIP> aips)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     for (AIP aip : aips) {
+      LOGGER.warn("AIP to ZipEntry " + aip.getId());
       zipEntries.addAll(aipToZipEntrie(aip));
     }
     return zipEntries;

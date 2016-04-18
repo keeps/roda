@@ -134,7 +134,6 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
     return true;
   }
 
-  // TODO FIX
   @Override
   public PreservationEventType getPreservationEventType() {
     return PreservationEventType.DELETION;
@@ -147,11 +146,11 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIPs were successfully removed.";
+    return "The AIPs were successfully removed";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "The AIPs were not removed.";
+    return "The AIPs were not removed";
   }
 }
