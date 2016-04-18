@@ -9,6 +9,7 @@ package org.roda.wui.api.controllers;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
@@ -40,14 +41,14 @@ public class Messages extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Message createMessage(RodaUser user, Message message) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException {
+  public static Message createMessage(RodaUser user, Message message)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createMessage(message, "test-email-template");
+    RodaCoreFactory.getModelService().createMessage(message, "test-email-template", new HashMap<String, Object>());
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -56,8 +57,8 @@ public class Messages extends RodaCoreService {
     return message;
   }
 
-  public static void deleteMessage(RodaUser user, String messageId) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void deleteMessage(RodaUser user, String messageId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
@@ -79,8 +80,8 @@ public class Messages extends RodaCoreService {
     return messages;
   }
 
-  public static void acknowledgeMessage(RodaUser user, String messageId, String token) throws RequestNotValidException,
-    GenericException, NotFoundException, AuthorizationDeniedException {
+  public static void acknowledgeMessage(RodaUser user, String messageId, String token)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions

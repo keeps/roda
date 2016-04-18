@@ -761,8 +761,8 @@ public class IndexServiceTest {
       message.setSentOn(new Date());
       message.setFromUser("Test Message Index");
       message.setRecipientUser("recipientuser@example.com");
-      model.createMessage(message, "test-email-template");
 
+      model.createMessage(message, "test-email-template", new HashMap<String, Object>());
       index.commit(Message.class);
 
       Message message2 = model.retrieveMessage(message.getId());

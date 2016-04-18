@@ -1,0 +1,15 @@
+<html>
+<body>
+<p>Dear <em>{{recipient}}</em>,</p>
+<p>A RODA {{from}} wants to notify you of a new ingest that was processed</a>:</p>
+<p> To acknowledge this message, please click on the following URL.
+<ul>
+<li><strong>Acknowledge URL:</strong> {{acknowledge}}</li>
+</ul>
+</p>
+<p>If you are not related to the ingest process before mentioned, please ignore this e-mail.</p>
+
+<p>RODA - Repository of Authentic Digital Objects</p>
+
+</body>
+<html>

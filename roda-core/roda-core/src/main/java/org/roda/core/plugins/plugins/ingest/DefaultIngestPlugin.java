@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -265,7 +267,25 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-    // do nothing
+
+    String emails = PluginHelper.getStringFromParameters(this,
+      getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    if (!"".equals(emails)) {
+      List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
+      for (String email : emailList) {
+        try {
+          Message message = new Message();
+          message.setSubject("New ingest process was completed");
+          message.setFromUser("Ingest Process");
+          message.setRecipientUser(email);
+          Map<String, Object> scopes = new HashMap<String, Object>();
+          model.createMessage(message, "ingestion-template", scopes);
+        } catch (GenericException e) {
+          LOGGER.error("Error while creating new message", e);
+        }
+      }
+    }
+
     return null;
   }
 
@@ -295,28 +315,25 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private int calculateEfectiveTotalSteps() {
+    List<String> parameterIdsToIgnore = Arrays.asList(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
+      RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION);
     int effectiveTotalSteps = getTotalSteps();
     boolean tikaParameters = false, dontDoFeatureExtraction = false, dontDoFulltext = false;
+
     for (PluginParameter pluginParameter : getParameters()) {
       if (pluginParameter.getType() == PluginParameterType.BOOLEAN
-        && (!pluginParameter.getId().equals(getPluginParameter(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID).getId())
-          && !pluginParameter.getId()
-            .equals(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION).getId())
-          && !pluginParameter.getId()
-            .equals(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION).getId()))
+        && !parameterIdsToIgnore.contains(pluginParameter.getId())
         && !PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
         effectiveTotalSteps--;
       }
 
-      if (pluginParameter.getId()
-        .equals(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION).getId())) {
+      if (pluginParameter.getId().equals(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) {
         tikaParameters = true;
         if (!PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
           dontDoFeatureExtraction = true;
         }
       }
-      if (pluginParameter.getId()
-        .equals(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION).getId())) {
+      if (pluginParameter.getId().equals(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) {
         tikaParameters = true;
         if (!PluginHelper.verifyIfStepShouldBePerformed(this, pluginParameter)) {
           dontDoFulltext = true;

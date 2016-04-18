@@ -35,6 +35,10 @@ select {
     font-size: 1.3rem;
 }
 
+.not-visible {
+	display: none;
+}
+
 .clickable {
 	cursor: pointer;
 }

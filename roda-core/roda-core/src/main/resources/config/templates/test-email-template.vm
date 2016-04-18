@@ -1,14 +1,13 @@
 <html>
 <body>
-<p>In the sequence of the registration process of the username <em>{{from}}</em>, an e-mail address verification is needed.</p>
-<p>To continue the verification process, access the following address <a href="$verificationCompleteURL">$verificationCompleteURL</a>, or, alternatively, insert the password for verification in the following address <a href="$verificationURL">$verificationURL</a>:
+<p>This content is just an email test template.</p>
 <ul>
 <li><strong>From User:</strong> {{from}}</li>
 <li><strong>Recipient User:</strong> {{recipient}}</li>
 <li><strong>Acknowledge URL:</strong> {{acknowledge}}</li>
 </ul>
 </p>
-<p>If you didn't made the registration before mentioned, please ignore this e-mail.</p>
+<p>If you didn't make an request, please ignore this e-mail.</p>
 
 <p>RODA - Repository of Authentic Digital Objects</p>
 

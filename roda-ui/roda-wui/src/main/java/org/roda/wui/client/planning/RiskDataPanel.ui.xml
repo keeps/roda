@@ -43,24 +43,20 @@
 						<g:Label addStyleNames="form-label">Impact</g:Label>
 						<g:IntegerBox ui:field="preMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
-					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Severity</g:Label>
-						<g:IntegerBox ui:field="preMitigationSeverity" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
-					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
 				<g:TextArea ui:field="preMitigationNotes" addStyleNames="form-textbox" />
 				
 				<g:Label styleName="h4">Mitigation</g:Label>
 				<g:Label addStyleNames="form-label">Strategy</g:Label>
-				<g:TextBox ui:field="mitigationStrategy" addStyleNames="form-textbox" />
+				<g:TextArea ui:field="mitigationStrategy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Owner Type</g:Label>
 				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Owner</g:Label>
 				<g:TextBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Related Event Identifier Type</g:Label>
+				<g:Label addStyleNames="form-label not-visible">Related Event Identifier Type</g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierType" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Related Event Identifier Value</g:Label>
+				<g:Label addStyleNames="form-label not-visible">Related Event Identifier Value</g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierValue" addStyleNames="form-textbox" />
 				
 				<g:Label styleName="h4">Pos Mitigation</g:Label>
@@ -72,10 +68,6 @@
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Impact</g:Label>
 						<g:IntegerBox ui:field="posMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
-					</g:FlowPanel>
-					<g:FlowPanel>
-						<g:Label addStyleNames="form-label">Severity</g:Label>
-						<g:IntegerBox ui:field="posMitigationSeverity" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">Notes</g:Label>

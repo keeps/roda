@@ -192,21 +192,21 @@ public class ShowRisk extends Composite {
 
     int posMitigationCounter = 0;
 
-    if (Integer.toString(risk.getPosMitigationProbability()).length() > 0) {
+    if (risk.getPosMitigationProbability() > 0) {
       posMitigationCounter++;
       riskPosMitigationProbabilityValue.setText(Integer.toString(risk.getPosMitigationProbability()));
     } else {
       riskPosMitigationProbabilityKey.setVisible(false);
     }
 
-    if (Integer.toString(risk.getPosMitigationImpact()).length() > 0) {
+    if (risk.getPosMitigationImpact() > 0) {
       posMitigationCounter++;
       riskPosMitigationImpactValue.setText(Integer.toString(risk.getPosMitigationImpact()));
     } else {
       riskPosMitigationImpactKey.setVisible(false);
     }
 
-    if (Integer.toString(risk.getPosMitigationSeverity()).length() > 0) {
+    if (risk.getPosMitigationSeverity() > 0) {
       posMitigationCounter++;
       riskPosMitigationSeverityValue.setText(Integer.toString(risk.getPosMitigationSeverity()));
     } else {
@@ -281,6 +281,12 @@ public class ShowRisk extends Composite {
         }
       }
     });
+
+    // FIXME it must be visible later
+    riskMitigationRelatedEventIdentifierTypeKey.setVisible(false);
+    riskMitigationRelatedEventIdentifierTypeValue.setVisible(false);
+    riskMitigationRelatedEventIdentifierValueKey.setVisible(false);
+    riskMitigationRelatedEventIdentifierValueValue.setVisible(false);
   }
 
   void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {

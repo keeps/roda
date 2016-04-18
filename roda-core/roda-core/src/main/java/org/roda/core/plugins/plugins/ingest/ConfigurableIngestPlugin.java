@@ -83,6 +83,11 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT, AutoAcceptSIPPlugin.getStaticName(),
         PluginParameterType.BOOLEAN, "true", true, false, AutoAcceptSIPPlugin.getStaticDescription()));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Ingest finished notification",
+        PluginParameterType.STRING, "", false, false,
+        "Send a notification after finishing the ingest process to one or more e-mail addresses (comma separated)"));
   }
 
   @Override
@@ -116,6 +121,7 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK));
     pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT));
+    pluginParameters.add(getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     return pluginParameters;
   }
 

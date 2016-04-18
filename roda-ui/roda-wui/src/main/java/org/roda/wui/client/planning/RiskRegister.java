@@ -152,7 +152,7 @@ public class RiskRegister extends Composite {
   public RiskRegister() {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_PRE_MITIGATION_SEVERITY));
+      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
 
     riskList = new RiskList(filter, facets, "Risks", true);
 
@@ -165,7 +165,7 @@ public class RiskRegister extends Composite {
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
-    facetPanels.put(RodaConstants.RISK_PRE_MITIGATION_SEVERITY, facetSeverities);
+    facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY, facetSeverities);
     FacetUtils.bindFacets(riskList, facetPanels);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -231,6 +231,17 @@ public class RiskRegister extends Composite {
       dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
 
     riskList.setFilter(new Filter(filterParameter));
+  }
+
+  private String getSeverityDefinition(int severity) {
+    // FIXME change it to correct names
+    if (severity < 5) {
+      return "Good";
+    } else if (severity < 15) {
+      return "Normal";
+    } else {
+      return "Bad";
+    }
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

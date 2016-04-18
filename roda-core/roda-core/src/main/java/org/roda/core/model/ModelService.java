@@ -29,6 +29,7 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.IdUtils;
@@ -1776,21 +1777,22 @@ public class ModelService extends ModelObservable {
   /***************** Message related *****************/
   /************************************************/
 
-  public Message createMessage(Message message, String templateName) throws GenericException {
+  public Message createMessage(Message message, String templateName, Map<String, Object> scopes)
+    throws GenericException {
     try {
       message.setId(UUID.randomUUID().toString());
       message.setAcknowledgeToken(UUID.randomUUID().toString());
 
-      String body = getUpdatedMessageBody(message, templateName);
+      String body = getUpdatedMessageBody(message, templateName, scopes);
       message.setBody(body);
 
       String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
-      if (host != null && !host.equals("")) {
-        LOGGER.info("Sending email ...");
+      if (StringUtils.isNotBlank(host)) {
+        LOGGER.trace("Sending email ...");
         String[] recipients = {message.getRecipientUser()};
         ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility();
         emailUtility.sendMail(message.getFromUser(), recipients, message.getSubject(), message.getBody());
-        LOGGER.info("Email sent");
+        LOGGER.trace("Email sent");
       }
 
       String messageAsJson = JsonUtils.getJsonFromObject(message);
@@ -1805,18 +1807,19 @@ public class ModelService extends ModelObservable {
     return message;
   }
 
-  private String getUpdatedMessageBody(Message message, String templateName) {
+  private String getUpdatedMessageBody(Message message, String templateName, Map<String, Object> scopesToAdd) {
     // update body message with the recipient user and acknowledge URL
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
     ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken());
 
-    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
-
     Map<String, Object> scopes = new HashMap<String, Object>();
     scopes.put("from", message.getFromUser());
     scopes.put("recipient", message.getRecipientUser());
     scopes.put("acknowledge", ackUrl);
+    scopes.putAll(scopesToAdd);
+
+    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
 
     Writer writer = new StringWriter();
     MustacheFactory mf = new DefaultMustacheFactory();
