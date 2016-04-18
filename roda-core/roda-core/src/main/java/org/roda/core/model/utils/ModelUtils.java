@@ -646,7 +646,6 @@ public final class ModelUtils {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     for (AIP aip : aips) {
-      LOGGER.warn("AIP to ZipEntry " + aip.getId());
       zipEntries.addAll(aipToZipEntrie(aip));
     }
     return zipEntries;
