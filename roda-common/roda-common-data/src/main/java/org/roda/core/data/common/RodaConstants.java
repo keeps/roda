@@ -330,10 +330,9 @@ public final class RodaConstants {
   public static final String JOB_OBJECTS = "objects";
   public static final String JOB_FILE_EXTENSION = ".json";
 
+  /* Plugins related parameters */
   public static final String PLUGIN_PARAMS_JOB_ID = "job.id";
-  public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
-  public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
-  public static final String PLUGIN_PARAMS_DO_FEATURE_EXTRACTION = "parameter.do_feature_extraction";
+
   public static final String PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION = "parameter.do_fulltext_extraction";
   public static final String PLUGIN_PARAMS_TOTAL_STEPS = "parameter.total_steps";
   public static final String PLUGIN_PARAMS_INT_VALUE = "parameter.int_value";
@@ -342,6 +341,20 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CLEAR_INDEXES = "parameter.clear_indexes";
   public static final String PLUGIN_PARAMS_RECURSIVE_LISTING = "parameter.recursive_listing";
   public static final String PLUGIN_PARAMS_CLASS_CANONICAL_NAME = "parameter.class_canonical_name";
+  public static final String PLUGIN_PARAMS_SIP_TO_AIP_CLASS = "parameter.sip_to_aip_class";
+  public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
+  public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
+  public static final String PLUGIN_PARAMS_DO_VIRUS_CHECK = "parameter.do_virus_check";
+  public static final String PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION = "parameter.do_descriptive_metadata_validation";
+  public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";
+  public static final String PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION = "parameter.do_file_format_identification";
+  public static final String PLUGIN_PARAMS_DO_PDFTOPDFA_CONVERSION = "parameter.do_pdf_to_pdfa_conversion";
+  public static final String PLUGIN_PARAMS_DO_VERAPDF_CHECK = "parameter.do_verapdf_check";
+  public static final String PLUGIN_PARAMS_DO_FEATURE_EXTRACTION = "parameter.do_feature_extraction";
+  public static final String PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION = "parameter.do_fulltext_extraction";
+  public static final String PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION = "parameter.do_digital_signature_validation";
+  public static final String PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK = "parameter.do_producer_authorization_check";
+  public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
 
   /* Job Report */

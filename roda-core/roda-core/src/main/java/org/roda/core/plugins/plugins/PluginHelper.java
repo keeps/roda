@@ -247,7 +247,7 @@ public final class PluginHelper {
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date eventDate) throws RequestNotValidException, NotFoundException,
-      GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
       .asList(PluginHelper.getLinkingIdentifier(source, RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
     List<LinkingIdentifier> outcomes = Arrays
@@ -260,7 +260,7 @@ public final class PluginHelper {
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, TransferredResource source, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipID, model, index, source, outcome, outcomeDetailExtension, notify, new Date());
   }
 
@@ -269,8 +269,8 @@ public final class PluginHelper {
    */
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
       .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     List<LinkingIdentifier> outcomes = null;
@@ -281,7 +281,7 @@ public final class PluginHelper {
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, PluginState outcome, String outcomeDetailExtension, boolean notify,
     Date eventDate) throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+    ValidationException, AlreadyExistsException {
     List<LinkingIdentifier> sources = Arrays
       .asList(PluginHelper.getLinkingIdentifier(aipID, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
     List<LinkingIdentifier> outcomes = null;
@@ -295,7 +295,7 @@ public final class PluginHelper {
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     ModelService model, IndexService index, List<LinkingIdentifier> sources, List<LinkingIdentifier> targets,
     PluginState outcome, String outcomeDetailExtension, boolean notify) throws RequestNotValidException,
-      NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    NotFoundException, GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipID, null, null, null, model, index, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
@@ -306,8 +306,8 @@ public final class PluginHelper {
   public static <T extends Serializable> PreservationMetadata createPluginEvent(Plugin<T> plugin, String aipID,
     String representationID, ModelService model, IndexService index, List<LinkingIdentifier> sources,
     List<LinkingIdentifier> targets, PluginState outcome, String outcomeDetailExtension, boolean notify)
-      throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
-      ValidationException, AlreadyExistsException {
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException,
+    ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipID, representationID, null, null, model, index, sources, targets, outcome,
       outcomeDetailExtension, notify, new Date());
   }
@@ -319,7 +319,7 @@ public final class PluginHelper {
     String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify) throws RequestNotValidException, NotFoundException, GenericException,
-      AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    AuthorizationDeniedException, ValidationException, AlreadyExistsException {
     return createPluginEvent(plugin, aipID, representationID, filePath, fileID, model, index, sources, outcomes,
       outcome, outcomeDetailExtension, notify, new Date());
   }
@@ -328,7 +328,7 @@ public final class PluginHelper {
     String representationID, List<String> filePath, String fileID, ModelService model, IndexService index,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, PluginState outcome,
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
-      GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
 
     IndexedPreservationAgent agent = null;
     try {
