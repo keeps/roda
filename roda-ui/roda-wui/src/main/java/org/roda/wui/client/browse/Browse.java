@@ -565,7 +565,7 @@ public class Browse extends Composite {
   }
 
   private SafeHtml getBreadcrumbLabel(IndexedAIP ancestor) {
-    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(),false);
+    SafeHtml elementLevelIconSafeHtml = DescriptionLevelUtils.getElementLevelIconSafeHtml(ancestor.getLevel(), false);
     SafeHtmlBuilder builder = new SafeHtmlBuilder();
     String label = ancestor.getTitle() != null ? ancestor.getTitle() : ancestor.getId();
     builder.append(elementLevelIconSafeHtml).append(SafeHtmlUtils.fromString(label));
@@ -801,32 +801,32 @@ public class Browse extends Composite {
             messages.ingestTransferRemoveFolderConfirmDialogCancel(),
             messages.ingestTransferRemoveFolderConfirmDialogOk(), new AsyncCallback<Boolean>() {
 
-            @Override
-            public void onSuccess(Boolean confirmed) {
-              if (confirmed) {
-                BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
+              @Override
+              public void onSuccess(Boolean confirmed) {
+                if (confirmed) {
+                  BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
 
-                  @Override
-                  public void onFailureImpl(Throwable caught) {
-                    AsyncCallbackUtils.defaultFailureTreatment(caught);
-                    aipList.refresh();
-                  }
+                    @Override
+                    public void onFailureImpl(Throwable caught) {
+                      AsyncCallbackUtils.defaultFailureTreatment(caught);
+                      aipList.refresh();
+                    }
 
-                  @Override
-                  public void onSuccessImpl(String parentId) {
-                    Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                      messages.ingestTransferRemoveSuccessMessage(size));
-                    aipList.refresh();
-                  }
-                });
+                    @Override
+                    public void onSuccessImpl(String parentId) {
+                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                        messages.ingestTransferRemoveSuccessMessage(size));
+                      aipList.refresh();
+                    }
+                  });
+                }
               }
-            }
 
-            @Override
-            public void onFailure(Throwable caught) {
-              AsyncCallbackUtils.defaultFailureTreatment(caught);
-            }
-          });
+              @Override
+              public void onFailure(Throwable caught) {
+                AsyncCallbackUtils.defaultFailureTreatment(caught);
+              }
+            });
         }
       });
 
@@ -884,7 +884,7 @@ public class Browse extends Composite {
       });
     }
   }
-  
+
   @UiHandler("newProcess")
   void buttonNewProcessHandler(ClickEvent e) {
     Toast.showInfo("Sorry", "Feature not yet implemented");

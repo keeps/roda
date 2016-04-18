@@ -42,9 +42,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExportAIPPlugin extends AbstractPlugin<AIP> {
+  private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
+
   public static final String EXPORT_FOLDER_PARAMETER = "outputFolder";
   public static final String EXPORT_TYPE = "exportType";
-  private static final Logger LOGGER = LoggerFactory.getLogger(ExportAIPPlugin.class);
+
   private String outputFolder;
   private ExportType exportType;
 
@@ -94,6 +96,9 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
     FileOutputStream fos = null;
+    // FIXME 20160418 hsilva: change all java.io to nio based code
+    // FIXME 20160419 hsilva: when exporting single ZIP, name the file something
+    // uniq, e.g. using job id as prefix
     try {
       if (exportType == ExportType.SINGLE_ZIP) {
         List<ZipEntryInfo> zipEntries = ModelUtils.zipAIP(aips);
@@ -102,11 +107,10 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
         ZipTools.zip(zipEntries, fos);
       } else if (exportType == ExportType.MULTI_ZIP) {
         for (AIP aip : aips) {
-          List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntrie(aip);
+          List<ZipEntryInfo> zipEntries = ModelUtils.aipToZipEntry(aip);
           java.io.File outputFolderFile = new java.io.File(outputFolder);
           fos = new FileOutputStream(new java.io.File(outputFolderFile, aip.getId() + ".zip"));
           ZipTools.zip(zipEntries, fos);
-          IOUtils.closeQuietly(fos);
         }
       } else if (exportType == ExportType.FOLDER) {
         FileStorageService localStorage = new FileStorageService(Paths.get(outputFolder));
@@ -115,7 +119,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
             StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
             localStorage.copy(storage, aipPath, DefaultStoragePath.parse(aip.getId()));
           } catch (AlreadyExistsException e) {
-            LOGGER.error("Already exist: " + aip.getId());
+            LOGGER.error("Already exist {}", aip.getId());
           }
         }
       }

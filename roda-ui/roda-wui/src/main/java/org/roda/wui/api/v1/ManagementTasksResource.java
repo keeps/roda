@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
@@ -104,11 +105,11 @@ public class ManagementTasksResource extends RodaCoreService {
   }
 
   @POST
-  @Path("/model/export")
-  public Response export(
-    @ApiParam(value = "", defaultValue = "") @QueryParam("outputFolder") @DefaultValue("") String outputFolder,
-    @ApiParam(value = "", defaultValue = "") @QueryParam("selected") @DefaultValue("") String selected,
-    @ApiParam(value = "", allowableValues = "SINGLE_ZIP,MULTI_ZIP,FOLDER", defaultValue = "SINGLE_ZIP") @QueryParam("type") @DefaultValue("singleZip") String type)
+  @Path("/model/exportAIPs")
+  public Response exportAIPs(
+    @ApiParam(value = "Folder where to put the export", defaultValue = "") @QueryParam("outputFolder") @DefaultValue("") String outputFolder,
+    @ApiParam(value = "Selected items (serialized as json using 'JsonUtils.getJsonFromObject()')", defaultValue = "") @QueryParam("selected") @DefaultValue("") String selected,
+    @ApiParam(value = "Export type", allowableValues = "SINGLE_ZIP,MULTI_ZIP,FOLDER", defaultValue = "SINGLE_ZIP", required = true) @DefaultValue("SINGLE_ZIP") @QueryParam("type") ExportType type)
     throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -153,7 +154,7 @@ public class ManagementTasksResource extends RodaCoreService {
   }
 
   private ApiResponseMessage createJobToExportAIPs(RodaUser user, Date startDate, String outputFolder, String selected,
-    String type) {
+    ExportType type) {
     ApiResponseMessage response;
     response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     try {
@@ -163,14 +164,15 @@ public class ManagementTasksResource extends RodaCoreService {
         .setPlugin(ExportAIPPlugin.class.getCanonicalName()).setObjects(selectedItems);
       Map<String, String> parameters = new HashMap<String, String>();
       parameters.put(ExportAIPPlugin.EXPORT_FOLDER_PARAMETER, outputFolder);
-      parameters.put(ExportAIPPlugin.EXPORT_TYPE, type);
+      parameters.put(ExportAIPPlugin.EXPORT_TYPE, type.toString());
       job.setPluginParameters(parameters);
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Export AIPs job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, "ManagementTasks", "export aips", null, duration);
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException e) {
+    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
+      | JobAlreadyStartedException e) {
       LOGGER.error("Error creating export AIPs job", e);
     }
     return response;

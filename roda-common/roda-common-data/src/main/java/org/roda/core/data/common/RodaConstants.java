@@ -42,6 +42,7 @@ public final class RodaConstants {
   public static final String MD5 = "MD5";
   public static final String LOCALE = "locale";
   public static final String W3C_XML_SCHEMA_NS_URI = "http://www.w3.org/2001/XMLSchema";
+  public static final int DEFAULT_PAGINATION_VALUE = 100;
 
   public enum DateGranularity {
     YEAR, MONTH, DAY, HOUR, MINUTE, SECOND, MILLISECOND
@@ -585,18 +586,7 @@ public final class RodaConstants {
   }
 
   public enum ExportType {
-    SINGLE_ZIP("singleZip"), MULTI_ZIP("multiZip"), FOLDER("folder");
-
-    private final String text;
-
-    private ExportType(final String text) {
-      this.text = text;
-    }
-
-    @Override
-    public String toString() {
-      return text;
-    }
+    SINGLE_ZIP, MULTI_ZIP, FOLDER;
   }
 
   public enum PreservationAgentType {

@@ -106,7 +106,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(RodaUser user, String aipId,
     String metadataId)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions
@@ -127,7 +127,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(RodaUser user, String aipId,
     String metadataId, Locale locale)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions
@@ -149,7 +149,7 @@ public class Browser extends RodaCoreService {
 
   public static <T extends IsIndexed> IndexResult<T> find(RodaUser user, Class<T> classToReturn, Filter filter,
     Sorter sorter, Sublist sublist, Facets facets)
-      throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
@@ -253,7 +253,7 @@ public class Browser extends RodaCoreService {
    */
   public static StreamResponse getAipRepresentation(RodaUser user, String aipId, String representationId,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -277,7 +277,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse listAipDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -302,7 +302,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getAipDescritiveMetadata(RodaUser user, String aipId, String metadataId,
     String acceptFormat, String language) throws AuthorizationDeniedException, GenericException, TransformerException,
-      NotFoundException, RequestNotValidException {
+    NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -328,7 +328,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getAipDescritiveMetadataVersion(RodaUser user, String aipId, String metadataId,
     String versionId, String acceptFormat, String language) throws AuthorizationDeniedException, GenericException,
-      TransformerException, NotFoundException, RequestNotValidException {
+    TransformerException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -354,7 +354,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse listAipPreservationMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -380,7 +380,7 @@ public class Browser extends RodaCoreService {
   public static StreamResponse getAipRepresentationPreservationMetadata(RodaUser user, String aipId,
     String representationId, String startAgent, String limitAgent, String startEvent, String limitEvent,
     String startFile, String limitFile, String acceptFormat, String language) throws AuthorizationDeniedException,
-      GenericException, TransformerException, NotFoundException, RequestNotValidException {
+    GenericException, TransformerException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
@@ -407,7 +407,7 @@ public class Browser extends RodaCoreService {
 
   public static StreamResponse getAipRepresentationPreservationMetadataFile(RodaUser user, String aipId,
     String representationId, String fileId)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
@@ -430,8 +430,8 @@ public class Browser extends RodaCoreService {
 
   public static void postAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-      ValidationException, AlreadyExistsException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
 
     Date startDate = new Date();
 
@@ -453,8 +453,8 @@ public class Browser extends RodaCoreService {
 
   public static void putAipRepresentationPreservationMetadataFile(RodaUser user, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId, InputStream is, FormDataContentDisposition fileDetail)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-      ValidationException, AlreadyExistsException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    ValidationException, AlreadyExistsException {
     Date startDate = new Date();
 
     // check user permissions
@@ -475,7 +475,7 @@ public class Browser extends RodaCoreService {
 
   public static void aipsAipIdPreservationMetadataRepresentationIdFileIdDelete(RodaUser user, String aipId,
     String representationId, String fileId, String preservationId)
-      throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // check user permissions
@@ -570,7 +570,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadata createDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
-      GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
+    GenericException, ValidationException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     Date start = new Date();
 
     // check user permissions
@@ -592,7 +592,7 @@ public class Browser extends RodaCoreService {
 
   public static DescriptiveMetadata updateDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId,
     String metadataType, String metadataVersion, ContentPayload metadataPayload) throws AuthorizationDeniedException,
-      GenericException, ValidationException, NotFoundException, RequestNotValidException {
+    GenericException, ValidationException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
     // check user permissions
@@ -719,8 +719,8 @@ public class Browser extends RodaCoreService {
 
   public static void putDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
     String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-      AlreadyExistsException, ValidationException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -742,8 +742,8 @@ public class Browser extends RodaCoreService {
 
   public static void postDescriptiveMetadataFile(RodaUser user, String aipId, String metadataId, String metadataType,
     String metadataVersion, InputStream is, FormDataContentDisposition fileDetail)
-      throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
-      AlreadyExistsException, ValidationException {
+    throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -765,7 +765,7 @@ public class Browser extends RodaCoreService {
 
   public static String createTransferredResourcesFolder(RodaUser user, String parentUUID, String folderName,
     boolean forceCommit)
-      throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
     // check user permissions
     UserUtility.checkRoles(user, INGEST_TRANSFER_ROLE);
@@ -806,7 +806,7 @@ public class Browser extends RodaCoreService {
 
   public static void createTransferredResourceFile(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
-      AlreadyExistsException, RequestNotValidException, NotFoundException {
+    AlreadyExistsException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
 
     // check user permissions
@@ -851,7 +851,7 @@ public class Browser extends RodaCoreService {
 
   public static void createTransferredResource(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
-      AlreadyExistsException, RequestNotValidException, NotFoundException {
+    AlreadyExistsException, RequestNotValidException, NotFoundException {
     if (name == null) {
       Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream, forceCommit);
     } else {
@@ -928,7 +928,7 @@ public class Browser extends RodaCoreService {
 
   public static void revertDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
     String versionId)
-      throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // check user permissions
@@ -950,7 +950,7 @@ public class Browser extends RodaCoreService {
 
   public static void removeDescriptiveMetadataVersion(RodaUser user, String aipId, String descriptiveMetadataId,
     String versionId)
-      throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
@@ -1043,7 +1043,7 @@ public class Browser extends RodaCoreService {
    * @param selected
    *          The filter to select the AIPs to export
    * @param acceptFormat
-   *          The output format (currently only zip is supported)
+   *          The output format
    * @return
    * @throws GenericException
    * @throws AuthorizationDeniedException
@@ -1064,7 +1064,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, selected, PermissionType.READ);
 
     // delegate
-    StreamResponse aipExport = BrowserHelper.getAips(selected, acceptFormat);
+    StreamResponse aipExport = BrowserHelper.getAIPs(selected, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -1086,7 +1086,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
 
     // delegate
-    StreamResponse aip = BrowserHelper.getAip(indexedAIP, acceptFormat);
+    StreamResponse aip = BrowserHelper.getAIP(indexedAIP, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

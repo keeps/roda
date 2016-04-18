@@ -534,7 +534,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void startJobsInTheStateCreated() {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.toString()));
-    Sublist sublist = new Sublist(0, 100);
+    Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     IndexResult<Job> jobs = null;
     List<Job> jobsToBeStarted = new ArrayList<>();
     try {
@@ -563,7 +563,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void cleanUnfinishedJobs() {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.STARTED.toString()));
-    Sublist sublist = new Sublist(0, 100);
+    Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     IndexResult<Job> jobs = null;
     List<Job> jobsToBeCleaned = new ArrayList<>();
     try {

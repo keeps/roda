@@ -134,10 +134,7 @@ public class AipsResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
 
     // delegate action to controller
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-
-    SelectedItemsFilter sif = new SelectedItemsFilter(filter);
+    SelectedItemsFilter sif = new SelectedItemsFilter(new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId)));
     Browser.removeAIP(user, sif);
 
     // FIXME give a better answer

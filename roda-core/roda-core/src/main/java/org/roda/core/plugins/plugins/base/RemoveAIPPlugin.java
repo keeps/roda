@@ -67,7 +67,7 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
     onlyRepresentations = false;
     if (parameters != null) {
       if (parameters.containsKey(ONLY_REPRESENTATIONS)) {
-        if (parameters.get(ONLY_REPRESENTATIONS).equalsIgnoreCase("true")) {
+        if ("true".equalsIgnoreCase(parameters.get(ONLY_REPRESENTATIONS))) {
           onlyRepresentations = true;
         }
       }
@@ -88,8 +88,7 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
           model.deleteAIP(aip.getId());
         }
       } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        LOGGER.error("Error while deleting AIP/Representation", e);
       }
     }
     Report report = PluginHelper.createPluginReport(this);

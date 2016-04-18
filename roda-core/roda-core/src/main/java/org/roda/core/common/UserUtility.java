@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 public class UserUtility {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserUtility.class);
   public static final String RODA_USER = "RODA_USER";
-  public static final int PAGINATION = 50;
 
   private static LdapUtility LDAP_UTILITY;
 
@@ -263,9 +262,9 @@ public class UserUtility {
     if (selected instanceof SelectedItemsFilter) {
       SelectedItemsFilter selectedItems = (SelectedItemsFilter) selected;
       long count = index.count(IndexedAIP.class, selectedItems.getFilter());
-      for (int i = 0; i < count; i += PAGINATION) {
-        List<IndexedAIP> aips = index
-          .find(IndexedAIP.class, selectedItems.getFilter(), null, new Sublist(i, PAGINATION), null).getResults();
+      for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+        List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItems.getFilter(), null,
+          new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
         for (IndexedAIP aip : aips) {
           checkObjectPermissions(user, aip, permission);
         }

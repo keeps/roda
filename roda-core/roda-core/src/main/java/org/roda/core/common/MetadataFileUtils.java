@@ -97,17 +97,22 @@ public class MetadataFileUtils {
   }
 
   public static ContentPayload getMetadataPayload(TransferredResource transferredResource) {
-    Element root = new Element("metadata");
-    org.jdom2.Document doc = new org.jdom2.Document();
-    Element child = new Element("field");
-    child.setAttribute("name", "title");
-    child.addContent(StringEscapeUtils.escapeXml11(transferredResource.getName()));
-    root.addContent(child);
-    doc.setRootElement(root);
-    XMLOutputter outter = new XMLOutputter();
-    outter.setFormat(Format.getPrettyFormat());
-    outter.outputString(doc);
-    return new StringContentPayload(outter.outputString(doc));
+    try {
+      Element root = new Element("metadata");
+      org.jdom2.Document doc = new org.jdom2.Document();
+      Element child = new Element("field");
+      child.setAttribute("name", "title");
+      child.addContent(StringEscapeUtils.escapeXml11(transferredResource.getName()));
+      root.addContent(child);
+      doc.setRootElement(root);
+      XMLOutputter outter = new XMLOutputter();
+      outter.setFormat(Format.getPrettyFormat());
+      outter.outputString(doc);
+      return new StringContentPayload(outter.outputString(doc));
+    } catch (IllegalDataException e) {
+      LOGGER.debug("Error generating TransferredResource metadata file {}", e.getMessage());
+      return new StringContentPayload("");
+    }
   }
 
   public static Map<String, List<String>> parseBinary(Binary binary)

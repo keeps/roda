@@ -537,7 +537,7 @@ public final class ModelUtils {
       ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : filePath.asString(), binary.getContent());
       zipEntries.add(info);
     } else {
-      // TODO add directory zip entry
+      // do nothing
     }
   }
 
@@ -551,15 +551,14 @@ public final class ModelUtils {
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     ModelService model = RodaCoreFactory.getModelService();
-    StorageService storage = RodaCoreFactory.getStorageService();
     for (IndexedAIP aip : aips) {
       AIP fullAIP = model.retrieveAIP(aip.getId());
-      zipEntries.addAll(aipToZipEntrie(fullAIP));
+      zipEntries.addAll(aipToZipEntry(fullAIP));
     }
     return zipEntries;
   }
 
-  public static List<ZipEntryInfo> aipToZipEntrie(AIP aip)
+  public static List<ZipEntryInfo> aipToZipEntry(AIP aip)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     StorageService storage = RodaCoreFactory.getStorageService();
@@ -619,7 +618,6 @@ public final class ModelUtils {
   public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems selectedItems)
     throws GenericException, RequestNotValidException {
     List<IndexedAIP> res = new ArrayList<IndexedAIP>();
-    final int PAGINATION = 100;
     if (selectedItems instanceof SelectedItemsList) {
       SelectedItemsList list = (SelectedItemsList) selectedItems;
       for (String objectId : list.getIds()) {
@@ -633,9 +631,9 @@ public final class ModelUtils {
       IndexService index = RodaCoreFactory.getIndexService();
       SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
       long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
-      for (int i = 0; i < count; i += PAGINATION) {
-        List<IndexedAIP> aips = index
-          .find(IndexedAIP.class, selectedItemsFilter.getFilter(), null, new Sublist(i, PAGINATION), null).getResults();
+      for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+        List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), null,
+          new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
         res.addAll(aips);
       }
     }
@@ -646,7 +644,7 @@ public final class ModelUtils {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
     for (AIP aip : aips) {
-      zipEntries.addAll(aipToZipEntrie(aip));
+      zipEntries.addAll(aipToZipEntry(aip));
     }
     return zipEntries;
   }

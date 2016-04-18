@@ -108,7 +108,7 @@ public class JobsHelper {
 
     // ask plugin orchestrator to execute the job
     RodaCoreFactory.getPluginOrchestrator().executeJob(job);
-    
+
     return job;
   }
 
@@ -138,12 +138,12 @@ public class JobsHelper {
 
   private static void deleteJobReports(Job job) throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId()));
-    Sublist sublist = new Sublist(0, 100);
+    Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     ModelService model = RodaCoreFactory.getModelService();
     IndexService index = RodaCoreFactory.getIndexService();
     Long jobReportsCount = index.count(Report.class, filter);
 
-    for (int i = 0; i < jobReportsCount; i += 100) {
+    for (int i = 0; i < jobReportsCount; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
       sublist.setFirstElementIndex(i);
       IndexResult<Report> jobReports = index.find(Report.class, filter, null, sublist);
       for (Report report : jobReports.getResults()) {

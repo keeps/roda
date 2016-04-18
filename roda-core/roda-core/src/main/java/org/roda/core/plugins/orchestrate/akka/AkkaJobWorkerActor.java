@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
@@ -111,17 +112,16 @@ public class AkkaJobWorkerActor extends UntypedActor {
         IndexService index = RodaCoreFactory.getIndexService();
         SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
         long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
-        for (int i = 0; i < count; i += 50) {
-          List<IndexedAIP> aips = index
-            .find(IndexedAIP.class, selectedItemsFilter.getFilter(), null, new Sublist(i, 50), null).getResults();
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), null,
+            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
           for (IndexedAIP aip : aips) {
             res.add(aip.getId());
           }
         }
-      } catch (Throwable t) {
-        LOGGER.error(t.getMessage(), t);
+      } catch (Throwable e) {
+        LOGGER.error("Error while retrieving AIPs from index", e);
       }
-      // LOGGER.error("Still not implemented!!!!!!!!");
     }
     return res;
   }
