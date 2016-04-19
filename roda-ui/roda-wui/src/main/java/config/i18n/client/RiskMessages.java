@@ -48,12 +48,12 @@ public interface RiskMessages extends Messages {
   @DefaultMessage("{0} at {1,localdatetime,predef:DATE_TIME_MEDIUM}")
   String riskHistoryLabel(String versionKey, Date createdDate);
 
-  @DefaultMessage("Good")
-  String showGoodSeverity();
+  @DefaultMessage("Low")
+  String showLowSeverity();
 
-  @DefaultMessage("Normal")
-  String showNormalSeverity();
+  @DefaultMessage("Moderate")
+  String showModerateSeverity();
 
-  @DefaultMessage("Bad")
-  String showBadSeverity();
+  @DefaultMessage("High")
+  String showHighSeverity();
 }

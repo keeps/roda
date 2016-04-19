@@ -96,10 +96,7 @@ public class EditRisk extends Composite {
    */
   public EditRisk(Risk risk) {
     this.risk = risk;
-
-    this.riskDataPanel = new RiskDataPanel(true, false);
-    this.riskDataPanel.setRisk(risk);
-
+    this.riskDataPanel = new RiskDataPanel(true, true, risk);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

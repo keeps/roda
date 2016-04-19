@@ -1242,4 +1242,54 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static List<String> retrieveShowMitigationTerms(RodaUser user, int preMitigationProbability,
+    int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
+    throws AuthorizationDeniedException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<String> ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
+      posMitigationProbability, posMitigationImpact);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveShowMitigationTerms", null, duration, "preMitigationProbability",
+      preMitigationProbability, "preMitigationImpact", preMitigationImpact, "posMitigationProbability",
+      posMitigationProbability, "posMitigationImpact", posMitigationImpact);
+    return ret;
+  }
+
+  public static List<String> retrieveMitigationSeverityLimits(RodaUser user) throws AuthorizationDeniedException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<String> ret = BrowserHelper.retrieveShowMitigationTerms();
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveMitigationSeverityLimits", null, duration);
+    return ret;
+  }
+
+  public static List<List<String>> retrieveAllMitigationProperties(RodaUser user) throws AuthorizationDeniedException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<List<String>> ret = BrowserHelper.retrieveAllMitigationProperties();
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveAllMitigationProperties", null, duration);
+    return ret;
+  }
+
 }

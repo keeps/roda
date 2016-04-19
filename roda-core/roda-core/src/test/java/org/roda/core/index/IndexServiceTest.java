@@ -19,6 +19,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.configuration.ConfigurationException;
 import org.hamcrest.Matchers;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -64,6 +66,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
@@ -561,14 +564,16 @@ public class IndexServiceTest {
       risk.setCategory("Risk category");
       risk.setNotes("Risk notes");
 
-      risk.setPreMitigationProbability(1);
-      risk.setPreMitigationImpact(1);
-      risk.setPreMitigationSeverity(1);
+      risk.setPreMitigationProbability(4);
+      risk.setPreMitigationImpact(4);
+      risk.setPreMitigationSeverity(16);
+      risk.setPreMitigationSeverityLevel(SEVERITY_LEVEL.High);
       risk.setPreMitigationNotes("Pre Notes");
 
-      risk.setPosMitigationProbability(2);
+      risk.setPosMitigationProbability(3);
       risk.setPosMitigationImpact(2);
-      risk.setPosMitigationSeverity(2);
+      risk.setPosMitigationSeverity(6);
+      risk.setPosMitigationSeverityLevel(SEVERITY_LEVEL.Moderate);
       risk.setPosMitigationNotes("Pos Notes");
 
       risk.setMitigationStrategy("Mitigation Strategy");
@@ -753,14 +758,14 @@ public class IndexServiceTest {
   }
 
   @Test
-  public void testMessageIndex() {
+  public void testMessageIndex() throws ConfigurationException {
     try {
       Message message = new Message();
       message.setSubject("Message subject");
       message.setBody("Message body");
       message.setSentOn(new Date());
       message.setFromUser("Test Message Index");
-      message.setRecipientUser("recipientuser@example.com");
+      message.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
 
       model.createMessage(message, "test-email-template", new HashMap<String, Object>());
       index.commit(Message.class);

@@ -109,10 +109,11 @@
    <field name="body" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="sentOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="fromUser" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="recipientUser" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="recipientUsers" type="string" indexed="true" stored="true" required="true" multiValued="true" />
    <field name="acknowledgeToken" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="isAcknowledged" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="acknowledgedOn" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="isAcknowledged" type="boolean" indexed="true" stored="true" required="true" multiValued="false" />
+   
+   <field name="acknowledgedUsers" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    

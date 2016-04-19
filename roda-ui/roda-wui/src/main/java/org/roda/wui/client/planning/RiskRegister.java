@@ -58,6 +58,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.BrowseMessages;
 import config.i18n.client.RiskMessages;
+import config.i18n.client.UserManagementConstants;
 
 /**
  * @author Luis Faria
@@ -108,6 +109,10 @@ public class RiskRegister extends Composite {
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
+  @SuppressWarnings("unused")
+  private static UserManagementConstants constants = (UserManagementConstants) GWT
+    .create(UserManagementConstants.class);
+
   private static final BrowseMessages defaultMessages = GWT.create(BrowseMessages.class);
   private static final RiskMessages messages = GWT.create(RiskMessages.class);
 
@@ -149,10 +154,11 @@ public class RiskRegister extends Composite {
    *
    * @param user
    */
+
   public RiskRegister() {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
+      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL));
 
     riskList = new RiskList(filter, facets, "Risks", true);
 
@@ -165,7 +171,7 @@ public class RiskRegister extends Composite {
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
-    facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY, facetSeverities);
+    facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, facetSeverities);
     FacetUtils.bindFacets(riskList, facetPanels);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
@@ -194,9 +200,7 @@ public class RiskRegister extends Composite {
     });
 
     initWidget(uiBinder.createAndBindUi(this));
-
     riskRegisterDescription.add(new HTMLWidgetWrapper("RiskRegisterDescription.html"));
-
     buttonRemove.setEnabled(false);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
@@ -206,7 +210,6 @@ public class RiskRegister extends Composite {
       public void onValueChange(ValueChangeEvent<Date> event) {
         updateDateFilter();
       }
-
     };
 
     inputDateInitial.setFormat(dateFormat);
@@ -231,17 +234,6 @@ public class RiskRegister extends Composite {
       dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
 
     riskList.setFilter(new Filter(filterParameter));
-  }
-
-  private String getSeverityDefinition(int severity) {
-    // FIXME change it to correct names
-    if (severity < 5) {
-      return "Good";
-    } else if (severity < 15) {
-      return "Normal";
-    } else {
-      return "Bad";
-    }
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -313,4 +305,5 @@ public class RiskRegister extends Composite {
       }
     });
   }
+
 }

@@ -36,7 +36,7 @@ import com.google.gwt.view.client.ProvidesKey;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class FormatList extends AsyncTableCell<Format> {
+public class FormatList extends BasicAsyncTableCell<Format> {
 
   private static final int PAGE_SIZE = 20;
 

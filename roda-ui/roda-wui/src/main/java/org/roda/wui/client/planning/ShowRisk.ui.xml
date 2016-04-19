@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
@@ -38,7 +38,7 @@
 				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
 				<g:Label ui:field="riskPreMitigationImpact" />
 				<g:Label styleName="descriptiveMetadata-field-key">Severity</g:Label>
-				<g:Label ui:field="riskPreMitigationSeverity" />
+				<g:HTML ui:field="riskPreMitigationSeverity"></g:HTML>
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
 				<g:Label ui:field="riskPreMitigationNotesValue" />
 				
@@ -56,11 +56,11 @@
 				
 				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Pos Mitigation</g:Label>
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
-				<g:Label ui:field="riskPosMitigationProbabilityValue" />
+				<g:Label ui:field="riskPosMitigationProbability" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationImpactKey">Impact</g:Label>
-				<g:Label ui:field="riskPosMitigationImpactValue" />
+				<g:Label ui:field="riskPosMitigationImpact" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationSeverityKey">Severity</g:Label>
-				<g:Label ui:field="riskPosMitigationSeverityValue" />
+				<g:HTML ui:field="riskPosMitigationSeverity"></g:HTML>
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
 				<g:Label ui:field="riskPosMitigationNotesValue" />
 			</g:FlowPanel>

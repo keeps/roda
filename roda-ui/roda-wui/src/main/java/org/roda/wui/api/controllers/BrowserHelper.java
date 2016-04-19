@@ -1400,4 +1400,57 @@ public class BrowserHelper {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
+
+  public static List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+    int posMitigationProbability, int posMitigationImpact) {
+    List<String> terms = new ArrayList<String>();
+
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
+      Integer.toString(preMitigationProbability)));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
+      Integer.toString(preMitigationImpact)));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
+      Integer.toString(posMitigationProbability)));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
+      Integer.toString(posMitigationImpact)));
+
+    return terms;
+  }
+
+  public static List<String> retrieveShowMitigationTerms() {
+    List<String> terms = new ArrayList<String>();
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
+    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
+    return terms;
+  }
+
+  public static List<List<String>> retrieveAllMitigationProperties() {
+    List<List<String>> properties = new ArrayList<>();
+
+    // first list contains severity content
+    List<String> severityTerms = new ArrayList<String>();
+    severityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
+    severityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
+    properties.add(severityTerms);
+
+    // second list contains probability content
+    List<String> probabilityTerms = new ArrayList<String>();
+    for (int i = 0; i < 6; i++) {
+      String value = Integer.toString(i);
+      probabilityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability", value));
+    }
+    properties.add(probabilityTerms);
+
+    // third list contains impact content
+    List<String> impactTerms = new ArrayList<String>();
+    for (int i = 0; i < 6; i++) {
+      String value = Integer.toString(i);
+      impactTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact", value));
+    }
+    properties.add(impactTerms);
+
+    return properties;
+  }
 }

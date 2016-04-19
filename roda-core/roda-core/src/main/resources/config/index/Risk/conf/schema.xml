@@ -109,17 +109,19 @@
    <field name="description" type="text_general" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="identifiedOn" type="tdate" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="identifiedBy" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="category" type="text_general" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="category" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="notes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="preMitigationProbability" type="int" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="preMitigationImpact" type="int" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="preMitigationSeverity" type="int" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="preMitigationSeverityLevel" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="preMitigationNotes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="posMitigationProbability" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="posMitigationImpact" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="posMitigationSeverity" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="posMitigationSeverityLevel" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="posMitigationNotes" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />
    
    <field name="mitigationStrategy" type="text_general" indexed="true" stored="true" required="false" multiValued="false" />

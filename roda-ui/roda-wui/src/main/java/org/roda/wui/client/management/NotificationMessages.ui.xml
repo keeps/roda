@@ -27,7 +27,7 @@
 					<g:Label addStyleNames="h5 sidebar-facet-title">
 						<ui:msg>Recipient Users</ui:msg>
 					</g:Label>
-					<g:FlowPanel ui:field="facetRecipientUser" />
+					<g:FlowPanel ui:field="facetRecipientUsers" />
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">

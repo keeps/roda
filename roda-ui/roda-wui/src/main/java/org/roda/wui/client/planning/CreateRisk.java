@@ -79,10 +79,7 @@ public class CreateRisk extends Composite {
    */
   public CreateRisk(Risk risk) {
     this.risk = risk;
-
-    this.riskDataPanel = new RiskDataPanel(true, false);
-    this.riskDataPanel.setRisk(risk);
-
+    this.riskDataPanel = new RiskDataPanel(true, false, risk);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

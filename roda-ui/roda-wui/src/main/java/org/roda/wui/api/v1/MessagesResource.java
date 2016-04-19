@@ -7,10 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +36,10 @@ import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+
 @Path(MessagesResource.ENDPOINT)
 @Api(value = MessagesResource.SWAGGER_ENDPOINT)
 public class MessagesResource {
@@ -53,8 +53,7 @@ public class MessagesResource {
 
   @GET
   @ApiOperation(value = "List Messages", notes = "Gets a list of Messages.", response = Message.class, responseContainer = "List")
-  public Response listMessages(
-    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+  public Response listMessages(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
     throws RODAException {
@@ -127,7 +126,8 @@ public class MessagesResource {
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Acknowledge Message", notes = "Acknowledge a particular Message.", response = Message.class)
   public Response acknowledgeMessage(@PathParam("messageId") String messageId, @QueryParam("token") String token,
-    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
+    @QueryParam("email") String email, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
+    throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     if (token == null) {
@@ -138,7 +138,7 @@ public class MessagesResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    org.roda.wui.api.controllers.Messages.acknowledgeMessage(user, messageId, token);
+    org.roda.wui.api.controllers.Messages.acknowledgeMessage(user, messageId, token, email);
 
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Message acknowledged"), mediaType).build();
   }

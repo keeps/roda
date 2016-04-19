@@ -46,7 +46,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class JobList extends AsyncTableCell<Job> {
+public class JobList extends BasicAsyncTableCell<Job> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);

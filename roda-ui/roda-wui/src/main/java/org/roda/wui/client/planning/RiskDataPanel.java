@@ -9,8 +9,11 @@
 package org.roda.wui.client.planning;
 
 import java.util.Date;
+import java.util.List;
 
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.search.SearchSuggestBox;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -23,16 +26,22 @@ import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.IntegerBox;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
+import config.i18n.client.RiskMessages;
 import config.i18n.client.UserManagementConstants;
 
 /**
@@ -50,6 +59,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private static UserManagementConstants constants = (UserManagementConstants) GWT
     .create(UserManagementConstants.class);
 
+  private static RiskMessages messages = GWT.create(RiskMessages.class);
+
   @UiField
   TextBox name;
 
@@ -62,26 +73,38 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   @UiField
   TextBox identifiedBy;
 
-  @UiField
-  TextBox category;
+  @UiField(provided = true)
+  SearchSuggestBox<Risk> category;
 
   @UiField
   TextArea notes;
 
   @UiField
-  IntegerBox preMitigationProbability;
+  ListBox preMitigationProbability;
 
   @UiField
-  IntegerBox preMitigationImpact;
+  ListBox preMitigationImpact;
+
+  @UiField
+  Label preMitigationSeverityKey;
+
+  @UiField
+  HTML preMitigationSeverityValue;
 
   @UiField
   TextArea preMitigationNotes;
 
   @UiField
-  IntegerBox posMitigationProbability;
+  ListBox posMitigationProbability;
 
   @UiField
-  IntegerBox posMitigationImpact;
+  ListBox posMitigationImpact;
+
+  @UiField
+  Label posMitigationSeverityKey;
+
+  @UiField
+  HTML posMitigationSeverityValue;
 
   @UiField
   TextArea posMitigationNotes;
@@ -109,6 +132,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private boolean changed = false;
   private boolean checked = false;
 
+  private int severityLowLimit;
+  private int severityHighLimit;
+
   /**
    * Create a new user data panel
    *
@@ -119,8 +145,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    *          editable
    *
    */
-  public RiskDataPanel(boolean editmode) {
-    this(true, editmode);
+  public RiskDataPanel(final boolean editmode, final Risk risk) {
+    this(true, editmode, risk);
   }
 
   /**
@@ -131,8 +157,50 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    * @param enableGroupSelect
    * @param enablePermissions
    */
-  public RiskDataPanel(boolean visible, boolean editmode) {
+
+  public RiskDataPanel(final boolean visible, final boolean editmode, final Risk risk) {
+    category = new SearchSuggestBox<Risk>(Risk.class, "category");
     initWidget(uiBinder.createAndBindUi(this));
+
+    BrowserService.Util.getInstance().retrieveAllMitigationProperties(new AsyncCallback<List<List<String>>>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
+
+      @Override
+      public void onSuccess(List<List<String>> terms) {
+        init(visible, editmode, terms, risk);
+      }
+    });
+  }
+
+  public void init(boolean visible, boolean editmode, List<List<String>> mitigationProperties, Risk risk) {
+
+    severityLowLimit = Integer.parseInt(mitigationProperties.get(0).get(0));
+    severityHighLimit = Integer.parseInt(mitigationProperties.get(0).get(1));
+
+    // add probability items to list box
+    for (int i = 0; i < 6; i++) {
+      posMitigationProbability.addItem(mitigationProperties.get(1).get(i));
+      if (i != 0) {
+        preMitigationProbability.addItem(mitigationProperties.get(1).get(i));
+      }
+    }
+
+    // add impact items to list box
+    for (int i = 0; i < 6; i++) {
+      posMitigationImpact.addItem(mitigationProperties.get(2).get(i));
+      if (i != 0) {
+        preMitigationImpact.addItem(mitigationProperties.get(2).get(i));
+      }
+    }
+
+    preMitigationProbability.setSelectedIndex(0);
+    preMitigationImpact.setSelectedIndex(0);
+    posMitigationProbability.setSelectedIndex(0);
+    posMitigationImpact.setSelectedIndex(0);
 
     this.editmode = editmode;
     super.setVisible(visible);
@@ -158,6 +226,40 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       }
     };
 
+    ChangeHandler changePreMitigationHandler = new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+
+        int probability = preMitigationProbability.getSelectedIndex() + 1;
+        int impact = preMitigationImpact.getSelectedIndex() + 1;
+
+        preMitigationSeverityKey.setVisible(true);
+        preMitigationSeverityValue.setVisible(true);
+        int severity = probability * impact;
+        preMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
+
+        RiskDataPanel.this.onChange();
+      }
+    };
+
+    ChangeHandler changePosMitigationHandler = new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+
+        int probability = posMitigationProbability.getSelectedIndex();
+        int impact = posMitigationImpact.getSelectedIndex();
+
+        posMitigationSeverityKey.setVisible(true);
+        posMitigationSeverityValue.setVisible(true);
+        int severity = probability * impact;
+        posMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
+
+        RiskDataPanel.this.onChange();
+      }
+    };
+
     name.addChangeHandler(changeHandler);
     name.addKeyUpHandler(keyUpHandler);
     description.addChangeHandler(changeHandler);
@@ -172,19 +274,17 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
     identifiedBy.addChangeHandler(changeHandler);
     identifiedBy.addKeyUpHandler(keyUpHandler);
-    category.addChangeHandler(changeHandler);
-    category.addKeyUpHandler(keyUpHandler);
     notes.addChangeHandler(changeHandler);
 
-    preMitigationProbability.addChangeHandler(changeHandler);
+    preMitigationProbability.addChangeHandler(changePreMitigationHandler);
     preMitigationProbability.addKeyUpHandler(keyUpHandler);
-    preMitigationImpact.addChangeHandler(changeHandler);
+    preMitigationImpact.addChangeHandler(changePreMitigationHandler);
     preMitigationImpact.addKeyUpHandler(keyUpHandler);
     preMitigationNotes.addChangeHandler(changeHandler);
 
-    posMitigationProbability.addChangeHandler(changeHandler);
+    posMitigationProbability.addChangeHandler(changePosMitigationHandler);
     posMitigationProbability.addKeyUpHandler(keyUpHandler);
-    posMitigationImpact.addChangeHandler(changeHandler);
+    posMitigationImpact.addChangeHandler(changePosMitigationHandler);
     posMitigationImpact.addKeyUpHandler(keyUpHandler);
     posMitigationNotes.addChangeHandler(changeHandler);
 
@@ -193,6 +293,14 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     mitigationOwner.addChangeHandler(changeHandler);
     mitigationRelatedEventIdentifierType.addChangeHandler(changeHandler);
     mitigationRelatedEventIdentifierValue.addChangeHandler(changeHandler);
+
+    if (!editmode) {
+      posMitigationSeverityKey.setVisible(false);
+      posMitigationSeverityValue.setVisible(false);
+      this.preMitigationSeverityValue.setHTML(getSeverityDefinition(0, severityLowLimit, severityHighLimit));
+    } else {
+      setRisk(risk);
+    }
 
     // FIXME it must be visible later
     mitigationRelatedEventIdentifierType.setVisible(false);
@@ -223,71 +331,11 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       identifiedBy.removeStyleName("isWrong");
     }
 
-    if (category.getText().length() == 0) {
+    if (category.getValue().length() == 0) {
       valid = false;
       category.addStyleName("isWrong");
     } else {
       category.removeStyleName("isWrong");
-    }
-
-    try {
-      Integer.parseInt(preMitigationProbability.getText());
-      preMitigationProbability.removeStyleName("isWrong");
-    } catch (NumberFormatException e) {
-      valid = false;
-      preMitigationProbability.addStyleName("isWrong");
-    }
-
-    try {
-      Integer.parseInt(preMitigationImpact.getText());
-      preMitigationImpact.removeStyleName("isWrong");
-    } catch (NumberFormatException e) {
-      valid = false;
-      preMitigationImpact.addStyleName("isWrong");
-    }
-
-    try {
-      Integer.parseInt(posMitigationProbability.getText());
-      posMitigationProbability.removeStyleName("isWrong");
-    } catch (NumberFormatException e) {
-      valid = false;
-      posMitigationProbability.addStyleName("isWrong");
-    }
-
-    try {
-      Integer.parseInt(posMitigationImpact.getText());
-      posMitigationImpact.removeStyleName("isWrong");
-    } catch (NumberFormatException e) {
-      valid = false;
-      posMitigationImpact.addStyleName("isWrong");
-    }
-
-    if (preMitigationProbability.getValue() < 1 || preMitigationProbability.getValue() > 5) {
-      valid = false;
-      preMitigationProbability.addStyleName("isWrong");
-    } else {
-      preMitigationProbability.removeStyleName("isWrong");
-    }
-
-    if (preMitigationImpact.getValue() < 1 || preMitigationProbability.getValue() > 5) {
-      valid = false;
-      preMitigationImpact.addStyleName("isWrong");
-    } else {
-      preMitigationImpact.removeStyleName("isWrong");
-    }
-
-    if (posMitigationProbability.getValue() < 0 || posMitigationProbability.getValue() > 5) {
-      valid = false;
-      posMitigationProbability.addStyleName("isWrong");
-    } else {
-      posMitigationProbability.removeStyleName("isWrong");
-    }
-
-    if (posMitigationImpact.getValue() < 0 || posMitigationProbability.getValue() > 5) {
-      valid = false;
-      posMitigationImpact.addStyleName("isWrong");
-    } else {
-      posMitigationImpact.removeStyleName("isWrong");
     }
 
     checked = true;
@@ -299,16 +347,37 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.description.setText(risk.getDescription());
     this.identifiedOn.setValue(risk.getIdentifiedOn());
     this.identifiedBy.setText(risk.getIdentifiedBy());
-    this.category.setText(risk.getCategory());
+    this.category.setValue(risk.getCategory());
     this.notes.setText(risk.getNotes());
 
-    this.preMitigationProbability.setValue(risk.getPreMitigationProbability());
-    this.preMitigationImpact.setValue(risk.getPreMitigationImpact());
+    int preProbability = Math.abs(risk.getPreMitigationProbability() - 1);
+    int preImpact = Math.abs(risk.getPreMitigationImpact() - 1);
+
+    this.preMitigationProbability.setSelectedIndex(preProbability);
+    this.preMitigationImpact.setSelectedIndex(preImpact);
     this.preMitigationNotes.setText(risk.getPreMitigationNotes());
 
-    this.posMitigationProbability.setValue(risk.getPosMitigationProbability());
-    this.posMitigationImpact.setValue(risk.getPosMitigationImpact());
+    this.preMitigationSeverityKey.setVisible(true);
+    this.preMitigationSeverityValue.setVisible(true);
+    int preSeverity = risk.getPreMitigationSeverity();
+    this.preMitigationSeverityValue.setHTML(getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
+
+    this.posMitigationProbability.setSelectedIndex(risk.getPosMitigationProbability());
+    this.posMitigationImpact.setSelectedIndex(risk.getPosMitigationImpact());
     this.posMitigationNotes.setText(risk.getPosMitigationNotes());
+
+    int probability = posMitigationProbability.getSelectedIndex();
+    int impact = posMitigationImpact.getSelectedIndex();
+
+    if (isElementValid(probability) || isElementValid(impact)) {
+      this.posMitigationSeverityKey.setVisible(true);
+      this.posMitigationSeverityValue.setVisible(true);
+      int posSeverity = risk.getPosMitigationSeverity();
+      this.posMitigationSeverityValue.setHTML(getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
+    } else {
+      this.posMitigationSeverityKey.setVisible(false);
+      this.posMitigationSeverityValue.setVisible(false);
+    }
 
     this.mitigationStrategy.setText(risk.getMitigationStrategy());
     this.mitigationOwnerType.setText(risk.getMitigationOwnerType());
@@ -324,23 +393,32 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setDescription(description.getText());
     risk.setIdentifiedOn(identifiedOn.getValue());
     risk.setIdentifiedBy(identifiedBy.getText());
-    risk.setCategory(category.getText());
+    risk.setCategory(category.getValue());
     risk.setNotes(notes.getText());
 
-    risk.setPreMitigationProbability(preMitigationProbability.getValue());
-    risk.setPreMitigationImpact(preMitigationImpact.getValue());
-    risk.setPreMitigationSeverity(preMitigationProbability.getValue() * preMitigationImpact.getValue());
+    int preProbability = preMitigationProbability.getSelectedIndex() + 1;
+    int preImpact = preMitigationImpact.getSelectedIndex() + 1;
+
+    int preSeverity = preProbability * preImpact;
+    risk.setPreMitigationProbability(preProbability);
+    risk.setPreMitigationImpact(preImpact);
+    risk.setPreMitigationSeverity(preSeverity);
+    risk.setPreMitigationSeverityLevel(getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     risk.setPreMitigationNotes(preMitigationNotes.getText());
 
-    risk.setPosMitigationProbability(posMitigationProbability.getValue());
-    risk.setPosMitigationImpact(posMitigationImpact.getValue());
+    int posProbability = posMitigationProbability.getSelectedIndex();
+    int posImpact = posMitigationImpact.getSelectedIndex();
 
-    if (posMitigationProbability.getValue() == 0 || posMitigationImpact.getValue() == 0) {
-      risk.setPosMitigationSeverity(risk.getPreMitigationSeverity());
+    risk.setPosMitigationProbability(posProbability);
+    risk.setPosMitigationImpact(posImpact);
+    if (posProbability == 0 && posImpact == 0) {
+      risk.setPosMitigationSeverity(preSeverity);
+      risk.setPosMitigationSeverityLevel(getSeverityLevel(preSeverity, severityLowLimit, severityHighLimit));
     } else {
-      risk.setPosMitigationSeverity(posMitigationProbability.getValue() * posMitigationImpact.getValue());
+      int posSeverity = posProbability * posImpact;
+      risk.setPosMitigationSeverity(posSeverity);
+      risk.setPosMitigationSeverityLevel(getSeverityLevel(posSeverity, severityLowLimit, severityHighLimit));
     }
-
     risk.setPosMitigationNotes(posMitigationNotes.getText());
 
     risk.setMitigationStrategy(mitigationStrategy.getText());
@@ -356,15 +434,15 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     name.setText("");
     description.setText("");
     identifiedBy.setText("");
-    category.setText("");
+    category.setValue("");
     notes.setText("");
 
-    preMitigationProbability.setValue(null);
-    preMitigationImpact.setValue(null);
+    preMitigationProbability.setSelectedIndex(0);
+    preMitigationImpact.setSelectedIndex(0);
     preMitigationNotes.setText("");
 
-    posMitigationProbability.setValue(null);
-    posMitigationImpact.setValue(null);
+    posMitigationProbability.setSelectedIndex(0);
+    posMitigationImpact.setSelectedIndex(0);
     posMitigationNotes.setText("");
 
     mitigationStrategy.setText("");
@@ -372,6 +450,31 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     mitigationOwner.setText("");
     mitigationRelatedEventIdentifierType.setText("");
     mitigationRelatedEventIdentifierValue.setText("");
+  }
+
+  private boolean isElementValid(Integer value) {
+    return value != null && value > 0 && value < 6;
+  }
+
+  private String getSeverityLevel(int severity, int lowLimit, int highLimit) {
+    if (severity < lowLimit) {
+      return messages.showLowSeverity();
+    } else if (severity < highLimit) {
+      return messages.showModerateSeverity();
+    } else {
+      return messages.showHighSeverity();
+    }
+  }
+
+  private SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
+    if (severity < lowLimit) {
+      return SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + messages.showLowSeverity() + "</span>");
+    } else if (severity < highLimit) {
+      return SafeHtmlUtils
+        .fromSafeConstant("<span class='label-warning'>" + messages.showModerateSeverity() + "</span>");
+    } else {
+      return SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.showHighSeverity() + "</span>");
+    }
   }
 
   /**

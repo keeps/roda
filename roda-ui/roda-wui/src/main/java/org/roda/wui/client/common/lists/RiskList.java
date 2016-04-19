@@ -46,7 +46,7 @@ import config.i18n.client.RiskMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class RiskList extends AsyncTableCell<Risk> {
+public class RiskList extends BasicAsyncTableCell<Risk> {
 
   private static final int PAGE_SIZE = 20;
 
@@ -80,8 +80,7 @@ public class RiskList extends AsyncTableCell<Risk> {
       }
     };
 
-    identifiedOnColumn = new Column<Risk, Date>(
-      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+    identifiedOnColumn = new Column<Risk, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG))) {
       @Override
       public Date getValue(Risk risk) {
         return risk != null ? risk.getIdentifiedOn() : null;
@@ -109,15 +108,14 @@ public class RiskList extends AsyncTableCell<Risk> {
       public SafeHtml getValue(Risk risk) {
         SafeHtml ret = null;
         if (risk != null) {
-          if (risk.getPosMitigationSeverity() < 5) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-success'>" + messages.showGoodSeverity() + "</span>");
-          } else if (risk.getPosMitigationSeverity() < 15) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-warning'>" + messages.showNormalSeverity() + "</span>");
+          String severity = risk.getPosMitigationSeverityLevel().toString();
+
+          if (severity.equals(messages.showLowSeverity())) {
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + severity + "</span>");
+          } else if (severity.equals(messages.showModerateSeverity())) {
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + severity + "</span>");
           } else {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-danger'>" + messages.showBadSeverity() + "</span>");
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + severity + "</span>");
           }
         }
 

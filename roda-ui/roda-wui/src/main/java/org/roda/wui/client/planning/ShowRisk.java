@@ -24,14 +24,19 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.RiskMessages;
 
 /**
  * @author Luis Faria
@@ -73,8 +78,7 @@ public class ShowRisk extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  // private static CommonMessages messages = GWT.create(CommonMessages.class);
+  private static RiskMessages messages = GWT.create(RiskMessages.class);
 
   @UiField
   Label riskId;
@@ -107,7 +111,7 @@ public class ShowRisk extends Composite {
   Label riskPreMitigationImpact;
 
   @UiField
-  Label riskPreMitigationSeverity;
+  HTML riskPreMitigationSeverity;
 
   @UiField
   Label riskPreMitigationNotesKey, riskPreMitigationNotesValue;
@@ -116,13 +120,22 @@ public class ShowRisk extends Composite {
   Label riskPosMitigationKey;
 
   @UiField
-  Label riskPosMitigationProbabilityKey, riskPosMitigationProbabilityValue;
+  Label riskPosMitigationProbabilityKey;
 
   @UiField
-  Label riskPosMitigationImpactKey, riskPosMitigationImpactValue;
+  Label riskPosMitigationProbability;
 
   @UiField
-  Label riskPosMitigationSeverityKey, riskPosMitigationSeverityValue;
+  Label riskPosMitigationImpactKey;
+
+  @UiField
+  Label riskPosMitigationImpact;
+
+  @UiField
+  Label riskPosMitigationSeverityKey;
+
+  @UiField
+  HTML riskPosMitigationSeverity;
 
   @UiField
   Label riskPosMitigationNotesKey, riskPosMitigationNotesValue;
@@ -168,8 +181,8 @@ public class ShowRisk extends Composite {
   }
 
   public ShowRisk(Risk risk) {
-    initWidget(uiBinder.createAndBindUi(this));
     this.risk = risk;
+    initWidget(uiBinder.createAndBindUi(this));
 
     riskId.setText(risk.getId());
     riskName.setText(risk.getName());
@@ -183,46 +196,58 @@ public class ShowRisk extends Composite {
     riskNotesValue.setText(risk.getNotes());
     riskNotesKey.setVisible(risk.getNotes().length() > 0);
 
-    riskPreMitigationProbability.setText(Integer.toString(risk.getPreMitigationProbability()));
-    riskPreMitigationImpact.setText(Integer.toString(risk.getPreMitigationImpact()));
-    riskPreMitigationSeverity.setText(Integer.toString(risk.getPreMitigationSeverity()));
+    final int preProbability = risk.getPreMitigationProbability();
+    final int preImpact = risk.getPreMitigationImpact();
+    final int preSeverity = risk.getPreMitigationSeverity();
+    final int posProbability = risk.getPosMitigationProbability();
+    final int posImpact = risk.getPosMitigationImpact();
+    final int posSeverity = risk.getPosMitigationSeverity();
+
+    BrowserService.Util.getInstance().retrieveShowMitigationTerms(preProbability, preImpact, posProbability, posImpact,
+      new AsyncCallback<List<String>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // do nothing
+        }
+
+        @Override
+        public void onSuccess(List<String> terms) {
+
+          if (terms.size() == 6) {
+            int severityHighLimit = Integer.parseInt(terms.get(0));
+            int severityLowLimit = Integer.parseInt(terms.get(1));
+
+            riskPreMitigationProbability.setText(terms.get(2));
+            riskPreMitigationImpact.setText(terms.get(3));
+
+            riskPreMitigationSeverity
+              .setHTML(ShowRisk.this.getSeverityDefinition(preSeverity, severityHighLimit, severityLowLimit));
+
+            riskPosMitigationProbability.setText(terms.get(4));
+            riskPosMitigationImpact.setText(terms.get(5));
+
+            if (posProbability == 0 && posImpact == 0) {
+              riskPosMitigationKey.setVisible(false);
+              riskPosMitigationProbabilityKey.setVisible(false);
+              riskPosMitigationProbability.setVisible(false);
+              riskPosMitigationImpactKey.setVisible(false);
+              riskPosMitigationImpact.setVisible(false);
+              riskPosMitigationSeverityKey.setVisible(false);
+              riskPosMitigationSeverity.setVisible(false);
+            } else {
+              riskPosMitigationSeverity
+                .setHTML(ShowRisk.this.getSeverityDefinition(posSeverity, severityHighLimit, severityLowLimit));
+            }
+          }
+        }
+      });
 
     riskPreMitigationNotesValue.setText(risk.getPreMitigationNotes());
     riskPreMitigationNotesKey.setVisible(risk.getPreMitigationNotes().length() > 0);
 
-    int posMitigationCounter = 0;
-
-    if (risk.getPosMitigationProbability() > 0) {
-      posMitigationCounter++;
-      riskPosMitigationProbabilityValue.setText(Integer.toString(risk.getPosMitigationProbability()));
-    } else {
-      riskPosMitigationProbabilityKey.setVisible(false);
-    }
-
-    if (risk.getPosMitigationImpact() > 0) {
-      posMitigationCounter++;
-      riskPosMitigationImpactValue.setText(Integer.toString(risk.getPosMitigationImpact()));
-    } else {
-      riskPosMitigationImpactKey.setVisible(false);
-    }
-
-    if (risk.getPosMitigationSeverity() > 0) {
-      posMitigationCounter++;
-      riskPosMitigationSeverityValue.setText(Integer.toString(risk.getPosMitigationSeverity()));
-    } else {
-      riskPosMitigationSeverityKey.setVisible(false);
-    }
-
-    if (risk.getPosMitigationNotes().length() > 0) {
-      posMitigationCounter++;
-      riskPosMitigationNotesValue.setText(risk.getPosMitigationNotes());
-    } else {
-      riskPosMitigationNotesKey.setVisible(false);
-    }
-
-    if (posMitigationCounter == 0) {
-      riskMitigationKey.setVisible(false);
-    }
+    riskPosMitigationNotesValue.setText(risk.getPosMitigationNotes());
+    riskPosMitigationNotesKey.setVisible(risk.getPosMitigationNotes().length() > 0);
 
     int mitigationCounter = 0;
 
@@ -309,6 +334,17 @@ public class ShowRisk extends Composite {
     } else {
       Tools.newHistory(RiskRegister.RESOLVER);
       callback.onSuccess(null);
+    }
+  }
+
+  private SafeHtml getSeverityDefinition(int severity, int lowLimit, int highLimit) {
+    if (severity < lowLimit) {
+      return SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + messages.showLowSeverity() + "</span>");
+    } else if (severity < highLimit) {
+      return SafeHtmlUtils
+        .fromSafeConstant("<span class='label-warning'>" + messages.showModerateSeverity() + "</span>");
+    } else {
+      return SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + messages.showHighSeverity() + "</span>");
     }
   }
 

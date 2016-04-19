@@ -25,4 +25,8 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
   public String getValue() {
     return suggestBox.getValue();
   }
+
+  public void setValue(String value) {
+    suggestBox.setValue(value);
+  }
 }

@@ -9,6 +9,9 @@ package org.roda.core.data.v2.messages;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -28,14 +31,15 @@ public class Message implements IsIndexed, Serializable {
   private String body = null;
   private Date sentOn = null;
   private String fromUser = null;
-  private String recipientUser = null;
+  private List<String> recipientUsers = null;
   private String acknowledgeToken = null;
   private boolean isAcknowledged = false;
-  private Date acknowledgedOn = null;
+  private Map<String, String> acknowledgedUsers = null;
 
   public Message() {
     super();
     this.sentOn = new Date();
+    this.acknowledgedUsers = new HashMap<String, String>();
   }
 
   public Message(Message message) {
@@ -44,10 +48,10 @@ public class Message implements IsIndexed, Serializable {
     this.body = message.getBody();
     this.sentOn = message.getSentOn();
     this.fromUser = message.getFromUser();
-    this.recipientUser = message.getRecipientUser();
+    this.recipientUsers = message.getRecipientUsers();
     this.acknowledgeToken = message.getAcknowledgeToken();
     this.isAcknowledged = message.isAcknowledged();
-    this.acknowledgedOn = message.getAcknowledgedOn();
+    this.acknowledgedUsers = message.getAcknowledgedUsers();
   }
 
   public String getId() {
@@ -90,14 +94,6 @@ public class Message implements IsIndexed, Serializable {
     this.fromUser = fromUser;
   }
 
-  public String getRecipientUser() {
-    return recipientUser;
-  }
-
-  public void setRecipientUser(String recipientUser) {
-    this.recipientUser = recipientUser;
-  }
-
   public String getAcknowledgeToken() {
     return acknowledgeToken;
   }
@@ -114,19 +110,31 @@ public class Message implements IsIndexed, Serializable {
     this.isAcknowledged = isAcknowledged;
   }
 
-  public Date getAcknowledgedOn() {
-    return acknowledgedOn;
+  public List<String> getRecipientUsers() {
+    return recipientUsers;
   }
 
-  public void setAcknowledgedOn(Date acknowledgedOn) {
-    this.acknowledgedOn = acknowledgedOn;
+  public void setRecipientUsers(List<String> recipientUsers) {
+    this.recipientUsers = recipientUsers;
+  }
+
+  public Map<String, String> getAcknowledgedUsers() {
+    return acknowledgedUsers;
+  }
+
+  public void setAcknowledgedUsers(Map<String, String> acknowledgedUsers) {
+    this.acknowledgedUsers = acknowledgedUsers;
+  }
+
+  public void addAcknowledgedUser(String recipientUser, String acknowledgedOn) {
+    this.acknowledgedUsers.put(recipientUser, acknowledgedOn);
   }
 
   @Override
   public String toString() {
     return "Format [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
-      + fromUser + ", recipientUser=" + recipientUser + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
-      + isAcknowledged + ", acknowledgedOn=" + acknowledgedOn + "]";
+      + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
+      + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + "]";
   }
 
   @JsonIgnore

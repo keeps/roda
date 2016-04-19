@@ -27,40 +27,45 @@ public class ConfigurableEmailUtility {
   private String protocol;
   private String login;
   private String password;
+  private Message msg;
+  private Session session;
 
-  public ConfigurableEmailUtility() {
+  public ConfigurableEmailUtility(String from, String subject) {
     this.protocol = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "protocol");
     this.login = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "login");
     this.password = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "password");
+
+    try {
+      session = getSession();
+      session.setDebug(false);
+
+      // create a message
+      msg = new MimeMessage(session);
+
+      // set the from and to address
+      InternetAddress addressFrom = new InternetAddress(login);
+
+      msg.setFrom(addressFrom);
+
+      // Setting the Subject and Content Type
+      msg.addHeader("name", from);
+      msg.setSubject(subject);
+
+    } catch (MessagingException e) {
+      e.printStackTrace();
+    }
   }
 
-  public void sendMail(String from, String recipients[], String subject, String message) throws MessagingException {
-    Session session = getSession(from);
-    session.setDebug(false);
+  public void sendMail(String recipient, String message) throws MessagingException {
 
-    // create a message
-    Message msg = new MimeMessage(session);
-
-    // set the from and to address
-    InternetAddress addressFrom = new InternetAddress(login);
-    msg.setFrom(addressFrom);
-
-    InternetAddress[] addressTo = new InternetAddress[recipients.length];
-    for (int i = 0; i < recipients.length; i++) {
-      addressTo[i] = new InternetAddress(recipients[i]);
-    }
-    msg.setRecipients(Message.RecipientType.TO, addressTo);
+    InternetAddress recipientAddress = new InternetAddress(recipient);
+    msg.setRecipient(Message.RecipientType.TO, recipientAddress);
 
     String htmlMessage = String.format("<?xml version=\"1.0\" encoding=\"UTF-8\"?>%s", message);
-
     MimeMultipart mimeMultipart = new MimeMultipart();
     MimeBodyPart mimeBodyPart = new MimeBodyPart();
     mimeBodyPart.setContent(htmlMessage, "text/html;charset=UTF-8");
     mimeMultipart.addBodyPart(mimeBodyPart);
-
-    // Setting the Subject and Content Type
-    msg.addHeader("name", from);
-    msg.setSubject(subject);
     msg.setContent(mimeMultipart);
 
     // sending the message
@@ -70,7 +75,7 @@ public class ConfigurableEmailUtility {
     transport.close();
   }
 
-  private Session getSession(String fromUser) {
+  private Session getSession() {
     javax.mail.Authenticator authenticator = null;
     boolean hasAuth = false;
 

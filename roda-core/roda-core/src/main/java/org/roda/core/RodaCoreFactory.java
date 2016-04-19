@@ -253,7 +253,8 @@ public class RodaCoreFactory {
         rodaPropertiesCache = new HashMap<String, Map<String, String>>();
         addConfiguration("roda-core.properties");
         addConfiguration("roda-core-formats.properties");
-        LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties");
+        addConfiguration("roda-wui.properties");
+        LOGGER.debug("Finished loading roda-core.properties & roda-core-formats.properties & roda-wui.properties");
 
         // instantiate storage and model service
         instantiateStorageAndModel();

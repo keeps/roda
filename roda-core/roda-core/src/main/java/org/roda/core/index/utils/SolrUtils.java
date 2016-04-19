@@ -1681,11 +1681,13 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY, risk.getPreMitigationProbability());
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_IMPACT, risk.getPreMitigationImpact());
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_SEVERITY, risk.getPreMitigationSeverity());
+    doc.addField(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL, risk.getPreMitigationSeverityLevel().toString());
     doc.addField(RodaConstants.RISK_PRE_MITIGATION_NOTES, risk.getPreMitigationNotes());
 
     doc.addField(RodaConstants.RISK_POS_MITIGATION_PROBABILITY, risk.getPosMitigationProbability());
     doc.addField(RodaConstants.RISK_POS_MITIGATION_IMPACT, risk.getPosMitigationImpact());
     doc.addField(RodaConstants.RISK_POS_MITIGATION_SEVERITY, risk.getPosMitigationSeverity());
+    doc.addField(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, risk.getPosMitigationSeverityLevel().toString());
     doc.addField(RodaConstants.RISK_POS_MITIGATION_NOTES, risk.getPosMitigationNotes());
 
     doc.addField(RodaConstants.RISK_MITIGATION_STRATEGY, risk.getMitigationStrategy());
@@ -1715,11 +1717,15 @@ public class SolrUtils {
     risk.setPreMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_PROBABILITY), 0));
     risk.setPreMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_IMPACT), 0));
     risk.setPreMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY), 0));
+    risk.setPreMitigationSeverityLevel(
+      Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_SEVERITY_LEVEL))));
     risk.setPreMitigationNotes(objectToString(doc.get(RodaConstants.RISK_PRE_MITIGATION_NOTES)));
 
     risk.setPosMitigationProbability(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_PROBABILITY), 0));
     risk.setPosMitigationImpact(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_IMPACT), 0));
     risk.setPosMitigationSeverity(objectToInteger(doc.get(RodaConstants.RISK_POS_MITIGATION_SEVERITY), 0));
+    risk.setPosMitigationSeverityLevel(
+      Risk.SEVERITY_LEVEL.valueOf(objectToString(doc.get(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL))));
     risk.setPosMitigationNotes(objectToString(doc.get(RodaConstants.RISK_POS_MITIGATION_NOTES)));
 
     risk.setMitigationStrategy(objectToString(doc.get(RodaConstants.RISK_MITIGATION_STRATEGY)));
@@ -1843,10 +1849,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.MESSAGE_BODY, message.getBody());
     doc.addField(RodaConstants.MESSAGE_SENT_ON, message.getSentOn());
     doc.addField(RodaConstants.MESSAGE_FROM_USER, message.getFromUser());
-    doc.addField(RodaConstants.MESSAGE_RECIPIENT_USER, message.getRecipientUser());
+    doc.addField(RodaConstants.MESSAGE_RECIPIENT_USERS, message.getRecipientUsers());
     doc.addField(RodaConstants.MESSAGE_ACKNOWLEDGE_TOKEN, message.getAcknowledgeToken());
     doc.addField(RodaConstants.MESSAGE_IS_ACKNOWLEDGED, message.isAcknowledged());
-    doc.addField(RodaConstants.MESSAGE_ACKNOWLEDGED_ON, message.getAcknowledgedOn());
+    doc.addField(RodaConstants.MESSAGE_ACKNOWLEDGED_USERS, JsonUtils.getJsonFromObject(message.getAcknowledgedUsers()));
 
     return doc;
   }
@@ -1859,10 +1865,11 @@ public class SolrUtils {
     message.setBody(objectToString(doc.get(RodaConstants.MESSAGE_BODY)));
     message.setSentOn(objectToDate(doc.get(RodaConstants.MESSAGE_SENT_ON)));
     message.setFromUser(objectToString(doc.get(RodaConstants.MESSAGE_FROM_USER)));
-    message.setRecipientUser(objectToString(doc.get(RodaConstants.MESSAGE_RECIPIENT_USER)));
+    message.setRecipientUsers(objectToListString(doc.get(RodaConstants.MESSAGE_RECIPIENT_USERS)));
     message.setAcknowledgeToken(objectToString(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGE_TOKEN)));
     message.setAcknowledged(objectToBoolean(doc.get(RodaConstants.MESSAGE_IS_ACKNOWLEDGED)));
-    message.setAcknowledgedOn(objectToDate(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGED_ON)));
+    message.setAcknowledgedUsers(
+      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGED_USERS))));
 
     return message;
   }

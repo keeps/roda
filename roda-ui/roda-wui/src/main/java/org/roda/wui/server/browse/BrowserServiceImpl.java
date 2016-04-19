@@ -347,15 +347,16 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createJob(Job job)
-    throws RequestNotValidException, AuthorizationDeniedException, NotFoundException, GenericException, JobAlreadyStartedException {
+  public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
+    GenericException, JobAlreadyStartedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Jobs.createJob(user, job);
   }
 
   @Override
   public Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException, JobAlreadyStartedException {
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    JobAlreadyStartedException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
@@ -537,6 +538,26 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.retrieveRiskVersions(user, riskId);
+  }
+
+  @Override
+  public List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+    int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveShowMitigationTerms(user, preMitigationProbability, preMitigationImpact,
+      posMitigationProbability, posMitigationImpact);
+  }
+
+  @Override
+  public List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveMitigationSeverityLimits(user);
+  }
+
+  @Override
+  public List<List<String>> retrieveAllMitigationProperties() throws AuthorizationDeniedException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveAllMitigationProperties(user);
   }
 
 }

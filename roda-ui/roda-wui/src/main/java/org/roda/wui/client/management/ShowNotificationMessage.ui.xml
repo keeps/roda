@@ -20,17 +20,18 @@
 				<g:Label styleName="descriptiveMetadata-field-key">Subject</g:Label>
 				<g:Label ui:field="messageSubject" />
 				<g:Label styleName="descriptiveMetadata-field-key">Body</g:Label>
-				<g:Label ui:field="messageBody" />
+				<g:HTML ui:field="messageBody" />
 				<g:Label styleName="descriptiveMetadata-field-key">Sent On</g:Label>
 				<g:Label ui:field="messageSentOn" />
 				<g:Label styleName="descriptiveMetadata-field-key">From User</g:Label>
 				<g:Label ui:field="messageFromUser" />
-				<g:Label styleName="descriptiveMetadata-field-key">Recipient User</g:Label>
-				<g:Label ui:field="messageRecipientUser" />
 				<g:Label styleName="descriptiveMetadata-field-key">Is Acknowledged</g:Label>
 				<g:Label ui:field="messageIsAcknowledged" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="messageAcknowledgedOnKey">Acknowledged On</g:Label>
-				<g:Label ui:field="messageAcknowledgedOnValue" />
+				
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="acknowledgedUsersKey">Acknowledged Users</g:Label>
+				<g:HTML ui:field="acknowledgedUsersValue" />
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="notAcknowledgedUsersKey">Not Acknowledged Users</g:Label>
+				<g:HTML ui:field="notAcknowledgedUsersValue" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

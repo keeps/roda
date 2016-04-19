@@ -41,14 +41,14 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.BrowseMessages;
 
-public class MessageList extends AsyncTableCell<Message> {
+public class MessageList extends BasicAsyncTableCell<Message> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private static final int PAGE_SIZE = 20;
 
   private TextColumn<Message> fromUser;
-  private TextColumn<Message> recipientUser;
+  // private TextColumn<Message> recipientUser;
   private Column<Message, Date> sentOn;
   private TextColumn<Message> subject;
   private Column<Message, SafeHtml> acknowledged;
@@ -71,13 +71,12 @@ public class MessageList extends AsyncTableCell<Message> {
       }
     };
 
-    recipientUser = new TextColumn<Message>() {
-
-      @Override
-      public String getValue(Message message) {
-        return message != null ? message.getRecipientUser() : null;
-      }
-    };
+    /*
+     * recipientUser = new TextColumn<Message>() {
+     * 
+     * @Override public String getValue(Message message) { return message !=
+     * null ? message.getRecipientUsers().toArray().toString() : null; } };
+     */
 
     sentOn = new Column<Message, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
@@ -113,7 +112,7 @@ public class MessageList extends AsyncTableCell<Message> {
     };
 
     fromUser.setSortable(true);
-    recipientUser.setSortable(true);
+    // recipientUser.setSortable(true);
     sentOn.setSortable(true);
     subject.setSortable(true);
     acknowledged.setSortable(true);
@@ -122,7 +121,7 @@ public class MessageList extends AsyncTableCell<Message> {
 
     // display.addColumn(idColumn, "Id");
     display.addColumn(fromUser, "From");
-    display.addColumn(recipientUser, "To");
+    // display.addColumn(recipientUser, "To");
     display.addColumn(sentOn, "Sent On");
     display.addColumn(subject, "Subject");
     display.addColumn(acknowledged, "Acknowledged");
@@ -145,7 +144,8 @@ public class MessageList extends AsyncTableCell<Message> {
 
     Map<Column<Message, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Message, ?>, List<String>>();
     columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.MESSAGE_FROM_USER));
-    columnSortingKeyMap.put(recipientUser, Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USER));
+    // columnSortingKeyMap.put(recipientUser,
+    // Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USERS));
     columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.MESSAGE_SENT_ON));
     columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.MESSAGE_SUBJECT));
     columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));

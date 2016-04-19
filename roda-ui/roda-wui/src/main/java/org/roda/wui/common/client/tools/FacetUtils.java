@@ -7,7 +7,6 @@
  */
 package org.roda.wui.common.client.tools;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -29,12 +28,12 @@ public class FacetUtils {
 
   private static ClientLogger LOGGER = new ClientLogger(FacetUtils.class.getName());
 
-  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T> list,
+  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T, ?> list,
     final Map<String, FlowPanel> facetPanels) {
     bindFacets(list, facetPanels, false);
   }
 
-  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T> list,
+  public static <T extends IsIndexed> void bindFacets(final AsyncTableCell<T, ?> list,
     final Map<String, FlowPanel> facetPanels, final boolean hideDisabled) {
     list.addValueChangeHandler(new ValueChangeHandler<IndexResult<T>>() {
 
@@ -45,7 +44,7 @@ public class FacetUtils {
     });
   }
 
-  private static <T extends IsIndexed> void updateFacetPanels(final AsyncTableCell<T> list,
+  private static <T extends IsIndexed> void updateFacetPanels(final AsyncTableCell<T, ?> list,
     final Map<String, FlowPanel> facetPanels, final List<FacetFieldResult> facetResults, final boolean hideDisabled) {
 
     for (FacetFieldResult facetResult : facetResults) {

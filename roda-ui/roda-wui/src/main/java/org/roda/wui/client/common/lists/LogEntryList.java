@@ -35,7 +35,7 @@ import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.CellPreviewEvent;
 import com.google.gwt.view.client.DefaultSelectionEventManager;
 
-public class LogEntryList extends AsyncTableCell<LogEntry> {
+public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
   private Column<LogEntry, Date> dateColumn;
   private TextColumn<LogEntry> actionComponentColumn;

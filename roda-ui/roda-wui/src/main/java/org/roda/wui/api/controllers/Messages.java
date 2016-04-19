@@ -80,7 +80,7 @@ public class Messages extends RodaCoreService {
     return messages;
   }
 
-  public static void acknowledgeMessage(RodaUser user, String messageId, String token)
+  public static void acknowledgeMessage(RodaUser user, String messageId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -88,7 +88,7 @@ public class Messages extends RodaCoreService {
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().acknowledgeMessage(messageId, token);
+    RodaCoreFactory.getModelService().acknowledgeMessage(messageId, token, email);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.management;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.v2.messages.Message;
@@ -22,14 +23,18 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -80,6 +85,7 @@ public class ShowNotificationMessage extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
   Label messageId;
@@ -88,7 +94,7 @@ public class ShowNotificationMessage extends Composite {
   Label messageSubject;
 
   @UiField
-  Label messageBody;
+  HTML messageBody;
 
   @UiField
   Label messageSentOn;
@@ -97,13 +103,19 @@ public class ShowNotificationMessage extends Composite {
   Label messageFromUser;
 
   @UiField
-  Label messageRecipientUser;
-
-  @UiField
   Label messageIsAcknowledged;
 
   @UiField
-  Label messageAcknowledgedOnKey, messageAcknowledgedOnValue;
+  Label acknowledgedUsersKey;
+
+  @UiField
+  HTML acknowledgedUsersValue;
+
+  @UiField
+  Label notAcknowledgedUsersKey;
+
+  @UiField
+  HTML notAcknowledgedUsersValue;
 
   @UiField
   Button buttonCancel;
@@ -117,18 +129,27 @@ public class ShowNotificationMessage extends Composite {
 
     messageId.setText(message.getId());
     messageSubject.setText(message.getSubject());
-    messageBody.setText(message.getBody());
-    messageSentOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(message.getSentOn()));
+    messageBody.setHTML(message.getBody());
+    messageSentOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(message.getSentOn()));
     messageFromUser.setText(message.getFromUser());
-    messageRecipientUser.setText(message.getRecipientUser());
     messageIsAcknowledged.setText(Boolean.toString(message.isAcknowledged()));
+    acknowledgedUsersKey.setVisible(false);
+    notAcknowledgedUsersKey.setVisible(false);
 
-    if (message.getAcknowledgedOn() != null) {
-      messageAcknowledgedOnValue
-        .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(message.getAcknowledgedOn()));
-    } else {
-      messageAcknowledgedOnKey.setVisible(false);
-      messageAcknowledgedOnValue.setVisible(false);
+    List<String> recipientUsers = new ArrayList<String>(message.getRecipientUsers());
+
+    for (String user : message.getAcknowledgedUsers().keySet()) {
+      String ackDate = message.getAcknowledgedUsers().get(user);
+      acknowledgedUsersKey.setVisible(true);
+      acknowledgedUsersValue.setHTML(SafeHtmlUtils.fromSafeConstant(
+        acknowledgedUsersValue.getHTML() + "<p>" + user + " <span class='small-and-gray'> " + ackDate + "</span></p>"));
+      recipientUsers.remove(user);
+    }
+
+    for (String user : recipientUsers) {
+      notAcknowledgedUsersKey.setVisible(true);
+      notAcknowledgedUsersValue
+        .setHTML(SafeHtmlUtils.fromSafeConstant(notAcknowledgedUsersValue.getHTML() + "<p>" + user + "</p>"));
     }
 
   }

@@ -413,11 +413,13 @@ public final class RodaConstants {
   public static final String RISK_PRE_MITIGATION_PROBABILITY = "preMitigationProbability";
   public static final String RISK_PRE_MITIGATION_IMPACT = "preMitigationImpact";
   public static final String RISK_PRE_MITIGATION_SEVERITY = "preMitigationSeverity";
+  public static final String RISK_PRE_MITIGATION_SEVERITY_LEVEL = "preMitigationSeverityLevel";
   public static final String RISK_PRE_MITIGATION_NOTES = "preMitigationNotes";
 
   public static final String RISK_POS_MITIGATION_PROBABILITY = "posMitigationProbability";
   public static final String RISK_POS_MITIGATION_IMPACT = "posMitigationImpact";
   public static final String RISK_POS_MITIGATION_SEVERITY = "posMitigationSeverity";
+  public static final String RISK_POS_MITIGATION_SEVERITY_LEVEL = "posMitigationSeverityLevel";
   public static final String RISK_POS_MITIGATION_NOTES = "posMitigationNotes";
 
   public static final String RISK_MITIGATION_STRATEGY = "mitigationStrategy";
@@ -486,10 +488,10 @@ public final class RodaConstants {
   public static final String MESSAGE_BODY = "body";
   public static final String MESSAGE_SENT_ON = "sentOn";
   public static final String MESSAGE_FROM_USER = "fromUser";
-  public static final String MESSAGE_RECIPIENT_USER = "recipientUser";
+  public static final String MESSAGE_RECIPIENT_USERS = "recipientUsers";
   public static final String MESSAGE_ACKNOWLEDGE_TOKEN = "acknowledgeToken";
   public static final String MESSAGE_IS_ACKNOWLEDGED = "isAcknowledged";
-  public static final String MESSAGE_ACKNOWLEDGED_ON = "acknowledgedOn";
+  public static final String MESSAGE_ACKNOWLEDGED_USERS = "acknowledgedUsers";
 
   public static final String MESSAGE_FILE_EXTENSION = ".json";
   public static final String MESSAGE_SEARCH = "search";
@@ -625,5 +627,8 @@ public final class RodaConstants {
   public static final String METADATA_VERSION_SEPARATOR = "_";
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
+
+  // Template Constants
+  public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template";
 
 }

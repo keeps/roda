@@ -272,17 +272,15 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     if (!"".equals(emails)) {
       List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
-      for (String email : emailList) {
-        try {
-          Message message = new Message();
-          message.setSubject("New ingest process was completed");
-          message.setFromUser("Ingest Process");
-          message.setRecipientUser(email);
-          Map<String, Object> scopes = new HashMap<String, Object>();
-          model.createMessage(message, "ingestion-template", scopes);
-        } catch (GenericException e) {
-          LOGGER.error("Error while creating new message", e);
-        }
+      try {
+        Message message = new Message();
+        message.setSubject("New ingest process was completed");
+        message.setFromUser("Ingest Process");
+        message.setRecipientUsers(emailList);
+        Map<String, Object> scopes = new HashMap<String, Object>();
+        model.createMessage(message, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
+      } catch (GenericException e) {
+        LOGGER.error("Error while creating new message", e);
       }
     }
 

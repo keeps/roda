@@ -32,7 +32,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
+public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -126,7 +126,8 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation> {
       columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
       columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
       columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
-      columnSortingKeyMap.put(totalNumberOfFilesColumn, Arrays.asList(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES));
+      columnSortingKeyMap.put(totalNumberOfFilesColumn,
+        Arrays.asList(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

@@ -34,7 +34,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
-public class SimpleRodaMemberList extends AsyncTableCell<RODAMember> {
+public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   private static final int PAGE_SIZE = 5;
 

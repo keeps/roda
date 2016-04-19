@@ -70,10 +70,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   private Filter defaultFilter;
   private String allFilter;
   private boolean defaultFilterIncremental = false;
-  
 
   private FlowPanel fieldsPanel;
-  private AsyncTableCell<?> list;
+  private AsyncTableCell<?, ?> list;
 
   public SearchPanel(Filter defaultFilter, String allFilter, String placeholder, boolean showSearchInputListBox,
     boolean showSearchAdvancedDisclosureButton) {
@@ -128,7 +127,8 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   }
 
   public void doSearch() {
-    Filter filter = buildSearchFilter(searchInputBox.getText(), defaultFilter, allFilter, fieldsPanel, defaultFilterIncremental);
+    Filter filter = buildSearchFilter(searchInputBox.getText(), defaultFilter, allFilter, fieldsPanel,
+      defaultFilterIncremental);
     list.setFilter(filter);
   }
 
@@ -196,7 +196,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchAdvancedPanel.add(searchAdvancedPanelButtons);
   }
 
-  public void setList(AsyncTableCell<?> list) {
+  public void setList(AsyncTableCell<?, ?> list) {
     this.list = list;
   }
 
@@ -208,13 +208,13 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     this.allFilter = allFilter;
   }
 
-  public void setVariables(Filter defaultFilter, String allFilter, AsyncTableCell<?> list, FlowPanel fieldsPanel) {
+  public void setVariables(Filter defaultFilter, String allFilter, AsyncTableCell<?, ?> list, FlowPanel fieldsPanel) {
     setDefaultFilter(defaultFilter);
     setAllFilter(allFilter);
     setList(list);
     setFieldsPanel(fieldsPanel);
   }
-  
+
   public void setDefaultFilterIncremental(boolean defaultFilterIncremental) {
     this.defaultFilterIncremental = defaultFilterIncremental;
   }

@@ -115,7 +115,7 @@ public class NotificationMessages extends Composite {
   MessageList messageList;
 
   @UiField(provided = true)
-  FlowPanel facetRecipientUser;
+  FlowPanel facetRecipientUsers;
 
   @UiField(provided = true)
   FlowPanel facetAcknowledged;
@@ -130,7 +130,7 @@ public class NotificationMessages extends Composite {
    */
   public NotificationMessages() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MESSAGE_RECIPIENT_USER),
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MESSAGE_RECIPIENT_USERS),
       new SimpleFacetParameter(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));
     messageList = new MessageList(filter, facets, "Notifications", false);
 
@@ -138,12 +138,12 @@ public class NotificationMessages extends Composite {
       false, false);
     searchPanel.setList(messageList);
 
-    facetRecipientUser = new FlowPanel();
+    facetRecipientUsers = new FlowPanel();
     facetAcknowledged = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.MESSAGE_RECIPIENT_USER, facetRecipientUser);
     facetPanels.put(RodaConstants.MESSAGE_IS_ACKNOWLEDGED, facetAcknowledged);
+    facetPanels.put(RodaConstants.MESSAGE_RECIPIENT_USERS, facetRecipientUsers);
     FacetUtils.bindFacets(messageList, facetPanels);
 
     messageList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

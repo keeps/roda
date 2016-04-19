@@ -34,8 +34,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class RodaMemberList extends AsyncTableCell<RODAMember> {
-
+public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());

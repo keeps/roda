@@ -38,7 +38,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class SearchFileList extends AsyncTableCell<IndexedFile> {
+public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 

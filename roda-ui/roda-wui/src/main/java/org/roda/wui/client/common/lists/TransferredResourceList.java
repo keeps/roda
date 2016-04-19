@@ -45,7 +45,7 @@ import com.google.gwt.user.client.ui.Label;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class TransferredResourceList extends AsyncTableCell<TransferredResource> {
+public class TransferredResourceList extends BasicAsyncTableCell<TransferredResource> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -102,8 +102,8 @@ public class TransferredResourceList extends AsyncTableCell<TransferredResource>
       }
     };
 
-    creationDateColumn = new Column<TransferredResource, Date>(new DateCell(
-      DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
+    creationDateColumn = new Column<TransferredResource, Date>(
+      new DateCell(DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT))) {
       @Override
       public Date getValue(TransferredResource r) {
         return r != null ? r.getCreationDate() : null;

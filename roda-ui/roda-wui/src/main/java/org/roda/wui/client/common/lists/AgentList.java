@@ -36,7 +36,7 @@ import com.google.gwt.view.client.ProvidesKey;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class AgentList extends AsyncTableCell<Agent> {
+public class AgentList extends BasicAsyncTableCell<Agent> {
 
   private static final int PAGE_SIZE = 20;
 

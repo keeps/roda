@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.client.management">
+	xmlns:u="urn:import:org.roda.wui.client.management" xmlns:s="urn:import:org.roda.wui.client.search">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 	
@@ -29,7 +29,7 @@
 				<g:Label addStyleNames="form-label">Identified By</g:Label>
 				<g:TextBox ui:field="identifiedBy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Category</g:Label>
-				<g:TextBox ui:field="category" addStyleNames="form-textbox" />
+				<s:SearchSuggestBox ui:field="category" addStyleNames="form-textbox"/>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
 				<g:TextArea ui:field="notes" addStyleNames="form-textbox" />
 				
@@ -37,11 +37,15 @@
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>
-						<g:IntegerBox ui:field="preMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="preMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Impact</g:Label>
-						<g:IntegerBox ui:field="preMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="preMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+					</g:FlowPanel>
+					<g:FlowPanel>
+						<g:Label addStyleNames="form-label" ui:field="preMitigationSeverityKey">Severity</g:Label>
+						<g:HTML ui:field="preMitigationSeverityValue"></g:HTML>
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
@@ -63,11 +67,15 @@
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>
-						<g:IntegerBox ui:field="posMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="posMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Impact</g:Label>
-						<g:IntegerBox ui:field="posMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="posMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+					</g:FlowPanel>
+					<g:FlowPanel>
+						<g:Label addStyleNames="form-label" ui:field="posMitigationSeverityKey">Severity</g:Label>
+						<g:HTML ui:field="posMitigationSeverityValue"></g:HTML>
 					</g:FlowPanel>
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">Notes</g:Label>

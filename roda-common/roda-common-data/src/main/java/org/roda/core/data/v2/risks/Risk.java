@@ -26,6 +26,10 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
 
+  public static enum SEVERITY_LEVEL {
+    Low, Moderate, High;
+  }
+
   private String description = null;
   private Date identifiedOn = null;
   private String identifiedBy = null;
@@ -35,11 +39,13 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
   private int preMitigationProbability = 0;
   private int preMitigationImpact = 0;
   private int preMitigationSeverity = 0;
+  private SEVERITY_LEVEL preMitigationSeverityLevel = null;
   private String preMitigationNotes = null;
 
   private int posMitigationProbability = 0;
   private int posMitigationImpact = 0;
   private int posMitigationSeverity = 0;
+  private SEVERITY_LEVEL posMitigationSeverityLevel = null;
   private String posMitigationNotes = null;
 
   private String mitigationStrategy = null;
@@ -66,11 +72,13 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.preMitigationProbability = risk.getPreMitigationProbability();
     this.preMitigationImpact = risk.getPreMitigationImpact();
     this.preMitigationSeverity = risk.getPreMitigationSeverity();
+    this.preMitigationSeverityLevel = risk.getPreMitigationSeverityLevel();
     this.preMitigationNotes = risk.getPreMitigationNotes();
 
     this.posMitigationProbability = risk.getPosMitigationProbability();
     this.posMitigationImpact = risk.getPosMitigationImpact();
     this.posMitigationSeverity = risk.getPosMitigationSeverity();
+    this.posMitigationSeverityLevel = risk.getPosMitigationSeverityLevel();
     this.posMitigationNotes = risk.getPosMitigationNotes();
 
     this.mitigationStrategy = risk.getMitigationStrategy();
@@ -162,6 +170,18 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.preMitigationSeverity = preMitigationSeverity;
   }
 
+  public SEVERITY_LEVEL getPreMitigationSeverityLevel() {
+    return preMitigationSeverityLevel;
+  }
+
+  public void setPreMitigationSeverityLevel(SEVERITY_LEVEL preMitigationSeverity) {
+    this.preMitigationSeverityLevel = preMitigationSeverity;
+  }
+
+  public void setPreMitigationSeverityLevel(String preMitigationSeverity) {
+    this.preMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(preMitigationSeverity);
+  }
+
   public String getPreMitigationNotes() {
     return preMitigationNotes;
   }
@@ -192,6 +212,18 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
 
   public void setPosMitigationSeverity(int posMitigationSeverity) {
     this.posMitigationSeverity = posMitigationSeverity;
+  }
+
+  public SEVERITY_LEVEL getPosMitigationSeverityLevel() {
+    return posMitigationSeverityLevel;
+  }
+
+  public void setPosMitigationSeverityLevel(SEVERITY_LEVEL posMitigationSeverity) {
+    this.posMitigationSeverityLevel = posMitigationSeverity;
+  }
+
+  public void setPosMitigationSeverityLevel(String posMitigationSeverity) {
+    this.posMitigationSeverityLevel = Risk.SEVERITY_LEVEL.valueOf(posMitigationSeverity);
   }
 
   public String getPosMitigationNotes() {

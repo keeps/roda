@@ -27,7 +27,6 @@ import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -46,7 +45,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class JobReportList extends AsyncTableCell<Report> {
+public class JobReportList extends BasicAsyncTableCell<Report> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);

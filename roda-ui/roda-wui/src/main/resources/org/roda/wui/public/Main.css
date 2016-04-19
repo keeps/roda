@@ -164,6 +164,11 @@ h6, .h6 {
 	font-size: 75%;
 }
 
+.small-and-gray {
+	font-size: 75%;
+	color: #999;
+}
+
 .fade-out {
     white-space: nowrap;
     position: relative;

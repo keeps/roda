@@ -20,7 +20,7 @@ import com.google.gwt.i18n.client.ConstantsWithLookup;
  *         'UserManagementConstants.properties'.
  */
 public interface UserManagementConstants extends Constants, ConstantsWithLookup {
-  
+
   // Create/Edit User/Group
   public String dataTabTitle();
 
@@ -56,10 +56,10 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editGroup();
 
   public String removeGroup();
-  
+
   public String actions();
 
-  // Select User/Group   
+  // Select User/Group
   public String selectNoUser();
 
   public String selectNoGroup();
@@ -76,16 +76,16 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String createUserCancel();
 
   public String createUserCreate();
-  
+
   // Edit User
   public String editUserTitle();
 
   public String editUserCancel();
-  
+
   public String editUserRemove();
-  
+
   public String editUserActivate();
-  
+
   public String editUserDeactivate();
 
   public String editUserApply();
@@ -140,9 +140,9 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String allGroups();
 
   public String memberGroups();
-  
+
   public String userGroups();
-  
+
   public String userPermissions();
 
   // Create Group
@@ -156,27 +156,27 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String editGroupTitle();
 
   public String editGroupApply();
-  
+
   public String editGroupRemove();
 
   public String editGroupCancel();
-  
+
   // Group data panel
   public String groupName();
 
   public String groupFullname();
-  
+
   public String groupDataNote();
-  
+
   public String groupGroups();
-  
+
   public String groupPermissions();
-  
+
   // Preferences
   public String preferencesUserDataTitle();
 
   public String preferencesSubmit();
-  
+
   public String preferencesCancel();
 
   public String preferencesEmailAlreadyExists();
@@ -250,7 +250,7 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String registerCaptchaTitle();
 
   public String registerSubmit();
-  
+
   public String registerCancel();
 
   public String registerUserExists();
@@ -258,22 +258,22 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String registerEmailAlreadyExists();
 
   public String registerWrongCaptcha();
-  
+
   public String registerFailure();
-  
+
   public String registerSendEmailVerificationFailure();
-  
+
   public String registerSuccessDialogTitle();
-  
+
   public String registerSuccessDialogMessage();
-  
+
   public String registerSuccessDialogMessageActive();
-  
+
   public String registerSuccessDialogButton();
 
   // Verify Email
   public String verifyEmailTitle();
-  
+
   public String verifyEmailUsername();
 
   public String verifyEmailToken();
@@ -283,9 +283,9 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String verifyEmailResend();
 
   public String verifyEmailChange();
-  
+
   public String verifyEmailSubmit();
-  
+
   public String verifyEmailCancel();
 
   public String verifyEmailNoSuchUser();
@@ -301,43 +301,43 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String verifyEmailChangeFailure();
 
   public String verifyEmailAlreadyExists();
-  
+
   public String verifyEmailChangeSuccess();
-  
+
   public String verifyEmailFailure();
-  
+
   public String verifyEmailSuccessDialogTitle();
-  
+
   public String verifyEmailSuccessDialogMessage();
-  
+
   public String verifyEmailSuccessDialogButton();
 
   // Recover Login
   public String recoverLoginTitle();
-  
+
   public String recoverLoginUsernameOrEmail();
 
   public String recoverLoginCaptchaTitle();
 
   public String recoverLoginSubmit();
-  
+
   public String recoverLoginCancel();
 
   public String recoverLoginCaptchaFailed();
 
   public String recoverLoginNoSuchUser();
-  
+
   public String recoverLoginFailure();
-  
+
   public String recoverLoginSuccessDialogTitle();
-  
+
   public String recoverLoginSuccessDialogMessage();
-  
+
   public String recoverLoginSuccessDialogButton();
 
   // Reset Password
   public String resetPasswordTitle();
-  
+
   public String resetPasswordUsername();
 
   public String resetPasswordToken();
@@ -347,19 +347,19 @@ public interface UserManagementConstants extends Constants, ConstantsWithLookup 
   public String resetPasswordRepeatPassword();
 
   public String resetPasswordSubmit();
-  
+
   public String resetPasswordCancel();
 
   public String resetPasswordInvalidToken();
 
   public String resetPasswordNoSuchUser();
-  
+
   public String resetPasswordFailure();
 
   public String resetPasswordSuccessDialogTitle();
-  
+
   public String resetPasswordSuccessDialogMessage();
-  
+
   public String resetPasswordSuccessDialogButton();
 
   // Select User Window

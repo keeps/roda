@@ -9,13 +9,14 @@ package org.roda.core.model;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,7 +30,6 @@ import java.util.UUID;
 import javax.mail.MessagingException;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.ConfigurableEmailUtility;
 import org.roda.core.common.IdUtils;
@@ -1783,23 +1783,29 @@ public class ModelService extends ModelObservable {
       message.setId(UUID.randomUUID().toString());
       message.setAcknowledgeToken(UUID.randomUUID().toString());
 
-      String body = getUpdatedMessageBody(message, templateName, scopes);
-      message.setBody(body);
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
+      String template = IOUtils.toString(templateStream, "UTF-8");
+      message.setBody(template);
+      IOUtils.closeQuietly(templateStream);
 
-      String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
-      if (StringUtils.isNotBlank(host)) {
-        LOGGER.trace("Sending email ...");
-        String[] recipients = {message.getRecipientUser()};
-        ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility();
-        emailUtility.sendMail(message.getFromUser(), recipients, message.getSubject(), message.getBody());
-        LOGGER.trace("Email sent");
+      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(message.getFromUser(), message.getSubject());
+
+      for (String recipient : message.getRecipientUsers()) {
+        String modifiedBody = getUpdatedMessageBody(message, recipient, template, templateName, scopes);
+        String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
+
+        if (host != null && !host.equals("")) {
+          LOGGER.debug("Sending email ...");
+          emailUtility.sendMail(recipient, modifiedBody);
+          LOGGER.debug("Email sent");
+        }
       }
 
       String messageAsJson = JsonUtils.getJsonFromObject(message);
       StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
       storage.createBinary(messagePath, new StringContentPayload(messageAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | AlreadyExistsException | MessagingException e) {
+      | AlreadyExistsException | MessagingException | IOException e) {
       LOGGER.error("Error creating message in storage", e);
     }
 
@@ -1807,27 +1813,29 @@ public class ModelService extends ModelObservable {
     return message;
   }
 
-  private String getUpdatedMessageBody(Message message, String templateName, Map<String, Object> scopesToAdd) {
+  private String getUpdatedMessageBody(Message message, String recipient, String template, String templateName,
+    Map<String, Object> scopesToAdd) {
     // update body message with the recipient user and acknowledge URL
+    String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
     ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
-    ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken());
+    ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken() + userUUID);
+    ackUrl = ackUrl.replaceAll("\\{email\\}", recipient);
 
     Map<String, Object> scopes = new HashMap<String, Object>();
     scopes.put("from", message.getFromUser());
-    scopes.put("recipient", message.getRecipientUser());
+    scopes.put("recipient", recipient);
     scopes.put("acknowledge", ackUrl);
     scopes.putAll(scopesToAdd);
 
-    InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
-
     Writer writer = new StringWriter();
     MustacheFactory mf = new DefaultMustacheFactory();
-    com.github.mustachejava.Mustache mustache = mf.compile(new InputStreamReader(templateStream), templateName);
+    StringReader reader = new StringReader(template);
+    com.github.mustachejava.Mustache mustache = mf.compile(reader, templateName);
     mustache.execute(writer, scopes);
-    String template = writer.toString();
-    IOUtils.closeQuietly(templateStream);
-    return template;
+    String modifiedTemplate = writer.toString();
+    IOUtils.closeQuietly(reader);
+    return modifiedTemplate;
   }
 
   public void updateMessage(Message message) throws GenericException {
@@ -1868,15 +1876,23 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public void acknowledgeMessage(String messageId, String token)
+  public void acknowledgeMessage(String messageId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
     Message message = this.retrieveMessage(messageId);
+    String ackToken = token.substring(0, 36);
+    String emailToken = token.substring(36);
 
-    if (message.getAcknowledgeToken().equals(token)) {
-      message.setAcknowledged(true);
-      message.setAcknowledgedOn(new Date());
-      this.updateMessage(message);
+    if (message.getAcknowledgeToken().equals(ackToken)) {
+      for (String recipient : message.getRecipientUsers()) {
+        if (UUID.nameUUIDFromBytes(recipient.getBytes()).toString().equals(emailToken)) {
+          DateFormat df = DateFormat.getDateTimeInstance();
+          String ackDate = df.format(new Date());
+          message.addAcknowledgedUser(recipient, ackDate);
+          message.setAcknowledged(true);
+          this.updateMessage(message);
+        }
+      }
     }
   }
 

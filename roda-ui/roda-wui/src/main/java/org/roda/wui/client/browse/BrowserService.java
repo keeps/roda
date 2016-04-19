@@ -204,4 +204,11 @@ public interface BrowserService extends RemoteService {
 
   RiskVersionsBundle retrieveRiskVersions(String riskId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+    int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException;
+
+  List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException;
+
+  List<List<String>> retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 }
