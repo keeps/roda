@@ -339,7 +339,7 @@ public class ValidationUtils {
             report.addIssue(convertSAXParseException(saxParseException));
           }
         } catch (SAXException e) {
-          LOGGER.error("Error validating preservation binary " + binary.getStoragePath().asString(), e);
+          LOGGER.error("Error validating preservation binary " + binary.getStoragePath(), e);
           report.setValid(false);
           for (SAXParseException saxParseException : errorHandler.getErrors()) {
             report.addIssue(convertSAXParseException(saxParseException));

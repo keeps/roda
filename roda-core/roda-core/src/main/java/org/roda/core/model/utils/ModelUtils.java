@@ -45,6 +45,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -534,7 +535,8 @@ public final class ModelUtils {
     if (!file.isDirectory()) {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
       Binary binary = storage.getBinary(filePath);
-      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : filePath.asString(), binary.getContent());
+      ZipEntryInfo info = new ZipEntryInfo(flat ? filePath.getName() : FSUtils.getStoragePathAsString(filePath, false),
+        binary.getContent());
       zipEntries.add(info);
     } else {
       // do nothing
@@ -543,7 +545,8 @@ public final class ModelUtils {
 
   public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    ZipEntryInfo info = new ZipEntryInfo(binary.getStoragePath().asString(), binary.getContent());
+    ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(binary.getStoragePath(), false),
+      binary.getContent());
     zipEntries.add(info);
   }
 

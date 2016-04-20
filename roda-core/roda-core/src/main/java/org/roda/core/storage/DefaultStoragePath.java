@@ -9,101 +9,56 @@ package org.roda.core.storage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
 
 public class DefaultStoragePath implements StoragePath {
 
-  private final String path;
-
-  public static DefaultStoragePath parse(String path) throws RequestNotValidException {
-    if (isValid(path)) {
-      return new DefaultStoragePath(sanitizePath(path));
-    } else {
-      throw new RequestNotValidException("The path \"" + path + "\" is not valid");
-    }
-  }
+  private final List<String> path;
 
   public static DefaultStoragePath parse(String... pathPartials) throws RequestNotValidException {
-    StringBuilder builder = new StringBuilder();
-    boolean empty = true;
-    for (String pathPartial : pathPartials) {
-      if (!empty) {
-        builder.append(SEPARATOR);
-      } else {
-        empty = false;
-      }
-      builder.append(pathPartial);
-
-    }
-    return parse(builder.toString());
+    return parse(Arrays.asList(pathPartials));
   }
-  
-  public static DefaultStoragePath parse(Iterable<String> pathPartials) throws RequestNotValidException {
-    StringBuilder builder = new StringBuilder();
-    boolean empty = true;
-    for (String pathPartial : pathPartials) {
-      if (!empty) {
-        builder.append(SEPARATOR);
-      } else {
-        empty = false;
-      }
-      builder.append(pathPartial);
 
+  public static DefaultStoragePath parse(List<String> pathPartials) throws RequestNotValidException {
+    if (isValid(pathPartials)) {
+      return new DefaultStoragePath(pathPartials);
+    } else {
+      throw new RequestNotValidException("The path \"" + pathPartials + "\" is not valid");
     }
-    return parse(builder.toString());
   }
 
   public static DefaultStoragePath parse(StoragePath base, String resourceName) throws RequestNotValidException {
-    if (resourceName.contains(SEPARATOR_REGEX)) {
-      throw new RequestNotValidException("The resource name is not valid: " + resourceName);
-    } else {
-      return parse(base.asString() + SEPARATOR + resourceName);
-    }
+    List<String> pathPartials = new ArrayList<>(base.asList());
+    pathPartials.add(resourceName);
+
+    return parse(pathPartials);
   }
 
-  private static String sanitizePath(String path) {
-    int init = 0, ends = path.length();
-    if (path.charAt(0) == SEPARATOR) {
-      init = 1;
-    }
-    if (path.charAt(ends - 1) == SEPARATOR) {
-      ends--;
-    }
-    return path.substring(init, ends);
+  private static boolean isValid(List<String> path) {
+    return path != null && !path.isEmpty();
   }
 
-  private static boolean isValid(String path) {
-    return path != null && path.trim().length() > 0;
-  }
-
-  private DefaultStoragePath(String path) {
+  private DefaultStoragePath(List<String> path) {
     super();
-    this.path = path.trim();
+    this.path = path;
 
   }
 
   @Override
   public String getContainerName() {
-    String containerName;
-    int firstIndexOfSlash = path.indexOf(SEPARATOR);
-    if (firstIndexOfSlash < 0) {
-      containerName = path;
-    } else {
-      containerName = path.substring(0, firstIndexOfSlash);
-    }
-
-    return containerName;
+    return path.get(0);
   }
 
   @Override
   public List<String> getDirectoryPath() {
-    List<String> directoryPath = new ArrayList<String>(Arrays.asList(path.split(SEPARATOR_REGEX)));
+    List<String> directoryPath = new ArrayList<String>(path);
     if (directoryPath.size() > 2) {
-      directoryPath.remove(0);
-      directoryPath.remove(directoryPath.size() - 1);
+      directoryPath = directoryPath.subList(1, directoryPath.size() - 1);
       return directoryPath;
     } else {
       return new ArrayList<String>();
@@ -112,30 +67,45 @@ public class DefaultStoragePath implements StoragePath {
 
   @Override
   public String getName() {
-    String name;
-    int lastIndexOfSlash = path.lastIndexOf(SEPARATOR);
-    if (lastIndexOfSlash < 0) {
-      name = path;
-    } else {
-      name = path.substring(lastIndexOfSlash + 1);
-    }
-
-    return name;
+    return path.get(path.size() - 1);
   }
 
   @Override
-  public String asString() {
+  public List<String> asList() {
     return path;
   }
 
   @Override
   public boolean isFromAContainer() {
-    return path.indexOf(SEPARATOR) == -1;
+    return path.size() == 1;
   }
 
   @Override
   public String toString() {
-    return asString();
+    return asString("/", null, null, false);
+  }
+
+  @Override
+  public String asString(String separator, String replaceAllRegex, String replaceAllReplacement,
+    boolean skipContainer) {
+    StringBuilder sb = new StringBuilder();
+    boolean dontSkip = !skipContainer;
+
+    for (Iterator<String> iterator = path.iterator(); iterator.hasNext();) {
+      String string = iterator.next();
+      if (dontSkip) {
+        if (StringUtils.isNotBlank(replaceAllRegex) && replaceAllReplacement != null) {
+          string = string.replaceAll(replaceAllRegex, replaceAllReplacement);
+        }
+        if (iterator.hasNext()) {
+          string += separator;
+        }
+        sb.append(string);
+      }
+      dontSkip = true;
+    }
+
+    return sb.toString();
   }
 
   @Override

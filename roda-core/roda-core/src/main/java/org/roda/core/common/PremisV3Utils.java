@@ -142,7 +142,7 @@ public class PremisV3Utils {
   public static Binary updatePremisToV3IfNeeded(Binary binary) throws IOException, SAXException, TransformerException,
     RequestNotValidException, NotFoundException, GenericException {
     if (isPremisV2(binary)) {
-      LOGGER.debug("Binary {} is Premis V2... Needs updated...", binary.getStoragePath().asString());
+      LOGGER.debug("Binary {} is Premis V2... Needs updated...", binary.getStoragePath());
       return updatePremisV2toV3(binary);
     } else {
       return binary;

@@ -324,22 +324,25 @@ public class PluginManager {
 
         Attributes mainAttributes = manifest.getMainAttributes();
 
-        String pluginClassName = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
+        String pluginClassNames = mainAttributes.getValue(RODA_PLUGIN_MANIFEST_KEY);
 
-        if (pluginClassName != null) {
+        if (pluginClassNames != null) {
 
-          LOGGER.trace("{} has plugin {}", jarFile.getFileName(), pluginClassName);
-          LOGGER.trace("Adding jar {} to classpath and loading {} with ClassLoader {}", jarFile.getFileName(),
-            pluginClassName, URLClassLoader.class.getSimpleName());
+          for (String pluginClassName : pluginClassNames.split("\\s+")) {
 
-          Object object = ClassLoaderUtility.createObject(jarURLs.toArray(new URL[jarURLs.size()]), pluginClassName);
+            LOGGER.trace("{} has plugin {}", jarFile.getFileName(), pluginClassName);
+            LOGGER.trace("Adding jar {} to classpath and loading {} with ClassLoader {}", jarFile.getFileName(),
+              pluginClassName, URLClassLoader.class.getSimpleName());
 
-          if (Plugin.class.isAssignableFrom(object.getClass())) {
+            Object object = ClassLoaderUtility.createObject(jarURLs.toArray(new URL[jarURLs.size()]), pluginClassName);
 
-            plugin = (Plugin<?>) object;
+            if (Plugin.class.isAssignableFrom(object.getClass())) {
 
-          } else {
-            LOGGER.error("{} is not a valid Plugin", pluginClassName);
+              plugin = (Plugin<?>) object;
+
+            } else {
+              LOGGER.error("{} is not a valid Plugin", pluginClassNames);
+            }
           }
 
         } else {

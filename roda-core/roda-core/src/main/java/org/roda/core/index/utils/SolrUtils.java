@@ -132,6 +132,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -385,10 +386,10 @@ public class SolrUtils {
   public static String escapeSolrSpecialChars(String string) {
     return string.replaceAll("([+&|!(){}\\[\\-\\]\\^\\\\~?:\"/])", "\\\\$1");
   }
-  
+
   public static void main(String[] args) {
     String query = "+   -   &&   ||   !   (   )   {   }   [   ]   ^   \"   ~   *   ?   :   /   .";
-    
+
     System.out.println(escapeSolrSpecialChars(query));
   }
 
@@ -1197,7 +1198,7 @@ public class SolrUtils {
     // extra-fields
     try {
       StoragePath filePath = ModelUtils.getFileStoragePath(file);
-      doc.addField(RodaConstants.FILE_STORAGEPATH, filePath.asString());
+      doc.addField(RodaConstants.FILE_STORAGEPATH, FSUtils.getStoragePathAsString(filePath, false));
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
     }

@@ -213,7 +213,7 @@ public class FileStorageService implements StorageService {
     try {
       directory = FSUtils.createRandomDirectory(parentDirPath);
 
-      return new DefaultDirectory(DefaultStoragePath.parse(basePath.relativize(directory).toString()));
+      return new DefaultDirectory(FSUtils.getStoragePath(basePath, directory));
     } catch (FileAlreadyExistsException e) {
       // cleanup
       FSUtils.deletePath(directory);
@@ -321,7 +321,7 @@ public class FileStorageService implements StorageService {
 
         // writing file
         payload.writeToPath(binPath);
-        StoragePath storagePath = DefaultStoragePath.parse(binPath.toString());
+        StoragePath storagePath = FSUtils.getStoragePath(basePath, binPath);
         ContentPayload newPayload = new FSPathContentPayload(binPath);
         Long sizeInBytes = Files.size(binPath);
         boolean isReference = false;
@@ -389,7 +389,7 @@ public class FileStorageService implements StorageService {
   }
 
   public Path resolve(StoragePath storagePath) {
-    return basePath.resolve(storagePath.asString());
+    return FSUtils.getEntityPath(basePath, storagePath);
   }
 
   @Override
@@ -398,7 +398,7 @@ public class FileStorageService implements StorageService {
     AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
       Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
-      Path targetPath = basePath.resolve(toStoragePath.asString());
+      Path targetPath = FSUtils.getEntityPath(basePath, toStoragePath);
       FSUtils.copy(sourcePath, targetPath, false);
 
     } else {
@@ -413,7 +413,7 @@ public class FileStorageService implements StorageService {
     AuthorizationDeniedException {
     if (fromService instanceof FileStorageService) {
       Path sourcePath = ((FileStorageService) fromService).resolve(fromStoragePath);
-      Path targetPath = basePath.resolve(toStoragePath.asString());
+      Path targetPath = FSUtils.getEntityPath(basePath, toStoragePath);
       FSUtils.move(sourcePath, targetPath, false);
     } else {
       Class<? extends Entity> rootEntity = fromService.getEntity(fromStoragePath);
@@ -435,8 +435,7 @@ public class FileStorageService implements StorageService {
         return DefaultBinary.class;
       }
     } else {
-      throw new GenericException(
-        "There isn't a Container or Directory or Binary representated by " + storagePath.asString());
+      throw new GenericException("There isn't a Container or Directory or Binary representated by " + storagePath);
     }
   }
 
@@ -465,7 +464,7 @@ public class FileStorageService implements StorageService {
   @Override
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Path fauxPath = historyDataPath.resolve(storagePath.asString());
+    Path fauxPath = FSUtils.getEntityPath(historyDataPath, storagePath);
     Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
 

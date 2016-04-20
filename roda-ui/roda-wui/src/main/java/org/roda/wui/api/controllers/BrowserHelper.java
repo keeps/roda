@@ -7,7 +7,6 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -534,30 +533,25 @@ public class BrowserHelper {
             StoragePath storagePath = ModelUtils.getPreservationMetadataStoragePath(preservationFile);
 
             Binary binary = storage.getBinary(storagePath);
-            if (preservationFile.getRepresentationId() != null) {
-              ZipEntryInfo info = new ZipEntryInfo(StringUtils.join(storagePath.getDirectoryPath(), File.separator)
-                + File.separator + storagePath.getName(), binary.getContent());
-              zipEntries.add(info);
-            } else {
-              ZipEntryInfo info = new ZipEntryInfo(StringUtils.join(storagePath.getDirectoryPath(), File.separator)
-                + File.separator + storagePath.getName(), binary.getContent());
-              zipEntries.add(info);
-            }
+
+            ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(storagePath, true),
+              binary.getContent());
+            zipEntries.add(info);
 
             if (preservationFile.getType() == PreservationMetadataType.EVENT) {
               try {
                 List<LinkingIdentifier> agentIDS = PremisV3Utils.extractAgentsFromEvent(binary);
-                if (agentIDS != null && agentIDS.size() > 0) {
+                if (!agentIDS.isEmpty()) {
                   for (LinkingIdentifier li : agentIDS) {
                     String agentID = li.getValue();
                     if (!agents.containsKey(agentID)) {
                       StoragePath agentPath = ModelUtils.getPreservationMetadataStoragePath(agentID,
                         PreservationMetadataType.AGENT);
                       Binary agentBinary = storage.getBinary(agentPath);
-                      ZipEntryInfo info = new ZipEntryInfo(StringUtils
-                        .join(preservationFile.getAipId() + File.separator
-                          + StringUtils.join(agentPath.getDirectoryPath(), File.separator), File.separator)
-                        + File.separator + agentPath.getName(), agentBinary.getContent());
+                      info = new ZipEntryInfo(
+                        FSUtils.getStoragePathAsString(DefaultStoragePath.parse(preservationFile.getAipId()), false,
+                          agentPath, true),
+                        agentBinary.getContent());
                       agents.put(agentID, info);
                     }
                   }

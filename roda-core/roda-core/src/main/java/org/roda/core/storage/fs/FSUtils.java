@@ -24,9 +24,11 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -65,6 +67,9 @@ public final class FSUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(FSUtils.class);
   private static final char VERSION_SEP = '_';
   private static final String METADATA_SUFFIX = ".json";
+  private static final String SEPARATOR = "/";
+  private static final String SEPARATOR_REGEX = "/";
+  private static final String SEPARATOR_REPLACEMENT = "%2F";
 
   /**
    * Private empty constructor
@@ -234,6 +239,14 @@ public final class FSUtils {
     }
   }
 
+  private static String encodePathPartial(String pathPartial) {
+    return pathPartial.replaceAll(SEPARATOR_REGEX, SEPARATOR_REPLACEMENT);
+  }
+
+  private static String decodePathPartial(String pathPartial) {
+    return pathPartial.replaceAll(SEPARATOR_REPLACEMENT, SEPARATOR);
+  }
+
   /**
    * Get path
    * 
@@ -243,7 +256,12 @@ public final class FSUtils {
    *          storage path, related to base path, that one wants to resolve
    */
   public static Path getEntityPath(Path basePath, StoragePath storagePath) {
-    Path resourcePath = basePath.resolve(storagePath.asString());
+    Path resourcePath = basePath;
+
+    for (String pathPartial : storagePath.asList()) {
+      resourcePath = resourcePath.resolve(encodePathPartial(pathPartial));
+    }
+
     return resourcePath;
   }
 
@@ -253,8 +271,43 @@ public final class FSUtils {
       throw new RequestNotValidException("Cannot use '" + VERSION_SEP + "' in version " + version);
     }
 
-    Path resourcePath = basePath.resolve(storagePath.asString() + VERSION_SEP + version);
+    Path resourcePath = basePath;
+
+    for (Iterator<String> iterator = storagePath.asList().iterator(); iterator.hasNext();) {
+      String pathPartial = iterator.next();
+      if (!iterator.hasNext()) {
+        pathPartial += VERSION_SEP + version;
+      }
+      resourcePath = resourcePath.resolve(encodePathPartial(pathPartial));
+    }
+
     return resourcePath;
+
+  }
+
+  public static StoragePath getStoragePath(Path basePath, Path absolutePath) throws RequestNotValidException {
+    return getStoragePath(basePath.relativize(absolutePath));
+  }
+
+  public static StoragePath getStoragePath(Path relativePath) throws RequestNotValidException {
+    List<String> pathPartials = new ArrayList<>();
+
+    for (int i = 0; i < relativePath.getNameCount(); i++) {
+      String pathPartial = relativePath.getName(i).toString();
+      pathPartials.add(decodePathPartial(pathPartial));
+    }
+
+    return DefaultStoragePath.parse(pathPartials);
+  }
+
+  public static String getStoragePathAsString(StoragePath storagePath, boolean skipStoragePathContainer,
+    StoragePath anotherStoragePath, boolean skipAnotherStoragePathContainer) {
+    return storagePath.asString(SEPARATOR, SEPARATOR_REGEX, SEPARATOR_REPLACEMENT, skipStoragePathContainer) + SEPARATOR
+      + anotherStoragePath.asString(SEPARATOR, SEPARATOR_REGEX, SEPARATOR_REPLACEMENT, skipAnotherStoragePathContainer);
+  }
+
+  public static String getStoragePathAsString(StoragePath storagePath, boolean skipContainer) {
+    return storagePath.asString(SEPARATOR, SEPARATOR_REGEX, SEPARATOR_REPLACEMENT, skipContainer);
   }
 
   /**
@@ -494,8 +547,7 @@ public final class FSUtils {
     }
 
     // storage path
-    Path relativePath = basePath.relativize(path);
-    StoragePath storagePath = DefaultStoragePath.parse(relativePath.toString());
+    StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
     if (Files.isDirectory(path)) {
@@ -543,7 +595,7 @@ public final class FSUtils {
     Path realFilePath = relativePath.getParent().resolve(realFileName);
     Path metadataPath = historyMetadataPath.resolve(relativePath.getParent().resolve(fileName + METADATA_SUFFIX));
 
-    StoragePath storagePath = DefaultStoragePath.parse(realFilePath.toString());
+    StoragePath storagePath = FSUtils.getStoragePath(realFilePath);
 
     // construct
     ContentPayload content = new FSPathContentPayload(path);
@@ -584,8 +636,7 @@ public final class FSUtils {
     Container resource;
 
     // storage path
-    Path relativePath = basePath.relativize(path);
-    StoragePath storagePath = DefaultStoragePath.parse(relativePath.toString());
+    StoragePath storagePath = FSUtils.getStoragePath(basePath, path);
 
     // construct
     if (Files.isDirectory(path)) {
@@ -690,8 +741,8 @@ public final class FSUtils {
 
   public static CloseableIterable<BinaryVersion> listBinaryVersions(final Path historyDataPath,
     final Path historyMetadataPath, final StoragePath storagePath)
-      throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
-    Path fauxPath = historyDataPath.resolve(storagePath.asString());
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Path fauxPath = getEntityPath(historyDataPath, storagePath);
     final Path parent = fauxPath.getParent();
     final String baseName = fauxPath.getFileName().toString();
 

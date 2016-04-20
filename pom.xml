@@ -134,7 +134,7 @@
 		<akka.version>2.4.4</akka.version>
 		<httpcomponents.version>4.5.2</httpcomponents.version>
 		<poi.version>3.13</poi.version>
-		<commons_ip.version>1.0.0-alpha12-pre7</commons_ip.version>
+		<commons_ip.version>1.0.0-alpha12-pre8</commons_ip.version>
 		<roda_community_url>http://roda-community.org</roda_community_url>
 	</properties>
 	<profiles>

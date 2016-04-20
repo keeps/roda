@@ -11,9 +11,6 @@ import java.util.List;
 
 public interface StoragePath {
 
-  public static final char SEPARATOR = '/';
-  public static final String SEPARATOR_REGEX = "/";
-
   public String getContainerName();
 
   public boolean isFromAContainer();
@@ -22,14 +19,14 @@ public interface StoragePath {
 
   public String getName();
 
-  public String asString();
-  
-  
+  public List<String> asList();
+
   // Force re-declaration of #hashCode() and #equals(Object)
-  
+
   public int hashCode();
-  
+
   public boolean equals(Object obj);
-  
+
+  public String asString(String separator, String replaceAllRegex, String replaceAllReplacement, boolean skipContainer);
 
 }
