@@ -158,7 +158,7 @@ public class EditDescriptiveMetadata extends Composite {
             }
 
             String lowerCaseType = bundle.getType() != null ? bundle.getType().toLowerCase() : null;
-            if (b.getType().equals(lowerCaseType)) {
+            if (b.getType().toLowerCase().equals(lowerCaseType)) {
               String lowerCaseVersion = bundle.getVersion() != null ? bundle.getVersion().toLowerCase() : null;
               if (b.getVersion() != null && lowerCaseVersion != null) {
                 if (lowerCaseVersion != null && b.getVersion().equals(lowerCaseVersion)) {

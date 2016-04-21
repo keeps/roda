@@ -86,13 +86,14 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
-    String html = "<i class='" + getElementLevelIconClasses(level) + "'>";
-    if (showText) {
-      html += "&nbsp;" + level;
+    StringBuilder b = new StringBuilder();
+    b.append("<i class='").append(getElementLevelIconClasses(level)).append("'>");
+    b.append("</i>");
+    if (showText && level != null && level.length() > 0) {
+      b.append("&nbsp;");
+      b.append(level);
     }
-    html += "</i>";
-
-    return SafeHtmlUtils.fromSafeConstant(html);
+    return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 
   public static String getElementLevelIconClasses(String level) {
