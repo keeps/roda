@@ -8,6 +8,7 @@
 package org.roda.core;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -71,11 +72,14 @@ public class CorporaConstants {
 
   // public static final String OTHER_AIP_PATH = "AIP/AIP_2";
   public static final String OTHER_AIP_ID = "AIP_2";
-  public static final String OTHER_DESCRIPTIVE_METADATA_STORAGEPATH = "AIP/AIP_2/metadata/descriptive/dc.xml";
+  public static final List<String> OTHER_DESCRIPTIVE_METADATA_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "metadata",
+    "descriptive", "dc.xml");
   public static final String OTHER_DESCRIPTIVE_METADATA_TYPE = "dcxml";
   public static final String OTHER_DESCRIPTIVE_METADATA_VERSION = null;
-  public static final String OTHER_REPRESENTATION_STORAGEPATH = "AIP/AIP_2/representations/representation_1";
-  public static final String OTHER_FILE_STORAGEPATH = "AIP/AIP_2/representations/representation_1/data/2012-roda-promo-en.pdf";
+  public static final List<String> OTHER_REPRESENTATION_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "representations",
+    "representation_1");
+  public static final List<String> OTHER_FILE_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "representations",
+    "representation_1", "data", "2012-roda-promo-en.pdf");
   // puid=fmt/101
 
   public static final String SOURCE_DESC_METADATA_CONTAINER = "DescriptiveMetadata";

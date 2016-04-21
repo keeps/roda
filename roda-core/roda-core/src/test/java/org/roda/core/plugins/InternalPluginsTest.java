@@ -290,6 +290,7 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
+    
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model

@@ -31,7 +31,6 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
-import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.fedora.FedoraContentPayload;
 import org.roda.core.storage.fedora.FedoraStorageService;
@@ -87,7 +86,7 @@ public final class FedoraConversionUtils {
 
   private static StoragePath getStoragePath(FedoraDatastream ds) throws GenericException, RequestNotValidException {
     try {
-      return FedoraUtils.doubleURLDecode(DefaultStoragePath.parse(ds.getPath()));
+      return FedoraUtils.fedoraPathToStoragePath(ds.getPath());
     } catch (FedoraException e) {
       throw new GenericException("Error while getting the storage path from a particular Fedora datastream", e);
     }
@@ -95,7 +94,7 @@ public final class FedoraConversionUtils {
 
   private static StoragePath getStoragePath(FedoraObject obj) throws GenericException, RequestNotValidException {
     try {
-      return FedoraUtils.doubleURLDecode(DefaultStoragePath.parse(obj.getPath()));
+      return FedoraUtils.fedoraPathToStoragePath(obj.getPath());
     } catch (FedoraException e) {
       throw new GenericException("Error while getting the storage path from a particular Fedora object", e);
     }
@@ -120,8 +119,8 @@ public final class FedoraConversionUtils {
 
       }
       URI contentDigest = datastream.getContentDigest();
-      return new DefaultBinary(FedoraUtils.doubleURLDecode(getStoragePath(datastream)), cp, sizeInBytes, false,
-        extractContentDigest(contentDigest));
+
+      return new DefaultBinary(getStoragePath(datastream), cp, sizeInBytes, false, extractContentDigest(contentDigest));
     } catch (FedoraException e) {
       throw new GenericException("Error while converting a Fedora datastream into a Binary", e);
     }
@@ -147,7 +146,7 @@ public final class FedoraConversionUtils {
    */
   public static Directory fedoraObjectToDirectory(String fedoraRepositoryURL, FedoraObject object)
     throws GenericException, RequestNotValidException {
-    return new DefaultDirectory(FedoraUtils.doubleURLDecode(getStoragePath(object)));
+    return new DefaultDirectory(getStoragePath(object));
   }
 
   /**
@@ -220,7 +219,7 @@ public final class FedoraConversionUtils {
    */
   public static Container fedoraObjectToContainer(FedoraObject object)
     throws GenericException, RequestNotValidException {
-    return new DefaultContainer(FedoraUtils.doubleURLDecode(getStoragePath(object)));
+    return new DefaultContainer(getStoragePath(object));
   }
 
   /**

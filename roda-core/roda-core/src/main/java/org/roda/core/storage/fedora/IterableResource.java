@@ -42,7 +42,7 @@ public class IterableResource implements CloseableIterable<Resource> {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     this.repository = repository;
     try {
-      fedoraResources = repository.getObject(FedoraUtils.createFedoraPath(storagePath)).getChildren(null).iterator();
+      fedoraResources = repository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath)).getChildren(null).iterator();
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not iterate through resource", e);
     } catch (BadRequestException e) {

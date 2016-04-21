@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.junit.After;
@@ -73,6 +74,7 @@ import org.roda.core.plugins.plugins.ingest.validation.DigitalSignatureDIPPlugin
 import org.roda.core.plugins.plugins.ingest.validation.DigitalSignaturePlugin;
 import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -626,11 +628,9 @@ public class InternalConvertPluginsTest {
     OptionalWithCause<File> file = allFiles.iterator().next();
 
     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file.get());
-    // FIXME 20160415 hsilva: this should not be hardcoded (must certainly
-    // constants already exist)
-    String intermediatePath = "/data/storage/";
-    Assert.assertEquals(0,
-      PDFSignatureUtils.countSignaturesPDF(basePath, fileStoragePath.asString(), intermediatePath));
+    DirectResourceAccess directAccess = model.getStorage().getDirectAccess(fileStoragePath);
+    Assert.assertEquals(0, PDFSignatureUtils.countSignaturesPDF(directAccess.getPath()));
+    IOUtils.closeQuietly(directAccess);
 
     Plugin<Representation> plugin = new DigitalSignatureDIPPlugin();
     Map<String, String> parameters = new HashMap<>();
@@ -646,8 +646,9 @@ public class InternalConvertPluginsTest {
     OptionalWithCause<File> newFile = allNewFiles.iterator().next();
 
     StoragePath newFileStoragePath = ModelUtils.getFileStoragePath(newFile.get());
-    Assert.assertEquals(1,
-      PDFSignatureUtils.countSignaturesPDF(basePath, newFileStoragePath.asString(), intermediatePath));
+    DirectResourceAccess newDirectAccess = model.getStorage().getDirectAccess(newFileStoragePath);
+    Assert.assertEquals(1, PDFSignatureUtils.countSignaturesPDF(newDirectAccess.getPath()));
+    IOUtils.closeQuietly(newDirectAccess);
   }
 
   @Test

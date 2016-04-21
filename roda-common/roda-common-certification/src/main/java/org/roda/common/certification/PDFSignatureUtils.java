@@ -260,10 +260,10 @@ public class PDFSignatureUtils {
     return sb;
   }
 
-  public static int countSignaturesPDF(Path base, String input, String intermediatePath) {
+  public static int countSignaturesPDF(Path file) {
     int counter = -1;
     try {
-      PdfReader reader = new PdfReader(base.toString() + intermediatePath + input);
+      PdfReader reader = new PdfReader(file.toAbsolutePath().toString());
       AcroFields af = reader.getAcroFields();
       ArrayList<String> names = af.getSignatureNames();
       counter = names.size();

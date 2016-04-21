@@ -812,24 +812,32 @@ public class PremisV3Utils {
   }
 
   public static IndexedPreservationAgent createPremisUserAgentBinary(Plugin<?> plugin, ModelService model,
-    IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
+      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     IndexedPreservationAgent agent = null;
-    Job job = PluginHelper.getJobFromIndex(plugin, index);
-    if(job!=null && job.getUsername() != null){
+    Job job = null;
+    try {
+      job = PluginHelper.getJobFromIndex(plugin, index);
+    } catch (NotFoundException e) {
+      LOGGER.warn("Could not create PREMIS user agent because job could not be found: " + e.getMessage());
+    }
+    if (job != null && job.getUsername() != null) {
       RODAMember member = index.retrieve(RODAMember.class, job.getUsername());
       String id = job.getUsername();
       ContentPayload agentPayload;
-  
+
       // TODO set agent extension
       agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON, "",
         "", "");
       model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
       agent = getPreservationAgent(plugin, model);
     }
+
     return agent;
   }
 
-  public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?> plugin, ModelService model, IndexService index) throws NotFoundException, GenericException {
+  public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?> plugin, ModelService model,
+    IndexService index) throws NotFoundException, GenericException {
     Job job = PluginHelper.getJobFromIndex(plugin, index);
     String id = job.getUsername();
     IndexedPreservationAgent agent = new IndexedPreservationAgent();

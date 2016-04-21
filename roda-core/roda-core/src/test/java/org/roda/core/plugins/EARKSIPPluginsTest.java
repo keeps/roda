@@ -51,7 +51,10 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -66,6 +69,8 @@ import jersey.repackaged.com.google.common.collect.Lists;
 
 public class EARKSIPPluginsTest {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPPluginsTest.class);
+
+  private static final String FAKE_JOB_ID = "NONE";
 
   private static final int CORPORA_FILES_COUNT = 4;
   private static final int CORPORA_FOLDERS_COUNT = 2;
@@ -105,6 +110,13 @@ public class EARKSIPPluginsTest {
     corporaService = new FileStorageService(corporaPath);
 
     LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
+    
+    Job fakeJob = new Job();
+    fakeJob.setId(FAKE_JOB_ID);
+    fakeJob.setPluginType(PluginType.MISC);
+    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    model.createJob(fakeJob);
+    index.commit(Job.class);
   }
 
   @After
@@ -130,6 +142,7 @@ public class EARKSIPPluginsTest {
   }
 
   private void assertReports(List<Report> reports) {
+    Assert.assertNotNull(reports);
     for (Report report : reports) {
       Assert.assertThat(report.getReports().get(0).getPluginState(), Matchers.is(PluginState.SUCCESS));
     }
@@ -142,6 +155,7 @@ public class EARKSIPPluginsTest {
 
     Plugin<TransferredResource> plugin = new EARKSIPToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();
+    parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     parameters.put(RodaConstants.PLUGIN_PARAMS_PARENT_ID, root.getId());
     plugin.setParameterValues(parameters);
 
@@ -165,8 +179,8 @@ public class EARKSIPPluginsTest {
   }
 
   @Test
-  public void testIngestEARKSIP() throws IOException, InterruptedException, RODAException, SolrServerException,
-    IsStillUpdatingException {
+  public void testIngestEARKSIP()
+    throws IOException, InterruptedException, RODAException, SolrServerException, IsStillUpdatingException {
     AIP aip = ingestCorpora();
     Assert.assertEquals(1, aip.getRepresentations().size());
 

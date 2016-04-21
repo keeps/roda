@@ -11,16 +11,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.StoragePath;
-import org.roda.core.model.ModelService;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.fedora.FedoraStorageService;
 import org.slf4j.Logger;
@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * @author Luis Faria <lfaria@keep.pt>
  */
 public final class FedoraUtils {
+  private static final String FEDORA_PATH_DELIMITER = "/";
   private static final Logger LOGGER = LoggerFactory.getLogger(FedoraUtils.class);
 
   /**
@@ -46,30 +47,15 @@ public final class FedoraUtils {
   /**
    * Creates a {@code String} version of a {@code StoragePath} for Fedora
    */
-  public static String createFedoraPath(StoragePath storagePath) {
-    String[] tokens = storagePath.asString().split(DefaultStoragePath.SEPARATOR_REGEX);
-    for(int i=0;i<tokens.length;i++){
-      tokens[i] = doubleURLEncode(tokens[i]);
-    }
-    return StringUtils.join(tokens,DefaultStoragePath.SEPARATOR);
-    
-  /*return storagePath.asString().replaceAll(" ", "%20");
+  public static String storagePathToFedoraPath(StoragePath storagePath) {
+    return storagePath.asList().stream().map(t -> doubleURLEncode(t))
+      .collect(Collectors.joining(FEDORA_PATH_DELIMITER));
+  }
 
-   try {
-      List<String> encodedPath = new ArrayList<String>();
-      encodedPath.add(doubleURLEncode(storagePath.getContainerName()));
-      if(!storagePath.isFromAContainer()){
-        for (String s : storagePath.getDirectoryPath()) {
-          encodedPath.add(doubleURLEncode(s));
-        }
-        encodedPath.add(doubleURLEncode(storagePath.getName()));
-      }
-
-      return DefaultStoragePath.parse(encodedPath).asString();
-    } catch (RequestNotValidException rnve) {
-      LOGGER.error(rnve.getMessage(),rnve);
-      return storagePath.asString();
-    }*/
+  public static StoragePath fedoraPathToStoragePath(String fedoraPath) throws RequestNotValidException {
+    List<String> path = Arrays.asList(fedoraPath.split("/")).stream().map(t -> doubleURLDecode(t))
+      .collect(Collectors.toList());
+    return DefaultStoragePath.parse(path);
   }
 
   public static String doubleURLEncode(String origin) {
@@ -79,11 +65,11 @@ public final class FedoraUtils {
       encoded = URLEncoder.encode(encoded, encoding);
       encoded = URLEncoder.encode(encoded, encoding);
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.error(uee.getMessage(),uee);
+      LOGGER.error(uee.getMessage(), uee);
     }
     return encoded;
   }
-  
+
   public static String doubleURLDecode(String origin) {
     String decoded = origin;
     String encoding = "UTF-8";
@@ -91,7 +77,7 @@ public final class FedoraUtils {
       decoded = URLDecoder.decode(decoded, encoding);
       decoded = URLDecoder.decode(decoded, encoding);
     } catch (UnsupportedEncodingException uee) {
-      LOGGER.error(uee.getMessage(),uee);
+      LOGGER.error(uee.getMessage(), uee);
     }
     return decoded;
   }
@@ -192,7 +178,7 @@ public final class FedoraUtils {
     try {
       List<String> encodedPath = new ArrayList<String>();
       encodedPath.add(doubleURLDecode(storagePath.getContainerName()));
-      if(!storagePath.isFromAContainer()){
+      if (!storagePath.isFromAContainer()) {
         for (String s : storagePath.getDirectoryPath()) {
           encodedPath.add(doubleURLDecode(s));
         }

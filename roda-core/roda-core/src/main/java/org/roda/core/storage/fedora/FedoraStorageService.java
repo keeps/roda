@@ -138,7 +138,7 @@ public class FedoraStorageService implements StorageService {
     throws AuthorizationDeniedException, AlreadyExistsException, RequestNotValidException, GenericException {
 
     try {
-      fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
+      fedoraRepository.createObject(FedoraUtils.storagePathToFedoraPath(storagePath));
       return new DefaultContainer(storagePath);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not create container", e);
@@ -159,7 +159,7 @@ public class FedoraStorageService implements StorageService {
 
     try {
       return FedoraConversionUtils
-        .fedoraObjectToContainer(fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath)));
+        .fedoraObjectToContainer(fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath)));
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not get container", e);
     } catch (BadRequestException e) {
@@ -175,7 +175,7 @@ public class FedoraStorageService implements StorageService {
   public void deleteContainer(StoragePath storagePath)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
     try {
-      fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath)).forceDelete();
+      fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath)).forceDelete();
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not delete container", e);
     } catch (org.fcrepo.client.NotFoundException e) {
@@ -203,7 +203,7 @@ public class FedoraStorageService implements StorageService {
       return StorageRecursiveListingUtils.countAllUnderContainer(this, storagePath);
     } else {
       try {
-        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath))
           .getChildren(null);
         return Long.valueOf(children.size());
       } catch (ForbiddenException e) {
@@ -222,7 +222,7 @@ public class FedoraStorageService implements StorageService {
   public Directory createDirectory(StoragePath storagePath)
     throws AuthorizationDeniedException, AlreadyExistsException, GenericException {
     try {
-      fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
+      fedoraRepository.createObject(FedoraUtils.storagePathToFedoraPath(storagePath));
       return new DefaultDirectory(storagePath);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Could not create directory", e);
@@ -245,7 +245,7 @@ public class FedoraStorageService implements StorageService {
         try {
           // XXX may want to change create object to native Fedora method that
           // creates a random object
-          directory = fedoraRepository.createObject(FedoraUtils.createFedoraPath(storagePath));
+          directory = fedoraRepository.createObject(FedoraUtils.storagePathToFedoraPath(storagePath));
         } catch (org.fcrepo.client.AlreadyExistsException e) {
           directory = null;
           LOGGER.warn("Got a colision when creating random directory", e);
@@ -268,7 +268,7 @@ public class FedoraStorageService implements StorageService {
       throw new RequestNotValidException("Invalid storage path for a directory: " + storagePath);
     }
     try {
-      FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath));
+      FedoraObject object = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath));
       return FedoraConversionUtils.fedoraObjectToDirectory(fedoraRepository.getRepositoryUrl(), object);
     } catch (ForbiddenException e) {
       throw new AuthorizationDeniedException("Error getting directory " + storagePath, e);
@@ -300,7 +300,7 @@ public class FedoraStorageService implements StorageService {
       return StorageRecursiveListingUtils.countAllUnderDirectory(this, storagePath);
     } else {
       try {
-        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.createFedoraPath(storagePath))
+        Collection<FedoraResource> children = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(storagePath))
           .getChildren(null);
         return Long.valueOf(children.size());
       } catch (ForbiddenException e) {
@@ -324,7 +324,7 @@ public class FedoraStorageService implements StorageService {
       throw new GenericException("Creating binary as reference not yet supported");
     } else {
       try {
-        String path = FedoraUtils.createFedoraPath(storagePath);
+        String path = FedoraUtils.storagePathToFedoraPath(storagePath);
         LOGGER.debug("PATH {}", path);
         FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
         FedoraDatastream binary = fedoraRepository.createDatastream(path, fedoraContentPayload);
@@ -359,7 +359,7 @@ public class FedoraStorageService implements StorageService {
             // XXX may want to change create object to native Fedora method that
             // creates a random datastream
             FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
-            binary = fedoraRepository.createDatastream(FedoraUtils.createFedoraPath(storagePath), fedoraContentPayload);
+            binary = fedoraRepository.createDatastream(FedoraUtils.storagePathToFedoraPath(storagePath), fedoraContentPayload);
             IOUtils.closeQuietly(fedoraContentPayload.getContent());
           } catch (org.fcrepo.client.AlreadyExistsException e) {
             binary = null;
@@ -387,7 +387,7 @@ public class FedoraStorageService implements StorageService {
       throw new GenericException("Updating binary as reference not yet supported");
     } else {
       try {
-        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
         FedoraContent fedoraContentPayload = FedoraConversionUtils.contentPayloadToFedoraContent(payload);
         datastream.updateContent(fedoraContentPayload);
         IOUtils.closeQuietly(fedoraContentPayload.getContent());
@@ -415,7 +415,7 @@ public class FedoraStorageService implements StorageService {
   public Binary getBinary(StoragePath storagePath)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     try {
-      FedoraDatastream ds = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream ds = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
 
       if (!isDatastream(ds)) {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
@@ -441,7 +441,7 @@ public class FedoraStorageService implements StorageService {
   @Override
   public void deleteResource(StoragePath storagePath)
     throws NotFoundException, AuthorizationDeniedException, GenericException {
-    String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
+    String fedoraPath = FedoraUtils.storagePathToFedoraPath(storagePath);
     try {
       if (fedoraRepository.exists(fedoraPath)) {
         boolean deleted = false;
@@ -498,13 +498,13 @@ public class FedoraStorageService implements StorageService {
       throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
-        FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(fromStoragePath));
+        FedoraObject object = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
 
-        object.copy(FedoraUtils.createFedoraPath(toStoragePath));
+        object.copy(FedoraUtils.storagePathToFedoraPath(toStoragePath));
       } else {
-        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(fromStoragePath));
+        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
 
-        datastream.copy(FedoraUtils.createFedoraPath(toStoragePath));
+        datastream.copy(FedoraUtils.storagePathToFedoraPath(toStoragePath));
       }
 
     } catch (ForbiddenException e) {
@@ -538,13 +538,13 @@ public class FedoraStorageService implements StorageService {
       throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     try {
       if (rootEntity.equals(Container.class) || rootEntity.equals(Directory.class)) {
-        FedoraObject object = fedoraRepository.getObject(FedoraUtils.createFedoraPath(fromStoragePath));
+        FedoraObject object = fedoraRepository.getObject(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
 
-        object.forceMove(FedoraUtils.createFedoraPath(toStoragePath));
+        object.forceMove(FedoraUtils.storagePathToFedoraPath(toStoragePath));
       } else {
-        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(fromStoragePath));
+        FedoraDatastream datastream = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(fromStoragePath));
 
-        datastream.forceMove(FedoraUtils.createFedoraPath(toStoragePath));
+        datastream.forceMove(FedoraUtils.storagePathToFedoraPath(toStoragePath));
       }
 
     } catch (ForbiddenException e) {
@@ -565,15 +565,14 @@ public class FedoraStorageService implements StorageService {
       if (getContainer(storagePath) != null) {
         return Container.class;
       } else {
-        throw new GenericException(
-          "There is no Container in the storage represented by \"" + storagePath.asString() + "\"");
+        throw new GenericException("There is no Container in the storage represented by \"" + storagePath + "\"");
       }
     } else {
       // it's a directory or binary. but first let's see if that entity
       // exists in the storage
       try {
         FedoraObject object = fedoraRepository
-          .getObject(FedoraUtils.createFedoraPath(storagePath) + "/" + FEDORA_RESOURCE_METADATA);
+          .getObject(FedoraUtils.storagePathToFedoraPath(storagePath) + "/" + FEDORA_RESOURCE_METADATA);
 
         if (object.getMixins().contains(FEDORA_CONTAINER)) {
           return Directory.class;
@@ -584,7 +583,7 @@ public class FedoraStorageService implements StorageService {
         }
       } catch (FedoraException e) {
         throw new GenericException(
-          "There is no Directory or Binary in the storage represented by \"" + storagePath.asString() + "\"", e);
+          "There is no Directory or Binary in the storage represented by \"" + storagePath + "\"", e);
       }
 
     }
@@ -653,7 +652,7 @@ public class FedoraStorageService implements StorageService {
   public CloseableIterable<BinaryVersion> listBinaryVersions(StoragePath storagePath)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     try {
-      String fedoraPath = FedoraUtils.createFedoraPath(storagePath);
+      String fedoraPath = FedoraUtils.storagePathToFedoraPath(storagePath);
       FedoraDatastream ds = fedoraRepository.getDatastream(fedoraPath);
 
       if (!isDatastream(ds)) {
@@ -711,10 +710,10 @@ public class FedoraStorageService implements StorageService {
   public BinaryVersion getBinaryVersion(StoragePath storagePath, String version)
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
-      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
       LOGGER.debug("FULL {}", fullVersionID);
-      FedoraDatastream ds = fedoraRepository.getDatastreamVersion(FedoraUtils.createFedoraPath(storagePath),
+      FedoraDatastream ds = fedoraRepository.getDatastreamVersion(FedoraUtils.storagePathToFedoraPath(storagePath),
         fullVersionID);
       if (!isDatastream(ds)) {
         throw new RequestNotValidException("The resource obtained as being a datastream isn't really a datastream");
@@ -740,7 +739,7 @@ public class FedoraStorageService implements StorageService {
     throws RequestNotValidException, NotFoundException, GenericException {
     try {
       String id = UUID.randomUUID().toString();
-      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String versionID = id + message;
       String versionIDEncoded = URLEncoder.encode(versionID, "UTF-8");
       LOGGER.warn("Creating version {} ({})", versionID, versionIDEncoded);
@@ -761,7 +760,7 @@ public class FedoraStorageService implements StorageService {
   public void revertBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, RequestNotValidException, GenericException {
     try {
-      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
       binary.revertToVersion(fullVersionID);
     } catch (ForbiddenException e) {
@@ -777,7 +776,7 @@ public class FedoraStorageService implements StorageService {
   public void deleteBinaryVersion(StoragePath storagePath, String version)
     throws NotFoundException, GenericException, RequestNotValidException {
     try {
-      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.createFedoraPath(storagePath));
+      FedoraDatastream binary = fedoraRepository.getDatastream(FedoraUtils.storagePathToFedoraPath(storagePath));
       String fullVersionID = getFullVersionID(binary, version);
       binary.deleteVersion(fullVersionID);
     } catch (ForbiddenException e) {

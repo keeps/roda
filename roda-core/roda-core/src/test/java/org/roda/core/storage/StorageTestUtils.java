@@ -12,6 +12,8 @@ import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.apache.commons.io.IOUtils;
@@ -30,7 +32,10 @@ public class StorageTestUtils {
 
   public static StoragePath generateRandomResourceStoragePathUnder(StoragePath basePath)
     throws RequestNotValidException {
-    return DefaultStoragePath.parse(basePath.asString(), UUID.randomUUID().toString());
+    List<String> path = new ArrayList<>(basePath.asList());
+    path.add(UUID.randomUUID().toString());
+
+    return DefaultStoragePath.parse(path);
   }
 
   public static void populate(StorageService storage, StoragePath basepath) throws AlreadyExistsException,
