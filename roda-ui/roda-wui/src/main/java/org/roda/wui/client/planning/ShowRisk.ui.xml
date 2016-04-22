@@ -3,7 +3,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared"
+	xmlns:p="urn:import:org.roda.wui.client.planning">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
@@ -16,53 +17,7 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Risk</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="riskId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
-				<g:Label ui:field="riskName" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskDescriptionKey">Description</g:Label>
-				<g:Label ui:field="riskDescriptionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified On</g:Label>
-				<g:Label ui:field="riskIdentifiedOn" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified By</g:Label>
-				<g:Label ui:field="riskIdentifiedBy" />
-				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
-				<g:Label ui:field="riskCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskNotesValue" />
-				
-				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre Mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Probability</g:Label>
-				<g:Label ui:field="riskPreMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
-				<g:Label ui:field="riskPreMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key">Severity</g:Label>
-				<g:HTML ui:field="riskPreMitigationSeverity"></g:HTML>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskPreMitigationNotesValue" />
-				
-				<g:Label styleName="h4" ui:field="riskMitigationKey">Mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationStrategyKey">Strategy</g:Label>
-				<g:Label ui:field="riskMitigationStrategyValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerTypeKey">Owner Type</g:Label>
-				<g:Label ui:field="riskMitigationOwnerTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerKey">Owner</g:Label>
-				<g:Label ui:field="riskMitigationOwnerValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related Event Identifier Type</g:Label>
-				<g:Label ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related Event Identifier Value</g:Label>
-				<g:Label ui:field="riskMitigationRelatedEventIdentifierValueValue" />
-				
-				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Pos Mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
-				<g:Label ui:field="riskPosMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationImpactKey">Impact</g:Label>
-				<g:Label ui:field="riskPosMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationSeverityKey">Severity</g:Label>
-				<g:HTML ui:field="riskPosMitigationSeverity"></g:HTML>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskPosMitigationNotesValue" />
+				<p:RiskShowPanel ui:field="riskShowPanel"></p:RiskShowPanel>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

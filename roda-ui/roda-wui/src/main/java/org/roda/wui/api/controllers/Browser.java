@@ -1242,6 +1242,39 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static boolean hasRiskVersions(RodaUser user, String id)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    boolean ret = BrowserHelper.hasRiskVersions(id);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "hasRiskVersions", null, duration, "riskId", id);
+    return ret;
+  }
+
+  public static Risk retrieveRiskVersion(RodaUser user, String riskId, String selectedVersion)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Risk ret = BrowserHelper.retrieveRiskVersion(riskId, selectedVersion);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "retrieveRiskVersion", null, duration, "riskId", riskId, "selectedVersion",
+      selectedVersion);
+    return ret;
+  }
+
   public static List<String> retrieveShowMitigationTerms(RodaUser user, int preMitigationProbability,
     int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
     throws AuthorizationDeniedException {

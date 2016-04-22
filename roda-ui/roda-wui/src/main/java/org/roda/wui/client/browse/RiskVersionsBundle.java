@@ -16,7 +16,7 @@ public class RiskVersionsBundle implements Serializable {
 
   private static final long serialVersionUID = -3057191819098099247L;
 
-  private Risk risk;
+  private Risk lastRisk;
   private List<BinaryVersionBundle> versions;
 
   public RiskVersionsBundle() {
@@ -25,16 +25,8 @@ public class RiskVersionsBundle implements Serializable {
 
   public RiskVersionsBundle(Risk risk, List<BinaryVersionBundle> versions) {
     super();
-    this.risk = risk;
+    this.lastRisk = risk;
     this.versions = versions;
-  }
-
-  public Risk getRisk() {
-    return risk;
-  }
-
-  public void setRisk(Risk risk) {
-    this.risk = risk;
   }
 
   public List<BinaryVersionBundle> getVersions() {
@@ -43,6 +35,14 @@ public class RiskVersionsBundle implements Serializable {
 
   public void setVersions(List<BinaryVersionBundle> versions) {
     this.versions = versions;
+  }
+
+  public Risk getLastRisk() {
+    return lastRisk;
+  }
+
+  public void setLastRisk(Risk lastRisk) {
+    this.lastRisk = lastRisk;
   }
 
 }

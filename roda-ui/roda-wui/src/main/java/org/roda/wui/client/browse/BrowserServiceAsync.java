@@ -137,6 +137,10 @@ public interface BrowserServiceAsync {
 
   void retrieveRiskVersions(String riskId, AsyncCallback<RiskVersionsBundle> callback);
 
+  void hasRiskVersions(String id, AsyncCallback<Boolean> asyncCallback);
+
+  void retrieveRiskVersion(String riskId, String selectedVersion, AsyncCallback<Risk> asyncCallback);
+
   void retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact, int posMitigationProbability,
     int posMitigationImpact, AsyncCallback<List<String>> asyncCallback);
 

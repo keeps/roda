@@ -1535,6 +1535,24 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
+  public BinaryVersion retrieveVersion(String id, String versionId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getRiskStoragePath(id);
+    return storage.getBinaryVersion(binaryPath, versionId);
+  }
+
+  public BinaryVersion revertRiskVersion(String riskId, String versionId, String message)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
+
+    BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, message);
+    storage.revertBinaryVersion(binaryPath, versionId);
+
+    notifyRiskCreatedOrUpdated(retrieveRisk(riskId));
+
+    return currentVersion;
+  }
+
   /***************** Agent related *****************/
   /************************************************/
 
@@ -1894,17 +1912,5 @@ public class ModelService extends ModelObservable {
         }
       }
     }
-  }
-
-  public BinaryVersion revertRiskVersion(String riskId, String versionId, String message)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
-
-    BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, message);
-    storage.revertBinaryVersion(binaryPath, versionId);
-
-    notifyRiskCreatedOrUpdated(retrieveRisk(riskId));
-
-    return currentVersion;
   }
 }

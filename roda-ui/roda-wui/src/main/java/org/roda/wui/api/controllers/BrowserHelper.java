@@ -1277,16 +1277,52 @@ public class BrowserHelper {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
     CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
     List<BinaryVersionBundle> versionList = new ArrayList<BinaryVersionBundle>();
+    boolean versionFlag = false;
+    Date newestDate = new Date();
+    Binary lastRiskBinary = null;
 
     for (BinaryVersion bv : iterable) {
       versionList.add(new BinaryVersionBundle(bv.getId(), bv.getMessage(), bv.getCreatedDate()));
+
+      if (!versionFlag) {
+        lastRiskBinary = bv.getBinary();
+        newestDate = bv.getCreatedDate();
+        versionFlag = true;
+      } else if (newestDate.before(bv.getCreatedDate())) {
+        lastRiskBinary = bv.getBinary();
+        newestDate = bv.getCreatedDate();
+      }
     }
 
     iterable.close();
-
-    Risk risk = RodaCoreFactory.getIndexService().retrieve(Risk.class, riskId);
-    RiskVersionsBundle riskBundle = new RiskVersionsBundle(risk, versionList);
+    Risk lastRisk = JsonUtils.getObjectFromJson(lastRiskBinary.getContent().createInputStream(), Risk.class);
+    RiskVersionsBundle riskBundle = new RiskVersionsBundle(lastRisk, versionList);
     return riskBundle;
+  }
+
+  public static boolean hasRiskVersions(String id)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    StoragePath storagePath = ModelUtils.getRiskStoragePath(id);
+    CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
+    return iterable.iterator().hasNext();
+  }
+
+  public static void revertRiskVersion(String riskId, String versionId, String message)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, message);
+  }
+
+  public static void removeRiskVersion(String riskId, String versionId)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
+    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
+  }
+
+  public static Risk retrieveRiskVersion(String riskId, String selectedVersion)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    BinaryVersion bv = RodaCoreFactory.getModelService().retrieveVersion(riskId, selectedVersion);
+    Risk oldRisk = JsonUtils.getObjectFromJson(bv.getBinary().getContent().createInputStream(), Risk.class);
+    return oldRisk;
   }
 
   public static void validateExportAipParams(String acceptFormat) throws RequestNotValidException {
@@ -1388,17 +1424,6 @@ public class BrowserHelper {
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
-  }
-
-  public static void revertRiskVersion(String riskId, String versionId, String message)
-    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, message);
-  }
-
-  public static void removeRiskVersion(String riskId, String versionId)
-    throws NotFoundException, GenericException, RequestNotValidException {
-    StoragePath storagePath = ModelUtils.getRiskStoragePath(riskId);
-    RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
   public static List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,

@@ -3,7 +3,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:p="urn:import:org.roda.wui.client.planning">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 	<ui:with field='messages' type='config.i18n.client.UserManagementMessages' />
@@ -18,8 +18,8 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Risk history</g:Label>
 				<g:ListBox ui:field="list" />
-				<g:Label styleName="wui-browse-metadata-descriptive-versions-type">Risk Name</g:Label>
-				<g:Label ui:field="riskLabel" />
+				<g:Label styleName="wui-browse-metadata-descriptive-versions-type">Risk</g:Label>
+				<p:RiskShowPanel ui:field="oldRisk" />
 
 			</g:FlowPanel>
 

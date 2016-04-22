@@ -541,6 +541,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
+  public boolean hasRiskVersions(String id)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.hasRiskVersions(user, id);
+  }
+
+  @Override
+  public Risk retrieveRiskVersion(String riskId, String selectedVersion)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.retrieveRiskVersion(user, riskId, selectedVersion);
+  }
+
+  @Override
   public List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());

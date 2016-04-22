@@ -16,6 +16,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.RiskVersionsBundle;
@@ -36,7 +37,6 @@ import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -104,8 +104,8 @@ public class RiskHistory extends Composite {
   @UiField
   ListBox list;
 
-  @UiField
-  Label riskLabel;
+  @UiField(provided = true)
+  RiskShowPanel oldRisk;
 
   @UiField
   Button buttonRevert;
@@ -126,9 +126,9 @@ public class RiskHistory extends Composite {
     this.riskId = riskId;
     this.bundle = bundle;
 
-    initWidget(uiBinder.createAndBindUi(this));
+    oldRisk = new RiskShowPanel(bundle.getLastRisk(), false);
 
-    Toast.showInfo("Risk History", "This feature is not fully implemented. Risk version content is missing.");
+    initWidget(uiBinder.createAndBindUi(this));
     init();
 
     list.addChangeHandler(new ChangeHandler() {
@@ -137,6 +137,20 @@ public class RiskHistory extends Composite {
       public void onChange(ChangeEvent event) {
         String versionKey = list.getSelectedValue();
         selectedVersion = versionKey;
+
+        BrowserService.Util.getInstance().retrieveRiskVersion(riskId, selectedVersion, new AsyncCallback<Risk>() {
+
+          @Override
+          public void onFailure(Throwable caught) {
+            AsyncCallbackUtils.defaultFailureTreatment(caught);
+          }
+
+          @Override
+          public void onSuccess(Risk oldRisk) {
+            RiskHistory.this.oldRisk.clear();
+            RiskHistory.this.oldRisk.init(oldRisk);
+          }
+        });
       }
     });
 
@@ -161,8 +175,6 @@ public class RiskHistory extends Composite {
 
       list.addItem(messages.riskHistoryLabel(message, createdDate), versionKey);
     }
-
-    riskLabel.setText(bundle.getRisk().getName());
 
     if (versionList.size() > 0) {
       list.setSelectedIndex(0);
@@ -221,13 +233,15 @@ public class RiskHistory extends Composite {
         RiskHistory.this.bundle = bundle;
         clean();
         init();
+
+        RiskHistory.this.oldRisk.clear();
+        RiskHistory.this.oldRisk.init(bundle.getLastRisk());
       }
     });
   }
 
   protected void clean() {
     list.clear();
-    riskLabel.setText("");
     selectedVersion = null;
   }
 

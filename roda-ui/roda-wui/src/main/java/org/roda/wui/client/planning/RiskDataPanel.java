@@ -140,26 +140,12 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    *
    * @param editmode
    *          if user name should be editable
-   * @param enableGroupSelect
-   *          if the list of groups to which the user belong to should be
-   *          editable
+   * @param risk
+   *          the risk to use
    *
    */
-  public RiskDataPanel(final boolean editmode, final Risk risk) {
-    this(true, editmode, risk);
-  }
-
-  /**
-   * Create a new user data panel
-   *
-   * @param visible
-   * @param editmode
-   * @param enableGroupSelect
-   * @param enablePermissions
-   */
-
-  public RiskDataPanel(final boolean visible, final boolean editmode, final Risk risk) {
-    category = new SearchSuggestBox<Risk>(Risk.class, "category");
+  public RiskDataPanel(final boolean editmode, final Risk risk, final String suggestField) {
+    category = new SearchSuggestBox<Risk>(Risk.class, suggestField);
     initWidget(uiBinder.createAndBindUi(this));
 
     BrowserService.Util.getInstance().retrieveAllMitigationProperties(new AsyncCallback<List<List<String>>>() {
@@ -171,12 +157,12 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
       @Override
       public void onSuccess(List<List<String>> terms) {
-        init(visible, editmode, terms, risk);
+        init(editmode, terms, risk);
       }
     });
   }
 
-  public void init(boolean visible, boolean editmode, List<List<String>> mitigationProperties, Risk risk) {
+  public void init(boolean editmode, List<List<String>> mitigationProperties, Risk risk) {
 
     severityLowLimit = Integer.parseInt(mitigationProperties.get(0).get(0));
     severityHighLimit = Integer.parseInt(mitigationProperties.get(0).get(1));
@@ -203,7 +189,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     posMitigationImpact.setSelectedIndex(0);
 
     this.editmode = editmode;
-    super.setVisible(visible);
+    super.setVisible(true);
 
     DefaultFormat dateFormat = new DateBox.DefaultFormat(DateTimeFormat.getFormat("yyyy-MM-dd"));
     identifiedOn.setFormat(dateFormat);

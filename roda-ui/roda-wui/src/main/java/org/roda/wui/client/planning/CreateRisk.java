@@ -9,6 +9,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -79,7 +80,7 @@ public class CreateRisk extends Composite {
    */
   public CreateRisk(Risk risk) {
     this.risk = risk;
-    this.riskDataPanel = new RiskDataPanel(true, false, risk);
+    this.riskDataPanel = new RiskDataPanel(false, risk, RodaConstants.RISK_CATEGORY);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

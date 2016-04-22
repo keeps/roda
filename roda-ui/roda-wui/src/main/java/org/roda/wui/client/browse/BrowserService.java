@@ -199,11 +199,17 @@ public interface BrowserService extends RemoteService {
   void revertRiskVersion(String riskId, String versionId, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
 
+  boolean hasRiskVersions(String id)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException;
+
   void removeRiskVersion(String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
 
   RiskVersionsBundle retrieveRiskVersions(String riskId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException;
+
+  Risk retrieveRiskVersion(String riskId, String selectedVersion)
+    throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException;
 
   List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException;
