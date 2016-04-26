@@ -11,7 +11,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 import org.roda.core.common.JsonUtilsTest;
-import org.roda.core.common.monitor.MonitorIndexTest;
 import org.roda.core.index.IndexServiceTest;
 import org.roda.core.index.PermissionsTest;
 import org.roda.core.index.SolrUtilsTest;

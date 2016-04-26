@@ -7,15 +7,6 @@
  */
 package org.roda.core.plugins;
 
-import gov.loc.premis.v3.CreatingApplicationComplexType;
-import gov.loc.premis.v3.EventComplexType;
-import gov.loc.premis.v3.FormatComplexType;
-import gov.loc.premis.v3.FormatRegistryComplexType;
-import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
-import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
-import gov.loc.premis.v3.Representation;
-import jersey.repackaged.com.google.common.collect.Lists;
-
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -93,6 +84,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.util.DateParser;
 import org.w3c.util.InvalidDateException;
+
+import gov.loc.premis.v3.CreatingApplicationComplexType;
+import gov.loc.premis.v3.EventComplexType;
+import gov.loc.premis.v3.FormatComplexType;
+import gov.loc.premis.v3.FormatRegistryComplexType;
+import gov.loc.premis.v3.LinkingAgentIdentifierComplexType;
+import gov.loc.premis.v3.ObjectCharacteristicsComplexType;
+import gov.loc.premis.v3.Representation;
+import jersey.repackaged.com.google.common.collect.Lists;
 
 public class InternalPluginsTest {
   private static final String FAKE_JOB_ID = "NONE";
@@ -279,7 +279,10 @@ public class InternalPluginsTest {
     throws RODAException, FileAlreadyExistsException, InterruptedException, IOException, SolrServerException {
     AIP aip = ingestCorpora();
 
-    Plugin<AIP> plugin = new AntivirusPlugin();
+    // 20160426 hsilva: we have to get the plugin from PluginManager to obtain
+    // the correct version of the concrete antivirus being used
+    Plugin<AIP> plugin = (Plugin<AIP>) RodaCoreFactory.getPluginManager()
+      .getPlugin(AntivirusPlugin.class.getCanonicalName());
     Map<String, String> parameters = new HashMap<>();
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, FAKE_JOB_ID);
     plugin.setParameterValues(parameters);
@@ -290,7 +293,6 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    
     String agentID = plugin.getClass().getName() + "@" + plugin.getVersion();
     boolean found = false;
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadataList = model
