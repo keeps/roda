@@ -1304,7 +1304,9 @@ public class BrowserHelper {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath storagePath = ModelUtils.getRiskStoragePath(id);
     CloseableIterable<BinaryVersion> iterable = RodaCoreFactory.getStorageService().listBinaryVersions(storagePath);
-    return iterable.iterator().hasNext();
+    boolean hasRiskVersion = iterable.iterator().hasNext();
+    IOUtils.closeQuietly(iterable);
+    return hasRiskVersion;
   }
 
   public static void revertRiskVersion(String riskId, String versionId, String message)
