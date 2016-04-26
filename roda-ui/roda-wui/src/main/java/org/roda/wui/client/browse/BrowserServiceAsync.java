@@ -30,6 +30,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
+import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.search.SearchField;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -142,9 +144,9 @@ public interface BrowserServiceAsync {
   void retrieveRiskVersion(String riskId, String selectedVersion, AsyncCallback<Risk> asyncCallback);
 
   void retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact, int posMitigationProbability,
-    int posMitigationImpact, AsyncCallback<List<String>> asyncCallback);
+    int posMitigationImpact, AsyncCallback<RiskMitigationBundle> asyncCallback);
 
   void retrieveMitigationSeverityLimits(AsyncCallback<List<String>> asyncCallback);
 
-  void retrieveAllMitigationProperties(AsyncCallback<List<List<String>>> asyncCallback);
+  void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 }

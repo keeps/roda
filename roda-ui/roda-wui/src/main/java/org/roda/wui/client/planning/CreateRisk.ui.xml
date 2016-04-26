@@ -13,7 +13,7 @@
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">
-					Create Risk
+					New risk
 				</g:Label>
 				<u:RiskDataPanel ui:field="riskDataPanel" />
 			</g:FlowPanel>

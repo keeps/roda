@@ -112,6 +112,8 @@ import org.roda.wui.client.browse.DescriptiveMetadataViewBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.common.HTMLUtils;
 import org.roda.wui.common.server.ServerTools;
 import org.slf4j.Logger;
@@ -1428,21 +1430,23 @@ public class BrowserHelper {
     }
   }
 
-  public static List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+  public static RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) {
-    List<String> terms = new ArrayList<String>();
 
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
-      Integer.toString(preMitigationProbability)));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
-      Integer.toString(preMitigationImpact)));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
-      Integer.toString(posMitigationProbability)));
-    terms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
-      Integer.toString(posMitigationImpact)));
+    int lowLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "lowLimit");
+    int highLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "highLimit");
 
+    String preProbability = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
+      Integer.toString(preMitigationProbability));
+    String preImpact = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
+      Integer.toString(preMitigationImpact));
+    String posProbability = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability",
+      Integer.toString(posMitigationProbability));
+    String posImpact = RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact",
+      Integer.toString(posMitigationImpact));
+
+    RiskMitigationBundle terms = new RiskMitigationBundle(lowLimit, highLimit, preProbability, preImpact,
+      posProbability, posImpact);
     return terms;
   }
 
@@ -1453,31 +1457,28 @@ public class BrowserHelper {
     return terms;
   }
 
-  public static List<List<String>> retrieveAllMitigationProperties() {
-    List<List<String>> properties = new ArrayList<>();
+  public static MitigationPropertiesBundle retrieveAllMitigationProperties() {
+    int lowLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "lowLimit");
+    int highLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationSeverity", "highLimit");
 
-    // first list contains severity content
-    List<String> severityTerms = new ArrayList<String>();
-    severityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "lowLimit"));
-    severityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationSeverity", "highLimit"));
-    properties.add(severityTerms);
+    int probabilityLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationProbability", "limit");
+    int impactLimit = RodaCoreFactory.getRodaConfigurationAsInt("ui", "risk", "mitigationImpact", "limit");
 
     // second list contains probability content
-    List<String> probabilityTerms = new ArrayList<String>();
-    for (int i = 0; i < 6; i++) {
+    List<String> probabilities = new ArrayList<String>();
+    for (int i = 0; i <= probabilityLimit; i++) {
       String value = Integer.toString(i);
-      probabilityTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability", value));
+      probabilities.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationProbability", value));
     }
-    properties.add(probabilityTerms);
 
     // third list contains impact content
-    List<String> impactTerms = new ArrayList<String>();
-    for (int i = 0; i < 6; i++) {
+    List<String> impacts = new ArrayList<String>();
+    for (int i = 0; i <= impactLimit; i++) {
       String value = Integer.toString(i);
-      impactTerms.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact", value));
+      impacts.add(RodaCoreFactory.getRodaConfigurationAsString("ui", "risk", "mitigationImpact", value));
     }
-    properties.add(impactTerms);
 
+    MitigationPropertiesBundle properties = new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
     return properties;
   }
 }

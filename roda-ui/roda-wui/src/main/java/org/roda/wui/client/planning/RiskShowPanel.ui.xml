@@ -23,16 +23,16 @@
 				<g:Label ui:field="riskName" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskDescriptionKey">Description</g:Label>
 				<g:Label ui:field="riskDescriptionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified On</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Identified on</g:Label>
 				<g:Label ui:field="riskIdentifiedOn" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified By</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key">Identified by</g:Label>
 				<g:Label ui:field="riskIdentifiedBy" />
 				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
 				<g:Label ui:field="riskCategory" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskNotesKey">Notes</g:Label>
 				<g:Label ui:field="riskNotesValue" />
 				
-				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre Mitigation</g:Label>
+				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre-mitigation</g:Label>
 				<g:Label styleName="descriptiveMetadata-field-key">Probability</g:Label>
 				<g:Label ui:field="riskPreMitigationProbability" />
 				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
@@ -43,18 +43,18 @@
 				<g:Label ui:field="riskPreMitigationNotesValue" />
 				
 				<g:Label styleName="h4" ui:field="riskMitigationKey">Mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationStrategyKey">Strategy</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationStrategyKey">Mitigation strategy/actions</g:Label>
 				<g:Label ui:field="riskMitigationStrategyValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerTypeKey">Owner Type</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerTypeKey">Risk owner type</g:Label>
 				<g:Label ui:field="riskMitigationOwnerTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerKey">Owner</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerKey">Risk owner</g:Label>
 				<g:Label ui:field="riskMitigationOwnerValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related Event Identifier Type</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related event identifier type</g:Label>
 				<g:Label ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related Event Identifier Value</g:Label>
+				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related event identifier value</g:Label>
 				<g:Label ui:field="riskMitigationRelatedEventIdentifierValueValue" />
 				
-				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Pos Mitigation</g:Label>
+				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Post-mitigation</g:Label>
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
 				<g:Label ui:field="riskPosMitigationProbability" />
 				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationImpactKey">Impact</g:Label>

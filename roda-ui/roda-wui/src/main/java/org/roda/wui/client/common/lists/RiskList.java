@@ -131,7 +131,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
-    display.addColumn(identifiedOnColumn, "Identified On");
+    display.addColumn(identifiedOnColumn, "Identified on");
     display.addColumn(categoryColumn, "Category");
     display.addColumn(ownerColumn, "Owner");
     display.addColumn(severityColumn, "Severity");

@@ -585,6 +585,7 @@
 		<lst name="defaults">
 			<str name="suggest">true</str>
 			<str name="suggest.count">10</str>
+			<str name="suggest.q">*</str>
 		</lst>
 		<arr name="components">
 			<str>suggest</str>

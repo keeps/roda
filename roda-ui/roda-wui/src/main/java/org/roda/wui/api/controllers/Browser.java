@@ -54,6 +54,8 @@ import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
 import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
+import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.common.RodaCoreService;
 
 /**
@@ -1275,7 +1277,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static List<String> retrieveShowMitigationTerms(RodaUser user, int preMitigationProbability,
+  public static RiskMitigationBundle retrieveShowMitigationTerms(RodaUser user, int preMitigationProbability,
     int preMitigationImpact, int posMitigationProbability, int posMitigationImpact)
     throws AuthorizationDeniedException {
     Date start = new Date();
@@ -1284,7 +1286,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    List<String> ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
+    RiskMitigationBundle ret = BrowserHelper.retrieveShowMitigationTerms(preMitigationProbability, preMitigationImpact,
       posMitigationProbability, posMitigationImpact);
 
     // register action
@@ -1310,14 +1312,15 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static List<List<String>> retrieveAllMitigationProperties(RodaUser user) throws AuthorizationDeniedException {
+  public static MitigationPropertiesBundle retrieveAllMitigationProperties(RodaUser user)
+    throws AuthorizationDeniedException {
     Date start = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    List<List<String>> ret = BrowserHelper.retrieveAllMitigationProperties();
+    MitigationPropertiesBundle ret = BrowserHelper.retrieveAllMitigationProperties();
 
     // register action
     long duration = new Date().getTime() - start.getTime();

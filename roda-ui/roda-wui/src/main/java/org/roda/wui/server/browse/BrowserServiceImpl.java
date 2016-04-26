@@ -59,6 +59,8 @@ import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
+import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
@@ -555,7 +557,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+  public RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.retrieveShowMitigationTerms(user, preMitigationProbability, preMitigationImpact,
@@ -569,7 +571,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public List<List<String>> retrieveAllMitigationProperties() throws AuthorizationDeniedException {
+  public MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     return Browser.retrieveAllMitigationProperties(user);
   }

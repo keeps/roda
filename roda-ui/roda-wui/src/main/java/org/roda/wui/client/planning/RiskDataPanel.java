@@ -113,6 +113,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   TextArea mitigationStrategy;
 
   @UiField
+  Label mitigationOwnerTypeKey;
+
+  @UiField
   TextBox mitigationOwnerType;
 
   @UiField
@@ -148,7 +151,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     category = new SearchSuggestBox<Risk>(Risk.class, suggestField);
     initWidget(uiBinder.createAndBindUi(this));
 
-    BrowserService.Util.getInstance().retrieveAllMitigationProperties(new AsyncCallback<List<List<String>>>() {
+    BrowserService.Util.getInstance().retrieveAllMitigationProperties(new AsyncCallback<MitigationPropertiesBundle>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -156,30 +159,29 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       }
 
       @Override
-      public void onSuccess(List<List<String>> terms) {
+      public void onSuccess(MitigationPropertiesBundle terms) {
         init(editmode, terms, risk);
       }
     });
   }
 
-  public void init(boolean editmode, List<List<String>> mitigationProperties, Risk risk) {
+  public void init(boolean editmode, MitigationPropertiesBundle mitigationProperties, Risk risk) {
+    severityLowLimit = mitigationProperties.getSeverityLowLimit();
+    severityHighLimit = mitigationProperties.getSeverityHighLimit();
 
-    severityLowLimit = Integer.parseInt(mitigationProperties.get(0).get(0));
-    severityHighLimit = Integer.parseInt(mitigationProperties.get(0).get(1));
-
-    // add probability items to list box
-    for (int i = 0; i < 6; i++) {
-      posMitigationProbability.addItem(mitigationProperties.get(1).get(i));
+    List<String> probabilities = mitigationProperties.getProbabilities();
+    for (int i = 0; i < probabilities.size(); i++) {
+      posMitigationProbability.addItem(probabilities.get(i));
       if (i != 0) {
-        preMitigationProbability.addItem(mitigationProperties.get(1).get(i));
+        preMitigationProbability.addItem(probabilities.get(i));
       }
     }
 
-    // add impact items to list box
-    for (int i = 0; i < 6; i++) {
-      posMitigationImpact.addItem(mitigationProperties.get(2).get(i));
+    List<String> impacts = mitigationProperties.getImpacts();
+    for (int i = 0; i < impacts.size(); i++) {
+      posMitigationImpact.addItem(impacts.get(i));
       if (i != 0) {
-        preMitigationImpact.addItem(mitigationProperties.get(2).get(i));
+        preMitigationImpact.addItem(impacts.get(i));
       }
     }
 
@@ -195,6 +197,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     identifiedOn.setFormat(dateFormat);
     identifiedOn.getDatePicker().setYearArrowsVisible(true);
     identifiedOn.setFireNullValues(true);
+    identifiedOn.setValue(new Date());
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -250,6 +253,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     name.addKeyUpHandler(keyUpHandler);
     description.addChangeHandler(changeHandler);
     description.addKeyUpHandler(keyUpHandler);
+    description.setVisibleLines(6);
     identifiedOn.addValueChangeHandler(new ValueChangeHandler<Date>() {
 
       @Override
@@ -261,20 +265,24 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     identifiedBy.addChangeHandler(changeHandler);
     identifiedBy.addKeyUpHandler(keyUpHandler);
     notes.addChangeHandler(changeHandler);
+    notes.setVisibleLines(6);
 
     preMitigationProbability.addChangeHandler(changePreMitigationHandler);
     preMitigationProbability.addKeyUpHandler(keyUpHandler);
     preMitigationImpact.addChangeHandler(changePreMitigationHandler);
     preMitigationImpact.addKeyUpHandler(keyUpHandler);
     preMitigationNotes.addChangeHandler(changeHandler);
+    preMitigationNotes.setVisibleLines(6);
 
     posMitigationProbability.addChangeHandler(changePosMitigationHandler);
     posMitigationProbability.addKeyUpHandler(keyUpHandler);
     posMitigationImpact.addChangeHandler(changePosMitigationHandler);
     posMitigationImpact.addKeyUpHandler(keyUpHandler);
     posMitigationNotes.addChangeHandler(changeHandler);
+    posMitigationNotes.setVisibleLines(6);
 
     mitigationStrategy.addChangeHandler(changeHandler);
+    mitigationStrategy.setVisibleLines(6);
     mitigationOwnerType.addChangeHandler(changeHandler);
     mitigationOwner.addChangeHandler(changeHandler);
     mitigationRelatedEventIdentifierType.addChangeHandler(changeHandler);
@@ -289,6 +297,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     }
 
     // FIXME it must be visible later
+    mitigationOwnerTypeKey.setVisible(false);
+    mitigationOwnerType.setVisible(false);
     mitigationRelatedEventIdentifierType.setVisible(false);
     mitigationRelatedEventIdentifierValue.setVisible(false);
   }
@@ -355,7 +365,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     int probability = posMitigationProbability.getSelectedIndex();
     int impact = posMitigationImpact.getSelectedIndex();
 
-    if (isElementValid(probability) || isElementValid(impact)) {
+    if (probability != 0 || impact != 0) {
       this.posMitigationSeverityKey.setVisible(true);
       this.posMitigationSeverityValue.setVisible(true);
       int posSeverity = risk.getPosMitigationSeverity();
@@ -373,7 +383,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   public Risk getRisk() {
-
     Risk risk = new Risk();
     risk.setName(name.getText());
     risk.setDescription(description.getText());
@@ -436,10 +445,6 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     mitigationOwner.setText("");
     mitigationRelatedEventIdentifierType.setText("");
     mitigationRelatedEventIdentifierValue.setText("");
-  }
-
-  private boolean isElementValid(Integer value) {
-    return value != null && value > 0 && value < 6;
   }
 
   private String getSeverityLevel(int severity, int lowLimit, int highLimit) {

@@ -36,6 +36,8 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
+import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.search.SearchField;
 
 import com.google.gwt.core.client.GWT;
@@ -211,10 +213,10 @@ public interface BrowserService extends RemoteService {
   Risk retrieveRiskVersion(String riskId, String selectedVersion)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException;
 
-  List<String> retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
+  RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException;
 
   List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException;
 
-  List<List<String>> retrieveAllMitigationProperties() throws AuthorizationDeniedException;
+  MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 }

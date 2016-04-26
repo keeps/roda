@@ -8,8 +8,6 @@
 
 package org.roda.wui.client.planning;
 
-import java.util.List;
-
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.common.client.ClientLogger;
@@ -166,7 +164,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     final int posSeverity = risk.getPosMitigationSeverity();
 
     BrowserService.Util.getInstance().retrieveShowMitigationTerms(preProbability, preImpact, posProbability, posImpact,
-      new AsyncCallback<List<String>>() {
+      new AsyncCallback<RiskMitigationBundle>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -174,40 +172,37 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
         }
 
         @Override
-        public void onSuccess(List<String> terms) {
+        public void onSuccess(RiskMitigationBundle terms) {
+          int severityLowLimit = terms.getSeverityLowLimit();
+          int severityHighLimit = terms.getSeverityHighLimit();
 
-          if (terms.size() == 6) {
-            int severityHighLimit = Integer.parseInt(terms.get(0));
-            int severityLowLimit = Integer.parseInt(terms.get(1));
+          riskPreMitigationProbability.setText(terms.getPreMitigationProbability());
+          riskPreMitigationImpact.setText(terms.getPreMitigationImpact());
 
-            riskPreMitigationProbability.setText(terms.get(2));
-            riskPreMitigationImpact.setText(terms.get(3));
+          riskPreMitigationSeverity
+            .setHTML(RiskShowPanel.this.getSeverityDefinition(preSeverity, severityLowLimit, severityHighLimit));
 
-            riskPreMitigationSeverity
-              .setHTML(RiskShowPanel.this.getSeverityDefinition(preSeverity, severityHighLimit, severityLowLimit));
+          riskPosMitigationProbability.setText(terms.getPosMitigationProbability());
+          riskPosMitigationImpact.setText(terms.getPosMitigationImpact());
 
-            riskPosMitigationProbability.setText(terms.get(4));
-            riskPosMitigationImpact.setText(terms.get(5));
-
-            if (posProbability == 0 && posImpact == 0) {
-              riskPosMitigationKey.setVisible(false);
-              riskPosMitigationProbabilityKey.setVisible(false);
-              riskPosMitigationProbability.setVisible(false);
-              riskPosMitigationImpactKey.setVisible(false);
-              riskPosMitigationImpact.setVisible(false);
-              riskPosMitigationSeverityKey.setVisible(false);
-              riskPosMitigationSeverity.setVisible(false);
-            } else {
-              riskPosMitigationKey.setVisible(true);
-              riskPosMitigationProbabilityKey.setVisible(true);
-              riskPosMitigationProbability.setVisible(true);
-              riskPosMitigationImpactKey.setVisible(true);
-              riskPosMitigationImpact.setVisible(true);
-              riskPosMitigationSeverityKey.setVisible(true);
-              riskPosMitigationSeverity.setVisible(true);
-              riskPosMitigationSeverity
-                .setHTML(RiskShowPanel.this.getSeverityDefinition(posSeverity, severityHighLimit, severityLowLimit));
-            }
+          if (posProbability == 0 && posImpact == 0) {
+            riskPosMitigationKey.setVisible(false);
+            riskPosMitigationProbabilityKey.setVisible(false);
+            riskPosMitigationProbability.setVisible(false);
+            riskPosMitigationImpactKey.setVisible(false);
+            riskPosMitigationImpact.setVisible(false);
+            riskPosMitigationSeverityKey.setVisible(false);
+            riskPosMitigationSeverity.setVisible(false);
+          } else {
+            riskPosMitigationKey.setVisible(true);
+            riskPosMitigationProbabilityKey.setVisible(true);
+            riskPosMitigationProbability.setVisible(true);
+            riskPosMitigationImpactKey.setVisible(true);
+            riskPosMitigationImpact.setVisible(true);
+            riskPosMitigationSeverityKey.setVisible(true);
+            riskPosMitigationSeverity.setVisible(true);
+            riskPosMitigationSeverity
+              .setHTML(RiskShowPanel.this.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
           }
         }
       });
@@ -267,6 +262,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     }
 
     // FIXME it must be visible later
+    riskMitigationOwnerTypeKey.setVisible(false);
+    riskMitigationOwnerTypeValue.setVisible(false);
     riskMitigationRelatedEventIdentifierTypeKey.setVisible(false);
     riskMitigationRelatedEventIdentifierTypeValue.setVisible(false);
     riskMitigationRelatedEventIdentifierValueKey.setVisible(false);

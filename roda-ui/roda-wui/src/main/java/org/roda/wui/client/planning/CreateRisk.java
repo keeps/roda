@@ -96,7 +96,7 @@ public class CreateRisk extends Composite {
 
         @Override
         public void onSuccess(Risk result) {
-          Tools.newHistory(ShowRisk.RESOLVER, result.getId());
+          Tools.newHistory(RiskRegister.RESOLVER, result.getId());
         }
 
       });

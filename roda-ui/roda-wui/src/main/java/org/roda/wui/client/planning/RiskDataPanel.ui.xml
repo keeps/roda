@@ -24,16 +24,16 @@
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Description</g:Label>
 				<g:TextArea ui:field="description" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Identified On</g:Label>
+				<g:Label addStyleNames="form-label">Identified on</g:Label>
 				<d:DateBox ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
-				<g:Label addStyleNames="form-label">Identified By</g:Label>
+				<g:Label addStyleNames="form-label">Identified by</g:Label>
 				<g:TextBox ui:field="identifiedBy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Category</g:Label>
 				<s:SearchSuggestBox ui:field="category" addStyleNames="form-textbox"/>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
 				<g:TextArea ui:field="notes" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Pre Mitigation</g:Label>
+				<g:Label styleName="h4">Pre-mitigation</g:Label>
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>
@@ -52,18 +52,18 @@
 				<g:TextArea ui:field="preMitigationNotes" addStyleNames="form-textbox" />
 				
 				<g:Label styleName="h4">Mitigation</g:Label>
-				<g:Label addStyleNames="form-label">Strategy</g:Label>
+				<g:Label addStyleNames="form-label">Mitigation strategy/actions</g:Label>
 				<g:TextArea ui:field="mitigationStrategy" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Owner Type</g:Label>
+				<g:Label addStyleNames="form-label" ui:field="mitigationOwnerTypeKey">Risk owner type</g:Label>
 				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">Owner</g:Label>
+				<g:Label addStyleNames="form-label">Risk owner</g:Label>
 				<g:TextBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label not-visible">Related Event Identifier Type</g:Label>
+				<g:Label addStyleNames="form-label not-visible">Related event identifier type</g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierType" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label not-visible">Related Event Identifier Value</g:Label>
+				<g:Label addStyleNames="form-label not-visible">Related event identifier value</g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierValue" addStyleNames="form-textbox" />
 				
-				<g:Label styleName="h4">Pos Mitigation</g:Label>
+				<g:Label styleName="h4">Post-mitigation</g:Label>
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>

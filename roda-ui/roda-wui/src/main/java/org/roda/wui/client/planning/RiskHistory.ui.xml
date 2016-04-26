@@ -18,7 +18,6 @@
 			<g:FlowPanel addStyleNames="col_10 content">
 				<g:Label styleName="h1">Risk history</g:Label>
 				<g:ListBox ui:field="list" />
-				<g:Label styleName="wui-browse-metadata-descriptive-versions-type">Risk</g:Label>
 				<p:RiskShowPanel ui:field="oldRisk" />
 
 			</g:FlowPanel>
