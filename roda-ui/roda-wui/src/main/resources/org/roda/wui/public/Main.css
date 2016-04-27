@@ -90,6 +90,17 @@ h6, .h6 {
 	color: #999;
 }
 
+.value {
+}
+
+.field {
+	margin-bottom: 10px;
+}
+
+.errormessage {
+	margin-top: 5px;
+}
+
 .label-success {
 	background-color: #5cb85c;
 	display: inline;
@@ -1864,7 +1875,6 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .descriptiveMetadata {
-	font-size: 1.3rem;
 }
 
 .descriptiveMetadata .title, .preservationMetadata .title {
@@ -1883,15 +1893,6 @@ td.datePickerMonth, td.datePickerYear {
 
 .descriptiveMetadata-field {
 	margin-bottom: 10px;
-}
-
-.descriptiveMetadata-field-key {
-	font-weight: 300;
-	color: #999;
-}
-
-.descriptiveMetadata-field-value {
-	
 }
 
 .browseDownload {

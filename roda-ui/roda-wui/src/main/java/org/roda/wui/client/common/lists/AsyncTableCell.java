@@ -572,4 +572,8 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return object;
   }
 
+  public List<CheckboxSelectionListener> getListeners() {
+    return this.listeners;
+  }
+
 }

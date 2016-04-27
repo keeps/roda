@@ -123,6 +123,7 @@ import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaGroup;
@@ -268,6 +269,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToFormat(doc));
     } else if (resultClass.equals(Message.class)) {
       ret = resultClass.cast(solrDocumentToMessage(doc));
+    } else if (resultClass.equals(RiskIncidence.class)) {
+      ret = resultClass.cast(solrDocumentToRiskIncidence(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
       ret = resultClass.cast(solrDocumentToIndexedFile(doc));
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -307,6 +310,8 @@ public class SolrUtils {
       ret = formatToSolrDocument((Format) object);
     } else if (resultClass.equals(Message.class)) {
       ret = messageToSolrDocument((Message) object);
+    } else if (resultClass.equals(RiskIncidence.class)) {
+      ret = riskIncidenceToSolrDocument((RiskIncidence) object);
     } else if (resultClass.equals(IndexedFile.class)) {
       throw new NotSupportedException();
     } else if (resultClass.equals(IndexedPreservationEvent.class)) {
@@ -359,6 +364,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_FORMAT;
     } else if (resultClass.equals(Message.class)) {
       indexName = RodaConstants.INDEX_MESSAGE;
+    } else if (resultClass.equals(RiskIncidence.class)) {
+      indexName = RodaConstants.INDEX_RISK_INCIDENCE;
     } else {
       throw new GenericException("Cannot find class index name: " + resultClass.getName());
     }
@@ -1865,6 +1872,26 @@ public class SolrUtils {
       JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGED_USERS))));
 
     return message;
+  }
+
+  public static SolrInputDocument riskIncidenceToSolrDocument(RiskIncidence incidence) {
+    SolrInputDocument doc = new SolrInputDocument();
+
+    doc.addField(RodaConstants.RISK_INCIDENCE_ID, incidence.getId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_ELEMENT_ID, incidence.getElementId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_RISKS, incidence.getRisks());
+
+    return doc;
+  }
+
+  public static RiskIncidence solrDocumentToRiskIncidence(SolrDocument doc) {
+    RiskIncidence incidence = new RiskIncidence();
+
+    incidence.setId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ID)));
+    incidence.setElementId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ELEMENT_ID)));
+    incidence.setRisks(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_RISKS)));
+
+    return incidence;
   }
 
   /*

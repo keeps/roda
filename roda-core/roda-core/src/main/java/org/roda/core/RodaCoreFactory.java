@@ -597,6 +597,8 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.format", indexDataPath.resolve(RodaConstants.CORE_FORMAT_FOLDER).toString());
     System.setProperty("solr.data.dir.message", indexDataPath.resolve(RodaConstants.CORE_MESSAGE_FOLDER).toString());
+    System.setProperty("solr.data.dir.riskincidence",
+      indexDataPath.resolve(RodaConstants.CORE_RISKINCIDENCE_FOLDER).toString());
   }
 
   private static void instantiateNodeSpecificObjects(NodeType nodeType) {

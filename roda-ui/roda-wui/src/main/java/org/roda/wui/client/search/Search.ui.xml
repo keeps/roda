@@ -57,6 +57,12 @@
 						<g:FlowPanel ui:field="facetMimetypes" />
 					</g:FlowPanel>
 				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel">
+					<g:Label addStyleNames="h4">Processes</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="newJobButton">
+						<ui:text from='{messages.riskRegisterProcessButton}' />
+					</g:Button>
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

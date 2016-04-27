@@ -22,6 +22,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 
@@ -32,7 +33,7 @@ public interface ModelObserver {
   public void aipUpdated(AIP aip);
 
   public void aipActiveFlagUpdated(AIP aip);
-  
+
   public void aipMoved(AIP aip, String oldParentId, String newParentId);
 
   public void aipDeleted(String aipId);
@@ -92,6 +93,10 @@ public interface ModelObserver {
   public void riskCreatedOrUpdated(Risk risk);
 
   public void riskDeleted(String riskId);
+
+  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence);
+
+  public void riskIncidenceDeleted(String riskIncidenceId);
 
   public void agentCreatedOrUpdated(Agent agent);
 

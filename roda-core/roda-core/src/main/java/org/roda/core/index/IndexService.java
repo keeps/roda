@@ -45,6 +45,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelService;
@@ -192,6 +193,10 @@ public class IndexService {
     observer.riskCreatedOrUpdated(risk);
   }
 
+  public void reindexRiskIncidence(RiskIncidence riskIncidence) {
+    observer.riskIncidenceCreatedOrUpdated(riskIncidence);
+  }
+
   public void reindexAgent(Agent agent) {
     observer.agentCreatedOrUpdated(agent);
   }
@@ -213,6 +218,8 @@ public class IndexService {
       reindexMessage(Message.class.cast(object));
     } else if (Risk.class.equals(objectClass)) {
       reindexRisk(Risk.class.cast(object));
+    } else if (RiskIncidence.class.equals(objectClass)) {
+      reindexRiskIncidence(RiskIncidence.class.cast(object));
     } else {
       LOGGER.error("Error trying to reindex an unconfigured object class: {}", objectClass.getCanonicalName());
     }

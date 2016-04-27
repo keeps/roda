@@ -22,6 +22,7 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -31,14 +32,17 @@ import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
+import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
+import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.ListboxUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -48,7 +52,9 @@ import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
@@ -147,6 +153,9 @@ public class Search extends Composite {
   FlowPanel filesSearchAdvancedFieldsPanel;
   FlowPanel representationsSearchAdvancedFieldsPanel;
 
+  @UiField
+  Button newJobButton;
+
   ListBox searchAdvancedFieldOptions;
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
@@ -241,6 +250,8 @@ public class Search extends Composite {
     createRepresentationsSearchAdvancedFieldsPanel();
     createFilesSearchAdvancedFieldsPanel();
     showSearchAdvancedFieldsPanel();
+
+    newJobButton.setEnabled(false);
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
@@ -426,6 +437,15 @@ public class Search extends Composite {
       }
     });
 
+    itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+
+      @Override
+      public void onSelectionChange(SelectedItems selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        newJobButton.setEnabled(!empty);
+      }
+    });
+
   }
 
   private void createRepresentationsSearchResultPanel() {
@@ -440,6 +460,15 @@ public class Search extends Composite {
         if (rep != null) {
           Tools.newHistory(ViewRepresentation.RESOLVER, rep.getAipId(), rep.getUUID());
         }
+      }
+    });
+
+    representationsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+
+      @Override
+      public void onSelectionChange(SelectedItems selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        newJobButton.setEnabled(!empty);
       }
     });
   }
@@ -466,5 +495,20 @@ public class Search extends Composite {
         }
       }
     });
+
+    filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+
+      @Override
+      public void onSelectionChange(SelectedItems selected) {
+        boolean empty = SelectedItemsUtils.isEmpty(selected);
+        newJobButton.setEnabled(!empty);
+      }
+    });
   }
+
+  @UiHandler("newJobButton")
+  void buttonStartIngestHandler(ClickEvent e) {
+    Toast.showInfo("Warning", "Feature not yet implemented");
+  }
+
 }

@@ -23,6 +23,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 
@@ -238,6 +239,18 @@ public abstract class ModelObservable {
   protected void notifyRiskDeleted(String riskId) {
     for (ModelObserver observer : observers) {
       observer.riskDeleted(riskId);
+    }
+  }
+
+  protected void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {
+    for (ModelObserver observer : observers) {
+      observer.riskIncidenceCreatedOrUpdated(riskIncidence);
+    }
+  }
+
+  protected void notifyRiskIncidenceDeleted(String riskIncidenceId) {
+    for (ModelObserver observer : observers) {
+      observer.riskDeleted(riskIncidenceId);
     }
   }
 

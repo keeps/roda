@@ -219,4 +219,7 @@ public interface BrowserService extends RemoteService {
   List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException;
 
   MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
+
+  void deleteRisk(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

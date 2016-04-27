@@ -28,9 +28,9 @@
 			<xsl:if
 				test="not(normalize-space($attributeValue)='') and not(normalize-space($attributeName)='')">
 
-				<div class="descriptiveMetadata-field">
-					<div class="descriptiveMetadata-field-key"><xsl:value-of select="$attributeName" /></div>
-					<div class="descriptiveMetadata-field-value"><xsl:value-of select="$attributeValue" /></div>
+				<div class="field">
+					<div class="label"><xsl:value-of select="$attributeName" /></div>
+					<div class="value"><xsl:value-of select="$attributeValue" /></div>
 				</div>
 				<xsl:text>&#xA;</xsl:text>
 			</xsl:if>
@@ -61,9 +61,9 @@
 		</xsl:variable>
 		<xsl:if
 			test="not(normalize-space($path)='') and not(normalize-space($value)='')">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key"><xsl:value-of select="$path" /></div>
-				<div class="descriptiveMetadata-field-value"><xsl:value-of select="$value" /></div>
+			<div class="field">
+				<div class="label"><xsl:value-of select="$path" /></div>
+				<div class="value"><xsl:value-of select="$value" /></div>
 			</div>
 			<xsl:text>&#xA;</xsl:text>
 		</xsl:if>

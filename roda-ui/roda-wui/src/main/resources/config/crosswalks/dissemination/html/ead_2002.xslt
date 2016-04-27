@@ -45,11 +45,11 @@
 	</xsl:template>
     <xsl:template match="ead:eadheader">
         <xsl:if test="ead:profiledesc/ead:langusage/ead:language/text()">
-            <div class="descriptiveMetadata-field">
-                <div class="descriptiveMetadata-field-key">
+            <div class="field">
+                <div class="label">
                     <xsl:value-of select="$i18n.languages"/>
                 </div>
-                <div class="descriptiveMetadata-field-value">
+                <div class="value">
                     <xsl:value-of select="ead:profiledesc/ead:langusage/ead:language/text()" />
                 </div>
             </div>
@@ -59,32 +59,32 @@
 		<!-- COMPLETE REFERENCE -->
 		<!-- HANDLE -->
 		<xsl:if test="ead:did/ead:unittitle/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.title"/>
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:did/ead:unittitle/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="@level">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.level" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="@level" />
 				</div>
 			</div>
 		</xsl:if>
 		<!-- HANDLE DATE BETTER??? -->
 		<xsl:if test="ead:did/ead:unitdate/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.unitdate" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<span class="value">
 						<xsl:value-of select="ead:did/ead:unitdate/text()" />
 					</span>
@@ -96,11 +96,11 @@
 				<xsl:when test="contains(ead:did/ead:unitdate/@normal, '/')">	<!-- initial/final -->
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />
 									</span>
@@ -110,11 +110,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01
 									</span>
@@ -124,11 +124,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01-01
 									</span>
@@ -138,11 +138,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
 									</span>
@@ -152,11 +152,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(substring-before(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
 									</span>
@@ -167,11 +167,11 @@
 				
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.finaldate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />
 									</span>
@@ -181,11 +181,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.finaldate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01
 									</span>
@@ -195,11 +195,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.finaldate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01-01
 									</span>
@@ -209,11 +209,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.finaldate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
 									</span>
@@ -223,11 +223,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(substring-after(ead:did/ead:unitdate/@normal, '/'))">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.finaldate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
 									</span>
@@ -239,11 +239,11 @@
 				<xsl:otherwise>
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}}-\d{{2}})$" select="normalize-space(ead:did/ead:unitdate/@normal)">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />
 									</span>
@@ -253,11 +253,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}}-\d{{2}})$" select="normalize-space(ead:did/ead:unitdate/@normal)">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01
 									</span>
@@ -267,11 +267,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})$" select="normalize-space(ead:did/ead:unitdate/@normal)">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-01-01
 									</span>
@@ -281,11 +281,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})(\d{{2}})$" select="normalize-space(ead:did/ead:unitdate/@normal)">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-<xsl:value-of select="regex-group(3)" />
 									</span>
@@ -295,11 +295,11 @@
 					</xsl:analyze-string>
 					<xsl:analyze-string regex="^(\d{{4}})(\d{{2}})$" select="normalize-space(ead:did/ead:unitdate/@normal)">
 						<xsl:matching-substring>
-							<div class="descriptiveMetadata-field">
-								<div class="descriptiveMetadata-field-key">
+							<div class="field">
+								<div class="label">
 									<xsl:value-of select="$i18n.initialdate" />
 								</div>
-								<div class="descriptiveMetadata-field-value">
+								<div class="value">
 									<span class="value">
 										<xsl:value-of select="regex-group(1)" />-<xsl:value-of select="regex-group(2)" />-01
 									</span>
@@ -312,33 +312,33 @@
 		</xsl:if>
 		<!-- COUNTRY CODE -->
 		<xsl:if test="ead:did/ead:unitid/@repositorycode">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.repositorycode" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:did/ead:unitid/@repositorycode" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:unitid/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.reference" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:did/ead:unitid/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="normalize-space(string-join(ead:did/ead:origination/text(),''))!=''">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.origination" />
 				</div>
 				<xsl:for-each select="ead:did/ead:origination">
 					<xsl:if test="normalize-space(text())!=''">
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<xsl:value-of select="text()" />
 						</div>
 					</xsl:if>
@@ -346,41 +346,41 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:acqinfo/ead:num/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.acquisitionnumber" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:acqinfo/ead:num/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:acqinfo/ead:date/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.acquisitiondate" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:acqinfo/ead:date/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:materialspec/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.materialspecification" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:did/ead:materialspec/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:physdesc/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.physicaldescription" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<span class="value">
 						<xsl:value-of select="ead:did/ead:physdesc/ead:p/text()" />
 					</span>
@@ -396,22 +396,22 @@
 		<xsl:if test="ead:did/ead:physdesc/ead:date/@normal">
 			<xsl:choose>
 				<xsl:when test="contains(ead:did/ead:physdesc/ead:date/@normal, '/')">
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
+					<div class="field">
+						<div class="label">
 							<xsl:value-of select="$i18n.dateofinitialphysicaldescription" />
 						</div>
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<span class="value">
 								<xsl:value-of
 									select="substring-before(ead:did/ead:physdesc/ead:date/@normal, '/')" />
 							</span>
 						</div>
 					</div>
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
+					<div class="field">
+						<div class="label">
 							<xsl:value-of select="$i18n.dateoffinalphysicaldescription" />
 						</div>
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<span class="value">
 								<xsl:value-of
 									select="substring-after(ead:did/ead:physdesc/ead:date/@normal, '/')" />
@@ -420,11 +420,11 @@
 					</div>
 				</xsl:when>
 				<xsl:otherwise>
-					<div class="descriptiveMetadata-field">
-						<div class="descriptiveMetadata-field-key">
+					<div class="field">
+						<div class="label">
 							<xsl:value-of select="$i18n.dateofinitialphysicaldescription" />
 						</div>
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<span class="value">
 								<xsl:value-of select="ead:did/ead:physdesc/ead:date/@normal" />
 							</span>
@@ -434,11 +434,11 @@
 			</xsl:choose>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:physdesc/ead:dimensions/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.dimensions" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<span class="value">
 						<xsl:value-of select="ead:did/ead:physdesc/ead:dimensions/text()" />
 					</span>
@@ -451,11 +451,11 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:physdesc/ead:physfacet/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.facetorappearance" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<span class="value">
 						<xsl:value-of select="ead:did/ead:physdesc/ead:physfacet/text()" />
 					</span>
@@ -468,11 +468,11 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:did/ead:physdesc/ead:extent/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.extent" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<span class="value">
 						<xsl:value-of select="ead:did/ead:physdesc/ead:extent/text()" />
 					</span>
@@ -485,20 +485,20 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="normalize-space(string-join(ead:did/ead:langmaterial/text(),''))!=''">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.languages" />
 				</div>
 				<xsl:for-each select="ead:did/ead:langmaterial">
 					<xsl:if test="normalize-space(text())!=''">
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<xsl:value-of select="text()" />
 						</div>
 					</xsl:if>
 				</xsl:for-each>
 				<xsl:for-each select="ead:did/ead:langmaterial/ead:language">
 					<xsl:if test="normalize-space(text())!=''">
-						<div class="descriptiveMetadata-field-value">
+						<div class="value">
 							<xsl:value-of select="text()" />
 						</div>
 					</xsl:if>
@@ -506,31 +506,31 @@
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:prefercite/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.quote" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:prefercite/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:bioghist/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.administrativeandbiographicalhistory" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:bioghist/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:bioghist/ead:chronlist">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.administrativeandbiographicalhistory" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:for-each select="ead:bioghist/ead:chronlist/ead:chronitem">
 						<xsl:variable name="line">
 							<xsl:if test="ead:date/@normal">
@@ -565,48 +565,48 @@
 		</xsl:if>
 
 		<xsl:if test="ead:custodhist/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.custodialhistory" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:custodhist/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:acqinfo/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.acquisitioninformation" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:acqinfo/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="normalize-space(string-join(ead:scopecontent/ead:p/text(),''))!=''">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.description" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:scopecontent/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:arrangement/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.organizationandordering" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:arrangement/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:arrangement/ead:table">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.organizationandordering" />
 				</div>
 				<xsl:variable name="output">
@@ -635,99 +635,99 @@
 						</tbody>
 					</table>
 				</xsl:variable>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:copy-of select="$output" />
 				</div>
 			</div>
 		</xsl:if>
 
 		<xsl:if test="ead:appraisal/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.appraisal" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:appraisal/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:accruals/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.accruals" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:accruals/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:phystech/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of
 						select="$i18n.physicalcharacteristicsandtechnicalrequirements" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:phystech/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:accessrestrict/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.accessrestrictions" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:accessrestrict/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:userrestrict/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.reproductionrestrictions" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:userrestrict/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:relatedmaterial/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.relatedmaterials" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:relatedmaterial/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:otherfindingaid/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.otherfindaids" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:otherfindingaid/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:note/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.notes" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:note/ead:p/text()" />
 				</div>
 			</div>
 		</xsl:if>
 		<xsl:if test="ead:bibliography/ead:p/text()">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="$i18n.bibliography" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="ead:bibliography/ead:p/text()" />
 				</div>
 			</div>

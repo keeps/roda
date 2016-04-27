@@ -581,4 +581,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.retrieveAllMitigationProperties(user);
   }
 
+  @Override
+  public void deleteRisk(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.deleteRisk(user, selected);
+  }
+
 }

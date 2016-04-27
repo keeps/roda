@@ -115,7 +115,11 @@ public final class ModelUtils {
   }
 
   private static List<String> getRepresentationPath(String aipId, String representationId) {
-    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
+    if (representationId == null) {
+      return getAIPPath(aipId);
+    } else {
+      return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
+    }
   }
 
   public static StoragePath getRepresentationStoragePath(String aipId, String representationId)
@@ -477,6 +481,15 @@ public final class ModelUtils {
 
   public static StoragePath getRiskStoragePath(String riskId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK, riskId + RodaConstants.RISK_FILE_EXTENSION);
+  }
+
+  public static StoragePath getRiskIncidenceContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE);
+  }
+
+  public static StoragePath getRiskIncidenceStoragePath(String riskIncidenceId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_RISK_INCIDENCE,
+      riskIncidenceId + RodaConstants.RISK_INCIDENCE_FILE_EXTENSION);
   }
 
   public static StoragePath getAgentContainerPath() throws RequestNotValidException {

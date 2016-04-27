@@ -67,6 +67,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -1552,6 +1553,113 @@ public class ModelService extends ModelObservable {
     notifyRiskCreatedOrUpdated(retrieveRisk(riskId));
 
     return currentVersion;
+  }
+
+  public RiskIncidence addRiskIncidence(String riskId, String aipId, String representationId,
+    List<String> fileDirectoryPath, String fileId, String type) throws GenericException {
+
+    RiskIncidence riskIncidence = null;
+    String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
+
+    try {
+      Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+
+      InputStream inputStream = incidenceBinary.getContent().createInputStream();
+      riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
+      IOUtils.closeQuietly(inputStream);
+
+      if (riskIncidence.getRisks().contains(riskId)) {
+        return riskIncidence;
+      }
+
+    } catch (NotFoundException | IOException | RequestNotValidException | AuthorizationDeniedException e) {
+
+      riskIncidence = new RiskIncidence();
+      riskIncidence.setId(UUID.randomUUID().toString());
+      if (fileId != null) {
+        riskIncidence.setElementId(fileId);
+      } else if (representationId != null) {
+        riskIncidence.setElementId(representationId);
+      } else {
+        riskIncidence.setElementId(aipId);
+      }
+
+    }
+
+    try {
+      riskIncidence.addRisk(riskId);
+      String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+      this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
+        new StringContentPayload(riskIncidenceAsJson), true);
+      notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
+    } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error adding risk incidence in storage", e);
+    }
+
+    return riskIncidence;
+  }
+
+  public void deleteRiskIncidence(String riskId, String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, String type)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+
+    String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
+
+    try {
+      Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+
+      if (incidenceBinary != null) {
+        InputStream inputStream = incidenceBinary.getContent().createInputStream();
+        RiskIncidence riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
+        riskIncidence.removeRisk(riskId);
+        IOUtils.closeQuietly(inputStream);
+
+        if (riskIncidence.getRisks().size() > 0) {
+          String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
+          this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
+            new StringContentPayload(riskIncidenceAsJson), true);
+          notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
+        } else {
+          StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, type,
+            fileDirectoryPath, fileId);
+          storage.deleteResource(binaryPath);
+          notifyRiskIncidenceDeleted(riskIncidence.getId());
+        }
+      } else {
+        throw new NotFoundException("Risk incidence binary does not exist");
+      }
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | IOException e) {
+      LOGGER.error("Error adding risk incidence in storage", e);
+    }
+  }
+
+  public RiskIncidence retrieveRiskIncidence(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, String type)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+
+    String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
+
+    try {
+      Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+        fileSuffix, type);
+
+      if (incidenceBinary != null) {
+        InputStream inputStream = incidenceBinary.getContent().createInputStream();
+        RiskIncidence riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
+        IOUtils.closeQuietly(inputStream);
+        return riskIncidence;
+      } else {
+        throw new NotFoundException("Risk incidence binary does not exist");
+      }
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | IOException e) {
+      LOGGER.error("Error adding risk incidence in storage", e);
+    }
+
+    return null;
   }
 
   /***************** Agent related *****************/

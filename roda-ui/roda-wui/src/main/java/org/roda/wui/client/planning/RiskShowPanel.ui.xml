@@ -17,52 +17,92 @@
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
 				<g:Label styleName="h1" ui:field="title">Risk</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="riskId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
-				<g:Label ui:field="riskName" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskDescriptionKey">Description</g:Label>
-				<g:Label ui:field="riskDescriptionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified on</g:Label>
-				<g:Label ui:field="riskIdentifiedOn" />
-				<g:Label styleName="descriptiveMetadata-field-key">Identified by</g:Label>
-				<g:Label ui:field="riskIdentifiedBy" />
-				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
-				<g:Label ui:field="riskCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskNotesValue" />
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Identifier</g:Label>
+					<g:Label styleName="value" ui:field="riskId" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Name</g:Label>
+					<g:Label styleName="value" ui:field="riskName" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskDescriptionKey">Description</g:Label>
+					<g:Label styleName="value" ui:field="riskDescriptionValue" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Identified on</g:Label>
+					<g:Label styleName="value" ui:field="riskIdentifiedOn" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Identified by</g:Label>
+					<g:Label styleName="value" ui:field="riskIdentifiedBy" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Category</g:Label>
+					<g:Label styleName="value" ui:field="riskCategory" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskNotesKey">Notes</g:Label>
+					<g:Label styleName="value" ui:field="riskNotesValue" />
+				</g:FlowPanel>
 				
 				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre-mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Probability</g:Label>
-				<g:Label ui:field="riskPreMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key">Impact</g:Label>
-				<g:Label ui:field="riskPreMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key">Severity</g:Label>
-				<g:HTML ui:field="riskPreMitigationSeverity"></g:HTML>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskPreMitigationNotesValue" />
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Probability</g:Label>
+					<g:Label styleName="value" ui:field="riskPreMitigationProbability" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Impact</g:Label>
+					<g:Label styleName="value" ui:field="riskPreMitigationImpact" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label">Severity</g:Label>
+					<g:HTML ui:field="riskPreMitigationSeverity"></g:HTML>
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
+					<g:Label styleName="value" ui:field="riskPreMitigationNotesValue" />
+				</g:FlowPanel>
 				
 				<g:Label styleName="h4" ui:field="riskMitigationKey">Mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationStrategyKey">Mitigation strategy/actions</g:Label>
-				<g:Label ui:field="riskMitigationStrategyValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerTypeKey">Risk owner type</g:Label>
-				<g:Label ui:field="riskMitigationOwnerTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationOwnerKey">Risk owner</g:Label>
-				<g:Label ui:field="riskMitigationOwnerValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related event identifier type</g:Label>
-				<g:Label ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related event identifier value</g:Label>
-				<g:Label ui:field="riskMitigationRelatedEventIdentifierValueValue" />
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskMitigationStrategyKey">Mitigation strategy/actions</g:Label>
+					<g:Label styleName="value" ui:field="riskMitigationStrategyValue" />	
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskMitigationOwnerTypeKey">Risk owner type</g:Label>
+					<g:Label styleName="value" ui:field="riskMitigationOwnerTypeValue" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskMitigationOwnerKey">Risk owner</g:Label>
+					<g:Label styleName="value" ui:field="riskMitigationOwnerValue" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierTypeKey">Related event identifier type</g:Label>
+					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierTypeValue" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskMitigationRelatedEventIdentifierValueKey">Related event identifier value</g:Label>
+					<g:Label styleName="value" ui:field="riskMitigationRelatedEventIdentifierValueValue" />
+				</g:FlowPanel>
 				
 				<g:Label styleName="h4" ui:field="riskPosMitigationKey">Post-mitigation</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
-				<g:Label ui:field="riskPosMitigationProbability" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationImpactKey">Impact</g:Label>
-				<g:Label ui:field="riskPosMitigationImpact" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationSeverityKey">Severity</g:Label>
-				<g:HTML ui:field="riskPosMitigationSeverity"></g:HTML>
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
-				<g:Label ui:field="riskPosMitigationNotesValue" />
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskPosMitigationProbabilityKey">Probability</g:Label>
+					<g:Label styleName="value" ui:field="riskPosMitigationProbability" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskPosMitigationImpactKey">Impact</g:Label>
+					<g:Label styleName="value" ui:field="riskPosMitigationImpact" />
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskPosMitigationSeverityKey">Severity</g:Label>
+					<g:HTML styleName="value" ui:field="riskPosMitigationSeverity"></g:HTML>
+				</g:FlowPanel>
+				<g:FlowPanel styleName="field">
+					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
+					<g:Label styleName="value" ui:field="riskPosMitigationNotesValue" />
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

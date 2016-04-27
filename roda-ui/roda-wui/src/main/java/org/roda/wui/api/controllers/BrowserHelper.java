@@ -983,6 +983,7 @@ public class BrowserHelper {
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     List<String> idList = consolidate(user, returnClass, ids);
     RodaCoreFactory.getIndexService().delete(returnClass, idList);
+    RodaCoreFactory.getIndexService().commit(returnClass);
   }
 
   public static boolean getScanUpdateStatus() {
@@ -1226,6 +1227,7 @@ public class BrowserHelper {
   public static Risk addRisk(Risk risk) throws GenericException, RequestNotValidException {
     Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk);
     RodaCoreFactory.getIndexService().create(Risk.class, createdRisk);
+    RodaCoreFactory.getIndexService().commit(Risk.class);
     return createdRisk;
   }
 
@@ -1233,6 +1235,7 @@ public class BrowserHelper {
     RodaCoreFactory.getModelService().updateRisk(risk, message);
     RodaCoreFactory.getIndexService().delete(Risk.class, Arrays.asList(risk.getId()));
     RodaCoreFactory.getIndexService().create(Risk.class, risk);
+    RodaCoreFactory.getIndexService().commit(Risk.class);
   }
 
   public static Agent addAgent(Agent agent) throws GenericException, RequestNotValidException {
@@ -1480,5 +1483,15 @@ public class BrowserHelper {
 
     MitigationPropertiesBundle properties = new MitigationPropertiesBundle(lowLimit, highLimit, probabilities, impacts);
     return properties;
+  }
+
+  public static void deleteRisk(RodaUser user, SelectedItems selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> idList = consolidate(user, Risk.class, selected);
+    for (String riskId : idList) {
+      RodaCoreFactory.getModelService().deleteRisk(riskId);
+    }
+    RodaCoreFactory.getIndexService().delete(Risk.class, idList);
+    RodaCoreFactory.getIndexService().commit(Risk.class);
   }
 }

@@ -1328,4 +1328,19 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
+  public static void deleteRisk(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.deleteRisk(user, selected);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "deleteRisk", null, duration, "selected", selected);
+  }
+
 }

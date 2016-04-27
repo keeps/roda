@@ -11,11 +11,11 @@
 	</xsl:template>
 	<xsl:template match="field">
 		<xsl:if test="normalize-space(text())!=''">
-			<div class="descriptiveMetadata-field">
-				<div class="descriptiveMetadata-field-key">
+			<div class="field">
+				<div class="label">
 					<xsl:value-of select="@name" />
 				</div>
-				<div class="descriptiveMetadata-field-value">
+				<div class="value">
 					<xsl:value-of select="text()" />
 				</div>
 			</div>	

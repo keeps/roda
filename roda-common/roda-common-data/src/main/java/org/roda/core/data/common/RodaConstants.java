@@ -87,6 +87,7 @@ public final class RodaConstants {
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_FORMAT_FOLDER = "format";
   public static final String CORE_MESSAGE_FOLDER = "message";
+  public static final String CORE_RISKINCIDENCE_FOLDER = "riskincidence";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";
@@ -185,6 +186,7 @@ public final class RodaConstants {
   public static final String INDEX_AGENT = "Agent";
   public static final String INDEX_FORMAT = "Format";
   public static final String INDEX_MESSAGE = "Message";
+  public static final String INDEX_RISK_INCIDENCE = "RiskIncidence";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
   // "DescriptiveMetadata";
@@ -204,6 +206,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_JOB = "Job";
   public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
   public static final String STORAGE_CONTAINER_RISK = "Risk";
+  public static final String STORAGE_CONTAINER_RISK_INCIDENCE = "RiskIncidence";
   public static final String STORAGE_CONTAINER_AGENT = "Agent";
   public static final String STORAGE_CONTAINER_FORMAT = "Format";
   public static final String STORAGE_CONTAINER_MESSAGE = "Message";
@@ -447,12 +450,17 @@ public final class RodaConstants {
   public static final String RISK_MITIGATION_OWNER = "mitigationOwner";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE = "mitigationRelatedEventIdentifierType";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
-
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   public static final String RISK_FILE_EXTENSION = ".json";
-
   public static final String RISK_SEARCH = "search";
+
+  public static final String RISK_INCIDENCE_ID = "id";
+  public static final String RISK_INCIDENCE_ELEMENT_ID = "elementId";
+  public static final String RISK_INCIDENCE_RISKS = "risks";
+
+  public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
+  public static final String RISK_INCIDENCE_SEARCH = "search";
 
   /* Agents */
   public static final String AGENT_ID = "id";

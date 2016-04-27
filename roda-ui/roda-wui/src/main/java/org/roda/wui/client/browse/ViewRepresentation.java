@@ -718,7 +718,7 @@ public class ViewRepresentation extends Composite {
     HTML html = new HTML();
     SafeHtmlBuilder b = new SafeHtmlBuilder();
 
-    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-exclamation-triangle fa-5'></i>"));
+    b.append(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-picture-o fa-5'></i>"));
     b.append(SafeHtmlUtils.fromSafeConstant("<h4 class='errormessage'>"));
     b.append(SafeHtmlUtils.fromString(messages.viewRepresentationNotSupportedPreview()));
     b.append(SafeHtmlUtils.fromSafeConstant("</h4>"));

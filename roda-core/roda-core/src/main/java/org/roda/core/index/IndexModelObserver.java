@@ -51,6 +51,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.messages.Message;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
@@ -795,6 +796,16 @@ public class IndexModelObserver implements ModelObserver {
 
   public void riskDeleted(String riskId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
+  }
+
+  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {
+    addDocumentToIndex(RodaConstants.INDEX_RISK_INCIDENCE, SolrUtils.riskIncidenceToSolrDocument(riskIncidence),
+      "Error creating Risk Incidence");
+  }
+
+  public void riskIncidenceDeleted(String riskIncidenceId) {
+    deleteDocumentFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, riskIncidenceId,
+      "Error deleting Risk Incidence (id=" + riskIncidenceId + ")");
   }
 
   public void agentCreatedOrUpdated(Agent agent) {

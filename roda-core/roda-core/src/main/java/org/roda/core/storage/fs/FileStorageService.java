@@ -36,7 +36,6 @@ import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultBinaryVersion;
 import org.roda.core.storage.DefaultContainer;
 import org.roda.core.storage.DefaultDirectory;
-import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;

@@ -149,4 +149,6 @@ public interface BrowserServiceAsync {
   void retrieveMitigationSeverityLimits(AsyncCallback<List<String>> asyncCallback);
 
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
+
+  void deleteRisk(SelectedItems selected, AsyncCallback<Void> asyncCallback);
 }

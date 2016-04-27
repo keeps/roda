@@ -22,7 +22,6 @@ import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
@@ -264,7 +263,7 @@ public class RiskRegister extends Composite {
 
     final SelectedItems selected = riskList.getSelected();
 
-    SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
+    SelectedItemsUtils.size(Risk.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {
@@ -285,7 +284,7 @@ public class RiskRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().delete(Risk.class.getName(), selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteRisk(selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
