@@ -638,8 +638,10 @@ public class PremisV3Utils {
     return agent;
   }
 
-  public static SolrInputDocument updateSolrDocument(SolrInputDocument doc, Binary premisBinary)
+  public static SolrInputDocument getSolrDocument(Binary premisBinary)
     throws GenericException {
+    
+    SolrInputDocument doc = new SolrInputDocument();
 
     InputStream inputStream = null;
     try {

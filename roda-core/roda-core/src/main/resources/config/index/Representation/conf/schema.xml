@@ -110,7 +110,9 @@
    <field name="original" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sizeInBytes" type="long" indexed="true" stored="true" /> 
-   <field name="totalNumberOfFiles" type="long" indexed="true" stored="true" />
+   <field name="numberOfDataFiles" type="long" indexed="true" stored="true" />
+   <field name="numberOfDocumentationFiles" type="long" indexed="true" stored="true" />
+   <field name="numberOfSchemaFiles" type="long" indexed="true" stored="true" />
    
    <field name="search" type="search" indexed="true" stored="false" required="false" multiValued="true" />
    

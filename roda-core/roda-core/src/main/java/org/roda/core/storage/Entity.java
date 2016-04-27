@@ -7,6 +7,8 @@
  */
 package org.roda.core.storage;
 
+import java.io.Serializable;
+
 import org.roda.core.data.v2.ip.StoragePath;
 
 /**
@@ -14,8 +16,8 @@ import org.roda.core.data.v2.ip.StoragePath;
  * by all roda storage model "entities"
  * 
  * @author Hélder Silva <hsilva@keep.pt>
- * */
-public interface Entity {
+ */
+public interface Entity extends Serializable {
   /**
    * The path of the entity in storage
    * 

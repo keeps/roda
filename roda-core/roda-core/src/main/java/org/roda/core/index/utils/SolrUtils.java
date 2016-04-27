@@ -1151,13 +1151,17 @@ public class SolrUtils {
     final String type = objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE));
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
-    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES), 0L);
+    final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
+
+    final Long numberOfDocumentationFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
+    final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
 
     return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, sizeInBytes,
-      totalNumberOfFiles);
+      totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
   }
 
-  public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep) {
+  public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep, Long sizeInBytes,
+    Long numberOfDataFiles, Long numberOfDocumentationFiles, Long numberOfSchemaFiles) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.REPRESENTATION_UUID, IdUtils.getRepresentationId(rep.getAipId(), rep.getId()));
     doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
@@ -1165,9 +1169,10 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
     doc.addField(RodaConstants.REPRESENTATION_TYPE, rep.getType());
 
-    // FIXME calculate storage size and number of files or get it from arguments
-    doc.addField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, 0L);
-    doc.addField(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES, 0L);
+    doc.addField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, sizeInBytes);
+    doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES, numberOfDataFiles);
+    doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
+    doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
     // indexing active state and permissions
     doc.addField(RodaConstants.ACTIVE, aip.isActive());
@@ -1176,7 +1181,7 @@ public class SolrUtils {
     return doc;
   }
 
-  public static SolrInputDocument fileToSolrDocument(AIP aip, File file, Binary premisFile, String fulltext) {
+  public static SolrInputDocument fileToSolrDocument(AIP aip, File file) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(RodaConstants.FILE_UUID, IdUtils.getFileId(file));
     List<String> path = file.getPath();
@@ -1206,21 +1211,6 @@ public class SolrUtils {
       LOGGER.warn("Could not index file storage path", e);
     }
 
-    // Add information from PREMIS
-    if (premisFile != null) {
-      // TODO get entry point from PREMIS or remove it
-      // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
-      try {
-        doc = PremisV3Utils.updateSolrDocument(doc, premisFile);
-      } catch (GenericException e) {
-        LOGGER.warn("Could not index file PREMIS information", e);
-      }
-    }
-
-    if (fulltext != null) {
-      doc.addField(RodaConstants.FILE_FULLTEXT, fulltext);
-
-    }
 
     // indexing active state and permissions
     doc.addField(RodaConstants.ACTIVE, aip.isActive());

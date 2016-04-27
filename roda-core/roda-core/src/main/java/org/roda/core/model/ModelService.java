@@ -1914,4 +1914,39 @@ public class ModelService extends ModelObservable {
       }
     }
   }
+
+  /****************************************************************
+   * 
+   * OTHER DIRECTORIES
+   * 
+   *********************************************************/
+
+  /**
+   * 
+   */
+  public Directory getSubmissionDirectory(String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    return storage.getDirectory(ModelUtils.getSubmissionStoragePath(aipId));
+  }
+
+  public Directory getDocumentationDirectory(String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId));
+  }
+
+  public Directory getDocumentationDirectory(String aipId, String representationId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId, representationId));
+  }
+
+  public Directory getSchemasDirectory(String aipId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId));
+  }
+
+  public Directory getSchemasDirectory(String aipId, String representationId)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId, representationId));
+  }
+
 }

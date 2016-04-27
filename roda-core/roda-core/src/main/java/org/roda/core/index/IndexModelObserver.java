@@ -19,8 +19,10 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.SolrInputField;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
+import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -165,19 +167,30 @@ public class IndexModelObserver implements ModelObserver {
   private void indexRepresentation(final AIP aip, final Representation representation) {
     CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
-      SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation);
-      index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
+      Long sizeInBytes = 0L;
+      Long numberOfDataFiles = 0L;
+
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          indexFile(aip, file.get(), recursiveIndexFile);
+          sizeInBytes += indexFile(aip, file.get(), recursiveIndexFile);
         } else {
           LOGGER.error("Cannot index representation file", file.getCause());
         }
+        numberOfDataFiles++;
       }
       allFiles.close();
+
+      Long numberOfDocumentationFiles = 0L;
+      Long numberOfSchemaFiles = 0L;
+
+      // TODO calculate number of documentation and schema files
+
+      SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
+        sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
+      index.add(RodaConstants.INDEX_REPRESENTATION, representationDocument);
 
     } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
       | AuthorizationDeniedException e) {
@@ -194,11 +207,33 @@ public class IndexModelObserver implements ModelObserver {
   // }
   // }
 
-  private void indexFile(AIP aip, File file, boolean recursive) {
-    Binary premisFile = getFilePremisFile(file);
-    String fulltext = getFileFulltext(file);
+  private Long indexFile(AIP aip, File file, boolean recursive) {
 
-    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file, premisFile, fulltext);
+    Long sizeInBytes = 0L;
+
+    SolrInputDocument fileDocument = SolrUtils.fileToSolrDocument(aip, file);
+
+    // Add information from PREMIS
+    Binary premisFile = getFilePremisFile(file);
+    if (premisFile != null) {
+      // TODO get entry point from PREMIS or remove it
+      // doc.addField(RodaConstants.FILE_ISENTRYPOINT, file.isEntryPoint());
+      try {
+        SolrInputDocument premisSolrDoc = PremisV3Utils.getSolrDocument(premisFile);
+        fileDocument.putAll(premisSolrDoc);
+        sizeInBytes = SolrUtils.objectToLong(premisSolrDoc.get(RodaConstants.FILE_SIZE).getValue(), 0L);
+      } catch (GenericException e) {
+        LOGGER.warn("Could not index file PREMIS information", e);
+      }
+    }
+
+    // Add full text
+    String fulltext = getFileFulltext(file);
+    if (fulltext != null) {
+      fileDocument.addField(RodaConstants.FILE_FULLTEXT, fulltext);
+
+    }
+
     try {
       index.add(RodaConstants.INDEX_FILE, fileDocument);
 
@@ -211,7 +246,7 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
         for (OptionalWithCause<File> subfile : allFiles) {
           if (subfile.isPresent()) {
-            indexFile(aip, subfile.get(), false);
+            sizeInBytes += indexFile(aip, subfile.get(), false);
           } else {
             LOGGER.error("Cannot index file", subfile.getCause());
           }
@@ -222,6 +257,8 @@ public class IndexModelObserver implements ModelObserver {
         LOGGER.error("Cannot index file sub-resources: " + file, e);
       }
     }
+
+    return sizeInBytes;
   }
 
   private Binary getFilePremisFile(File file) {

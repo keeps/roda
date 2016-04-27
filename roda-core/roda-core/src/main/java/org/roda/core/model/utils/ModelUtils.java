@@ -106,6 +106,14 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getAIPOtherMetadataPath(aipId));
   }
 
+  private static List<String> getSubmissionPath(String aipId) {
+    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+  }
+
+  public static StoragePath getSubmissionStoragePath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getSubmissionPath(aipId));
+  }
+
   private static List<String> getRepresentationPath(String aipId, String representationId) {
     return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_REPRESENTATIONS, representationId);
   }
@@ -174,6 +182,40 @@ public final class ModelUtils {
     throws RequestNotValidException {
     // TODO check if descriptive metadata is from a representation
     return getDescriptiveMetadataPath(descriptiveMetadata.getAipId(), descriptiveMetadata.getId());
+  }
+
+  private static List<String> getDocumentationPath(String aipId) {
+    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+  }
+
+  private static List<String> getDocumentationPath(String aipId, String representationId) {
+    return build(getRepresentationDataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+  }
+
+  public static StoragePath getDocumentationStoragePath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDocumentationPath(aipId));
+  }
+
+  public static StoragePath getDocumentationStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getDocumentationPath(aipId, representationId));
+  }
+  
+  private static List<String> getSchemasPath(String aipId) {
+    return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+  }
+
+  private static List<String> getSchemasPath(String aipId, String representationId) {
+    return build(getRepresentationDataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+  }
+
+  public static StoragePath getSchemasStoragePath(String aipId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(getSchemasPath(aipId));
+  }
+
+  public static StoragePath getSchemasStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getSchemasPath(aipId, representationId));
   }
 
   public static StoragePath getFileStoragePath(String aipId, String representationId, List<String> directoryPath,

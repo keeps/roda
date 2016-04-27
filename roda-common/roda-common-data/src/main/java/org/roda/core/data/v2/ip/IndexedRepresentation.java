@@ -18,16 +18,21 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   private long sizeInBytes;
   private long totalNumberOfFiles;
 
+  private long numberOfDocumentationFiles;
+  private long numberOfSchemaFiles;
+
   public IndexedRepresentation() {
     super();
   }
 
   public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, long sizeInBytes,
-    long totalNumberOfFiles) {
+    long totalNumberOfFiles, long numberOfDocumentationFiles, long numberOfSchemaFiles) {
     super(id, aipId, original, type);
     this.uuid = uuid;
     this.sizeInBytes = sizeInBytes;
     this.totalNumberOfFiles = totalNumberOfFiles;
+    this.numberOfDocumentationFiles = numberOfDocumentationFiles;
+    this.numberOfSchemaFiles = numberOfSchemaFiles;
   }
 
   @Override
@@ -55,10 +60,28 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     this.totalNumberOfFiles = totalNumberOfFiles;
   }
 
+  public long getNumberOfDocumentationFiles() {
+    return numberOfDocumentationFiles;
+  }
+
+  public void setNumberOfDocumentationFiles(long numberOfDocumentationFiles) {
+    this.numberOfDocumentationFiles = numberOfDocumentationFiles;
+  }
+
+  public long getNumberOfSchemaFiles() {
+    return numberOfSchemaFiles;
+  }
+
+  public void setNumberOfSchemaFiles(long numberOfSchemaFiles) {
+    this.numberOfSchemaFiles = numberOfSchemaFiles;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
+    result = prime * result + (int) (numberOfDocumentationFiles ^ (numberOfDocumentationFiles >>> 32));
+    result = prime * result + (int) (numberOfSchemaFiles ^ (numberOfSchemaFiles >>> 32));
     result = prime * result + (int) (sizeInBytes ^ (sizeInBytes >>> 32));
     result = prime * result + (int) (totalNumberOfFiles ^ (totalNumberOfFiles >>> 32));
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
@@ -74,6 +97,10 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     if (getClass() != obj.getClass())
       return false;
     IndexedRepresentation other = (IndexedRepresentation) obj;
+    if (numberOfDocumentationFiles != other.numberOfDocumentationFiles)
+      return false;
+    if (numberOfSchemaFiles != other.numberOfSchemaFiles)
+      return false;
     if (sizeInBytes != other.sizeInBytes)
       return false;
     if (totalNumberOfFiles != other.totalNumberOfFiles)
@@ -89,7 +116,8 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   @Override
   public String toString() {
     return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles="
-      + totalNumberOfFiles + "]";
+      + totalNumberOfFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
+      + numberOfSchemaFiles + "]";
   }
 
 }

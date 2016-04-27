@@ -216,6 +216,8 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
   public static final String STORAGE_DIRECTORY_REPRESENTATIONS = "representations";
   public static final String STORAGE_DIRECTORY_SUBMISSION = "submission";
+  public static final String STORAGE_DIRECTORY_DOCUMENTATION = "documentation";
+  public static final String STORAGE_DIRECTORY_SCHEMAS = "schemas";
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";
@@ -268,7 +270,9 @@ public final class RodaConstants {
   public static final String REPRESENTATION_ORIGINAL = "original";
   public static final String REPRESENTATION_TYPE = "type";
   public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
-  public static final String REPRESENTATION_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
+  public static final String REPRESENTATION_NUMBER_OF_DATA_FILES = "numberOfDataFiles";
+  public static final String REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
+  public static final String REPRESENTATION_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
   public static final String REPRESENTATION_SEARCH = "search";
 
   // Representation types

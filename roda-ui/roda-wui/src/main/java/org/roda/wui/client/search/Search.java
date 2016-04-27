@@ -255,7 +255,7 @@ public class Search extends Composite {
       RodaConstants.SEARCH_FIELD_TYPE_BOOLEAN);
     sizeField.simpleSearchField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, messages.searchRepresentationFieldSize(),
       RodaConstants.SEARCH_FIELD_TYPE_STORAGE);
-    numberOfFilesField.simpleSearchField(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES,
+    numberOfFilesField.simpleSearchField(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES,
       messages.searchRepresentationFieldNumberOfFiles(), RodaConstants.SEARCH_FIELD_TYPE_NUMERIC_INTERVAL);
 
     representationsSearchAdvancedFieldsPanel.add(idField);
