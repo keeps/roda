@@ -20,8 +20,8 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
-import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.cellview.client.CellTable;
@@ -39,8 +39,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
   private TextColumn<IndexedRepresentation> idColumn;
   private TextColumn<IndexedRepresentation> originalColumn;
-  private TextColumn<IndexedRepresentation> sizeInBytesColumn;
-  private TextColumn<IndexedRepresentation> totalNumberOfFilesColumn;
+  private TextColumn<IndexedRepresentation> typeColumn;
+  // private TextColumn<IndexedRepresentation> sizeInBytesColumn;
+  // private TextColumn<IndexedRepresentation> totalNumberOfFilesColumn;
 
   public RepresentationList() {
     this(null, null, null, false);
@@ -69,41 +70,57 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       }
     };
 
-    sizeInBytesColumn = new TextColumn<IndexedRepresentation>() {
+    typeColumn = new TextColumn<IndexedRepresentation>() {
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? Humanize.readableFileSize(rep.getSizeInBytes()) : null;
+        if (rep != null && StringUtils.isNotBlank(rep.getType())) {
+          return rep.getType();
+        } else {
+          return null;
+        }
       }
     };
 
-    totalNumberOfFilesColumn = new TextColumn<IndexedRepresentation>() {
-
-      @Override
-      public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getTotalNumberOfFiles() + " files" : null;
-      }
-    };
+    // sizeInBytesColumn = new TextColumn<IndexedRepresentation>() {
+    //
+    // @Override
+    // public String getValue(IndexedRepresentation rep) {
+    // return rep != null ? Humanize.readableFileSize(rep.getSizeInBytes()) :
+    // null;
+    // }
+    // };
+    //
+    // totalNumberOfFilesColumn = new TextColumn<IndexedRepresentation>() {
+    //
+    // @Override
+    // public String getValue(IndexedRepresentation rep) {
+    // return rep != null ? rep.getTotalNumberOfFiles() + " files" : null;
+    // }
+    // };
 
     /* add sortable */
     idColumn.setSortable(true);
     originalColumn.setSortable(true);
-    sizeInBytesColumn.setSortable(true);
-    totalNumberOfFilesColumn.setSortable(true);
+    typeColumn.setSortable(true);
+    // sizeInBytesColumn.setSortable(true);
+    // totalNumberOfFilesColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(idColumn, "Id");
     display.addColumn(originalColumn, "Original");
-    display.addColumn(sizeInBytesColumn, "Size");
-    display.addColumn(totalNumberOfFilesColumn, "Number of files");
+    display.addColumn(typeColumn, "Type");
+    // display.addColumn(sizeInBytesColumn, "Size");
+    // display.addColumn(totalNumberOfFilesColumn, "Number of files");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
     display.setColumnWidth(idColumn, "100%");
 
     originalColumn.setCellStyleNames("nowrap");
-    sizeInBytesColumn.setCellStyleNames("nowrap");
-    totalNumberOfFilesColumn.setCellStyleNames("nowrap");
+    typeColumn.setCellStyleNames("nowrap");
+    // sizeInBytesColumn.setCellStyleNames("nowrap");
+    // totalNumberOfFilesColumn.setCellStyleNames("nowrap");
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, false));
@@ -125,9 +142,11 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       Map<Column<IndexedRepresentation, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRepresentation, ?>, List<String>>();
       columnSortingKeyMap.put(idColumn, Arrays.asList(RodaConstants.REPRESENTATION_ID));
       columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
-      columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
-      columnSortingKeyMap.put(totalNumberOfFilesColumn,
-        Arrays.asList(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES));
+      columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
+      // columnSortingKeyMap.put(sizeInBytesColumn,
+      // Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
+      // columnSortingKeyMap.put(totalNumberOfFilesColumn,
+      // Arrays.asList(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

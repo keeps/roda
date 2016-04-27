@@ -162,11 +162,11 @@ public interface BrowseMessages extends Messages {
   @AlternateMessage({"one", "One file, {1}"})
   String downloadRepresentationInfo(@PluralCount int numberOfFiles, String readableFileSize);
 
-  @DefaultMessage("Original")
-  SafeHtml downloadTitleOriginal();
+  @DefaultMessage("Original ({0})")
+  SafeHtml downloadTitleOriginal(String repType);
 
-  @DefaultMessage("Alternative")
-  SafeHtml downloadTitleDefault();
+  @DefaultMessage("Alternative ({0})")
+  SafeHtml downloadTitleDefault(String repType);
 
   @DefaultMessage("")
   String titleDatesEmpty();

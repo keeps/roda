@@ -128,43 +128,43 @@ public class ViewRepresentation extends Composite {
         BrowserService.Util.getInstance().getItemBundle(aipId, LocaleInfo.getCurrentLocale().getLocaleName(),
           new AsyncCallback<BrowseItemBundle>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            errorRedirect(callback);
-          }
-
-          @Override
-          public void onSuccess(final BrowseItemBundle itemBundle) {
-            if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
-              if (historyTokens.size() > 2) {
-                final String fileUUID = historyTokens.get(2);
-
-                BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
-                  new AsyncCallback<IndexedFile>() {
-
-                  @Override
-                  public void onSuccess(IndexedFile simpleFile) {
-                    ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
-                      fileUUID, simpleFile);
-                    callback.onSuccess(view);
-                  }
-
-                  @Override
-                  public void onFailure(Throwable caught) {
-                    Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
-                    errorRedirect(callback);
-                  }
-                });
-
-              } else {
-                ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
-                callback.onSuccess(view);
-              }
-            } else {
+            @Override
+            public void onFailure(Throwable caught) {
               errorRedirect(callback);
             }
-          }
-        });
+
+            @Override
+            public void onSuccess(final BrowseItemBundle itemBundle) {
+              if (itemBundle != null && verifyRepresentation(itemBundle.getRepresentations(), representationUUID)) {
+                if (historyTokens.size() > 2) {
+                  final String fileUUID = historyTokens.get(2);
+
+                  BrowserService.Util.getInstance().retrieve(IndexedFile.class.getName(), fileUUID,
+                    new AsyncCallback<IndexedFile>() {
+
+                      @Override
+                      public void onSuccess(IndexedFile simpleFile) {
+                        ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID,
+                          fileUUID, simpleFile);
+                        callback.onSuccess(view);
+                      }
+
+                      @Override
+                      public void onFailure(Throwable caught) {
+                        Toast.showError(caught.getClass().getSimpleName(), caught.getMessage());
+                        errorRedirect(callback);
+                      }
+                    });
+
+                } else {
+                  ViewRepresentation view = new ViewRepresentation(viewers, aipId, itemBundle, representationUUID);
+                  callback.onSuccess(view);
+                }
+              } else {
+                errorRedirect(callback);
+              }
+            }
+          });
       } else {
         errorRedirect(callback);
       }
@@ -226,7 +226,7 @@ public class ViewRepresentation extends Composite {
 
   @UiField
   FlowPanel filesPanel;
-  
+
   @UiField(provided = true)
   SearchPanel searchPanel;
 
@@ -306,9 +306,9 @@ public class ViewRepresentation extends Composite {
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
     filesList = new SimpleFileList(defaultFilter, null, null, false);
-    
-    searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH, messages.viewRepresentationSearchPlaceHolder(), false,
-      false);
+
+    searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH,
+      messages.viewRepresentationSearchPlaceHolder(), false, false);
     searchPanel.setList(filesList);
     searchPanel.setDefaultFilterIncremental(false);
 
@@ -506,10 +506,11 @@ public class ViewRepresentation extends Composite {
 
   private String representationType(Representation rep) {
     SafeHtml labelText;
+    String repType = rep.getType();
     if (rep.isOriginal()) {
-      labelText = messages.downloadTitleOriginal();
+      labelText = messages.downloadTitleOriginal(repType);
     } else {
-      labelText = messages.downloadTitleDefault();
+      labelText = messages.downloadTitleDefault(repType);
     }
     return labelText.asString();
   }

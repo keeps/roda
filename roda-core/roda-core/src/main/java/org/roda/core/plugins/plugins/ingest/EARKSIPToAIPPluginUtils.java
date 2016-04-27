@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -108,8 +109,16 @@ public class EARKSIPToAIPPluginUtils {
     IPContentType contentType = sip.getContentType();
     if (IPContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
       type = contentType.getOtherType();
+    } else if (IPContentType.SMURF.equals(contentType)) {
+      type = RodaConstants.AIP_TYPE_SMURF;
+    } else if (IPContentType.ERMS.equals(contentType)) {
+      type = RodaConstants.AIP_TYPE_ERMS;
+    } else if (IPContentType.RDBMS.equals(contentType)) {
+      type = RodaConstants.AIP_TYPE_RDBMS;
+    } else if (IPContentType.mixed.equals(contentType)) {
+      type = RodaConstants.AIP_TYPE_MIXED;
     } else {
-      type = contentType.toString();
+      type = RodaConstants.AIP_TYPE_OTHER;
     }
     return type;
   }
@@ -119,8 +128,18 @@ public class EARKSIPToAIPPluginUtils {
     RepresentationContentType contentType = sr.getContentType();
     if (RepresentationContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
       type = contentType.getOtherType();
+    } else if (RepresentationContentType.SMURF.equals(contentType)) {
+      type = RodaConstants.REPRESENTATION_TYPE_SMURF;
+    } else if (RepresentationContentType.MOREQ.equals(contentType)) {
+      type = RodaConstants.REPRESENTATION_TYPE_MOREQ;
+    } else if (RepresentationContentType.SIARD.equals(contentType)) {
+      type = RodaConstants.REPRESENTATION_TYPE_SIARD;
+    } else if (RepresentationContentType.SIARD2.equals(contentType)) {
+      type = RodaConstants.REPRESENTATION_TYPE_SIARD2;
+    } else if (RepresentationContentType.mixed.equals(contentType)) {
+      type = RodaConstants.REPRESENTATION_TYPE_MIXED;
     } else {
-      type = contentType.toString();
+      type = RodaConstants.REPRESENTATION_TYPE_OTHER;
     }
     return type;
   }

@@ -578,13 +578,14 @@ public class Browse extends Composite {
     Button downloadButton = new Button();
     final String aipId = rep.getAipId();
     final String repUUID = rep.getUUID();
+    final String repType = rep.getType();
 
     SafeHtml labelText;
 
     if (rep.isOriginal()) {
-      labelText = messages.downloadTitleOriginal();
+      labelText = messages.downloadTitleOriginal(repType);
     } else {
-      labelText = messages.downloadTitleDefault();
+      labelText = messages.downloadTitleDefault(repType);
     }
 
     downloadButton.setText(labelText.asString());

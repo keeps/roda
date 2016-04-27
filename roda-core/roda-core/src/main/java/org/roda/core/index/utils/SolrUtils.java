@@ -1163,6 +1163,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_ID, rep.getId());
     doc.addField(RodaConstants.REPRESENTATION_AIP_ID, rep.getAipId());
     doc.addField(RodaConstants.REPRESENTATION_ORIGINAL, rep.isOriginal());
+    doc.addField(RodaConstants.REPRESENTATION_TYPE, rep.getType());
 
     // FIXME calculate storage size and number of files or get it from arguments
     doc.addField(RodaConstants.REPRESENTATION_SIZE_IN_BYTES, 0L);
