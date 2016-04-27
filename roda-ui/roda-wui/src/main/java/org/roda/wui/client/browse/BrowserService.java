@@ -85,8 +85,8 @@ public interface BrowserService extends RemoteService {
   AIP moveInHierarchy(String aipId, String parentId) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
 
-  String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException;
+  String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException;
 
   String removeAIP(SelectedItems aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;

@@ -254,27 +254,28 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP createAIP(String parentId, Permissions permissions) throws RequestNotValidException, NotFoundException,
-    GenericException, AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(String parentId, String type, Permissions permissions) throws RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
     boolean active = true;
     boolean notify = true;
-    return createAIP(active, parentId, permissions, notify);
+    return createAIP(active, parentId, type, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, Permissions permissions) throws RequestNotValidException,
-    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
+  public AIP createAIP(boolean active, String parentId, String type, Permissions permissions)
+    throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException {
     boolean notify = true;
-    return createAIP(active, parentId, permissions, notify);
+    return createAIP(active, parentId, type, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, Permissions permissions, boolean notify)
+  public AIP createAIP(boolean active, String parentId, String type, Permissions permissions, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
 
-    AIP aip = new AIP(id, parentId, active, permissions);
+    AIP aip = new AIP(id, parentId, type, active, permissions);
     createAIPMetadata(aip);
 
     if (notify) {
@@ -549,10 +550,10 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
-  public Representation createRepresentation(String aipId, String representationId, boolean original, boolean notify)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
+  public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
+    boolean notify) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
     AlreadyExistsException {
-    Representation representation = new Representation(representationId, aipId, original);
+    Representation representation = new Representation(representationId, aipId, original, type);
 
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
@@ -568,7 +569,7 @@ public class ModelService extends ModelObservable {
   }
 
   // TODO support asReference
-  public Representation createRepresentation(String aipId, String representationId, boolean original,
+  public Representation createRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, GenericException,
     NotFoundException, AuthorizationDeniedException, AlreadyExistsException, ValidationException {
     Representation representation;
@@ -581,7 +582,7 @@ public class ModelService extends ModelObservable {
     if (validationReport.isValid()) {
       storage.copy(sourceStorage, sourcePath, directoryPath);
 
-      representation = new Representation(representationId, aipId, original);
+      representation = new Representation(representationId, aipId, original, type);
 
       // update AIP metadata
       AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
@@ -596,7 +597,7 @@ public class ModelService extends ModelObservable {
     return representation;
   }
 
-  public Representation updateRepresentation(String aipId, String representationId, boolean original,
+  public Representation updateRepresentation(String aipId, String representationId, boolean original, String type,
     StorageService sourceStorage, StoragePath sourcePath) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException {
     Representation representation;
@@ -619,7 +620,7 @@ public class ModelService extends ModelObservable {
       }
 
       // build return object
-      representation = new Representation(representationId, aipId, original);
+      representation = new Representation(representationId, aipId, original, type);
 
       super.notifyRepresentationUpdated(representation);
     } else {

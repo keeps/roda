@@ -724,7 +724,8 @@ public class Browse extends Composite {
 
   @UiHandler("createItem")
   void buttonCreateItemHandler(ClickEvent e) {
-    BrowserService.Util.getInstance().createAIP(aipId, new AsyncCallback<String>() {
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    BrowserService.Util.getInstance().createAIP(aipId, aipType, new AsyncCallback<String>() {
 
       @Override
       public void onFailure(Throwable caught) {

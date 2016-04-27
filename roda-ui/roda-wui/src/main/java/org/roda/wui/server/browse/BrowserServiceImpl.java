@@ -246,10 +246,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String createAIP(String parentId) throws AuthorizationDeniedException, GenericException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException {
+  public String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
+    NotFoundException, RequestNotValidException, AlreadyExistsException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    return Browser.createAIP(user, parentId).getId();
+    return Browser.createAIP(user, parentId, type).getId();
 
   }
 

@@ -28,6 +28,8 @@ import org.roda_project.commons_ip.model.IPFile;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
+import org.roda_project.commons_ip.model.impl.eark.EARKEnums.IPContentType;
+import org.roda_project.commons_ip.model.impl.eark.EARKEnums.RepresentationContentType;
 import org.roda_project.commons_ip.utils.METSEnums.MetadataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,14 +45,17 @@ public class EARKSIPToAIPPluginUtils {
     Permissions permissions = new Permissions();
     boolean notify = false;
 
-    AIP aip = model.createAIP(active, parentId, permissions, notify);
+    String aipType = getType(sip);
+
+    AIP aip = model.createAIP(active, parentId, aipType, permissions, notify);
 
     // process representations
     if (sip.getRepresentations() != null && !sip.getRepresentations().isEmpty()) {
 
       for (IPRepresentation sr : sip.getRepresentations()) {
         boolean original = true;
-        model.createRepresentation(aip.getId(), sr.getObjectID(), original, notify);
+        String representationType = getType(sr);
+        model.createRepresentation(aip.getId(), sr.getObjectID(), original, representationType, notify);
 
         if (sr.getData() != null && !sr.getData().isEmpty()) {
           for (IPFile file : sr.getData()) {
@@ -94,6 +99,28 @@ public class EARKSIPToAIPPluginUtils {
       } else {
         type = metadataType.getType();
       }
+    }
+    return type;
+  }
+
+  private static String getType(SIP sip) {
+    String type;
+    IPContentType contentType = sip.getContentType();
+    if (IPContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
+      type = contentType.getOtherType();
+    } else {
+      type = contentType.toString();
+    }
+    return type;
+  }
+
+  private static String getType(IPRepresentation sr) {
+    String type;
+    RepresentationContentType contentType = sr.getContentType();
+    if (RepresentationContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
+      type = contentType.getOtherType();
+    } else {
+      type = contentType.toString();
     }
     return type;
   }

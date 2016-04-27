@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.common.MetadataFileUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -101,12 +102,17 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         Permissions permissions = new Permissions();
         boolean notifyCreatedAIP = false;
 
-        final AIP aip = model.createAIP(active, parentId, permissions, notifyCreatedAIP);
+        String aipType = RodaConstants.AIP_TYPE_MIXED;
+
+        final AIP aip = model.createAIP(active, parentId, aipType, permissions, notifyCreatedAIP);
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
         boolean notifyRepresentationCreated = false;
 
-        model.createRepresentation(aip.getId(), representationId, original, notifyRepresentationCreated);
+        String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+
+        model.createRepresentation(aip.getId(), representationId, original, representationType,
+          notifyRepresentationCreated);
 
         // create files
 

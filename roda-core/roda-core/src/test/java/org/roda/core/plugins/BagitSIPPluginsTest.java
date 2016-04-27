@@ -139,7 +139,10 @@ public class BagitSIPPluginsTest {
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
     FileAlreadyExistsException, SolrServerException {
-    AIP root = model.createAIP(null, new Permissions());
+    String parentId = null;
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+      
+    AIP root = model.createAIP(parentId, aipType, new Permissions());
 
     Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();

@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
+
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -41,7 +43,7 @@ public class CorporaConstants {
   public static final String DESCRIPTIVE_METADATA_ID_EADUNKNOWN = "ead_unknown.xml";
 
   public static final String REPRESENTATION_1_ID = "representation_1";
-  public static final String REPRESENTATION_1_TYPE = "digitalized_work";
+  public static final String REPRESENTATION_1_TYPE = RodaConstants.REPRESENTATION_TYPE_MIXED;
   public static final boolean REPRESENTATION_1_ORIGINAL = true;
 
   public static final List<String> REPRESENTATION_1_FILE_1_PATH = new ArrayList<>();

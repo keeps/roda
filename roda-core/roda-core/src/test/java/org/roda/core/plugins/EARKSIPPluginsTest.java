@@ -110,7 +110,7 @@ public class EARKSIPPluginsTest {
     corporaService = new FileStorageService(corporaPath);
 
     LOGGER.info("Running E-ARK SIP plugins tests under storage {}", basePath);
-    
+
     Job fakeJob = new Job();
     fakeJob.setId(FAKE_JOB_ID);
     fakeJob.setPluginType(PluginType.MISC);
@@ -151,7 +151,9 @@ public class EARKSIPPluginsTest {
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
-    AIP root = model.createAIP(null, new Permissions());
+    String parentId = null;
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    AIP root = model.createAIP(parentId, aipType, new Permissions());
 
     Plugin<TransferredResource> plugin = new EARKSIPToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();

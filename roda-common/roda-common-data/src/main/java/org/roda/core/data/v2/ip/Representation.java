@@ -21,15 +21,18 @@ public class Representation implements Serializable {
   private String id;
   private boolean original;
 
+  private String type;
+
   public Representation() {
     super();
   }
 
-  public Representation(String id, String aipId, boolean original) {
+  public Representation(String id, String aipId, boolean original, String type) {
     super();
     this.id = id;
     this.aipId = aipId;
     this.original = original;
+    this.type = type;
   }
 
   public String getId() {
@@ -56,6 +59,14 @@ public class Representation implements Serializable {
     this.original = original;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -63,6 +74,7 @@ public class Representation implements Serializable {
     result = prime * result + ((aipId == null) ? 0 : aipId.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + (original ? 1231 : 1237);
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
@@ -87,12 +99,17 @@ public class Representation implements Serializable {
       return false;
     if (original != other.original)
       return false;
+    if (type == null) {
+      if (other.type != null)
+        return false;
+    } else if (!type.equals(other.type))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + "]";
+    return "Representation [aipId=" + aipId + ", id=" + id + ", original=" + original + ", type=" + type + "]";
   }
 
 }

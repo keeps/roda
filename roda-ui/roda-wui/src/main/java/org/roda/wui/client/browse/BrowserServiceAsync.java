@@ -51,7 +51,7 @@ public interface BrowserServiceAsync {
 
   void moveInHierarchy(String aipId, String parentId, AsyncCallback<AIP> callback);
 
-  void createAIP(String parentId, AsyncCallback<String> callback);
+  void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
   void removeAIP(SelectedItems aips, AsyncCallback<String> callback);
 

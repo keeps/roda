@@ -160,7 +160,9 @@ public class InternalConvertPluginsTestForTravis {
   private AIP ingestCorpora(int corporaId) throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
     FileAlreadyExistsException, SolrServerException, IsStillUpdatingException {
-    AIP root = model.createAIP(null, new Permissions());
+    String parentId = null;
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+    AIP root = model.createAIP(parentId, aipType, new Permissions());
 
     Plugin<TransferredResource> plugin = new TransferredResourceToAIPPlugin();
     Map<String, String> parameters = new HashMap<>();

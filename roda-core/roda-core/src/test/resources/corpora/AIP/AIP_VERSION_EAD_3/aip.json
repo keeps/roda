@@ -1,6 +1,7 @@
 {
   "parentId": null,
   "active": true,
+  "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
     "id": "ead_3.xml",
@@ -9,9 +10,11 @@
   }],
   "representations": [{
     "id": "representation_1",
-    "original": true
+    "original": true,
+    "type": "MIXED"
   }, {
     "id": "representation_2",
-    "original": false
+    "original": false,
+    "type": "MIXED"
   }]
 }

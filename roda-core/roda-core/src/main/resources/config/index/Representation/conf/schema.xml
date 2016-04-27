@@ -108,6 +108,7 @@
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" /> 
    <field name="aipId" type="string" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="original" type="boolean" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="type" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="sizeInBytes" type="long" indexed="true" stored="true" /> 
    <field name="totalNumberOfFiles" type="long" indexed="true" stored="true" />
    

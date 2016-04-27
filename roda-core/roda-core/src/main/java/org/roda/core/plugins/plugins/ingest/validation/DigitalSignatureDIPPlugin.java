@@ -108,7 +108,8 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
           representation.getId(), recursive);
 
         newRepresentations.add(newRepresentationID);
-        model.createRepresentation(aipId, newRepresentationID, false, notify);
+
+        model.createRepresentation(aipId, newRepresentationID, false, representation.getType(), notify);
         List<String> filePath = null;
         Path resultFile = null;
         List<OptionalWithCause<File>> fileList = IteratorUtils.toList(allFiles.iterator());

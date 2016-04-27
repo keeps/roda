@@ -252,6 +252,13 @@ public final class RodaConstants {
   public static final String AIP_LABEL = "label";
   public static final String AIP_SEARCH = "search";
 
+  // AIP types
+  public static final String AIP_TYPE_ERMS = "ERMS";
+  public static final String AIP_TYPE_OTHER = "OTHER";
+  public static final String AIP_TYPE_RDBMS = "RDBMS";
+  public static final String AIP_TYPE_SMURF = "SMURF";
+  public static final String AIP_TYPE_MIXED = "MIXED";
+
   /*
    * Representation FIELDS
    */
@@ -259,9 +266,18 @@ public final class RodaConstants {
   public static final String REPRESENTATION_ID = "id";
   public static final String REPRESENTATION_AIP_ID = "aipId";
   public static final String REPRESENTATION_ORIGINAL = "original";
+  public static final String REPRESENTATION_TYPE = "type";
   public static final String REPRESENTATION_SIZE_IN_BYTES = "sizeInBytes";
   public static final String REPRESENTATION_TOTAL_NUMBER_OF_FILES = "totalNumberOfFiles";
   public static final String REPRESENTATION_SEARCH = "search";
+
+  // Representation types
+  public static final String REPRESENTATION_TYPE_MIXED = "MIXED";
+  public static final String REPRESENTATION_TYPE_MOREQ = "MOREQ";
+  public static final String REPRESENTATION_TYPE_OTHER = "OTHER";
+  public static final String REPRESENTATION_TYPE_SIARD = "SIARD";
+  public static final String REPRESENTATION_TYPE_SIARD2 = "SIARD";
+  public static final String REPRESENTATION_TYPE_SMURF = "SMURF";
 
   /*
    * OTHER FIELDS

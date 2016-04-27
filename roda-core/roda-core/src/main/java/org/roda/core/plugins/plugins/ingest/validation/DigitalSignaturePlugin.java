@@ -257,7 +257,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
                       boolean original = false;
                       newRepresentations.add(newRepresentationID);
-                      model.createRepresentation(aipId, newRepresentationID, original, notify);
+                      model.createRepresentation(aipId, newRepresentationID, original, representation.getType(),
+                        notify);
                     }
 
                     // update file on new representation

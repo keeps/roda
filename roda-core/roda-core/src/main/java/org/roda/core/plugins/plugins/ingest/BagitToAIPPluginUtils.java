@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.common.MetadataFileUtils;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -52,7 +53,9 @@ public class BagitToAIPPluginUtils {
 
     boolean notify = false;
 
-    AIP aip = model.createAIP(active, parentId, permissions, notify);
+    String aipType = RodaConstants.AIP_TYPE_MIXED;
+
+    AIP aip = model.createAIP(active, parentId, aipType, permissions, notify);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);
@@ -60,7 +63,9 @@ public class BagitToAIPPluginUtils {
     String representationId = UUID.randomUUID().toString();
     boolean original = true;
 
-    model.createRepresentation(aip.getId(), representationId, original, notify);
+    String representationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+
+    model.createRepresentation(aip.getId(), representationId, original, representationType, notify);
 
     if (bag.getPayload() != null) {
       for (BagFile bagFile : bag.getPayload()) {

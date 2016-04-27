@@ -734,11 +734,11 @@ public class BrowserHelper {
     return model.moveAIP(aipId, parentId);
   }
 
-  public static AIP createAIP(String parentAipId, Permissions permissions) throws GenericException,
+  public static AIP createAIP(String parentAipId, String type, Permissions permissions) throws GenericException,
     AuthorizationDeniedException, RequestNotValidException, NotFoundException, AlreadyExistsException {
     ModelService model = RodaCoreFactory.getModelService();
 
-    AIP aip = model.createAIP(parentAipId, permissions);
+    AIP aip = model.createAIP(parentAipId, type, permissions);
     return aip;
   }
 

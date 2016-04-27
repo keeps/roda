@@ -22,9 +22,9 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     super();
   }
 
-  public IndexedRepresentation(String uuid, String id, String aipId, boolean original, long sizeInBytes,
+  public IndexedRepresentation(String uuid, String id, String aipId, boolean original, String type, long sizeInBytes,
     long totalNumberOfFiles) {
-    super(id, aipId, original);
+    super(id, aipId, original, type);
     this.uuid = uuid;
     this.sizeInBytes = sizeInBytes;
     this.totalNumberOfFiles = totalNumberOfFiles;

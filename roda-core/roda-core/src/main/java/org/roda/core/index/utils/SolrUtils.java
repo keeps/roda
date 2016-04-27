@@ -1148,11 +1148,13 @@ public class SolrUtils {
     final String id = objectToString(doc.get(RodaConstants.REPRESENTATION_ID));
     final String aipId = objectToString(doc.get(RodaConstants.REPRESENTATION_AIP_ID));
     final Boolean original = objectToBoolean(doc.get(RodaConstants.REPRESENTATION_ORIGINAL), Boolean.FALSE);
+    final String type = objectToString(doc.get(RodaConstants.REPRESENTATION_TYPE));
 
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_TOTAL_NUMBER_OF_FILES), 0L);
 
-    return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), sizeInBytes, totalNumberOfFiles);
+    return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, sizeInBytes,
+      totalNumberOfFiles);
   }
 
   public static SolrInputDocument representationToSolrDocument(AIP aip, Representation rep) {

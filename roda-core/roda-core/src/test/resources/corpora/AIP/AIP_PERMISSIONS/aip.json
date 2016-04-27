@@ -1,6 +1,7 @@
 {
   "parentId": null,
   "active": false,
+  "type": "MIXED",
   "permissions": {
     "users": {
       "READ": ["testuser"]
@@ -15,9 +16,11 @@
   }],
   "representations": [{
     "id": "representation_1",
-    "original": true
+    "original": true,
+    "type": "MIXED"
   }, {
     "id": "representation_2",
-    "original": false
+    "original": false,
+    "type": "MIXED"
   }]
 }

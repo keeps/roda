@@ -223,12 +223,18 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
                     ContentPayload payload = new FSPathContentPayload(pluginResult);
 
-                    // create a new representation if it does not exist
+                    // create a new representation if it
+                    // does not exist
                     if (!newRepresentations.contains(newRepresentationID)) {
                       LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
                       boolean original = false;
                       newRepresentations.add(newRepresentationID);
-                      model.createRepresentation(aip.getId(), newRepresentationID, original, notify);
+                      // TODO the concrete plugin should
+                      // define the
+                      // representation type
+                      String newRepresentationType = representation.getType();
+                      model.createRepresentation(aip.getId(), newRepresentationID, original, newRepresentationType,
+                        notify);
                     }
 
                     String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -281,9 +287,9 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
       try {
         /*
-         * for (String repId : newRepresentations) {
-         * AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion
-         * (this, index, model, storage, aip.getId(), repId); }
+         * for (String repId : newRepresentations) { AbstractConvertPluginUtils.
+         * reIndexingRepresentationAfterConversion (this, index, model, storage,
+         * aip.getId(), repId); }
          */
 
         model.notifyAIPUpdated(aip.getId());
@@ -355,7 +361,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
                     LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aipId);
                     boolean original = false;
                     newRepresentations.add(newRepresentationID);
-                    model.createRepresentation(aipId, newRepresentationID, original, notify);
+                    // TODO the concrete plugin should
+                    // define the
+                    // representation type
+                    String newRepresentationType = representation.getType();
+                    model.createRepresentation(aipId, newRepresentationID, original, newRepresentationType, notify);
                   }
 
                   String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -470,8 +480,11 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
               // create a new representation if it does not exist
               LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, file.getAipId());
               boolean original = false;
-              model.createRepresentation(file.getAipId(), newRepresentationID, original, model.getStorage(),
-                storagePath);
+              // TODO the concrete plugin should define the
+              // representation type
+              String newRepresentationType = RodaConstants.REPRESENTATION_TYPE_MIXED;
+              model.createRepresentation(file.getAipId(), newRepresentationID, original, newRepresentationType,
+                model.getStorage(), storagePath);
 
               // update file on new representation
               newFileId = file.getId().replaceFirst("[.][^.]+$", "." + outputFormat);
@@ -601,7 +614,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
   private void createNewFilesOnRepresentation(StorageService storage, ModelService model, List<File> unchangedFiles,
     String newRepresentationID, boolean notify) throws RequestNotValidException, GenericException, NotFoundException,
-      AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
+    AuthorizationDeniedException, UnsupportedOperationException, IOException, AlreadyExistsException {
 
     for (File f : unchangedFiles) {
       StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);

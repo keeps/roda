@@ -22,6 +22,7 @@ public class AIP implements Serializable {
   @JsonIgnore
   private String id;
   private String parentId;
+  private String type;
   private boolean active;
   private Permissions permissions;
 
@@ -33,15 +34,17 @@ public class AIP implements Serializable {
     super();
   }
 
-  public AIP(String id, String parentId, boolean active, Permissions permissions) {
-    this(id, parentId, active, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>());
+  public AIP(String id, String parentId, String type, boolean active, Permissions permissions) {
+    this(id, parentId, type, active, permissions, new ArrayList<DescriptiveMetadata>(),
+      new ArrayList<Representation>());
   }
 
-  public AIP(String id, String parentId, boolean active, Permissions permissions,
+  public AIP(String id, String parentId, String type, boolean active, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations) {
     super();
     this.id = id;
     this.parentId = parentId;
+    this.type = type;
     this.active = active;
     this.permissions = permissions;
 
@@ -97,6 +100,14 @@ public class AIP implements Serializable {
     this.parentId = parentId;
   }
 
+  public String getType() {
+    return type;
+  }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
   public void setActive(boolean active) {
     this.active = active;
   }
@@ -135,6 +146,7 @@ public class AIP implements Serializable {
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((representations == null) ? 0 : representations.hashCode());
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
@@ -174,13 +186,18 @@ public class AIP implements Serializable {
         return false;
     } else if (!representations.equals(other.representations))
       return false;
+    if (type == null) {
+      if (other.type != null)
+        return false;
+    } else if (!type.equals(other.type))
+      return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "AIP [id=" + id + ", parentId=" + parentId + ", active=" + active + ", permissions=" + permissions
-      + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations + "]";
+    return "AIP [id=" + id + ", parentId=" + parentId + ", type=" + type + ", active=" + active + ", permissions="
+      + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations + "]";
   }
 
 }

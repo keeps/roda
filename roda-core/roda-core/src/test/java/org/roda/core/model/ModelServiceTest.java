@@ -630,7 +630,7 @@ public class ModelServiceTest {
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
 
     Representation createdRepresentation = model.createRepresentation(aipId, newRepresentationId,
-      CorporaConstants.REPRESENTATION_1_ORIGINAL, corporaService,
+      CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
       DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
 
     // check if it is connected
@@ -652,7 +652,7 @@ public class ModelServiceTest {
     final StoragePath corporaRepresentationPath = DefaultStoragePath
       .parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH);
     Representation updatedRepresentation = model.updateRepresentation(aipId, CorporaConstants.REPRESENTATION_1_ID,
-      CorporaConstants.REPRESENTATION_1_ORIGINAL, corporaService,
+      CorporaConstants.REPRESENTATION_1_ORIGINAL, CorporaConstants.REPRESENTATION_1_TYPE, corporaService,
       DefaultStoragePath.parse(CorporaConstants.OTHER_REPRESENTATION_STORAGEPATH));
 
     // check if it is connected

@@ -547,8 +547,8 @@ public class Browser extends RodaCoreService {
     return returnAIP;
   }
 
-  public static AIP createAIP(RodaUser user, String parentId) throws AuthorizationDeniedException, GenericException,
-    NotFoundException, RequestNotValidException, AlreadyExistsException {
+  public static AIP createAIP(RodaUser user, String parentId, String type) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException {
     Date start = new Date();
 
     // check user permissions
@@ -564,7 +564,7 @@ public class Browser extends RodaCoreService {
     permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
 
     // delegate
-    AIP aip = BrowserHelper.createAIP(parentId, permissions);
+    AIP aip = BrowserHelper.createAIP(parentId, type, permissions);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
