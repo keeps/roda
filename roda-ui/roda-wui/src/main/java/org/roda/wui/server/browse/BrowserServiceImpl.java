@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.Messages;
@@ -228,7 +229,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
           searchField.setId(field);
           searchField.setSearchFields(fieldsNamesList);
           searchField.setType(fieldType);
-          searchField.setLabel(messages.getTranslation(fieldLabelI18N));
+          try {
+            searchField.setLabel(messages.getTranslation(fieldLabelI18N));
+          } catch (MissingResourceException e) {
+            searchField.setLabel(fieldLabelI18N);
+          }
           searchField.setFixed(fieldFixed);
 
           searchFields.add(searchField);
