@@ -7,6 +7,37 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
-public class IngestHelper {
+import org.apache.commons.lang3.StringUtils;
+import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
+import org.roda_project.commons_ip.model.IPRepresentation;
+import org.roda_project.commons_ip.model.MetadataType;
+import org.roda_project.commons_ip.model.MetadataType.MetadataTypeEnum;
+import org.roda_project.commons_ip.model.SIP;
 
+public final class IngestHelper {
+
+  private IngestHelper() {
+
+  }
+
+  public static String getType(SIP sip) {
+    return sip.getContentType().asString();
+  }
+
+  public static String getType(IPRepresentation sr) {
+    return sr.getContentType().asString();
+  }
+
+  public static String getMetadataType(IPDescriptiveMetadata dm) {
+    MetadataType metadataType = dm.getMetadataType();
+    String type = "";
+    if (metadataType != null) {
+      if (metadataType.getType() == MetadataTypeEnum.OTHER && StringUtils.isNotBlank(metadataType.getOtherType())) {
+        type = metadataType.getOtherType();
+      } else {
+        type = metadataType.getType().getType();
+      }
+    }
+    return type;
+  }
 }

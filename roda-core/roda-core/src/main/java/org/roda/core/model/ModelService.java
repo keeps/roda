@@ -556,6 +556,9 @@ public class ModelService extends ModelObservable {
     AlreadyExistsException {
     Representation representation = new Representation(representationId, aipId, original, type);
 
+    StoragePath directoryPath = ModelUtils.getRepresentationStoragePath(aipId, representationId);
+    storage.createDirectory(directoryPath);
+
     // update AIP metadata
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     aip.getRepresentations().add(representation);
@@ -781,10 +784,17 @@ public class ModelService extends ModelObservable {
   public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    String id = IdUtils.getPreservationMetadataId(PreservationMetadataType.OBJECT_FILE, aipId, representationId,
+    return retrievePreservationFile(aipId, representationId, fileDirectoryPath, fileId,
+      PreservationMetadataType.OBJECT_FILE);
+  }
+
+  public Binary retrievePreservationFile(String aipId, String representationId, List<String> fileDirectoryPath,
+    String fileId, PreservationMetadataType type)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+
+    String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
+    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, type, aipId, representationId,
       fileDirectoryPath, fileId);
-    StoragePath filePath = ModelUtils.getPreservationMetadataStoragePath(id, PreservationMetadataType.OBJECT_FILE,
-      aipId, representationId, fileDirectoryPath, fileId);
     return storage.getBinary(filePath);
   }
 
@@ -810,27 +820,34 @@ public class ModelService extends ModelObservable {
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-    ValidationException, AlreadyExistsException {
+    AlreadyExistsException {
     String id = IdUtils.getPreservationMetadataId(type, aipId, representationId, fileDirectoryPath, fileId);
     return createPreservationMetadata(type, id, aipId, representationId, fileDirectoryPath, fileId, payload, notify);
   }
 
+  public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String aipId,
+    List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify) throws GenericException,
+    NotFoundException, RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    String id = IdUtils.getPreservationMetadataId(type, aipId, null, fileDirectoryPath, fileId);
+    return createPreservationMetadata(type, id, aipId, null, fileDirectoryPath, fileId, payload, notify);
+  }
+
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
     String representationId, ContentPayload payload, boolean notify) throws GenericException, NotFoundException,
-    RequestNotValidException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     return createPreservationMetadata(type, id, aipId, representationId, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id,
     ContentPayload payload, boolean notify) throws GenericException, NotFoundException, RequestNotValidException,
-    AuthorizationDeniedException, ValidationException, AlreadyExistsException {
+    AuthorizationDeniedException, AlreadyExistsException {
     return createPreservationMetadata(type, id, null, null, null, null, payload, notify);
   }
 
   public PreservationMetadata createPreservationMetadata(PreservationMetadataType type, String id, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId, ContentPayload payload, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
-    ValidationException, AlreadyExistsException {
+    AlreadyExistsException {
     PreservationMetadata pm = new PreservationMetadata();
     pm.setId(id);
     pm.setAipId(aipId);
@@ -1796,38 +1813,32 @@ public class ModelService extends ModelObservable {
       for (Resource resource : allFormats) {
         String resourceName = resource.getStoragePath().getName();
         Format format = this.retrieveFormat(resourceName.substring(0, resourceName.lastIndexOf('.')));
-        boolean formatAdded = false;
 
         if (agent.getFormatIds().contains(format.getId())) {
           formats.add(format);
-          formatAdded = true;
         }
 
-        for (int i = 0; i < format.getPronoms().size() && formatAdded == false; i++) {
+        for (int i = 0; i < format.getPronoms().size() && formats.isEmpty(); i++) {
           if (agent.getPronoms().contains(format.getPronoms().get(i))) {
             formats.add(format);
-            formatAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getMimetypes().size() && formatAdded == false; i++) {
+        for (int i = 0; i < format.getMimetypes().size() && formats.isEmpty(); i++) {
           if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
             formats.add(format);
-            formatAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getExtensions().size() && formatAdded == false; i++) {
+        for (int i = 0; i < format.getExtensions().size() && formats.isEmpty(); i++) {
           if (agent.getExtensions().contains(format.getExtensions().get(i))) {
             formats.add(format);
-            formatAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getUtis().size() && formatAdded == false; i++) {
+        for (int i = 0; i < format.getUtis().size() && formats.isEmpty(); i++) {
           if (agent.getUtis().contains(format.getUtis().get(i))) {
             formats.add(format);
-            formatAdded = true;
           }
         }
       }
@@ -1858,38 +1869,32 @@ public class ModelService extends ModelObservable {
       for (Resource resource : allAgents) {
         String resourceName = resource.getStoragePath().getName();
         Agent agent = this.retrieveAgent(resourceName.substring(0, resourceName.lastIndexOf('.')));
-        boolean agentAdded = false;
 
         if (agent.getFormatIds().contains(format.getId())) {
           agents.add(agent);
-          agentAdded = true;
         }
 
-        for (int i = 0; i < format.getPronoms().size() && agentAdded == false; i++) {
+        for (int i = 0; i < format.getPronoms().size() && agents.isEmpty(); i++) {
           if (agent.getPronoms().contains(format.getPronoms().get(i))) {
             agents.add(agent);
-            agentAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getMimetypes().size() && agentAdded == false; i++) {
+        for (int i = 0; i < format.getMimetypes().size() && agents.isEmpty(); i++) {
           if (agent.getMimetypes().contains(format.getMimetypes().get(i))) {
             agents.add(agent);
-            agentAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getExtensions().size() && agentAdded == false; i++) {
+        for (int i = 0; i < format.getExtensions().size() && agents.isEmpty(); i++) {
           if (agent.getExtensions().contains(format.getExtensions().get(i))) {
             agents.add(agent);
-            agentAdded = true;
           }
         }
 
-        for (int i = 0; i < format.getUtis().size() && agentAdded == false; i++) {
+        for (int i = 0; i < format.getUtis().size() && agents.isEmpty(); i++) {
           if (agent.getUtis().contains(format.getUtis().get(i))) {
             agents.add(agent);
-            agentAdded = true;
           }
         }
       }
@@ -2047,6 +2052,21 @@ public class ModelService extends ModelObservable {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId, representationId));
   }
 
+  public File createDocumentation(String aipId, String representationId, List<String> directoryPath, String fileId,
+    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    File file;
+    // FIXME how to set this?
+    boolean asReference = false;
+
+    StoragePath filePath = ModelUtils.getDocumentationStoragePath(aipId, representationId, directoryPath, fileId);
+
+    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
+    file = ResourceParseUtils.convertResourceToFile(createdBinary);
+
+    return file;
+  }
+
   public Directory getSchemasDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId));
@@ -2055,6 +2075,21 @@ public class ModelService extends ModelObservable {
   public Directory getSchemasDirectory(String aipId, String representationId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getSchemasStoragePath(aipId, representationId));
+  }
+
+  public File createSchema(String aipId, String representationId, List<String> directoryPath, String fileId,
+    ContentPayload contentPayload) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    File file;
+    // FIXME how to set this?
+    boolean asReference = false;
+
+    StoragePath filePath = ModelUtils.getSchemaStoragePath(aipId, representationId, directoryPath, fileId);
+
+    final Binary createdBinary = storage.createBinary(filePath, contentPayload, asReference);
+    file = ResourceParseUtils.convertResourceToFile(createdBinary);
+
+    return file;
   }
 
 }

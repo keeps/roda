@@ -11,6 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
@@ -100,7 +101,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
 
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-        reportItem.setItemId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+        reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
         if (sip.getParentID() != null && aipCreated.getParentId() == null) {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", sip.getParentID()));
@@ -117,7 +118,11 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       LOGGER.error("Error converting " + earkSIPPath + " to AIP", e);
     } finally {
       if (sip != null) {
-        FSUtils.deletePathQuietly(sip.getBasePath());
+        Path transferredResourcesAbsolutePath = RodaCoreFactory.getTransferredResourcesScanner().getBasePath()
+          .toAbsolutePath();
+        if (!sip.getBasePath().toAbsolutePath().toString().startsWith(transferredResourcesAbsolutePath.toString())) {
+          FSUtils.deletePathQuietly(sip.getBasePath());
+        }
       }
     }
   }

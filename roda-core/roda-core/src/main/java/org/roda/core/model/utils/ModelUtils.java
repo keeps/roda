@@ -205,6 +205,16 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(getDocumentationPath(aipId, representationId));
   }
 
+  public static StoragePath getDocumentationStoragePath(String aipId, String representationId,
+    List<String> directoryPath, String fileId) throws RequestNotValidException {
+    List<String> path = getDocumentationPath(aipId, representationId);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
+    }
+    path.add(fileId);
+    return DefaultStoragePath.parse(path);
+  }
+
   private static List<String> getSchemasPath(String aipId) {
     return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
   }
@@ -220,6 +230,16 @@ public final class ModelUtils {
   public static StoragePath getSchemasStoragePath(String aipId, String representationId)
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getSchemasPath(aipId, representationId));
+  }
+
+  public static StoragePath getSchemaStoragePath(String aipId, String representationId, List<String> directoryPath,
+    String fileId) throws RequestNotValidException {
+    List<String> path = getSchemasPath(aipId, representationId);
+    if (directoryPath != null) {
+      path.addAll(directoryPath);
+    }
+    path.add(fileId);
+    return DefaultStoragePath.parse(path);
   }
 
   public static StoragePath getFileStoragePath(String aipId, String representationId, List<String> directoryPath,
@@ -441,6 +461,14 @@ public final class ModelUtils {
           path.addAll(fileDirectoryPath);
         }
         path.add(fileId + RodaConstants.PREMIS_FILE_SUFFIX);
+      } else if (type.equals(PreservationMetadataType.OTHER)) {
+        path = getRepresentationMetadataPath(aipId, representationId);
+        path.add(RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
+        path.add(RodaConstants.STORAGE_DIRECTORY_OTHER_TECH_METADATA);
+        if (fileDirectoryPath != null) {
+          path.addAll(fileDirectoryPath);
+        }
+        path.add(fileId + RodaConstants.OTHER_TECH_METADATA_FILE_SUFFIX);
       } else {
         throw new RequestNotValidException("Unsupported preservation metadata type: " + type);
       }

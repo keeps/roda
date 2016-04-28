@@ -218,6 +218,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_METADATA = "metadata";
   public static final String STORAGE_DIRECTORY_DESCRIPTIVE = "descriptive";
   public static final String STORAGE_DIRECTORY_PRESERVATION = "preservation";
+  public static final String STORAGE_DIRECTORY_OTHER_TECH_METADATA = "otherTechMd";
   public static final String STORAGE_DIRECTORY_REPRESENTATIONS = "representations";
   public static final String STORAGE_DIRECTORY_SUBMISSION = "submission";
   public static final String STORAGE_DIRECTORY_DOCUMENTATION = "documentation";
@@ -225,6 +226,7 @@ public final class RodaConstants {
   public static final String STORAGE_DIRECTORY_DATA = "data";
   public static final String STORAGE_DIRECTORY_AGENTS = "agents";
   public static final String STORAGE_DIRECTORY_OTHER = "other";
+
   public static final String STORAGE_AIP_METADATA_FILENAME = "aip.json";
 
   /*
@@ -259,12 +261,7 @@ public final class RodaConstants {
   public static final String AIP_SEARCH = "search";
 
   // AIP types
-  public static final String AIP_TYPE_ERMS = "ERMS";
-  public static final String AIP_TYPE_OTHER = "OTHER";
-  public static final String AIP_TYPE_RDBMS = "RDBMS";
-  public static final String AIP_TYPE_SMURF = "SMURF";
   public static final String AIP_TYPE_MIXED = "MIXED";
-
   /*
    * Representation FIELDS
    */
@@ -281,12 +278,6 @@ public final class RodaConstants {
 
   // Representation types
   public static final String REPRESENTATION_TYPE_MIXED = "MIXED";
-  public static final String REPRESENTATION_TYPE_MOREQ = "MOREQ";
-  public static final String REPRESENTATION_TYPE_OTHER = "OTHER";
-  public static final String REPRESENTATION_TYPE_SIARD = "SIARD";
-  public static final String REPRESENTATION_TYPE_SIARD2 = "SIARD";
-  public static final String REPRESENTATION_TYPE_SMURF = "SMURF";
-
   /*
    * OTHER FIELDS
    */
@@ -386,8 +377,8 @@ public final class RodaConstants {
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_JOB_ID = "jobId";
-  public static final String JOB_REPORT_ITEM_ID = "itemId";
-  public static final String JOB_REPORT_OTHER_ID = "otherId";
+  public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
+  public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
   public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";
@@ -539,6 +530,11 @@ public final class RodaConstants {
   public static final String PREMIS_EVENT_SUFFIX = ".event.premis.xml";
   public static final String PREMIS_REPRESENTATION_SUFFIX = ".representation.premis.xml";
   public static final String PREMIS_AGENT_SUFFIX = ".agent.premis.xml";
+
+  /*
+   * Other Preservation metadata
+   */
+  public static final String OTHER_TECH_METADATA_FILE_SUFFIX = ".other.tech.md";
 
   /* Preservation events fields */
   public static final String PRESERVATION_EVENT_ID = "id";

@@ -1625,8 +1625,8 @@ public class SolrUtils {
 
     doc.addField(RodaConstants.JOB_REPORT_ID, jobReport.getId());
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
-    doc.addField(RodaConstants.JOB_REPORT_ITEM_ID, jobReport.getItemId());
-    doc.addField(RodaConstants.JOB_REPORT_OTHER_ID, jobReport.getOtherId());
+    doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());
+    doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, jobReport.getOutcomeObjectId());
     doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
     doc.addField(RodaConstants.JOB_REPORT_DATE_CREATED, jobReport.getDateCreated());
     doc.addField(RodaConstants.JOB_REPORT_DATE_UPDATE, jobReport.getDateUpdated());
@@ -1646,8 +1646,8 @@ public class SolrUtils {
 
     jobReport.setId(objectToString(doc.get(RodaConstants.JOB_REPORT_ID)));
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
-    jobReport.setItemId(objectToString(doc.get(RodaConstants.JOB_REPORT_ITEM_ID)));
-    jobReport.setOtherId(objectToString(doc.get(RodaConstants.JOB_REPORT_OTHER_ID)));
+    jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID)));
+    jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID)));
     jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));

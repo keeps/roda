@@ -131,6 +131,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         try {
           parentAIP = model.retrieveAIP(aip.getParentId());
           Set<PermissionType> userPermissions = parentAIP.getPermissions().getUserPermissions(jobCreatorUsername);
+          LOGGER.trace("Checking if user '{}' has permissions on parent AIP '{}' ({})", jobCreatorUsername,
+            parentAIP.getId(), userPermissions);
           if (userPermissions.contains(PermissionType.CREATE)) {
             LOGGER.debug("User '{}' has CREATE permission on parent AIP...Granting user permission to this aip",
               jobCreatorUsername);

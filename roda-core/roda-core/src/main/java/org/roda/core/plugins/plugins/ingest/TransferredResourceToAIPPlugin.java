@@ -136,7 +136,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
         model.notifyAIPCreated(aip.getId());
 
-        reportItem.setItemId(aip.getId()).setPluginState(PluginState.SUCCESS);
+        reportItem.setOutcomeObjectId(aip.getId()).setPluginState(PluginState.SUCCESS);
 
         createWellformedEventSuccess(model, index, transferredResource, aip);
         LOGGER.debug("Done with converting {} to AIP {}", transferredResourcePath, aip.getId());

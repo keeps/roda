@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
@@ -77,8 +78,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
 
   protected int totalSteps = 10;
-  private Map<String, String> aipIdToTransferredResourceId;
-  private JobPluginInfo info = new JobPluginInfo();
+  protected boolean failIfRelatedAIPFailed = true;
 
   private String successMessage;
   private String failureMessage;
@@ -118,21 +118,74 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return null;
   }
 
+  private class Reports {
+    // transferredResourceId > map<aipId, report>
+    private Map<String, Map<String, Report>> reports = new HashMap<>();
+    // transferredResourceId > list<aipId>
+    private Map<String, List<String>> transferredResourceToAipIds = new HashMap<>();
+    // aipId > transferredResourceId
+    private Map<String, String> aipIdToTransferredResourceId = new HashMap<>();
+
+    public Map<String, Map<String, Report>> getReports() {
+      return reports;
+    }
+
+    public List<String> getAipIds() {
+      return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+    }
+
+    public List<String> getAipIds(String transferredResource) {
+      return transferredResourceToAipIds.get(transferredResource);
+    }
+
+    public Map<String, String> getAipIdToTransferredResourceId() {
+      return aipIdToTransferredResourceId;
+    }
+
+    public void addReport(String sourceObjectId, String outcomeObjectId, Report report) {
+      if (StringUtils.isNotBlank(sourceObjectId) && StringUtils.isNotBlank(outcomeObjectId)) {
+        aipIdToTransferredResourceId.put(outcomeObjectId, sourceObjectId);
+        if (transferredResourceToAipIds.get(sourceObjectId) != null) {
+          transferredResourceToAipIds.get(sourceObjectId).add(outcomeObjectId);
+        } else {
+          List<String> aipIds = new ArrayList<>();
+          aipIds.add(outcomeObjectId);
+          transferredResourceToAipIds.put(sourceObjectId, aipIds);
+        }
+      }
+      if (reports.get(sourceObjectId) != null) {
+        reports.get(sourceObjectId).put(outcomeObjectId, report);
+      } else {
+        Map<String, Report> innerReports = new HashMap<>();
+        innerReports.put(outcomeObjectId, report);
+        reports.put(sourceObjectId, innerReports);
+      }
+    }
+
+    public void addReport(String itemId, Report report) {
+      reports.get(aipIdToTransferredResourceId.get(itemId)).get(itemId).addReport(report);
+    }
+
+    public void remove(String transferredResourceId) {
+      reports.remove(transferredResourceId);
+      transferredResourceToAipIds.remove(transferredResourceId);
+    }
+
+  }
+
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage,
     List<TransferredResource> resources) throws PluginException {
+    Date startDate = new Date();
+    Reports reports = new Reports();
     Report report = PluginHelper.createPluginReport(this);
     Report pluginReport;
 
-    // transferredResourceId > report
-    Map<String, Report> reports = new HashMap<>();
-    aipIdToTransferredResourceId = new HashMap<>();
-
-    info.setTotalSteps(getTotalSteps());
-    info.setObjectsCount(resources.size());
-    info.setObjectsBeingProcessed(info.getObjectsCount());
-    PluginHelper.updateJobInformation(this, info, false);
-    Date startDate = new Date();
+    JobPluginInfo jobPluginInfo = new JobPluginInfo();
+    jobPluginInfo.setTotalSteps(getTotalSteps());
+    jobPluginInfo.setObjectsCount(resources.size());
+    jobPluginInfo.setObjectsBeingProcessed(resources.size());
+    PluginHelper.updateJobInformation(this, jobPluginInfo, false);
 
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
@@ -146,50 +199,48 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     // 1) unpacking & wellformedness check (transform TransferredResource into
     // an AIP)
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
-    reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-    List<AIP> aips = getAIPsFromReports(model, storage, reports);
-    info.setObjectsBeingProcessed(aips.size());
-    info.setObjectsProcessedWithFailure(resources.size() - aips.size());
-    PluginHelper.updateJobInformation(this, info, true);
+    reports = mergeReports(reports, pluginReport);
+    List<AIP> aips = getAIPsFromReports(model, resources, jobPluginInfo, reports);
+    PluginHelper.updateJobInformation(this, jobPluginInfo, true);
 
     // this event can only be created after AIPs exist and that's why it is
     // performed here, after transformTransferredResourceIntoAnAIP
-    createIngestStartedEvent(model, index, aipIdToTransferredResourceId, startDate);
+    createIngestStartedEvent(model, index, reports, startDate);
 
     // 2) virus check
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK))) {
       pluginReport = doVirusCheck(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 3) descriptive metadata validation
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION))) {
       pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 4) create file fixity information
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON))) {
       pluginReport = createFileFixityInformation(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 5) format identification (using Siegfried)
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION))) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 6) Format validation - PDF/A format validator (using VeraPDF)
@@ -200,9 +251,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       params.put("hasFeatures", "False");
       params.put("maxKbytes", "20000");
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 7) feature extraction (using Apache Tika)
@@ -217,43 +268,45 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       params.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)) ? "true" : "false");
       pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 9) validation of digital signature
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION))) {
       pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, false);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 10) verify producer authorization
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK))) {
       pluginReport = verifyProducerAuthorization(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
     // 11) Auto accept
     if (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))) {
       pluginReport = doAutoAccept(index, model, storage, aips);
-      reports = mergeReports(reports, aipIdToTransferredResourceId, pluginReport);
-      aips = recalculateAIPsList(model, resources, aips, reports, aipIdToTransferredResourceId, true);
-      info.setObjectsProcessedWithSuccess(resources.size() - info.getObjectsProcessedWithFailure());
-      PluginHelper.updateJobInformation(this, info, true);
+      reports = mergeReports(reports, pluginReport);
+      aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
+      jobPluginInfo.setObjectsProcessedWithSuccess(resources.size() - jobPluginInfo.getObjectsProcessedWithFailure());
+      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
     }
 
-    // 12) delete SIP from transfer
-    // FIXME
+    // delete SIP from transfer
+    // FIXME 20160429 hsilva: actually this will happen in two very distinct
+    // moments and should not be done by a plugin 1) when auto accepting is on
+    // 2) when doing manual acceptance
 
-    createIngestEndedEvent(model, index, aips, reports, aipIdToTransferredResourceId);
+    createIngestEndedEvent(model, index, aips);
 
     return report;
   }
@@ -292,23 +345,46 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
    * obtaining them from model)
    */
   private List<AIP> recalculateAIPsList(ModelService model, List<TransferredResource> resources, List<AIP> aips,
-    Map<String, Report> reports, Map<String, String> aipIdToTransferredResourceId, boolean removeAIPProcessingFailed) {
+    Reports reports, JobPluginInfo jobPluginInfo, boolean removeAIPProcessingFailed) {
     List<AIP> newAips = new ArrayList<>();
-    for (AIP aip : aips) {
-      String transferredResourceId = aipIdToTransferredResourceId.get(aip.getId());
-      Report report = reports.get(transferredResourceId);
-      if (removeAIPProcessingFailed && report.getPluginState() == PluginState.FAILURE) {
-        LOGGER.trace("Removing AIP {} from the list", aip.getId());
-      } else {
-        try {
-          newAips.add(model.retrieveAIP(aip.getId()));
-        } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
-          LOGGER.error("Error while retrieving AIP", e);
+    List<AIP> transferredResourceAips;
+    boolean oneTransferredResourceAipFailed;
+    for (Entry<String, Map<String, Report>> transferredResourceReportsEntry : reports.getReports().entrySet()) {
+      String transferredResourceId = transferredResourceReportsEntry.getKey();
+      transferredResourceAips = new ArrayList<>();
+      oneTransferredResourceAipFailed = false;
+
+      for (String aipId : reports.getAipIds(transferredResourceId)) {
+        Report aipReport = transferredResourceReportsEntry.getValue().get(aipId);
+        if (removeAIPProcessingFailed && aipReport.getPluginState() == PluginState.FAILURE) {
+          LOGGER.trace("Removing AIP {} from the list", aipReport.getOutcomeObjectId());
+          oneTransferredResourceAipFailed = true;
+        } else {
+          try {
+            transferredResourceAips.add(model.retrieveAIP(aipId));
+          } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+            LOGGER.error("Error while retrieving AIP", e);
+          }
         }
       }
+
+      if (failIfRelatedAIPFailed && oneTransferredResourceAipFailed) {
+        LOGGER.trace(
+          "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
+          transferredResourceId);
+        reports.remove(transferredResourceId);
+        // FIXME 20160502 hsilva: more should be done because reports in some of
+        // the AIPs state that it went ok, so all reports of this transferred
+        // resource should be updated to state the failure
+      } else {
+        newAips.addAll(transferredResourceAips);
+      }
     }
-    info.setObjectsProcessedWithFailure(resources.size() - newAips.size());
-    info.setObjectsBeingProcessed(newAips.size());
+
+    int sourceObjectsBeingProcessed = reports.getReports().keySet().size();
+    jobPluginInfo.setObjectsProcessedWithFailure(resources.size() - sourceObjectsBeingProcessed);
+    jobPluginInfo.setObjectsBeingProcessed(sourceObjectsBeingProcessed);
+
     return newAips;
   }
 
@@ -345,8 +421,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return effectiveTotalSteps;
   }
 
-  private void createIngestStartedEvent(ModelService model, IndexService index,
-    Map<String, String> aipIdToTransferredResourceId, Date startDate) {
+  private void createIngestStartedEvent(ModelService model, IndexService index, Reports reports, Date startDate) {
+    Map<String, String> aipIdToTransferredResourceId = reports.getAipIdToTransferredResourceId();
     setPreservationEventType(START_TYPE);
     setPreservationSuccessMessage(START_SUCCESS);
     setPreservationFailureMessage(START_FAILURE);
@@ -364,8 +440,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
   }
 
-  private void createIngestEndedEvent(ModelService model, IndexService index, List<AIP> aips,
-    Map<String, Report> reports, Map<String, String> aipIdToTransferredResourceId) {
+  private void createIngestEndedEvent(ModelService model, IndexService index, List<AIP> aips) {
     setPreservationEventType(END_TYPE);
     setPreservationSuccessMessage(END_SUCCESS);
     setPreservationFailureMessage(END_FAILURE);
@@ -383,9 +458,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
   }
 
-  private List<AIP> getAIPsFromReports(ModelService model, StorageService storage, Map<String, Report> reports) {
+  private List<AIP> getAIPsFromReports(ModelService model, List<TransferredResource> resources,
+    JobPluginInfo jobPluginInfo, Reports reports) {
     List<AIP> aips = new ArrayList<>();
-    List<String> aipIds = getAIPsIdsFromReport(reports);
+    List<String> aipIds = reports.getAipIds();
 
     LOGGER.debug("Getting AIPs: {}", aipIds);
 
@@ -398,36 +474,25 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
     LOGGER.debug("Done retrieving AIPs");
 
+    jobPluginInfo.setObjectsBeingProcessed(reports.getReports().keySet().size());
+    jobPluginInfo.setObjectsProcessedWithFailure(resources.size() - reports.getReports().keySet().size());
+
     return aips;
 
   }
 
-  private List<String> getAIPsIdsFromReport(Map<String, Report> reports) {
-    List<String> aipIds = new ArrayList<>();
-    for (Entry<String, Report> entry : reports.entrySet()) {
-      if (StringUtils.isNoneBlank(entry.getValue().getReports().get(0).getItemId())) {
-        aipIds.add(entry.getValue().getReports().get(0).getItemId());
-      }
-    }
-
-    return aipIds;
-  }
-
-  private Map<String, Report> mergeReports(Map<String, Report> reports,
-    Map<String, String> aipIdToTransferredResourceId, Report plugin) {
+  private Reports mergeReports(Reports reports, Report plugin) {
+    Map<String, String> aipIdToTransferredResourceId = reports.getAipIdToTransferredResourceId();
     if (plugin != null) {
       for (Report reportItem : plugin.getReports()) {
-        if (StringUtils.isNotBlank(reportItem.getOtherId())) {
-          if (StringUtils.isNotBlank(reportItem.getItemId())) {
-            aipIdToTransferredResourceId.put(reportItem.getItemId(), reportItem.getOtherId());
-          }
+        if (StringUtils.isNotBlank(reportItem.getSourceObjectId())) {
           Report report = new Report();
           report.addReport(reportItem);
-          reports.put(reportItem.getOtherId(), report);
-
-        } else if (StringUtils.isNotBlank(reportItem.getItemId())
-          && aipIdToTransferredResourceId.get(reportItem.getItemId()) != null) {
-          reports.get(aipIdToTransferredResourceId.get(reportItem.getItemId())).addReport(reportItem);
+          report.setOutcomeObjectId(reportItem.getOutcomeObjectId());
+          reports.addReport(reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId(), report);
+        } else if (StringUtils.isNotBlank(reportItem.getOutcomeObjectId())
+          && aipIdToTransferredResourceId.get(reportItem.getOutcomeObjectId()) != null) {
+          reports.addReport(reportItem.getOutcomeObjectId(), reportItem);
         }
       }
     }

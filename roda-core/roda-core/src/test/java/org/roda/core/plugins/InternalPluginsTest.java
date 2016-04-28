@@ -199,31 +199,31 @@ public class InternalPluginsTest {
     return transferredResource;
   }
 
-  private void assertReports(List<Report> reports, List<String> itemIds) {
-    assertReports(reports, itemIds, null);
+  private void assertReports(List<Report> reports, List<String> outcomeObjectIds) {
+    assertReports(reports, outcomeObjectIds, null);
   }
 
-  private void assertReports(List<Report> reports, List<String> itemIds, List<String> otherItemIds) {
-    if (itemIds != null) {
-      Assert.assertEquals(itemIds.size(), reports.size());
-    } else if (otherItemIds != null) {
-      Assert.assertEquals(otherItemIds.size(), reports.size());
+  private void assertReports(List<Report> reports, List<String> outcomeObjectIds, List<String> sourceObjectIds) {
+    if (outcomeObjectIds != null) {
+      Assert.assertEquals(outcomeObjectIds.size(), reports.size());
+    } else if (sourceObjectIds != null) {
+      Assert.assertEquals(sourceObjectIds.size(), reports.size());
     }
 
     for (Report report : reports) {
       Assert.assertThat(report.getPluginState(), Matchers.is(PluginState.SUCCESS));
 
-      if (itemIds != null && report.getItemId() != null) {
-        Assert.assertThat(report.getItemId(), Matchers.isIn(itemIds));
+      if (outcomeObjectIds != null && report.getOutcomeObjectId() != null) {
+        Assert.assertThat(report.getOutcomeObjectId(), Matchers.isIn(outcomeObjectIds));
       }
 
-      if (otherItemIds != null && report.getOtherId() != null) {
-        Assert.assertThat(report.getOtherId(), Matchers.isIn(otherItemIds));
+      if (sourceObjectIds != null && report.getSourceObjectId() != null) {
+        Assert.assertThat(report.getSourceObjectId(), Matchers.isIn(sourceObjectIds));
       }
 
       // assert sub-reports
       if (report.getReports().size() > 0) {
-        assertReports(report.getReports(), itemIds, otherItemIds);
+        assertReports(report.getReports(), outcomeObjectIds, sourceObjectIds);
       }
     }
   }

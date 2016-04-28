@@ -89,7 +89,8 @@ public class ManagementTasksResource extends RodaCoreService {
 
   @POST
   @Path("/index/actionlogclean")
-  public Response executeIndexActionLogCleanTask(@QueryParam("params") List<String> params)
+  public Response executeIndexActionLogCleanTask(
+    @ApiParam(value = "Amount of days to keep action information in the index", defaultValue = "30") @QueryParam("daysToKeep") String daysToKeep)
     throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -102,7 +103,7 @@ public class ManagementTasksResource extends RodaCoreService {
         "User \"" + user.getId() + "\" doesn't have permission the execute the requested task!");
     }
 
-    return Response.ok().entity(createJobForRunningActionlogCleaner(user, params, startDate)).build();
+    return Response.ok().entity(createJobForRunningActionlogCleaner(user, daysToKeep, startDate)).build();
   }
 
   @POST
@@ -394,14 +395,14 @@ public class ManagementTasksResource extends RodaCoreService {
     return response;
   }
 
-  private ApiResponseMessage createJobForRunningActionlogCleaner(RodaUser user, List<String> params, Date startDate) {
+  private ApiResponseMessage createJobForRunningActionlogCleaner(RodaUser user, String daysToKeep, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
     job.setName("Management Task | Log cleaner job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
       .setPlugin(ActionLogCleanerPlugin.class.getCanonicalName());
-    if (!params.isEmpty()) {
+    if (!daysToKeep.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<String, String>();
-      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, params.get(0));
+      pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, daysToKeep);
       job.setPluginParameters(pluginParameters);
     }
     try {
@@ -409,7 +410,7 @@ public class ManagementTasksResource extends RodaCoreService {
       response.setMessage("Log cleaner created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "action log clean", null, duration, "params", params);
+      registerAction(user, "ManagementTasks", "action log clean", null, duration, "daysToKeep", daysToKeep);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating log cleaner job", e);

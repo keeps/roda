@@ -36,7 +36,15 @@
 
 	<xsl:template match="/">
 		<doc>
-			<field name="level">work</field>
+			<xsl:choose>
+				<xsl:when
+					test="/rdf:RDF/rdf:Description/rdf:type[@rdf:resource = 'http://publications.europa.eu/ontology/cdm#expression']">
+					<field name="level">expression</field>
+				</xsl:when>
+				<xsl:otherwise>
+					<field name="level">work</field>
+				</xsl:otherwise>
+			</xsl:choose>
 			<xsl:apply-templates />
 		</doc>
 	</xsl:template>

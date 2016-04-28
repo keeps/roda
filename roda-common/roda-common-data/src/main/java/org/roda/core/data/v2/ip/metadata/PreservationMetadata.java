@@ -14,7 +14,7 @@ public class PreservationMetadata implements Serializable {
   private static final long serialVersionUID = -4312941542769679721L;
 
   public static enum PreservationMetadataType {
-    OBJECT_REPRESENTATION, OBJECT_FILE, OBJECT_INTELLECTUAL_ENTITY, AGENT, EVENT, RIGHTS_STATEMENT, ENVIRONMENT;
+    OBJECT_REPRESENTATION, OBJECT_FILE, OBJECT_INTELLECTUAL_ENTITY, AGENT, EVENT, RIGHTS_STATEMENT, ENVIRONMENT, OTHER;
   }
 
   private String id;

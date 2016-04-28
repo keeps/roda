@@ -133,12 +133,12 @@ public class ShowJobReport extends Composite {
 
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
-    objectId.setText(jobReport.getOtherId());
-    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getOtherId()));
+    objectId.setText(jobReport.getSourceObjectId());
+    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getSourceObjectId()));
 
-    if (jobReport.getItemId() != null) {
-      aip.setText(jobReport.getItemId());
-      aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getItemId()));
+    if (jobReport.getOutcomeObjectId() != null) {
+      aip.setText(jobReport.getOutcomeObjectId());
+      aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
     } else {
       // TODO show better message
       aip.setText("No AIP created");

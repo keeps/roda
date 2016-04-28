@@ -78,7 +78,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getOtherId();
+          value = report.getSourceObjectId();
         }
 
         return value;
@@ -186,7 +186,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
     Filter filter = getFilter();
 
     Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
-    columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OTHER_ID));
+    columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));

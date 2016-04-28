@@ -971,6 +971,8 @@ public class RodaCoreFactory {
               schema = Optional.ofNullable(xmlSchema);
             } catch (SAXException e) {
               LOGGER.error("Error while loading XML Schema", e);
+            } finally {
+              IOUtils.closeQuietly(schemaStream);
             }
           }
         }

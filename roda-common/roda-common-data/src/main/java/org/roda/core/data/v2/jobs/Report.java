@@ -25,8 +25,8 @@ public class Report implements Serializable, IsIndexed {
 
   private String id = null;
   private String jobId = null;
-  private String itemId = null;
-  private String otherId = null;
+  private String sourceObjectId = null;
+  private String outcomeObjectId = null;
 
   private String title = null;
   private Date dateCreated = null;
@@ -48,8 +48,8 @@ public class Report implements Serializable, IsIndexed {
     super();
     this.id = report.getId();
     this.jobId = report.getJobId();
-    this.itemId = report.getItemId();
-    this.otherId = report.getOtherId();
+    this.sourceObjectId = report.getSourceObjectId();
+    this.outcomeObjectId = report.getOutcomeObjectId();
     this.title = report.getTitle();
     this.dateCreated = report.getDateCreated();
     this.dateUpdated = report.getDateUpdated();
@@ -78,21 +78,21 @@ public class Report implements Serializable, IsIndexed {
     this.jobId = jobId;
   }
 
-  public String getItemId() {
-    return itemId;
+  public String getSourceObjectId() {
+    return sourceObjectId;
   }
 
-  public Report setItemId(String itemId) {
-    this.itemId = itemId;
+  public Report setSourceObjectId(String sourceObjectId) {
+    this.sourceObjectId = sourceObjectId;
     return this;
   }
 
-  public String getOtherId() {
-    return otherId;
+  public String getOutcomeObjectId() {
+    return outcomeObjectId;
   }
 
-  public Report setOtherId(String otherId) {
-    this.otherId = otherId;
+  public Report setOutcomeObjectId(String outcomeObjectId) {
+    this.outcomeObjectId = outcomeObjectId;
     return this;
   }
 
@@ -180,9 +180,7 @@ public class Report implements Serializable, IsIndexed {
   public Report addReport(Report report) {
     // FIXME not quite sure that this is the best place for this logic but it's
     // very handy
-    // if (report.getDateUpdated() == null) {
     report.setDateUpdated(new Date());
-    // }
     setDateUpdated(report.getDateUpdated());
     if (totalSteps == 0 && report.getTotalSteps() != 0) {
       setTotalSteps(report.getTotalSteps());
@@ -210,10 +208,11 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public String toString() {
-    return "Report [id=" + id + ", jobId=" + jobId + ", itemId=" + itemId + ", otherId=" + otherId + ", title=" + title
-      + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
-      + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
-      + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails + ", reports=" + reports + "]";
+    return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", outcomeObjectId="
+      + outcomeObjectId + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated
+      + ", completionPercentage=" + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps="
+      + totalSteps + ", plugin=" + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails
+      + ", reports=" + reports + "]";
   }
 
   @JsonIgnore

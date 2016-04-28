@@ -106,8 +106,8 @@
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="jobId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="itemId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="otherId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="outcomeObjectId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="title" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="dateCreated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="dateUpdated" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />

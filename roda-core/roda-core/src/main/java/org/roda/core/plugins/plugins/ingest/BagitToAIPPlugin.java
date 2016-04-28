@@ -93,7 +93,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml", parentId);
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
-        reportItem.setItemId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
+        reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 
         if (aipCreated.getParentId() == null) {
           reportItem.setPluginDetails(String.format("Parent with id '%s' not found", parentId));

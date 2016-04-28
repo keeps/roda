@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -100,82 +101,84 @@ public class SiegfriedPluginUtils {
   }
 
   public static <T extends Serializable> void runSiegfriedOnRepresentation(Plugin<T> plugin, IndexService index,
-    ModelService model, StorageService storage, AIP aip, Representation representation)
-      throws GenericException, RequestNotValidException, AlreadyExistsException, NotFoundException,
-      AuthorizationDeniedException, PluginException {
+    ModelService model, StorageService storage, AIP aip, Representation representation) throws GenericException,
+    RequestNotValidException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException, PluginException {
 
     StoragePath representationDataPath = ModelUtils.getRepresentationDataStoragePath(aip.getId(),
       representation.getId());
     DirectResourceAccess directAccess = storage.getDirectAccess(representationDataPath);
 
     Path representationFsPath = directAccess.getPath();
-    String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
-    IOUtils.closeQuietly(directAccess);
+    if (Files.exists(representationFsPath)) {
 
-    boolean notify = false;
-    final JSONObject obj = new JSONObject(siegfriedOutput);
-    JSONArray files = (JSONArray) obj.get("files");
+      String siegfriedOutput = SiegfriedPluginUtils.runSiegfriedOnPath(representationFsPath);
+      IOUtils.closeQuietly(directAccess);
 
-    for (int i = 0; i < files.length(); i++) {
-      JSONObject fileObject = files.getJSONObject(i);
+      boolean notify = false;
+      final JSONObject obj = new JSONObject(siegfriedOutput);
+      JSONArray files = (JSONArray) obj.get("files");
 
-      Path fullFsPath = Paths.get(fileObject.getString("filename"));
-      Path relativeFsPath = representationFsPath.relativize(fullFsPath);
+      for (int i = 0; i < files.length(); i++) {
+        JSONObject fileObject = files.getJSONObject(i);
 
-      String fileId = relativeFsPath.getFileName().toString();
-      List<String> fileDirectoryPath = new ArrayList<>();
-      for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
-        fileDirectoryPath.add(relativeFsPath.getName(j).toString());
-      }
+        Path fullFsPath = Paths.get(fileObject.getString("filename"));
+        Path relativeFsPath = representationFsPath.relativize(fullFsPath);
 
-      ContentPayload payload = new StringContentPayload(fileObject.toString());
+        String fileId = relativeFsPath.getFileName().toString();
+        List<String> fileDirectoryPath = new ArrayList<>();
+        for (int j = 0; j < relativeFsPath.getNameCount() - 1; j++) {
+          fileDirectoryPath.add(relativeFsPath.getName(j).toString());
+        }
 
-      model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-        SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, notify);
+        ContentPayload payload = new StringContentPayload(fileObject.toString());
 
-      // Update PREMIS files
-      JSONArray matches = (JSONArray) fileObject.get("matches");
-      if (matches.length() > 0) {
-        for (int j = 0; j < matches.length(); j++) {
-          JSONObject match = (JSONObject) matches.get(j);
-          String format = null;
-          String version = null;
-          String pronom = null;
-          String mime = null;
+        model.createOtherMetadata(aip.getId(), representation.getId(), fileDirectoryPath, fileId,
+          SiegfriedPlugin.FILE_SUFFIX, SiegfriedPlugin.OTHER_METADATA_TYPE, payload, notify);
 
-          if (plugin.getVersion().startsWith("1.5")) {
-            if (match.getString("ns").equalsIgnoreCase("pronom")) {
-              format = match.getString("format");
-              version = match.getString("version");
-              pronom = match.getString("id");
-              mime = match.getString("mime");
+        // Update PREMIS files
+        JSONArray matches = (JSONArray) fileObject.get("matches");
+        if (matches.length() > 0) {
+          for (int j = 0; j < matches.length(); j++) {
+            JSONObject match = (JSONObject) matches.get(j);
+            String format = null;
+            String version = null;
+            String pronom = null;
+            String mime = null;
+
+            if (plugin.getVersion().startsWith("1.5")) {
+              if (match.getString("ns").equalsIgnoreCase("pronom")) {
+                format = match.getString("format");
+                version = match.getString("version");
+                pronom = match.getString("id");
+                mime = match.getString("mime");
+              }
+            } else {
+              if (match.getString("id").equalsIgnoreCase("pronom")) {
+                format = match.getString("format");
+                version = match.getString("version");
+                pronom = match.getString("puid");
+                mime = match.getString("mime");
+              }
             }
-          } else {
-            if (match.getString("id").equalsIgnoreCase("pronom")) {
-              format = match.getString("format");
-              version = match.getString("version");
-              pronom = match.getString("puid");
-              mime = match.getString("mime");
+            try {
+              Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
+                fileId);
+
+              File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
+              PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
+
+              PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
+              String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(),
+                fileDirectoryPath, fileId);
+
+              ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
+              model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
+                premisFilePayload, notify);
+            } catch (NotFoundException e) {
+              LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
+            } catch (RODAException e) {
+              LOGGER.error("Siegfried will not update PREMIS due to an error", e);
             }
-          }
-          try {
-            Binary premisBin = model.retrievePreservationFile(aip.getId(), representation.getId(), fileDirectoryPath,
-              fileId);
-
-            File premisFile = PremisV3Utils.binaryToFile(premisBin.getContent(), false);
-            PremisV3Utils.updateFileFormat(premisFile, format, version, pronom, mime);
-
-            PreservationMetadataType type = PreservationMetadataType.OBJECT_FILE;
-            String id = IdUtils.getPreservationMetadataId(type, aip.getId(), representation.getId(), fileDirectoryPath,
-              fileId);
-
-            ContentPayload premisFilePayload = PremisV3Utils.fileToBinary(premisFile);
-            model.updatePreservationMetadata(id, type, aip.getId(), representation.getId(), fileDirectoryPath, fileId,
-              premisFilePayload, notify);
-          } catch (NotFoundException e) {
-            LOGGER.debug("Siegfried will not update PREMIS because it doesn't exist");
-          } catch (RODAException e) {
-            LOGGER.error("Siegfried will not update PREMIS due to an error", e);
           }
         }
       }

@@ -67,12 +67,12 @@ public final class PluginHelper {
     return createPluginReportItem(plugin, null, transferredResource.getUUID());
   }
 
-  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String itemId,
-    String otherId) {
+  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+    String sourceObjectId) {
     Report reportItem = new Report();
     reportItem.setJobId(getJobId(plugin));
-    reportItem.setItemId(itemId);
-    reportItem.setOtherId(otherId);
+    reportItem.setSourceObjectId(sourceObjectId);
+    reportItem.setOutcomeObjectId(outcomeObjectId);
     reportItem.setTitle(plugin.getName());
     reportItem.setPlugin(plugin.getClass().getCanonicalName());
     reportItem.setDateCreated(new Date());
@@ -186,13 +186,13 @@ public final class PluginHelper {
   public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
     String jobId = getJobId(plugin);
     Report jobReport = new Report(reportItem);
-    String itemId = reportItem.getItemId();
-    if (itemId == null) {
+    String outcomeObjectId = reportItem.getOutcomeObjectId();
+    if (outcomeObjectId == null) {
       // 20160401 hsilva: this way, when there is no AIP created but still want
       // to create a job report, we will not get a null in the job report Id
-      itemId = reportItem.getOtherId();
+      outcomeObjectId = reportItem.getSourceObjectId();
     }
-    jobReport.setId(itemId);
+    jobReport.setId(outcomeObjectId);
     jobReport.setJobId(jobId);
     if (reportItem.getTotalSteps() != 0) {
       jobReport.setTotalSteps(reportItem.getTotalSteps());
@@ -214,11 +214,11 @@ public final class PluginHelper {
     try {
       Report jobReport;
       try {
-        jobReport = model.retrieveJobReport(jobId, reportItem.getItemId());
+        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId());
       } catch (NotFoundException e) {
-        jobReport = createPluginReportItem(plugin, reportItem.getItemId(), reportItem.getOtherId());
+        jobReport = createPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId());
 
-        jobReport.setId(reportItem.getItemId());
+        jobReport.setId(reportItem.getOutcomeObjectId());
         jobReport.addReport(reportItem);
       }
 

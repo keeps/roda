@@ -10,9 +10,8 @@ package org.roda.core.plugins.plugins.ingest;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Optional;
 
-import org.apache.commons.lang3.StringUtils;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
@@ -20,18 +19,18 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda_project.commons_ip.model.IPDescriptiveMetadata;
 import org.roda_project.commons_ip.model.IPFile;
+import org.roda_project.commons_ip.model.IPMetadata;
 import org.roda_project.commons_ip.model.IPRepresentation;
 import org.roda_project.commons_ip.model.MigrationException;
 import org.roda_project.commons_ip.model.SIP;
-import org.roda_project.commons_ip.model.impl.eark.EARKEnums.IPContentType;
-import org.roda_project.commons_ip.model.impl.eark.EARKEnums.RepresentationContentType;
-import org.roda_project.commons_ip.utils.METSEnums.MetadataType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,44 +45,17 @@ public class EARKSIPToAIPPluginUtils {
     Permissions permissions = new Permissions();
     boolean notify = false;
 
-    String aipType = getType(sip);
+    String aipType = IngestHelper.getType(sip);
 
     AIP aip = model.createAIP(active, parentId, aipType, permissions, notify);
 
-    // process representations
-    if (sip.getRepresentations() != null && !sip.getRepresentations().isEmpty()) {
+    // process IP information
+    processIPInformation(model, sip, aip, notify);
 
-      for (IPRepresentation sr : sip.getRepresentations()) {
-        boolean original = true;
-        String representationType = getType(sr);
-        model.createRepresentation(aip.getId(), sr.getObjectID(), original, representationType, notify);
-
-        if (sr.getData() != null && !sr.getData().isEmpty()) {
-          for (IPFile file : sr.getData()) {
-            List<String> directoryPath = file.getRelativeFolders();
-            String fileId = file.getFileName();
-            ContentPayload payload = new FSPathContentPayload(file.getPath());
-            model.createFile(aip.getId(), sr.getObjectID(), directoryPath, fileId, payload, notify);
-          }
-        }
-      }
+    // process IPRepresentation information
+    for (IPRepresentation representation : sip.getRepresentations()) {
+      processIPRepresentationInformation(model, representation, aip.getId(), notify);
     }
-
-    // process descriptive metadata
-    if (sip.getDescriptiveMetadata() != null && !sip.getDescriptiveMetadata().isEmpty()) {
-      for (IPDescriptiveMetadata dm : sip.getDescriptiveMetadata()) {
-        String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
-        ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
-        String metadataType = getMetadataType(dm);
-        String metadataVersion = dm.getMetadataVersion();
-        model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, metadataVersion,
-          notify);
-      }
-    }
-
-    // TODO add preservation metadata
-    // TODO add documentation
-    // TODO add schemas
 
     model.notifyAIPCreated(aip.getId());
 
@@ -91,56 +63,105 @@ public class EARKSIPToAIPPluginUtils {
 
   }
 
-  private static String getMetadataType(IPDescriptiveMetadata dm) {
-    MetadataType metadataType = dm.getMetadataType();
-    String type = "";
-    if (metadataType != null) {
-      if (metadataType == MetadataType.OTHER && StringUtils.isNotBlank(metadataType.getOtherType())) {
-        type = metadataType.getOtherType();
+  private static void processIPInformation(ModelService model, SIP sip, AIP aip, boolean notify)
+    throws RequestNotValidException, GenericException, AlreadyExistsException, AuthorizationDeniedException,
+    NotFoundException {
+    // process descriptive metadata
+    processDescriptiveMetadata(model, aip, sip.getDescriptiveMetadata(), notify);
+
+    // process preservation metadata
+    processPreservationMetadata(model, sip.getPreservationMetadata(), aip.getId(), Optional.empty(), notify);
+
+    // process documentation
+    processDocumentation(model, sip.getDocumentation(), aip.getId(), null, notify);
+
+    // process schemas
+    processSchemas(model, sip.getSchemas(), aip.getId(), null, notify);
+
+  }
+
+  private static void processDescriptiveMetadata(ModelService model, AIP aip,
+    List<IPDescriptiveMetadata> descriptiveMetadata, boolean notify) throws RequestNotValidException, GenericException,
+    AlreadyExistsException, AuthorizationDeniedException, NotFoundException {
+    for (IPDescriptiveMetadata dm : descriptiveMetadata) {
+      String descriptiveMetadataId = dm.getMetadata().getFileName().toString();
+      ContentPayload payload = new FSPathContentPayload(dm.getMetadata().getPath());
+      String metadataType = IngestHelper.getMetadataType(dm);
+      String metadataVersion = dm.getMetadataVersion();
+      model.createDescriptiveMetadata(aip.getId(), descriptiveMetadataId, payload, metadataType, metadataVersion,
+        notify);
+    }
+  }
+
+  private static void processPreservationMetadata(ModelService model, List<IPMetadata> preservationMetadata,
+    String aipId, Optional<String> representationId, boolean notify) throws GenericException, NotFoundException,
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    for (IPMetadata pm : preservationMetadata) {
+      IPFile file = pm.getMetadata();
+      ContentPayload fileContentPayload = new FSPathContentPayload(file.getPath());
+
+      if (representationId.isPresent()) {
+        model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, representationId.get(),
+          file.getRelativeFolders(), file.getFileName(), fileContentPayload, notify);
       } else {
-        type = metadataType.getType();
+        model.createPreservationMetadata(PreservationMetadataType.OTHER, aipId, file.getRelativeFolders(),
+          file.getFileName(), fileContentPayload, notify);
       }
     }
-    return type;
   }
 
-  private static String getType(SIP sip) {
-    String type;
-    IPContentType contentType = sip.getContentType();
-    if (IPContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
-      type = contentType.getOtherType();
-    } else if (IPContentType.SMURF.equals(contentType)) {
-      type = RodaConstants.AIP_TYPE_SMURF;
-    } else if (IPContentType.ERMS.equals(contentType)) {
-      type = RodaConstants.AIP_TYPE_ERMS;
-    } else if (IPContentType.RDBMS.equals(contentType)) {
-      type = RodaConstants.AIP_TYPE_RDBMS;
-    } else if (IPContentType.mixed.equals(contentType)) {
-      type = RodaConstants.AIP_TYPE_MIXED;
-    } else {
-      type = RodaConstants.AIP_TYPE_OTHER;
+  private static void processDocumentation(ModelService model, List<IPFile> documentation, String aipId,
+    String representationId, boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    for (IPFile doc : documentation) {
+      List<String> directoryPath = doc.getRelativeFolders();
+      String fileId = doc.getFileName();
+      ContentPayload payload = new FSPathContentPayload(doc.getPath());
+      model.createDocumentation(aipId, representationId, directoryPath, fileId, payload);
     }
-    return type;
   }
 
-  private static String getType(IPRepresentation sr) {
-    String type;
-    RepresentationContentType contentType = sr.getContentType();
-    if (RepresentationContentType.OTHER.equals(contentType) && StringUtils.isNotBlank(contentType.getOtherType())) {
-      type = contentType.getOtherType();
-    } else if (RepresentationContentType.SMURF.equals(contentType)) {
-      type = RodaConstants.REPRESENTATION_TYPE_SMURF;
-    } else if (RepresentationContentType.MOREQ.equals(contentType)) {
-      type = RodaConstants.REPRESENTATION_TYPE_MOREQ;
-    } else if (RepresentationContentType.SIARD.equals(contentType)) {
-      type = RodaConstants.REPRESENTATION_TYPE_SIARD;
-    } else if (RepresentationContentType.SIARD2.equals(contentType)) {
-      type = RodaConstants.REPRESENTATION_TYPE_SIARD2;
-    } else if (RepresentationContentType.mixed.equals(contentType)) {
-      type = RodaConstants.REPRESENTATION_TYPE_MIXED;
-    } else {
-      type = RodaConstants.REPRESENTATION_TYPE_OTHER;
+  private static void processSchemas(ModelService model, List<IPFile> schemas, String aipId, String representationId,
+    boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    for (IPFile schema : schemas) {
+      List<String> directoryPath = schema.getRelativeFolders();
+      String fileId = schema.getFileName();
+      ContentPayload payload = new FSPathContentPayload(schema.getPath());
+      model.createSchema(aipId, representationId, directoryPath, fileId, payload);
     }
-    return type;
   }
+
+  private static void processIPRepresentationInformation(ModelService model, IPRepresentation sr, String aipId,
+    boolean notify) throws RequestNotValidException, GenericException, AlreadyExistsException,
+    AuthorizationDeniedException, NotFoundException {
+    boolean original = true;
+    String representationType = IngestHelper.getType(sr);
+    Representation representation = model.createRepresentation(aipId, sr.getObjectID(), original, representationType,
+      notify);
+
+    // process representation descriptive metadata
+    // XXX 20160504 hsilva: there's no "space" in the model to accommodate this
+    // information
+
+    // process representation preservation metadata
+    processPreservationMetadata(model, sr.getPreservationMetadata(), aipId, Optional.ofNullable(representation.getId()),
+      notify);
+
+    // process representation files
+    for (IPFile file : sr.getData()) {
+      List<String> directoryPath = file.getRelativeFolders();
+      String fileId = file.getFileName();
+      ContentPayload payload = new FSPathContentPayload(file.getPath());
+      model.createFile(aipId, representation.getId(), directoryPath, fileId, payload, notify);
+    }
+
+    // process representation documentation
+    processDocumentation(model, sr.getDocumentation(), aipId, representation.getId(), notify);
+
+    // process representation schemas
+    processSchemas(model, sr.getSchemas(), aipId, representation.getId(), notify);
+
+  }
+
 }
