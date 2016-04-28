@@ -96,10 +96,7 @@ public class EditFormat extends Composite {
    */
   public EditFormat(Format format) {
     this.format = format;
-
-    this.formatDataPanel = new FormatDataPanel(true, false);
-    this.formatDataPanel.setFormat(format);
-
+    this.formatDataPanel = new FormatDataPanel(true, true, format);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -119,7 +116,7 @@ public class EditFormat extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Tools.newHistory(ShowFormat.RESOLVER, format.getId());
+            Tools.newHistory(FormatRegister.RESOLVER, format.getId());
           }
 
         });

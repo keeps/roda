@@ -130,6 +130,9 @@ public class RiskRegister extends Composite {
   @UiField(provided = true)
   FlowPanel facetSeverities;
 
+  @UiField(provided = true)
+  FlowPanel facetOwner;
+
   @UiField
   DateBox inputDateInitial;
 
@@ -157,7 +160,8 @@ public class RiskRegister extends Composite {
   public RiskRegister() {
     Filter filter = null;
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.RISK_CATEGORY),
-      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL));
+      new SimpleFacetParameter(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL),
+      new SimpleFacetParameter(RodaConstants.RISK_MITIGATION_OWNER));
 
     riskList = new RiskList(filter, facets, "Risks", true);
 
@@ -167,10 +171,12 @@ public class RiskRegister extends Composite {
 
     facetCategories = new FlowPanel();
     facetSeverities = new FlowPanel();
+    facetOwner = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.RISK_CATEGORY, facetCategories);
     facetPanels.put(RodaConstants.RISK_POS_MITIGATION_SEVERITY_LEVEL, facetSeverities);
+    facetPanels.put(RodaConstants.RISK_MITIGATION_OWNER, facetOwner);
     FacetUtils.bindFacets(riskList, facetPanels);
 
     riskList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {

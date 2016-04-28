@@ -111,8 +111,8 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
    * @param editmode
    *          if user name should be editable
    */
-  public FormatDataPanel(boolean editmode) {
-    this(true, editmode);
+  public FormatDataPanel(boolean editmode, Format format) {
+    this(true, editmode, format);
   }
 
   /**
@@ -121,7 +121,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
    * @param visible
    * @param editmode
    */
-  public FormatDataPanel(boolean visible, boolean editmode) {
+  public FormatDataPanel(boolean visible, boolean editmode, Format format) {
     initWidget(uiBinder.createAndBindUi(this));
 
     this.editmode = editmode;
@@ -131,6 +131,7 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     initialRelease.setFormat(dateFormat);
     initialRelease.getDatePicker().setYearArrowsVisible(true);
     initialRelease.setFireNullValues(true);
+    initialRelease.setValue(new Date());
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -175,6 +176,10 @@ public class FormatDataPanel extends Composite implements HasValueChangeHandlers
     mimetypes.addChangeHandler(changeHandler);
     pronoms.addChangeHandler(changeHandler);
     utis.addChangeHandler(changeHandler);
+
+    if (editmode) {
+      setFormat(format);
+    }
   }
 
   public boolean isValid() {

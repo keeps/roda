@@ -1343,4 +1343,34 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "deleteRisk", null, duration, "selected", selected);
   }
 
+  public static void deleteAgent(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.deleteAgent(user, selected);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "deleteAgent", null, duration, "selected", selected);
+  }
+
+  public static void deleteFormat(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.deleteFormat(user, selected);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "deleteFormat", null, duration, "selected", selected);
+  }
+
 }

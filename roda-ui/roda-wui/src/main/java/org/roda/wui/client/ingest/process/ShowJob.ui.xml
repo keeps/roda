@@ -16,48 +16,70 @@
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Ingest process</g:Label>
-				<g:Label addStyleNames="label">
-					Name
-				</g:Label>
-				<g:Label ui:field="name" />
-				<g:Label addStyleNames="label">
-					Creator
-				</g:Label>
-				<g:Label ui:field="creator" />
-				<g:Label addStyleNames="label">
-					Start date
-				</g:Label>
-				<g:Label ui:field="dateStarted" />
-				<g:Label addStyleNames="label" ui:field="dateEndedLabel">
-					End date
-				</g:Label>
-				<g:Label ui:field="dateEnded" />
-				<g:Label addStyleNames="label">
-					Duration
-				</g:Label>
-				<g:Label ui:field="duration" />
-				<g:Label addStyleNames="label">
-					Status
-				</g:Label>
-				<g:HTML ui:field="status" />
-				<g:Label addStyleNames="label">
-					Progress
-				</g:Label>
-				<g:HTML ui:field="progress" />
-
-				<g:Label addStyleNames="label">
-					Plugin
-				</g:Label>
-				<g:Label ui:field="plugin" />
-				<g:FlowPanel styleName="panel">
-					<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+							<g:Label styleName="h1">Ingest process</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Name
+								</g:Label>
+								<g:Label styleName="value" ui:field="name" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Creator
+								</g:Label>
+								<g:Label styleName="value" ui:field="creator" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Start date
+								</g:Label>
+								<g:Label styleName="value" ui:field="dateStarted" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label" ui:field="dateEndedLabel">
+									End date
+								</g:Label>
+								<g:Label styleName="value" ui:field="dateEnded" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Duration
+								</g:Label>
+								<g:Label styleName="value" ui:field="duration" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Status
+								</g:Label>
+								<g:HTML ui:field="status" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Progress
+								</g:Label>
+								<g:HTML ui:field="progress" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Plugin
+								</g:Label>
+								<g:Label ui:field="plugin" />
+								<g:FlowPanel styleName="panel">
+									<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
+								</g:FlowPanel>
+							</g:FlowPanel>
+			
+							<g:Label addStyleNames="h3 {style.reportTitle}">
+								Processed
+							</g:Label>
+							<lists:JobReportList ui:field="jobReports" />
+						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
-
-				<g:Label addStyleNames="h3 {style.reportTitle}">
-					Processed
-				</g:Label>
-				<lists:JobReportList ui:field="jobReports" />
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

@@ -222,4 +222,10 @@ public interface BrowserService extends RemoteService {
 
   void deleteRisk(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void deleteAgent(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void deleteFormat(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

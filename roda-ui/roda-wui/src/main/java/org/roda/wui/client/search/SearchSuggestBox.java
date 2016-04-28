@@ -9,6 +9,8 @@ package org.roda.wui.client.search;
 
 import org.roda.core.data.v2.index.IsIndexed;
 
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SuggestBox;
 
@@ -28,5 +30,9 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
 
   public void setValue(String value) {
     suggestBox.setValue(value);
+  }
+
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<String> handler) {
+    return suggestBox.addValueChangeHandler(handler);
   }
 }

@@ -14,24 +14,46 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Message</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="messageId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Subject</g:Label>
-				<g:Label ui:field="messageSubject" />
-				<g:Label styleName="descriptiveMetadata-field-key">Body</g:Label>
-				<g:HTML ui:field="messageBody" />
-				<g:Label styleName="descriptiveMetadata-field-key">Sent On</g:Label>
-				<g:Label ui:field="messageSentOn" />
-				<g:Label styleName="descriptiveMetadata-field-key">From User</g:Label>
-				<g:Label ui:field="messageFromUser" />
-				<g:Label styleName="descriptiveMetadata-field-key">Is Acknowledged</g:Label>
-				<g:Label ui:field="messageIsAcknowledged" />
-				
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="acknowledgedUsersKey">Acknowledged Users</g:Label>
-				<g:HTML ui:field="acknowledgedUsersValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="notAcknowledgedUsersKey">Not Acknowledged Users</g:Label>
-				<g:HTML ui:field="notAcknowledgedUsersValue" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+							<g:Label styleName="h1">Message</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Identifier</g:Label>
+								<g:Label styleName="value" ui:field="messageId" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Subject</g:Label>
+								<g:Label styleName="value" ui:field="messageSubject" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Body</g:Label>
+								<g:HTML styleName="value" ui:field="messageBody" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Sent On</g:Label>
+								<g:Label styleName="value" ui:field="messageSentOn" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">From User</g:Label>
+								<g:Label styleName="value" ui:field="messageFromUser" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Is Acknowledged</g:Label>
+								<g:Label styleName="value" ui:field="messageIsAcknowledged" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">				
+								<g:Label styleName="label" ui:field="acknowledgedUsersKey">Acknowledged Users</g:Label>
+								<g:HTML styleName="value" ui:field="acknowledgedUsersValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="notAcknowledgedUsersKey">Not Acknowledged Users</g:Label>
+								<g:HTML styleName="value" ui:field="notAcknowledgedUsersValue" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

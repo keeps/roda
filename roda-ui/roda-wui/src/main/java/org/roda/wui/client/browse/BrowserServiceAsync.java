@@ -151,4 +151,8 @@ public interface BrowserServiceAsync {
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 
   void deleteRisk(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
+  void deleteAgent(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
+  void deleteFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
 }

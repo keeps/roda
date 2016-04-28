@@ -38,7 +38,6 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -287,6 +286,7 @@ public class ShowPreservationEvent extends Composite {
       typeLabel.addStyleName("label");
       // TODO humanize list
       Label typeValue = new Label(Tools.join(agentId.getRoles(), ", "));
+      typeValue.addStyleName("value");
       body.add(typeLabel);
       body.add(typeValue);
     }
@@ -295,6 +295,7 @@ public class ShowPreservationEvent extends Composite {
       Label typeLabel = new Label("Type");
       typeLabel.addStyleName("label");
       Label typeValue = new Label(agent.getType());
+      typeValue.addStyleName("value");
       body.add(typeLabel);
       body.add(typeValue);
     }
@@ -303,6 +304,7 @@ public class ShowPreservationEvent extends Composite {
       Label versionLabel = new Label("Version");
       versionLabel.addStyleName("label");
       Label versionValue = new Label(agent.getVersion());
+      versionValue.addStyleName("value");
       body.add(versionLabel);
       body.add(versionValue);
     }
@@ -311,6 +313,7 @@ public class ShowPreservationEvent extends Composite {
       Label noteLabel = new Label("Note");
       noteLabel.addStyleName("label");
       Label noteValue = new Label(agent.getNote());
+      noteValue.addStyleName("value");
       body.add(noteLabel);
       body.add(noteValue);
     }
@@ -319,6 +322,7 @@ public class ShowPreservationEvent extends Composite {
       Label extensionLabel = new Label("Extension");
       extensionLabel.addStyleName("label");
       Label extensionValue = new Label(agent.getExtension());
+      extensionValue.addStyleName("value");
       body.add(extensionLabel);
       body.add(extensionValue);
     }
@@ -371,6 +375,7 @@ public class ShowPreservationEvent extends Composite {
       Label titleLabel = new Label("Title");
       titleLabel.addStyleName("label");
       Label titleValue = new Label(iAIP.getTitle());
+      titleValue.addStyleName("value");
 
       body.add(titleLabel);
       body.add(titleValue);
@@ -387,6 +392,7 @@ public class ShowPreservationEvent extends Composite {
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
+      id_Value.addStyleName("value");
 
       body.add(idLabel);
       body.add(id_Value);
@@ -414,6 +420,7 @@ public class ShowPreservationEvent extends Composite {
       Label originalLabel = new Label("Status");
       originalLabel.addStyleName("label");
       Label originalValue = new Label(irep.isOriginal() ? "original" : "alternative");
+      originalValue.addStyleName("value");
 
       body.add(originalLabel);
       body.add(originalValue);
@@ -430,6 +437,7 @@ public class ShowPreservationEvent extends Composite {
       Label idLabel = new Label("Identifier (not found)");
       idLabel.addStyleName("label");
       Label id_Value = new Label(idValue);
+      id_Value.addStyleName("value");
 
       body.add(idLabel);
       body.add(id_Value);
@@ -457,6 +465,7 @@ public class ShowPreservationEvent extends Composite {
       nameLabel.addStyleName("label");
       Label nameValue = new Label(
         StringUtils.isNotBlank(ifile.getOriginalName()) ? ifile.getOriginalName() : ifile.getId());
+      nameValue.addStyleName("value");
 
       Label pathLabel = null;
       Label pathValue = null;
@@ -464,6 +473,7 @@ public class ShowPreservationEvent extends Composite {
         pathLabel = new Label("Path");
         pathLabel.addStyleName("label");
         pathValue = new Label(Tools.join(ifile.getPath(), "/"));
+        pathValue.addStyleName("value");
       }
 
       Label formatLabel = new Label("Format");
@@ -472,12 +482,14 @@ public class ShowPreservationEvent extends Composite {
       // TODO guard nulls
       Label formatValue = new Label(
         fileFormat.getFormatDesignationName() + " " + fileFormat.getFormatDesignationVersion());
+      formatValue.addStyleName("value");
 
       // TODO add pronom and mime type
 
       Label sizeLabel = new Label("Size");
       sizeLabel.addStyleName("label");
       Label sizeValue = new Label(Humanize.readableFileSize(ifile.getSize()));
+      sizeValue.addStyleName("value");
 
       body.add(nameLabel);
       body.add(nameValue);
@@ -503,6 +515,7 @@ public class ShowPreservationEvent extends Composite {
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
+      id_Value.addStyleName("value");
 
       body.add(idLabel);
       body.add(id_Value);
@@ -528,10 +541,12 @@ public class ShowPreservationEvent extends Composite {
       Label nameLabel = new Label("Name");
       nameLabel.addStyleName("label");
       Label nameValue = new Label(tr.getName());
+      nameValue.addStyleName("value");
 
       Label pathLabel = new Label("Path");
       pathLabel.addStyleName("label");
       Label pathValue = new Label(tr.getFullPath());
+      pathValue.addStyleName("value");
 
       body.add(nameLabel);
       body.add(nameValue);
@@ -550,6 +565,7 @@ public class ShowPreservationEvent extends Composite {
       idLabel.addStyleName("label");
       String path = LinkingObjectUtils.getLinkingObjectPath(idValue);
       Label id_Value = new Label(path);
+      id_Value.addStyleName("value");
 
       body.add(idLabel);
       body.add(id_Value);

@@ -588,4 +588,18 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.deleteRisk(user, selected);
   }
 
+  @Override
+  public void deleteAgent(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.deleteAgent(user, selected);
+  }
+
+  @Override
+  public void deleteFormat(SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    Browser.deleteFormat(user, selected);
+  }
+
 }

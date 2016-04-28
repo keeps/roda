@@ -16,40 +16,78 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Format</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="formatId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
-				<g:Label ui:field="formatName" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatDefinitionKey">Definition</g:Label>
-				<g:Label ui:field="formatDefinitionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
-				<g:Label ui:field="formatCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatLatestVersionKey">Latest Version</g:Label>
-				<g:Label ui:field="formatLatestVersionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatPopularityKey">Popularity</g:Label>
-				<g:Label ui:field="formatPopularityValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatDeveloperKey">Developer</g:Label>
-				<g:Label ui:field="formatDeveloperValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Initial Release</g:Label>
-				<g:Label ui:field="formatInitialRelease" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatStandardKey">Standard</g:Label>
-				<g:Label ui:field="formatStandardValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Open Format</g:Label>
-				<g:Label ui:field="formatIsOpenFormat" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatWebsiteKey">Website</g:Label>
-				<g:Label ui:field="formatWebsiteValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatProvenanceInformationKey">Provenance Information</g:Label>
-				<g:Label ui:field="formatProvenanceInformationValue" />
-				
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatExtensionsKey">Extensions</g:Label>
-				<g:FlowPanel ui:field="formatExtensionsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatMimetypesKey">Mimetypes</g:Label>
-				<g:FlowPanel ui:field="formatMimetypesValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatPronomsKey">Pronoms</g:Label>
-				<g:FlowPanel ui:field="formatPronomsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatUtisKey">UTIs</g:Label>
-				<g:FlowPanel ui:field="formatUtisValue" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+							<g:Label styleName="h1">Format</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Identifier</g:Label>
+								<g:Label styleName="value" ui:field="formatId" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Name</g:Label>
+								<g:Label styleName="value" ui:field="formatName" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatDefinitionKey">Definition</g:Label>
+								<g:Label styleName="value" ui:field="formatDefinitionValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Category</g:Label>
+								<g:Label styleName="value" ui:field="formatCategory" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatLatestVersionKey">Latest Version</g:Label>
+								<g:Label styleName="value" ui:field="formatLatestVersionValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatPopularityKey">Popularity</g:Label>
+								<g:Label styleName="value" ui:field="formatPopularityValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatDeveloperKey">Developer</g:Label>
+								<g:Label styleName="value" ui:field="formatDeveloperValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Initial Release</g:Label>
+								<g:Label styleName="value" ui:field="formatInitialRelease" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatStandardKey">Standard</g:Label>
+								<g:Label styleName="value" ui:field="formatStandardValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Open Format</g:Label>
+								<g:Label styleName="value" ui:field="formatIsOpenFormat" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatWebsiteKey">Website</g:Label>
+								<g:Label styleName="value" ui:field="formatWebsiteValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatProvenanceInformationKey">Provenance Information</g:Label>
+								<g:Label styleName="value" ui:field="formatProvenanceInformationValue" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatExtensionsKey">Extensions</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatExtensionsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatMimetypesKey">Mimetypes</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatMimetypesValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatPronomsKey">Pronoms</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatPronomsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatUtisKey">UTIs</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatUtisValue" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

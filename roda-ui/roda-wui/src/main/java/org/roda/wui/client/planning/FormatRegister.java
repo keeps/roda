@@ -261,7 +261,7 @@ public class FormatRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().delete(Format.class.getName(), selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteFormat(selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {

@@ -16,47 +16,93 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Agent</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="agentId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Name</g:Label>
-				<g:Label ui:field="agentName" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentTypeKey">Type</g:Label>
-				<g:Label ui:field="agentTypeValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentDescriptionKey">Description</g:Label>
-				<g:Label ui:field="agentDescriptionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Category</g:Label>
-				<g:Label ui:field="agentCategory" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentVersionKey">Version</g:Label>
-				<g:Label ui:field="agentVersionValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentLicenseKey">License</g:Label>
-				<g:Label ui:field="agentLicenseValue" />		
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentPopularityKey">Popularity</g:Label>
-				<g:Label ui:field="agentPopularityValue" />
-				<g:Label styleName="descriptiveMetadata-field-key">Initial Release</g:Label>
-				<g:Label ui:field="agentInitialRelease" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentWebsiteKey">Website</g:Label>
-				<g:Label ui:field="agentWebsiteValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentDownloadKey">Download</g:Label>
-				<g:Label ui:field="agentDownloadValue" />		
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="agentProvenanceInformationKey">Provenance Information</g:Label>
-				<g:Label ui:field="agentProvenanceInformationValue" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+			
+							<g:Label styleName="h1">Agent</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Identifier</g:Label>
+								<g:Label styleName="value" ui:field="agentId" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Name</g:Label>
+								<g:Label styleName="value" ui:field="agentName" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentTypeKey">Type</g:Label>
+								<g:Label styleName="value" ui:field="agentTypeValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentDescriptionKey">Description</g:Label>
+								<g:Label styleName="value" ui:field="agentDescriptionValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Category</g:Label>
+								<g:Label styleName="value" ui:field="agentCategory" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentVersionKey">Version</g:Label>
+								<g:Label styleName="value" ui:field="agentVersionValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentLicenseKey">License</g:Label>
+								<g:Label styleName="value" ui:field="agentLicenseValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">	
+								<g:Label styleName="label" ui:field="agentPopularityKey">Popularity</g:Label>
+								<g:Label styleName="value" ui:field="agentPopularityValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Initial Release</g:Label>
+								<g:Label styleName="value" ui:field="agentInitialRelease" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentWebsiteKey">Website</g:Label>
+								<g:Label styleName="value" ui:field="agentWebsiteValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="agentDownloadKey">Download</g:Label>
+								<g:Label styleName="value" ui:field="agentDownloadValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">	
+								<g:Label styleName="label" ui:field="agentProvenanceInformationKey">Provenance Information</g:Label>
+								<g:Label styleName="value" ui:field="agentProvenanceInformationValue" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="platformsKey">Platforms</g:Label>
+								<g:FlowPanel styleName="value" ui:field="platformsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="extensionsKey">Extensions</g:Label>
+								<g:FlowPanel styleName="value" ui:field="extensionsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="mimetypesKey">Mimetypes</g:Label>
+								<g:FlowPanel styleName="value" ui:field="mimetypesValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="pronomsKey">Pronoms</g:Label>
+								<g:FlowPanel styleName="value" ui:field="pronomsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="utisKey">UTIs</g:Label>
+								<g:FlowPanel styleName="value" ui:field="utisValue" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="formatIdsKey">Formats</g:Label>
+								<g:FlowPanel styleName="value" ui:field="formatIdsValue" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="requiredAgentsKey">Required Agents</g:Label>
+								<g:FlowPanel styleName="value" ui:field="requiredAgentsValue" />
+							</g:FlowPanel>
 				
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="platformsKey">Platforms</g:Label>
-				<g:FlowPanel ui:field="platformsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="extensionsKey">Extensions</g:Label>
-				<g:FlowPanel ui:field="extensionsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="mimetypesKey">Mimetypes</g:Label>
-				<g:FlowPanel ui:field="mimetypesValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="pronomsKey">Pronoms</g:Label>
-				<g:FlowPanel ui:field="pronomsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="utisKey">UTIs</g:Label>
-				<g:FlowPanel ui:field="utisValue" />
-				
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="formatIdsKey">Formats</g:Label>
-				<g:FlowPanel ui:field="formatIdsValue" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="requiredAgentsKey">Required Agents</g:Label>
-				<g:FlowPanel ui:field="requiredAgentsValue" />
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
 				
 			</g:FlowPanel>
 

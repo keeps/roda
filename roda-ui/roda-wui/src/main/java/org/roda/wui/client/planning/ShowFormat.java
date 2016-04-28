@@ -15,6 +15,7 @@ import java.util.List;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -166,31 +167,31 @@ public class ShowFormat extends Composite {
     formatName.setText(format.getName());
 
     formatDefinitionValue.setText(format.getDefinition());
-    formatDefinitionKey.setVisible(format.getDefinition().length() > 0);
+    formatDefinitionKey.setVisible(StringUtils.isNotBlank(format.getDefinition()));
 
     formatCategory.setText(format.getCategory());
 
     formatLatestVersionValue.setText(format.getLatestVersion());
-    formatLatestVersionKey.setVisible(format.getLatestVersion().length() > 0);
+    formatLatestVersionKey.setVisible(StringUtils.isNotBlank(format.getLatestVersion()));
 
     formatPopularityValue.setText(Integer.toString(format.getPopularity()));
-    formatPopularityKey.setVisible(Integer.toString(format.getPopularity()).length() > 0);
+    formatPopularityKey.setVisible(StringUtils.isNotBlank(Integer.toString(format.getPopularity())));
 
     formatDeveloperValue.setText(format.getDeveloper());
-    formatDeveloperKey.setVisible(format.getDeveloper().length() > 0);
+    formatDeveloperKey.setVisible(StringUtils.isNotBlank(format.getDeveloper()));
 
     formatInitialRelease
       .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(format.getInitialRelease()));
     formatIsOpenFormat.setText(Boolean.toString(format.isOpenFormat()));
 
     formatStandardValue.setText(format.getStandard());
-    formatStandardKey.setVisible(format.getStandard().length() > 0);
+    formatStandardKey.setVisible(StringUtils.isNotBlank(format.getStandard()));
 
     formatWebsiteValue.setText(format.getWebsite());
-    formatWebsiteKey.setVisible(format.getWebsite().length() > 0);
+    formatWebsiteKey.setVisible(StringUtils.isNotBlank(format.getWebsite()));
 
     formatProvenanceInformationValue.setText(format.getProvenanceInformation());
-    formatProvenanceInformationKey.setVisible(format.getProvenanceInformation().length() > 0);
+    formatProvenanceInformationKey.setVisible(StringUtils.isNotBlank(format.getProvenanceInformation()));
 
     List<String> extensionsList = format.getExtensions();
     formatExtensionsValue.setVisible(extensionsList != null && !extensionsList.isEmpty());

@@ -85,6 +85,8 @@ public class ShowNotificationMessage extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
+
+  @SuppressWarnings("unused")
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField

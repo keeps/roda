@@ -16,46 +16,68 @@
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Information package processing report</g:Label>
-				<g:Label addStyleNames="label">
-					Job
-				</g:Label>
-				<!-- <g:Label ui:field="job" /> -->
-				<g:Anchor ui:field="job" />
-				<g:Label addStyleNames="label">
-					Submission Information Package
-				</g:Label>
-				<g:Anchor ui:field="objectId" />
-				<g:Label addStyleNames="label">
-					Archival Information Package
-				</g:Label>
-				<g:Anchor ui:field="aip" />
-
-				<g:Label addStyleNames="label">
-					Date created
-				</g:Label>
-				<g:Label ui:field="dateCreated" />
-				<g:Label addStyleNames="label">
-					Date updated
-				</g:Label>
-				<g:Label ui:field="dateUpdated" />
-				<g:Label addStyleNames="label">
-					Duration
-				</g:Label>
-				<g:Label ui:field="duration" />
-				<g:Label addStyleNames="label">
-					Status
-				</g:Label>
-				<g:HTML ui:field="status" />
-				<g:Label addStyleNames="label">
-					Progress
-				</g:Label>
-				<g:Label ui:field="progress" />
-				<g:Label addStyleNames="h4">
-					<ui:msg>Run tasks</ui:msg>
-				</g:Label>
-				<g:FlowPanel ui:field="reportAttributes" />
-				<g:FlowPanel ui:field="reportItems" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+							<g:Label styleName="h1">Information package processing report</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Job
+								</g:Label>
+								<!-- <g:Label ui:field="job" /> -->
+								<g:Anchor ui:field="job" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Submission Information Package
+								</g:Label>
+								<g:Anchor ui:field="objectId" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Archival Information Package
+								</g:Label>
+								<g:Anchor ui:field="aip" />
+							</g:FlowPanel>
+							
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Date created
+								</g:Label>
+								<g:Label styleName="value" ui:field="dateCreated" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Date updated
+								</g:Label>
+								<g:Label styleName="value" ui:field="dateUpdated" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Duration
+								</g:Label>
+								<g:Label styleName="value" ui:field="duration" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Status
+								</g:Label>
+								<g:HTML ui:field="status" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label addStyleNames="label">
+									Progress
+								</g:Label>
+								<g:Label styleName="value" ui:field="progress" />
+							</g:FlowPanel>
+							<g:Label addStyleNames="h4">
+								<ui:msg>Run tasks</ui:msg>
+							</g:Label>
+							<g:FlowPanel ui:field="reportAttributes" />
+							<g:FlowPanel ui:field="reportItems" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+				</g:FlowPanel>
 
 			</g:FlowPanel>
 

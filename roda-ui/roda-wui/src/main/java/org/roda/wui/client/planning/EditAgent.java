@@ -90,10 +90,7 @@ public class EditAgent extends Composite {
 
   public EditAgent(Agent agent) {
     this.agent = agent;
-
-    this.agentDataPanel = new AgentDataPanel(true, false);
-    this.agentDataPanel.setAgent(agent);
-
+    this.agentDataPanel = new AgentDataPanel(true, true, agent);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -113,7 +110,7 @@ public class EditAgent extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Tools.newHistory(ShowAgent.RESOLVER, agent.getId());
+            Tools.newHistory(AgentRegister.RESOLVER, agent.getId());
           }
 
         });

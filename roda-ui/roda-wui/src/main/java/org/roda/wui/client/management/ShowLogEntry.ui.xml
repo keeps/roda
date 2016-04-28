@@ -14,24 +14,46 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Log Entry</g:Label>
-				<g:Label styleName="descriptiveMetadata-field-key">Identifier</g:Label>
-				<g:Label ui:field="logId" />
-				<g:Label styleName="descriptiveMetadata-field-key">Component</g:Label>
-				<g:Label ui:field="logComponent" />
-				<g:Label styleName="descriptiveMetadata-field-key">Method</g:Label>
-				<g:Label ui:field="logMethod" />
-				<g:Label styleName="descriptiveMetadata-field-key">Address</g:Label>
-				<g:Label ui:field="logAddress" />
-				<g:Label styleName="descriptiveMetadata-field-key">Datetime</g:Label>
-				<g:Label ui:field="logDatetime" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="logRelatedObjectLabel">Related
-					object</g:Label>
-				<g:Label ui:field="logRelatedObject" />
-				<g:Label styleName="descriptiveMetadata-field-key">Username</g:Label>
-				<g:Label ui:field="logUsername" />
-				<g:Label styleName="descriptiveMetadata-field-key" ui:field="logParametersLabel">Parameters</g:Label>
-				<g:FlowPanel ui:field="logParameters" />
+				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
+					<g:FlowPanel addStyleNames="row full_width no_padding">
+						<g:FlowPanel addStyleNames="wui-data-panel">
+							<g:Label styleName="h1">Log Entry</g:Label>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Identifier</g:Label>
+								<g:Label styleName="value" ui:field="logId" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Component</g:Label>
+								<g:Label styleName="value" ui:field="logComponent" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Method</g:Label>
+								<g:Label styleName="value" ui:field="logMethod" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Address</g:Label>
+								<g:Label styleName="value" ui:field="logAddress" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Datetime</g:Label>
+								<g:Label styleName="value" ui:field="logDatetime" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logRelatedObjectLabel">Related
+									object</g:Label>
+								<g:Label styleName="value" ui:field="logRelatedObject" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label">Username</g:Label>
+								<g:Label styleName="value" ui:field="logUsername" />
+							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								<g:Label styleName="label" ui:field="logParametersLabel">Parameters</g:Label>
+								<g:FlowPanel styleName="value" ui:field="logParameters" />
+							</g:FlowPanel>
+						</g:FlowPanel>
+					</g:FlowPanel>
+				</g:FlowPanel>
 			</g:FlowPanel>
 
 			<g:FlowPanel addStyleNames="col_2 last sidebar">

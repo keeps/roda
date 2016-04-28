@@ -27,7 +27,7 @@
 				<g:Label addStyleNames="form-label">Identified on</g:Label>
 				<d:DateBox ui:field="identifiedOn" addStyleNames="form-textbox form-textbox-small" />
 				<g:Label addStyleNames="form-label">Identified by</g:Label>
-				<g:TextBox ui:field="identifiedBy" addStyleNames="form-textbox" />
+				<s:SearchSuggestBox ui:field="identifiedBy" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Category</g:Label>
 				<s:SearchSuggestBox ui:field="category" addStyleNames="form-textbox"/>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
@@ -37,11 +37,11 @@
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>
-						<g:ListBox ui:field="preMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="preMitigationProbability" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Impact</g:Label>
-						<g:ListBox ui:field="preMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="preMitigationImpact" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label" ui:field="preMitigationSeverityKey">Severity</g:Label>
@@ -57,7 +57,7 @@
 				<g:Label addStyleNames="form-label" ui:field="mitigationOwnerTypeKey">Risk owner type</g:Label>
 				<g:TextBox ui:field="mitigationOwnerType" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Risk owner</g:Label>
-				<g:TextBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
+				<s:SearchSuggestBox ui:field="mitigationOwner" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label not-visible">Related event identifier type</g:Label>
 				<g:TextBox ui:field="mitigationRelatedEventIdentifierType" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label not-visible">Related event identifier value</g:Label>
@@ -67,11 +67,11 @@
 				<g:FlowPanel addStyleNames="form-risk-mitigation-inline">
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Probability</g:Label>
-						<g:ListBox ui:field="posMitigationProbability" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="posMitigationProbability" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label">Impact</g:Label>
-						<g:ListBox ui:field="posMitigationImpact" addStyleNames="form-textbox form-textbox-small form-risk-mitigation-margin" />
+						<g:ListBox ui:field="posMitigationImpact" addStyleNames="form-selectbox form-textbox-small form-risk-mitigation-margin" />
 					</g:FlowPanel>
 					<g:FlowPanel>
 						<g:Label addStyleNames="form-label" ui:field="posMitigationSeverityKey">Severity</g:Label>

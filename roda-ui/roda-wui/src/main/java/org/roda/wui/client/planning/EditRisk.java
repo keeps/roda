@@ -97,7 +97,8 @@ public class EditRisk extends Composite {
    */
   public EditRisk(Risk risk) {
     this.risk = risk;
-    this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY);
+    this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
+      RodaConstants.RISK_MITIGATION_OWNER);
     initWidget(uiBinder.createAndBindUi(this));
   }
 

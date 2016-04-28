@@ -261,7 +261,7 @@ public class AgentRegister extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                BrowserService.Util.getInstance().delete(Agent.class.getName(), selected, new AsyncCallback<Void>() {
+                BrowserService.Util.getInstance().deleteAgent(selected, new AsyncCallback<Void>() {
 
                   @Override
                   public void onFailure(Throwable caught) {

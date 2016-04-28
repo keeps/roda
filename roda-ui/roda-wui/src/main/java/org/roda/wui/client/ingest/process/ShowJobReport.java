@@ -173,18 +173,21 @@ public class ShowJobReport extends Composite {
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       Label attributeValue = new Label(reportItem.getPlugin());
+      attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
       attributeLabel = new Label("Start datetime");
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateCreated()));
+      attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
       attributeLabel = new Label("End datetime");
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
       attributeValue = new Label(dateTimeFormat.format(reportItem.getDateUpdated()));
+      attributeValue.setStyleName("value");
       panelBody.add(attributeValue);
 
       attributeLabel = new Label("Outcome");

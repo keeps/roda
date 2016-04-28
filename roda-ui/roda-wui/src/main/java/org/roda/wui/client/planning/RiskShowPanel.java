@@ -10,6 +10,7 @@ package org.roda.wui.client.planning;
 
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 
 import com.google.gwt.core.client.GWT;
@@ -148,13 +149,13 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
     riskName.setText(risk.getName());
 
     riskDescriptionValue.setText(risk.getDescription());
-    riskDescriptionKey.setVisible(risk.getDescription().length() > 0);
+    riskDescriptionKey.setVisible(StringUtils.isNotBlank(risk.getDescription()));
 
     riskIdentifiedOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(risk.getIdentifiedOn()));
     riskIdentifiedBy.setText(risk.getIdentifiedBy());
     riskCategory.setText(risk.getCategory());
     riskNotesValue.setText(risk.getNotes());
-    riskNotesKey.setVisible(risk.getNotes().length() > 0);
+    riskNotesKey.setVisible(StringUtils.isNotBlank(risk.getNotes()));
 
     final int preProbability = risk.getPreMitigationProbability();
     final int preImpact = risk.getPreMitigationImpact();
@@ -185,37 +186,27 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
           riskPosMitigationProbability.setText(terms.getPosMitigationProbability());
           riskPosMitigationImpact.setText(terms.getPosMitigationImpact());
 
-          if (posProbability == 0 && posImpact == 0) {
-            riskPosMitigationKey.setVisible(false);
-            riskPosMitigationProbabilityKey.setVisible(false);
-            riskPosMitigationProbability.setVisible(false);
-            riskPosMitigationImpactKey.setVisible(false);
-            riskPosMitigationImpact.setVisible(false);
-            riskPosMitigationSeverityKey.setVisible(false);
-            riskPosMitigationSeverity.setVisible(false);
-          } else {
-            riskPosMitigationKey.setVisible(true);
-            riskPosMitigationProbabilityKey.setVisible(true);
-            riskPosMitigationProbability.setVisible(true);
-            riskPosMitigationImpactKey.setVisible(true);
-            riskPosMitigationImpact.setVisible(true);
-            riskPosMitigationSeverityKey.setVisible(true);
-            riskPosMitigationSeverity.setVisible(true);
-            riskPosMitigationSeverity
-              .setHTML(RiskShowPanel.this.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
-          }
+          riskPosMitigationKey.setVisible(true);
+          riskPosMitigationProbabilityKey.setVisible(true);
+          riskPosMitigationProbability.setVisible(true);
+          riskPosMitigationImpactKey.setVisible(true);
+          riskPosMitigationImpact.setVisible(true);
+          riskPosMitigationSeverityKey.setVisible(true);
+          riskPosMitigationSeverity.setVisible(true);
+          riskPosMitigationSeverity
+            .setHTML(RiskShowPanel.this.getSeverityDefinition(posSeverity, severityLowLimit, severityHighLimit));
         }
       });
 
     riskPreMitigationNotesValue.setText(risk.getPreMitigationNotes());
-    riskPreMitigationNotesKey.setVisible(risk.getPreMitigationNotes().length() > 0);
+    riskPreMitigationNotesKey.setVisible(StringUtils.isNotBlank(risk.getPreMitigationNotes()));
 
     riskPosMitigationNotesValue.setText(risk.getPosMitigationNotes());
-    riskPosMitigationNotesKey.setVisible(risk.getPosMitigationNotes().length() > 0);
+    riskPosMitigationNotesKey.setVisible(StringUtils.isNotBlank(risk.getPosMitigationNotes()));
 
     int mitigationCounter = 0;
 
-    if (risk.getMitigationStrategy().length() > 0) {
+    if (StringUtils.isNotBlank(risk.getMitigationStrategy())) {
       mitigationCounter++;
       riskMitigationStrategyKey.setVisible(true);
       riskMitigationStrategyValue.setText(risk.getMitigationStrategy());
@@ -223,7 +214,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskMitigationStrategyKey.setVisible(false);
     }
 
-    if (risk.getMitigationOwnerType().length() > 0) {
+    if (StringUtils.isNotBlank(risk.getMitigationOwnerType())) {
       mitigationCounter++;
       riskMitigationOwnerTypeKey.setVisible(true);
       riskMitigationOwnerTypeValue.setText(risk.getMitigationOwnerType());
@@ -231,7 +222,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskMitigationOwnerTypeKey.setVisible(false);
     }
 
-    if (risk.getMitigationOwner().length() > 0) {
+    if (StringUtils.isNotBlank(risk.getMitigationOwner())) {
       mitigationCounter++;
       riskMitigationOwnerKey.setVisible(true);
       riskMitigationOwnerValue.setText(risk.getMitigationOwner());
@@ -239,7 +230,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskMitigationOwnerKey.setVisible(false);
     }
 
-    if (risk.getMitigationRelatedEventIdentifierType().length() > 0) {
+    if (StringUtils.isNotBlank(risk.getMitigationRelatedEventIdentifierType())) {
       mitigationCounter++;
       riskMitigationRelatedEventIdentifierTypeKey.setVisible(true);
       riskMitigationRelatedEventIdentifierTypeValue.setText(risk.getMitigationRelatedEventIdentifierType());
@@ -247,7 +238,7 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
       riskMitigationRelatedEventIdentifierTypeKey.setVisible(false);
     }
 
-    if (risk.getMitigationRelatedEventIdentifierValue().length() > 0) {
+    if (StringUtils.isNotBlank(risk.getMitigationRelatedEventIdentifierValue())) {
       mitigationCounter++;
       riskMitigationRelatedEventIdentifierValueKey.setVisible(true);
       riskMitigationRelatedEventIdentifierValueValue.setText(risk.getMitigationRelatedEventIdentifierValue());

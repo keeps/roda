@@ -677,6 +677,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Severity")
   String riskRegisterSeverity();
 
+  @DefaultMessage("Owner")
+  String riskRegisterOwner();
+
   @DefaultMessage("New")
   String riskRegisterNewButton();
 

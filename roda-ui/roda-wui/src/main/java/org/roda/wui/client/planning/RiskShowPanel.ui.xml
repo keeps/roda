@@ -27,7 +27,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskDescriptionKey">Description</g:Label>
-					<g:Label styleName="value" ui:field="riskDescriptionValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskDescriptionValue" />
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label">Identified on</g:Label>
@@ -43,7 +43,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskNotesKey">Notes</g:Label>
-					<g:Label styleName="value" ui:field="riskNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskNotesValue" />
 				</g:FlowPanel>
 				
 				<g:Label styleName="h4" ui:field="riskPreMitigationKey">Pre-mitigation</g:Label>
@@ -57,17 +57,17 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label">Severity</g:Label>
-					<g:HTML ui:field="riskPreMitigationSeverity"></g:HTML>
+					<g:HTML styleName="value" ui:field="riskPreMitigationSeverity"></g:HTML>
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskPreMitigationNotesKey">Notes</g:Label>
-					<g:Label styleName="value" ui:field="riskPreMitigationNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPreMitigationNotesValue" />
 				</g:FlowPanel>
 				
 				<g:Label styleName="h4" ui:field="riskMitigationKey">Mitigation</g:Label>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskMitigationStrategyKey">Mitigation strategy/actions</g:Label>
-					<g:Label styleName="value" ui:field="riskMitigationStrategyValue" />	
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskMitigationStrategyValue" />	
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskMitigationOwnerTypeKey">Risk owner type</g:Label>
@@ -101,7 +101,7 @@
 				</g:FlowPanel>
 				<g:FlowPanel styleName="field">
 					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
-					<g:Label styleName="value" ui:field="riskPosMitigationNotesValue" />
+					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>

@@ -131,8 +131,8 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
    * @param editmode
    *          if user name should be editable
    */
-  public AgentDataPanel(boolean editmode) {
-    this(true, editmode);
+  public AgentDataPanel(boolean editmode, Agent agent) {
+    this(true, editmode, agent);
   }
 
   /**
@@ -141,7 +141,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
    * @param visible
    * @param editmode
    */
-  public AgentDataPanel(boolean visible, boolean editmode) {
+  public AgentDataPanel(boolean visible, boolean editmode, Agent agent) {
 
     formatIds = new IncrementalAssociativeList(Format.class, RodaConstants.FORMAT_ID, RodaConstants.FORMAT_SEARCH,
       messages.getFormatsDialogName());
@@ -158,6 +158,7 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
     initialRelease.setFormat(dateFormat);
     initialRelease.getDatePicker().setYearArrowsVisible(true);
     initialRelease.setFireNullValues(true);
+    initialRelease.setValue(new Date());
 
     ChangeHandler changeHandler = new ChangeHandler() {
 
@@ -208,6 +209,10 @@ public class AgentDataPanel extends Composite implements HasValueChangeHandlers<
 
     formatIds.addChangeHandler(changeHandler);
     requiredAgents.addChangeHandler(changeHandler);
+
+    if (editmode) {
+      setAgent(agent);
+    }
   }
 
   public boolean isValid() {

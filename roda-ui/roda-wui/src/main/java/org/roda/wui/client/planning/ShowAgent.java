@@ -16,6 +16,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -179,33 +180,33 @@ public class ShowAgent extends Composite {
     agentName.setText(agent.getName());
 
     agentTypeValue.setText(agent.getType());
-    agentTypeKey.setVisible(agent.getType().length() > 0);
+    agentTypeKey.setVisible(StringUtils.isNotBlank(agent.getType()));
 
     agentDescriptionValue.setText(agent.getDescription());
-    agentDescriptionKey.setVisible(agent.getDescription().length() > 0);
+    agentDescriptionKey.setVisible(StringUtils.isNotBlank(agent.getDescription()));
 
     agentCategory.setText(agent.getCategory());
 
     agentVersionValue.setText(agent.getVersion());
-    agentVersionKey.setVisible(agent.getVersion().length() > 0);
+    agentVersionKey.setVisible(StringUtils.isNotBlank(agent.getVersion()));
 
     agentLicenseValue.setText(agent.getLicense());
-    agentLicenseKey.setVisible(agent.getLicense().length() > 0);
+    agentLicenseKey.setVisible(StringUtils.isNotBlank(agent.getLicense()));
 
     agentPopularityValue.setText(Integer.toString(agent.getPopularity()));
-    agentPopularityKey.setVisible(Integer.toString(agent.getPopularity()).length() > 0);
+    agentPopularityKey.setVisible(StringUtils.isNotBlank(Integer.toString(agent.getPopularity())));
 
     agentInitialRelease
       .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_FULL).format(agent.getInitialRelease()));
 
     agentWebsiteValue.setText(agent.getWebsite());
-    agentWebsiteKey.setVisible(agent.getWebsite().length() > 0);
+    agentWebsiteKey.setVisible(StringUtils.isNotBlank(agent.getWebsite()));
 
     agentDownloadValue.setText(agent.getDownload());
-    agentDownloadKey.setVisible(agent.getDownload().length() > 0);
+    agentDownloadKey.setVisible(StringUtils.isNotBlank(agent.getDownload()));
 
     agentProvenanceInformationValue.setText(agent.getProvenanceInformation());
-    agentProvenanceInformationKey.setVisible(agent.getProvenanceInformation().length() > 0);
+    agentProvenanceInformationKey.setVisible(StringUtils.isNotBlank(agent.getProvenanceInformation()));
 
     List<String> platformsList = agent.getPlatforms();
     platformsValue.setVisible(platformsList != null && !platformsList.isEmpty());

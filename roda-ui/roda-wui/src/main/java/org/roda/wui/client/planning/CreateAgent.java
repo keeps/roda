@@ -79,10 +79,7 @@ public class CreateAgent extends Composite {
    */
   public CreateAgent(Agent agent) {
     this.agent = agent;
-
-    this.agentDataPanel = new AgentDataPanel(true, false);
-    this.agentDataPanel.setAgent(agent);
-
+    this.agentDataPanel = new AgentDataPanel(true, false, agent);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
@@ -98,7 +95,7 @@ public class CreateAgent extends Composite {
 
         @Override
         public void onSuccess(Agent result) {
-          Tools.newHistory(ShowAgent.RESOLVER, result.getId());
+          Tools.newHistory(AgentRegister.RESOLVER, result.getId());
         }
 
       });
