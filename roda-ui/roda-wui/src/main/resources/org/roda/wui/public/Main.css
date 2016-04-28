@@ -86,32 +86,39 @@ h6, .h6 {
 }
 
 .label {
+	font-size: 1.5rem;
+	font-weight: 300;
+	color: #999;
 }
 
 .value {
-	font-size: 14px;
+	font-size: 1.6rem;
 	color: rgb(88, 89, 91);
 }
 
 .field {
-	margin-bottom: 10px;
+	margin-bottom: 1rem;
 }
 
 .errormessage {
-	margin-top: 5px;
+	margin-top: 0.5rem;
 }
 
 .text-area-whitespace-wrap {
 	white-space: pre-wrap;
 }
 
+table .label-success, table .label-danger, table .label-warning, table .label-info, table .label-default {
+	font-size: 1.2rem;
+}
+
 .label-success {
 	background-color: #5cb85c;
 	display: inline;
     padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
+/*     font-size: 75%; */
+/*     font-weight: 700; */
+	line-height: 1;
     color: #fff;
     text-align: center;
     white-space: nowrap;
@@ -123,9 +130,9 @@ h6, .h6 {
 	background-color: #d9534f;
 	display: inline;
     padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
+/*     font-size: 75%; */
+/*     font-weight: 700; */
+	line-height: 1;
     color: #fff;
     text-align: center;
     white-space: nowrap;
@@ -137,8 +144,8 @@ h6, .h6 {
 	background-color: #f0ad4e;
 	display: inline;
     padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
+    /*font-size: 75%;
+    font-weight: 700;*/
     line-height: 1;
     color: #fff;
     text-align: center;
@@ -151,9 +158,9 @@ h6, .h6 {
 	background-color: #337ab7;
 	display: inline;
     padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
+/*     font-size: 75%; */
+/*     font-weight: 700; */
+	line-height: 1;
     color: #fff;
     text-align: center;
     white-space: nowrap;
@@ -165,9 +172,9 @@ h6, .h6 {
 	background-color: #777;
 	display: inline;
     padding: .2em .6em .3em;
-    font-size: 75%;
-    font-weight: 700;
-    line-height: 1;
+/*     font-size: 75%; */
+/*     font-weight: 700; */
+	line-height: 1;
     color: #fff;
     text-align: center;
     white-space: nowrap;
@@ -349,6 +356,9 @@ pre>code {
 	box-sizing: border-box;
 	margin-bottom: 5px;
 	background-color: #f5f5f5;
+	font-size: 1.5rem;
+	font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-weight: 300;
 }
 
 .content .fieldTextBox, .content .form-textbox {

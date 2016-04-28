@@ -237,7 +237,7 @@ public class ShowPreservationEvent extends Composite {
       || StringUtils.isNotBlank(event.getEventOutcomeDetailExtension()));
 
     String eventOutcome = event.getEventOutcome();
-    eventOutcomeLabel.setText(eventOutcome);
+    eventOutcomeLabel.setText(eventOutcome.toLowerCase());
     if (PluginState.SUCCESS.toString().equalsIgnoreCase(eventOutcome)) {
       eventOutcomeLabel.setStyleName("label-success");
     } else if (PluginState.FAILURE.toString().equalsIgnoreCase(eventOutcome)) {

@@ -121,16 +121,17 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
           switch (report.getPluginState()) {
             case SUCCESS:
-              ret = SafeHtmlUtils
-                .fromSafeConstant("<span class='label-success'>" + report.getPluginState() + "</span>");
+              ret = SafeHtmlUtils.fromSafeConstant(
+                "<span class='label-success'>" + report.getPluginState().toString().toLowerCase() + "</span>");
               break;
             case RUNNING:
-              ret = SafeHtmlUtils
-                .fromSafeConstant("<span class='label-default'>" + report.getPluginState() + "</span>");
+              ret = SafeHtmlUtils.fromSafeConstant(
+                "<span class='label-default'>" + report.getPluginState().toString().toLowerCase() + "</span>");
               break;
             case FAILURE:
             default:
-              ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + report.getPluginState() + "</span>");
+              ret = SafeHtmlUtils.fromSafeConstant(
+                "<span class='label-danger'>" + report.getPluginState().toString().toLowerCase() + "</span>");
               break;
           }
         }

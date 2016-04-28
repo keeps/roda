@@ -98,9 +98,9 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
         if (event != null) {
           String outcome = event.getEventOutcome();
           if (PluginState.SUCCESS.toString().equalsIgnoreCase(outcome)) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + outcome + "</span>");
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + outcome.toLowerCase() + "</span>");
           } else if (PluginState.FAILURE.toString().equalsIgnoreCase(outcome)) {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + outcome + "</span>");
+            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + outcome.toLowerCase() + "</span>");
           } else {
             ret = SafeHtmlUtils.fromString(outcome);
           }

@@ -133,8 +133,8 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
     display.addColumn(nameColumn, "Name");
     display.addColumn(categoryColumn, "Category");
     display.addColumn(ownerColumn, "Owner");
-    display.addColumn(severityColumn, "Severity");
     display.addColumn(identifiedOnColumn, "Identified on");
+    display.addColumn(severityColumn, "Severity");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);

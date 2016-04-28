@@ -300,7 +300,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Choose files...")
   String ingestTransferUploadBrowseFiles();
 
-  @DefaultMessage("Done")
+  @DefaultMessage("done")
   String ingestTransferUploadFinishButton();
 
   /******** DIALOG GENERIC **************/
@@ -393,19 +393,19 @@ public interface BrowseMessages extends Messages {
   String ingestProcessNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
-  @DefaultMessage("Waiting to start")
+  @DefaultMessage("waiting to start")
   String showJobStatusCreated();
 
-  @DefaultMessage("RUNNING")
+  @DefaultMessage("running")
   String showJobStatusStarted();
 
-  @DefaultMessage("DONE")
+  @DefaultMessage("done")
   String showJobStatusCompleted();
 
-  @DefaultMessage("FAILED")
+  @DefaultMessage("failed")
   String showJobStatusFailedDuringCreation();
 
-  @DefaultMessage("FAILED")
+  @DefaultMessage("failed")
   String showJobStatusFailedToComplete();
 
   @DefaultMessage("{0}% done")
@@ -705,10 +705,10 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Search message...")
   String messageSearchPlaceHolder();
 
-  @DefaultMessage("YES")
+  @DefaultMessage("yes")
   String showMessageAcknowledged();
 
-  @DefaultMessage("NO")
+  @DefaultMessage("no")
   String showMessageNotAcknowledged();
 
   /************* Humanize ****************/
