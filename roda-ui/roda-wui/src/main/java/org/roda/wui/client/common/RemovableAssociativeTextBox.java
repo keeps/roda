@@ -75,4 +75,8 @@ public class RemovableAssociativeTextBox extends Composite implements HasHandler
   public void addSearchClickHandler(ClickHandler clickHandler) {
     dialogButton.addClickHandler(clickHandler);
   }
+
+  public void setEnabled(boolean enabled) {
+    itemName.setEnabled(enabled);
+  }
 }

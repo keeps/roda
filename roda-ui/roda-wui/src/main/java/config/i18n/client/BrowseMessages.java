@@ -289,6 +289,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Cancel")
   String createJobCancelTitle();
 
+  @DefaultMessage("Workflow")
+  String createJobWorkflow();
+
   /****** INGEST TRANSFER UPLOAD *********/
 
   @DefaultMessage("Ingest transfer upload")

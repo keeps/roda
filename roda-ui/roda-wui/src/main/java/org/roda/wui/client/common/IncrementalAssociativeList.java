@@ -121,6 +121,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
 
   private void addTextBox(String elementId, String elementName) {
     final RemovableAssociativeTextBox box = new RemovableAssociativeTextBox(elementId, elementName);
+    box.setEnabled(false);
     textBoxPanel.add(box);
     textBoxes.add(box);
 
@@ -184,7 +185,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
 
           DomEvent.fireNativeEvent(Document.get().createChangeEvent(), box);
         } catch (NotFoundException e) {
-          Toast.showError("Dialog", actualClass.getSimpleName() + " dialog not found");
+          Toast.showError(actualClass.getSimpleName() + " dialog not found: " + e);
         }
 
       }

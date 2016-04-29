@@ -9,17 +9,22 @@ package org.roda.wui.client.ingest.process;
 
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ChangeEvent;
+import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -37,9 +42,11 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 
 import config.i18n.client.BrowseMessages;
+import config.i18n.client.RiskMessages;
 
 public class PluginParameterPanel extends Composite {
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  private static final RiskMessages riskMessages = GWT.create(RiskMessages.class);
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final PluginParameter parameter;
@@ -70,11 +77,44 @@ public class PluginParameterPanel extends Composite {
       createPluginSipToAipLayout();
     } else if (PluginParameterType.AIP_ID.equals(parameter.getType())) {
       createSelectAipLayout();
+    } else if (PluginParameterType.RISK_ID.equals(parameter.getType())) {
+      createSelectRiskLayout();
     } else {
       logger
         .warn("Unsupported plugin parameter type: " + parameter.getType() + ". Reverting to default parameter editor.");
       createStringLayout();
     }
+  }
+
+  private void createSelectRiskLayout() {
+    Label parameterName = new Label(parameter.getName());
+    IncrementalAssociativeList list = new IncrementalAssociativeList(Risk.class, RodaConstants.RISK_ID,
+      RodaConstants.RISK_SEARCH, riskMessages.getRisksDialogName());
+
+    final List<String> values = list.getTextBoxesValue();
+
+    list.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        value = getValuesString(values);
+      }
+
+      private String getValuesString(List<String> values) {
+        String builder = "";
+
+        for (String value : values) {
+          builder += value + ",";
+        }
+
+        return builder.substring(0, builder.length() - 1);
+      }
+
+    });
+
+    layout.add(parameterName);
+    layout.add(list);
+    addHelp();
   }
 
   private void createSelectAipLayout() {

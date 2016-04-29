@@ -360,6 +360,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_SIP_TO_AIP_CLASS = "parameter.sip_to_aip_class";
   public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
   public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
+  public static final String PLUGIN_PARAMS_RISK_ID = "parameter.risk_id";
   public static final String PLUGIN_PARAMS_DO_VIRUS_CHECK = "parameter.do_virus_check";
   public static final String PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION = "parameter.do_descriptive_metadata_validation";
   public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";

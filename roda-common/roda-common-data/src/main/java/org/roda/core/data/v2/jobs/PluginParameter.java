@@ -48,7 +48,12 @@ public class PluginParameter implements Serializable {
     /**
      * Interface to select an AIP Id
      */
-    AIP_ID;
+    AIP_ID,
+
+    /**
+     * Interface to select an Risk Id
+     */
+    RISK_ID;
   }
 
   /**

@@ -253,6 +253,8 @@ public class RiskRegister extends Composite {
       EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
       RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRiskJob.RESOLVER.getHistoryToken())) {
+      CreateRiskJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

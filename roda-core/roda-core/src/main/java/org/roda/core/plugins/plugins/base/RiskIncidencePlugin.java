@@ -166,7 +166,7 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
 
   @Override
   public Plugin<T> cloneMe() {
-    return new RiskIncidencePlugin();
+    return new RiskIncidencePlugin<T>();
   }
 
   @Override

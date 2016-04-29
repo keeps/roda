@@ -421,6 +421,10 @@ pre>code {
 	margin-left: 5px;
 }
 
+.form-textbox-medium {
+	width: 50%;
+}
+
 .form-button {
 	margin-bottom: 10px;
 }

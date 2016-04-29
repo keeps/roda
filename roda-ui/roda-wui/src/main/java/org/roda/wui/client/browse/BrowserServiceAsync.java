@@ -31,7 +31,9 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
+import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -155,4 +157,9 @@ public interface BrowserServiceAsync {
   void deleteAgent(SelectedItems selected, AsyncCallback<Void> asyncCallback);
 
   void deleteFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+
+  void getRiskJobBundle(AsyncCallback<RiskJobBundle> asyncCallback);
+
+  void createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
+    Map<String, String> value, AsyncCallback<Job> asyncCallback);
 }

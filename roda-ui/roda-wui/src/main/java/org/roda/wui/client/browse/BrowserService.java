@@ -37,7 +37,9 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
+import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
 
 import com.google.gwt.core.client.GWT;
@@ -228,4 +230,11 @@ public interface BrowserService extends RemoteService {
 
   void deleteFormat(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  RiskJobBundle getRiskJobBundle()
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  Job createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
+    Map<String, String> value) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, JobAlreadyStartedException;
 }

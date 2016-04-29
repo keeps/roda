@@ -22,10 +22,14 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
@@ -37,12 +41,12 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.ListboxUtils;
+import org.roda.wui.client.planning.CreateRiskJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
-import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -508,7 +512,40 @@ public class Search extends Composite {
 
   @UiHandler("newJobButton")
   void buttonStartIngestHandler(ClickEvent e) {
-    Toast.showInfo("Warning", "Feature not yet implemented");
+    Tools.newHistory(CreateRiskJob.RESOLVER);
+  }
+
+  public Pair<SelectedItems, String> getSelected() {
+    Pair<SelectedItems, String> selectedItems = new Pair<SelectedItems, String>();
+    SelectedItems selected = null;
+    String elementsType = "";
+
+    if (itemsSearchAdvancedFieldsPanel.isVisible()) {
+      selected = itemsSearchResultPanel.getSelected();
+      elementsType = IndexedAIP.class.getSimpleName();
+    }
+
+    if (representationsSearchResultPanel != null && representationsSearchAdvancedFieldsPanel.isVisible()) {
+      selected = representationsSearchResultPanel.getSelected();
+      elementsType = Representation.class.getSimpleName();
+    }
+
+    if (filesSearchResultPanel != null && filesSearchAdvancedFieldsPanel.isVisible()) {
+      selected = filesSearchResultPanel.getSelected();
+      elementsType = File.class.getSimpleName();
+    }
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList selectedset = (SelectedItemsList) selected;
+
+      if (SelectedItemsUtils.isEmpty(selectedset)) {
+        selected = new SelectedItemsList();
+      }
+    }
+
+    selectedItems.setFirst(selected);
+    selectedItems.setSecond(elementsType);
+    return selectedItems;
   }
 
 }

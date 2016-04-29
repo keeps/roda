@@ -12,9 +12,9 @@
 	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
 
 	<g:FlowPanel>
-		<g:TextBox addStyleNames="form-textbox form-textbox-small" ui:field="itemName"></g:TextBox>
+		<g:TextBox addStyleNames="form-textbox form-textbox-medium" ui:field="itemName"></g:TextBox>
 		<g:Button addStyleNames="search-field-remove" ui:field="removeDynamicTextBoxButton"><i class="fa fa-close"></i></g:Button>
 		<g:Button addStyleNames="search-field-dialog" ui:field="dialogButton"><i class="fa fa-search"></i></g:Button>
-		<g:TextBox addStyleNames="form-textbox form-textbox-small" ui:field="hiddenItemId"></g:TextBox>
+		<g:TextBox addStyleNames="form-textbox" ui:field="hiddenItemId"></g:TextBox>
 	</g:FlowPanel>
 </ui:UiBinder>

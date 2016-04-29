@@ -56,4 +56,7 @@ public interface RiskMessages extends Messages {
 
   @DefaultMessage("High")
   String showHighSeverity();
+
+  @DefaultMessage("Risks")
+  String getRisksDialogName();
 }

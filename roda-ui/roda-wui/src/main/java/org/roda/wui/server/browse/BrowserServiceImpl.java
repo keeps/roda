@@ -55,13 +55,14 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.DescriptiveMetadataEditBundle;
 import org.roda.wui.client.browse.DescriptiveMetadataVersionsBundle;
 import org.roda.wui.client.browse.PreservationEventViewBundle;
-import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.browse.SupportedMetadataTypeBundle;
 import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
+import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
+import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
 import org.roda.wui.common.I18nUtility;
 import org.roda.wui.common.server.ServerTools;
@@ -600,6 +601,34 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
     Browser.deleteFormat(user, selected);
+  }
+
+  @Override
+  public RiskJobBundle getRiskJobBundle()
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    // TODO check permissions
+    RiskJobBundle bundle = new RiskJobBundle();
+    bundle.setPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.RISK));
+    return bundle;
+  }
+
+  @Override
+  public Job createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
+    Map<String, String> value) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
+    NotFoundException, JobAlreadyStartedException {
+
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+
+    Job job = new Job();
+    job.setName(jobName);
+    job.setObjects(selected);
+    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    job.setPlugin(id);
+
+    value.put("selectedType", selectedType);
+    job.setPluginParameters(value);
+
+    return Jobs.createJob(user, job);
   }
 
 }

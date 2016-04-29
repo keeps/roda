@@ -19,7 +19,6 @@ import java.util.List;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.browse.RiskVersionsBundle;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.management.MemberManagement;

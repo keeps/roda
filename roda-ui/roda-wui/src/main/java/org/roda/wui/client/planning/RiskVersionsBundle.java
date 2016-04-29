@@ -5,12 +5,13 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.wui.client.browse;
+package org.roda.wui.client.planning;
 
 import java.io.Serializable;
 import java.util.List;
 
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.BinaryVersionBundle;
 
 public class RiskVersionsBundle implements Serializable {
 
