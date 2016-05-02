@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.wui.client.common.UserLogin;
@@ -264,7 +265,7 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
 
-      SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId));
+      SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId), IndexedAIP.class.getName());
       BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
         @Override

@@ -20,6 +20,7 @@ import org.roda.core.data.v2.NamedIndexedModel;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.wui.client.common.dialogs.SelectDialog;
 import org.roda.wui.client.common.dialogs.SelectDialogFactory;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
@@ -78,7 +79,9 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
   public List<String> getTextBoxesValue() {
     ArrayList<String> listValues = new ArrayList<String>();
     for (RemovableAssociativeTextBox textBox : textBoxes) {
-      listValues.add(textBox.getHiddenTextBoxValue());
+      if (StringUtils.isNotBlank(textBox.getHiddenTextBoxValue())) {
+        listValues.add(textBox.getHiddenTextBoxValue());
+      }
     }
     return listValues;
   }
@@ -178,12 +181,12 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
               NamedIndexedModel modelValue = event.getValue();
               box.setNameTextBoxValue(modelValue.getName());
               box.setHiddenTextBoxValue(modelValue.getUUID());
+              DomEvent.fireNativeEvent(Document.get().createChangeEvent(), box);
             }
           };
 
           dialog.addValueChangeHandler(changeHandler);
 
-          DomEvent.fireNativeEvent(Document.get().createChangeEvent(), box);
         } catch (NotFoundException e) {
           Toast.showError(actualClass.getSimpleName() + " dialog not found: " + e);
         }

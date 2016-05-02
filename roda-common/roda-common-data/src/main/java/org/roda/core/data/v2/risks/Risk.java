@@ -54,6 +54,7 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
   private String mitigationRelatedEventIdentifierType = null;
   private String mitigationRelatedEventIdentifierValue = null;
 
+  private int objectsSize = 0;
   private Map<String, String> affectedObjects = new HashMap<String, String>();
 
   public Risk() {
@@ -87,6 +88,7 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.mitigationRelatedEventIdentifierType = risk.getMitigationRelatedEventIdentifierType();
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
 
+    this.objectsSize = risk.getObjectsSize();
     this.affectedObjects = new HashMap<String, String>(risk.getAffectedObjects());
   }
 
@@ -274,6 +276,14 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.mitigationRelatedEventIdentifierValue = mitigationRelatedEventIdentifierValue;
   }
 
+  public int getObjectsSize() {
+    return objectsSize;
+  }
+
+  public void setObjectsSize(int objectsSize) {
+    this.objectsSize = objectsSize;
+  }
+
   public Map<String, String> getAffectedObjects() {
     return affectedObjects;
   }
@@ -293,7 +303,8 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
       + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
       + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
-      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
+      + mitigationRelatedEventIdentifierValue + ", objectsSize=" + objectsSize + ", affectedObjects=" + affectedObjects
+      + "]";
   }
 
   @JsonIgnore

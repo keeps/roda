@@ -27,6 +27,10 @@ public interface PluginOrchestrator {
 
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
 
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids);
+
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids);
+
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin);
 
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin);

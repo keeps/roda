@@ -14,14 +14,16 @@ public class SelectedItemsFilter implements SelectedItems {
   private static final long serialVersionUID = 975693329806484985L;
 
   private Filter filter;
+  private String selectedClass;
 
   public SelectedItemsFilter() {
     super();
   }
 
-  public SelectedItemsFilter(Filter filter) {
+  public SelectedItemsFilter(Filter filter, String selectedClass) {
     super();
     this.filter = filter;
+    this.selectedClass = selectedClass;
   }
 
   public Filter getFilter() {
@@ -30,6 +32,15 @@ public class SelectedItemsFilter implements SelectedItems {
 
   public void setFilter(Filter filter) {
     this.filter = filter;
+  }
+
+  @Override
+  public String getSelectedClass() {
+    return selectedClass;
+  }
+
+  public void setSelectedClass(String selectedClass) {
+    this.selectedClass = selectedClass;
   }
 
   @Override

@@ -51,6 +51,7 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
   public LogEntryList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(LogEntry.class);
   }
 
   @Override

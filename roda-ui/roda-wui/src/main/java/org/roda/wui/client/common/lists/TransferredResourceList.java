@@ -60,6 +60,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(TransferredResource.class);
   }
 
   public TransferredResourceList(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,

@@ -84,6 +84,14 @@
 						<ui:msg>Edit</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label ui:field="riskIndicatorKey" addStyleNames="h4">
+						<ui:msg>Risks</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-clock" ui:field="risks">
+						<ui:msg>Risks</ui:msg>
+					</g:Button>
+				</g:FlowPanel>
 			</g:FlowPanel>
 
 		</g:FlowPanel>

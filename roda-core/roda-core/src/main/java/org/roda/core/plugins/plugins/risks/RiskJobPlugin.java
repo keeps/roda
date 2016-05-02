@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base;
+package org.roda.core.plugins.plugins.risks;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -122,8 +122,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Serializable> resources)
     throws PluginException {
-
-    // FIXME resource should be filled by selected items?
     Report report = executePlugin(index, model, storage, resources, RiskIncidencePlugin.class.getName());
     return report;
   }
@@ -148,7 +146,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         message.setFromUser("Job Process");
         message.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createMessage(message, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
+        model.createMessage(message, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
       } catch (GenericException e) {
         LOGGER.error("Error while creating new message", e);
       }

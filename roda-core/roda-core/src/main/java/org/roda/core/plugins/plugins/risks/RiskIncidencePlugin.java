@@ -5,12 +5,13 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.plugins.plugins.base;
+package org.roda.core.plugins.plugins.risks;
 
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
@@ -33,7 +34,7 @@ import org.slf4j.LoggerFactory;
 public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<T> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidencePlugin.class);
-  private static String riskId = null;
+  private static String riskIds = null;
 
   @Override
   public void init() throws PluginException {
@@ -64,76 +65,77 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    if (parameters.containsKey("riskId")) {
-      riskId = parameters.get("riskId");
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
+      riskIds = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
     }
   }
 
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
+
+    LOGGER.debug("Creating risk incidences");
+    Report pluginReport = PluginHelper.createPluginReport(this);
+
     if (!list.isEmpty()) {
-      if (list.get(0) instanceof AIP) {
-        return executeOnAIP(index, model, storage, (List<AIP>) list);
-      } else if (list.get(0) instanceof Representation) {
-        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
-      } else if (list.get(0) instanceof File) {
-        return executeOnFile(index, model, storage, (List<File>) list);
+      if (riskIds != null) {
+        String[] risks = riskIds.split(",");
+        for (String riskId : risks) {
+          if (list.get(0) instanceof AIP) {
+            pluginReport = executeOnAIP(index, model, riskId, (List<AIP>) list, pluginReport);
+          } else if (list.get(0) instanceof Representation) {
+            pluginReport = executeOnRepresentation(model, riskId, (List<Representation>) list, pluginReport);
+          } else if (list.get(0) instanceof File) {
+            pluginReport = executeOnFile(model, riskId, (List<File>) list, pluginReport);
+          }
+        }
       }
     }
 
-    return new Report();
+    LOGGER.debug("Done creating risk incidences");
+    return pluginReport;
   }
 
-  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report executeOnAIP(IndexService index, ModelService model, String riskId, List<AIP> list, Report pluginReport)
     throws PluginException {
-    LOGGER.debug("Creating risk incidences");
-    Report pluginReport = PluginHelper.createPluginReport(this);
 
-    for (AIP aip : list) {
-      try {
+    try {
+      for (AIP aip : list) {
         model.addRiskIncidence(riskId, aip.getId(), null, null, null, "RiskIncidence");
-      } catch (GenericException e) {
-        pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
       }
+    } catch (GenericException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
     }
 
-    LOGGER.debug("Done creating risk incidences");
     return pluginReport;
   }
 
-  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
-    List<Representation> list) throws PluginException {
-    LOGGER.debug("Creating risk incidences");
-    Report pluginReport = PluginHelper.createPluginReport(this);
+  public Report executeOnRepresentation(ModelService model, String riskId, List<Representation> list,
+    Report pluginReport) throws PluginException {
 
-    for (Representation representation : list) {
-      try {
+    try {
+      for (Representation representation : list) {
         model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null, "RiskIncidence");
-      } catch (GenericException e) {
-        pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
       }
+    } catch (GenericException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
     }
 
-    LOGGER.debug("Done creating risk incidences");
     return pluginReport;
   }
 
-  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+  public Report executeOnFile(ModelService model, String riskId, List<File> list, Report pluginReport)
     throws PluginException {
-    LOGGER.debug("Creating risk incidences");
-    Report pluginReport = PluginHelper.createPluginReport(this);
 
-    for (File file : list) {
-      try {
+    try {
+      for (File file : list) {
         model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
           "RiskIncidence");
-      } catch (GenericException e) {
-        pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
       }
+    } catch (GenericException e) {
+      pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
     }
 
-    LOGGER.debug("Done creating risk incidences");
     return pluginReport;
   }
 

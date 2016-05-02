@@ -1397,4 +1397,20 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "deleteFormat", null, duration, "selected", selected);
   }
 
+  public static int getObjectRiskSize(RodaUser user, String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    int counter = BrowserHelper.getObjectRiskSize(aipId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getObjectRiskSize", null, duration, "aipId", aipId);
+    return counter;
+  }
+
 }

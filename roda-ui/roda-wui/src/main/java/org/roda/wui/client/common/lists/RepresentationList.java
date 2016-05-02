@@ -52,6 +52,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
   public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(IndexedRepresentation.class);
   }
 
   @Override

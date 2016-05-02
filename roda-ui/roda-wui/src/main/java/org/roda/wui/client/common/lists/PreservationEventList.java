@@ -62,6 +62,7 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
 
   public PreservationEventList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(IndexedPreservationEvent.class);
   }
 
   @Override

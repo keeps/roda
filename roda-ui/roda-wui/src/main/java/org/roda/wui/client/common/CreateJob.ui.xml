@@ -26,13 +26,13 @@
 				</g:Label>
 				<g:FlowPanel ui:field="targetPanel"  />
 				<g:Label addStyleNames="form-label">
-					<ui:text from='{messages.createJobIngestWorkflow}' />
+					<ui:text from='{messages.createJobWorkflow}' />
 				</g:Label>
-				<g:ListBox addStyleNames="form-listbox" ui:field="ingestWorkflowList" />
-				<g:Label addStyleNames="form-help" ui:field="ingestWorkflowListDescription" />
+				<g:ListBox addStyleNames="form-listbox" ui:field="workflowList" />
+				<g:Label addStyleNames="form-help" ui:field="workflowListDescription" />
 				<g:FlowPanel styleName="panel">
 					<p:PluginOptionsPanel styleName="panel-body"
-						ui:field="ingestWorkflowOptions" />
+						ui:field="workflowOptions" />
 				</g:FlowPanel>
 			</g:FlowPanel>
 

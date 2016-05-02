@@ -1519,7 +1519,9 @@ public class ModelService extends ModelObservable {
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
 
       // Create version snapshot
-      storage.createBinaryVersion(riskPath, message);
+      if (message != null) {
+        storage.createBinaryVersion(riskPath, message);
+      }
 
       storage.updateBinaryContent(riskPath, new StringContentPayload(riskAsJson), false, true);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
@@ -1610,6 +1612,12 @@ public class ModelService extends ModelObservable {
       this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
         new StringContentPayload(riskIncidenceAsJson), true);
       notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
+
+      Risk risk = this.retrieveRisk(riskId);
+      risk.setObjectsSize(risk.getObjectsSize() + 1);
+      this.updateRisk(risk, null);
+      notifyRiskCreatedOrUpdated(risk);
+
     } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error adding risk incidence in storage", e);
     }
@@ -1644,6 +1652,12 @@ public class ModelService extends ModelObservable {
           storage.deleteResource(binaryPath);
           notifyRiskIncidenceDeleted(riskIncidence.getId());
         }
+
+        Risk risk = this.retrieveRisk(riskId);
+        risk.setObjectsSize(risk.getObjectsSize() - 1);
+        this.updateRisk(risk, null);
+        notifyRiskCreatedOrUpdated(risk);
+
       } else {
         throw new NotFoundException("Risk incidence binary does not exist");
       }
@@ -1671,8 +1685,7 @@ public class ModelService extends ModelObservable {
       } else {
         throw new NotFoundException("Risk incidence binary does not exist");
       }
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | IOException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Error adding risk incidence in storage", e);
     }
 

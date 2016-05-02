@@ -53,6 +53,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
 
   public FormatList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Format.class);
   }
 
   @Override

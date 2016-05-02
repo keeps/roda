@@ -59,6 +59,7 @@ public class MessageList extends BasicAsyncTableCell<Message> {
 
   public MessageList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Message.class);
   }
 
   @Override

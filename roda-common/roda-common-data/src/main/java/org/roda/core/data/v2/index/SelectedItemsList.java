@@ -14,14 +14,16 @@ public class SelectedItemsList implements SelectedItems {
   private static final long serialVersionUID = -5364779540199737165L;
 
   private List<String> ids;
+  private String selectedClass;
 
   public SelectedItemsList() {
     super();
   }
 
-  public SelectedItemsList(List<String> ids) {
+  public SelectedItemsList(List<String> ids, String selectedClass) {
     super();
     this.ids = ids;
+    this.selectedClass = selectedClass;
   }
 
   public List<String> getIds() {
@@ -30,6 +32,15 @@ public class SelectedItemsList implements SelectedItems {
 
   public void setIds(List<String> ids) {
     this.ids = ids;
+  }
+
+  @Override
+  public String getSelectedClass() {
+    return selectedClass;
+  }
+
+  public void setSelectedClass(String selectedClass) {
+    this.selectedClass = selectedClass;
   }
 
   @Override
@@ -59,7 +70,7 @@ public class SelectedItemsList implements SelectedItems {
 
   @Override
   public String toString() {
-    return "SelectedItemsList [ids=" + ids + "]";
+    return "SelectedItemsList [ids=" + ids + ", selectedClass=" + selectedClass + "]";
   }
 
 }

@@ -220,4 +220,16 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   }
 
+  @Override
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

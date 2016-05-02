@@ -54,6 +54,7 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
   public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(IndexedFile.class);
   }
 
   @Override

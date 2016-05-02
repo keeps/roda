@@ -379,9 +379,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Storage path")
   String viewRepresentationInfoStoragePath();
 
-  /************* Ingest process new ****************/
+  /************* process new ****************/
   @DefaultMessage("Job {0,localdatetime,predef:DATE_TIME_SHORT}")
-  String ingestProcessNewDefaultName(Date date);
+  String processNewDefaultName(Date date);
 
   @DefaultMessage("{0} ({1})")
   String pluginLabel(String name, String version);
@@ -390,10 +390,10 @@ public interface BrowseMessages extends Messages {
   String pluginAipIdButton();
 
   @DefaultMessage("Missing mandatory information")
-  String ingestProcessNewMissingMandatoryInfoDialogTitle();
+  String processNewMissingMandatoryInfoDialogTitle();
 
   @DefaultMessage("Please fill the following mandatory parameters: {0,list}")
-  String ingestProcessNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
+  String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
   @DefaultMessage("waiting to start")
@@ -697,6 +697,10 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("Search risks...")
   String riskRegisterSearchPlaceHolder();
+
+  @DefaultMessage("This object has {0,number} risks")
+  @AlternateMessage({"one", "This object has 1 risk"})
+  String showObjectsRiskCounter(@PluralCount int counter);
 
   /************* User log ****************/
 

@@ -53,6 +53,7 @@ public class AgentList extends BasicAsyncTableCell<Agent> {
 
   public AgentList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Agent.class);
   }
 
   @Override

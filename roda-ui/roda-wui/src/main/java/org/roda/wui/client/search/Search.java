@@ -22,14 +22,11 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
@@ -515,24 +512,19 @@ public class Search extends Composite {
     Tools.newHistory(CreateRiskJob.RESOLVER);
   }
 
-  public Pair<SelectedItems, String> getSelected() {
-    Pair<SelectedItems, String> selectedItems = new Pair<SelectedItems, String>();
+  public SelectedItems getSelected() {
     SelectedItems selected = null;
-    String elementsType = "";
 
     if (itemsSearchAdvancedFieldsPanel.isVisible()) {
       selected = itemsSearchResultPanel.getSelected();
-      elementsType = IndexedAIP.class.getSimpleName();
     }
 
     if (representationsSearchResultPanel != null && representationsSearchAdvancedFieldsPanel.isVisible()) {
       selected = representationsSearchResultPanel.getSelected();
-      elementsType = Representation.class.getSimpleName();
     }
 
     if (filesSearchResultPanel != null && filesSearchAdvancedFieldsPanel.isVisible()) {
       selected = filesSearchResultPanel.getSelected();
-      elementsType = File.class.getSimpleName();
     }
 
     if (selected instanceof SelectedItemsList) {
@@ -543,9 +535,7 @@ public class Search extends Composite {
       }
     }
 
-    selectedItems.setFirst(selected);
-    selectedItems.setSecond(elementsType);
-    return selectedItems;
+    return selected;
   }
 
 }

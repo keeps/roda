@@ -60,6 +60,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
   private TextColumn<Risk> categoryColumn;
   private TextColumn<Risk> ownerColumn;
   private Column<Risk, SafeHtml> severityColumn;
+  private TextColumn<Risk> objectCounterColumn;
 
   public RiskList() {
     this(null, null, null, false);
@@ -67,6 +68,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
 
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Risk.class);
   }
 
   @Override
@@ -123,11 +125,19 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
       }
     };
 
+    objectCounterColumn = new TextColumn<Risk>() {
+      @Override
+      public String getValue(Risk risk) {
+        return Integer.toString(risk.getObjectsSize());
+      }
+    };
+
     nameColumn.setSortable(true);
     identifiedOnColumn.setSortable(true);
     categoryColumn.setSortable(true);
     ownerColumn.setSortable(true);
     severityColumn.setSortable(true);
+    objectCounterColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(nameColumn, "Name");
@@ -135,6 +145,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
     display.addColumn(ownerColumn, "Owner");
     display.addColumn(identifiedOnColumn, "Identified on");
     display.addColumn(severityColumn, "Severity");
+    display.addColumn(objectCounterColumn, "Objects");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -145,6 +156,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
     identifiedOnColumn.setCellStyleNames("nowrap");
     ownerColumn.setCellStyleNames("nowrap");
     severityColumn.setCellStyleNames("nowrap");
+    objectCounterColumn.setCellStyleNames("nowrap");
   }
 
   @Override
@@ -158,6 +170,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
     columnSortingKeyMap.put(ownerColumn, Arrays.asList(RodaConstants.RISK_MITIGATION_OWNER));
     columnSortingKeyMap.put(severityColumn, Arrays.asList(RodaConstants.RISK_POS_MITIGATION_SEVERITY));
+    columnSortingKeyMap.put(objectCounterColumn, Arrays.asList(RodaConstants.RISK_OBJECTS_SIZE));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

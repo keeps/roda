@@ -37,7 +37,6 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
-import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
@@ -117,7 +116,7 @@ public interface BrowserService extends RemoteService {
   Job createJob(Job job) throws AuthorizationDeniedException, NotFoundException, RequestNotValidException,
     GenericException, JobAlreadyStartedException;
 
-  List<PluginInfo> getPluginsInfo(PluginType type);
+  List<PluginInfo> getPluginsInfo(List<PluginType> type);
 
   CreateIngestJobBundle getCreateIngestProcessBundle();
 
@@ -169,10 +168,6 @@ public interface BrowserService extends RemoteService {
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
-
-  Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    JobAlreadyStartedException;
 
   void updateAIPPermssions(String aipId, Permissions permissions)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
@@ -231,10 +226,9 @@ public interface BrowserService extends RemoteService {
   void deleteFormat(SelectedItems selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  RiskJobBundle getRiskJobBundle()
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+  Job createProcess(String jobName, SelectedItems selected, String id, Map<String, String> value)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException;
 
-  Job createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
-    Map<String, String> value) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    NotFoundException, JobAlreadyStartedException;
+  int getObjectRiskSize(String aipId) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 }

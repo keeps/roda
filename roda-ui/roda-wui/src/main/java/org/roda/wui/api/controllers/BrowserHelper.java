@@ -89,6 +89,7 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
@@ -1531,4 +1532,17 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(Format.class);
   }
 
+  public static int getObjectRiskSize(String aipId) throws GenericException, RequestNotValidException {
+    Filter filter = new Filter();
+    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_ELEMENT_ID, aipId));
+    IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
+      new Sublist());
+
+    if (incidences.getResults().size() == 1) {
+      RiskIncidence incidence = incidences.getResults().get(0);
+      return incidence.getRisks().size();
+    } else {
+      throw new GenericException();
+    }
+  }
 }

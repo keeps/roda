@@ -18,4 +18,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
   @Type(value = SelectedItemsFilter.class, name = "filter")})
 public interface SelectedItems extends Serializable {
 
+  String getSelectedClass();
+
 }

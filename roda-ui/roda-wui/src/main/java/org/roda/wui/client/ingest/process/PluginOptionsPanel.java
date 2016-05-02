@@ -21,7 +21,7 @@ import com.google.gwt.user.client.ui.FlowPanel;
 public class PluginOptionsPanel extends Composite {
 
   private PluginInfo pluginInfo = null;
-  private List<PluginInfo> sipToAipPlugins = new ArrayList<>();
+  private List<PluginInfo> plugins = new ArrayList<>();
 
   private final List<PluginParameterPanel> panels;
 
@@ -40,7 +40,7 @@ public class PluginOptionsPanel extends Composite {
     layout.clear();
 
     for (PluginParameter parameter : pluginInfo.getParameters()) {
-      PluginParameterPanel panel = new PluginParameterPanel(parameter, getSipToAipPlugins());
+      PluginParameterPanel panel = new PluginParameterPanel(parameter);
       panels.add(panel);
       layout.add(panel);
     }
@@ -84,12 +84,12 @@ public class PluginOptionsPanel extends Composite {
     return missing;
   }
 
-  public List<PluginInfo> getSipToAipPlugins() {
-    return sipToAipPlugins;
+  public List<PluginInfo> getPlugins() {
+    return plugins;
   }
 
-  public void setSipToAipPlugins(List<PluginInfo> sipToAipPlugins) {
-    this.sipToAipPlugins = sipToAipPlugins;
+  public void setPlugins(List<PluginInfo> plugins) {
+    this.plugins = plugins;
   }
 
 }

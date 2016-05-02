@@ -66,6 +66,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
   public JobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(Report.class);
     this.pluginsInfo = pluginsInfo;
   }
 

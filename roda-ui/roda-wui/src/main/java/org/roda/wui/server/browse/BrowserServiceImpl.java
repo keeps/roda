@@ -36,7 +36,10 @@ import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
@@ -60,7 +63,6 @@ import org.roda.wui.client.browse.Viewers;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
-import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
@@ -362,27 +364,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    JobAlreadyStartedException {
-
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-
-    Job job = new Job();
-    job.setName(jobName);
-    job.setObjects(selected);
-    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
-
-    job.setPlugin(plugin);
-    job.setPluginParameters(parameters);
-
-    return Jobs.createJob(user, job);
-  }
-
-  @Override
-  public List<PluginInfo> getPluginsInfo(PluginType type) {
+  public List<PluginInfo> getPluginsInfo(List<PluginType> types) {
     // TODO check permissions
-    return RodaCoreFactory.getPluginManager().getPluginsInfo(type);
+    return RodaCoreFactory.getPluginManager().getPluginsInfo(types);
   }
 
   @Override
@@ -604,31 +588,38 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public RiskJobBundle getRiskJobBundle()
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    // TODO check permissions
-    RiskJobBundle bundle = new RiskJobBundle();
-    bundle.setPlugins(RodaCoreFactory.getPluginManager().getPluginsInfo(PluginType.RISK));
-    return bundle;
-  }
-
-  @Override
-  public Job createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
-    Map<String, String> value) throws AuthorizationDeniedException, GenericException, RequestNotValidException,
-    NotFoundException, JobAlreadyStartedException {
+  public Job createProcess(String jobName, SelectedItems selected, String id, Map<String, String> value)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
 
     Job job = new Job();
     job.setName(jobName);
     job.setObjects(selected);
-    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
     job.setPlugin(id);
-
-    value.put("selectedType", selectedType);
     job.setPluginParameters(value);
 
+    if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
+      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS);
+    } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
+      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_REPRESENTATIONS);
+    } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
+      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_FILES);
+    } else if (TransferredResource.class.getName().equals(selected.getSelectedClass())) {
+      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
+    } else {
+      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN_ON_OBJECTS);
+    }
+
     return Jobs.createJob(user, job);
+  }
+
+  @Override
+  public int getObjectRiskSize(String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.getObjectRiskSize(user, aipId);
   }
 
 }

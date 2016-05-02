@@ -811,6 +811,8 @@ public class IndexModelObserver implements ModelObserver {
 
   public void riskDeleted(String riskId) {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
+    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_RISKS, riskId,
+      "Error deleting RiskIncidences (riskId=" + riskId + ")");
   }
 
   public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {

@@ -41,6 +41,7 @@ import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
+import org.roda.wui.client.planning.RiskRegister;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
@@ -215,6 +216,12 @@ public class Browse extends Composite {
 
   @UiField
   Button editPermissions;
+
+  @UiField
+  Label riskIndicatorKey;
+
+  @UiField
+  Button risks;
 
   private boolean viewingTop;
 
@@ -762,7 +769,7 @@ public class Browse extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId));
+                SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId), IndexedAIP.class.getName());
                 BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
                   @Override
@@ -831,6 +838,7 @@ public class Browse extends Composite {
               }
             });
         }
+
       });
 
     }
@@ -899,4 +907,12 @@ public class Browse extends Composite {
       Tools.newHistory(RESOLVER, EditPermissions.RESOLVER.getHistoryToken(), aipId);
     }
   }
+
+  @UiHandler("risks")
+  void buttonRisksHandler(ClickEvent e) {
+    if (aipId != null) {
+      Tools.newHistory(RESOLVER, RiskRegister.RESOLVER.getHistoryToken(), aipId);
+    }
+  }
+
 }

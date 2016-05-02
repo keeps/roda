@@ -51,6 +51,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
   public AIPList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
+    super.setSelectedClass(IndexedAIP.class);
   }
 
   @Override

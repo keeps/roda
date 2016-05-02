@@ -59,4 +59,5 @@ public interface RiskMessages extends Messages {
 
   @DefaultMessage("Risks")
   String getRisksDialogName();
+
 }

@@ -231,6 +231,114 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids) {
+    try {
+      LOGGER.info("Started {}", plugin.getName());
+      int multiplier = 0;
+      Iterator<String> iter = ids.iterator();
+      List<Future<Object>> futures = new ArrayList<>();
+      List<Plugin<Representation>> innerPlugins = new ArrayList<>();
+      Plugin<Representation> innerPlugin;
+      String representationId;
+
+      plugin.beforeAllExecute(index, model, storage);
+
+      List<Representation> block = new ArrayList<Representation>();
+      while (iter.hasNext()) {
+        if (block.size() == BLOCK_SIZE) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, BLOCK_SIZE);
+          futures
+            .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+          block = new ArrayList<Representation>();
+          multiplier++;
+        }
+
+        representationId = iter.next();
+        block.add(model.retrieveRepresentation(aipId, representationId));
+
+      }
+
+      if (!block.isEmpty()) {
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, block.size());
+        futures
+          .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+        multiplier++;
+      }
+
+      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+
+      for (Plugin<Representation> p : innerPlugins) {
+        p.afterBlockExecute(index, model, storage);
+      }
+
+      plugin.afterAllExecute(index, model, storage);
+
+      LOGGER.info("Ended {}", plugin.getName());
+      return mapToReports(reports);
+
+    } catch (Exception e) {
+      LOGGER.error("Error running plugin on Representations", e);
+    }
+
+    LOGGER.info("Ended {}", plugin.getName());
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids) {
+    try {
+      LOGGER.info("Started {}", plugin.getName());
+      int multiplier = 0;
+      Iterator<String> iter = ids.iterator();
+      List<Future<Object>> futures = new ArrayList<>();
+      List<Plugin<File>> innerPlugins = new ArrayList<>();
+      Plugin<File> innerPlugin;
+      String fileId;
+
+      plugin.beforeAllExecute(index, model, storage);
+
+      List<File> block = new ArrayList<File>();
+      while (iter.hasNext()) {
+        if (block.size() == BLOCK_SIZE) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, BLOCK_SIZE);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+          block = new ArrayList<File>();
+          multiplier++;
+        }
+
+        fileId = iter.next();
+        block.add(model.retrieveFile(aipId, representationId, new ArrayList<>(), fileId));
+
+      }
+
+      if (!block.isEmpty()) {
+        innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, block.size());
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+        multiplier++;
+      }
+
+      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
+      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+
+      for (Plugin<File> p : innerPlugins) {
+        p.afterBlockExecute(index, model, storage);
+      }
+
+      plugin.afterAllExecute(index, model, storage);
+
+      LOGGER.info("Ended {}", plugin.getName());
+      return mapToReports(reports);
+
+    } catch (Exception e) {
+      LOGGER.error("Error running plugin on Files", e);
+    }
+
+    LOGGER.info("Ended {}", plugin.getName());
+    return null;
+  }
+
+  @Override
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());

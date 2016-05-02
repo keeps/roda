@@ -92,6 +92,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private int initialPageSize = 20;
   private int pageSizeIncrement = 100;
 
+  private Class<T> selectedClass;
   private final O object;
 
   public AsyncTableCell() {
@@ -485,14 +486,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public SelectedItems getSelected() {
     SelectedItems ret;
     if (isAllSelected()) {
-      ret = new SelectedItemsFilter(getFilter());
+      ret = new SelectedItemsFilter(getFilter(), selectedClass.getName());
     } else {
       List<String> ids = new ArrayList<>();
       for (T item : selected) {
         ids.add(item.getUUID());
       }
 
-      ret = new SelectedItemsList(ids);
+      ret = new SelectedItemsList(ids, selectedClass.getName());
     }
 
     return ret;
@@ -574,6 +575,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public List<CheckboxSelectionListener> getListeners() {
     return this.listeners;
+  }
+
+  public Class<T> getSelectedClass() {
+    return this.selectedClass;
+  }
+
+  public void setSelectedClass(Class<T> selectedClass) {
+    this.selectedClass = selectedClass;
   }
 
 }

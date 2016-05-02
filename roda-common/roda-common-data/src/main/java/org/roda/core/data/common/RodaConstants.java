@@ -443,6 +443,7 @@ public final class RodaConstants {
   public static final String RISK_MITIGATION_OWNER = "mitigationOwner";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_TYPE = "mitigationRelatedEventIdentifierType";
   public static final String RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE = "mitigationRelatedEventIdentifierValue";
+  public static final String RISK_OBJECTS_SIZE = "objectsSize";
   public static final String RISK_AFFECTED_OBJECTS = "affectedObjects";
 
   public static final String RISK_FILE_EXTENSION = ".json";
@@ -656,5 +657,6 @@ public final class RodaConstants {
 
   // Template Constants
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template";
+  public static final String RISK_EMAIL_TEMPLATE = "ingestion-template";
 
 }

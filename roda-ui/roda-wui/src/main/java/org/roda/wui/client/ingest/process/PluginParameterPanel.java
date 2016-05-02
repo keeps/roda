@@ -7,6 +7,7 @@
  */
 package org.roda.wui.client.ingest.process;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
@@ -15,7 +16,9 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.utils.PluginUtils;
@@ -30,6 +33,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.CheckBox;
@@ -50,15 +54,13 @@ public class PluginParameterPanel extends Composite {
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   private final PluginParameter parameter;
-  private final List<PluginInfo> sipToAipPlugins;
   private final FlowPanel layout;
 
   private String value;
 
-  public PluginParameterPanel(PluginParameter parameter, List<PluginInfo> sipToAipPlugins) {
+  public PluginParameterPanel(PluginParameter parameter) {
     super();
     this.parameter = parameter;
-    this.sipToAipPlugins = sipToAipPlugins;
 
     layout = new FlowPanel();
     initWidget(layout);
@@ -91,13 +93,15 @@ public class PluginParameterPanel extends Composite {
     IncrementalAssociativeList list = new IncrementalAssociativeList(Risk.class, RodaConstants.RISK_ID,
       RodaConstants.RISK_SEARCH, riskMessages.getRisksDialogName());
 
-    final List<String> values = list.getTextBoxesValue();
-
     list.addChangeHandler(new ChangeHandler() {
 
       @Override
       public void onChange(ChangeEvent event) {
-        value = getValuesString(values);
+        IncrementalAssociativeList sourceList = (IncrementalAssociativeList) event.getSource();
+        List<String> values = sourceList.getTextBoxesValue();
+        if (!values.isEmpty()) {
+          value = getValuesString(values);
+        }
       }
 
       private String getValuesString(List<String> values) {
@@ -193,51 +197,64 @@ public class PluginParameterPanel extends Composite {
   }
 
   private void createPluginSipToAipLayout() {
-    Label parameterName = new Label(parameter.getName());
 
-    layout.add(parameterName);
-    addHelp();
+    List<PluginType> plugins = Arrays.asList(PluginType.SIP_TO_AIP);
+    BrowserService.Util.getInstance().getPluginsInfo(plugins, new AsyncCallback<List<PluginInfo>>() {
 
-    FlowPanel radioGroup = new FlowPanel();
+      @Override
+      public void onFailure(Throwable caught) {
+        // do nothing
+      }
 
-    PluginUtils.sortByName(sipToAipPlugins);
+      @Override
+      public void onSuccess(List<PluginInfo> pluginsInfo) {
+        Label parameterName = new Label(parameter.getName());
 
-    for (final PluginInfo pluginInfo : sipToAipPlugins) {
-      if (pluginInfo != null) {
-        RadioButton pRadio = new RadioButton(parameter.getName(),
-          messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+        layout.add(parameterName);
+        addHelp();
 
-        if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
-          pRadio.setValue(true);
-          value = pluginInfo.getId();
-        }
+        FlowPanel radioGroup = new FlowPanel();
 
-        Label pHelp = new Label(pluginInfo.getDescription());
+        PluginUtils.sortByName(pluginsInfo);
 
-        radioGroup.add(pRadio);
-        radioGroup.add(pHelp);
+        for (final PluginInfo pluginInfo : pluginsInfo) {
+          if (pluginInfo != null) {
+            RadioButton pRadio = new RadioButton(parameter.getName(),
+              messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
 
-        pRadio.addStyleName("form-radiobutton");
-        pHelp.addStyleName("form-help");
-
-        pRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
-
-          @Override
-          public void onValueChange(ValueChangeEvent<Boolean> event) {
-            if (event.getValue()) {
+            if (pluginInfo.getId().equals(parameter.getDefaultValue())) {
+              pRadio.setValue(true);
               value = pluginInfo.getId();
             }
+
+            Label pHelp = new Label(pluginInfo.getDescription());
+
+            radioGroup.add(pRadio);
+            radioGroup.add(pHelp);
+
+            pRadio.addStyleName("form-radiobutton");
+            pHelp.addStyleName("form-help");
+
+            pRadio.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+              @Override
+              public void onValueChange(ValueChangeEvent<Boolean> event) {
+                if (event.getValue()) {
+                  value = pluginInfo.getId();
+                }
+              }
+            });
+          } else {
+            GWT.log("Got a null plugin");
           }
-        });
-      } else {
-        GWT.log("Got a null plugin");
+        }
+
+        layout.add(radioGroup);
+
+        radioGroup.addStyleName("form-radiogroup");
+        parameterName.addStyleName("form-label");
       }
-    }
-
-    layout.add(radioGroup);
-
-    radioGroup.addStyleName("form-radiogroup");
-    parameterName.addStyleName("form-label");
+    });
   }
 
   private void createStringLayout() {

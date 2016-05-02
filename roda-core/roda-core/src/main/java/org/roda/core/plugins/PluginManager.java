@@ -114,6 +114,16 @@ public class PluginManager {
     return pluginInfoPerType.get(pluginType);
   }
 
+  public List<PluginInfo> getPluginsInfo(List<PluginType> pluginTypes) {
+    List<PluginInfo> pluginsInfo = new ArrayList<PluginInfo>();
+
+    for (PluginType pluginType : pluginTypes) {
+      pluginsInfo.addAll(pluginInfoPerType.get(pluginType));
+    }
+
+    return pluginsInfo;
+  }
+
   /**
    * Returns an instance of the {@link Plugin} with the specified ID
    * (classname).

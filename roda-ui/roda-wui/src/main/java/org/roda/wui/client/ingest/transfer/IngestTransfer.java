@@ -26,15 +26,15 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.Dialogs;
+import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.ingest.process.CreateJob;
+import org.roda.wui.client.ingest.process.CreateIngestJob;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
@@ -121,8 +121,8 @@ public class IngestTransfer extends Composite {
   public static final SafeHtml FOLDER_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
   public static final SafeHtml FILE_ICON = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
 
-  private static final Filter DEFAULT_FILTER = new Filter(new EmptyKeyFilterParameter(
-    RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
+  private static final Filter DEFAULT_FILTER = new Filter(
+    new EmptyKeyFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID));
 
   interface MyUiBinder extends UiBinder<Widget, IngestTransfer> {
   }
@@ -222,10 +222,10 @@ public class IngestTransfer extends Composite {
       public void onSelectionChange(SelectedItems selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
 
-        remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder() : messages
-          .ingestTransferButtonRemoveSelectedItems());
-        startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder() : messages
-          .ingestTransferButtonIngestSelectedItems());
+        remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()
+          : messages.ingestTransferButtonRemoveSelectedItems());
+        startIngest.setText(empty ? messages.ingestTransferButtonIngestWholeFolder()
+          : messages.ingestTransferButtonIngestSelectedItems());
         updateVisibles();
       }
 
@@ -254,8 +254,8 @@ public class IngestTransfer extends Composite {
       download.setVisible(true);
     } else {
 
-      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID,
-        r.getRelativePath()));
+      Filter filter = new Filter(
+        new SimpleFilterParameter(RodaConstants.TRANSFERRED_RESOURCE_PARENT_ID, r.getRelativePath()));
       transferredResourceList.setFilter(filter);
       searchPanel.setDefaultFilter(filter);
 
@@ -477,7 +477,8 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItems s = new SelectedItemsList(Arrays.asList(resource.getUUID()));
+                SelectedItems s = new SelectedItemsList(Arrays.asList(resource.getUUID()),
+                  TransferredResource.class.getName());
                 BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override
@@ -550,7 +551,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("startIngest")
   void buttonStartIngestHandler(ClickEvent e) {
-    Tools.newHistory(CreateJob.RESOLVER);
+    Tools.newHistory(CreateIngestJob.RESOLVER);
   }
 
   public SelectedItems getSelected() {
@@ -559,7 +560,7 @@ public class IngestTransfer extends Composite {
       SelectedItemsList selectedset = (SelectedItemsList) selected;
 
       if (SelectedItemsUtils.isEmpty(selectedset) && resource != null) {
-        selected = new SelectedItemsList(Arrays.asList(resource.getUUID()));
+        selected = new SelectedItemsList(Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
       }
     }
 

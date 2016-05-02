@@ -89,7 +89,7 @@ public class TransferredResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
     // TODO support remove multiple resources in one go
-    SelectedItemsList selected = new SelectedItemsList(Arrays.asList(path));
+    SelectedItemsList selected = new SelectedItemsList(Arrays.asList(path), TransferredResource.class.getName());
     Browser.removeTransferredResources(user, selected);
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();

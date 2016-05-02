@@ -31,7 +31,6 @@ import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
-import org.roda.wui.client.planning.RiskJobBundle;
 import org.roda.wui.client.planning.RiskMitigationBundle;
 import org.roda.wui.client.planning.RiskVersionsBundle;
 import org.roda.wui.client.search.SearchField;
@@ -74,7 +73,7 @@ public interface BrowserServiceAsync {
 
   void createJob(Job job, AsyncCallback<Job> callback);
 
-  void getPluginsInfo(PluginType type, AsyncCallback<List<PluginInfo>> callback);
+  void getPluginsInfo(List<PluginType> type, AsyncCallback<List<PluginInfo>> callback);
 
   void getCreateIngestProcessBundle(AsyncCallback<CreateIngestJobBundle> callback);
 
@@ -113,9 +112,6 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void retrieve(String classNameToReturn, String id, AsyncCallback<T> callback);
 
   void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
-
-  void createIngestProcess(String jobName, SelectedItems selected, String plugin, Map<String, String> parameters,
-    AsyncCallback<Job> asyncCallback);
 
   void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
 
@@ -158,8 +154,8 @@ public interface BrowserServiceAsync {
 
   void deleteFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
 
-  void getRiskJobBundle(AsyncCallback<RiskJobBundle> asyncCallback);
+  void createProcess(String jobName, SelectedItems selected, String id, Map<String, String> value,
+    AsyncCallback<Job> asyncCallback);
 
-  void createRiskProcess(String jobName, SelectedItems selected, String selectedType, String id,
-    Map<String, String> value, AsyncCallback<Job> asyncCallback);
+  void getObjectRiskSize(String aipId, AsyncCallback<Integer> asyncCallback);
 }

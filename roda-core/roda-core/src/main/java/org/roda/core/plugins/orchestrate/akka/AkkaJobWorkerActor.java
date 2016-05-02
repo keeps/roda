@@ -11,15 +11,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
@@ -77,6 +84,20 @@ public class AkkaJobWorkerActor extends UntypedActor {
         // FIXME 20160404 hsilva: this should be done inside the orchestrator
         // method
         PluginHelper.updateJobPercentage(plugin, 100);
+      } else if (ORCHESTRATOR_METHOD.ON_REPRESENTATIONS == job.getOrchestratorMethod()) {
+        Pair<String, List<String>> representations = getRepresentations(job.getObjects());
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
+          representations.getFirst(), representations.getSecond());
+        // FIXME 20160404 hsilva: this should be done inside the orchestrator
+        // method
+        PluginHelper.updateJobPercentage(plugin, 100);
+      } else if (ORCHESTRATOR_METHOD.ON_FILES == job.getOrchestratorMethod()) {
+        Pair<Pair<String, String>, List<String>> files = getFiles(job.getObjects());
+        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles((Plugin<File>) plugin,
+          files.getFirst().getFirst(), files.getFirst().getSecond(), files.getSecond());
+        // FIXME 20160404 hsilva: this should be done inside the orchestrator
+        // method
+        PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.RUN_PLUGIN == job.getOrchestratorMethod()) {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }
@@ -124,6 +145,94 @@ public class AkkaJobWorkerActor extends UntypedActor {
       }
     }
     return res;
+  }
+
+  public Pair<String, List<String>> getRepresentations(SelectedItems selectedItems) {
+    Pair<String, List<String>> resultPair = new Pair<String, List<String>>();
+    try {
+
+      String aipId = null;
+      List<String> res = new ArrayList<String>();
+
+      if (selectedItems instanceof SelectedItemsList) {
+        SelectedItemsList list = (SelectedItemsList) selectedItems;
+
+        if (list.getIds().size() > 0) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, list.getIds()));
+          List<IndexedRepresentation> reps = RodaCoreFactory.getIndexService()
+            .find(IndexedRepresentation.class, filter, null, new Sublist(0, list.getIds().size())).getResults();
+          for (IndexedRepresentation rep : reps) {
+            res.add(rep.getId());
+            aipId = rep.getAipId();
+          }
+        }
+      } else {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        long count = index.count(IndexedRepresentation.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, selectedItemsFilter.getFilter(),
+            null, new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
+          for (IndexedRepresentation rep : reps) {
+            res.add(rep.getId());
+            aipId = rep.getAipId();
+          }
+        }
+      }
+
+      resultPair.setFirst(aipId);
+      resultPair.setSecond(res);
+    } catch (Throwable e) {
+      LOGGER.error("Error while retrieving Representations from index", e);
+    }
+
+    return resultPair;
+  }
+
+  public Pair<Pair<String, String>, List<String>> getFiles(SelectedItems selectedItems) {
+    Pair<Pair<String, String>, List<String>> resultPair = new Pair<Pair<String, String>, List<String>>();
+    try {
+
+      String aipId = null;
+      String representationId = null;
+      List<String> res = new ArrayList<String>();
+
+      if (selectedItems instanceof SelectedItemsList) {
+        SelectedItemsList list = (SelectedItemsList) selectedItems;
+
+        if (list.getIds().size() > 0) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, list.getIds()));
+          List<IndexedFile> files = RodaCoreFactory.getIndexService()
+            .find(IndexedFile.class, filter, null, new Sublist(0, list.getIds().size())).getResults();
+          for (IndexedFile file : files) {
+            res.add(file.getId());
+            aipId = file.getAipId();
+            representationId = file.getRepresentationId();
+          }
+        }
+      } else {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        long count = index.count(IndexedFile.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedFile> files = index.find(IndexedFile.class, selectedItemsFilter.getFilter(), null,
+            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
+          for (IndexedFile file : files) {
+            res.add(file.getId());
+            aipId = file.getAipId();
+            representationId = file.getRepresentationId();
+          }
+        }
+      }
+
+      Pair<String, String> fileInfo = new Pair<String, String>(aipId, representationId);
+      resultPair.setFirst(fileInfo);
+      resultPair.setSecond(res);
+    } catch (Throwable e) {
+      LOGGER.error("Error while retrieving Representations from index", e);
+    }
+
+    return resultPair;
   }
 
 }
