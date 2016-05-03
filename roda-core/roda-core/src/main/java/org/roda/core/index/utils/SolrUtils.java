@@ -1160,8 +1160,9 @@ public class SolrUtils {
     final Long sizeInBytes = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
     final Long totalNumberOfFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
 
-    final Long numberOfDocumentationFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_SIZE_IN_BYTES), 0L);
-    final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES), 0L);
+    final Long numberOfDocumentationFiles = objectToLong(
+      doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES), 0L);
+    final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES), 0L);
 
     return new IndexedRepresentation(uuid, id, aipId, Boolean.TRUE.equals(original), type, sizeInBytes,
       totalNumberOfFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
@@ -1217,7 +1218,6 @@ public class SolrUtils {
     } catch (RequestNotValidException e) {
       LOGGER.warn("Could not index file storage path", e);
     }
-
 
     // indexing active state and permissions
     doc.addField(RodaConstants.ACTIVE, aip.isActive());
@@ -2172,23 +2172,6 @@ public class SolrUtils {
       }
     }
     return doc;
-  }
-
-  public static long getSizePath(Path startPath) throws IOException {
-    final AtomicLong size = new AtomicLong(0);
-    Files.walkFileTree(startPath, new SimpleFileVisitor<Path>() {
-      @Override
-      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-        size.addAndGet(attrs.size());
-        return FileVisitResult.CONTINUE;
-      }
-
-      @Override
-      public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
-        return FileVisitResult.CONTINUE;
-      }
-    });
-    return size.get();
   }
 
   public static <T extends IsIndexed> List<String> suggest(SolrClient index, Class<T> classToRetrieve, String field,

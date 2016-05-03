@@ -19,7 +19,6 @@ import org.apache.solr.client.solrj.SolrClient;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrException;
 import org.apache.solr.common.SolrInputDocument;
-import org.apache.solr.common.SolrInputField;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -60,6 +59,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.ingest.characterization.TikaFullTextPlugin;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -184,10 +185,24 @@ public class IndexModelObserver implements ModelObserver {
       }
       allFiles.close();
 
-      Long numberOfDocumentationFiles = 0L;
-      Long numberOfSchemaFiles = 0L;
+      // Calculate number of documentation and schema files
+      StorageService storage = model.getStorage();
+      Long numberOfDocumentationFiles;
+      try {
+        Directory documentationDirectory = model.getDocumentationDirectory(aip.getId(), representation.getId());
+        numberOfDocumentationFiles = storage.countResourcesUnderDirectory(documentationDirectory.getStoragePath(),
+          true);
+      } catch (NotFoundException e) {
+        numberOfDocumentationFiles = 0L;
+      }
 
-      // TODO calculate number of documentation and schema files
+      Long numberOfSchemaFiles;
+      try {
+        Directory schemasDirectory = model.getSchemasDirectory(aip.getId(), representation.getId());
+        numberOfSchemaFiles = storage.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
+      } catch (NotFoundException e) {
+        numberOfSchemaFiles = 0L;
+      }
 
       SolrInputDocument representationDocument = SolrUtils.representationToSolrDocument(aip, representation,
         sizeInBytes, numberOfDataFiles, numberOfDocumentationFiles, numberOfSchemaFiles);

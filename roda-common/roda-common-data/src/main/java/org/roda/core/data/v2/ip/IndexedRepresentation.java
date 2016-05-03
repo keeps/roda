@@ -16,7 +16,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   private String uuid;
 
   private long sizeInBytes;
-  private long totalNumberOfFiles;
+  private long numberOfDataFiles;
 
   private long numberOfDocumentationFiles;
   private long numberOfSchemaFiles;
@@ -30,7 +30,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     super(id, aipId, original, type);
     this.uuid = uuid;
     this.sizeInBytes = sizeInBytes;
-    this.totalNumberOfFiles = totalNumberOfFiles;
+    this.numberOfDataFiles = totalNumberOfFiles;
     this.numberOfDocumentationFiles = numberOfDocumentationFiles;
     this.numberOfSchemaFiles = numberOfSchemaFiles;
   }
@@ -52,12 +52,12 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     this.sizeInBytes = sizeInBytes;
   }
 
-  public long getTotalNumberOfFiles() {
-    return totalNumberOfFiles;
+  public long getNumberOfDataFiles() {
+    return numberOfDataFiles;
   }
 
-  public void setTotalNumberOfFiles(long totalNumberOfFiles) {
-    this.totalNumberOfFiles = totalNumberOfFiles;
+  public void setNumberOfDataFiles(long numberOfDataFiles) {
+    this.numberOfDataFiles = numberOfDataFiles;
   }
 
   public long getNumberOfDocumentationFiles() {
@@ -83,7 +83,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
     result = prime * result + (int) (numberOfDocumentationFiles ^ (numberOfDocumentationFiles >>> 32));
     result = prime * result + (int) (numberOfSchemaFiles ^ (numberOfSchemaFiles >>> 32));
     result = prime * result + (int) (sizeInBytes ^ (sizeInBytes >>> 32));
-    result = prime * result + (int) (totalNumberOfFiles ^ (totalNumberOfFiles >>> 32));
+    result = prime * result + (int) (numberOfDataFiles ^ (numberOfDataFiles >>> 32));
     result = prime * result + ((uuid == null) ? 0 : uuid.hashCode());
     return result;
   }
@@ -103,7 +103,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
       return false;
     if (sizeInBytes != other.sizeInBytes)
       return false;
-    if (totalNumberOfFiles != other.totalNumberOfFiles)
+    if (numberOfDataFiles != other.numberOfDataFiles)
       return false;
     if (uuid == null) {
       if (other.uuid != null)
@@ -116,7 +116,7 @@ public class IndexedRepresentation extends Representation implements IsIndexed {
   @Override
   public String toString() {
     return "IndexedRepresentation [uuid=" + uuid + ", sizeInBytes=" + sizeInBytes + ", totalNumberOfFiles="
-      + totalNumberOfFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
+      + numberOfDataFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles + ", numberOfSchemaFiles="
       + numberOfSchemaFiles + "]";
   }
 

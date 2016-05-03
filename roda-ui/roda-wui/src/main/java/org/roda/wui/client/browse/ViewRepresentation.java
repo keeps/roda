@@ -248,6 +248,12 @@ public class ViewRepresentation extends Composite {
   @UiField
   FlowPanel infoFilePanel;
 
+  @UiField
+  FocusPanel downloadDocumentationButton;
+
+  @UiField
+  FocusPanel downloadSchemasButton;
+
   /**
    * Create a new panel to view a representation
    * 
@@ -296,6 +302,14 @@ public class ViewRepresentation extends Composite {
     this.fileUUID = fileUUID;
     this.file = file;
 
+    IndexedRepresentation rep = null;
+    for (IndexedRepresentation irep : itemBundle.getRepresentations()) {
+      if (irep.getUUID().equals(representationUUID)) {
+        rep = irep;
+        break;
+      }
+    }
+
     if (file != null && file.isDirectory()) {
       defaultFilter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_PARENT_UUID, file.getUUID()));
     } else if (file != null && !file.isDirectory() && file.getParentUUID() != null) {
@@ -319,6 +333,9 @@ public class ViewRepresentation extends Composite {
 
     infoFileButton.setVisible(false);
     downloadFileButton.setVisible(false);
+
+    downloadDocumentationButton.setVisible(rep.getNumberOfDocumentationFiles() > 0);
+    downloadSchemasButton.setVisible(rep.getNumberOfSchemaFiles() > 0);
 
     infoFileButton.setTitle(messages.viewRepresentationInfoFileButton());
     downloadFileButton.setTitle(messages.viewRepresentationDownloadFileButton());

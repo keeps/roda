@@ -320,8 +320,12 @@ public class BrowserHelper {
     }
   }
 
-  protected static StreamResponse getAipRepresentation(String aipId, String representationId, String acceptFormat)
+  protected static StreamResponse getAipRepresentation(IndexedRepresentation representation, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+
+    String aipId = representation.getAipId();
+    String representationId = representation.getId();
+
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
       List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();

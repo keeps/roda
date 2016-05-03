@@ -42,7 +42,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private TextColumn<IndexedRepresentation> originalColumn;
   private TextColumn<IndexedRepresentation> typeColumn;
   private TextColumn<IndexedRepresentation> sizeInBytesColumn;
-  private TextColumn<IndexedRepresentation> totalNumberOfFilesColumn;
+  private TextColumn<IndexedRepresentation> numberOfDataFilesColumn;
+  private TextColumn<IndexedRepresentation> numberOfDocumentationFilesColumn;
+  private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
     this(null, null, null, false);
@@ -91,11 +93,27 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       }
     };
 
-    totalNumberOfFilesColumn = new TextColumn<IndexedRepresentation>() {
+    numberOfDataFilesColumn = new TextColumn<IndexedRepresentation>() {
 
       @Override
       public String getValue(IndexedRepresentation rep) {
-        return rep != null ? rep.getTotalNumberOfFiles() + " files" : null;
+        return rep != null ? rep.getNumberOfDataFiles() + " files" : null;
+      }
+    };
+
+    numberOfDocumentationFilesColumn = new TextColumn<IndexedRepresentation>() {
+
+      @Override
+      public String getValue(IndexedRepresentation rep) {
+        return rep != null ? rep.getNumberOfDocumentationFiles() + " files" : null;
+      }
+    };
+
+    numberOfSchemasFilesColumn = new TextColumn<IndexedRepresentation>() {
+
+      @Override
+      public String getValue(IndexedRepresentation rep) {
+        return rep != null ? rep.getNumberOfSchemaFiles() + " files" : null;
       }
     };
 
@@ -104,14 +122,18 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     originalColumn.setSortable(true);
     typeColumn.setSortable(true);
     sizeInBytesColumn.setSortable(true);
-    totalNumberOfFilesColumn.setSortable(true);
+    numberOfDataFilesColumn.setSortable(true);
+    numberOfDocumentationFilesColumn.setSortable(true);
+    numberOfSchemasFilesColumn.setSortable(true);
 
     // TODO externalize strings into constants
     display.addColumn(idColumn, "Id");
     display.addColumn(originalColumn, "Original");
     display.addColumn(typeColumn, "Type");
     display.addColumn(sizeInBytesColumn, "Size");
-    display.addColumn(totalNumberOfFilesColumn, "Number of files");
+    display.addColumn(numberOfDataFilesColumn, "Files");
+    display.addColumn(numberOfDocumentationFilesColumn, "Documentation");
+    display.addColumn(numberOfSchemasFilesColumn, "Schemas");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -120,7 +142,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
     originalColumn.setCellStyleNames("nowrap");
     typeColumn.setCellStyleNames("nowrap");
     sizeInBytesColumn.setCellStyleNames("nowrap");
-    totalNumberOfFilesColumn.setCellStyleNames("nowrap");
+    numberOfDataFilesColumn.setCellStyleNames("nowrap");
+    numberOfDocumentationFilesColumn.setCellStyleNames("nowrap");
+    numberOfSchemasFilesColumn.setCellStyleNames("nowrap");
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(idColumn, false));
@@ -144,8 +168,12 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
       columnSortingKeyMap.put(originalColumn, Arrays.asList(RodaConstants.REPRESENTATION_ORIGINAL));
       columnSortingKeyMap.put(typeColumn, Arrays.asList(RodaConstants.REPRESENTATION_TYPE));
       columnSortingKeyMap.put(sizeInBytesColumn, Arrays.asList(RodaConstants.REPRESENTATION_SIZE_IN_BYTES));
-      columnSortingKeyMap.put(totalNumberOfFilesColumn,
+      columnSortingKeyMap.put(numberOfDataFilesColumn,
         Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DATA_FILES));
+      columnSortingKeyMap.put(numberOfDocumentationFilesColumn,
+        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_DOCUMENTATION_FILES));
+      columnSortingKeyMap.put(numberOfSchemasFilesColumn,
+        Arrays.asList(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 

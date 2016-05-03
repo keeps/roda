@@ -39,6 +39,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -272,26 +273,27 @@ public class Browser extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static StreamResponse getAipRepresentation(RodaUser user, String aipId, String representationId,
-    String acceptFormat)
+  public static StreamResponse getAipRepresentation(RodaUser user, String representationUUID, String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
     // validate input
     BrowserHelper.validateGetAipRepresentationParams(acceptFormat);
 
+    IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+
     // check user permissions
     UserUtility.checkRoles(user, BROWSE_ROLE);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
     UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
 
     // delegate
-    StreamResponse aipRepresentation = BrowserHelper.getAipRepresentation(aipId, representationId, acceptFormat);
+    StreamResponse aipRepresentation = BrowserHelper.getAipRepresentation(representation, acceptFormat);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", aipId, duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, RodaConstants.API_PATH_PARAM_REPRESENTATION_ID, representationId);
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentation", representation.getAipId(), duration,
+      RodaConstants.REPRESENTATION_ID, representation.getId());
 
     return aipRepresentation;
   }

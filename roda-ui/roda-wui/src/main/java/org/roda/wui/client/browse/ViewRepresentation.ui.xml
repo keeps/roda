@@ -31,6 +31,18 @@
 							<m:BreadcrumbPanel ui:field="breadcrumb"
 								addStyleNames="viewRepresentationBreadcrumb" />
 							<g:FlowPanel addStyleNames="filePreviewToolbarIcons">
+								<g:FocusPanel ui:field="downloadDocumentationButton"
+									addStyleNames="toolbarLink">
+									<g:HTML>
+										<i class="fa fa-book"></i>
+									</g:HTML>
+								</g:FocusPanel>
+								<g:FocusPanel ui:field="downloadSchemasButton"
+									addStyleNames="toolbarLink">
+									<g:HTML>
+										<i class="fa fa-list-alt"></i>
+									</g:HTML>
+								</g:FocusPanel>
 								<g:FocusPanel ui:field="downloadFileButton"
 									addStyleNames="toolbarLink filePreviewToolbarDownloadIcon">
 									<g:HTML>
