@@ -38,7 +38,7 @@ import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -538,13 +538,13 @@ public final class ModelUtils {
       formatId + RodaConstants.FORMAT_FILE_EXTENSION);
   }
 
-  public static StoragePath getMessageContainerPath() throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_MESSAGE);
+  public static StoragePath getNotificationContainerPath() throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_NOTIFICATION);
   }
 
-  public static StoragePath getMessageStoragePath(String messageId) throws RequestNotValidException {
-    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_MESSAGE,
-      messageId + RodaConstants.MESSAGE_FILE_EXTENSION);
+  public static StoragePath getNotificationStoragePath(String notificationId) throws RequestNotValidException {
+    return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_NOTIFICATION,
+      notificationId + RodaConstants.NOTIFICATION_FILE_EXTENSION);
   }
 
   public static StoragePath getOtherMetadataFolderStoragePath(String aipId, String representationId)
@@ -594,8 +594,8 @@ public final class ModelUtils {
       return getAgentContainerPath();
     } else if (clazz.equals(Format.class)) {
       return getFormatContainerPath();
-    } else if (clazz.equals(Message.class)) {
-      return getMessageContainerPath();
+    } else if (clazz.equals(Notification.class)) {
+      return getNotificationContainerPath();
     } else if (clazz.equals(Risk.class)) {
       return getRiskContainerPath();
     } else {

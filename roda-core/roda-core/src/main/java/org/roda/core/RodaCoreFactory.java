@@ -98,7 +98,7 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.Group;
 import org.roda.core.data.v2.user.RODAMember;
@@ -596,7 +596,8 @@ public class RodaCoreFactory {
     System.setProperty("solr.data.dir.risk", indexDataPath.resolve(RodaConstants.CORE_RISK_FOLDER).toString());
     System.setProperty("solr.data.dir.agent", indexDataPath.resolve(RodaConstants.CORE_AGENT_FOLDER).toString());
     System.setProperty("solr.data.dir.format", indexDataPath.resolve(RodaConstants.CORE_FORMAT_FOLDER).toString());
-    System.setProperty("solr.data.dir.message", indexDataPath.resolve(RodaConstants.CORE_MESSAGE_FOLDER).toString());
+    System.setProperty("solr.data.dir.notification",
+      indexDataPath.resolve(RodaConstants.CORE_NOTIFICATION_FOLDER).toString());
     System.setProperty("solr.data.dir.riskincidence",
       indexDataPath.resolve(RodaConstants.CORE_RISKINCIDENCE_FOLDER).toString());
   }
@@ -1153,8 +1154,8 @@ public class RodaCoreFactory {
         runReindexRodaEntityPlugin(Agent.class);
       } else if ("format".equalsIgnoreCase(entity)) {
         runReindexRodaEntityPlugin(Format.class);
-      } else if ("message".equalsIgnoreCase(entity)) {
-        runReindexRodaEntityPlugin(Message.class);
+      } else if ("notification".equalsIgnoreCase(entity)) {
+        runReindexRodaEntityPlugin(Notification.class);
       } else if ("transferred_resources".equalsIgnoreCase(entity)) {
         runReindexTransferredResourcesPlugin();
       } else if ("actionlogs".equalsIgnoreCase(entity)) {
@@ -1275,7 +1276,7 @@ public class RodaCoreFactory {
     System.err.println("cannot be run with RODA running (i.e. deployed in Tomcat for example)");
     System.err.println("Syntax:");
     System.err.println(
-      "java -jar x.jar index reindex aip|job|risk|agent|format|message|transferred_resources|actionlogs|users_and_groups");
+      "java -jar x.jar index reindex aip|job|risk|agent|format|notification|transferred_resources|actionlogs|users_and_groups");
     System.err.println("java -jar x.jar index list users|groups|sips|file");
     System.err.println("java -jar x.jar orphans [newParentID]");
     System.err.println("java -jar x.jar fixity");

@@ -19,7 +19,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
 
@@ -27,12 +27,12 @@ import org.roda.wui.common.RodaCoreService;
  * FIXME 1) verify all checkObject*Permissions (because now also a permission
  * for insert is available)
  */
-public class Messages extends RodaCoreService {
+public class Notifications extends RodaCoreService {
 
-  private static final String MESSAGES_COMPONENT = "Messages";
+  private static final String NOTIFICATIONS_COMPONENT = "Notifications";
   private static final String INGEST_SUBMIT_ROLE = "ingest.submit";
 
-  private Messages() {
+  private Notifications() {
     super();
   }
 
@@ -41,23 +41,24 @@ public class Messages extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Message createMessage(RodaUser user, Message message)
+  public static Notification createNotification(RodaUser user, Notification notification)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createMessage(message, "test-email-template", new HashMap<String, Object>());
+    RodaCoreFactory.getModelService().createNotification(notification, "test-email-template",
+      new HashMap<String, Object>());
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, MESSAGES_COMPONENT, "createMessage", null, duration, "message", message);
+    registerAction(user, NOTIFICATIONS_COMPONENT, "createNotification", null, duration, "notification", notification);
 
-    return message;
+    return notification;
   }
 
-  public static void deleteMessage(RodaUser user, String messageId)
+  public static void deleteNotification(RodaUser user, String notificationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -65,22 +66,23 @@ public class Messages extends RodaCoreService {
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().deleteMessage(messageId);
+    RodaCoreFactory.getModelService().deleteNotification(notificationId);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, MESSAGES_COMPONENT, "deleteMessage", null, duration, "messageId", messageId);
+    registerAction(user, NOTIFICATIONS_COMPONENT, "deleteNotification", null, duration, "notificationId",
+      notificationId);
   }
 
-  public static List<Message> retrieveMessages(IndexResult<Message> listMessagesIndexResult) {
-    List<Message> messages = new ArrayList<Message>();
-    for (Message message : listMessagesIndexResult.getResults()) {
-      messages.add(message);
+  public static List<Notification> retrieveNotifications(IndexResult<Notification> listNotificationsIndexResult) {
+    List<Notification> notifications = new ArrayList<Notification>();
+    for (Notification notification : listNotificationsIndexResult.getResults()) {
+      notifications.add(notification);
     }
-    return messages;
+    return notifications;
   }
 
-  public static void acknowledgeMessage(RodaUser user, String messageId, String token, String email)
+  public static void acknowledgeNotification(RodaUser user, String notificationId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -88,12 +90,12 @@ public class Messages extends RodaCoreService {
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().acknowledgeMessage(messageId, token, email);
+    RodaCoreFactory.getModelService().acknowledgeNotification(notificationId, token, email);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, MESSAGES_COMPONENT, "acknowledgeMessage", null, duration, "messageId", messageId, "token",
-      token);
+    registerAction(user, NOTIFICATIONS_COMPONENT, "acknowledgeNotification", null, duration, "notificationId",
+      notificationId, "token", token);
   }
 
   /*

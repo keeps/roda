@@ -36,11 +36,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
-<<<<<<< HEAD
-=======
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.Representation;
->>>>>>> risk incidence logic and UI, generic abstract job creation for ingest and risks
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.user.RodaUser;
@@ -139,96 +134,11 @@ public class AipsResource {
 
     // delegate action to controller
     SelectedItemsFilter sif = new SelectedItemsFilter(
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId)), IndexedAIP.class.getName());
+      new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId)), AIP.class.getName());
     Browser.removeAIP(user, sif);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();
-  }
-
-  @GET
-  @Path("/{aip_id}/data/")
-  @ApiOperation(value = "List representations", notes = "List AIP representations", response = Representation.class, responseContainer = "List")
-  @ApiResponses(value = {
-    @ApiResponse(code = 200, message = "OK", response = Representation.class, responseContainer = "List"),
-    @ApiResponse(code = 404, message = "AIP not found", response = Representation.class, responseContainer = "List")})
-
-  public Response listRepresentations(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
-    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
-    throws RODAException {
-    // TODO
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-  }
-
-  @GET
-  @Path("/{aip_id}/data/{representation_id}")
-  @Produces({"application/json", "application/zip"})
-  @ApiOperation(value = "Get representation", notes = "Get representation", response = Representation.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
-
-  public Response getRepresentation(
-    @ApiParam(value = "The ID of the existing AIP", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
-    // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-    // delegate action to controller
-    StreamResponse aipRepresentation = Browser.getAipRepresentation(user, aipId, representationId, acceptFormat);
-
-    return ApiUtils.okResponse(aipRepresentation);
-  }
-
-  @PUT
-  @Path("/{aip_id}/data/{representation_id}")
-  @ApiOperation(value = "Update representation", notes = "Update existing representation", response = Representation.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 404, message = "Not found", response = Representation.class)})
-
-  public Response updateRepresentation(
-    @ApiParam(value = "The ID of the AIP where to update the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The ID of the existing representation to update", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-    throws RODAException {
-    // TODO
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-  }
-
-  @POST
-  @Path("/{aip_id}/data/{representation_id}")
-  @ApiOperation(value = "Create representation", notes = "Create a new representation on the AIP", response = Representation.class)
-  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK", response = Representation.class),
-    @ApiResponse(code = 409, message = "Already exists", response = Representation.class)})
-
-  public Response aipsAipIdDataRepresentationIdPost(
-    @ApiParam(value = "The ID of the AIP where to create the representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The requested ID for the new representation", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId,
-    @ApiParam(value = "The path to the directory in the shared file system where the representation should be provided.", required = true) @FormParam("filepath") String filepath)
-    throws RODAException {
-    // TODO
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
-  }
-
-  @DELETE
-  @Path("/{aip_id}/data/{representation_id}")
-  @ApiOperation(value = "Delete representation", notes = "Delete representation", response = Void.class)
-  @ApiResponses(value = {@ApiResponse(code = 204, message = "OK", response = Void.class),
-    @ApiResponse(code = 404, message = "Not found", response = Void.class)})
-
-  public Response aipsAipIdDataRepresentationIdDelete(
-    @ApiParam(value = "The ID of the AIP where the representation is.", required = true) @PathParam(RodaConstants.API_PATH_PARAM_AIP_ID) String aipId,
-    @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId)
-    throws RODAException {
-    // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
-    // delegate action to controller
-    Browser.removeRepresentation(user, aipId, representationId);
-
-    // FIXME give a better answer
-    return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "magic!")).build();
   }
 
   @GET

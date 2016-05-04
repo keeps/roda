@@ -21,10 +21,10 @@ import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.MessageList;
+import org.roda.wui.client.common.lists.NotificationList;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -52,7 +52,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria
  *
  */
-public class NotificationMessages extends Composite {
+public class NotificationRegister extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -63,7 +63,7 @@ public class NotificationMessages extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {NotificationMessages.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {NotificationRegister.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
@@ -75,21 +75,21 @@ public class NotificationMessages extends Composite {
     }
   };
 
-  private static NotificationMessages instance = null;
+  private static NotificationRegister instance = null;
 
   /**
    * Get the singleton instance
    *
    * @return the instance
    */
-  public static NotificationMessages getInstance() {
+  public static NotificationRegister getInstance() {
     if (instance == null) {
-      instance = new NotificationMessages();
+      instance = new NotificationRegister();
     }
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, NotificationMessages> {
+  interface MyUiBinder extends UiBinder<Widget, NotificationRegister> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -112,7 +112,7 @@ public class NotificationMessages extends Composite {
   DateBox inputDateFinal;
 
   @UiField(provided = true)
-  MessageList messageList;
+  NotificationList notificationList;
 
   @UiField(provided = true)
   FlowPanel facetRecipientUsers;
@@ -121,38 +121,38 @@ public class NotificationMessages extends Composite {
   FlowPanel facetAcknowledged;
 
   private static final Filter DEFAULT_FILTER = new Filter(
-    new BasicSearchFilterParameter(RodaConstants.MESSAGE_SEARCH, "*"));
+    new BasicSearchFilterParameter(RodaConstants.NOTIFICATION_SEARCH, "*"));
 
   /**
    * Create a new notification
    *
    * @param user
    */
-  public NotificationMessages() {
+  public NotificationRegister() {
     Filter filter = null;
-    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.MESSAGE_RECIPIENT_USERS),
-      new SimpleFacetParameter(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));
-    messageList = new MessageList(filter, facets, "Notifications", false);
+    Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.NOTIFICATION_RECIPIENT_USERS),
+      new SimpleFacetParameter(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
+    notificationList = new NotificationList(filter, facets, "Notifications", false);
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.MESSAGE_SEARCH, messages.messageSearchPlaceHolder(),
-      false, false);
-    searchPanel.setList(messageList);
+    searchPanel = new SearchPanel(DEFAULT_FILTER, RodaConstants.NOTIFICATION_SEARCH,
+      messages.messageSearchPlaceHolder(), false, false);
+    searchPanel.setList(notificationList);
 
     facetRecipientUsers = new FlowPanel();
     facetAcknowledged = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
-    facetPanels.put(RodaConstants.MESSAGE_IS_ACKNOWLEDGED, facetAcknowledged);
-    facetPanels.put(RodaConstants.MESSAGE_RECIPIENT_USERS, facetRecipientUsers);
-    FacetUtils.bindFacets(messageList, facetPanels);
+    facetPanels.put(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, facetAcknowledged);
+    facetPanels.put(RodaConstants.NOTIFICATION_RECIPIENT_USERS, facetRecipientUsers);
+    FacetUtils.bindFacets(notificationList, facetPanels);
 
-    messageList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+    notificationList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        Message selected = messageList.getSelectionModel().getSelectedObject();
+        Notification selected = notificationList.getSelectionModel().getSelectedObject();
         if (selected != null) {
-          Tools.newHistory(ShowNotificationMessage.RESOLVER, selected.getId());
+          Tools.newHistory(ShowNotification.RESOLVER, selected.getId());
         }
       }
     });
@@ -190,19 +190,19 @@ public class NotificationMessages extends Composite {
     Date dateInitial = inputDateInitial.getDatePicker().getValue();
     Date dateFinal = inputDateFinal.getDatePicker().getValue();
 
-    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.MESSAGE_SENT_ON, dateInitial,
-      dateFinal, RodaConstants.DateGranularity.DAY);
+    DateRangeFilterParameter filterParameter = new DateRangeFilterParameter(RodaConstants.NOTIFICATION_SENT_ON,
+      dateInitial, dateFinal, RodaConstants.DateGranularity.DAY);
 
-    messageList.setFilter(new Filter(filterParameter));
+    notificationList.setFilter(new Filter(filterParameter));
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
-      messageList.refresh();
+      notificationList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() > 1
-      && ShowNotificationMessage.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
-      ShowNotificationMessage.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      && ShowNotification.RESOLVER.getHistoryToken().equals(historyTokens.get(0))) {
+      ShowNotification.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {
       Tools.newHistory(RESOLVER);
       callback.onSuccess(null);

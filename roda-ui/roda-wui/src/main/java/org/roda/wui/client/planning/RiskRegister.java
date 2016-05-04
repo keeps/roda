@@ -20,6 +20,7 @@ import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
@@ -256,7 +257,24 @@ public class RiskRegister extends Composite {
     } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRiskJob.RESOLVER.getHistoryToken())) {
       CreateRiskJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
-      riskList.refresh();
+      final String aipId = historyTokens.get(0);
+      final String riskIdConstant = RodaConstants.RISK_ID;
+
+      BrowserService.Util.getInstance().getRiskOnAIP(aipId, new AsyncCallback<List<String>>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          AsyncCallbackUtils.defaultFailureTreatment(caught);
+          riskList.refresh();
+        }
+
+        @Override
+        public void onSuccess(List<String> result) {
+          riskList.setFilter(new Filter(new OneOfManyFilterParameter(riskIdConstant, result)));
+          riskList.refresh();
+        }
+      });
+
       callback.onSuccess(this);
     } else {
       Tools.newHistory(RESOLVER);

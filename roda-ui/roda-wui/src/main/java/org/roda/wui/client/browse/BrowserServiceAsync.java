@@ -158,4 +158,6 @@ public interface BrowserServiceAsync {
     AsyncCallback<Job> asyncCallback);
 
   void getObjectRiskSize(String aipId, AsyncCallback<Integer> asyncCallback);
+
+  void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);
 }

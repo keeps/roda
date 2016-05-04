@@ -29,7 +29,7 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -40,20 +40,20 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
-@Path(MessagesResource.ENDPOINT)
-@Api(value = MessagesResource.SWAGGER_ENDPOINT)
-public class MessagesResource {
-  public static final String ENDPOINT = "/v1/messages";
-  public static final String SWAGGER_ENDPOINT = "v1 messages";
+@Path(NotificationsResource.ENDPOINT)
+@Api(value = NotificationsResource.SWAGGER_ENDPOINT)
+public class NotificationsResource {
+  public static final String ENDPOINT = "/v1/notifications";
+  public static final String SWAGGER_ENDPOINT = "v1 notifications";
 
-  private static Logger LOGGER = LoggerFactory.getLogger(MessagesResource.class);
+  private static Logger LOGGER = LoggerFactory.getLogger(NotificationsResource.class);
 
   @Context
   private HttpServletRequest request;
 
   @GET
-  @ApiOperation(value = "List Messages", notes = "Gets a list of Messages.", response = Message.class, responseContainer = "List")
-  public Response listMessages(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+  @ApiOperation(value = "List Notifications", notes = "Gets a list of Notifications.", response = Notification.class, responseContainer = "List")
+  public Response listNotifications(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
     throws RODAException {
@@ -64,70 +64,72 @@ public class MessagesResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Message> listMessagesIndexResult = org.roda.wui.api.controllers.Browser.find(user, Message.class, null,
-      null, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
+    IndexResult<Notification> listNotificationsIndexResult = org.roda.wui.api.controllers.Browser.find(user,
+      Notification.class, null, null, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())),
+      null);
 
     // transform controller method output
-    List<Message> messages = org.roda.wui.api.controllers.Messages.retrieveMessages(listMessagesIndexResult);
+    List<Notification> notifications = org.roda.wui.api.controllers.Notifications
+      .retrieveNotifications(listNotificationsIndexResult);
 
-    return Response.ok(messages, mediaType).build();
+    return Response.ok(notifications, mediaType).build();
   }
 
   @POST
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Creates a new Message", notes = "Creates a new Message.", response = Message.class)
-  public Response createMessage(Message message,
+  @ApiOperation(value = "Creates a new Notification", notes = "Creates a new Notification.", response = Notification.class)
+  public Response createNotification(Notification notification,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Message newMessage = org.roda.wui.api.controllers.Messages.createMessage(user, message);
+    Notification newNotification = org.roda.wui.api.controllers.Notifications.createNotification(user, notification);
 
-    return Response.created(ApiUtils.getUriFromRequest(request)).entity(newMessage).type(mediaType).build();
+    return Response.created(ApiUtils.getUriFromRequest(request)).entity(newNotification).type(mediaType).build();
   }
 
   @GET
-  @Path("/{messageId}")
+  @Path("/{notificationId}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Get Message", notes = "Gets a particular Message.", response = Message.class)
-  public Response getMessage(@PathParam("messageId") String messageId,
+  @ApiOperation(value = "Get Notification", notes = "Gets a particular Notification.", response = Notification.class)
+  public Response getNotification(@PathParam("notificationId") String notificationId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Message message = org.roda.wui.api.controllers.Browser.retrieve(user, Message.class, messageId);
+    Notification notification = org.roda.wui.api.controllers.Browser.retrieve(user, Notification.class, notificationId);
 
-    return Response.ok(message, mediaType).build();
+    return Response.ok(notification, mediaType).build();
   }
 
   @DELETE
-  @Path("/{messageId}")
+  @Path("/{notificationId}")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Delete Message", notes = "Delete a particular Message.", response = ApiResponseMessage.class)
-  public Response deleteMessage(@PathParam("messageId") String messageId,
+  @ApiOperation(value = "Delete Notification", notes = "Delete a particular Notification.", response = ApiResponseMessage.class)
+  public Response deleteNotification(@PathParam("notificationId") String notificationId,
     @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    org.roda.wui.api.controllers.Messages.deleteMessage(user, messageId);
+    org.roda.wui.api.controllers.Notifications.deleteNotification(user, notificationId);
 
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Message deleted"), mediaType).build();
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Notification deleted"), mediaType).build();
   }
 
   @GET
-  @Path("/{messageId}/acknowledge")
+  @Path("/{notificationId}/acknowledge")
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-  @ApiOperation(value = "Acknowledge Message", notes = "Acknowledge a particular Message.", response = Message.class)
-  public Response acknowledgeMessage(@PathParam("messageId") String messageId, @QueryParam("token") String token,
-    @QueryParam("email") String email, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+  @ApiOperation(value = "Acknowledge Notification", notes = "Acknowledge a particular Notification.", response = Notification.class)
+  public Response acknowledgeNotification(@PathParam("notificationId") String notificationId,
+    @QueryParam("token") String token, @QueryParam("email") String email,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     if (token == null) {
@@ -138,8 +140,8 @@ public class MessagesResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    org.roda.wui.api.controllers.Messages.acknowledgeMessage(user, messageId, token, email);
+    org.roda.wui.api.controllers.Notifications.acknowledgeNotification(user, notificationId, token, email);
 
-    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Message acknowledged"), mediaType).build();
+    return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Notification acknowledged"), mediaType).build();
   }
 }

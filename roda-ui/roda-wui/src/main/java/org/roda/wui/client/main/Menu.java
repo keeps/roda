@@ -23,7 +23,7 @@ import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.MemberManagement;
-import org.roda.wui.client.management.NotificationMessages;
+import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.Profile;
 import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.UserLog;
@@ -140,7 +140,7 @@ public class Menu extends Composite {
       createCommand(UserLog.RESOLVER.getHistoryPath()));
     // FIXME add constant for notification title
     administration_notifications = administrationMenu.addItem("Notifications",
-      createCommand(NotificationMessages.RESOLVER.getHistoryPath()));
+      createCommand(NotificationRegister.RESOLVER.getHistoryPath()));
     administration_preferences = administrationMenu.addItem(constants.title_administration_preferences(),
       createCommand(Management.RESOLVER.getHistoryPath()));
 
@@ -237,7 +237,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(Management.RESOLVER, administration_actions);
     updateResolverSubItemVisibility(MemberManagement.RESOLVER, administration_user);
     updateResolverSubItemVisibility(UserLog.RESOLVER, administration_log);
-    updateResolverSubItemVisibility(NotificationMessages.RESOLVER, administration_notifications);
+    updateResolverSubItemVisibility(NotificationRegister.RESOLVER, administration_notifications);
     updateResolverSubItemVisibility(Management.RESOLVER, administration_preferences);
     updateResolverTopItemVisibility(Management.RESOLVER,
       new MenuItem(constants.title_administration(), administrationMenu), 4);

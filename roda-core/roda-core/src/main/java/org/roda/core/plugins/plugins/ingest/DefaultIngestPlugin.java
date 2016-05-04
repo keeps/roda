@@ -33,7 +33,7 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -326,12 +326,12 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     if (!"".equals(emails)) {
       List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
       try {
-        Message message = new Message();
-        message.setSubject("New ingest process was completed");
-        message.setFromUser("Ingest Process");
-        message.setRecipientUsers(emailList);
+        Notification notification = new Notification();
+        notification.setSubject("New ingest process was completed");
+        notification.setFromUser("Ingest Process");
+        notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createMessage(message, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
+        model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
       } catch (GenericException e) {
         LOGGER.error("Error while creating new message", e);
       }

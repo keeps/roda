@@ -65,7 +65,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -1919,24 +1919,25 @@ public class ModelService extends ModelObservable {
     }
   }
 
-  /***************** Message related *****************/
+  /***************** Notification related *****************/
   /************************************************/
 
-  public Message createMessage(Message message, String templateName, Map<String, Object> scopes)
+  public Notification createNotification(Notification notification, String templateName, Map<String, Object> scopes)
     throws GenericException {
     try {
-      message.setId(UUID.randomUUID().toString());
-      message.setAcknowledgeToken(UUID.randomUUID().toString());
+      notification.setId(UUID.randomUUID().toString());
+      notification.setAcknowledgeToken(UUID.randomUUID().toString());
 
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
       String template = IOUtils.toString(templateStream, "UTF-8");
-      message.setBody(template);
+      notification.setBody(template);
       IOUtils.closeQuietly(templateStream);
 
-      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(message.getFromUser(), message.getSubject());
+      ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(notification.getFromUser(),
+        notification.getSubject());
 
-      for (String recipient : message.getRecipientUsers()) {
-        String modifiedBody = getUpdatedMessageBody(message, recipient, template, templateName, scopes);
+      for (String recipient : notification.getRecipientUsers()) {
+        String modifiedBody = getUpdatedMessageBody(notification, recipient, template, templateName, scopes);
         String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
 
         if (host != null && !host.equals("")) {
@@ -1946,29 +1947,29 @@ public class ModelService extends ModelObservable {
         }
       }
 
-      String messageAsJson = JsonUtils.getJsonFromObject(message);
-      StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
-      storage.createBinary(messagePath, new StringContentPayload(messageAsJson), false);
+      String notificationAsJson = JsonUtils.getJsonFromObject(notification);
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
+      storage.createBinary(notificationPath, new StringContentPayload(notificationAsJson), false);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | AlreadyExistsException | MessagingException | IOException e) {
-      LOGGER.error("Error creating message in storage", e);
+      LOGGER.error("Error creating notification in storage", e);
     }
 
-    notifyMessageCreatedOrUpdated(message);
-    return message;
+    notifyNotificationCreatedOrUpdated(notification);
+    return notification;
   }
 
-  private String getUpdatedMessageBody(Message message, String recipient, String template, String templateName,
-    Map<String, Object> scopesToAdd) {
+  private String getUpdatedMessageBody(Notification notification, String recipient, String template,
+    String templateName, Map<String, Object> scopesToAdd) {
     // update body message with the recipient user and acknowledge URL
     String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
-    String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "message", "acknowledge");
-    ackUrl = ackUrl.replaceAll("\\{messageId\\}", message.getId());
-    ackUrl = ackUrl.replaceAll("\\{token\\}", message.getAcknowledgeToken() + userUUID);
+    String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
+    ackUrl = ackUrl.replaceAll("\\{notificationId\\}", notification.getId());
+    ackUrl = ackUrl.replaceAll("\\{token\\}", notification.getAcknowledgeToken() + userUUID);
     ackUrl = ackUrl.replaceAll("\\{email\\}", recipient);
 
     Map<String, Object> scopes = new HashMap<String, Object>();
-    scopes.put("from", message.getFromUser());
+    scopes.put("from", notification.getFromUser());
     scopes.put("recipient", recipient);
     scopes.put("acknowledge", ackUrl);
     scopes.putAll(scopesToAdd);
@@ -1983,59 +1984,59 @@ public class ModelService extends ModelObservable {
     return modifiedTemplate;
   }
 
-  public void updateMessage(Message message) throws GenericException {
+  public void updateNotification(Notification notification) throws GenericException {
     try {
-      String messageAsJson = JsonUtils.getJsonFromObject(message);
-      StoragePath messagePath = ModelUtils.getMessageStoragePath(message.getId());
-      storage.updateBinaryContent(messagePath, new StringContentPayload(messageAsJson), false, true);
+      String notificationAsJson = JsonUtils.getJsonFromObject(notification);
+      StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notification.getId());
+      storage.updateBinaryContent(notificationPath, new StringContentPayload(notificationAsJson), false, true);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
-      LOGGER.error("Error updating message in storage", e);
+      LOGGER.error("Error updating notification in storage", e);
     }
 
-    notifyMessageCreatedOrUpdated(message);
+    notifyNotificationCreatedOrUpdated(notification);
   }
 
-  public void deleteMessage(String messageId)
+  public void deleteNotification(String notificationId)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
-    StoragePath messagePath = ModelUtils.getMessageStoragePath(messageId);
-    storage.deleteResource(messagePath);
-    notifyMessageDeleted(messageId);
+    StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
+    storage.deleteResource(notificationPath);
+    notifyNotificationDeleted(notificationId);
   }
 
-  public Message retrieveMessage(String messageId)
+  public Notification retrieveNotification(String notificationId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    StoragePath messagePath = ModelUtils.getMessageStoragePath(messageId);
-    Binary binary = storage.getBinary(messagePath);
-    Message ret;
+    StoragePath notificationPath = ModelUtils.getNotificationStoragePath(notificationId);
+    Binary binary = storage.getBinary(notificationPath);
+    Notification ret;
     InputStream inputStream = null;
     try {
       inputStream = binary.getContent().createInputStream();
-      ret = JsonUtils.getObjectFromJson(inputStream, Message.class);
+      ret = JsonUtils.getObjectFromJson(inputStream, Notification.class);
     } catch (IOException e) {
-      throw new GenericException("Error reading message", e);
+      throw new GenericException("Error reading notification", e);
     } finally {
       IOUtils.closeQuietly(inputStream);
     }
     return ret;
   }
 
-  public void acknowledgeMessage(String messageId, String token, String email)
+  public void acknowledgeNotification(String notificationId, String token, String email)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
 
-    Message message = this.retrieveMessage(messageId);
+    Notification notification = this.retrieveNotification(notificationId);
     String ackToken = token.substring(0, 36);
     String emailToken = token.substring(36);
 
-    if (message.getAcknowledgeToken().equals(ackToken)) {
-      for (String recipient : message.getRecipientUsers()) {
+    if (notification.getAcknowledgeToken().equals(ackToken)) {
+      for (String recipient : notification.getRecipientUsers()) {
         if (UUID.nameUUIDFromBytes(recipient.getBytes()).toString().equals(emailToken)) {
           DateFormat df = DateFormat.getDateTimeInstance();
           String ackDate = df.format(new Date());
-          message.addAcknowledgedUser(recipient, ackDate);
-          message.setAcknowledged(true);
-          this.updateMessage(message);
+          notification.addAcknowledgedUser(recipient, ackDate);
+          notification.setAcknowledged(true);
+          this.updateNotification(notification);
         }
       }
     }

@@ -17,30 +17,30 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1">Message</g:Label>
+							<g:Label styleName="h1">Notification</g:Label>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">Identifier</g:Label>
-								<g:Label styleName="value" ui:field="messageId" />
+								<g:Label styleName="value" ui:field="notificationId" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">Subject</g:Label>
-								<g:Label styleName="value" ui:field="messageSubject" />
+								<g:Label styleName="value" ui:field="notificationSubject" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">Body</g:Label>
-								<g:HTML styleName="value" ui:field="messageBody" />
+								<g:HTML styleName="value" ui:field="notificationBody" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">Sent On</g:Label>
-								<g:Label styleName="value" ui:field="messageSentOn" />
+								<g:Label styleName="value" ui:field="notificationSentOn" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">From User</g:Label>
-								<g:Label styleName="value" ui:field="messageFromUser" />
+								<g:Label styleName="value" ui:field="notificationFromUser" />
 							</g:FlowPanel>
 							<g:FlowPanel styleName="field">
 								<g:Label styleName="label">Is Acknowledged</g:Label>
-								<g:Label styleName="value" ui:field="messageIsAcknowledged" />
+								<g:Label styleName="value" ui:field="notificationIsAcknowledged" />
 							</g:FlowPanel>
 							
 							<g:FlowPanel styleName="field">				

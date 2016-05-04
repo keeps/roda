@@ -20,7 +20,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -106,8 +106,8 @@ public interface ModelObserver {
 
   public void formatDeleted(String formatId);
 
-  public void messageCreatedOrUpdated(Message message);
+  public void notificationCreatedOrUpdated(Notification notification);
 
-  public void messageDeleted(String messageId);
+  public void notificationDeleted(String notificationId);
 
 }

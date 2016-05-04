@@ -64,7 +64,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.user.Group;
@@ -760,38 +760,38 @@ public class IndexServiceTest {
   @Test
   public void testMessageIndex() throws ConfigurationException {
     try {
-      Message message = new Message();
-      message.setSubject("Message subject");
-      message.setBody("Message body");
-      message.setSentOn(new Date());
-      message.setFromUser("Test Message Index");
-      message.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
+      Notification notification = new Notification();
+      notification.setSubject("Message subject");
+      notification.setBody("Message body");
+      notification.setSentOn(new Date());
+      notification.setFromUser("Test Message Index");
+      notification.setRecipientUsers(Arrays.asList("recipientuser@example.com"));
 
-      model.createMessage(message, "test-email-template", new HashMap<String, Object>());
-      index.commit(Message.class);
+      model.createNotification(notification, "test-email-template", new HashMap<String, Object>());
+      index.commit(Notification.class);
 
-      Message message2 = model.retrieveMessage(message.getId());
+      Notification message2 = model.retrieveNotification(notification.getId());
       assertNotNull(message2);
-      assertEquals(message.getId(), message2.getId());
-      assertEquals(message.getSubject(), message2.getSubject());
+      assertEquals(notification.getId(), message2.getId());
+      assertEquals(notification.getSubject(), message2.getSubject());
 
-      IndexResult<Message> find = index.find(Message.class, null, null, new Sublist(0, 10));
+      IndexResult<Notification> find = index.find(Notification.class, null, null, new Sublist(0, 10));
       assertEquals(1, find.getTotalCount());
 
-      Message message3 = index.retrieve(Message.class, message.getId());
+      Notification message3 = index.retrieve(Notification.class, notification.getId());
       assertNotNull(message3);
-      assertEquals(message.getId(), message3.getId());
+      assertEquals(notification.getId(), message3.getId());
       assertEquals(message3.getSubject(), message3.getSubject());
 
       message3.setSubject("Message New Subject");
-      model.updateMessage(message3);
+      model.updateNotification(message3);
 
-      Message message4 = index.retrieve(Message.class, message.getId());
+      Notification message4 = index.retrieve(Notification.class, notification.getId());
       assertNotNull(message4);
-      assertEquals(message.getId(), message4.getId());
+      assertEquals(notification.getId(), message4.getId());
       assertEquals(message4.getSubject(), "Message New Subject");
 
-      model.deleteMessage(message.getId());
+      model.deleteNotification(notification.getId());
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       assertTrue(false);

@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.data.v2.messages;
+package org.roda.core.data.v2.notifications;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "message")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Message implements IsIndexed, Serializable {
+public class Notification implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
 
@@ -36,22 +36,22 @@ public class Message implements IsIndexed, Serializable {
   private boolean isAcknowledged = false;
   private Map<String, String> acknowledgedUsers = null;
 
-  public Message() {
+  public Notification() {
     super();
     this.sentOn = new Date();
     this.acknowledgedUsers = new HashMap<String, String>();
   }
 
-  public Message(Message message) {
-    this.id = message.getId();
-    this.subject = message.getSubject();
-    this.body = message.getBody();
-    this.sentOn = message.getSentOn();
-    this.fromUser = message.getFromUser();
-    this.recipientUsers = message.getRecipientUsers();
-    this.acknowledgeToken = message.getAcknowledgeToken();
-    this.isAcknowledged = message.isAcknowledged();
-    this.acknowledgedUsers = message.getAcknowledgedUsers();
+  public Notification(Notification notification) {
+    this.id = notification.getId();
+    this.subject = notification.getSubject();
+    this.body = notification.getBody();
+    this.sentOn = notification.getSentOn();
+    this.fromUser = notification.getFromUser();
+    this.recipientUsers = notification.getRecipientUsers();
+    this.acknowledgeToken = notification.getAcknowledgeToken();
+    this.isAcknowledged = notification.isAcknowledged();
+    this.acknowledgedUsers = notification.getAcknowledgedUsers();
   }
 
   public String getId() {
@@ -132,7 +132,7 @@ public class Message implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
+    return "Notification [id=" + id + ", subject=" + subject + ", body=" + body + ", sentOn=" + sentOn + ", fromUser="
       + fromUser + ", recipientUsers=" + recipientUsers + ", acknowledgeToken=" + acknowledgeToken + ", isAcknowledged="
       + isAcknowledged + ", acknowledgedUsers=" + acknowledgedUsers + "]";
   }

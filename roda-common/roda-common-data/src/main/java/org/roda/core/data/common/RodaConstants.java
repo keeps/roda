@@ -86,7 +86,7 @@ public final class RodaConstants {
   public static final String CORE_RISK_FOLDER = "risk";
   public static final String CORE_AGENT_FOLDER = "agent";
   public static final String CORE_FORMAT_FOLDER = "format";
-  public static final String CORE_MESSAGE_FOLDER = "message";
+  public static final String CORE_NOTIFICATION_FOLDER = "notification";
   public static final String CORE_RISKINCIDENCE_FOLDER = "riskincidence";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
@@ -186,7 +186,7 @@ public final class RodaConstants {
   public static final String INDEX_RISK = "Risk";
   public static final String INDEX_AGENT = "Agent";
   public static final String INDEX_FORMAT = "Format";
-  public static final String INDEX_MESSAGE = "Message";
+  public static final String INDEX_NOTIFICATION = "Notification";
   public static final String INDEX_RISK_INCIDENCE = "RiskIncidence";
   // FIXME not in use. are the following to remove?
   // public static final String INDEX_DESCRIPTIVE_METADATA =
@@ -210,7 +210,7 @@ public final class RodaConstants {
   public static final String STORAGE_CONTAINER_RISK_INCIDENCE = "RiskIncidence";
   public static final String STORAGE_CONTAINER_AGENT = "Agent";
   public static final String STORAGE_CONTAINER_FORMAT = "Format";
-  public static final String STORAGE_CONTAINER_MESSAGE = "Message";
+  public static final String STORAGE_CONTAINER_NOTIFICATION = "Notification";
 
   /*
    * STORAGE DIRECTORIES
@@ -505,18 +505,18 @@ public final class RodaConstants {
   public static final String FORMAT_SEARCH = "search";
 
   /* Messages */
-  public static final String MESSAGE_ID = "id";
-  public static final String MESSAGE_SUBJECT = "subject";
-  public static final String MESSAGE_BODY = "body";
-  public static final String MESSAGE_SENT_ON = "sentOn";
-  public static final String MESSAGE_FROM_USER = "fromUser";
-  public static final String MESSAGE_RECIPIENT_USERS = "recipientUsers";
-  public static final String MESSAGE_ACKNOWLEDGE_TOKEN = "acknowledgeToken";
-  public static final String MESSAGE_IS_ACKNOWLEDGED = "isAcknowledged";
-  public static final String MESSAGE_ACKNOWLEDGED_USERS = "acknowledgedUsers";
+  public static final String NOTIFICATION_ID = "id";
+  public static final String NOTIFICATION_SUBJECT = "subject";
+  public static final String NOTIFICATION_BODY = "body";
+  public static final String NOTIFICATION_SENT_ON = "sentOn";
+  public static final String NOTIFICATION_FROM_USER = "fromUser";
+  public static final String NOTIFICATION_RECIPIENT_USERS = "recipientUsers";
+  public static final String NOTIFICATION_ACKNOWLEDGE_TOKEN = "acknowledgeToken";
+  public static final String NOTIFICATION_IS_ACKNOWLEDGED = "isAcknowledged";
+  public static final String NOTIFICATION_ACKNOWLEDGED_USERS = "acknowledgedUsers";
 
-  public static final String MESSAGE_FILE_EXTENSION = ".json";
-  public static final String MESSAGE_SEARCH = "search";
+  public static final String NOTIFICATION_FILE_EXTENSION = ".json";
+  public static final String NOTIFICATION_SEARCH = "search";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";

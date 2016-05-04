@@ -622,4 +622,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     return Browser.getObjectRiskSize(user, aipId);
   }
 
+  @Override
+  public List<String> getRiskOnAIP(String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    return Browser.getRiskOnAIP(user, aipId);
+  }
+
 }

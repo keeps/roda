@@ -19,7 +19,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
@@ -41,34 +41,34 @@ import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.BrowseMessages;
 
-public class MessageList extends BasicAsyncTableCell<Message> {
+public class NotificationList extends BasicAsyncTableCell<Notification> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private static final int PAGE_SIZE = 20;
 
-  private TextColumn<Message> fromUser;
+  private TextColumn<Notification> fromUser;
   // private TextColumn<Message> recipientUser;
-  private Column<Message, Date> sentOn;
-  private TextColumn<Message> subject;
-  private Column<Message, SafeHtml> acknowledged;
+  private Column<Notification, Date> sentOn;
+  private TextColumn<Notification> subject;
+  private Column<Notification, SafeHtml> acknowledged;
 
-  public MessageList() {
+  public NotificationList() {
     this(null, null, null, false);
   }
 
-  public MessageList(Filter filter, Facets facets, String summary, boolean selectable) {
+  public NotificationList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
-    super.setSelectedClass(Message.class);
+    super.setSelectedClass(Notification.class);
   }
 
   @Override
-  protected void configureDisplay(CellTable<Message> display) {
-    fromUser = new TextColumn<Message>() {
+  protected void configureDisplay(CellTable<Notification> display) {
+    fromUser = new TextColumn<Notification>() {
 
       @Override
-      public String getValue(Message message) {
-        return message != null ? message.getFromUser() : null;
+      public String getValue(Notification notification) {
+        return notification != null ? notification.getFromUser() : null;
       }
     };
 
@@ -79,27 +79,27 @@ public class MessageList extends BasicAsyncTableCell<Message> {
      * null ? message.getRecipientUsers().toArray().toString() : null; } };
      */
 
-    sentOn = new Column<Message, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
+    sentOn = new Column<Notification, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM))) {
       @Override
-      public Date getValue(Message message) {
-        return message != null ? message.getSentOn() : null;
+      public Date getValue(Notification notification) {
+        return notification != null ? notification.getSentOn() : null;
       }
     };
 
-    subject = new TextColumn<Message>() {
+    subject = new TextColumn<Notification>() {
 
       @Override
-      public String getValue(Message message) {
-        return message != null ? message.getSubject() : null;
+      public String getValue(Notification notification) {
+        return notification != null ? notification.getSubject() : null;
       }
     };
 
-    acknowledged = new Column<Message, SafeHtml>(new SafeHtmlCell()) {
+    acknowledged = new Column<Notification, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Message message) {
+      public SafeHtml getValue(Notification notification) {
         SafeHtml ret = null;
-        if (message != null) {
-          if (message.isAcknowledged()) {
+        if (notification != null) {
+          if (notification.isAcknowledged()) {
             ret = SafeHtmlUtils
               .fromSafeConstant("<span class='label-success'>" + messages.showMessageAcknowledged() + "</span>");
           } else {
@@ -139,31 +139,32 @@ public class MessageList extends BasicAsyncTableCell<Message> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Message>> callback) {
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
+    AsyncCallback<IndexResult<Notification>> callback) {
 
     Filter filter = getFilter();
 
-    Map<Column<Message, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Message, ?>, List<String>>();
-    columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.MESSAGE_FROM_USER));
+    Map<Column<Notification, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Notification, ?>, List<String>>();
+    columnSortingKeyMap.put(fromUser, Arrays.asList(RodaConstants.NOTIFICATION_FROM_USER));
     // columnSortingKeyMap.put(recipientUser,
     // Arrays.asList(RodaConstants.MESSAGE_RECIPIENT_USERS));
-    columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.MESSAGE_SENT_ON));
-    columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.MESSAGE_SUBJECT));
-    columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.MESSAGE_IS_ACKNOWLEDGED));
+    columnSortingKeyMap.put(sentOn, Arrays.asList(RodaConstants.NOTIFICATION_SENT_ON));
+    columnSortingKeyMap.put(subject, Arrays.asList(RodaConstants.NOTIFICATION_SUBJECT));
+    columnSortingKeyMap.put(acknowledged, Arrays.asList(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    BrowserService.Util.getInstance().find(Message.class.getName(), filter, sorter, sublist, getFacets(),
+    BrowserService.Util.getInstance().find(Notification.class.getName(), filter, sorter, sublist, getFacets(),
       LocaleInfo.getCurrentLocale().getLocaleName(), callback);
 
   }
 
   @Override
-  protected ProvidesKey<Message> getKeyProvider() {
-    return new ProvidesKey<Message>() {
+  protected ProvidesKey<Notification> getKeyProvider() {
+    return new ProvidesKey<Notification>() {
 
       @Override
-      public Object getKey(Message item) {
+      public Object getKey(Notification item) {
         return item.getId();
       }
     };

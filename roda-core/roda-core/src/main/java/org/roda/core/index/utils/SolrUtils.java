@@ -121,7 +121,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -267,8 +267,8 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToAgent(doc));
     } else if (resultClass.equals(Format.class)) {
       ret = resultClass.cast(solrDocumentToFormat(doc));
-    } else if (resultClass.equals(Message.class)) {
-      ret = resultClass.cast(solrDocumentToMessage(doc));
+    } else if (resultClass.equals(Notification.class)) {
+      ret = resultClass.cast(solrDocumentToNotification(doc));
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = resultClass.cast(solrDocumentToRiskIncidence(doc));
     } else if (resultClass.equals(IndexedFile.class)) {
@@ -308,8 +308,8 @@ public class SolrUtils {
       ret = agentToSolrDocument((Agent) object);
     } else if (resultClass.equals(Format.class)) {
       ret = formatToSolrDocument((Format) object);
-    } else if (resultClass.equals(Message.class)) {
-      ret = messageToSolrDocument((Message) object);
+    } else if (resultClass.equals(Notification.class)) {
+      ret = notificationToSolrDocument((Notification) object);
     } else if (resultClass.equals(RiskIncidence.class)) {
       ret = riskIncidenceToSolrDocument((RiskIncidence) object);
     } else if (resultClass.equals(IndexedFile.class)) {
@@ -362,8 +362,8 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_AGENT;
     } else if (resultClass.equals(Format.class)) {
       indexName = RodaConstants.INDEX_FORMAT;
-    } else if (resultClass.equals(Message.class)) {
-      indexName = RodaConstants.INDEX_MESSAGE;
+    } else if (resultClass.equals(Notification.class)) {
+      indexName = RodaConstants.INDEX_NOTIFICATION;
     } else if (resultClass.equals(RiskIncidence.class)) {
       indexName = RodaConstants.INDEX_RISK_INCIDENCE;
     } else {
@@ -1843,37 +1843,38 @@ public class SolrUtils {
     return format;
   }
 
-  public static SolrInputDocument messageToSolrDocument(Message message) {
+  public static SolrInputDocument notificationToSolrDocument(Notification notification) {
     SolrInputDocument doc = new SolrInputDocument();
 
-    doc.addField(RodaConstants.MESSAGE_ID, message.getId());
-    doc.addField(RodaConstants.MESSAGE_SUBJECT, message.getSubject());
-    doc.addField(RodaConstants.MESSAGE_BODY, message.getBody());
-    doc.addField(RodaConstants.MESSAGE_SENT_ON, message.getSentOn());
-    doc.addField(RodaConstants.MESSAGE_FROM_USER, message.getFromUser());
-    doc.addField(RodaConstants.MESSAGE_RECIPIENT_USERS, message.getRecipientUsers());
-    doc.addField(RodaConstants.MESSAGE_ACKNOWLEDGE_TOKEN, message.getAcknowledgeToken());
-    doc.addField(RodaConstants.MESSAGE_IS_ACKNOWLEDGED, message.isAcknowledged());
-    doc.addField(RodaConstants.MESSAGE_ACKNOWLEDGED_USERS, JsonUtils.getJsonFromObject(message.getAcknowledgedUsers()));
+    doc.addField(RodaConstants.NOTIFICATION_ID, notification.getId());
+    doc.addField(RodaConstants.NOTIFICATION_SUBJECT, notification.getSubject());
+    doc.addField(RodaConstants.NOTIFICATION_BODY, notification.getBody());
+    doc.addField(RodaConstants.NOTIFICATION_SENT_ON, notification.getSentOn());
+    doc.addField(RodaConstants.NOTIFICATION_FROM_USER, notification.getFromUser());
+    doc.addField(RodaConstants.NOTIFICATION_RECIPIENT_USERS, notification.getRecipientUsers());
+    doc.addField(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN, notification.getAcknowledgeToken());
+    doc.addField(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED, notification.isAcknowledged());
+    doc.addField(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS,
+      JsonUtils.getJsonFromObject(notification.getAcknowledgedUsers()));
 
     return doc;
   }
 
-  public static Message solrDocumentToMessage(SolrDocument doc) {
-    Message message = new Message();
+  public static Notification solrDocumentToNotification(SolrDocument doc) {
+    Notification notification = new Notification();
 
-    message.setId(objectToString(doc.get(RodaConstants.MESSAGE_ID)));
-    message.setSubject(objectToString(doc.get(RodaConstants.MESSAGE_SUBJECT)));
-    message.setBody(objectToString(doc.get(RodaConstants.MESSAGE_BODY)));
-    message.setSentOn(objectToDate(doc.get(RodaConstants.MESSAGE_SENT_ON)));
-    message.setFromUser(objectToString(doc.get(RodaConstants.MESSAGE_FROM_USER)));
-    message.setRecipientUsers(objectToListString(doc.get(RodaConstants.MESSAGE_RECIPIENT_USERS)));
-    message.setAcknowledgeToken(objectToString(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGE_TOKEN)));
-    message.setAcknowledged(objectToBoolean(doc.get(RodaConstants.MESSAGE_IS_ACKNOWLEDGED)));
-    message.setAcknowledgedUsers(
-      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.MESSAGE_ACKNOWLEDGED_USERS))));
+    notification.setId(objectToString(doc.get(RodaConstants.NOTIFICATION_ID)));
+    notification.setSubject(objectToString(doc.get(RodaConstants.NOTIFICATION_SUBJECT)));
+    notification.setBody(objectToString(doc.get(RodaConstants.NOTIFICATION_BODY)));
+    notification.setSentOn(objectToDate(doc.get(RodaConstants.NOTIFICATION_SENT_ON)));
+    notification.setFromUser(objectToString(doc.get(RodaConstants.NOTIFICATION_FROM_USER)));
+    notification.setRecipientUsers(objectToListString(doc.get(RodaConstants.NOTIFICATION_RECIPIENT_USERS)));
+    notification.setAcknowledgeToken(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN)));
+    notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED)));
+    notification.setAcknowledgedUsers(
+      JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS))));
 
-    return message;
+    return notification;
   }
 
   public static SolrInputDocument riskIncidenceToSolrDocument(RiskIncidence incidence) {

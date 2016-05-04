@@ -43,7 +43,7 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -205,8 +205,8 @@ public class IndexService {
     observer.formatCreatedOrUpdated(format);
   }
 
-  public void reindexMessage(Message message) {
-    observer.messageCreatedOrUpdated(message);
+  public void reindexNotification(Notification notification) {
+    observer.notificationCreatedOrUpdated(notification);
   }
 
   public <T extends Serializable> void reindex(Class<T> objectClass, T object) {
@@ -214,8 +214,8 @@ public class IndexService {
       reindexAgent(Agent.class.cast(object));
     } else if (Format.class.equals(objectClass)) {
       reindexFormat(Format.class.cast(object));
-    } else if (Message.class.equals(objectClass)) {
-      reindexMessage(Message.class.cast(object));
+    } else if (Notification.class.equals(objectClass)) {
+      reindexNotification(Notification.class.cast(object));
     } else if (Risk.class.equals(objectClass)) {
       reindexRisk(Risk.class.cast(object));
     } else if (RiskIncidence.class.equals(objectClass)) {

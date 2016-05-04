@@ -21,7 +21,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -278,15 +278,15 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyMessageCreatedOrUpdated(Message message) {
+  protected void notifyNotificationCreatedOrUpdated(Notification notification) {
     for (ModelObserver observer : observers) {
-      observer.messageCreatedOrUpdated(message);
+      observer.notificationCreatedOrUpdated(notification);
     }
   }
 
-  protected void notifyMessageDeleted(String messageId) {
+  protected void notifyNotificationDeleted(String notificationId) {
     for (ModelObserver observer : observers) {
-      observer.messageDeleted(messageId);
+      observer.notificationDeleted(notificationId);
     }
   }
 }

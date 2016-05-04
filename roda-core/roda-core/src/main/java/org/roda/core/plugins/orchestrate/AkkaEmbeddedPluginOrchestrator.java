@@ -38,6 +38,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -710,9 +711,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null) {
       synchronized (runningJobs) {
-        if (TransferredResource.class.equals(pluginClass)) {
+        if (PluginType.INGEST == plugin.getType()) {
           IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
           initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
+        } else if (PluginType.RISK == plugin.getType()) {
+          RiskJobPluginInfo riskPluginInfo = new RiskJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, riskPluginInfo, objectsCount);
         }
       }
     }

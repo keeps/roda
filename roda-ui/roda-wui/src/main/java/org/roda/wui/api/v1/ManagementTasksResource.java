@@ -36,7 +36,7 @@ import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -71,7 +71,7 @@ public class ManagementTasksResource extends RodaCoreService {
   @POST
   @Path("/index/reindex")
   public Response executeIndexReindexTask(
-    @ApiParam(value = "", allowableValues = "aip,job,risk,riskincidence,agent,format,message,actionlogs,transferred_resources", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -148,8 +148,8 @@ public class ManagementTasksResource extends RodaCoreService {
       response = createJobToReindexAllAgents(user, startDate);
     } else if ("format".equals(entity)) {
       response = createJobToReindexAllFormats(user, startDate);
-    } else if ("message".equals(entity)) {
-      response = createJobToReindexAllMessages(user, startDate);
+    } else if ("notification".equals(entity)) {
+      response = createJobToReindexAllNotifications(user, startDate);
     } else if ("transferred_resources".equals(entity)) {
       response = createJobToReindexTransferredResources(user, startDate, params);
     } else if ("actionlogs".equals(entity)) {
@@ -289,24 +289,24 @@ public class ManagementTasksResource extends RodaCoreService {
     return response;
   }
 
-  private ApiResponseMessage createJobToReindexAllMessages(RodaUser user, Date startDate) {
+  private ApiResponseMessage createJobToReindexAllNotifications(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Messages' job")
+    Job job = new Job().setName("Management Task | Reindex 'Notifications' job")
       .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
       .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, Message.class.getCanonicalName());
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, Notification.class.getCanonicalName());
     job.setPluginParameters(pluginParameters);
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");
       // register action
       long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex messages", null, duration);
+      registerAction(user, "ManagementTasks", "reindex notifications", null, duration);
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
-      LOGGER.error("Error creating reindex Messages job", e);
+      LOGGER.error("Error creating reindex Notifications job", e);
     }
     return response;
   }

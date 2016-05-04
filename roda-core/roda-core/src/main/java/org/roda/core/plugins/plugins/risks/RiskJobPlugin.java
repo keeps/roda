@@ -23,13 +23,13 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   private int totalSteps = 2;
   private Map<String, String> aipIdToTransferredResourceId;
-  private JobPluginInfo info = new JobPluginInfo();
+  private RiskJobPluginInfo info = new RiskJobPluginInfo();
 
   private String successMessage;
   private String failureMessage;
@@ -141,14 +141,14 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
     if (!"".equals(emails)) {
       List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
       try {
-        Message message = new Message();
-        message.setSubject("New process was completed");
-        message.setFromUser("Job Process");
-        message.setRecipientUsers(emailList);
+        Notification notification = new Notification();
+        notification.setSubject("New process was completed");
+        notification.setFromUser("Job Process");
+        notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createMessage(message, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
+        model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
       } catch (GenericException e) {
-        LOGGER.error("Error while creating new message", e);
+        LOGGER.error("Error while creating new notification", e);
       }
     }
 

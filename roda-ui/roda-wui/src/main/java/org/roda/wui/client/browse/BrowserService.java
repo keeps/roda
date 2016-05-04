@@ -231,4 +231,7 @@ public interface BrowserService extends RemoteService {
     JobAlreadyStartedException;
 
   int getObjectRiskSize(String aipId) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  List<String> getRiskOnAIP(String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 }

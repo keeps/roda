@@ -1413,4 +1413,20 @@ public class Browser extends RodaCoreService {
     return counter;
   }
 
+  public static List<String> getRiskOnAIP(RodaUser user, String aipId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    List<String> riskList = BrowserHelper.getRiskOnAIP(aipId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getRiskOnAIP", null, duration, "aipId", aipId);
+    return riskList;
+  }
+
 }

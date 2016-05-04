@@ -13,7 +13,7 @@ package org.roda.wui.client.management;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.roda.core.data.v2.messages.Message;
+import org.roda.core.data.v2.notifications.Notification;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.common.client.HistoryResolver;
@@ -40,29 +40,30 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria
  *
  */
-public class ShowNotificationMessage extends Composite {
+public class ShowNotification extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
-        String messageId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(Message.class.getName(), messageId, new AsyncCallback<Message>() {
+        String notificationId = historyTokens.get(0);
+        BrowserService.Util.getInstance().retrieve(Notification.class.getName(), notificationId,
+          new AsyncCallback<Notification>() {
 
-          @Override
-          public void onFailure(Throwable caught) {
-            callback.onFailure(caught);
-          }
+            @Override
+            public void onFailure(Throwable caught) {
+              callback.onFailure(caught);
+            }
 
-          @Override
-          public void onSuccess(Message message) {
-            ShowNotificationMessage notificationPanel = new ShowNotificationMessage(message);
-            callback.onSuccess(notificationPanel);
-          }
-        });
+            @Override
+            public void onSuccess(Notification notification) {
+              ShowNotification notificationPanel = new ShowNotification(notification);
+              callback.onSuccess(notificationPanel);
+            }
+          });
       } else {
-        Tools.newHistory(NotificationMessages.RESOLVER);
+        Tools.newHistory(NotificationRegister.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -73,7 +74,7 @@ public class ShowNotificationMessage extends Composite {
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(NotificationMessages.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(NotificationRegister.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -81,7 +82,7 @@ public class ShowNotificationMessage extends Composite {
     }
   };
 
-  interface MyUiBinder extends UiBinder<Widget, ShowNotificationMessage> {
+  interface MyUiBinder extends UiBinder<Widget, ShowNotification> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -90,22 +91,22 @@ public class ShowNotificationMessage extends Composite {
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   @UiField
-  Label messageId;
+  Label notificationId;
 
   @UiField
-  Label messageSubject;
+  Label notificationSubject;
 
   @UiField
-  HTML messageBody;
+  HTML notificationBody;
 
   @UiField
-  Label messageSentOn;
+  Label notificationSentOn;
 
   @UiField
-  Label messageFromUser;
+  Label notificationFromUser;
 
   @UiField
-  Label messageIsAcknowledged;
+  Label notificationIsAcknowledged;
 
   @UiField
   Label acknowledgedUsersKey;
@@ -126,22 +127,23 @@ public class ShowNotificationMessage extends Composite {
    * Create a new panel to view a notification
    *
    */
-  public ShowNotificationMessage(Message message) {
+  public ShowNotification(Notification notification) {
     initWidget(uiBinder.createAndBindUi(this));
 
-    messageId.setText(message.getId());
-    messageSubject.setText(message.getSubject());
-    messageBody.setHTML(message.getBody());
-    messageSentOn.setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(message.getSentOn()));
-    messageFromUser.setText(message.getFromUser());
-    messageIsAcknowledged.setText(Boolean.toString(message.isAcknowledged()));
+    notificationId.setText(notification.getId());
+    notificationSubject.setText(notification.getSubject());
+    notificationBody.setHTML(notification.getBody());
+    notificationSentOn
+      .setText(DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(notification.getSentOn()));
+    notificationFromUser.setText(notification.getFromUser());
+    notificationIsAcknowledged.setText(Boolean.toString(notification.isAcknowledged()));
     acknowledgedUsersKey.setVisible(false);
     notAcknowledgedUsersKey.setVisible(false);
 
-    List<String> recipientUsers = new ArrayList<String>(message.getRecipientUsers());
+    List<String> recipientUsers = new ArrayList<String>(notification.getRecipientUsers());
 
-    for (String user : message.getAcknowledgedUsers().keySet()) {
-      String ackDate = message.getAcknowledgedUsers().get(user);
+    for (String user : notification.getAcknowledgedUsers().keySet()) {
+      String ackDate = notification.getAcknowledgedUsers().get(user);
       acknowledgedUsersKey.setVisible(true);
       acknowledgedUsersValue.setHTML(SafeHtmlUtils.fromSafeConstant(
         acknowledgedUsersValue.getHTML() + "<p>" + user + " <span class='small-and-gray'> " + ackDate + "</span></p>"));
@@ -162,7 +164,7 @@ public class ShowNotificationMessage extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(NotificationMessages.RESOLVER);
+    Tools.newHistory(NotificationRegister.RESOLVER);
   }
 
 }

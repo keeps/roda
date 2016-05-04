@@ -911,7 +911,7 @@ public class Browse extends Composite {
   @UiHandler("risks")
   void buttonRisksHandler(ClickEvent e) {
     if (aipId != null) {
-      Tools.newHistory(RESOLVER, RiskRegister.RESOLVER.getHistoryToken(), aipId);
+      Tools.newHistory(RiskRegister.RESOLVER, aipId);
     }
   }
 
