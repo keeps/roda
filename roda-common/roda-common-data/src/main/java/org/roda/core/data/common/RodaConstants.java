@@ -97,6 +97,7 @@ public final class RodaConstants {
    */
   public static final String API_SEP = "/";
   public static final String API_REST_V1_AIPS = "api/v1/aips/";
+  public static final String API_REST_V1_REPRESENTATIONS = "api/v1/representations/";
   public static final String API_REST_V1_FILES = "api/v1/files/";
   public static final String API_REST_V1_TRANSFERRED = "api/v1/transferred";
   public static final String API_REST_V1_THEME = "api/v1/theme";

@@ -15,17 +15,27 @@ import com.google.gwt.safehtml.shared.UriUtils;
 
 public class RestUtils {
 
-  public static SafeUri createRepresentationDownloadUri(String aipId, String repId) {
+  public static SafeUri createRepresentationDownloadUri(String representationUUID) {
 
-    // api/v1/aips/{aip_id}/data/{rep_id}/?acceptFormat=bin
+    // api/v1/representations/{representation_uuid}/?acceptFormat=bin
     StringBuilder b = new StringBuilder();
     // base uri
-    b.append(RodaConstants.API_REST_V1_AIPS).append(UriUtils.encode(aipId)).append(RodaConstants.API_SEP)
-      .append(RodaConstants.API_DATA).append(RodaConstants.API_SEP).append(UriUtils.encode(repId))
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
       .append(RodaConstants.API_SEP);
     // accept format attribute
     b.append(RodaConstants.API_QUERY_START).append(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT)
       .append(RodaConstants.API_QUERY_ASSIGN_SYMBOL).append(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN);
+
+    return UriUtils.fromSafeConstant(b.toString());
+  }
+
+  public static SafeUri createRepresentationPartDownloadUri(String representationUUID, String part) {
+
+    // api/v1/aips/{aip_id}/data/{rep_id}/{part}
+    StringBuilder b = new StringBuilder();
+    // base uri
+    b.append(RodaConstants.API_REST_V1_REPRESENTATIONS).append(UriUtils.encode(representationUUID))
+      .append(RodaConstants.API_SEP).append(UriUtils.encode(part));
 
     return UriUtils.fromSafeConstant(b.toString());
   }

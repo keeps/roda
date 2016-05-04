@@ -571,6 +571,22 @@ public class ViewRepresentation extends Composite {
     }
   }
 
+  @UiHandler("downloadDocumentationButton")
+  void buttonDownloadDocumentationButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createRepresentationPartDownloadUri(representationUUID,
+      RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+    Window.Location.assign(downloadUri.asString());
+  }
+
+  @UiHandler("downloadSchemasButton")
+  void buttonDownloadSchemasButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createRepresentationPartDownloadUri(representationUUID,
+      RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+    Window.Location.assign(downloadUri.asString());
+  }
+
   @UiHandler("infoFileButton")
   void buttonInfoFileButtonHandler(ClickEvent e) {
     toggleRightPanel();
