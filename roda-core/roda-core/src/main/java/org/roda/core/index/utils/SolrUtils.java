@@ -14,11 +14,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import javax.transaction.NotSupportedException;
@@ -133,6 +127,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.storage.Binary;
+import org.roda.core.storage.Directory;
+import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1087,13 +1083,17 @@ public class SolrUtils {
     final List<String> descriptions = objectToListString(doc.get(RodaConstants.AIP_DESCRIPTION));
     final Date dateInitial = objectToDate(doc.get(RodaConstants.AIP_DATE_INITIAL));
     final Date dateFinal = objectToDate(doc.get(RodaConstants.AIP_DATE_FINAL));
+    final Long numberOfSubmissionFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES), 0L);
+    final Long numberOfDocumentationFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES), 0L);
+    final Long numberOfSchemaFiles = objectToLong(doc.get(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES), 0L);
+
     Permissions permissions = getPermissions(doc);
     final String level = levels.isEmpty() ? null : levels.get(0);
     final String title = titles.isEmpty() ? null : titles.get(0);
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
-      permissions);
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
@@ -1146,6 +1146,37 @@ public class SolrUtils {
         }
       }
     }
+
+    // Calculate number of documentation and schema files
+    StorageService storage = model.getStorage();
+
+    Long numberOfSubmissionFiles;
+    try {
+      Directory submissionDirectory = model.getSubmissionDirectory(aip.getId());
+      numberOfSubmissionFiles = storage.countResourcesUnderDirectory(submissionDirectory.getStoragePath(), true);
+    } catch (NotFoundException e) {
+      numberOfSubmissionFiles = 0L;
+    }
+
+    Long numberOfDocumentationFiles;
+    try {
+      Directory documentationDirectory = model.getDocumentationDirectory(aip.getId());
+      numberOfDocumentationFiles = storage.countResourcesUnderDirectory(documentationDirectory.getStoragePath(), true);
+    } catch (NotFoundException e) {
+      numberOfDocumentationFiles = 0L;
+    }
+
+    Long numberOfSchemaFiles;
+    try {
+      Directory schemasDirectory = model.getSchemasDirectory(aip.getId());
+      numberOfSchemaFiles = storage.countResourcesUnderDirectory(schemasDirectory.getStoragePath(), true);
+    } catch (NotFoundException e) {
+      numberOfSchemaFiles = 0L;
+    }
+
+    ret.addField(RodaConstants.AIP_NUMBER_OF_SUBMISSION_FILES, numberOfSubmissionFiles);
+    ret.addField(RodaConstants.AIP_NUMBER_OF_DOCUMENTATION_FILES, numberOfDocumentationFiles);
+    ret.addField(RodaConstants.AIP_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
     return ret;
   }

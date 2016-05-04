@@ -358,7 +358,15 @@ public class BrowserHelper {
     String aipId = representation.getAipId();
     String representationId = representation.getId();
 
-    if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
+    if (RodaConstants.STORAGE_DIRECTORY_DATA.equals(part)) {
+      StoragePath storagePath = ModelUtils.getRepresentationDataStoragePath(aipId, representationId);
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else if (RodaConstants.STORAGE_DIRECTORY_METADATA.equals(part)) {
+      StoragePath storagePath = ModelUtils.getRepresentationMetadataStoragePath(aipId, representationId);
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
       Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId, representationId);
       return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
     } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
@@ -367,7 +375,6 @@ public class BrowserHelper {
     } else {
       throw new GenericException("Unsupported part: " + part);
     }
-    // TODO support download of other parts of the representation
   }
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -1398,8 +1405,10 @@ public class BrowserHelper {
   public static StreamResponse getAIP(IndexedAIP indexedAIP, String acceptFormat)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      List<ZipEntryInfo> zipEntries = ModelUtils.zipIndexedAIP(Arrays.asList(indexedAIP));
-      return createZipStreamResponse(zipEntries, "export");
+      StoragePath storagePath = ModelUtils.getAIPStoragePath(indexedAIP.getId());
+      StorageService storage = RodaCoreFactory.getStorageService();
+      Directory directory = storage.getDirectory(storagePath);
+      return DownloadUtils.download(storage, directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
       StoragePath aipJsonPath = DefaultStoragePath.parse(ModelUtils.getAIPStoragePath(indexedAIP.getId()),
         RodaConstants.STORAGE_AIP_METADATA_FILENAME);
@@ -1422,6 +1431,24 @@ public class BrowserHelper {
       return new StreamResponse(filename, mediaType, stream);
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
+    }
+  }
+
+  public static StreamResponse getAIPPart(IndexedAIP aip, String part)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    String aipId = aip.getId();
+
+    if (RodaConstants.STORAGE_DIRECTORY_SUBMISSION.equals(part)) {
+      Directory directory = RodaCoreFactory.getModelService().getSubmissionDirectory(aipId);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
+      Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
+      Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else {
+      throw new GenericException("Unsupported part: " + part);
     }
   }
 

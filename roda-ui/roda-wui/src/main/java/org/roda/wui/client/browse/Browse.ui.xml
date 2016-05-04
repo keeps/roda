@@ -46,7 +46,7 @@
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
 				<g:FlowPanel ui:field="sidebarData">
 					<g:Label addStyleNames="h4">
-						<ui:msg>View</ui:msg>
+						<ui:msg>Representations</ui:msg>
 					</g:Label>
 					<g:FlowPanel ui:field="downloadList">
 					</g:FlowPanel>
@@ -58,6 +58,9 @@
 					<g:Button addStyleNames="btn btn-clock" ui:field="preservationEvents">
 						<ui:msg>Events</ui:msg>
 					</g:Button>
+					<g:Button addStyleNames="btn btn-clock" ui:field="risks">
+						<ui:msg>Risks</ui:msg>
+					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
 						<ui:msg>New process</ui:msg>
 					</g:Button>
@@ -66,6 +69,9 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Archival package</ui:msg>
 					</g:Label>
+					<g:Button addStyleNames="btn btn-download" ui:field="download">
+						<ui:msg>Download</ui:msg>
+					</g:Button>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New</ui:msg>
 					</g:Button>
@@ -84,12 +90,18 @@
 						<ui:msg>Edit</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label ui:field="riskIndicatorKey" addStyleNames="h4">
-						<ui:msg>Risks</ui:msg>
+				<g:FlowPanel ui:field="otherInformation">
+					<g:Label addStyleNames="h4">
+						<ui:msg>Other</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-clock" ui:field="risks">
-						<ui:msg>Risks</ui:msg>
+					<g:Button addStyleNames="btn btn-download" ui:field="submission">
+						<ui:msg>Submission</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-download" ui:field="documentation">
+						<ui:msg>Documentation</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-download" ui:field="schemas">
+						<ui:msg>Schemas</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

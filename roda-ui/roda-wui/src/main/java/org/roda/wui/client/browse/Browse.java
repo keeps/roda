@@ -76,6 +76,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
@@ -200,28 +201,19 @@ public class Browse extends Composite {
   FlowPanel actionsSidebar;
 
   @UiField
-  Button preservationEvents;
+  Button preservationEvents, risks, newProcess;
 
   @UiField
-  Button createItem;
-
-  @UiField
-  Button moveItem;
-
-  @UiField
-  Button remove;
-
-  @UiField
-  Button newProcess;
+  Button download, createItem, moveItem, remove;
 
   @UiField
   Button editPermissions;
 
   @UiField
-  Label riskIndicatorKey;
+  FlowPanel otherInformation;
 
   @UiField
-  Button risks;
+  Button submission, documentation, schemas;
 
   private boolean viewingTop;
 
@@ -373,6 +365,11 @@ public class Browse extends Composite {
     moveItem.setVisible(false);
     editPermissions.setVisible(false);
     remove.setVisible(false);
+
+    submission.setVisible(false);
+    documentation.setVisible(false);
+    schemas.setVisible(false);
+    otherInformation.setVisible(submission.isVisible() || documentation.isVisible() || schemas.isVisible());
   }
 
   protected void showError(String id, Throwable caught) {
@@ -503,6 +500,10 @@ public class Browse extends Composite {
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
       remove.setVisible(true);
+      submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
+      documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
+      schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
+      otherInformation.setVisible(submission.isVisible() || documentation.isVisible() || schemas.isVisible());
     } else {
       viewAction();
     }
@@ -915,4 +916,31 @@ public class Browse extends Composite {
     }
   }
 
+  @UiHandler("download")
+  void downloadButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createAIPDownloadUri(aipId);
+    Window.Location.assign(downloadUri.asString());
+  }
+
+  @UiHandler("submission")
+  void submissionButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_SUBMISSION);
+    Window.Location.assign(downloadUri.asString());
+  }
+
+  @UiHandler("documentation")
+  void documentationButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+    Window.Location.assign(downloadUri.asString());
+  }
+
+  @UiHandler("schemas")
+  void schemasButtonHandler(ClickEvent e) {
+    SafeUri downloadUri = null;
+    downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+    Window.Location.assign(downloadUri.asString());
+  }
 }

@@ -285,11 +285,13 @@ public class IndexServiceTest {
 
     index.commitAIPs();
 
-    long aipCount = index.count(IndexedAIP.class, IndexedAIP.FONDS_FILTER);
+    // TODO following filter should be in corpora constants or removed
+    Filter fondsFilter = new Filter(new SimpleFilterParameter("level", "fonds"));
+
+    long aipCount = index.count(IndexedAIP.class, fondsFilter);
     assertEquals(1, aipCount);
 
-    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, IndexedAIP.FONDS_FILTER, null, new Sublist(0, 10),
-      null);
+    final IndexResult<IndexedAIP> aips = index.find(IndexedAIP.class, fondsFilter, null, new Sublist(0, 10), null);
 
     assertEquals(1, aips.getLimit());
     assertEquals(CorporaConstants.SOURCE_AIP_ID, aips.getResults().get(0).getId());

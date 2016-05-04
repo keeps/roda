@@ -131,6 +131,11 @@ public final class ModelUtils {
     return build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_METADATA);
   }
 
+  public static StoragePath getRepresentationMetadataStoragePath(String aipId, String representationId)
+    throws RequestNotValidException {
+    return DefaultStoragePath.parse(getRepresentationMetadataPath(aipId, representationId));
+  }
+
   private static List<String> getRepresentationPreservationMetadataPath(String aipId, String representationId) {
     return build(getRepresentationMetadataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_PRESERVATION);
   }
@@ -611,6 +616,10 @@ public final class ModelUtils {
     return DefaultStoragePath.parse(path);
   }
 
+  /**
+   * @deprecated use DownloadUtils instead.
+   */
+  @Deprecated
   public static void addToZip(List<ZipEntryInfo> zipEntries, org.roda.core.data.v2.ip.File file, boolean flat)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StorageService storage = RodaCoreFactory.getStorageService();
@@ -626,6 +635,10 @@ public final class ModelUtils {
     }
   }
 
+  /**
+   * @deprecated use DownloadUtils instead.
+   */
+  @Deprecated
   public static void addToZip(List<ZipEntryInfo> zipEntries, Binary binary)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     ZipEntryInfo info = new ZipEntryInfo(FSUtils.getStoragePathAsString(binary.getStoragePath(), false),
@@ -633,6 +646,10 @@ public final class ModelUtils {
     zipEntries.add(info);
   }
 
+  /**
+   * @deprecated use DownloadUtils instead.
+   */
+  @Deprecated
   public static List<ZipEntryInfo> zipIndexedAIP(List<IndexedAIP> aips)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
@@ -643,7 +660,10 @@ public final class ModelUtils {
     }
     return zipEntries;
   }
-
+  /**
+   * @deprecated use DownloadUtils instead.
+   */
+  @Deprecated
   public static List<ZipEntryInfo> aipToZipEntry(AIP aip)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();

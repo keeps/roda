@@ -249,6 +249,10 @@ public final class RodaConstants {
   public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
   public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
 
+  public static final String AIP_NUMBER_OF_SUBMISSION_FILES = "numberOfSubmissionFiles";
+  public static final String AIP_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
+  public static final String AIP_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
+
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
   public static final String AIP_TITLE_SORT = "title_sort";

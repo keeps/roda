@@ -10,8 +10,6 @@ package org.roda.core.data.v2.ip;
 import java.util.Date;
 import java.util.List;
 
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.v2.index.IsIndexed;
 
@@ -19,12 +17,10 @@ import org.roda.core.data.v2.index.IsIndexed;
  * This class contains the indexed information about an AIP.
  * 
  * @author Hélder Silva <hsilva@keep.pt>
+ * @author Luis Faria <lfaria@keep.pt>
  */
 public class IndexedAIP implements IsIndexed {
   private static final long serialVersionUID = 38813680938917204L;
-
-  // FIXME this should be defined from DescriptionLevelManager information
-  public static final Filter FONDS_FILTER = new Filter(new SimpleFilterParameter("level", "fonds"));
 
   private String id;
   private AIPState state;
@@ -41,6 +37,10 @@ public class IndexedAIP implements IsIndexed {
 
   private Permissions permissions = new Permissions();
 
+  private Long numberOfSubmissionFiles;
+  private Long numberOfDocumentationFiles;
+  private Long numberOfSchemaFiles;
+
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
@@ -56,7 +56,8 @@ public class IndexedAIP implements IsIndexed {
    */
   public IndexedAIP(IndexedAIP other) {
     this(other.getId(), other.getState(), other.getLevel(), other.getTitle(), other.getDateInitial(),
-      other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions());
+      other.getDateFinal(), other.getDescription(), other.getParentID(), other.getAncestors(), other.getPermissions(),
+      other.getNumberOfSubmissionFiles(), other.getNumberOfDocumentationFiles(), other.getNumberOfSchemaFiles());
   }
 
   /**
@@ -76,21 +77,46 @@ public class IndexedAIP implements IsIndexed {
    * @param subElementsCount
    */
   public IndexedAIP(String id, AIPState state, String level, String title, Date dateInitial, Date dateFinal,
-    String description, String parentID, List<String> ancestors, Permissions permissions) {
+    String description, String parentID, List<String> ancestors, Permissions permissions, Long numberOfSubmissionFiles,
+    Long numberOfDocumentationFiles, Long numberOfSchemaFiles) {
+    super();
+    this.id = id;
+    this.state = state;
+    this.level = level;
+    this.title = title;
+    this.dateInitial = dateInitial;
+    this.dateFinal = dateFinal;
+    this.description = description;
+    this.parentID = parentID;
+    this.ancestors = ancestors;
+    this.permissions = permissions;
+    this.numberOfSubmissionFiles = numberOfSubmissionFiles;
+    this.numberOfDocumentationFiles = numberOfDocumentationFiles;
+    this.numberOfSchemaFiles = numberOfSchemaFiles;
+  }
 
-    setId(id);
-    setState(state);
-    setLevel(level);
-    setTitle(title);
-    setDateInitial(dateInitial);
-    setDateFinal(dateFinal);
+  public Long getNumberOfSubmissionFiles() {
+    return numberOfSubmissionFiles;
+  }
 
-    setDescription(description);
+  public void setNumberOfSubmissionFiles(Long numberOfSubmissionFiles) {
+    this.numberOfSubmissionFiles = numberOfSubmissionFiles;
+  }
 
-    setParentID(parentID);
-    setAncestors(ancestors);
+  public Long getNumberOfDocumentationFiles() {
+    return numberOfDocumentationFiles;
+  }
 
-    setPermissions(permissions);
+  public void setNumberOfDocumentationFiles(Long numberOfDocumentationFiles) {
+    this.numberOfDocumentationFiles = numberOfDocumentationFiles;
+  }
+
+  public Long getNumberOfSchemaFiles() {
+    return numberOfSchemaFiles;
+  }
+
+  public void setNumberOfSchemaFiles(Long numberOfSchemaFiles) {
+    this.numberOfSchemaFiles = numberOfSchemaFiles;
   }
 
   public AIPState getState() {
@@ -234,6 +260,9 @@ public class IndexedAIP implements IsIndexed {
     result = prime * result + ((description == null) ? 0 : description.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((level == null) ? 0 : level.hashCode());
+    result = prime * result + ((numberOfDocumentationFiles == null) ? 0 : numberOfDocumentationFiles.hashCode());
+    result = prime * result + ((numberOfSchemaFiles == null) ? 0 : numberOfSchemaFiles.hashCode());
+    result = prime * result + ((numberOfSubmissionFiles == null) ? 0 : numberOfSubmissionFiles.hashCode());
     result = prime * result + ((parentID == null) ? 0 : parentID.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((state == null) ? 0 : state.hashCode());
@@ -280,6 +309,21 @@ public class IndexedAIP implements IsIndexed {
         return false;
     } else if (!level.equals(other.level))
       return false;
+    if (numberOfDocumentationFiles == null) {
+      if (other.numberOfDocumentationFiles != null)
+        return false;
+    } else if (!numberOfDocumentationFiles.equals(other.numberOfDocumentationFiles))
+      return false;
+    if (numberOfSchemaFiles == null) {
+      if (other.numberOfSchemaFiles != null)
+        return false;
+    } else if (!numberOfSchemaFiles.equals(other.numberOfSchemaFiles))
+      return false;
+    if (numberOfSubmissionFiles == null) {
+      if (other.numberOfSubmissionFiles != null)
+        return false;
+    } else if (!numberOfSubmissionFiles.equals(other.numberOfSubmissionFiles))
+      return false;
     if (parentID == null) {
       if (other.parentID != null)
         return false;
@@ -304,7 +348,9 @@ public class IndexedAIP implements IsIndexed {
   public String toString() {
     return "IndexedAIP [id=" + id + ", state=" + state + ", level=" + level + ", title=" + title + ", dateInitial="
       + dateInitial + ", dateFinal=" + dateFinal + ", description=" + description + ", parentID=" + parentID
-      + ", ancestors=" + ancestors + ", permissions=" + permissions + "]";
+      + ", ancestors=" + ancestors + ", permissions=" + permissions + ", numberOfSubmissionFiles="
+      + numberOfSubmissionFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
+      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + "]";
   }
 
   @Override

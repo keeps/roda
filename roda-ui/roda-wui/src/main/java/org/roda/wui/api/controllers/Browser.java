@@ -1236,6 +1236,25 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
+  public static StreamResponse getAIPPart(RodaUser user, String aipId, String part)
+    throws RequestNotValidException, AuthorizationDeniedException, GenericException, NotFoundException {
+    Date startDate = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+    IndexedAIP indexedAIP = BrowserHelper.retrieve(IndexedAIP.class, aipId);
+    UserUtility.checkObjectPermissions(user, indexedAIP, PermissionType.READ);
+
+    // delegate
+    StreamResponse aip = BrowserHelper.getAIPPart(indexedAIP, part);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getAIPPart", aipId, duration, "part", part);
+
+    return aip;
+  }
+
   public static void removeRiskVersion(RodaUser user, String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
     Date start = new Date();

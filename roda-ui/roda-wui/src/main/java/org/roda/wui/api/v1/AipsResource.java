@@ -92,6 +92,24 @@ public class AipsResource {
     return ApiUtils.okResponse(aipRepresentation);
   }
 
+  @GET
+  @Path("/{" + RodaConstants.AIP_ID + "}/{part}")
+  // @Produces({"application/zip"})
+  @ApiOperation(value = "Download part of the AIP")
+  @ApiResponses(value = {@ApiResponse(code = 200, message = "OK"), @ApiResponse(code = 404, message = "Not found")})
+  public Response getAIPPart(
+    @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam(RodaConstants.AIP_ID) String aipId,
+    @ApiParam(value = "The ID of the AIP to retrieve.", required = true) @PathParam("part") String part)
+    throws RODAException {
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+
+    // delegate action to controller
+    StreamResponse aipRepresentation = Browser.getAIPPart(user, aipId, part);
+
+    return ApiUtils.okResponse(aipRepresentation);
+  }
+
   @PUT
   @Path("/{aip_id}")
   @ApiOperation(value = "Update AIP", notes = "Update existing AIP", response = AIP.class)

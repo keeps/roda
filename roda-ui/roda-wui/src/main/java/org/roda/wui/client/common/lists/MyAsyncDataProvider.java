@@ -11,7 +11,7 @@ import java.io.Serializable;
 
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.wui.common.client.widgets.Toast;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.ColumnSortList;
@@ -38,7 +38,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError("Error getting data from server: [" + caught.getClass().getName() + "] " + caught.getMessage());
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override
@@ -92,7 +92,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError("Error getting data from server: [" + caught.getClass().getName() + "] " + caught.getMessage());
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
 
       @Override
@@ -101,7 +101,7 @@ public abstract class MyAsyncDataProvider<T extends Serializable> extends AsyncD
       }
     });
   }
-  
+
   public int getRowCount() {
     return rowCount;
   }
