@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
@@ -88,17 +87,17 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private int numberOfWorkers;
 
   // Map< jobId, Map <plugin, jobplugininfo>>
-  private Map<String, Map<Plugin<?>, JobPluginInfo>> runningTasks;
+  private Map<String, Map<Plugin<?>, JobPluginInfo>> runningJobs;
   // Map< jobId, total number of objects>
-  private Map<String, Integer> runningTasksObjectsCount;
+  private Map<String, Integer> runningJobsObjectsCount;
 
   public AkkaEmbeddedPluginOrchestrator() {
     index = RodaCoreFactory.getIndexService();
     model = RodaCoreFactory.getModelService();
     storage = RodaCoreFactory.getStorageService();
 
-    runningTasks = new HashMap<>();
-    runningTasksObjectsCount = new HashMap<>();
+    runningJobs = new HashMap<>();
+    runningJobsObjectsCount = new HashMap<>();
 
     numberOfWorkers = RodaCoreFactory.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
@@ -484,7 +483,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void executeJob(Job job) throws JobAlreadyStartedException {
     LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
 
-    if (runningTasks.containsKey(job.getId())) {
+    if (runningJobs.containsKey(job.getId())) {
       throw new JobAlreadyStartedException();
     } else {
 
@@ -602,23 +601,30 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     // keep track of each job/plugin relation
     String jobId = PluginHelper.getJobId(innerPlugin);
     if (jobId != null) {
-      synchronized (runningTasks) {
-        JobPluginInfo jobPluginInfo = new JobPluginInfo();
-        jobPluginInfo.setObjectsCount(objectsCount);
-        jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
-        if (runningTasks.get(jobId) != null) {
-          runningTasks.get(jobId).put(innerPlugin, jobPluginInfo);
-          runningTasksObjectsCount.put(jobId, runningTasksObjectsCount.get(jobId) + objectsCount);
-        } else {
-          Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
-          inner.put(innerPlugin, jobPluginInfo);
-          runningTasks.put(jobId, inner);
-          runningTasksObjectsCount.put(jobId, objectsCount);
+      synchronized (runningJobs) {
+        if (TransferredResource.class.equals(pluginClass)) {
+          IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
         }
       }
     }
 
     return innerPlugin;
+  }
+
+  private <T extends Serializable> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId,
+    JobPluginInfo jobPluginInfo, int objectsCount) {
+    jobPluginInfo.setObjectsCount(objectsCount);
+    jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
+    if (runningJobs.get(jobId) != null) {
+      runningJobs.get(jobId).put(innerPlugin, jobPluginInfo);
+      runningJobsObjectsCount.put(jobId, runningJobsObjectsCount.get(jobId) + objectsCount);
+    } else {
+      Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
+      inner.put(innerPlugin, jobPluginInfo);
+      runningJobs.put(jobId, inner);
+      runningJobsObjectsCount.put(jobId, objectsCount);
+    }
   }
 
   @Override
@@ -627,11 +633,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobId != null) {
       // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
       // it should block per job)
-      synchronized (runningTasks) {
+      synchronized (runningJobs) {
         PluginHelper.updateJobPercentage(plugin, model, percentage);
         if (percentage == 100) {
-          runningTasks.remove(jobId);
-          runningTasksObjectsCount.remove(jobId);
+          runningJobs.remove(jobId);
+          runningJobsObjectsCount.remove(jobId);
         }
       }
     }
@@ -643,41 +649,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (jobId != null) {
       // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
       // it should block per job)
-      synchronized (runningTasks) {
-        Integer taskObjectsCount = runningTasksObjectsCount.get(jobId);
-        Map<Plugin<?>, JobPluginInfo> jobInfo = runningTasks.get(jobId);
-        boolean pluginIsDone = (info.getStepsCompleted() == info.getTotalSteps());
-        JobPluginInfo jobPluginInfo = jobInfo.get(plugin);
-        jobPluginInfo.setTotalSteps(info.getTotalSteps());
-        jobPluginInfo.setStepsCompleted(info.getStepsCompleted());
-        jobPluginInfo.setCompletionPercentage(info.getCompletionPercentage());
-        jobPluginInfo.setObjectsBeingProcessed(pluginIsDone ? 0 : info.getObjectsBeingProcessed());
-        jobPluginInfo.setObjectsWaitingToBeProcessed(pluginIsDone ? 0 : info.getObjectsWaitingToBeProcessed());
-        jobPluginInfo.setObjectsProcessedWithSuccess(info.getObjectsProcessedWithSuccess());
-        jobPluginInfo.setObjectsProcessedWithFailure(info.getObjectsProcessedWithFailure());
-
-        float percentage = 0f;
-        int beingProcessed = 0;
-        int processedWithSuccess = 0;
-        int processedWithFailure = 0;
-        for (JobPluginInfo pluginInfo : jobInfo.values()) {
-          if (pluginInfo.getTotalSteps() > 0) {
-            float pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
-            float pluginWeight = ((float) pluginInfo.getObjectsCount()) / taskObjectsCount;
-            percentage += (pluginPercentage * pluginWeight);
-
-            processedWithSuccess += pluginInfo.getObjectsProcessedWithSuccess();
-            processedWithFailure += pluginInfo.getObjectsProcessedWithFailure();
-          }
-          beingProcessed += pluginInfo.getObjectsBeingProcessed();
-        }
-
-        JobPluginInfo infoUpdated = new JobPluginInfo();
-        infoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
-        infoUpdated.setObjectsBeingProcessed(beingProcessed);
-        infoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
-        infoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
-
+      synchronized (runningJobs) {
+        Integer jobObjectsCount = runningJobsObjectsCount.get(jobId);
+        Map<Plugin<?>, JobPluginInfo> jobPluginInfos = runningJobs.get(jobId);
+        JobPluginInfo infoUpdated = info.processJobPluginInformation(plugin, jobObjectsCount, jobPluginInfos);
         PluginHelper.updateJobInformation(plugin, model, infoUpdated);
       }
     }

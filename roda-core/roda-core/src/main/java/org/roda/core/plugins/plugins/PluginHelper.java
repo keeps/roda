@@ -378,10 +378,7 @@ public final class PluginHelper {
    * Updates the job status
    */
   public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
-    JobPluginInfo jobPluginInfo, boolean incrementStepsCompleted) {
-    if (incrementStepsCompleted) {
-      jobPluginInfo.setStepsCompleted(jobPluginInfo.getStepsCompleted() + 1);
-    }
+    JobPluginInfo jobPluginInfo) {
     RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
     return jobPluginInfo;
   }
@@ -436,6 +433,10 @@ public final class PluginHelper {
    */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
+    // do stuff with concrete JobPluginInfo
+    //
+
+    // update job
     try {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);

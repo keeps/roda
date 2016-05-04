@@ -7,9 +7,12 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-public class JobPluginInfo {
-  private int stepsCompleted = 0;
-  private int totalSteps = 0;
+import java.io.Serializable;
+import java.util.Map;
+
+import org.roda.core.plugins.Plugin;
+
+public abstract class JobPluginInfo {
   private int completionPercentage = 0;
   private int objectsCount = 0;
   private int objectsBeingProcessed = 0;
@@ -23,22 +26,6 @@ public class JobPluginInfo {
 
   public JobPluginInfo(int completionPercentage) {
     this.completionPercentage = completionPercentage;
-  }
-
-  public int getStepsCompleted() {
-    return stepsCompleted;
-  }
-
-  public void setStepsCompleted(int stepsCompleted) {
-    this.stepsCompleted = stepsCompleted;
-  }
-
-  public int getTotalSteps() {
-    return totalSteps;
-  }
-
-  public void setTotalSteps(int totalSteps) {
-    this.totalSteps = totalSteps;
   }
 
   public int getCompletionPercentage() {
@@ -89,12 +76,6 @@ public class JobPluginInfo {
     this.objectsProcessedWithFailure = objectsProcessedWithFailure;
   }
 
-  @Override
-  public String toString() {
-    return "JobPluginInfo [stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", completionPercentage="
-      + completionPercentage + ", objectsCount=" + objectsCount + ", objectsBeingProcessed=" + objectsBeingProcessed
-      + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsProcessedWithSuccess="
-      + objectsProcessedWithSuccess + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + "]";
-  }
-
+  abstract <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin,
+    Integer taskObjectsCount, Map<Plugin<?>, JobPluginInfo> jobInfos);
 }

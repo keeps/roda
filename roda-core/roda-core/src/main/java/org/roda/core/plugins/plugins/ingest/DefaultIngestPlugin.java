@@ -40,7 +40,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.IngestJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
 import org.roda.core.plugins.plugins.base.DescriptiveMetadataValidationPlugin;
@@ -181,11 +181,11 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Report report = PluginHelper.createPluginReport(this);
     Report pluginReport;
 
-    JobPluginInfo jobPluginInfo = new JobPluginInfo();
+    IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
     jobPluginInfo.setTotalSteps(getTotalSteps());
     jobPluginInfo.setObjectsCount(resources.size());
     jobPluginInfo.setObjectsBeingProcessed(resources.size());
-    PluginHelper.updateJobInformation(this, jobPluginInfo, false);
+    PluginHelper.updateJobInformation(this, jobPluginInfo);
 
     // 0) process "parent id" and "force parent id" info. (because we might need
     // to fallback to default values)
@@ -201,7 +201,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     pluginReport = transformTransferredResourceIntoAnAIP(index, model, storage, resources);
     reports = mergeReports(reports, pluginReport);
     List<AIP> aips = getAIPsFromReports(model, resources, jobPluginInfo, reports);
-    PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+    PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
 
     // this event can only be created after AIPs exist and that's why it is
     // performed here, after transformTransferredResourceIntoAnAIP
@@ -213,7 +213,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 3) descriptive metadata validation
@@ -222,7 +222,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 4) create file fixity information
@@ -231,7 +231,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = createFileFixityInformation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 5) format identification (using Siegfried)
@@ -240,7 +240,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 6) Format validation - PDF/A format validator (using VeraPDF)
@@ -253,7 +253,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doVeraPDFCheck(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 7) feature extraction (using Apache Tika)
@@ -270,7 +270,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doFeatureAndFullTextExtraction(index, model, storage, aips, params);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 9) validation of digital signature
@@ -279,7 +279,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, false);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 10) verify producer authorization
@@ -288,7 +288,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = verifyProducerAuthorization(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // 11) Auto accept
@@ -298,7 +298,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
       jobPluginInfo.setObjectsProcessedWithSuccess(resources.size() - jobPluginInfo.getObjectsProcessedWithFailure());
-      PluginHelper.updateJobInformation(this, jobPluginInfo, true);
+      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
     }
 
     // delete SIP from transfer
@@ -345,7 +345,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
    * obtaining them from model)
    */
   private List<AIP> recalculateAIPsList(ModelService model, List<TransferredResource> resources, List<AIP> aips,
-    Reports reports, JobPluginInfo jobPluginInfo, boolean removeAIPProcessingFailed) {
+    Reports reports, IngestJobPluginInfo jobPluginInfo, boolean removeAIPProcessingFailed) {
     List<AIP> newAips = new ArrayList<>();
     List<AIP> transferredResourceAips;
     boolean oneTransferredResourceAipFailed;
@@ -459,7 +459,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   }
 
   private List<AIP> getAIPsFromReports(ModelService model, List<TransferredResource> resources,
-    JobPluginInfo jobPluginInfo, Reports reports) {
+    IngestJobPluginInfo jobPluginInfo, Reports reports) {
     List<AIP> aips = new ArrayList<>();
     List<String> aipIds = reports.getAipIds();
 
