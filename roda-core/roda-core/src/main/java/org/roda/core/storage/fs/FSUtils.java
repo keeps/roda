@@ -369,7 +369,7 @@ public final class FSUtils {
     return resourceIterable;
   }
 
-  public static Long countPath(Path basePath, Path directoryPath) throws NotFoundException, GenericException {
+  public static Long countPath(Path directoryPath) throws NotFoundException, GenericException {
     Long count = 0L;
     DirectoryStream<Path> directoryStream = null;
     try {
@@ -392,9 +392,9 @@ public final class FSUtils {
     return count;
   }
 
-  public static Long recursivelyCountPath(Path basePath, Path directoryPath)
-    throws NotFoundException, GenericException {
-    Long count = 0L;
+  public static Long recursivelyCountPath(Path directoryPath) throws NotFoundException, GenericException {
+    // starting at -1 because the walk counts the directory itself
+    Long count = -1L;
     Stream<Path> walk = null;
     try {
       walk = Files.walk(directoryPath);

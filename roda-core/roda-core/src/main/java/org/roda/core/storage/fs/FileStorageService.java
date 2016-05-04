@@ -173,9 +173,9 @@ public class FileStorageService implements StorageService {
     throws NotFoundException, GenericException {
     Path path = FSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
-      return FSUtils.recursivelyCountPath(basePath, path);
+      return FSUtils.recursivelyCountPath(path);
     } else {
-      return FSUtils.countPath(basePath, path);
+      return FSUtils.countPath(path);
     }
   }
 
@@ -259,9 +259,9 @@ public class FileStorageService implements StorageService {
     throws NotFoundException, GenericException {
     Path directoryPath = FSUtils.getEntityPath(basePath, storagePath);
     if (recursive) {
-      return FSUtils.recursivelyCountPath(basePath, directoryPath);
+      return FSUtils.recursivelyCountPath(directoryPath);
     } else {
-      return FSUtils.countPath(basePath, directoryPath);
+      return FSUtils.countPath(directoryPath);
     }
   }
 

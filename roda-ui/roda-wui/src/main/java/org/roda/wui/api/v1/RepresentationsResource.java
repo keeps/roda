@@ -7,8 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import java.io.File;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -20,6 +18,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
@@ -63,6 +62,22 @@ public class RepresentationsResource {
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
     StreamResponse aipRepresentation = Browser.getAipRepresentation(user, representationUUID, acceptFormat);
+
+    return ApiUtils.okResponse(aipRepresentation);
+  }
+
+  @GET
+  @Path("/{" + RodaConstants.REPRESENTATION_UUID + "}/{part}")
+  //@Produces({"application/json", MediaType.APPLICATION_OCTET_STREAM})
+  @ApiOperation(value = "Download part of the representation")
+  public Response getRepresentationPart(
+    @ApiParam(value = "The ID of the existing representation", required = true) @PathParam(RodaConstants.REPRESENTATION_UUID) String representationUUID,
+    @ApiParam(value = "The part of the representation to download", required = true, allowableValues = "data, metadata, documentation, schemas") @PathParam("part") String part)
+    throws RODAException {
+    // get user
+    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    // delegate action to controller
+    StreamResponse aipRepresentation = Browser.getAipRepresentationPart(user, representationUUID, part);
 
     return ApiUtils.okResponse(aipRepresentation);
   }

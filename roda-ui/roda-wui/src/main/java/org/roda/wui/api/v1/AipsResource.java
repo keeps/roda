@@ -36,7 +36,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.user.RodaUser;

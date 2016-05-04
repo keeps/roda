@@ -99,10 +99,12 @@ import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.Directory;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.wui.api.v1.utils.ApiUtils;
+import org.roda.wui.api.v1.utils.DownloadUtils;
 import org.roda.wui.api.v1.utils.StreamResponse;
 import org.roda.wui.client.browse.BinaryVersionBundle;
 import org.roda.wui.client.browse.BrowseItemBundle;
@@ -315,8 +317,9 @@ public class BrowserHelper {
   protected static void validateGetAipRepresentationParams(String acceptFormat) throws RequestNotValidException {
     if (!RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)
       && !RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
-      throw new RequestNotValidException("Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT
-        + "' value. Expected values: " + Arrays.asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
+      throw new RequestNotValidException(
+        "Invalid '" + RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT + "' value. Expected values: " + Arrays
+          .asList(RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON, RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN));
     }
   }
 
@@ -327,21 +330,10 @@ public class BrowserHelper {
     String representationId = representation.getId();
 
     if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_BIN.equals(acceptFormat)) {
-      ModelService model = RodaCoreFactory.getModelService();
-      List<ZipEntryInfo> zipEntries = new ArrayList<ZipEntryInfo>();
-      boolean recursive = true;
-      CloseableIterable<OptionalWithCause<org.roda.core.data.v2.ip.File>> allFiles = model.listFilesUnder(aipId,
-        representationId, recursive);
-      for (OptionalWithCause<org.roda.core.data.v2.ip.File> file : allFiles) {
-        if (file.isPresent()) {
-          ModelUtils.addToZip(zipEntries, file.get(), false);
-        } else {
-          LOGGER.error("Cannot get AIP representation file", file.getCause());
-        }
-      }
-      IOUtils.closeQuietly(allFiles);
-
-      return createZipStreamResponse(zipEntries, aipId + "_" + representationId);
+      StoragePath storagePath = ModelUtils.getRepresentationStoragePath(representation.getAipId(),
+        representation.getId());
+      Directory directory = RodaCoreFactory.getStorageService().getDirectory(storagePath);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
     } else if (RodaConstants.API_QUERY_VALUE_ACCEPT_FORMAT_JSON.equals(acceptFormat)) {
       ModelService model = RodaCoreFactory.getModelService();
       Representation rep = model.retrieveRepresentation(aipId, representationId);
@@ -358,6 +350,23 @@ public class BrowserHelper {
     } else {
       throw new GenericException("Unsupported accept format: " + acceptFormat);
     }
+  }
+
+  public static StreamResponse getAipRepresentationPart(IndexedRepresentation representation, String part)
+    throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    String aipId = representation.getAipId();
+    String representationId = representation.getId();
+
+    if (RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION.equals(part)) {
+      Directory directory = RodaCoreFactory.getModelService().getDocumentationDirectory(aipId, representationId);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else if (RodaConstants.STORAGE_DIRECTORY_SCHEMAS.equals(part)) {
+      Directory directory = RodaCoreFactory.getModelService().getSchemasDirectory(aipId, representationId);
+      return DownloadUtils.download(RodaCoreFactory.getStorageService(), directory);
+    } else {
+      throw new GenericException("Unsupported part: " + part);
+    }
+    // TODO support download of other parts of the representation
   }
 
   protected static void validateListAipDescriptiveMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -392,7 +401,6 @@ public class BrowserHelper {
     }
 
     return createZipStreamResponse(zipEntries, aipId);
-
   }
 
   protected static void validateGetAipDescritiveMetadataParams(String acceptFormat) throws RequestNotValidException {
@@ -1522,4 +1530,5 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().delete(Format.class, idList);
     RodaCoreFactory.getIndexService().commit(Format.class);
   }
+
 }

@@ -298,6 +298,28 @@ public class Browser extends RodaCoreService {
     return aipRepresentation;
   }
 
+  public static StreamResponse getAipRepresentationPart(RodaUser user, String representationUUID, String part)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    Date startDate = new Date();
+
+    IndexedRepresentation representation = BrowserHelper.retrieve(IndexedRepresentation.class, representationUUID);
+
+    // check user permissions
+    UserUtility.checkRoles(user, BROWSE_ROLE);
+    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, representation.getAipId());
+    UserUtility.checkObjectPermissions(user, aip, PermissionType.READ);
+
+    // delegate
+    StreamResponse aipRepresentation = BrowserHelper.getAipRepresentationPart(representation, part);
+
+    // register action
+    long duration = new Date().getTime() - startDate.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getAipRepresentationPart", representation.getAipId(), duration,
+      RodaConstants.REPRESENTATION_ID, representation.getId(), "part", part);
+
+    return aipRepresentation;
+  }
+
   public static StreamResponse listAipDescriptiveMetadata(RodaUser user, String aipId, String start, String limit,
     String acceptFormat)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {

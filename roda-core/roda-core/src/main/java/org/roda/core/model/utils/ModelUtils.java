@@ -193,7 +193,7 @@ public final class ModelUtils {
   }
 
   private static List<String> getDocumentationPath(String aipId, String representationId) {
-    return build(getRepresentationDataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
+    return build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_DOCUMENTATION);
   }
 
   public static StoragePath getDocumentationStoragePath(String aipId) throws RequestNotValidException {
@@ -204,13 +204,13 @@ public final class ModelUtils {
     throws RequestNotValidException {
     return DefaultStoragePath.parse(getDocumentationPath(aipId, representationId));
   }
-  
+
   private static List<String> getSchemasPath(String aipId) {
     return build(getAIPPath(aipId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
   }
 
   private static List<String> getSchemasPath(String aipId, String representationId) {
-    return build(getRepresentationDataPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
+    return build(getRepresentationPath(aipId, representationId), RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
   }
 
   public static StoragePath getSchemasStoragePath(String aipId) throws RequestNotValidException {
