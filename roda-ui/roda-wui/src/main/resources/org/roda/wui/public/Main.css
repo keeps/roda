@@ -3829,6 +3829,15 @@ td.datePickerMonth, td.datePickerYear {
 	background-color: #EFBBBB !important;
 }
 
+.ingest-process-failed-column {
+	color: #d9534f;
+	font-weight: bolder;
+}
+
+.ingest-process-counter-0 {
+	color: #999;
+}
+
 /**********************************************
 				SHOW JOB
 ************************************************/

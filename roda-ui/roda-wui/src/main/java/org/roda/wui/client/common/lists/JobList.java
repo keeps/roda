@@ -30,6 +30,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -58,10 +59,10 @@ public class JobList extends BasicAsyncTableCell<Job> {
   private Column<Job, SafeHtml> statusColumn;
   private TextColumn<Job> progressColumn;
   private TextColumn<Job> objectsTotalCountColumn;
-  private TextColumn<Job> objectsSuccessCountColumn;
-  private TextColumn<Job> objectsFailureCountColumn;
-  private TextColumn<Job> objectsProcessingCountColumn;
-  private TextColumn<Job> objectsWaitingCountColumn;
+  private Column<Job, SafeHtml> objectsSuccessCountColumn;
+  private Column<Job, SafeHtml> objectsFailureCountColumn;
+  private Column<Job, SafeHtml> objectsProcessingCountColumn;
+  private Column<Job, SafeHtml> objectsWaitingCountColumn;
 
   public JobList() {
     this(null, null, null, false);
@@ -118,8 +119,13 @@ public class JobList extends BasicAsyncTableCell<Job> {
         if (job != null) {
           JOB_STATE state = job.getState();
           if (JOB_STATE.COMPLETED.equals(state)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
+            if (job.getObjectsCount() == job.getObjectsProcessedWithSuccess()) {
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
+            } else {
+              ret = SafeHtmlUtils
+                .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusCompleted() + "</span>");
+            }
           } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
             ret = SafeHtmlUtils.fromSafeConstant(
               "<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
@@ -145,59 +151,74 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
       @Override
       public String getValue(Job job) {
-        String ret = null;
+        String ret = "";
         if (job != null) {
-          ret = job.getObjectsCount() + "";
+          if (job.getObjectsCount() > 0) {
+            ret = job.getObjectsCount() + "";
+          }
         }
         return ret;
       }
     };
 
-    objectsSuccessCountColumn = new TextColumn<Job>() {
-
+    objectsSuccessCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(Job job) {
-        String ret = null;
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          ret = job.getObjectsProcessedWithSuccess() + "";
+          b.append(job.getObjectsProcessedWithSuccess() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getObjectsProcessedWithSuccess());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
-        return ret;
+        return b.toSafeHtml();
       }
     };
 
-    objectsFailureCountColumn = new TextColumn<Job>() {
-
+    objectsFailureCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(Job job) {
-        String ret = null;
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          ret = job.getObjectsProcessedWithFailure() + "";
+          b.append(SafeHtmlUtils.fromSafeConstant("<span"));
+          if (job.getObjectsProcessedWithFailure() > 0) {
+            b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-failed-column'"));
+          } else {
+            b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-counter-0'"));
+          }
+          b.append(SafeHtmlUtils.fromSafeConstant(">"));
+          b.append(job.getObjectsProcessedWithFailure());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
-        return ret;
+        return b.toSafeHtml();
       }
     };
 
-    objectsWaitingCountColumn = new TextColumn<Job>() {
-
+    objectsWaitingCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(Job job) {
-        String ret = null;
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          ret = job.getObjectsWaitingToBeProcessed() + "";
+          b.append(job.getObjectsWaitingToBeProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getObjectsWaitingToBeProcessed());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
-        return ret;
+        return b.toSafeHtml();
       }
     };
 
-    objectsProcessingCountColumn = new TextColumn<Job>() {
-
+    objectsProcessingCountColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public String getValue(Job job) {
-        String ret = null;
+      public SafeHtml getValue(Job job) {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          ret = job.getObjectsBeingProcessed() + "";
+          b.append(job.getObjectsBeingProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getObjectsBeingProcessed());
+          b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
-        return ret;
+        return b.toSafeHtml();
       }
     };
 
@@ -244,13 +265,13 @@ public class JobList extends BasicAsyncTableCell<Job> {
     startDateColumn.setCellStyleNames("nowrap");
     statusColumn.setCellStyleNames("nowrap");
     usernameColumn.setCellStyleNames("nowrap");
-    durationColumn.setCellStyleNames("nowrap");
-    progressColumn.setCellStyleNames("nowrap");
-    objectsTotalCountColumn.setCellStyleNames("nowrap");
-    objectsSuccessCountColumn.setCellStyleNames("nowrap");
-    objectsFailureCountColumn.setCellStyleNames("nowrap");
-    objectsProcessingCountColumn.setCellStyleNames("nowrap");
-    objectsWaitingCountColumn.setCellStyleNames("nowrap");
+    durationColumn.setCellStyleNames("nowrap text-align-right");
+    progressColumn.setCellStyleNames("nowrap text-align-right");
+    objectsTotalCountColumn.setCellStyleNames("nowrap text-align-right");
+    objectsSuccessCountColumn.setCellStyleNames("nowrap text-align-right");
+    objectsFailureCountColumn.setCellStyleNames("nowrap text-align-right");
+    objectsProcessingCountColumn.setCellStyleNames("nowrap text-align-right");
+    objectsWaitingCountColumn.setCellStyleNames("nowrap text-align-right");
   }
 
   @Override

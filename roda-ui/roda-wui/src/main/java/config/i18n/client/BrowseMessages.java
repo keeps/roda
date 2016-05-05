@@ -405,7 +405,7 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("done")
   String showJobStatusCompleted();
 
-  @DefaultMessage("failed")
+  @DefaultMessage("failed to start")
   String showJobStatusFailedDuringCreation();
 
   @DefaultMessage("failed")

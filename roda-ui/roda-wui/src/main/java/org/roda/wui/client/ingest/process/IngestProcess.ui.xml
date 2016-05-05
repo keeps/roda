@@ -33,7 +33,7 @@
 				<g:FlowPanel styleName="sidebar-group">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
-							State
+							Status
 						</g:Label>
 						<g:FlowPanel ui:field="stateFacets" />
 					</g:FlowPanel>
