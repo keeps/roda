@@ -11,14 +11,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
-import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.SimpleRodaMemberList;
+import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -26,7 +24,8 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -39,7 +38,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
 
 public class EditPermissions extends Composite {
 
@@ -89,12 +87,6 @@ public class EditPermissions extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  @UiField(provided = true)
-  SearchPanel searchPanel;
-
-  @UiField(provided = true)
-  SimpleRodaMemberList list;
-
   @UiField
   FlowPanel permissionsPanel;
 
@@ -103,31 +95,14 @@ public class EditPermissions extends Composite {
   public EditPermissions(IndexedAIP aip) {
     this.aip = aip;
 
-    Filter filter = null;
-    list = new SimpleRodaMemberList(filter, null, "Users and groups", false);
-
-    searchPanel = new SearchPanel(null, null, "", false, false);
-    searchPanel.setList(list);
-
     initWidget(uiBinder.createAndBindUi(this));
-
-    list.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        RODAMember selected = list.getSelectionModel().getSelectedObject();
-        if (selected != null) {
-          addPermissionPanel(selected);
-        }
-      }
-    });
 
     createPermissionPanel();
   }
 
   private void createPermissionPanel() {
     Permissions permissions = aip.getPermissions();
-    
+
     GWT.log(aip.getPermissions().toString());
 
     for (String username : permissions.getUsernames()) {
@@ -143,6 +118,24 @@ public class EditPermissions extends Composite {
     permissionsPanel.insert(new PermissionPanel(member), 0);
   }
 
+  @UiHandler("buttonAdd")
+  void buttonAddHandler(ClickEvent e) {
+    // TODO add filter that excludes already added users/group
+
+    MemberSelectDialog selectDialog = new MemberSelectDialog("Select user or group to add", null);
+    selectDialog.showAndCenter();
+    selectDialog.addValueChangeHandler(new ValueChangeHandler<RODAMember>() {
+
+      @Override
+      public void onValueChange(ValueChangeEvent<RODAMember> event) {
+        RODAMember selected = event.getValue();
+        if (selected != null) {
+          addPermissionPanel(selected);
+        }
+      }
+    });
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     Permissions permissions = new Permissions();
@@ -156,14 +149,14 @@ public class EditPermissions extends Composite {
         permissions.setGroupPermissions(permissionPanel.getName(), permissionPanel.getPermissions());
       }
     }
-    
+
     BrowserService.Util.getInstance().updateAIPPermssions(aip.getId(), permissions, new AsyncCallback<Void>() {
-      
+
       @Override
       public void onSuccess(Void result) {
         cancel();
       }
-      
+
       @Override
       public void onFailure(Throwable caught) {
         Toast.showError(caught.getMessage());
@@ -176,7 +169,7 @@ public class EditPermissions extends Composite {
   void buttonCancelHandler(ClickEvent e) {
     cancel();
   }
-  
+
   public void cancel() {
     Tools.newHistory(Browse.RESOLVER, aip.getId());
   }
@@ -184,14 +177,11 @@ public class EditPermissions extends Composite {
   public class PermissionPanel extends Composite {
     private FlowPanel panel;
     private FlowPanel panelBody;
-    private SafeHtml type;
+    private FlowPanel rightPanel;
+    private HTML type;
     private Label nameLabel;
-    private FlowPanel showPermissionsPanel;
     private FlowPanel editPermissionsPanel;
     private Button removePanel;
-    private Button editPermissionsButton;
-    private Button savePermissionsButton;
-    private Button cancelEditPermissionsButton;
 
     private String name;
     private boolean isUser;
@@ -207,10 +197,12 @@ public class EditPermissions extends Composite {
       panel = new FlowPanel();
       panelBody = new FlowPanel();
 
-      type = SafeHtmlUtils.fromSafeConstant(isUser ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>");
+      type = new HTML(
+        SafeHtmlUtils.fromSafeConstant(isUser ? "<i class='fa fa-user'></i>" : "<i class='fa fa-users'></i>"));
       nameLabel = new Label(name);
 
-      showPermissionsPanel = new FlowPanel();
+      rightPanel = new FlowPanel();
+
       editPermissionsPanel = new FlowPanel();
 
       for (PermissionType permissionType : Permissions.PermissionType.values()) {
@@ -219,28 +211,30 @@ public class EditPermissions extends Composite {
           valueCheckBox.setValue(true);
         }
         editPermissionsPanel.add(valueCheckBox);
+        valueCheckBox.addStyleName("permission-edit-checkbox");
       }
 
       removePanel = new Button("Remove");
-      editPermissionsButton = new Button("Edit");
-      savePermissionsButton = new Button("Save");
-      cancelEditPermissionsButton = new Button("Cancel");
 
-      panelBody.add(new HTML(type));
+      panelBody.add(type);
       panelBody.add(nameLabel);
-      panelBody.add(showPermissionsPanel);
-      panelBody.add(editPermissionsPanel);
-      panelBody.add(removePanel);
-      panelBody.add(editPermissionsButton);
-      panelBody.add(savePermissionsButton);
-      panelBody.add(cancelEditPermissionsButton);
+      panelBody.add(rightPanel);
+
+      rightPanel.add(editPermissionsPanel);
+      rightPanel.add(removePanel);
 
       panel.add(panelBody);
 
       initWidget(panel);
 
-      panel.addStyleName("panel");
+      panel.addStyleName("panel permission");
+      panel.addStyleName(isUser ? "permission-user" : "permission-group");
       panelBody.addStyleName("panel-body");
+      type.addStyleName("permission-type");
+      nameLabel.addStyleName("permission-name");
+      rightPanel.addStyleName("pull-right");
+      editPermissionsPanel.addStyleName("permission-edit");
+      removePanel.addStyleName("permission-remove btn btn-ban");
 
       removePanel.addClickHandler(new ClickHandler() {
 
@@ -250,48 +244,6 @@ public class EditPermissions extends Composite {
         }
       });
 
-      editPermissionsButton.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          setEditMode(true);
-        }
-      });
-
-      savePermissionsButton.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          showPermissionsPanel.clear();
-          for (int i = 0; i < editPermissionsPanel.getWidgetCount(); i++) {
-            ValueCheckBox valueCheckBox = (ValueCheckBox) editPermissionsPanel.getWidget(i);
-            if (valueCheckBox.getValue()) {
-              showPermissionsPanel.add(new Label(valueCheckBox.getPermissionType().toString()));
-            }
-          }
-          setEditMode(false);
-        }
-      });
-
-      cancelEditPermissionsButton.addClickHandler(new ClickHandler() {
-
-        @Override
-        public void onClick(ClickEvent event) {
-          setEditMode(false);
-        }
-      });
-
-      setEditMode(true);
-    }
-
-    private void setEditMode(boolean editMode) {
-      showPermissionsPanel.setVisible(!editMode);
-      removePanel.setVisible(!editMode);
-      editPermissionsButton.setVisible(!editMode);
-
-      editPermissionsPanel.setVisible(editMode);
-      savePermissionsButton.setVisible(editMode);
-      cancelEditPermissionsButton.setVisible(editMode);
     }
 
     public Set<PermissionType> getPermissions() {
@@ -304,7 +256,7 @@ public class EditPermissions extends Composite {
       }
       return permissions;
     }
-    
+
     public String getName() {
       return name;
     }

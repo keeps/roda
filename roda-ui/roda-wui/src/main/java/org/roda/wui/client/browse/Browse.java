@@ -863,14 +863,14 @@ public class Browse extends Composite {
         new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
       SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
       if (itemBundle.getAip().getParentID() != null) {
-        selectAipDialog.setEmptyParentButtonVisible();
+        selectAipDialog.setEmptyParentButtonVisible(true);
       }
       selectAipDialog.showAndCenter();
-      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IsIndexed>() {
+      selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
         @Override
-        public void onValueChange(ValueChangeEvent<IsIndexed> event) {
-          final IndexedAIP parentAIP = (IndexedAIP) event.getValue();
+        public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+          final IndexedAIP parentAIP = event.getValue();
           final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
           BrowserService.Util.getInstance().moveInHierarchy(aipId, parentId, new AsyncCallback<AIP>() {

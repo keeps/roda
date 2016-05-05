@@ -128,10 +128,10 @@ public class JobList extends BasicAsyncTableCell<Job> {
             }
           } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
             ret = SafeHtmlUtils.fromSafeConstant(
-              "<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
+              "<span class='label-default'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
           } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
             ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedToComplete() + "</span>");
+              .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusFailedToComplete() + "</span>");
           } else if (JOB_STATE.CREATED.equals(state)) {
             ret = SafeHtmlUtils
               .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");

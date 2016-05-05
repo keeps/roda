@@ -310,7 +310,7 @@ public final class RodaConstants {
   // MEMBER: USER or GROUP
   public static final String MEMBERS_ID = "id";
   public static final String MEMBERS_NAME = "name";
-  public static final String MEMBERS_FULLNAME = "fullName";
+  // public static final String MEMBERS_FULLNAME = "fullName";
   public static final String MEMBERS_IS_ACTIVE = "isActive";
   public static final String MEMBERS_IS_USER = "isUser";
   public static final String MEMBERS_GROUPS_ALL = "groupsAll";

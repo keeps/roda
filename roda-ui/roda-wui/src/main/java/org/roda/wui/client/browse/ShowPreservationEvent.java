@@ -384,8 +384,11 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
+      Anchor link = new Anchor("Inspect intellectual entity",
+        Tools.createHistoryHashLink(Browse.RESOLVER, iAIP.getId()));
       footer.add(link);
+
+      link.addStyleName("btn");
 
     } else {
       Label idLabel = new Label("Identifier (not found)");
@@ -425,8 +428,10 @@ public class ShowPreservationEvent extends Composite {
       body.add(originalLabel);
       body.add(originalValue);
 
-      Anchor link = new Anchor("open",
-        Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getAipId(), irep.getId()));
+      Anchor link = new Anchor("Inspect representation",
+        Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, irep.getAipId(), irep.getUUID()));
+
+      link.addStyleName("btn");
 
       FlowPanel footer = new FlowPanel();
       footer.addStyleName("panel-footer");
@@ -506,8 +511,10 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER, ifile.getAipId(),
-        ifile.getRepresentationUUID(), ifile.getUUID()));
+      Anchor link = new Anchor("Inspect file", Tools.createHistoryHashLink(ViewRepresentation.RESOLVER,
+        ifile.getAipId(), ifile.getRepresentationUUID(), ifile.getUUID()));
+
+      link.addStyleName("btn");
       footer.add(link);
 
     } else {
@@ -557,7 +564,10 @@ public class ShowPreservationEvent extends Composite {
       footer.addStyleName("panel-footer");
       layout.add(footer);
 
-      Anchor link = new Anchor("open", Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
+      Anchor link = new Anchor("Inspect transferred resource",
+        Tools.createHistoryHashLink(IngestTransfer.RESOLVER, tr.getUUID()));
+      link.addStyleName("btn");
+
       footer.add(link);
 
     } else {

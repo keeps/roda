@@ -13,10 +13,8 @@
 	<g:FlowPanel styleName="wui-management-user" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">Edit permissions</g:Label>
-				<common:SearchPanel ui:field="searchPanel" />
-				<lists:SimpleRodaMemberList
-					addStyleNames="searchResults" ui:field="list" />
+				<g:Label styleName="h1">Archival package permissions</g:Label>
+				<g:Label styleName="h4">Assigned permissions</g:Label>
 				<g:FlowPanel ui:field="permissionsPanel" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
@@ -24,6 +22,9 @@
 					<g:Label addStyleNames="h5">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+						Add
+					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
 						Save
 					</g:Button>

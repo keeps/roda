@@ -35,7 +35,7 @@ public class Filter implements Serializable {
    *          the {@link Filter} to clone.
    */
   public Filter(Filter filter) {
-    this(filter.getParameters());
+    this(filter != null ? filter.getParameters() : new ArrayList<FilterParameter>());
   }
 
   /**

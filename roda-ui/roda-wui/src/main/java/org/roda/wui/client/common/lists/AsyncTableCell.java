@@ -143,7 +143,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     dataProvider.addDataDisplay(display);
 
-    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.RIGHT, false, true);
+    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.LEFT, false, true);
     resultsPager.setDisplay(display);
 
     pageSizePager = new PageSizePager(getPageSizePagerIncrement());
@@ -151,9 +151,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     createSelectAllPanel();
 
-    add(resultsPager);
+    
     add(selectAllPanel);
     add(display);
+    add(resultsPager);
     add(pageSizePager);
 
     selectionModel = new SingleSelectionModel<>(getKeyProvider());

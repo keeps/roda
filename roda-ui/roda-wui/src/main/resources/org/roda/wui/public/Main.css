@@ -708,13 +708,20 @@ pre>code {
 }
 
 .my-asyncdatagrid-pager-results {
-	margin-right: 0px;
-	margin-left: auto;
+    display: inline-block;
+    line-height: 1;
+    font-size: 1.3rem;
+}
+
+.my-asyncdatagrid-pager-results img{
+	vertical-align: middle;
 }
 
 .my-asyncdatagrid-pager-pagesize {
-	margin-left: auto;
-	margin-top: 5px;
+	/*margin-left: auto; */
+    /* margin-top: 5px; */
+    display: inline-block;
+    float: right;
 }
 
 .my-asyncdatagrid-pager-pagesize a {
@@ -1514,6 +1521,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .sidebar-facet-input-date {
 	width: 45%;
+	font-size: 1.2rem;
 }
 
 .sidebar-facet-date-separator {
@@ -4181,6 +4189,31 @@ td.datePickerMonth, td.datePickerYear {
 	color: #999;
 }
 
+.permission {
+	margin-bottom: 10px;
+}
+
+.permission-group .panel-body {
+    background-color: #EEE;
+}
+
+.permission .permission-type {
+	display: inline;
+}
+
+.permission .permission-type, .permission-name, .permission-edit {
+	display: inline;
+	margin-right: 10px; 
+}
+
+.permission-edit {
+	margin-right: 5rem;
+}
+
+.permission-edit-checkbox {
+	margin-left: 10px; 
+}
+
 /** Create/Edit User **/
 .wui-user-data .office-input-panel {
 	margin-top: 10px;
@@ -4714,10 +4747,11 @@ td.datePickerMonth, td.datePickerYear {
 	margin-bottom: 20px;
 }
 
+/*
 .selectAip .selectAipResultsPanel .my-asyncdatagrid-pager-results,
 .selectAip .selectAipResultsPanel thead {
 	display: none;
-}
+}*/
 
 @media (max-width: 800px) {
 	.selectAip .selectAipResultsPanel {

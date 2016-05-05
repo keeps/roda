@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -139,11 +138,11 @@ public class PluginParameterPanel extends Composite {
       public void onClick(ClickEvent event) {
         SelectAipDialog selectAipDialog = new SelectAipDialog(parameter.getName());
         selectAipDialog.showAndCenter();
-        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IsIndexed>() {
+        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
           @Override
-          public void onValueChange(ValueChangeEvent<IsIndexed> event) {
-            IndexedAIP aip = (IndexedAIP) event.getValue();
+          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+            IndexedAIP aip = event.getValue();
 
             Label itemTitle = new Label();
             HTMLPanel itemIconHtmlPanel = DescriptionLevelUtils.getElementLevelIconHTMLPanel(aip.getLevel());

@@ -13,10 +13,10 @@ import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
 
-public interface SelectDialog extends HasValueChangeHandlers<IsIndexed> {
+public interface SelectDialog<T extends IsIndexed> extends HasValueChangeHandlers<T> {
 
   public void showAndCenter();
 
-  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<IsIndexed> changeHandler);
+  public HandlerRegistration addValueChangeHandler(ValueChangeHandler<T> changeHandler);
 
 }
