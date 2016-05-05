@@ -47,26 +47,7 @@ import org.slf4j.LoggerFactory;
 public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
-  public static String START_SUCCESS = "The ingest process has started.";
-  public static String START_FAILURE = "The ingest process has started.";
-  public static String START_PARTIAL = "The ingest process has started.";
-  public static String START_DESCRIPTION = "The ingest process has started.";
-  public static PreservationEventType START_TYPE = PreservationEventType.INGEST_START;
-
-  public static String END_SUCCESS = "The ingest process has successfully ended.";
-  public static String END_FAILURE = "Failed to conclude the ingest process.";
-  public static String END_PARTIAL = "The ingest process ended, however, some of the SIPs could not be successfully ingested.";
-  public static String END_DESCRIPTION = "The ingest process has ended.";
-  public static PreservationEventType END_TYPE = PreservationEventType.INGEST_END;
-
-  private int totalSteps = 2;
-  private Map<String, String> aipIdToTransferredResourceId;
   private RiskJobPluginInfo info = new RiskJobPluginInfo();
-
-  private String successMessage;
-  private String failureMessage;
-  private PreservationEventType eventType;
-  private String eventDescription;
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -83,8 +64,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    // totalSteps = calculateEfectiveTotalSteps();
-    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, getTotalSteps() + "");
   }
 
   @Override
@@ -136,20 +115,22 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
-    String emails = PluginHelper.getStringFromParameters(this,
-      pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
-    if (!"".equals(emails)) {
-      List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
-      try {
+    try {
+
+      String emails = PluginHelper.getStringFromParameters(this,
+        pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+      if (!"".equals(emails)) {
+        List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
         Notification notification = new Notification();
-        notification.setSubject("New process was completed");
+        notification.setSubject("RODA risk process finished - XXX");
         notification.setFromUser("Job Process");
         notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
         model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
-      } catch (GenericException e) {
-        LOGGER.error("Error while creating new notification", e);
       }
+
+    } catch (GenericException e) {
+      LOGGER.error("Could not send ingest notification");
     }
 
     return null;
@@ -190,50 +171,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   @Override
-  public PreservationEventType getPreservationEventType() {
-    return eventType;
-  }
-
-  @Override
-  public String getPreservationEventDescription() {
-    return eventDescription;
-  }
-
-  @Override
-  public String getPreservationEventSuccessMessage() {
-    return successMessage;
-  }
-
-  @Override
-  public String getPreservationEventFailureMessage() {
-    return failureMessage;
-  }
-
-  public void setPreservationEventType(PreservationEventType t) {
-    this.eventType = t;
-  }
-
-  public void setPreservationSuccessMessage(String message) {
-    this.successMessage = message;
-  }
-
-  public void setPreservationFailureMessage(String message) {
-    this.failureMessage = message;
-  }
-
-  public void setPreservationEventDescription(String description) {
-    this.eventDescription = description;
-  }
-
-  public int getTotalSteps() {
-    return totalSteps;
-  }
-
-  public void setTotalSteps(int steps) {
-    this.totalSteps = steps;
-  }
-
-  @Override
   public String getName() {
     return "Risk Job Plugin Name";
   }
@@ -251,5 +188,25 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public PreservationEventType getPreservationEventType() {
+    return PreservationEventType.VALIDATION;
+  }
+
+  @Override
+  public String getPreservationEventDescription() {
+    return "";
+  }
+
+  @Override
+  public String getPreservationEventSuccessMessage() {
+    return "";
+  }
+
+  @Override
+  public String getPreservationEventFailureMessage() {
+    return "";
   }
 }

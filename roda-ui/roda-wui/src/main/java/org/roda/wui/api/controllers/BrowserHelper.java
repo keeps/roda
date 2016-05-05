@@ -58,7 +58,9 @@ import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -88,6 +90,9 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
+import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -96,6 +101,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
@@ -1291,45 +1297,37 @@ public class BrowserHelper {
 
   }
 
-  public static Risk addRisk(Risk risk) throws GenericException, RequestNotValidException {
-    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk);
-    RodaCoreFactory.getIndexService().create(Risk.class, createdRisk);
+  public static Risk addRisk(Risk risk, boolean commit) throws GenericException, RequestNotValidException {
+    Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, commit);
     RodaCoreFactory.getIndexService().commit(Risk.class);
     return createdRisk;
   }
 
-  public static void modifyRisk(Risk risk, String message) throws GenericException, RequestNotValidException {
-    RodaCoreFactory.getModelService().updateRisk(risk, message);
-    RodaCoreFactory.getIndexService().delete(Risk.class, Arrays.asList(risk.getId()));
-    RodaCoreFactory.getIndexService().create(Risk.class, risk);
+  public static void modifyRisk(Risk risk, String message, boolean commit)
+    throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
     RodaCoreFactory.getIndexService().commit(Risk.class);
   }
 
-  public static Agent addAgent(Agent agent) throws GenericException, RequestNotValidException {
-    Agent createdAgent = RodaCoreFactory.getModelService().createAgent(agent);
-    RodaCoreFactory.getIndexService().create(Agent.class, createdAgent);
+  public static Agent addAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
+    Agent createdAgent = RodaCoreFactory.getModelService().createAgent(agent, commit);
     RodaCoreFactory.getIndexService().commit(Agent.class);
     return createdAgent;
   }
 
-  public static void modifyAgent(Agent agent) throws GenericException, RequestNotValidException {
-    RodaCoreFactory.getModelService().updateAgent(agent);
-    RodaCoreFactory.getIndexService().delete(Agent.class, Arrays.asList(agent.getId()));
-    RodaCoreFactory.getIndexService().create(Agent.class, agent);
+  public static void modifyAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateAgent(agent, commit);
     RodaCoreFactory.getIndexService().commit(Agent.class);
   }
 
-  public static Format addFormat(Format format) throws GenericException, RequestNotValidException {
-    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format);
-    RodaCoreFactory.getIndexService().create(Format.class, createdFormat);
+  public static Format addFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+    Format createdFormat = RodaCoreFactory.getModelService().createFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
     return createdFormat;
   }
 
-  public static void modifyFormat(Format format) throws GenericException, RequestNotValidException {
-    RodaCoreFactory.getModelService().updateFormat(format);
-    RodaCoreFactory.getIndexService().delete(Format.class, Arrays.asList(format.getId()));
-    RodaCoreFactory.getIndexService().create(Format.class, format);
+  public static void modifyFormat(Format format, boolean commit) throws GenericException, RequestNotValidException {
+    RodaCoreFactory.getModelService().updateFormat(format, commit);
     RodaCoreFactory.getIndexService().commit(Format.class);
   }
 
@@ -1387,7 +1385,7 @@ public class BrowserHelper {
 
   public static void revertRiskVersion(String riskId, String versionId, String message)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, message);
+    RodaCoreFactory.getModelService().revertRiskVersion(riskId, versionId, message, false);
   }
 
   public static void removeRiskVersion(String riskId, String versionId)
@@ -1576,47 +1574,45 @@ public class BrowserHelper {
     return properties;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+  public static void deleteRisk(RodaUser user, SelectedItems selected)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
+    InvalidParameterException, JobAlreadyStartedException {
     List<String> idList = consolidate(user, Risk.class, selected);
+
     for (String riskId : idList) {
-      RodaCoreFactory.getModelService().deleteRisk(riskId);
+      RodaCoreFactory.getModelService().deleteRisk(riskId, true);
     }
-    RodaCoreFactory.getIndexService().delete(Risk.class, idList);
-    RodaCoreFactory.getIndexService().commit(Risk.class);
+
+    RiskIncidenceRemoverPlugin plugin = new RiskIncidenceRemoverPlugin();
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("riskIds", StringUtils.join(idList, ","));
+
+    Date jobDate = new Date();
+    PluginInfo pluginInfo = new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(),
+      plugin.getDescription(), plugin.getType(), plugin.getParameters());
+
+    Job job = new Job();
+    job.setName(plugin.getName() + " " + jobDate);
+    job.setPlugin(pluginInfo.getId());
+    job.setPluginParameters(parameters);
+    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS);
+
+    Jobs.createJob(user, job);
   }
 
   public static void deleteAgent(RodaUser user, SelectedItems<Agent> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Agent.class, selected);
     for (String agentId : idList) {
-      RodaCoreFactory.getModelService().deleteAgent(agentId);
+      RodaCoreFactory.getModelService().deleteAgent(agentId, true);
     }
-    RodaCoreFactory.getIndexService().delete(Agent.class, idList);
-    RodaCoreFactory.getIndexService().commit(Agent.class);
   }
 
   public static void deleteFormat(RodaUser user, SelectedItems<Format> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> idList = consolidate(user, Format.class, selected);
     for (String formatId : idList) {
-      RodaCoreFactory.getModelService().deleteFormat(formatId);
-    }
-    RodaCoreFactory.getIndexService().delete(Format.class, idList);
-    RodaCoreFactory.getIndexService().commit(Format.class);
-  }
-
-  public static int getObjectRiskSize(String aipId) throws GenericException, RequestNotValidException {
-    Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_ELEMENT_ID, aipId));
-    IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
-      new Sublist());
-
-    if (incidences.getResults().size() == 1) {
-      RiskIncidence incidence = incidences.getResults().get(0);
-      return incidence.getRisks().size();
-    } else {
-      throw new GenericException();
+      RodaCoreFactory.getModelService().deleteFormat(formatId, true);
     }
   }
 
@@ -1630,7 +1626,8 @@ public class BrowserHelper {
       RiskIncidence incidence = incidences.getResults().get(0);
       return incidence.getRisks();
     } else {
-      throw new GenericException();
+      return new ArrayList<String>();
     }
   }
+
 }

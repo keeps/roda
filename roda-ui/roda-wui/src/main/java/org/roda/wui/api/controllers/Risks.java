@@ -40,14 +40,14 @@ public class Risks extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Risk createRisk(RodaUser user, Risk risk) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException {
+  public static Risk createRisk(RodaUser user, Risk risk)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createRisk(risk);
+    RodaCoreFactory.getModelService().createRisk(risk, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -56,15 +56,15 @@ public class Risks extends RodaCoreService {
     return risk;
   }
 
-  public static void deleteRisk(RodaUser user, String riskId) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void deleteRisk(RodaUser user, String riskId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().deleteRisk(riskId);
+    RodaCoreFactory.getModelService().deleteRisk(riskId, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

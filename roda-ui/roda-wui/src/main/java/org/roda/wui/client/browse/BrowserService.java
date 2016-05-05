@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -218,8 +219,8 @@ public interface BrowserService extends RemoteService {
 
   MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 
-  void deleteRisk(SelectedItems<Risk> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+  void deleteRisk(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   void deleteAgent(SelectedItems<Agent> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
@@ -230,8 +231,6 @@ public interface BrowserService extends RemoteService {
   Job createProcess(String jobName, SelectedItems<TransferredResource> selected, String id, Map<String, String> value)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
     JobAlreadyStartedException;
-
-  int getObjectRiskSize(String aipId) throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   List<String> getRiskOnAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;

@@ -190,7 +190,7 @@ public class IndexService {
   }
 
   public void reindexRisk(Risk risk) {
-    observer.riskCreatedOrUpdated(risk);
+    observer.riskCreatedOrUpdated(risk, false);
   }
 
   public void reindexRiskIncidence(RiskIncidence riskIncidence) {
@@ -198,11 +198,11 @@ public class IndexService {
   }
 
   public void reindexAgent(Agent agent) {
-    observer.agentCreatedOrUpdated(agent);
+    observer.agentCreatedOrUpdated(agent, false);
   }
 
   public void reindexFormat(Format format) {
-    observer.formatCreatedOrUpdated(format);
+    observer.formatCreatedOrUpdated(format, false);
   }
 
   public void reindexNotification(Notification notification) {

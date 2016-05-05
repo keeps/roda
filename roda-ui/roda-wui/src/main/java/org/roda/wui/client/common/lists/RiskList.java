@@ -49,6 +49,7 @@ import config.i18n.client.RiskMessages;
 public class RiskList extends BasicAsyncTableCell<Risk> {
 
   private static final int PAGE_SIZE = 20;
+  private Filter filter;
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   // private static final BrowseMessages messages =
@@ -69,6 +70,7 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
     super.setSelectedClass(Risk.class);
+    this.filter = filter;
   }
 
   @Override
@@ -187,6 +189,17 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
         return item.getId();
       }
     };
+  }
+
+  @Override
+  public void setFilter(Filter filter) {
+    if (filter == null) {
+      super.setFilter(this.filter);
+    } else {
+      super.setFilter(filter);
+    }
+
+    refresh();
   }
 
   @Override

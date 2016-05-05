@@ -40,14 +40,14 @@ public class Formats extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Format createFormat(RodaUser user, Format format) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException {
+  public static Format createFormat(RodaUser user, Format format)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createFormat(format);
+    RodaCoreFactory.getModelService().createFormat(format, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -56,15 +56,15 @@ public class Formats extends RodaCoreService {
     return format;
   }
 
-  public static void deleteFormat(RodaUser user, String formatId) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void deleteFormat(RodaUser user, String formatId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().deleteFormat(formatId);
+    RodaCoreFactory.getModelService().deleteFormat(formatId, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

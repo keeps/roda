@@ -158,7 +158,6 @@ public interface BrowserServiceAsync {
   void createProcess(String jobName, SelectedItems selected, String id, Map<String, String> value,
     AsyncCallback<Job> asyncCallback);
 
-  void getObjectRiskSize(String aipId, AsyncCallback<Integer> asyncCallback);
-
   void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);
+
 }

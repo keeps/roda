@@ -230,15 +230,15 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyRiskCreatedOrUpdated(Risk risk) {
+  protected void notifyRiskCreatedOrUpdated(Risk risk, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.riskCreatedOrUpdated(risk);
+      observer.riskCreatedOrUpdated(risk, commit);
     }
   }
 
-  protected void notifyRiskDeleted(String riskId) {
+  protected void notifyRiskDeleted(String riskId, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.riskDeleted(riskId);
+      observer.riskDeleted(riskId, commit);
     }
   }
 
@@ -250,31 +250,31 @@ public abstract class ModelObservable {
 
   protected void notifyRiskIncidenceDeleted(String riskIncidenceId) {
     for (ModelObserver observer : observers) {
-      observer.riskDeleted(riskIncidenceId);
+      observer.riskIncidenceDeleted(riskIncidenceId);
     }
   }
 
-  protected void notifyAgentCreatedOrUpdated(Agent agent) {
+  protected void notifyAgentCreatedOrUpdated(Agent agent, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.agentCreatedOrUpdated(agent);
+      observer.agentCreatedOrUpdated(agent, commit);
     }
   }
 
-  protected void notifyAgentDeleted(String agentId) {
+  protected void notifyAgentDeleted(String agentId, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.agentDeleted(agentId);
+      observer.agentDeleted(agentId, commit);
     }
   }
 
-  protected void notifyFormatCreatedOrUpdated(Format format) {
+  protected void notifyFormatCreatedOrUpdated(Format format, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.formatCreatedOrUpdated(format);
+      observer.formatCreatedOrUpdated(format, commit);
     }
   }
 
-  protected void notifyFormatDeleted(String formatId) {
+  protected void notifyFormatDeleted(String formatId, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.formatDeleted(formatId);
+      observer.formatDeleted(formatId, commit);
     }
   }
 

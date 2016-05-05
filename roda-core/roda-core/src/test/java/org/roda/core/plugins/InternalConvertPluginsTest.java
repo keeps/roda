@@ -658,7 +658,7 @@ public class InternalConvertPluginsTest {
   @Test
   public void testVeraPDFPlugin() throws RODAException, FileAlreadyExistsException, InterruptedException, IOException,
     SolrServerException, IsStillUpdatingException {
-    AIP aip = ingestCorpora(2);
+    ingestCorpora(2);
 
     Plugin<AIP> plugin = new VeraPDFPlugin();
     Map<String, String> parameters = new HashMap<>();

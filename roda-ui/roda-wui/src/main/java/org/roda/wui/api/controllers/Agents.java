@@ -40,14 +40,14 @@ public class Agents extends RodaCoreService {
    * ---------------- REST related methods - start -----------------------------
    * ---------------------------------------------------------------------------
    */
-  public static Agent createAgent(RodaUser user, Agent agent) throws AuthorizationDeniedException,
-    RequestNotValidException, NotFoundException, GenericException {
+  public static Agent createAgent(RodaUser user, Agent agent)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
     Date startDate = new Date();
 
     // FIXME check user permissions
     UserUtility.checkRoles(user, INGEST_SUBMIT_ROLE);
 
-    RodaCoreFactory.getModelService().createAgent(agent);
+    RodaCoreFactory.getModelService().createAgent(agent, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -56,15 +56,15 @@ public class Agents extends RodaCoreService {
     return agent;
   }
 
-  public static void deleteAgent(RodaUser user, String agentId) throws RequestNotValidException, GenericException,
-    NotFoundException, AuthorizationDeniedException {
+  public static void deleteAgent(RodaUser user, String agentId)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     Date startDate = new Date();
 
     // check user permissions
     // FIXME
 
     // delegate
-    RodaCoreFactory.getModelService().deleteAgent(agentId);
+    RodaCoreFactory.getModelService().deleteAgent(agentId, false);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

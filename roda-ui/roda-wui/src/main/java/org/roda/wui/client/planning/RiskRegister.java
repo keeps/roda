@@ -244,6 +244,7 @@ public class RiskRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
+      riskList.setFilter(null);
       riskList.refresh();
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
@@ -271,7 +272,6 @@ public class RiskRegister extends Composite {
         @Override
         public void onSuccess(List<String> result) {
           riskList.setFilter(new Filter(new OneOfManyFilterParameter(riskIdConstant, result)));
-          riskList.refresh();
         }
       });
 

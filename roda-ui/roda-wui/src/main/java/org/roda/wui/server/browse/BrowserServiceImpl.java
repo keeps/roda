@@ -25,6 +25,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
@@ -567,9 +568,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRisk(SelectedItems<Risk> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public void deleteRisk(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+    RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+
     Browser.deleteRisk(user, selected);
   }
 
@@ -613,13 +615,6 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     }
 
     return Jobs.createJob(user, job);
-  }
-
-  @Override
-  public int getObjectRiskSize(String aipId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.getObjectRiskSize(user, aipId);
   }
 
   @Override

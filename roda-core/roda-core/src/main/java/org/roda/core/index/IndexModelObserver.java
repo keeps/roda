@@ -807,14 +807,28 @@ public class IndexModelObserver implements ModelObserver {
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }
 
-  public void riskCreatedOrUpdated(Risk risk) {
+  public void riskCreatedOrUpdated(Risk risk, boolean commit) {
     addDocumentToIndex(RodaConstants.INDEX_RISK, SolrUtils.riskToSolrDocument(risk), "Error creating Risk");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Risk.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
-  public void riskDeleted(String riskId) {
+  public void riskDeleted(String riskId, boolean commit) {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_RISKS, riskId,
-      "Error deleting RiskIncidences (riskId=" + riskId + ")");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Risk.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
   public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {
@@ -827,20 +841,52 @@ public class IndexModelObserver implements ModelObserver {
       "Error deleting Risk Incidence (id=" + riskIncidenceId + ")");
   }
 
-  public void agentCreatedOrUpdated(Agent agent) {
+  public void agentCreatedOrUpdated(Agent agent, boolean commit) {
     addDocumentToIndex(RodaConstants.INDEX_AGENT, SolrUtils.agentToSolrDocument(agent), "Error creating Agent");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Risk.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
-  public void agentDeleted(String agentId) {
+  public void agentDeleted(String agentId, boolean commit) {
     deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Agent.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
-  public void formatCreatedOrUpdated(Format format) {
+  public void formatCreatedOrUpdated(Format format, boolean commit) {
     addDocumentToIndex(RodaConstants.INDEX_FORMAT, SolrUtils.formatToSolrDocument(format), "Error creating Format");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Risk.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
-  public void formatDeleted(String formatId) {
+  public void formatDeleted(String formatId, boolean commit) {
     deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, Format.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
   @Override

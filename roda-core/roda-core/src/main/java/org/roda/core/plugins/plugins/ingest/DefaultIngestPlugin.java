@@ -325,20 +325,22 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
-    String emails = PluginHelper.getStringFromParameters(this,
-      getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
-    if (!"".equals(emails)) {
-      List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
-      try {
+    try {
+
+      String emails = PluginHelper.getStringFromParameters(this,
+        getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+      if (!"".equals(emails)) {
+        List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
         Notification notification = new Notification();
-        notification.setSubject("New ingest process was completed");
-        notification.setFromUser("Ingest Process");
+        notification.setSubject("RODA ingest process finished - XXX");
+        notification.setFromUser("Job Process");
         notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
-      } catch (GenericException e) {
-        LOGGER.error("Error while creating new message", e);
+        model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
       }
+
+    } catch (GenericException e) {
+      LOGGER.error("Could not send ingest notification");
     }
 
     return null;

@@ -587,7 +587,7 @@ public class IndexServiceTest {
       HashMap<String, String> affectedObjects = new HashMap<String, String>();
       affectedObjects.put("Affected related type", "Affected related value");
       risk.setAffectedObjects(affectedObjects);
-      model.createRisk(risk);
+      model.createRisk(risk, false);
 
       index.commit(Risk.class);
 
@@ -605,14 +605,14 @@ public class IndexServiceTest {
       assertEquals(risk.getName(), risk3.getName());
 
       risk3.setName("Risk New Name");
-      model.updateRisk(risk3, "Risk updated");
+      model.updateRisk(risk3, "Risk updated", false);
 
       Risk risk4 = index.retrieve(Risk.class, risk.getId());
       assertNotNull(risk4);
       assertEquals(risk.getId(), risk4.getId());
       assertEquals(risk4.getName(), "Risk New Name");
 
-      model.deleteRisk(risk.getId());
+      model.deleteRisk(risk.getId(), false);
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       e.printStackTrace();
@@ -663,7 +663,7 @@ public class IndexServiceTest {
       formatIds.add("format1");
       agent.setFormatIds(formatIds);
 
-      model.createAgent(agent);
+      model.createAgent(agent, false);
 
       Agent agent2 = model.retrieveAgent(agent.getId());
       assertNotNull(agent2);
@@ -681,14 +681,14 @@ public class IndexServiceTest {
       assertEquals(agent.getName(), agent3.getName());
 
       agent3.setName("Agent New Name");
-      model.updateAgent(agent3);
+      model.updateAgent(agent3, false);
 
       Agent agent4 = index.retrieve(Agent.class, agent.getId());
       assertNotNull(agent4);
       assertEquals(agent.getId(), agent4.getId());
       assertEquals(agent4.getName(), "Agent New Name");
 
-      model.deleteAgent(agent.getId());
+      model.deleteAgent(agent.getId(), false);
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       assertTrue(false);
@@ -727,7 +727,7 @@ public class IndexServiceTest {
       utis.add("com.adobe.pdf");
       format.setUtis(utis);
 
-      model.createFormat(format);
+      model.createFormat(format, false);
 
       index.commit(Format.class);
 
@@ -745,14 +745,14 @@ public class IndexServiceTest {
       assertEquals(format.getName(), format3.getName());
 
       format3.setName("Format New Name");
-      model.updateFormat(format3);
+      model.updateFormat(format3, false);
 
       Format format4 = index.retrieve(Format.class, format.getId());
       assertNotNull(format4);
       assertEquals(format.getId(), format4.getId());
       assertEquals(format4.getName(), "Format New Name");
 
-      model.deleteFormat(format.getId());
+      model.deleteFormat(format.getId(), false);
 
     } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       assertTrue(false);

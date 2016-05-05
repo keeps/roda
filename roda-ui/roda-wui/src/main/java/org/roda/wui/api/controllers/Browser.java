@@ -28,7 +28,9 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
+import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
@@ -1048,7 +1050,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.modifyRisk(risk, message);
+    BrowserHelper.modifyRisk(risk, message, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1063,7 +1065,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.modifyFormat(format);
+    BrowserHelper.modifyFormat(format, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1078,7 +1080,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    BrowserHelper.modifyAgent(agent);
+    BrowserHelper.modifyAgent(agent, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1093,7 +1095,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Risk ret = BrowserHelper.addRisk(risk);
+    Risk ret = BrowserHelper.addRisk(risk, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1109,7 +1111,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Format ret = BrowserHelper.addFormat(format);
+    Format ret = BrowserHelper.addFormat(format, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1125,7 +1127,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Agent ret = BrowserHelper.addAgent(agent);
+    Agent ret = BrowserHelper.addAgent(agent, false);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1374,8 +1376,9 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+  public static void deleteRisk(RodaUser user, SelectedItems selected)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
+    InvalidParameterException, JobAlreadyStartedException {
     Date start = new Date();
 
     // check user permissions
@@ -1417,22 +1420,6 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "deleteFormat", null, duration, "selected", selected);
-  }
-
-  public static int getObjectRiskSize(RodaUser user, String aipId)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    Date start = new Date();
-
-    // check user permissions
-    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-
-    // delegate
-    int counter = BrowserHelper.getObjectRiskSize(aipId);
-
-    // register action
-    long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "getObjectRiskSize", null, duration, "aipId", aipId);
-    return counter;
   }
 
   public static List<String> getRiskOnAIP(RodaUser user, String aipId)

@@ -38,7 +38,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
@@ -71,7 +70,7 @@ public class ManagementTasksResource extends RodaCoreService {
   @POST
   @Path("/index/reindex")
   public Response executeIndexReindexTask(
-    @ApiParam(value = "", allowableValues = "aip,job,risk,riskincidence,agent,format,notification,actionlogs,transferred_resources", defaultValue = "aip") @QueryParam("entity") String entity,
+    @ApiParam(value = "", allowableValues = "aip,job,risk,agent,format,notification,actionlogs,transferred_resources", defaultValue = "aip") @QueryParam("entity") String entity,
     @QueryParam("params") List<String> params) throws AuthorizationDeniedException {
     Date startDate = new Date();
 
@@ -142,8 +141,6 @@ public class ManagementTasksResource extends RodaCoreService {
       response = createJobToReindexAllJobs(user, startDate);
     } else if ("risk".equals(entity)) {
       response = createJobToReindexAllRisks(user, startDate);
-    } else if ("riskincidence".equals(entity)) {
-      response = createJobToReindexAllRiskIncidences(user, startDate);
     } else if ("agent".equals(entity)) {
       response = createJobToReindexAllAgents(user, startDate);
     } else if ("format".equals(entity)) {
@@ -219,28 +216,6 @@ public class ManagementTasksResource extends RodaCoreService {
     } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
       | JobAlreadyStartedException e) {
       LOGGER.error("Error creating reindex Risks job", e);
-    }
-    return response;
-  }
-
-  private ApiResponseMessage createJobToReindexAllRiskIncidences(RodaUser user, Date startDate) {
-    ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Risk RiskIncidences' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
-      .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
-    Map<String, String> pluginParameters = new HashMap<>();
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, RiskIncidence.class.getCanonicalName());
-    job.setPluginParameters(pluginParameters);
-    try {
-      Job jobCreated = Jobs.createJob(user, job);
-      response.setMessage("Reindex job created (" + jobCreated + ")");
-      // register action
-      long duration = new Date().getTime() - startDate.getTime();
-      registerAction(user, "ManagementTasks", "reindex risk incidences", null, duration);
-    } catch (AuthorizationDeniedException | RequestNotValidException | NotFoundException | GenericException
-      | JobAlreadyStartedException e) {
-      LOGGER.error("Error creating reindex Risk Incidences job", e);
     }
     return response;
   }

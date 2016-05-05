@@ -26,6 +26,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidencePlugin.class);
   private static String riskIds = null;
+  private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   @Override
   public void init() throws PluginException {
@@ -77,6 +79,9 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
     LOGGER.debug("Creating risk incidences");
     Report pluginReport = PluginHelper.createPluginReport(this);
 
+    RiskJobPluginInfo jobPluginInfo = new RiskJobPluginInfo();
+    PluginHelper.updateJobInformation(this, jobPluginInfo);
+
     if (!list.isEmpty()) {
       if (riskIds != null) {
         String[] risks = riskIds.split(",");
@@ -88,10 +93,13 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
           } else if (list.get(0) instanceof File) {
             pluginReport = executeOnFile(model, riskId, (List<File>) list, pluginReport);
           }
+
+          jobPluginInfo.putRisk(riskId, 1);
         }
       }
     }
 
+    PluginHelper.updateJobInformation(this, jobPluginInfo);
     LOGGER.debug("Done creating risk incidences");
     return pluginReport;
   }
@@ -101,7 +109,7 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
 
     try {
       for (AIP aip : list) {
-        model.addRiskIncidence(riskId, aip.getId(), null, null, null, "RiskIncidence");
+        model.addRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
       }
     } catch (GenericException e) {
       pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
@@ -115,7 +123,8 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
 
     try {
       for (Representation representation : list) {
-        model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null, "RiskIncidence");
+        model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null,
+          OTHER_METADATA_TYPE);
       }
     } catch (GenericException e) {
       pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");
@@ -130,7 +139,7 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
     try {
       for (File file : list) {
         model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-          "RiskIncidence");
+          OTHER_METADATA_TYPE);
       }
     } catch (GenericException e) {
       pluginReport.setPluginState(PluginState.FAILURE).setPluginDetails("Risk incidence was not added");

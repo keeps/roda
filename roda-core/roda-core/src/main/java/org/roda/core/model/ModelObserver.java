@@ -90,21 +90,21 @@ public interface ModelObserver {
 
   public void transferredResourceDeleted(String transferredResourceID);
 
-  public void riskCreatedOrUpdated(Risk risk);
+  public void riskCreatedOrUpdated(Risk risk, boolean commit);
 
-  public void riskDeleted(String riskId);
+  public void riskDeleted(String riskId, boolean commit);
 
   public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence);
 
   public void riskIncidenceDeleted(String riskIncidenceId);
 
-  public void agentCreatedOrUpdated(Agent agent);
+  public void agentCreatedOrUpdated(Agent agent, boolean commit);
 
-  public void agentDeleted(String agentId);
+  public void agentDeleted(String agentId, boolean commit);
 
-  public void formatCreatedOrUpdated(Format format);
+  public void formatCreatedOrUpdated(Format format, boolean commit);
 
-  public void formatDeleted(String formatId);
+  public void formatDeleted(String formatId, boolean commit);
 
   public void notificationCreatedOrUpdated(Notification notification);
 

@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,12 +44,14 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
+import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -439,8 +442,21 @@ public final class PluginHelper {
    */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
+
     // do stuff with concrete JobPluginInfo
-    //
+    if (jobPluginInfo instanceof RiskJobPluginInfo) {
+      RiskJobPluginInfo riskJobPluginInfo = (RiskJobPluginInfo) jobPluginInfo;
+      Map<String, Integer> riskCounter = riskJobPluginInfo.getRisks();
+      for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
+        try {
+          Risk risk = model.retrieveRisk(riskEntry.getKey());
+          risk.setObjectsSize(risk.getObjectsSize() + riskEntry.getValue());
+          model.updateRisk(risk, null, true);
+        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+          LOGGER.error("Could not update risk counters");
+        }
+      }
+    }
 
     // update job
     try {

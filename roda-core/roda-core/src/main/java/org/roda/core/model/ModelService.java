@@ -1502,7 +1502,7 @@ public class ModelService extends ModelObservable {
   /***************** Risk related *****************/
   /************************************************/
 
-  public Risk createRisk(Risk risk) throws GenericException {
+  public Risk createRisk(Risk risk, boolean commit) throws GenericException {
     try {
       risk.setId(UUID.randomUUID().toString());
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
@@ -1513,11 +1513,11 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk);
+    notifyRiskCreatedOrUpdated(risk, commit);
     return risk;
   }
 
-  public void updateRisk(Risk risk, String message) throws GenericException {
+  public void updateRisk(Risk risk, String message, boolean commit) throws GenericException {
     try {
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
@@ -1532,14 +1532,14 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating risk in storage", e);
     }
 
-    notifyRiskCreatedOrUpdated(risk);
+    notifyRiskCreatedOrUpdated(risk, commit);
   }
 
-  public void deleteRisk(String riskId)
+  public void deleteRisk(String riskId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
     storage.deleteResource(riskPath);
-    notifyRiskDeleted(riskId);
+    notifyRiskDeleted(riskId, commit);
   }
 
   public Risk retrieveRisk(String riskId)
@@ -1566,14 +1566,14 @@ public class ModelService extends ModelObservable {
     return storage.getBinaryVersion(binaryPath, versionId);
   }
 
-  public BinaryVersion revertRiskVersion(String riskId, String versionId, String message)
+  public BinaryVersion revertRiskVersion(String riskId, String versionId, String message, boolean commit)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     StoragePath binaryPath = ModelUtils.getRiskStoragePath(riskId);
 
     BinaryVersion currentVersion = storage.createBinaryVersion(binaryPath, message);
     storage.revertBinaryVersion(binaryPath, versionId);
 
-    notifyRiskCreatedOrUpdated(retrieveRisk(riskId));
+    notifyRiskCreatedOrUpdated(retrieveRisk(riskId), commit);
 
     return currentVersion;
   }
@@ -1617,11 +1617,6 @@ public class ModelService extends ModelObservable {
         new StringContentPayload(riskIncidenceAsJson), true);
       notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
 
-      Risk risk = this.retrieveRisk(riskId);
-      risk.setObjectsSize(risk.getObjectsSize() + 1);
-      this.updateRisk(risk, null);
-      notifyRiskCreatedOrUpdated(risk);
-
     } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error adding risk incidence in storage", e);
     }
@@ -1636,10 +1631,10 @@ public class ModelService extends ModelObservable {
     String fileSuffix = RodaConstants.RISK_INCIDENCE_FILE_EXTENSION;
 
     try {
-      Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
-        fileSuffix, type);
+      try {
+        Binary incidenceBinary = this.retrieveOtherMetadataBinary(aipId, representationId, fileDirectoryPath, fileId,
+          fileSuffix, type);
 
-      if (incidenceBinary != null) {
         InputStream inputStream = incidenceBinary.getContent().createInputStream();
         RiskIncidence riskIncidence = JsonUtils.getObjectFromJson(inputStream, RiskIncidence.class);
         riskIncidence.removeRisk(riskId);
@@ -1651,22 +1646,18 @@ public class ModelService extends ModelObservable {
             new StringContentPayload(riskIncidenceAsJson), true);
           notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
         } else {
-          StoragePath binaryPath = ModelUtils.getOtherMetadataStoragePath(aipId, representationId, type,
-            fileDirectoryPath, fileId);
-          storage.deleteResource(binaryPath);
+          storage.deleteResource(incidenceBinary.getStoragePath());
           notifyRiskIncidenceDeleted(riskIncidence.getId());
         }
 
         Risk risk = this.retrieveRisk(riskId);
         risk.setObjectsSize(risk.getObjectsSize() - 1);
-        this.updateRisk(risk, null);
-        notifyRiskCreatedOrUpdated(risk);
+        this.updateRisk(risk, null, false);
 
-      } else {
-        throw new NotFoundException("Risk incidence binary does not exist");
+      } catch (NotFoundException e) {
+        // do nothing
       }
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
-      | IOException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | IOException e) {
       LOGGER.error("Error adding risk incidence in storage", e);
     }
   }
@@ -1699,7 +1690,7 @@ public class ModelService extends ModelObservable {
   /***************** Agent related *****************/
   /************************************************/
 
-  public Agent createAgent(Agent agent) throws GenericException {
+  public Agent createAgent(Agent agent, boolean commit) throws GenericException {
     try {
       agent.setId(UUID.randomUUID().toString());
       String agentAsJson = JsonUtils.getJsonFromObject(agent);
@@ -1710,11 +1701,11 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating agent in storage", e);
     }
 
-    notifyAgentCreatedOrUpdated(agent);
+    notifyAgentCreatedOrUpdated(agent, commit);
     return agent;
   }
 
-  public void updateAgent(Agent agent) throws GenericException {
+  public void updateAgent(Agent agent, boolean commit) throws GenericException {
     try {
       String agentAsJson = JsonUtils.getJsonFromObject(agent);
       StoragePath agentPath = ModelUtils.getAgentStoragePath(agent.getId());
@@ -1723,15 +1714,15 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating agent in storage", e);
     }
 
-    notifyAgentCreatedOrUpdated(agent);
+    notifyAgentCreatedOrUpdated(agent, commit);
   }
 
-  public void deleteAgent(String agentId)
+  public void deleteAgent(String agentId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
     StoragePath agentPath = ModelUtils.getAgentStoragePath(agentId);
     storage.deleteResource(agentPath);
-    notifyAgentDeleted(agentId);
+    notifyAgentDeleted(agentId, commit);
   }
 
   public Agent retrieveAgent(String agentId)
@@ -1755,7 +1746,7 @@ public class ModelService extends ModelObservable {
   /***************** Format related *****************/
   /************************************************/
 
-  public Format createFormat(Format format) throws GenericException {
+  public Format createFormat(Format format, boolean commit) throws GenericException {
     try {
       format.setId(UUID.randomUUID().toString());
       String formatAsJson = JsonUtils.getJsonFromObject(format);
@@ -1766,11 +1757,11 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error creating format in storage", e);
     }
 
-    notifyFormatCreatedOrUpdated(format);
+    notifyFormatCreatedOrUpdated(format, commit);
     return format;
   }
 
-  public void updateFormat(Format format) throws GenericException {
+  public void updateFormat(Format format, boolean commit) throws GenericException {
     try {
       String formatAsJson = JsonUtils.getJsonFromObject(format);
       StoragePath formatPath = ModelUtils.getFormatStoragePath(format.getId());
@@ -1779,15 +1770,15 @@ public class ModelService extends ModelObservable {
       LOGGER.error("Error updating format in storage", e);
     }
 
-    notifyFormatCreatedOrUpdated(format);
+    notifyFormatCreatedOrUpdated(format, commit);
   }
 
-  public void deleteFormat(String formatId)
+  public void deleteFormat(String formatId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
 
     StoragePath formatPath = ModelUtils.getFormatStoragePath(formatId);
     storage.deleteResource(formatPath);
-    notifyFormatDeleted(formatId);
+    notifyFormatDeleted(formatId, commit);
   }
 
   public Format retrieveFormat(String formatId)

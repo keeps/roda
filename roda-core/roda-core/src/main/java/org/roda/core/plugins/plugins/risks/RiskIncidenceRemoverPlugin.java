@@ -7,16 +7,18 @@
  */
 package org.roda.core.plugins.plugins.risks;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
@@ -32,10 +34,10 @@ import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RiskIncidenceRemoverPlugin<T extends Serializable> extends AbstractPlugin<T> {
+public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidenceRemoverPlugin.class);
-  private static String riskId;
+  private static String riskIds;
   private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   @Override
@@ -67,31 +69,39 @@ public class RiskIncidenceRemoverPlugin<T extends Serializable> extends Abstract
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    if (parameters.containsKey("riskId")) {
-      riskId = parameters.get("riskId");
+    if (parameters.containsKey("riskIds")) {
+      riskIds = parameters.get("riskIds");
     }
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
     LOGGER.debug("Removing old risk incidences");
     Report pluginReport = PluginHelper.createPluginReport(this);
 
     try {
-      for (T element : list) {
-        if (element instanceof AIP) {
-          AIP aip = (AIP) element;
-          model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
-        } else if (element instanceof Representation) {
-          Representation representation = (Representation) element;
-          model.deleteRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null,
-            OTHER_METADATA_TYPE);
-        } else if (element instanceof File) {
-          File file = (File) element;
-          model.deleteRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-            OTHER_METADATA_TYPE);
+      if (riskIds != null) {
+        String[] risks = riskIds.split(",");
+        for (String riskId : risks) {
+          for (AIP aip : list) {
+            model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+
+            for (Representation representation : aip.getRepresentations()) {
+              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
+
+              boolean recursive = true;
+              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+                representation.getId(), recursive);
+
+              for (OptionalWithCause<File> ofile : allFiles) {
+                File file = ofile.get();
+                model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
+                  OTHER_METADATA_TYPE);
+              }
+            }
+          }
         }
       }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
@@ -130,8 +140,8 @@ public class RiskIncidenceRemoverPlugin<T extends Serializable> extends Abstract
   }
 
   @Override
-  public Plugin<T> cloneMe() {
-    return new RiskIncidenceRemoverPlugin<T>();
+  public Plugin<AIP> cloneMe() {
+    return new RiskIncidenceRemoverPlugin();
   }
 
   @Override
