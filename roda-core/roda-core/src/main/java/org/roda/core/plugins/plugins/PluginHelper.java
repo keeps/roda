@@ -86,6 +86,11 @@ public final class PluginHelper {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
+  public static <T extends Serializable> Job getJob(Plugin<T> plugin, ModelService model)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
+    return model.retrieveJob(getJobId(plugin));
+  }
+
   public static <T extends Serializable> void setPluginParameters(Plugin<T> plugin, Job job) {
     Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
