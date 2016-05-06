@@ -19,6 +19,7 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
@@ -208,28 +209,28 @@ public class EditPermissions extends Composite {
     return permissions;
   }
 
+  private void apply(boolean recursive) {
+    Permissions permissions = getPermissions();
+
+    BrowserService.Util.getInstance().updateAIPPermissions(aip.getId(), permissions, recursive,
+      new LoadingAsyncCallback<Void>() {
+
+        @Override
+        public void onSuccessImpl(Void result) {
+          Toast.showInfo("Success", "Permissions changed");
+        }
+        
+      });
+  }
+
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
-    Permissions permissions = getPermissions();
-    GWT.log("Set permissions to: " + permissions);
-
-    BrowserService.Util.getInstance().updateAIPPermssions(aip.getId(), permissions, new AsyncCallback<Void>() {
-
-      @Override
-      public void onSuccess(Void result) {
-        Toast.showInfo("Success", "Permissions changed");
-      }
-
-      @Override
-      public void onFailure(Throwable caught) {
-        AsyncCallbackUtils.defaultFailureTreatment(caught);
-      }
-    });
+    apply(false);
   }
-  
+
   @UiHandler("buttonApplyToAll")
   void buttonApplyToAllHandler(ClickEvent e) {
-    Toast.showError("Sorry", "Feature not yet implemented");
+    apply(true);
   }
 
   @UiHandler("buttonClose")

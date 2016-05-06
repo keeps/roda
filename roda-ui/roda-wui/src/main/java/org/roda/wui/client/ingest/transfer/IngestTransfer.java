@@ -267,6 +267,7 @@ public class IngestTransfer extends Composite {
     breadcrumb.setVisible(true);
 
     lastScanned.setText(messages.ingestTransferLastScanned(resource.getLastScanDate()));
+    refresh.setTitle(messages.ingestTransferLastScanned(resource.getLastScanDate()));
 
     updateVisibles();
   }
@@ -294,8 +295,8 @@ public class IngestTransfer extends Composite {
     searchPanel.setDefaultFilter(DEFAULT_FILTER);
     breadcrumb.setVisible(false);
 
-    // TODO get date from service
     lastScanned.setText("");
+    refresh.setTitle("");
 
     updateVisibles();
   }

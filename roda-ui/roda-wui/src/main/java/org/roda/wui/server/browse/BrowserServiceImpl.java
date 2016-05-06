@@ -449,10 +449,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void updateAIPPermssions(String aipId, Permissions permissions)
+  public void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    Browser.updateAIPPermissions(user, aipId, permissions);
+    Browser.updateAIPPermissions(user, aipId, permissions, recursive);
   }
 
   @Override

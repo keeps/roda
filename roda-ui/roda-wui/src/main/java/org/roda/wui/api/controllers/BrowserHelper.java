@@ -1237,11 +1237,33 @@ public class BrowserHelper {
     RodaCoreFactory.getStorageService().deleteBinaryVersion(storagePath, versionId);
   }
 
-  public static void updateAIPPermissions(IndexedAIP indexedAIP, Permissions permissions)
+  public static void updateAIPPermissions(IndexedAIP indexedAIP, Permissions permissions, boolean recursive)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    AIP aip = RodaCoreFactory.getModelService().retrieveAIP(indexedAIP.getId());
+    final ModelService model = RodaCoreFactory.getModelService();
+    AIP aip = model.retrieveAIP(indexedAIP.getId());
     aip.setPermissions(permissions);
-    RodaCoreFactory.getModelService().updateAIPPermissions(aip);
+    model.updateAIPPermissions(aip);
+
+    if (recursive) {
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, indexedAIP.getId()));
+      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
+
+        @Override
+        public void run(IndexedAIP idescendant)
+          throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+          AIP descendant;
+          try {
+            descendant = model.retrieveAIP(idescendant.getId());
+            descendant.setPermissions(permissions);
+            model.updateAIPPermissions(descendant);
+          } catch (NotFoundException e) {
+            LOGGER.warn("Got an AIP from index which was not found in the model", e);
+          }
+
+        }
+      });
+    }
+
   }
 
   public static Risk addRisk(Risk risk) throws GenericException, RequestNotValidException {

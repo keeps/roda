@@ -1016,7 +1016,7 @@ public class Browser extends RodaCoreService {
       RodaConstants.API_QUERY_PARAM_VERSION, versionId);
   }
 
-  public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions)
+  public static void updateAIPPermissions(RodaUser user, String aipId, Permissions permissions, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -1025,7 +1025,7 @@ public class Browser extends RodaCoreService {
     IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
     UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
 
-    BrowserHelper.updateAIPPermissions(aip, permissions);
+    BrowserHelper.updateAIPPermissions(aip, permissions, recursive);
 
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "updateAIPPermissions", null, duration, RodaConstants.API_PATH_PARAM_AIP_ID,

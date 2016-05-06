@@ -7,10 +7,6 @@
 	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:style>
-	.reportTitle {
-		margin-bottom: -25px;
-		margin-top: 20px;
-	}
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-ingest-new" addStyleNames="wrapper skip_padding">
@@ -73,7 +69,7 @@
 								</g:FlowPanel>
 							</g:FlowPanel>
 			
-							<g:Label addStyleNames="h3 {style.reportTitle}">
+							<g:Label addStyleNames="h4">
 								Processed
 							</g:Label>
 							<lists:JobReportList ui:field="jobReports" />

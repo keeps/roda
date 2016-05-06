@@ -113,7 +113,7 @@ public interface BrowserServiceAsync {
 
   void suggest(String classNameToReturn, String field, String query, AsyncCallback<List<String>> callback);
 
-  void updateAIPPermssions(String aipId, Permissions permissions, AsyncCallback<Void> callback);
+  void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive, AsyncCallback<Void> callback);
 
   void addRisk(Risk risk, AsyncCallback<Risk> asyncCallback);
 

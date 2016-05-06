@@ -122,25 +122,26 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
 
     Header<String> sizeHeader = new TextHeader("Size");
 
-    Header<String> sizeFooter = new Header<String>(new TextCell()) {
-      @Override
-      public String getValue() {
-        List<TransferredResource> items = display.getVisibleItems();
-        if (items.size() == 0) {
-          return "";
-        } else {
-          long totalSize = 0;
-          for (TransferredResource item : items) {
-            if (item != null) {
-              totalSize += item.getSize();
-            }
-          }
-          return totalSize > 0 ? Humanize.readableFileSize(totalSize) : "";
-        }
-      }
-    };
-
-    display.addColumn(sizeColumn, sizeHeader, sizeFooter);
+    // Header<String> sizeFooter = new Header<String>(new TextCell()) {
+    // @Override
+    // public String getValue() {
+    // List<TransferredResource> items = display.getVisibleItems();
+    // if (items.size() == 0) {
+    // return "";
+    // } else {
+    // long totalSize = 0;
+    // for (TransferredResource item : items) {
+    // if (item != null) {
+    // totalSize += item.getSize();
+    // }
+    // }
+    // return totalSize > 0 ? Humanize.readableFileSize(totalSize) : "";
+    // }
+    // }
+    // };
+    //
+    // display.addColumn(sizeColumn, sizeHeader, sizeFooter);
+    display.addColumn(sizeColumn, sizeHeader);
     display.addColumn(creationDateColumn, "Date created");
 
     Label emptyInfo = new Label("No items to display");
@@ -152,7 +153,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
 
     // idColumn.setCellStyleNames("nowrap");
     sizeHeader.setHeaderStyleNames("text-align-right");
-    sizeFooter.setHeaderStyleNames("text-align-right");
+    // sizeFooter.setHeaderStyleNames("text-align-right");
     sizeColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
     creationDateColumn.setCellStyleNames("nowrap my-collections-table-cell-alignright");
   }

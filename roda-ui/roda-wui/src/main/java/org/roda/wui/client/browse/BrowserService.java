@@ -169,7 +169,7 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  void updateAIPPermssions(String aipId, Permissions permissions)
+  void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
   void modifyRisk(Risk risk, String message)
