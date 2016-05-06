@@ -108,7 +108,8 @@ public class JobList extends BasicAsyncTableCell<Job> {
           || JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState())) {
           return null;
         }
-        return Humanize.durationInShortDHMS(job.getStartDate(), job.getEndDate());
+        Date end = job.getEndDate() != null ? job.getEndDate() : getDate();
+        return Humanize.durationInShortDHMS(job.getStartDate(), end);
       }
     };
 

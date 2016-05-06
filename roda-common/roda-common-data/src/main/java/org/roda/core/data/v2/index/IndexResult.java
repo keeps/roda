@@ -8,6 +8,7 @@
 package org.roda.core.data.v2.index;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.List;
 
 public class IndexResult<T extends Serializable> implements Serializable {
@@ -19,6 +20,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
   private long totalCount;
   private List<T> results;
   private List<FacetFieldResult> facetResults;
+  private final Date date = new Date();
 
   public IndexResult() {
     super();
@@ -85,9 +87,14 @@ public class IndexResult<T extends Serializable> implements Serializable {
     this.facetResults = facetResults;
   }
 
+  public Date getDate() {
+    return date;
+  }
+
   @Override
   public String toString() {
     return "IndexResult [offset=" + offset + ", limit=" + limit + ", totalCount=" + totalCount + ", results=" + results
-      + ", facetResults=" + facetResults + "]";
+      + ", facetResults=" + facetResults + ", date=" + date + "]";
   }
+
 }

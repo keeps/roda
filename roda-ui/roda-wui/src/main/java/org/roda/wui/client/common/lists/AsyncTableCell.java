@@ -8,6 +8,7 @@
 package org.roda.wui.client.common.lists;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -151,7 +152,6 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     createSelectAllPanel();
 
-    
     add(selectAllPanel);
     add(display);
     add(resultsPager);
@@ -572,6 +572,14 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public O getObject() {
     return object;
+  }
+
+  public int getRowCount() {
+    return dataProvider.getRowCount();
+  }
+
+  public Date getDate() {
+    return dataProvider.getDate();
   }
 
   public List<CheckboxSelectionListener> getListeners() {
