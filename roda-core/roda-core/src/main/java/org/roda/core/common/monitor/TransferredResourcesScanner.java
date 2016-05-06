@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
@@ -53,7 +54,7 @@ public class TransferredResourcesScanner {
     return basePath;
   }
 
-  public String createFolder(String parentUUID, String folderName)
+  public TransferredResource createFolder(String parentUUID, String folderName)
     throws GenericException, RequestNotValidException, NotFoundException {
     Path parentPath;
     if (parentUUID != null) {
@@ -68,17 +69,17 @@ public class TransferredResourcesScanner {
       BasicFileAttributes attrs = Files.readAttributes(createdPath, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(createdPath, attrs, 0L, basePath, new Date());
       index.create(TransferredResource.class, resource);
-      return resource.getUUID();
+      return resource;
     } catch (IOException e) {
       LOGGER.error("Cannot create folder", e);
       throw new GenericException("Cannot create folder", e);
     }
   }
 
-  public String createFile(String parentUUID, String fileName, InputStream inputStream)
+  public TransferredResource createFile(String parentUUID, String fileName, InputStream inputStream)
     throws GenericException, RequestNotValidException, NotFoundException {
     Path parentPath;
-    if (parentUUID != null) {
+    if (StringUtils.isNotBlank(parentUUID)) {
       TransferredResource parent = index.retrieve(TransferredResource.class, parentUUID);
       parentPath = basePath.resolve(parent.getRelativePath());
     } else {
@@ -96,7 +97,7 @@ public class TransferredResourcesScanner {
       BasicFileAttributes attrs = Files.readAttributes(file, BasicFileAttributes.class);
       TransferredResource resource = createTransferredResource(file, attrs, attrs.size(), basePath, new Date());
       index.create(TransferredResource.class, resource);
-      return resource.getUUID();
+      return resource;
     } catch (IOException e) {
       LOGGER.error("Cannot create file", e);
       throw new GenericException("Cannot create file", e);

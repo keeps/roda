@@ -48,6 +48,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -441,12 +442,7 @@ public final class PluginHelper {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
       Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
-
-      job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
-      job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-      job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-      job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
-        - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+      job = JobsHelper.setJobCounters(job, jobPluginInfo);
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {

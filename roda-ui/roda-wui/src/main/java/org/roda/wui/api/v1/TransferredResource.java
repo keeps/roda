@@ -55,7 +55,7 @@ public class TransferredResource {
 
   @GET
   public Response getResource(
-    @ApiParam(value = "The resource id", required = false) @QueryParam("resourceId") String resourceId)
+    @ApiParam(value = "The resource id", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_RESOURCE_ID) String resourceId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
@@ -67,19 +67,20 @@ public class TransferredResource {
   }
 
   @POST
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   public Response createResource(
-    @ApiParam(value = "The id of the parent", required = true) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
-    @ApiParam(value = "The name of the directory to create", required = false) @QueryParam("name") String name,
+    @ApiParam(value = "The id of the parent") @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_PARENT_UUID) String parentUUID,
+    @ApiParam(value = "The name of the directory to create", required = false) @QueryParam(RodaConstants.TRANSFERRED_RESOURCE_DIRECTORY_NAME) String name,
     @FormDataParam("upl") InputStream inputStream, @FormDataParam("upl") FormDataContentDisposition fileDetail)
     throws RODAException {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
     // delegate action to controller
-    Browser.createTransferredResource(user, parentUUID, fileDetail.getFileName(), inputStream, name, true);
+    org.roda.core.data.v2.ip.TransferredResource transferredResource = Browser.createTransferredResource(user,
+      parentUUID, fileDetail.getFileName(), inputStream, name, true);
 
-    // FIXME give a better answer
-    return Response.ok().entity("{'status':'success'}").build();
+    return Response.ok().entity(transferredResource).build();
   }
 
   @DELETE

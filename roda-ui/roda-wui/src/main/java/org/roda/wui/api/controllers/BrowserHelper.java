@@ -952,13 +952,14 @@ public class BrowserHelper {
   // transferredResourceId);
   // }
 
-  public static String createTransferredResourcesFolder(String parentUUID, String folderName, boolean forceCommit)
-    throws GenericException, RequestNotValidException, NotFoundException {
-    String uuid = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parentUUID, folderName);
+  public static TransferredResource createTransferredResourcesFolder(String parentUUID, String folderName,
+    boolean forceCommit) throws GenericException, RequestNotValidException, NotFoundException {
+    TransferredResource transferredResource = RodaCoreFactory.getTransferredResourcesScanner().createFolder(parentUUID,
+      folderName);
     if (forceCommit) {
       RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
-    return uuid;
+    return transferredResource;
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
@@ -989,14 +990,17 @@ public class BrowserHelper {
     RodaCoreFactory.getTransferredResourcesScanner().removeTransferredResource(ids);
   }
 
-  public static void createTransferredResourceFile(String parentUUID, String fileName, InputStream inputStream,
-    boolean forceCommit) throws GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
+  public static TransferredResource createTransferredResourceFile(String parentUUID, String fileName,
+    InputStream inputStream, boolean forceCommit)
+    throws GenericException, AlreadyExistsException, RequestNotValidException, NotFoundException {
     LOGGER.debug("createTransferredResourceFile(path={}, name={})", parentUUID, fileName);
-    RodaCoreFactory.getTransferredResourcesScanner().createFile(parentUUID, fileName, inputStream);
+    TransferredResource transferredResource = RodaCoreFactory.getTransferredResourcesScanner().createFile(parentUUID,
+      fileName, inputStream);
     if (forceCommit) {
       RodaCoreFactory.getTransferredResourcesScanner().commit();
     }
 
+    return transferredResource;
   }
 
   protected static <T extends IsIndexed> void delete(RodaUser user, Class<T> returnClass, SelectedItems ids)

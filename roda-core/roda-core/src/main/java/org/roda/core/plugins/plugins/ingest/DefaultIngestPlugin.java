@@ -130,6 +130,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       return reports;
     }
 
+    public Map<String, List<String>> getTransferredResourceToAipIds() {
+      return transferredResourceToAipIds;
+    }
+
     public List<String> getAipIds() {
       return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
     }
@@ -162,8 +166,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
     }
 
-    public void addReport(String itemId, Report report) {
-      reports.get(aipIdToTransferredResourceId.get(itemId)).get(itemId).addReport(report);
+    public void addReport(String outcomeObjectId, Report report) {
+      reports.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId).addReport(report);
     }
 
     public void remove(String transferredResourceId) {
@@ -208,7 +212,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     createIngestStartedEvent(model, index, reports, startDate);
 
     // 2) virus check
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VIRUS_CHECK))) {
       pluginReport = doVirusCheck(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -217,7 +221,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 3) descriptive metadata validation
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION))) {
       pluginReport = doDescriptiveMetadataValidation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -226,7 +230,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 4) create file fixity information
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_CREATE_PREMIS_SKELETON))) {
       pluginReport = createFileFixityInformation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -235,7 +239,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 5) format identification (using Siegfried)
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FILE_FORMAT_IDENTIFICATION))) {
       pluginReport = doFileFormatIdentification(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -244,7 +248,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 6) Format validation - PDF/A format validator (using VeraPDF)
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_VERAPDF_CHECK))) {
       Map<String, String> params = new HashMap<String, String>();
       params.put("profile", "1b");
@@ -258,10 +262,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
     // 7) feature extraction (using Apache Tika)
     // 8) full-text extraction (using Apache Tika)
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && (PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION))
       || PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION))) {
+        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION)))) {
       Map<String, String> params = new HashMap<String, String>();
       params.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, PluginHelper.verifyIfStepShouldBePerformed(this,
         getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION)) ? "true" : "false");
@@ -274,7 +278,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 9) validation of digital signature
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_DIGITAL_SIGNATURE_VALIDATION))) {
       pluginReport = doDigitalSignatureValidation(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -283,7 +287,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 10) verify producer authorization
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_PRODUCER_AUTHORIZATION_CHECK))) {
       pluginReport = verifyProducerAuthorization(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -292,7 +296,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     // 11) Auto accept
-    if (PluginHelper.verifyIfStepShouldBePerformed(this,
+    if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))) {
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
@@ -474,8 +478,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
     LOGGER.debug("Done retrieving AIPs");
 
-    jobPluginInfo.setObjectsBeingProcessed(reports.getReports().keySet().size());
-    jobPluginInfo.setObjectsProcessedWithFailure(resources.size() - reports.getReports().keySet().size());
+    int beingProcessed = reports.getTransferredResourceToAipIds().keySet().size();
+    jobPluginInfo.setObjectsBeingProcessed(beingProcessed);
+    jobPluginInfo.setObjectsProcessedWithFailure(resources.size() - beingProcessed);
 
     return aips;
 

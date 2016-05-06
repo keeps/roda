@@ -169,10 +169,10 @@ public class InternalPluginsTest {
     //
     // FSUtils.copy(corpora, f.getBasePath().resolve("test"), true);
 
-    String parentUUID = f.createFolder(null, "test");
-    String test1UUID = f.createFolder(parentUUID, CORPORA_TEST1);
-    String test2UUID = f.createFolder(parentUUID, "test2");
-    String test3UUID = f.createFolder(parentUUID, "test3");
+    String parentUUID = f.createFolder(null, "test").getUUID();
+    String test1UUID = f.createFolder(parentUUID, CORPORA_TEST1).getUUID();
+    String test2UUID = f.createFolder(parentUUID, "test2").getUUID();
+    String test3UUID = f.createFolder(parentUUID, "test3").getUUID();
 
     f.createFile(parentUUID, CORPORA_TEST1_TXT, generateContentData());
     f.createFile(parentUUID, "test2.txt", generateContentData());

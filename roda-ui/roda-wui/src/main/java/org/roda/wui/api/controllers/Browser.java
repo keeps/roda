@@ -808,8 +808,8 @@ public class Browser extends RodaCoreService {
 
   }
 
-  public static String createTransferredResourcesFolder(RodaUser user, String parentUUID, String folderName,
-    boolean forceCommit)
+  public static TransferredResource createTransferredResourcesFolder(RodaUser user, String parentUUID,
+    String folderName, boolean forceCommit)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
     // check user permissions
@@ -819,13 +819,14 @@ public class Browser extends RodaCoreService {
 
     // delegate
     try {
-      String uuid = BrowserHelper.createTransferredResourcesFolder(parentUUID, folderName, forceCommit);
+      TransferredResource transferredResource = BrowserHelper.createTransferredResourcesFolder(parentUUID, folderName,
+        forceCommit);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM,
         parentUUID, FOLDERNAME_PARAM, folderName, SUCCESS_PARAM, true);
-      return uuid;
+      return transferredResource;
     } catch (GenericException e) {
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourcesFolder", null, duration, PARENT_PARAM,
@@ -849,7 +850,7 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "removeTransferredResources", null, duration, "selected", selected);
   }
 
-  public static void createTransferredResourceFile(RodaUser user, String parentUUID, String fileName,
+  public static TransferredResource createTransferredResourceFile(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
     Date startDate = new Date();
@@ -861,12 +862,15 @@ public class Browser extends RodaCoreService {
 
     // delegate
     try {
-      BrowserHelper.createTransferredResourceFile(parentUUID, fileName, inputStream, forceCommit);
+      TransferredResource transferredResource = BrowserHelper.createTransferredResourceFile(parentUUID, fileName,
+        inputStream, forceCommit);
 
       // register action
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, parentUUID,
         FILENAME_PARAM, fileName, SUCCESS_PARAM, true);
+
+      return transferredResource;
     } catch (GenericException e) {
       long duration = new Date().getTime() - startDate.getTime();
       registerAction(user, BROWSER_COMPONENT, "createTransferredResourceFile", null, duration, PATH_PARAM, parentUUID,
@@ -894,14 +898,17 @@ public class Browser extends RodaCoreService {
     return classificationPlan;
   }
 
-  public static void createTransferredResource(RodaUser user, String parentUUID, String fileName,
+  public static TransferredResource createTransferredResource(RodaUser user, String parentUUID, String fileName,
     InputStream inputStream, String name, boolean forceCommit) throws AuthorizationDeniedException, GenericException,
     AlreadyExistsException, RequestNotValidException, NotFoundException {
+    TransferredResource transferredResource;
     if (name == null) {
-      Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream, forceCommit);
+      transferredResource = Browser.createTransferredResourceFile(user, parentUUID, fileName, inputStream, forceCommit);
     } else {
-      Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
+      transferredResource = Browser.createTransferredResourcesFolder(user, parentUUID, name, forceCommit);
     }
+
+    return transferredResource;
   }
 
   public static boolean getScanUpdateStatus() {
@@ -926,10 +933,6 @@ public class Browser extends RodaCoreService {
     return supportedMetadata;
   }
 
-  /**
-   * @deprecated this method should be moved to the api
-   */
-  @Deprecated
   public static StreamResponse getTransferredResource(RodaUser user, String resourceId)
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
     Date startDate = new Date();

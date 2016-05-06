@@ -689,7 +689,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       for (Job job : jobsToBeCleaned) {
         try {
           Job jobToBeCleaned = model.retrieveJob(job.getId());
-          jobToBeCleaned.setState(JOB_STATE.FAILED_TO_COMPLETE);
+          JobsHelper.updateJobInTheStateStarted(jobToBeCleaned);
           model.createOrUpdateJob(jobToBeCleaned);
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get/update Job", e);
