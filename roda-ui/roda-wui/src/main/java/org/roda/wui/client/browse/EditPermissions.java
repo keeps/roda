@@ -7,16 +7,21 @@
  */
 package org.roda.wui.client.browse;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
+import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -38,6 +43,8 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+
+import config.i18n.client.BrowseMessages;
 
 public class EditPermissions extends Composite {
 
@@ -87,8 +94,13 @@ public class EditPermissions extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
+  private static BrowseMessages messages = GWT.create(BrowseMessages.class);
+
   @UiField
-  FlowPanel permissionsPanel;
+  Label userPermissionsHeader, groupPermissionsHeader;
+
+  @UiField
+  FlowPanel userPermissionsPanel, groupPermissionsPanel;
 
   private IndexedAIP aip;
 
@@ -102,27 +114,37 @@ public class EditPermissions extends Composite {
 
   private void createPermissionPanel() {
     Permissions permissions = aip.getPermissions();
-
-    GWT.log(aip.getPermissions().toString());
+    GWT.log("Permissions are: " + permissions);
 
     for (String username : permissions.getUsernames()) {
-      permissionsPanel.add(new PermissionPanel(username, true, permissions.getUserPermissions(username)));
+      userPermissionsPanel.add(new PermissionPanel(username, true, permissions.getUserPermissions(username)));
     }
 
     for (String groupname : permissions.getGroupnames()) {
-      permissionsPanel.add(new PermissionPanel(groupname, false, permissions.getGroupPermissions(groupname)));
+      groupPermissionsPanel.add(new PermissionPanel(groupname, false, permissions.getGroupPermissions(groupname)));
     }
   }
 
   public void addPermissionPanel(RODAMember member) {
-    permissionsPanel.insert(new PermissionPanel(member), 0);
+    if (member.isUser()) {
+      userPermissionsPanel.insert(new PermissionPanel(member), 0);
+    } else {
+      groupPermissionsPanel.insert(new PermissionPanel(member), 0);
+    }
   }
 
   @UiHandler("buttonAdd")
   void buttonAddHandler(ClickEvent e) {
-    // TODO add filter that excludes already added users/group
 
-    MemberSelectDialog selectDialog = new MemberSelectDialog("Select user or group to add", null);
+    Filter filter = new Filter();
+    for (String username : getAssignedUserNames()) {
+      filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, username));
+    }
+    for (String groupname : getAssignedGroupNames()) {
+      filter.add(new NotSimpleFilterParameter(RodaConstants.MEMBERS_ID, groupname));
+    }
+
+    MemberSelectDialog selectDialog = new MemberSelectDialog("Select user or group to add", filter);
     selectDialog.showAndCenter();
     selectDialog.addValueChangeHandler(new ValueChangeHandler<RODAMember>() {
 
@@ -136,12 +158,35 @@ public class EditPermissions extends Composite {
     });
   }
 
-  @UiHandler("buttonApply")
-  void buttonApplyHandler(ClickEvent e) {
+  public List<String> getAssignedUserNames() {
+    List<String> ret = new ArrayList<String>();
+    for (int i = 0; i < userPermissionsPanel.getWidgetCount(); i++) {
+      PermissionPanel permissionPanel = (PermissionPanel) userPermissionsPanel.getWidget(i);
+
+      if (permissionPanel.isUser()) {
+        ret.add(permissionPanel.getName());
+      }
+    }
+    return ret;
+  }
+
+  public List<String> getAssignedGroupNames() {
+    List<String> ret = new ArrayList<String>();
+    for (int i = 0; i < groupPermissionsPanel.getWidgetCount(); i++) {
+      PermissionPanel permissionPanel = (PermissionPanel) groupPermissionsPanel.getWidget(i);
+
+      if (!permissionPanel.isUser()) {
+        ret.add(permissionPanel.getName());
+      }
+    }
+    return ret;
+  }
+
+  public Permissions getPermissions() {
     Permissions permissions = new Permissions();
 
-    for (int i = 0; i < permissionsPanel.getWidgetCount(); i++) {
-      PermissionPanel permissionPanel = (PermissionPanel) permissionsPanel.getWidget(i);
+    for (int i = 0; i < userPermissionsPanel.getWidgetCount(); i++) {
+      PermissionPanel permissionPanel = (PermissionPanel) userPermissionsPanel.getWidget(i);
 
       if (permissionPanel.isUser()) {
         permissions.setUserPermissions(permissionPanel.getName(), permissionPanel.getPermissions());
@@ -150,27 +195,44 @@ public class EditPermissions extends Composite {
       }
     }
 
+    for (int i = 0; i < groupPermissionsPanel.getWidgetCount(); i++) {
+      PermissionPanel permissionPanel = (PermissionPanel) groupPermissionsPanel.getWidget(i);
+
+      if (permissionPanel.isUser()) {
+        permissions.setUserPermissions(permissionPanel.getName(), permissionPanel.getPermissions());
+      } else {
+        permissions.setGroupPermissions(permissionPanel.getName(), permissionPanel.getPermissions());
+      }
+    }
+
+    return permissions;
+  }
+
+  @UiHandler("buttonApply")
+  void buttonApplyHandler(ClickEvent e) {
+    Permissions permissions = getPermissions();
+    GWT.log("Set permissions to: " + permissions);
+
     BrowserService.Util.getInstance().updateAIPPermssions(aip.getId(), permissions, new AsyncCallback<Void>() {
 
       @Override
       public void onSuccess(Void result) {
-        cancel();
+        Toast.showInfo("Success", "Permissions changed");
       }
 
       @Override
       public void onFailure(Throwable caught) {
-        Toast.showError(caught.getMessage());
-        cancel();
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
       }
     });
   }
 
-  @UiHandler("buttonCancel")
+  @UiHandler("buttonClose")
   void buttonCancelHandler(ClickEvent e) {
-    cancel();
+    close();
   }
 
-  public void cancel() {
+  public void close() {
     Tools.newHistory(Browse.RESOLVER, aip.getId());
   }
 
@@ -206,7 +268,7 @@ public class EditPermissions extends Composite {
       editPermissionsPanel = new FlowPanel();
 
       for (PermissionType permissionType : Permissions.PermissionType.values()) {
-        ValueCheckBox valueCheckBox = new ValueCheckBox(permissionType, permissionType.toString());
+        ValueCheckBox valueCheckBox = new ValueCheckBox(permissionType);
         if (permissions.contains(permissionType)) {
           valueCheckBox.setValue(true);
         }
@@ -268,8 +330,9 @@ public class EditPermissions extends Composite {
     public class ValueCheckBox extends CheckBox {
       private PermissionType permissionType;
 
-      public ValueCheckBox(PermissionType permissionType, String label) {
-        super(label);
+      public ValueCheckBox(PermissionType permissionType) {
+        super(messages.objectPermission(permissionType));
+        setTitle(messages.objectPermissionDescription(permissionType));
         this.permissionType = permissionType;
       }
 

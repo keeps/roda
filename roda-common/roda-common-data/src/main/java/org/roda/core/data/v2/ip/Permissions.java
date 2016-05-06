@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Rui Castro
  * @author Luis Faria <lfaria@keep.pt>
@@ -40,6 +42,7 @@ public class Permissions implements Serializable {
     return users;
   }
 
+  @JsonIgnore
   public Set<String> getUsernames() {
     HashSet<String> usernames = new HashSet<>();
 
@@ -58,6 +61,7 @@ public class Permissions implements Serializable {
     return groups;
   }
 
+  @JsonIgnore
   public Set<String> getGroupnames() {
     HashSet<String> groupnames = new HashSet<>();
 

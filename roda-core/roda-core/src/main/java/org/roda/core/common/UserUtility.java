@@ -108,6 +108,7 @@ public class UserUtility {
       RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
 
       Filter filter = new Filter();
+      // FIXME 20160506 this should be a retrieve, giving that the ID is like "user:[username]"
       filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, rsu.getId()));
       filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
       try {

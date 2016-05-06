@@ -13,6 +13,8 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.ip.Permissions.PermissionType;
+
 import com.google.gwt.i18n.client.Messages;
 import com.google.gwt.safehtml.shared.SafeHtml;
 
@@ -756,5 +758,17 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("{0,number,##}s")
   String durationDHMSShortSeconds(int seconds);
+
+  @DefaultMessage("Unknown")
+  @AlternateMessage({"CREATE", "Create", "DELETE", "Delete", "GRANT", "Grant", "READ", "Read", "UPDATE", "Update"})
+  String objectPermission(@Select PermissionType permissionType);
+
+  @DefaultMessage("")
+  @AlternateMessage({"CREATE", "Permission to submit or create a new archival package under this one", "DELETE",
+    "Permission to delete this archival package or any of its sub-components", "GRANT",
+    "Permission to change the permissions of this archival package", "READ",
+    "Permission to seach or access this archival package", "UPDATE",
+    "Permission to change this archival package or any of its sub-components"})
+  String objectPermissionDescription(@Select PermissionType permissionType);
 
 }

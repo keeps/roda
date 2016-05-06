@@ -243,7 +243,7 @@ public class SolrUtils {
   private static <T> T solrDocumentTo(Class<T> resultClass, SolrDocument doc) throws GenericException {
     T ret;
     if (resultClass.equals(IndexedAIP.class)) {
-      ret = resultClass.cast(solrDocumentToIndexAIP(doc));
+      ret = resultClass.cast(solrDocumentToIndexedAIP(doc));
     } else if (resultClass.equals(IndexedRepresentation.class) || resultClass.equals(Representation.class)) {
       ret = resultClass.cast(solrDocumentToRepresentation(doc));
     } else if (resultClass.equals(LogEntry.class)) {
@@ -1072,7 +1072,7 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
 
-  public static IndexedAIP solrDocumentToIndexAIP(SolrDocument doc) {
+  public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
     final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE));
     final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
@@ -2055,7 +2055,7 @@ public class SolrUtils {
     }
 
     permissions.setUsers(userPermissions);
-    permissions.setGroups(userPermissions);
+    permissions.setGroups(groupPermissions);
 
     return permissions;
   }
