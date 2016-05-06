@@ -226,6 +226,11 @@ public class EditPermissions extends Composite {
       }
     });
   }
+  
+  @UiHandler("buttonApplyToAll")
+  void buttonApplyToAllHandler(ClickEvent e) {
+    Toast.showError("Sorry", "Feature not yet implemented");
+  }
 
   @UiHandler("buttonClose")
   void buttonCancelHandler(ClickEvent e) {

@@ -38,6 +38,7 @@ import org.junit.Test;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
+import org.roda.core.common.ReportAssertUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
@@ -67,7 +68,6 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.plugins.antivirus.AntivirusPlugin;
@@ -105,7 +105,7 @@ public class InternalPluginsTest {
   private static final String CORPORA_TEST1 = "test1";
   private static final String CORPORA_TEST1_TXT = "test1.txt";
   private static final int GENERATED_FILE_SIZE = 100;
-  private static final int AUTO_COMMIT_TIMEOUT = 2000;
+
   private static Path basePath;
   private static Path logPath;
 
@@ -199,34 +199,7 @@ public class InternalPluginsTest {
     return transferredResource;
   }
 
-  private void assertReports(List<Report> reports, List<String> outcomeObjectIds) {
-    assertReports(reports, outcomeObjectIds, null);
-  }
-
-  private void assertReports(List<Report> reports, List<String> outcomeObjectIds, List<String> sourceObjectIds) {
-    if (outcomeObjectIds != null) {
-      Assert.assertEquals(outcomeObjectIds.size(), reports.size());
-    } else if (sourceObjectIds != null) {
-      Assert.assertEquals(sourceObjectIds.size(), reports.size());
-    }
-
-    for (Report report : reports) {
-      Assert.assertThat(report.getPluginState(), Matchers.is(PluginState.SUCCESS));
-
-      if (outcomeObjectIds != null && report.getOutcomeObjectId() != null) {
-        Assert.assertThat(report.getOutcomeObjectId(), Matchers.isIn(outcomeObjectIds));
-      }
-
-      if (sourceObjectIds != null && report.getSourceObjectId() != null) {
-        Assert.assertThat(report.getSourceObjectId(), Matchers.isIn(sourceObjectIds));
-      }
-
-      // assert sub-reports
-      if (report.getReports().size() > 0) {
-        assertReports(report.getReports(), outcomeObjectIds, sourceObjectIds);
-      }
-    }
-  }
+  
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
@@ -246,7 +219,7 @@ public class InternalPluginsTest {
 
     List<TransferredResource> items = Arrays.asList(transferredResource);
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, items);
-    assertReports(reports, null, items.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
+    ReportAssertUtils.assertReports(reports, null, items.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
     index.commitAIPs();
 
@@ -291,7 +264,7 @@ public class InternalPluginsTest {
 
     List<String> aipIdList = Arrays.asList(aip.getId());
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
-    assertReports(reports, aipIdList);
+    ReportAssertUtils.assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -351,7 +324,7 @@ public class InternalPluginsTest {
 
     List<String> aipIdList = Arrays.asList(aip.getId());
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
-    assertReports(reports, aipIdList);
+    ReportAssertUtils.assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -408,7 +381,7 @@ public class InternalPluginsTest {
     plugin.setParameterValues(parameters2);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
-    assertReports(reports, aipIdList);
+    ReportAssertUtils.assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 
@@ -517,7 +490,7 @@ public class InternalPluginsTest {
     plugin.setParameterValues(parameters2);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs(plugin, aipIdList);
-    assertReports(reports, aipIdList);
+    ReportAssertUtils.assertReports(reports, aipIdList);
 
     aip = model.retrieveAIP(aip.getId());
 

@@ -321,10 +321,6 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
 
       try {
-
-        model.addRiskIncidence("1b7236dd-5611-4893-bb4d-1fd56547b753", representation.getAipId(),
-          representation.getId(), null, null, "RiskIncidence");
-
         LOGGER.debug("Processing representation {}", representation);
         boolean recursive = true;
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),

@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.common.ReportAssertUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
@@ -58,6 +59,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -666,7 +668,10 @@ public class InternalConvertPluginsTest {
     plugin.setParameterValues(parameters);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin);
-    Assert.assertEquals("PARTIAL_SUCCESS", reports.get(0).getReports().get(0).getPluginState().toString());
+    Report report0 = reports.get(0).getReports().get(0);
+    if (!PluginState.PARTIAL_SUCCESS.equals(report0.getPluginState())) {
+      Assert.fail("Report not a partial success: " + report0);
+    }
 
     Plugin<Representation> plugin2 = new PdfToPdfaPlugin<Representation>();
     RodaCoreFactory.getPluginOrchestrator().runPluginOnAllRepresentations(plugin2);
@@ -674,7 +679,10 @@ public class InternalConvertPluginsTest {
     Plugin<AIP> plugin3 = new VeraPDFPlugin();
     plugin3.setParameterValues(parameters);
     reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAllAIPs(plugin3);
-    Assert.assertEquals("SUCCESS", reports.get(0).getReports().get(1).getPluginState().toString());
+    Report report1 = reports.get(0).getReports().get(1);
+    if (!PluginState.SUCCESS.equals(report1.getPluginState())) {
+      Assert.fail("Report failed: " + report1);
+    }
 
   }
 }
