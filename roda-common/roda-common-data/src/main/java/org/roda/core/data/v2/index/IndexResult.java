@@ -20,10 +20,11 @@ public class IndexResult<T extends Serializable> implements Serializable {
   private long totalCount;
   private List<T> results;
   private List<FacetFieldResult> facetResults;
-  private final Date date = new Date();
+  private Date date;
 
   public IndexResult() {
     super();
+    date = new Date();
   }
 
   public IndexResult(long offset, long limit, long totalCount, List<T> results, List<FacetFieldResult> facetResults) {
@@ -33,6 +34,7 @@ public class IndexResult<T extends Serializable> implements Serializable {
     this.totalCount = totalCount;
     this.results = results;
     this.setFacetResults(facetResults);
+    date = new Date();
   }
 
   /**
@@ -89,6 +91,10 @@ public class IndexResult<T extends Serializable> implements Serializable {
 
   public Date getDate() {
     return date;
+  }
+
+  public void setDate(Date date) {
+    this.date = date;
   }
 
   @Override
