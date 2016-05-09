@@ -192,6 +192,7 @@ public class SolrUtils {
     Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
+    query.setParam("q.op", "AND");
     query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
@@ -214,6 +215,7 @@ public class SolrUtils {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
+    query.setParam("q.op", "AND");
     query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());

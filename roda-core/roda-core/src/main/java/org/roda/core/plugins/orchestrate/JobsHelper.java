@@ -17,7 +17,7 @@ public final class JobsHelper {
 
   }
 
-  public static Job updateJobInTheStateStarted(Job job) {
+  public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
     job.setObjectsBeingProcessed(0);
     job.setObjectsProcessedWithSuccess(0);

@@ -37,7 +37,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -672,6 +671,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public void cleanUnfinishedJobs() {
     Filter filter = new Filter();
     filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.STARTED.toString()));
+    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.toString()));
     Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     IndexResult<Job> jobs = null;
     List<Job> jobsToBeCleaned = new ArrayList<>();
@@ -689,7 +689,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       for (Job job : jobsToBeCleaned) {
         try {
           Job jobToBeCleaned = model.retrieveJob(job.getId());
-          JobsHelper.updateJobInTheStateStarted(jobToBeCleaned);
+          JobsHelper.updateJobInTheStateStartedOrCreated(jobToBeCleaned);
           model.createOrUpdateJob(jobToBeCleaned);
         } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
           LOGGER.error("Unable to get/update Job", e);
