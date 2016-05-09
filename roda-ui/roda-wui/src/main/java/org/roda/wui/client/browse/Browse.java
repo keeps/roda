@@ -25,7 +25,6 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -496,6 +495,7 @@ public class Browse extends Composite {
       }
 
       // Set button visibility
+      download.setVisible(true);
       createItem.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
@@ -531,6 +531,7 @@ public class Browse extends Composite {
     actionsSidebar.setVisible(true);
 
     // Set button visibility
+    download.setVisible(false);
     createItem.setVisible(true);
     moveItem.setVisible(true);
     editPermissions.setVisible(true);

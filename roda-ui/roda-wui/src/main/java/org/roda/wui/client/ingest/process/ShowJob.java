@@ -163,7 +163,7 @@ public class ShowJob extends Composite {
   JobReportList jobReports;
 
   @UiField
-  Button buttonBack;
+  Button buttonStop, buttonBack;
 
   private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
 
@@ -215,6 +215,8 @@ public class ShowJob extends Composite {
       }
     }
 
+    // set button visibility
+    buttonStop.setVisible(isJobRunning());
   }
 
   private boolean isJobRunning() {
@@ -288,6 +290,9 @@ public class ShowJob extends Composite {
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
     progress.setHTML(b.toSafeHtml());
+
+    // set button visibility
+    buttonStop.setVisible(isJobRunning());
 
     scheduleUpdateStatus();
   }
