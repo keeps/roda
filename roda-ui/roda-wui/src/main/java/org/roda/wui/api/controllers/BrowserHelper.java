@@ -1618,7 +1618,7 @@ public class BrowserHelper {
 
   public static List<String> getRiskOnAIP(String aipId) throws GenericException, RequestNotValidException {
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_ELEMENT_ID, aipId));
+    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_OBJECT_ID, aipId));
     IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
       new Sublist());
 

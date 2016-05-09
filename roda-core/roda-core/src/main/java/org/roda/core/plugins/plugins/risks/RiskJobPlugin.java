@@ -29,7 +29,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
-import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -47,13 +46,11 @@ import org.slf4j.LoggerFactory;
 public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
-  private RiskJobPluginInfo info = new RiskJobPluginInfo();
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risks", PluginParameterType.RISK_ID, "", false, false,
-        "Add the risks that will be associated with the elements above."));
+        "Add the risks that will be associated with the objects above."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
@@ -116,21 +113,20 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
 
     try {
-
       String emails = PluginHelper.getStringFromParameters(this,
         pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
       if (!"".equals(emails)) {
         List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
         Notification notification = new Notification();
-        notification.setSubject("RODA risk process finished - XXX");
-        notification.setFromUser("Job Process");
+        notification.setSubject("RODA risk process finished");
+        notification.setFromUser(this.getClass().getSimpleName());
         notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
         model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
       }
 
     } catch (GenericException e) {
-      LOGGER.error("Could not send ingest notification");
+      LOGGER.error("Could not send risk job notification");
     }
 
     return null;
@@ -172,12 +168,12 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public String getName() {
-    return "Risk Job Plugin Name";
+    return "Risk Job Plugin";
   }
 
   @Override
   public String getDescription() {
-    return "Risk Job Plugin Description";
+    return "Job responsible to associate risk with objects";
   }
 
   @Override
@@ -192,21 +188,22 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public PreservationEventType getPreservationEventType() {
+    // TODO change to a more adequate event type?
     return PreservationEventType.VALIDATION;
   }
 
   @Override
   public String getPreservationEventDescription() {
-    return "";
+    return "Job responsible to associate risk with objects";
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "";
+    return "Risk was successfully associated with objects";
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "";
+    return "Risk was not successfully associated with objects";
   }
 }

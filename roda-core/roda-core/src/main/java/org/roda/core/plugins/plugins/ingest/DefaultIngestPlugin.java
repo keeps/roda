@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -28,6 +29,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
+import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -52,6 +54,8 @@ import org.roda.core.plugins.plugins.ingest.validation.VeraPDFPlugin;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.CaseFormat;
 
 /***
  * https://docs.google.com/spreadsheets/d/
@@ -324,26 +328,52 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
-
     try {
-
-      String emails = PluginHelper.getStringFromParameters(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
-      if (!"".equals(emails)) {
-        List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
-        Notification notification = new Notification();
-        notification.setSubject("RODA ingest process finished - XXX");
-        notification.setFromUser("Job Process");
-        notification.setRecipientUsers(emailList);
-        Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
-      }
-
-    } catch (GenericException e) {
+      sendNotification(model);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Could not send ingest notification");
     }
 
     return null;
+  }
+
+  private void sendNotification(ModelService model)
+    throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    Job job = PluginHelper.getJob(this, model);
+
+    String emails = PluginHelper.getStringFromParameters(this,
+      getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+
+    if (!"".equals(emails)) {
+      List<String> emailList = new ArrayList<String>(Arrays.asList(emails.split("\\s*,\\s*")));
+      Notification notification = new Notification();
+      String outcome = "SUCCESS";
+
+      if (job.getObjectsProcessedWithFailure() > 0) {
+        outcome = "FAILURE";
+      }
+
+      notification.setSubject("RODA ingest process finished - " + outcome);
+      notification.setFromUser(this.getClass().getSimpleName());
+      notification.setRecipientUsers(emailList);
+
+      Map<String, Object> scopes = new HashMap<String, Object>();
+      scopes.put("outcome", outcome);
+      scopes.put("type", CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, job.getPluginType().toString()));
+      scopes.put("sips", job.getObjectsCount());
+      scopes.put("success", job.getObjectsProcessedWithSuccess());
+      scopes.put("failed", job.getObjectsProcessedWithFailure());
+      scopes.put("name", job.getName());
+      scopes.put("creator", job.getUsername());
+
+      SimpleDateFormat parser = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+      scopes.put("start", parser.format(job.getStartDate()));
+
+      long duration = (new Date().getTime() - job.getStartDate().getTime()) / 1000;
+      scopes.put("duration", duration + " seconds");
+
+      model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
+    }
   }
 
   /**

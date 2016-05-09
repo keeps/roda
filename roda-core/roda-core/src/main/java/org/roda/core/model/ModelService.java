@@ -20,7 +20,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -1535,6 +1534,16 @@ public class ModelService extends ModelObservable {
     notifyRiskCreatedOrUpdated(risk, commit);
   }
 
+  public void updateRisks(List<Risk> risks, String message, boolean commit) throws GenericException {
+    for (int i = 0; i < risks.size(); i++) {
+      if (i == risks.size() - 1) {
+        updateRisk(risks.get(i), message, false);
+      } else {
+        updateRisk(risks.get(i), message, commit);
+      }
+    }
+  }
+
   public void deleteRisk(String riskId, boolean commit)
     throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
     StoragePath riskPath = ModelUtils.getRiskStoragePath(riskId);
@@ -1601,11 +1610,11 @@ public class ModelService extends ModelObservable {
       riskIncidence = new RiskIncidence();
       riskIncidence.setId(UUID.randomUUID().toString());
       if (fileId != null) {
-        riskIncidence.setElementId(fileId);
+        riskIncidence.setObjectId(fileId);
       } else if (representationId != null) {
-        riskIncidence.setElementId(representationId);
+        riskIncidence.setObjectId(representationId);
       } else {
-        riskIncidence.setElementId(aipId);
+        riskIncidence.setObjectId(aipId);
       }
 
     }
@@ -1922,16 +1931,29 @@ public class ModelService extends ModelObservable {
     try {
       notification.setId(UUID.randomUUID().toString());
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
+      List<String> recipients = notification.getRecipientUsers();
 
       InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
       String template = IOUtils.toString(templateStream, "UTF-8");
-      notification.setBody(template);
       IOUtils.closeQuietly(templateStream);
+
+      if (!scopes.containsKey("from")) {
+        scopes.put("from", notification.getFromUser());
+      }
+
+      if (recipients.size() == 1) {
+        scopes.put("recipient", recipients.get(0));
+      } else {
+        scopes.put("recipient", RodaConstants.NOTIFICATION_VARIOUS_RECIPIENT_USERS);
+      }
+
+      notification.setBody(executeMustache(template, templateName, scopes));
+      scopes.remove("recipient");
 
       ConfigurableEmailUtility emailUtility = new ConfigurableEmailUtility(notification.getFromUser(),
         notification.getSubject());
 
-      for (String recipient : notification.getRecipientUsers()) {
+      for (String recipient : recipients) {
         String modifiedBody = getUpdatedMessageBody(notification, recipient, template, templateName, scopes);
         String host = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "host");
 
@@ -1955,7 +1977,8 @@ public class ModelService extends ModelObservable {
   }
 
   private String getUpdatedMessageBody(Notification notification, String recipient, String template,
-    String templateName, Map<String, Object> scopesToAdd) {
+    String templateName, Map<String, Object> scopes) {
+
     // update body message with the recipient user and acknowledge URL
     String userUUID = UUID.nameUUIDFromBytes(recipient.getBytes()).toString();
     String ackUrl = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "acknowledge");
@@ -1963,12 +1986,22 @@ public class ModelService extends ModelObservable {
     ackUrl = ackUrl.replaceAll("\\{token\\}", notification.getAcknowledgeToken() + userUUID);
     ackUrl = ackUrl.replaceAll("\\{email\\}", recipient);
 
-    Map<String, Object> scopes = new HashMap<String, Object>();
-    scopes.put("from", notification.getFromUser());
-    scopes.put("recipient", recipient);
     scopes.put("acknowledge", ackUrl);
-    scopes.putAll(scopesToAdd);
+    scopes.put("recipient", recipient);
 
+    try {
+      User user = UserUtility.getLdapUtility().getUserWithEmail(recipient);
+      if (user != null) {
+        scopes.put("recipient", user.getName());
+      }
+    } catch (LdapUtilityException e) {
+      // do nothing
+    }
+
+    return executeMustache(template, templateName, scopes);
+  }
+
+  private String executeMustache(String template, String templateName, Map<String, Object> scopes) {
     Writer writer = new StringWriter();
     MustacheFactory mf = new DefaultMustacheFactory();
     StringReader reader = new StringReader(template);
@@ -1976,6 +2009,7 @@ public class ModelService extends ModelObservable {
     mustache.execute(writer, scopes);
     String modifiedTemplate = writer.toString();
     IOUtils.closeQuietly(reader);
+    IOUtils.closeQuietly(writer);
     return modifiedTemplate;
   }
 

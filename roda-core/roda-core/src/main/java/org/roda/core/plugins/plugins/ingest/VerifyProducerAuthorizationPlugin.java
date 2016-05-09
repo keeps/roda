@@ -7,11 +7,15 @@
  */
 package org.roda.core.plugins.plugins.ingest;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.roda.core.common.XMLUtility;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -21,6 +25,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
+import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -33,6 +38,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -125,6 +131,18 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
     Report reportItem) {
     try {
+      List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+
+      for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
+        Binary retrieveDescriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
+          descriptiveMetadata.getId());
+        InputStream createInputStream = retrieveDescriptiveMetadataBinary.getContent().createInputStream();
+        String useRestrict = XMLUtility.getStringFromFile(createInputStream, "/ead/archdesc/userestrict/p");
+        if (useRestrict.equals(RodaConstants.OBJECT_PERMISSIONS_FREE_ACCESS)) {
+          // TODO give access to all users
+        }
+      }
+
       AIP parentAIP = null;
       String jobCreatorUsername = currentJob.getUsername();
       if (aip.getParentId() != null) {
@@ -158,7 +176,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException e) {
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
+      | IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
     }
   }

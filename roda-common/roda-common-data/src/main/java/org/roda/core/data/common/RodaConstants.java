@@ -293,6 +293,8 @@ public final class RodaConstants {
   public static final String OBJECT_PERMISSIONS_REMOVE_GROUPS = "removeGroups";
   public static final String OBJECT_PERMISSIONS_GRANT_USERS = "grantUsers";
   public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
+  public static final String OBJECT_PERMISSIONS_FREE_ACCESS = "Livre";
+  public static final String OBJECT_PERMISSIONS_XPATH = "/ead/archdesc/userestrict/p[text()=\"Livre\"]";
 
   public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
   public static final String LOG_ACTION_COMPONENT = "actionComponent";
@@ -457,7 +459,7 @@ public final class RodaConstants {
   public static final String RISK_SEARCH = "search";
 
   public static final String RISK_INCIDENCE_ID = "id";
-  public static final String RISK_INCIDENCE_ELEMENT_ID = "elementId";
+  public static final String RISK_INCIDENCE_OBJECT_ID = "objectId";
   public static final String RISK_INCIDENCE_RISKS = "risks";
 
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";
@@ -524,6 +526,7 @@ public final class RodaConstants {
 
   public static final String NOTIFICATION_FILE_EXTENSION = ".json";
   public static final String NOTIFICATION_SEARCH = "search";
+  public static final String NOTIFICATION_VARIOUS_RECIPIENT_USERS = "various-recipient-users";
 
   /* View representation */
   public static final String VIEW_REPRESENTATION_DESCRIPTION_LEVEL = "description-level-representation";
@@ -662,8 +665,8 @@ public final class RodaConstants {
 
   public static final String DEFAULT_DATETIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-  // Template Constants
+  /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template";
-  public static final String RISK_EMAIL_TEMPLATE = "ingestion-template";
+  public static final String RISK_EMAIL_TEMPLATE = "risk-template";
 
 }

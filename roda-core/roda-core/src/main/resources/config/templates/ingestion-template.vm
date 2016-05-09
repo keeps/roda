@@ -1,15 +1,27 @@
 <html>
-<body>
-<p>Dear <em>{{recipient}}</em>,</p>
-<p>A RODA {{from}} wants to notify you of a new ingest that was processed</a>:</p>
-<p> To acknowledge this message, please click on the following URL.
-<ul>
-<li><strong>Acknowledge URL:</strong> {{acknowledge}}</li>
-</ul>
-</p>
-<p>If you are not related to the ingest process before mentioned, please ignore this e-mail.</p>
+	<body>
+		<p>Dear <em>{{recipient}}</em>,</p>
+		<p>RODA wants to inform you that an ingest process has just finished. The details of the job are as follows:</p>	
+		
+		<h2><strong>Summary</strong></h2>
+		<p><strong>Outcome:</strong> {{outcome}}</p>
+		<p><strong>Job Type:</strong> {{type}}</p>
+		<p><strong>Total SIPs processed:</strong> {{sips}}</p>
+		<p><strong>Successful:</strong> {{success}}</p>
+		<p><strong>Failed:</strong> {{failed}}</p>
+			
+		<h2><strong>Job details</strong></h2>	
+		<p><strong>Name:</strong> {{name}}</p>
+		<p><strong>Creator:</strong> {{creator}}</p>
+		<p><strong>Start date:</strong> {{start}}</p>
+		<p><strong>Duration:</strong> {{duration}}</p>	
 
-<p>RODA - Repository of Authentic Digital Objects</p>
-
-</body>
+		<h2><strong>Acknowledgement</strong></h2>		
+		<p>To acknowledge this message, please click on the following link: <a href="{{acknowledge}}">Message received</a></p>
+					
+		<p>If you are not related to the ingest process before mentioned, please ignore this e-mail.</p>
+		<hr>
+		<p>RODA - Repository of Authentic Digital Objects</p>
+		<p>An open-source digital repository designed for preservation</p>
+	</body>
 <html>

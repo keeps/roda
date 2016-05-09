@@ -27,36 +27,32 @@ public class ConfigurableEmailUtility {
   private String protocol;
   private String login;
   private String password;
-  private Message msg;
-  private Session session;
+  private String from;
+  private String subject;
+  private javax.mail.Authenticator authenticator = null;
+  private Properties props = new Properties();
 
   public ConfigurableEmailUtility(String from, String subject) {
     this.protocol = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "protocol");
     this.login = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "login");
     this.password = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "password");
+    this.from = from;
+    this.subject = subject;
 
-    try {
-      session = getSession();
-      session.setDebug(false);
-
-      // create a message
-      msg = new MimeMessage(session);
-
-      // set the from and to address
-      InternetAddress addressFrom = new InternetAddress(login);
-
-      msg.setFrom(addressFrom);
-
-      // Setting the Subject and Content Type
-      msg.addHeader("name", from);
-      msg.setSubject(subject);
-
-    } catch (MessagingException e) {
-      e.printStackTrace();
-    }
+    createSessionParameters();
   }
 
   public void sendMail(String recipient, String message) throws MessagingException {
+
+    Session session = Session.getDefaultInstance(props, authenticator);
+    session.setDebug(false);
+
+    Message msg = new MimeMessage(session);
+
+    InternetAddress addressFrom = new InternetAddress(login);
+    msg.setFrom(addressFrom);
+    msg.addHeader("name", from);
+    msg.setSubject(subject);
 
     InternetAddress recipientAddress = new InternetAddress(recipient);
     msg.setRecipient(Message.RecipientType.TO, recipientAddress);
@@ -75,11 +71,9 @@ public class ConfigurableEmailUtility {
     transport.close();
   }
 
-  private Session getSession() {
-    javax.mail.Authenticator authenticator = null;
+  private void createSessionParameters() {
     boolean hasAuth = false;
 
-    Properties props = new Properties();
     String properties = RodaCoreFactory.getRodaConfigurationAsString("core", "email", "properties");
     String[] propertyList = properties.split(" ");
 
@@ -97,7 +91,5 @@ public class ConfigurableEmailUtility {
         }
       };
     }
-
-    return Session.getDefaultInstance(props, authenticator);
   }
 }

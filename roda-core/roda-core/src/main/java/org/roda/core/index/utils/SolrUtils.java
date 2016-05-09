@@ -1915,7 +1915,7 @@ public class SolrUtils {
     SolrInputDocument doc = new SolrInputDocument();
 
     doc.addField(RodaConstants.RISK_INCIDENCE_ID, incidence.getId());
-    doc.addField(RodaConstants.RISK_INCIDENCE_ELEMENT_ID, incidence.getElementId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_ID, incidence.getObjectId());
     doc.addField(RodaConstants.RISK_INCIDENCE_RISKS, incidence.getRisks());
 
     return doc;
@@ -1925,7 +1925,7 @@ public class SolrUtils {
     RiskIncidence incidence = new RiskIncidence();
 
     incidence.setId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ID)));
-    incidence.setElementId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ELEMENT_ID)));
+    incidence.setObjectId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_ID)));
     incidence.setRisks(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_RISKS)));
 
     return incidence;

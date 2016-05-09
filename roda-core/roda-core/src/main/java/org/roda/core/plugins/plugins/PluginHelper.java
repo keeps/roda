@@ -439,6 +439,8 @@ public final class PluginHelper {
 
   /**
    * 20160331 hsilva: Only orchestrators should invoke this method
+   * 
+   * @throws GenericException
    */
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
@@ -446,15 +448,19 @@ public final class PluginHelper {
     // do stuff with concrete JobPluginInfo
     if (jobPluginInfo instanceof RiskJobPluginInfo) {
       RiskJobPluginInfo riskJobPluginInfo = (RiskJobPluginInfo) jobPluginInfo;
+      List<Risk> countedRisks = new ArrayList<Risk>();
       Map<String, Integer> riskCounter = riskJobPluginInfo.getRisks();
-      for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
-        try {
+
+      try {
+        for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
           Risk risk = model.retrieveRisk(riskEntry.getKey());
           risk.setObjectsSize(risk.getObjectsSize() + riskEntry.getValue());
-          model.updateRisk(risk, null, true);
-        } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-          LOGGER.error("Could not update risk counters");
+          countedRisks.add(risk);
         }
+
+        model.updateRisks(countedRisks, null, true);
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not update risk counters");
       }
     }
 

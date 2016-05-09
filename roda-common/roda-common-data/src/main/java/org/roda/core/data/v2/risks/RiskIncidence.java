@@ -25,7 +25,7 @@ public class RiskIncidence implements IsIndexed, Serializable {
   private static final long serialVersionUID = -1089167070045254627L;
 
   private String id;
-  private String elementId;
+  private String objectId;
   private List<String> risks;
 
   public RiskIncidence() {
@@ -35,7 +35,7 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   public RiskIncidence(RiskIncidence incidence) {
     this.id = incidence.getId();
-    this.setElementId(incidence.getElementId());
+    this.setObjectId(incidence.getObjectId());
     this.setRisks(incidence.getRisks());
   }
 
@@ -47,12 +47,12 @@ public class RiskIncidence implements IsIndexed, Serializable {
     this.id = id;
   }
 
-  public String getElementId() {
-    return elementId;
+  public String getObjectId() {
+    return objectId;
   }
 
-  public void setElementId(String elementId) {
-    this.elementId = elementId;
+  public void setObjectId(String objectId) {
+    this.objectId = objectId;
   }
 
   public List<String> getRisks() {
@@ -73,7 +73,7 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", elementId=" + elementId + ", risks=" + risks + "]";
+    return "Format [id=" + id + ", objectId=" + objectId + ", risks=" + risks + "]";
   }
 
   @JsonIgnore

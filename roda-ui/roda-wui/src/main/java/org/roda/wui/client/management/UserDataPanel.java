@@ -26,8 +26,8 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -45,10 +45,10 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.MultiWordSuggestOracle;
 import com.google.gwt.user.client.ui.SuggestBox;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
 
@@ -257,19 +257,17 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
       }
     };
 
-    username.addKeyPressHandler(new KeyPressHandler() {
+    username.addKeyDownHandler(new KeyDownHandler() {
 
       @Override
-      public void onKeyPress(KeyPressEvent event) {
-        char keyCode = event.getCharCode();
+      public void onKeyDown(KeyDownEvent event) {
+        int keyCode = event.getNativeKeyCode();
 
         if (!(keyCode >= '0' && keyCode <= '9') && !(keyCode >= 'A' && keyCode <= 'Z')
-          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_'
-          && (keyCode != (char) KeyCodes.KEY_TAB) && (keyCode != (char) KeyCodes.KEY_DELETE)
-          && (keyCode != (char) KeyCodes.KEY_ENTER) && (keyCode != (char) KeyCodes.KEY_HOME)
-          && (keyCode != (char) KeyCodes.KEY_END) && (keyCode != (char) KeyCodes.KEY_LEFT)
-          && (keyCode != (char) KeyCodes.KEY_UP) && (keyCode != (char) KeyCodes.KEY_RIGHT)
-          && (keyCode != (char) KeyCodes.KEY_DOWN)) {
+          && !(keyCode >= 'a' && keyCode <= 'z') && keyCode != '.' && keyCode != '_' && (keyCode != KeyCodes.KEY_TAB)
+          && (keyCode != KeyCodes.KEY_DELETE) && (keyCode != KeyCodes.KEY_ENTER) && (keyCode != KeyCodes.KEY_HOME)
+          && (keyCode != KeyCodes.KEY_END) && (keyCode != KeyCodes.KEY_LEFT) && (keyCode != KeyCodes.KEY_UP)
+          && (keyCode != KeyCodes.KEY_RIGHT) && (keyCode != KeyCodes.KEY_DOWN) && (keyCode != KeyCodes.KEY_BACKSPACE)) {
           ((TextBox) event.getSource()).cancelKey();
         }
       }
@@ -415,10 +413,10 @@ public class UserDataPanel extends Composite implements HasValueChangeHandlers<U
     user.setId(username.getText());
     user.setName(username.getText());
     user.setFullName(fullname.getText());
-    user.setBusinessCategory(businessCategory.getValue(businessCategory.getSelectedIndex()));
-    user.setIdDocumentType(idType.getValue(idType.getSelectedIndex()));
+    // user.setBusinessCategory(businessCategory.getValue(businessCategory.getSelectedIndex()));
+    // user.setIdDocumentType(idType.getValue(idType.getSelectedIndex()));
     user.setIdDocument(idNumber.getText());
-    user.setIdDocumentDate(idDate.getValue());
+    // user.setIdDocumentDate(idDate.getValue());
     user.setIdDocumentLocation(idLocality.getText());
     user.setBirthCountry(nationality.getText());
     user.setFinanceIdentificationNumber(nif.getText());
