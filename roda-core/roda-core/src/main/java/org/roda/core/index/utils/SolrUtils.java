@@ -2131,12 +2131,13 @@ public class SolrUtils {
       Map<String, Object> stylesheetOpt = new HashMap<String, Object>();
       if (aip != null) {
         stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_AIP_ID, aip.getId());
+        if (representationID != null) {
+          stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
+          stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+            IdUtils.getRepresentationId(aip.getId(), representationID));
+        }
       }
-      if (representationID != null) {
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_ID, representationID);
-        stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
-          IdUtils.getRepresentationId(aip.getId(), representationID));
-      }
+
       if (fileID != null) {
         stylesheetOpt.put(RodaConstants.PRESERVATION_EVENT_FILE_ID, fileID);
       }

@@ -145,27 +145,78 @@ public class PluginParameter implements Serializable {
       + description + "]";
   }
 
-  /**
-   * @see Object#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((defaultValue == null) ? 0 : defaultValue.hashCode());
+    result = prime * result + ((description == null) ? 0 : description.hashCode());
+    result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + (mandatory ? 1231 : 1237);
+    result = prime * result + ((name == null) ? 0 : name.hashCode());
+    result = prime * result + ((possibleValues == null) ? 0 : possibleValues.hashCode());
+    result = prime * result + (readonly ? 1231 : 1237);
+    result = prime * result + ((type == null) ? 0 : type.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
-    boolean equal = false;
-
-    if (obj != null && obj instanceof PluginParameter) {
-
-      PluginParameter other = (PluginParameter) obj;
-
-      equal = getName() == other.getName() || getName().equals(other.getName());
-      equal &= getId() == other.getId() || getId().equals(other.getId());
-      equal &= getType() == other.getType() || getType().equals(other.getType());
-      equal &= getDefaultValue() == other.getDefaultValue() || getDefaultValue().equals(other.getDefaultValue());
-      equal &= possibleValues.equals(other.possibleValues);
-
-    } else {
-      equal = false;
+    if (this == obj) {
+      return true;
     }
-
-    return equal;
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof PluginParameter)) {
+      return false;
+    }
+    PluginParameter other = (PluginParameter) obj;
+    if (defaultValue == null) {
+      if (other.defaultValue != null) {
+        return false;
+      }
+    } else if (!defaultValue.equals(other.defaultValue)) {
+      return false;
+    }
+    if (description == null) {
+      if (other.description != null) {
+        return false;
+      }
+    } else if (!description.equals(other.description)) {
+      return false;
+    }
+    if (id == null) {
+      if (other.id != null) {
+        return false;
+      }
+    } else if (!id.equals(other.id)) {
+      return false;
+    }
+    if (mandatory != other.mandatory) {
+      return false;
+    }
+    if (name == null) {
+      if (other.name != null) {
+        return false;
+      }
+    } else if (!name.equals(other.name)) {
+      return false;
+    }
+    if (possibleValues == null) {
+      if (other.possibleValues != null) {
+        return false;
+      }
+    } else if (!possibleValues.equals(other.possibleValues)) {
+      return false;
+    }
+    if (readonly != other.readonly) {
+      return false;
+    }
+    if (type != other.type) {
+      return false;
+    }
+    return true;
   }
 
   public String getId() {

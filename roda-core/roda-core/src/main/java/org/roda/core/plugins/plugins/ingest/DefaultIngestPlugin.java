@@ -352,6 +352,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Reports reports, IngestJobPluginInfo jobPluginInfo, boolean removeAIPProcessingFailed) {
     List<AIP> newAips = new ArrayList<>();
     List<AIP> transferredResourceAips;
+    List<String> transferredResourcesToRemoveFromReports = new ArrayList<>();
     boolean oneTransferredResourceAipFailed;
     for (Entry<String, Map<String, Report>> transferredResourceReportsEntry : reports.getReports().entrySet()) {
       String transferredResourceId = transferredResourceReportsEntry.getKey();
@@ -376,13 +377,16 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         LOGGER.trace(
           "Will not process AIPs from transferred resource '{}' any longer because at least one of them failed",
           transferredResourceId);
-        reports.remove(transferredResourceId);
+        transferredResourcesToRemoveFromReports.add(transferredResourceId);
         // FIXME 20160502 hsilva: more should be done because reports in some of
         // the AIPs state that it went ok, so all reports of this transferred
         // resource should be updated to state the failure
       } else {
         newAips.addAll(transferredResourceAips);
       }
+    }
+    for (String transferredResourceId : transferredResourcesToRemoveFromReports) {
+      reports.remove(transferredResourceId);
     }
 
     int sourceObjectsBeingProcessed = reports.getReports().keySet().size();

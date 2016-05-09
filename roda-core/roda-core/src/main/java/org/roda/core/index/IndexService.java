@@ -89,7 +89,7 @@ public class IndexService {
         LOGGER.warn("Ancestor not found: {}", actual.getParentID());
       }
 
-      if (ancestors.contains(parent)) {
+      if (parent != null && ancestors.contains(parent)) {
         LOGGER.warn("Found a cyclic ancestor relationship: {} and {}", aip.getId(), parent.getId());
         break;
       }

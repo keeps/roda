@@ -1672,7 +1672,7 @@ public class LdapUtility {
     if (userAttributes.get("businessCategory") != null) {
       user.setBusinessCategory(userAttributes.get("businessCategory").get().toString());
     }
-    
+
     if (userAttributes.get("friendlyCountryName") != null) {
       user.setBirthCountry(userAttributes.get("friendlyCountryName").get().toString());
     }
@@ -1780,10 +1780,9 @@ public class LdapUtility {
     }
     if (!StringUtils.isBlank(user.getCountryName())) {
       attributes.put("countryName", user.getCountryName());
-    } else if (removeUnsetValues)
-      if (removeUnsetValues) {
-        attributes.remove("countryName");
-      }
+    } else if (removeUnsetValues) {
+      attributes.remove("countryName");
+    }
     if (!StringUtils.isBlank(user.getTelephoneNumber())) {
       attributes.put("telephoneNumber", user.getTelephoneNumber());
     } else if (removeUnsetValues) {
@@ -1936,7 +1935,7 @@ public class LdapUtility {
   //
   // return attributesList;
   // }
-  
+
   // FIXME filter is not being used: see if it is needed
   private List<Attributes> searchAttributes(DirContext ctxRoot, String ctxDN, String keyAttribute, Filter filter)
     throws NamingException {

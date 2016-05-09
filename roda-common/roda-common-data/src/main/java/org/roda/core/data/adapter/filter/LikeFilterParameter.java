@@ -50,9 +50,15 @@ public class LikeFilterParameter extends FilterParameter {
     return "LikeFilterParameter(name=" + getName() + ", expression=" + getExpression() + ")";
   }
 
-  /**
-   * @see FilterParameter#equals(Object)
-   */
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((expression == null) ? 0 : expression.hashCode());
+    return result;
+  }
+
+  @Override
   public boolean equals(Object obj) {
     boolean equal = true;
 
