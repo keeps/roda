@@ -20,7 +20,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
@@ -160,10 +159,10 @@ public class AgentRegister extends Composite {
       }
     });
 
-    agentList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    agentList.addCheckboxSelectionListener(new CheckboxSelectionListener<Agent>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<Agent> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
@@ -238,9 +237,9 @@ public class AgentRegister extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveAgentHandler(ClickEvent e) {
 
-    final SelectedItems selected = agentList.getSelected();
+    final SelectedItems<Agent> selected = agentList.getSelected();
 
-    SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
+    SelectedItemsUtils.size(Agent.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {

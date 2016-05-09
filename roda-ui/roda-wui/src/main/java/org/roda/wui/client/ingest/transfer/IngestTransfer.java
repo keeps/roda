@@ -459,7 +459,7 @@ public class IngestTransfer extends Composite {
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
 
-    final SelectedItems selected = transferredResourceList.getSelected();
+    final SelectedItems<TransferredResource> selected = transferredResourceList.getSelected();
 
     if (SelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
@@ -478,8 +478,8 @@ public class IngestTransfer extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItems s = new SelectedItemsList(Arrays.asList(resource.getUUID()),
-                  TransferredResource.class.getName());
+                SelectedItems<TransferredResource> s = new SelectedItemsList<TransferredResource>(
+                  Arrays.asList(resource.getUUID()), TransferredResource.class.getName());
                 BrowserService.Util.getInstance().removeTransferredResources(s, new AsyncCallback<Void>() {
 
                   @Override

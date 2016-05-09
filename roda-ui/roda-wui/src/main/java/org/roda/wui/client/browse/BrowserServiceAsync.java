@@ -22,8 +22,9 @@ import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -50,11 +51,11 @@ public interface BrowserServiceAsync {
 
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveInHierarchy(String aipId, String parentId, AsyncCallback<AIP> callback);
+  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void removeAIP(SelectedItems aips, AsyncCallback<String> callback);
+  void removeAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
@@ -65,7 +66,7 @@ public interface BrowserServiceAsync {
 
   void createTransferredResourcesFolder(String parent, String folderName, AsyncCallback<String> callback);
 
-  void removeTransferredResources(SelectedItems selected, AsyncCallback<Void> callback);
+  void removeTransferredResources(SelectedItems<TransferredResource> selected, AsyncCallback<Void> callback);
 
   void transferScanIsUpdating(AsyncCallback<Boolean> callback);
 
@@ -105,7 +106,7 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString, AsyncCallback<IndexResult<T>> callback);
 
-  void delete(String classNameToReturn, SelectedItems ids, AsyncCallback<Void> callback);
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
 
   void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
 

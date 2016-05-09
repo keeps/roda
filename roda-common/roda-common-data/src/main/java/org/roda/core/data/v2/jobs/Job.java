@@ -72,7 +72,7 @@ public class Job implements IsIndexed, Serializable {
   private ORCHESTRATOR_METHOD orchestratorMethod = null;
 
   // objects to act upon
-  private SelectedItems objects = null;
+  private SelectedItems<?> objects = null;
 
   public Job() {
     super();
@@ -91,7 +91,7 @@ public class Job implements IsIndexed, Serializable {
     this.orchestratorMethod = job.getOrchestratorMethod();
     this.objects = job.getObjects();
     if (objects instanceof SelectedItemsList) {
-      this.objectsCount = ((SelectedItemsList) objects).getIds().size();
+      this.objectsCount = ((SelectedItemsList<?>) objects).getIds().size();
     } else {
       this.objectsCount = 0;
     }
@@ -232,11 +232,11 @@ public class Job implements IsIndexed, Serializable {
     return pluginType;
   }
 
-  public SelectedItems getObjects() {
+  public SelectedItems<?> getObjects() {
     return objects;
   }
 
-  public void setObjects(SelectedItems objects) {
+  public void setObjects(SelectedItems<?> objects) {
     this.objects = objects;
   }
 

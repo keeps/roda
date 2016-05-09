@@ -290,7 +290,7 @@ public class RiskRegister extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveRiskHandler(ClickEvent e) {
 
-    final SelectedItems selected = riskList.getSelected();
+    final SelectedItems<Risk> selected = riskList.getSelected();
 
     SelectedItemsUtils.size(Risk.class, selected, new AsyncCallback<Long>() {
 

@@ -20,7 +20,6 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
@@ -160,10 +159,10 @@ public class FormatRegister extends Composite {
       }
     });
 
-    formatList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    formatList.addCheckboxSelectionListener(new CheckboxSelectionListener<Format>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<Format> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
@@ -238,9 +237,9 @@ public class FormatRegister extends Composite {
   @UiHandler("buttonRemove")
   void buttonRemoveFormatHandler(ClickEvent e) {
 
-    final SelectedItems selected = formatList.getSelected();
+    final SelectedItems<Format> selected = formatList.getSelected();
 
-    SelectedItemsUtils.size(TransferredResource.class, selected, new AsyncCallback<Long>() {
+    SelectedItemsUtils.size(Format.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {

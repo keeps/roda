@@ -123,8 +123,6 @@ public class IngestProcess extends Composite {
 
   @UiField
   Button newJob;
-  @UiField
-  Button removeFinished;
 
   private IngestProcess() {
 
@@ -197,11 +195,6 @@ public class IngestProcess extends Composite {
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
     Tools.newHistory(IngestTransfer.RESOLVER);
-  }
-
-  @UiHandler("removeFinished")
-  void handleViewAction(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {

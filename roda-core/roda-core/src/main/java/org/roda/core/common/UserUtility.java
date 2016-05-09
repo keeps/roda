@@ -108,7 +108,8 @@ public class UserUtility {
       RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
 
       Filter filter = new Filter();
-      // FIXME 20160506 this should be a retrieve, giving that the ID is like "user:[username]"
+      // FIXME 20160506 this should be a retrieve, giving that the ID is like
+      // "user:[username]"
       filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, rsu.getId()));
       filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
       try {
@@ -257,11 +258,12 @@ public class UserUtility {
 
   }
 
-  public static void checkObjectPermissions(RodaUser user, SelectedItems selected, PermissionType permission)
-    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
+  public static void checkObjectPermissions(RodaUser user, SelectedItems<IndexedAIP> selected,
+    PermissionType permission) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     IndexService index = RodaCoreFactory.getIndexService();
     if (selected instanceof SelectedItemsFilter) {
-      SelectedItemsFilter selectedItems = (SelectedItemsFilter) selected;
+      SelectedItemsFilter<IndexedAIP> selectedItems = (SelectedItemsFilter<IndexedAIP>) selected;
+
       long count = index.count(IndexedAIP.class, selectedItems.getFilter());
       for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
         List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItems.getFilter(), null,
@@ -271,7 +273,7 @@ public class UserUtility {
         }
       }
     } else {
-      SelectedItemsList selectedItems = (SelectedItemsList) selected;
+      SelectedItemsList<IndexedAIP> selectedItems = (SelectedItemsList<IndexedAIP>) selected;
       List<IndexedAIP> aips = ModelUtils.getIndexedAIPsFromObjectIds(selectedItems);
       for (IndexedAIP aip : aips) {
         checkObjectPermissions(user, aip, permission);

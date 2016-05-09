@@ -2,7 +2,9 @@
   font-family: "Ubuntu";
   font-style: normal;
   font-weight: 300;
-  src: local('Ubuntu Light'), local('Ubuntu-Light'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
+  /* Some Chrome browsers load an incorrect Ubuntu Light font from local*/
+/*   src: local('Ubuntu Light'), local('Ubuntu-Light'), url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype"); */
+  src: url(/api/v1/theme?resourceId=fonts/Ubuntu/Ubuntu-Light.ttf) format("truetype");
 }
 
 @font-face {

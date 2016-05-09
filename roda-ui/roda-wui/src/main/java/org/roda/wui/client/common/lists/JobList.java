@@ -22,11 +22,11 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.DateCell;
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -40,8 +40,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-import config.i18n.client.BrowseMessages;
-
 /**
  * 
  * @author Luis Faria <lfaria@keep.pt>
@@ -50,7 +48,8 @@ import config.i18n.client.BrowseMessages;
 public class JobList extends BasicAsyncTableCell<Job> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
-  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
+  // private static final BrowseMessages messages =
+  // GWT.create(BrowseMessages.class);
 
   private TextColumn<Job> nameColumn;
   private TextColumn<Job> usernameColumn;
@@ -116,35 +115,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
     statusColumn = new Column<Job, SafeHtml>(new SafeHtmlCell()) {
       @Override
       public SafeHtml getValue(Job job) {
-        SafeHtml ret = null;
-        if (job != null) {
-          JOB_STATE state = job.getState();
-          if (JOB_STATE.COMPLETED.equals(state)) {
-            if (job.getObjectsCount() == job.getObjectsProcessedWithSuccess()) {
-              ret = SafeHtmlUtils
-                .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
-            } else {
-              ret = SafeHtmlUtils
-                .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusCompleted() + "</span>");
-            }
-          } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-            ret = SafeHtmlUtils.fromSafeConstant(
-              "<span class='label-default'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
-          } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-default'>" + messages.showJobStatusFailedToComplete() + "</span>");
-          } else if (JOB_STATE.CREATED.equals(state)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
-          } else if (JOB_STATE.STARTED.equals(state)) {
-            ret = SafeHtmlUtils
-              .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusStarted() + "</span>");
-          } else {
-            ret = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + state + "</span>");
-          }
-        }
-
-        return ret;
+        return HtmlSnippetUtils.getJobStateHtml(job);
       }
     };
 

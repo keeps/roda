@@ -82,7 +82,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   private Column<T, Boolean> selectColumn;
   private Set<T> selected = new HashSet<T>();
-  private final List<CheckboxSelectionListener> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener>();
+  private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
 
   private Filter filter;
   private Facets facets;
@@ -484,17 +484,17 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     this.selectable = selectable;
   }
 
-  public SelectedItems getSelected() {
-    SelectedItems ret;
+  public SelectedItems<T> getSelected() {
+    SelectedItems<T> ret;
     if (isAllSelected()) {
-      ret = new SelectedItemsFilter(getFilter(), selectedClass.getName());
+      ret = new SelectedItemsFilter<T>(getFilter(), selectedClass.getName());
     } else {
       List<String> ids = new ArrayList<>();
       for (T item : selected) {
         ids.add(item.getUUID());
       }
 
-      ret = new SelectedItemsList(ids, selectedClass.getName());
+      ret = new SelectedItemsList<T>(ids, selectedClass.getName());
     }
 
     return ret;
@@ -509,20 +509,20 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   // LISTENER
 
-  public interface CheckboxSelectionListener {
-    public void onSelectionChange(SelectedItems selected);
+  public interface CheckboxSelectionListener<T extends IsIndexed> {
+    public void onSelectionChange(SelectedItems<T> selected);
   }
 
-  public void addCheckboxSelectionListener(CheckboxSelectionListener checkboxSelectionListener) {
+  public void addCheckboxSelectionListener(CheckboxSelectionListener<T> checkboxSelectionListener) {
     listeners.add(checkboxSelectionListener);
   }
 
-  public void removeCheckboxSelectionListener(CheckboxSelectionListener listener) {
+  public void removeCheckboxSelectionListener(CheckboxSelectionListener<T> listener) {
     listeners.remove(listener);
   }
 
   public void fireOnCheckboxSelectionChanged() {
-    for (CheckboxSelectionListener listener : listeners) {
+    for (CheckboxSelectionListener<T> listener : listeners) {
       listener.onSelectionChange(getSelected());
     }
   }
@@ -582,7 +582,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return dataProvider.getDate();
   }
 
-  public List<CheckboxSelectionListener> getListeners() {
+  public List<CheckboxSelectionListener<T>> getListeners() {
     return this.listeners;
   }
 

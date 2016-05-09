@@ -18,18 +18,18 @@ import org.roda.wui.client.browse.BrowserService;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SelectedItemsUtils {
-  public static boolean isEmpty(SelectedItems selected) {
-    return selected instanceof SelectedItemsList && ((SelectedItemsList) selected).getIds().isEmpty();
+  public static boolean isEmpty(SelectedItems<?> selected) {
+    return selected instanceof SelectedItemsList && ((SelectedItemsList<?>) selected).getIds().isEmpty();
   }
 
-  public static <T extends IsIndexed> void size(Class<T> classToReturn, SelectedItems selected,
+  public static <T extends IsIndexed> void size(Class<T> classToReturn, SelectedItems<T> selected,
     final AsyncCallback<Long> callback) {
 
     if (selected instanceof SelectedItemsList) {
-      Long size = (long) ((SelectedItemsList) selected).getIds().size();
+      Long size = (long) ((SelectedItemsList<T>) selected).getIds().size();
       callback.onSuccess(size);
     } else if (selected instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter) selected).getFilter();
+      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
       BrowserService.Util.getInstance().count(classToReturn.getName(), filter, new AsyncCallback<Long>() {
 
         @Override

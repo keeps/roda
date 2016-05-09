@@ -438,10 +438,10 @@ public class Search extends Composite {
       }
     });
 
-    itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    itemsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedAIP>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         newJobButton.setEnabled(!empty);
       }
@@ -464,14 +464,15 @@ public class Search extends Composite {
       }
     });
 
-    representationsSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    representationsSearchResultPanel
+      .addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRepresentation>() {
 
-      @Override
-      public void onSelectionChange(SelectedItems selected) {
-        boolean empty = SelectedItemsUtils.isEmpty(selected);
-        newJobButton.setEnabled(!empty);
-      }
-    });
+        @Override
+        public void onSelectionChange(SelectedItems<IndexedRepresentation> selected) {
+          boolean empty = SelectedItemsUtils.isEmpty(selected);
+          newJobButton.setEnabled(!empty);
+        }
+      });
   }
 
   private void createFilesSearchResultPanel() {
@@ -497,10 +498,10 @@ public class Search extends Composite {
       }
     });
 
-    filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    filesSearchResultPanel.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedFile>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<IndexedFile> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         newJobButton.setEnabled(!empty);
       }
@@ -512,8 +513,8 @@ public class Search extends Composite {
     Tools.newHistory(CreateRiskJob.RESOLVER);
   }
 
-  public SelectedItems getSelected() {
-    SelectedItems selected = null;
+  public SelectedItems<?> getSelected() {
+    SelectedItems<?> selected = null;
 
     if (itemsSearchAdvancedFieldsPanel.isVisible()) {
       selected = itemsSearchResultPanel.getSelected();
@@ -527,12 +528,8 @@ public class Search extends Composite {
       selected = filesSearchResultPanel.getSelected();
     }
 
-    if (selected instanceof SelectedItemsList) {
-      SelectedItemsList selectedset = (SelectedItemsList) selected;
-
-      if (SelectedItemsUtils.isEmpty(selectedset)) {
-        selected = new SelectedItemsList();
-      }
+    if (selected == null) {
+      selected = new SelectedItemsList<>();
     }
 
     return selected;

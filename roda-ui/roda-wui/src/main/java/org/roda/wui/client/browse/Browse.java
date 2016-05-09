@@ -27,7 +27,6 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
-import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
@@ -753,7 +752,7 @@ public class Browse extends Composite {
   @UiHandler("remove")
   void buttonRemoveHandler(ClickEvent e) {
 
-    final SelectedItems selected = aipList.getSelected();
+    final SelectedItems<IndexedAIP> selected = aipList.getSelected();
 
     if (SelectedItemsUtils.isEmpty(selected)) {
       // Remove the whole folder
@@ -771,7 +770,8 @@ public class Browse extends Composite {
             @Override
             public void onSuccess(Boolean confirmed) {
               if (confirmed) {
-                SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId), IndexedAIP.class.getName());
+                SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+                  IndexedAIP.class.getName());
                 BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
 
                   @Override
@@ -859,13 +859,67 @@ public class Browse extends Composite {
 
   @UiHandler("moveItem")
   void buttonMoveItemHandler(ClickEvent e) {
-    if (aipId != null && itemBundle != null) {
-      Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
-        new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
-      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
-      if (itemBundle.getAip().getParentID() != null) {
-        selectAipDialog.setEmptyParentButtonVisible(true);
+    final SelectedItems<IndexedAIP> selected = aipList.getSelected();
+
+    if (SelectedItemsUtils.isEmpty(selected)) {
+      // Move this item
+
+      if (aipId != null && itemBundle != null) {
+        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
+          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
+        if (itemBundle.getAip().getParentID() != null) {
+          selectAipDialog.setEmptyParentButtonVisible(true);
+        }
+        selectAipDialog.showAndCenter();
+        selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
+
+          @Override
+          public void onValueChange(ValueChangeEvent<IndexedAIP> event) {
+            final IndexedAIP parentAIP = event.getValue();
+            final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
+            SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+              IndexedAIP.class.getName());
+
+            BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new AsyncCallback<IndexedAIP>() {
+
+              @Override
+              public void onSuccess(IndexedAIP result) {
+                if (result != null) {
+                  clear();
+                  viewAction(result.getId());
+                }
+              }
+
+              @Override
+              public void onFailure(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                }
+              }
+            });
+          }
+        });
+      } else {
+        Dialogs.showInformationDialog("Select an item", "Please select one or more items to move", "OK");
       }
+    } else {
+      // Move all selected
+      Filter filter;
+      boolean showEmptyParentButton;
+      if (aipId != null) {
+        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
+          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+        showEmptyParentButton = true;
+      } else {
+        filter = new Filter();
+        showEmptyParentButton = false;
+      }
+
+      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
+      selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
       selectAipDialog.showAndCenter();
       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
 
@@ -874,10 +928,10 @@ public class Browse extends Composite {
           final IndexedAIP parentAIP = event.getValue();
           final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
-          BrowserService.Util.getInstance().moveInHierarchy(aipId, parentId, new AsyncCallback<AIP>() {
+          BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new LoadingAsyncCallback<IndexedAIP>() {
 
             @Override
-            public void onSuccess(AIP result) {
+            public void onSuccessImpl(IndexedAIP result) {
               if (result != null) {
                 clear();
                 viewAction(result.getId());
@@ -885,7 +939,7 @@ public class Browse extends Composite {
             }
 
             @Override
-            public void onFailure(Throwable caught) {
+            public void onFailureImpl(Throwable caught) {
               if (caught instanceof NotFoundException) {
                 Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
               } else {
@@ -895,6 +949,7 @@ public class Browse extends Composite {
           });
         }
       });
+
     }
   }
 

@@ -58,7 +58,8 @@ public class AkkaJobWorkerActor extends UntypedActor {
 
       if (ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES == job.getOrchestratorMethod()) {
         if (job.getObjects() instanceof SelectedItemsFilter) {
-          SelectedItemsFilter selectedItems = (SelectedItemsFilter) job.getObjects();
+          SelectedItemsFilter<TransferredResource> selectedItems = (SelectedItemsFilter<TransferredResource>) job
+            .getObjects();
 
           Long objectsCount = RodaCoreFactory.getIndexService().count(TransferredResource.class,
             selectedItems.getFilter());
@@ -68,7 +69,8 @@ public class AkkaJobWorkerActor extends UntypedActor {
             selectedItems.getFilter(), (Plugin<TransferredResource>) plugin);
         } else {
           reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(
-            (Plugin<TransferredResource>) plugin, getTransferredResourcesFromObjectIds(job.getObjects()));
+            (Plugin<TransferredResource>) plugin,
+            getTransferredResourcesFromObjectIds((SelectedItems<TransferredResource>) job.getObjects()));
         }
         // FIXME 20160404 hsilva: this should be done inside the orchestrator
         // method
@@ -80,19 +82,20 @@ public class AkkaJobWorkerActor extends UntypedActor {
         PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.ON_AIPS == job.getOrchestratorMethod()) {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
-          getAIPs(job.getObjects()));
+          getAIPs((SelectedItems<IndexedAIP>) job.getObjects()));
         // FIXME 20160404 hsilva: this should be done inside the orchestrator
         // method
         PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.ON_REPRESENTATIONS == job.getOrchestratorMethod()) {
-        Pair<String, List<String>> representations = getRepresentations(job.getObjects());
+        Pair<String, List<String>> representations = getRepresentations(
+          (SelectedItems<IndexedRepresentation>) job.getObjects());
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
           representations.getFirst(), representations.getSecond());
         // FIXME 20160404 hsilva: this should be done inside the orchestrator
         // method
         PluginHelper.updateJobPercentage(plugin, 100);
       } else if (ORCHESTRATOR_METHOD.ON_FILES == job.getOrchestratorMethod()) {
-        Pair<Pair<String, String>, List<String>> files = getFiles(job.getObjects());
+        Pair<Pair<String, String>, List<String>> files = getFiles((SelectedItems<IndexedFile>) job.getObjects());
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles((Plugin<File>) plugin,
           files.getFirst().getFirst(), files.getFirst().getSecond(), files.getSecond());
         // FIXME 20160404 hsilva: this should be done inside the orchestrator
@@ -106,10 +109,11 @@ public class AkkaJobWorkerActor extends UntypedActor {
     }
   }
 
-  public List<TransferredResource> getTransferredResourcesFromObjectIds(SelectedItems selectedItems) {
+  public List<TransferredResource> getTransferredResourcesFromObjectIds(
+    SelectedItems<TransferredResource> selectedItems) {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
     if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList list = (SelectedItemsList) selectedItems;
+      SelectedItemsList<TransferredResource> list = (SelectedItemsList<TransferredResource>) selectedItems;
       for (String objectId : list.getIds()) {
         try {
           res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
@@ -123,15 +127,15 @@ public class AkkaJobWorkerActor extends UntypedActor {
     return res;
   }
 
-  public List<String> getAIPs(SelectedItems selectedItems) {
+  public List<String> getAIPs(SelectedItems<IndexedAIP> selectedItems) {
     List<String> res = new ArrayList<String>();
     if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList list = (SelectedItemsList) selectedItems;
+      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
       res.addAll(list.getIds());
     } else {
       try {
         IndexService index = RodaCoreFactory.getIndexService();
-        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        SelectedItemsFilter<IndexedAIP> selectedItemsFilter = (SelectedItemsFilter<IndexedAIP>) selectedItems;
         long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
         for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
           List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), null,
@@ -147,7 +151,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
     return res;
   }
 
-  public Pair<String, List<String>> getRepresentations(SelectedItems selectedItems) {
+  public Pair<String, List<String>> getRepresentations(SelectedItems<IndexedRepresentation> selectedItems) {
     Pair<String, List<String>> resultPair = new Pair<String, List<String>>();
     try {
 
@@ -155,7 +159,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       List<String> res = new ArrayList<String>();
 
       if (selectedItems instanceof SelectedItemsList) {
-        SelectedItemsList list = (SelectedItemsList) selectedItems;
+        SelectedItemsList<IndexedRepresentation> list = (SelectedItemsList<IndexedRepresentation>) selectedItems;
 
         if (list.getIds().size() > 0) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, list.getIds()));
@@ -168,7 +172,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
         }
       } else {
         IndexService index = RodaCoreFactory.getIndexService();
-        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        SelectedItemsFilter<IndexedRepresentation> selectedItemsFilter = (SelectedItemsFilter<IndexedRepresentation>) selectedItems;
         long count = index.count(IndexedRepresentation.class, selectedItemsFilter.getFilter());
         for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
           List<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, selectedItemsFilter.getFilter(),
@@ -189,7 +193,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
     return resultPair;
   }
 
-  public Pair<Pair<String, String>, List<String>> getFiles(SelectedItems selectedItems) {
+  public Pair<Pair<String, String>, List<String>> getFiles(SelectedItems<IndexedFile> selectedItems) {
     Pair<Pair<String, String>, List<String>> resultPair = new Pair<Pair<String, String>, List<String>>();
     try {
 
@@ -198,7 +202,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
       List<String> res = new ArrayList<String>();
 
       if (selectedItems instanceof SelectedItemsList) {
-        SelectedItemsList list = (SelectedItemsList) selectedItems;
+        SelectedItemsList<IndexedFile> list = (SelectedItemsList<IndexedFile>) selectedItems;
 
         if (list.getIds().size() > 0) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, list.getIds()));
@@ -212,7 +216,7 @@ public class AkkaJobWorkerActor extends UntypedActor {
         }
       } else {
         IndexService index = RodaCoreFactory.getIndexService();
-        SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+        SelectedItemsFilter<IndexedFile> selectedItemsFilter = (SelectedItemsFilter<IndexedFile>) selectedItems;
         long count = index.count(IndexedFile.class, selectedItemsFilter.getFilter());
         for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
           List<IndexedFile> files = index.find(IndexedFile.class, selectedItemsFilter.getFilter(), null,

@@ -28,6 +28,7 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -37,7 +38,6 @@ import org.roda.wui.common.client.widgets.Toast;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -237,27 +237,7 @@ public class ShowJob extends Composite {
     duration.setText(Humanize.durationInDHMS(job.getStartDate(), job.getEndDate()));
 
     // set state
-    JOB_STATE state = job.getState();
-    SafeHtml statusHtml;
-    if (JOB_STATE.COMPLETED.equals(state)) {
-      statusHtml = SafeHtmlUtils
-        .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
-    } else if (JOB_STATE.FAILED_DURING_CREATION.equals(state)) {
-      statusHtml = SafeHtmlUtils
-        .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedDuringCreation() + "</span>");
-    } else if (JOB_STATE.FAILED_TO_COMPLETE.equals(state)) {
-      statusHtml = SafeHtmlUtils
-        .fromSafeConstant("<span class='label-danger'>" + messages.showJobStatusFailedToComplete() + "</span>");
-    } else if (JOB_STATE.CREATED.equals(state)) {
-      statusHtml = SafeHtmlUtils
-        .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusCreated() + "</span>");
-    } else if (JOB_STATE.STARTED.equals(state)) {
-      statusHtml = SafeHtmlUtils
-        .fromSafeConstant("<span class='label-info'>" + messages.showJobStatusStarted() + "</span>");
-    } else {
-      statusHtml = SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>" + state + "</span>");
-    }
-    status.setHTML(statusHtml);
+    status.setHTML(HtmlSnippetUtils.getJobStateHtml(job));
 
     // set counters
     SafeHtmlBuilder b = new SafeHtmlBuilder();

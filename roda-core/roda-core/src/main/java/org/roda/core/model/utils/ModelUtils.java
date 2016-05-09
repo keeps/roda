@@ -721,11 +721,11 @@ public final class ModelUtils {
     return zipEntries;
   }
 
-  public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems selectedItems)
+  public static List<IndexedAIP> getIndexedAIPsFromObjectIds(SelectedItems<IndexedAIP> selectedItems)
     throws GenericException, RequestNotValidException {
     List<IndexedAIP> res = new ArrayList<IndexedAIP>();
     if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList list = (SelectedItemsList) selectedItems;
+      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
       for (String objectId : list.getIds()) {
         try {
           res.add(RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, objectId));
@@ -735,7 +735,7 @@ public final class ModelUtils {
       }
     } else if (selectedItems instanceof SelectedItemsFilter) {
       IndexService index = RodaCoreFactory.getIndexService();
-      SelectedItemsFilter selectedItemsFilter = (SelectedItemsFilter) selectedItems;
+      SelectedItemsFilter<IndexedAIP> selectedItemsFilter = (SelectedItemsFilter<IndexedAIP>) selectedItems;
       long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
       for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
         List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), null,

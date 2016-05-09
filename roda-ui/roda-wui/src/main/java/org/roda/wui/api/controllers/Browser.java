@@ -217,7 +217,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems ids)
+  public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -546,14 +546,14 @@ public class Browser extends RodaCoreService {
    * ---------------------------------------------------------------------------
    */
 
-  public static AIP moveInHierarchy(RodaUser user, String aipId, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException {
+  public static IndexedAIP moveInHierarchy(RodaUser user, SelectedItems<IndexedAIP> selected, String parentId)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
-    IndexedAIP aip = BrowserHelper.retrieve(IndexedAIP.class, aipId);
-    UserUtility.checkObjectPermissions(user, aip, PermissionType.UPDATE);
+    UserUtility.checkObjectPermissions(user, selected, PermissionType.UPDATE);
 
     if (parentId != null) {
       IndexedAIP parentAip = BrowserHelper.retrieve(IndexedAIP.class, parentId);
@@ -561,12 +561,12 @@ public class Browser extends RodaCoreService {
     }
 
     // delegate
-    AIP returnAIP = BrowserHelper.moveInHierarchy(aipId, parentId);
+    IndexedAIP returnAIP = BrowserHelper.moveInHierarchy(selected, parentId, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
-    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", aip.getId(), duration,
-      RodaConstants.API_PATH_PARAM_AIP_ID, aipId, "toParent", parentId);
+    registerAction(user, BROWSER_COMPONENT, "moveInHierarchy", parentId, duration, "selected", selected, "toParent",
+      parentId);
 
     return returnAIP;
   }
@@ -597,7 +597,7 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
-  public static String removeAIP(RodaUser user, SelectedItems aips)
+  public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
@@ -835,7 +835,7 @@ public class Browser extends RodaCoreService {
     }
   }
 
-  public static void removeTransferredResources(RodaUser user, SelectedItems selected)
+  public static void removeTransferredResources(RodaUser user, SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -1036,7 +1036,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
-    SelectedItems selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 
@@ -1195,7 +1195,7 @@ public class Browser extends RodaCoreService {
    * @throws RequestNotValidException
    * @throws IOException
    */
-  public static StreamResponse exportAIP(RodaUser user, SelectedItems selected, String acceptFormat)
+  public static StreamResponse exportAIP(RodaUser user, SelectedItems<IndexedAIP> selected, String acceptFormat)
     throws GenericException, AuthorizationDeniedException, NotFoundException, RequestNotValidException, IOException {
     Date startDate = new Date();
 
@@ -1374,7 +1374,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems selected)
+  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
@@ -1389,7 +1389,7 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "deleteRisk", null, duration, "selected", selected);
   }
 
-  public static void deleteAgent(RodaUser user, SelectedItems selected)
+  public static void deleteAgent(RodaUser user, SelectedItems<Agent> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
@@ -1404,7 +1404,7 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "deleteAgent", null, duration, "selected", selected);
   }
 
-  public static void deleteFormat(RodaUser user, SelectedItems selected)
+  public static void deleteFormat(RodaUser user, SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     Date start = new Date();
 
