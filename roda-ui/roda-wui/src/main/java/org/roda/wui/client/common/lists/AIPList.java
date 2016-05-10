@@ -37,7 +37,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
+public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -46,11 +46,11 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
-    this(null, null, null, false);
+    this(null, null, null, false, Boolean.FALSE);
   }
 
-  public AIPList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
+  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, Boolean showInactive) {
+    super(filter, facets, summary, selectable, showInactive);
     super.setSelectedClass(IndexedAIP.class);
   }
 
@@ -128,8 +128,9 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
       GWT.log("Filter: " + filter);
 
+      Boolean showInactive = getObject();
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
     }
   }
 

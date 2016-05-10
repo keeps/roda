@@ -14,6 +14,8 @@ import java.util.Map;
 public class Facets implements Serializable {
   private static final long serialVersionUID = -1897012583120840693L;
 
+  public static final Facets NONE = new Facets();
+
   private Map<String, FacetParameter> parameters = new HashMap<String, FacetParameter>();
   private String query = "";
 

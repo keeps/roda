@@ -20,6 +20,8 @@ import java.util.List;
 public class Filter implements Serializable {
   private static final long serialVersionUID = -5544859696646804386L;
 
+  public static final Filter NONE = new Filter();
+
   private List<FilterParameter> parameters = new ArrayList<FilterParameter>();
 
   /**

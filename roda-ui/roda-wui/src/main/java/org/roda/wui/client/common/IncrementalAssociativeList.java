@@ -174,7 +174,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
           SelectDialog dialog = dialogFactory.getSelectDialog(actualClass, dialogName, filter);
           dialog.showAndCenter();
 
-          ValueChangeHandler changeHandler = new ValueChangeHandler<NamedIndexedModel>() {
+          ValueChangeHandler<NamedIndexedModel> changeHandler = new ValueChangeHandler<NamedIndexedModel>() {
 
             @Override
             public void onValueChange(ValueChangeEvent<NamedIndexedModel> event) {

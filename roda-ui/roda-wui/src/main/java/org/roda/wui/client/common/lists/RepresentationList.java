@@ -33,7 +33,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
+public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Boolean> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -47,11 +47,11 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
-    this(null, null, null, false);
+    this(null, null, null, false, false);
   }
 
-  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
+  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
+    super(filter, facets, summary, selectable, showInactive);
     super.setSelectedClass(IndexedRepresentation.class);
   }
 
@@ -178,8 +178,9 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+      boolean showInactive = getObject();
       BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
-        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
     }
   }
 

@@ -86,6 +86,8 @@ public class CreateRiskJob extends CreateJob<Risk> {
   public void updateObjectList() {
 
     SelectedItems selected = getSelected();
+    boolean selectable = false;
+    boolean showInactive = false;
 
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
@@ -93,21 +95,22 @@ public class CreateRiskJob extends CreateJob<Risk> {
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
-          AIPList list = new AIPList(filter, null, "AIPs", false);
+
+          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
-          RepresentationList list = new RepresentationList(filter, null, "Representations", false);
+          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", false);
+          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
@@ -116,19 +119,19 @@ public class CreateRiskJob extends CreateJob<Risk> {
         Filter filter = ((SelectedItemsFilter) getSelected()).getFilter();
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, null, "AIPs", false);
+          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, null, "Representations", false);
+          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", false);
+          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }

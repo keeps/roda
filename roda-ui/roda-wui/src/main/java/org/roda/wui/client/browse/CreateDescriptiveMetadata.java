@@ -265,8 +265,10 @@ public class CreateDescriptiveMetadata extends Composite {
   private void cancel() {
     if (isNew) {
 
-      SelectedItemsList selected = new SelectedItemsList(Arrays.asList(aipId), IndexedAIP.class.getName());
-      BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+      SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
+        IndexedAIP.class.getName());
+      boolean showInactive = true;
+      BrowserService.Util.getInstance().removeAIP(selected, showInactive, new AsyncCallback<String>() {
 
         @Override
         public void onFailure(Throwable caught) {

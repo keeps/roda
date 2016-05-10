@@ -83,7 +83,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Button buttonCancel;
 
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
-    SelectedItems selectedItems = null;
+    SelectedItems<?> selectedItems = null;
 
     if (classToReceive.getName().equals(TransferredResource.class.getName())) {
       selectedItems = IngestTransfer.getInstance().getSelected();
@@ -92,7 +92,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     }
 
     initWidget(uiBinder.createAndBindUi(this));
-    final SelectedItems items = selectedItems;
+    final SelectedItems<?> items = selectedItems;
 
     BrowserService.Util.getInstance().getPluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
 

@@ -161,6 +161,9 @@ public class Search extends Composite {
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
 
+  boolean selectable = true;
+  boolean showInactive = false;
+
   private Search() {
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
@@ -420,7 +423,8 @@ public class Search extends Composite {
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults(), true);
+    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults(), selectable,
+      showInactive);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
@@ -450,8 +454,8 @@ public class Search extends Composite {
   }
 
   private void createRepresentationsSearchResultPanel() {
-    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, null,
-      messages.searchResults(), true);
+    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, Facets.NONE,
+      messages.searchResults(), selectable, showInactive);
 
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -479,7 +483,9 @@ public class Search extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.FILE_FILEFORMAT),
       new SimpleFacetParameter(RodaConstants.FILE_PRONOM),
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
-    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults(), true);
+
+    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults(), selectable,
+      showInactive);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);

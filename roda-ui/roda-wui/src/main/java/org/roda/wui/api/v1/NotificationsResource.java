@@ -22,8 +22,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -64,9 +66,10 @@ public class NotificationsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Notification> listNotificationsIndexResult = org.roda.wui.api.controllers.Browser.find(user,
-      Notification.class, null, null, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())),
-      null);
+    boolean showInactive = true;
+    IndexResult<Notification> listNotificationsIndexResult = org.roda.wui.api.controllers.Browser.find(
+      Notification.class, Filter.NONE, Sorter.NONE, new Sublist(pagingParams.getFirst(), pagingParams.getSecond()),
+      Facets.NONE, user, showInactive);
 
     // transform controller method output
     List<Notification> notifications = org.roda.wui.api.controllers.Notifications

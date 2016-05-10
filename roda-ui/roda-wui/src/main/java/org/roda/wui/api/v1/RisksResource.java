@@ -28,6 +28,9 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -53,8 +56,7 @@ public class RisksResource {
 
   @GET
   @ApiOperation(value = "List Risks", notes = "Gets a list of Risks.", response = Risk.class, responseContainer = "List")
-  public Response listRisks(
-    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+  public Response listRisks(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
     throws RODAException {
@@ -65,8 +67,10 @@ public class RisksResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Risk> listRisksIndexResult = org.roda.wui.api.controllers.Browser.find(user, Risk.class, null, null,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
+    boolean showInactive = true;
+    IndexResult<Risk> listRisksIndexResult = org.roda.wui.api.controllers.Browser.find(Risk.class, Filter.NONE,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
 
     // transform controller method output
     List<Risk> risks = org.roda.wui.api.controllers.Risks.retrieveRisks(listRisksIndexResult);

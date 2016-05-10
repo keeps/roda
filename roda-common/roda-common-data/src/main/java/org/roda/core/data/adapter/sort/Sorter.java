@@ -14,9 +14,12 @@ import java.util.List;
 
 /**
  * @author Rui Castro
+ * @author Luis Faria
  */
 public class Sorter implements Serializable {
   private static final long serialVersionUID = 4255866410869992178L;
+
+  public static final Sorter NONE = new Sorter();
 
   private List<SortParameter> parameters = new ArrayList<SortParameter>();
 

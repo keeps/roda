@@ -104,7 +104,7 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
     BrowserService.Util.getInstance().find(Format.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), true, callback);
   }
 
   @Override

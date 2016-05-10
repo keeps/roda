@@ -28,6 +28,9 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -64,8 +67,11 @@ public class AgentsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Agent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(user, Agent.class, null, null,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
+    // TODO add show inactive to API
+    boolean showInactive = false;
+    IndexResult<Agent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(Agent.class, Filter.NONE,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
 
     // transform controller method output
     List<Agent> agents = org.roda.wui.api.controllers.Agents.retrieveAgents(listAgentsIndexResult);

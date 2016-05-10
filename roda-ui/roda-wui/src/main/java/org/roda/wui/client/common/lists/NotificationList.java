@@ -154,8 +154,9 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+    boolean showInactive = true;
     BrowserService.Util.getInstance().find(Notification.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
 
   }
 

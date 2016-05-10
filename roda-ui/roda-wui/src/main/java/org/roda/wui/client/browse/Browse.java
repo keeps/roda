@@ -212,15 +212,16 @@ public class Browse extends Composite {
 
   private List<HandlerRegistration> handlers;
 
+  boolean showInactive = false;
+
   private Browse() {
     viewingTop = true;
     handlers = new ArrayList<HandlerRegistration>();
 
-    Filter filter = null;
-    Facets facets = null;
     String summary = "List of items";
     boolean selectable = true;
-    aipList = new AIPList(filter, facets, summary, selectable);
+
+    aipList = new AIPList(Filter.NONE, Facets.NONE, summary, selectable, showInactive);
     initWidget(uiBinder.createAndBindUi(this));
 
     browseDescription.add(new HTMLWidgetWrapper("BrowseDescription.html"));
@@ -779,7 +780,7 @@ public class Browse extends Composite {
               if (confirmed) {
                 SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
                   IndexedAIP.class.getName());
-                BrowserService.Util.getInstance().removeAIP(selected, new AsyncCallback<String>() {
+                BrowserService.Util.getInstance().removeAIP(selected, showInactive, new AsyncCallback<String>() {
 
                   @Override
                   public void onFailure(Throwable caught) {
@@ -823,21 +824,22 @@ public class Browse extends Composite {
               @Override
               public void onSuccess(Boolean confirmed) {
                 if (confirmed) {
-                  BrowserService.Util.getInstance().removeAIP(selected, new LoadingAsyncCallback<String>() {
+                  BrowserService.Util.getInstance().removeAIP(selected, showInactive,
+                    new LoadingAsyncCallback<String>() {
 
-                    @Override
-                    public void onFailureImpl(Throwable caught) {
-                      AsyncCallbackUtils.defaultFailureTreatment(caught);
-                      aipList.refresh();
-                    }
+                      @Override
+                      public void onFailureImpl(Throwable caught) {
+                        AsyncCallbackUtils.defaultFailureTreatment(caught);
+                        aipList.refresh();
+                      }
 
-                    @Override
-                    public void onSuccessImpl(String parentId) {
-                      Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
-                        messages.ingestTransferRemoveSuccessMessage(size));
-                      aipList.refresh();
-                    }
-                  });
+                      @Override
+                      public void onSuccessImpl(String parentId) {
+                        Toast.showInfo(messages.ingestTransferRemoveSuccessTitle(),
+                          messages.ingestTransferRemoveSuccessMessage(size));
+                        aipList.refresh();
+                      }
+                    });
                 }
               }
 
@@ -875,7 +877,7 @@ public class Browse extends Composite {
         Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
         // TODO add also OR new NotSimpleFilterParameter(RodaConstants.AIP_ID,
         // aipId)
-        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
+        SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, showInactive);
         if (itemBundle.getAip().getParentID() != null) {
           selectAipDialog.setEmptyParentButtonVisible(true);
         }
@@ -889,26 +891,27 @@ public class Browse extends Composite {
             SelectedItemsList<IndexedAIP> selected = new SelectedItemsList<IndexedAIP>(Arrays.asList(aipId),
               IndexedAIP.class.getName());
 
-            BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new AsyncCallback<IndexedAIP>() {
+            BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, showInactive,
+              new AsyncCallback<IndexedAIP>() {
 
-              @Override
-              public void onSuccess(IndexedAIP result) {
-                if (result != null) {
-                  Tools.newHistory(Browse.RESOLVER, result.getId());
-                } else {
-                  Tools.newHistory(Browse.RESOLVER);
+                @Override
+                public void onSuccess(IndexedAIP result) {
+                  if (result != null) {
+                    Tools.newHistory(Browse.RESOLVER, result.getId());
+                  } else {
+                    Tools.newHistory(Browse.RESOLVER);
+                  }
                 }
-              }
 
-              @Override
-              public void onFailure(Throwable caught) {
-                if (caught instanceof NotFoundException) {
-                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-                } else {
-                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                @Override
+                public void onFailure(Throwable caught) {
+                  if (caught instanceof NotFoundException) {
+                    Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                  } else {
+                    Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                  }
                 }
-              }
-            });
+              });
           }
         });
       } else {
@@ -926,7 +929,7 @@ public class Browse extends Composite {
         showEmptyParentButton = false;
       }
 
-      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
+      SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter, showInactive);
       selectAipDialog.setEmptyParentButtonVisible(showEmptyParentButton);
       selectAipDialog.showAndCenter();
       selectAipDialog.addValueChangeHandler(new ValueChangeHandler<IndexedAIP>() {
@@ -936,26 +939,27 @@ public class Browse extends Composite {
           final IndexedAIP parentAIP = event.getValue();
           final String parentId = (parentAIP != null) ? parentAIP.getId() : null;
 
-          BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, new LoadingAsyncCallback<IndexedAIP>() {
+          BrowserService.Util.getInstance().moveInHierarchy(selected, parentId, showInactive,
+            new LoadingAsyncCallback<IndexedAIP>() {
 
-            @Override
-            public void onSuccessImpl(IndexedAIP result) {
-              if (result != null) {
-                Tools.newHistory(Browse.RESOLVER, result.getId());
-              } else {
-                Tools.newHistory(Browse.RESOLVER);
+              @Override
+              public void onSuccessImpl(IndexedAIP result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
+                }
               }
-            }
 
-            @Override
-            public void onFailureImpl(Throwable caught) {
-              if (caught instanceof NotFoundException) {
-                Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
-              } else {
-                Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+              @Override
+              public void onFailureImpl(Throwable caught) {
+                if (caught instanceof NotFoundException) {
+                  Toast.showError(messages.moveNoSuchObject(caught.getMessage()));
+                } else {
+                  Toast.showError(messages.moveIllegalOperation(caught.getMessage()));
+                }
               }
-            }
-          });
+            });
         }
       });
 

@@ -159,12 +159,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, String localeString)
+    Sublist sublist, Facets facets, String localeString, boolean showInactive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       RodaUser user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = parseClass(classNameToReturn);
-      IndexResult<T> result = Browser.find(user, classToReturn, filter, sorter, sublist, facets);
+      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, showInactive);
       return I18nUtility.translate(result, classToReturn, localeString);
     } catch (Throwable e) {
       LOGGER.error("Unexpected error in find", e);
@@ -189,11 +189,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
+  public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
-    Browser.delete(user, classToReturn, ids);
+    Browser.delete(user, classToReturn, ids, showInactive);
   }
 
   @Override
@@ -247,11 +247,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
+  public IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.moveInHierarchy(user, selected, parentId);
+    return Browser.moveInHierarchy(selected, parentId, user, showInactive);
   }
 
   @Override
@@ -263,10 +263,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String removeAIP(SelectedItems<IndexedAIP> aips)
+  public String removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.removeAIP(user, aips);
+    return Browser.removeAIP(user, aips, showInactive);
   }
 
   @Override
@@ -568,7 +568,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRisk(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+  public void deleteRisk(SelectedItems<Risk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 

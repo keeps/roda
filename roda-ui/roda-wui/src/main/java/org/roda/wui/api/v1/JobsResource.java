@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
@@ -68,8 +69,10 @@ public class JobsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(user, Job.class, null, null,
-      new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
+    boolean showInactive = true;
+    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.NONE,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
 
     // transform controller method output
     Jobs jobs = JobsHelper.getJobsFromIndexResult(listJobsIndexResult);

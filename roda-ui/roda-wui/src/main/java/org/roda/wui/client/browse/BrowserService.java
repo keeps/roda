@@ -85,13 +85,14 @@ public interface BrowserService extends RemoteService {
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
-  IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId) throws AuthorizationDeniedException,
-    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
+  IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException;
 
   String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String removeAIP(SelectedItems<IndexedAIP> aips)
+  String removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
@@ -157,7 +158,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString) throws GenericException, AuthorizationDeniedException, RequestNotValidException;
+    Facets facets, String localeString, boolean showInactive)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -165,7 +167,7 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
@@ -219,7 +221,7 @@ public interface BrowserService extends RemoteService {
 
   MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 
-  void deleteRisk(SelectedItems selected) throws AuthorizationDeniedException, GenericException,
+  void deleteRisk(SelectedItems<Risk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   void deleteAgent(SelectedItems<Agent> selected)

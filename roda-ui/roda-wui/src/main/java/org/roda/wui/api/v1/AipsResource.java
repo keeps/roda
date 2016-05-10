@@ -153,7 +153,9 @@ public class AipsResource {
     // delegate action to controller
     SelectedItemsFilter<IndexedAIP> sif = new SelectedItemsFilter<IndexedAIP>(
       new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId)), AIP.class.getName());
-    Browser.removeAIP(user, sif);
+    // TODO get show inactive by parameters
+    boolean showInactive = false;
+    Browser.removeAIP(user, sif, showInactive);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();

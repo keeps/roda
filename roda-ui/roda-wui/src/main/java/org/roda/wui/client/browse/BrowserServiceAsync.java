@@ -51,11 +51,12 @@ public interface BrowserServiceAsync {
 
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
+  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive,
+    AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void removeAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
+  void removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
@@ -104,9 +105,10 @@ public interface BrowserServiceAsync {
     AsyncCallback<Void> callback);
 
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, AsyncCallback<IndexResult<T>> callback);
+    Facets facets, String localeString, boolean showInactive, AsyncCallback<IndexResult<T>> callback);
 
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive,
+    AsyncCallback<Void> callback);
 
   void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
 
@@ -149,13 +151,13 @@ public interface BrowserServiceAsync {
 
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 
-  void deleteRisk(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+  void deleteRisk(SelectedItems<Risk> selected, AsyncCallback<Void> asyncCallback);
 
-  void deleteAgent(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+  void deleteAgent(SelectedItems<Agent> selected, AsyncCallback<Void> asyncCallback);
 
-  void deleteFormat(SelectedItems selected, AsyncCallback<Void> asyncCallback);
+  void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
 
-  void createProcess(String jobName, SelectedItems selected, String id, Map<String, String> value,
+  void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
     AsyncCallback<Job> asyncCallback);
 
   void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);

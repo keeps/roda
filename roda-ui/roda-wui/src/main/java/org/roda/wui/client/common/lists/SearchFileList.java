@@ -38,7 +38,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
+public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -49,11 +49,11 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
   private TextColumn<IndexedFile> lengthColumn;
 
   public SearchFileList() {
-    this(null, null, null, false);
+    this(null, null, null, false, false);
   }
 
-  public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable);
+  public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
+    super(filter, facets, summary, selectable, showInactive);
     super.setSelectedClass(IndexedFile.class);
   }
 
@@ -182,8 +182,9 @@ public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+      boolean showInactive = getObject();
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
     }
   }
 }

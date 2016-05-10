@@ -28,6 +28,9 @@ import javax.ws.rs.core.Response;
 
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
+import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
@@ -53,8 +56,7 @@ public class FormatsResource {
 
   @GET
   @ApiOperation(value = "List Formats", notes = "Gets a list of Formats.", response = Format.class, responseContainer = "List")
-  public Response listFormats(
-    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+  public Response listFormats(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
     throws RODAException {
@@ -65,8 +67,10 @@ public class FormatsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    IndexResult<Format> listFormatsIndexResult = org.roda.wui.api.controllers.Browser.find(user, Format.class, null,
-      null, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), null);
+    boolean showInactive = true;
+    IndexResult<Format> listFormatsIndexResult = org.roda.wui.api.controllers.Browser.find(Format.class, Filter.NONE,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
 
     // transform controller method output
     List<Format> formats = org.roda.wui.api.controllers.Formats.retrieveFormats(listFormatsIndexResult);
@@ -78,8 +82,8 @@ public class FormatsResource {
   @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
   @ApiOperation(value = "Creates a new Format", notes = "Creates a new Format.", response = Format.class)
-  public Response createFormat(Format format, @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
-    throws RODAException {
+  public Response createFormat(Format format,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) throws RODAException {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user

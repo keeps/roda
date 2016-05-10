@@ -164,8 +164,9 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+    boolean showInactive = true;
     BrowserService.Util.getInstance().find(IndexedPreservationEvent.class.getName(), filter, sorter, sublist,
-      getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), callback);
+      getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
   }
 
 }

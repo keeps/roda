@@ -17,19 +17,22 @@ import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.BrowseMessages;
 
-public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
+public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Boolean> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
     new BasicSearchFilterParameter(RodaConstants.AIP_SEARCH, "*"));
 
+  private static final Boolean SHOW_INACTIVE = Boolean.FALSE;
+
   public SelectAipDialog(String title) {
-    this(title, DEFAULT_FILTER_AIP);
+    this(title, DEFAULT_FILTER_AIP, SHOW_INACTIVE);
   }
 
-  public SelectAipDialog(String title, Filter filter) {
-    super(title, filter, RodaConstants.AIP_SEARCH, new AIPList(filter, null, messages.selectAipSearchResults(), false));
+  public SelectAipDialog(String title, Filter filter, boolean showInactive) {
+    super(title, filter, RodaConstants.AIP_SEARCH,
+      new AIPList(filter, null, messages.selectAipSearchResults(), false, showInactive));
 
   }
 }

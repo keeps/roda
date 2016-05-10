@@ -319,7 +319,10 @@ public class ViewRepresentation extends Composite {
     }
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_AIPID, aipId));
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
-    filesList = new SimpleFileList(defaultFilter, null, null, false);
+
+    boolean selectable = false;
+    boolean showInactive = true;
+    filesList = new SimpleFileList(defaultFilter, null, null, selectable, showInactive);
 
     searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH,
       messages.viewRepresentationSearchPlaceHolder(), false, false);
