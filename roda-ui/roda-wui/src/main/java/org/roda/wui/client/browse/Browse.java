@@ -27,6 +27,7 @@ import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.user.RodaUser;
@@ -166,10 +167,7 @@ public class Browse extends Composite {
   SimplePanel itemIcon;
 
   @UiField
-  Label itemTitle;
-
-  @UiField
-  Label itemId;
+  Label inactiveLabel, itemTitle, itemId;
 
   @UiField
   TabPanel itemMetadata;
@@ -203,9 +201,10 @@ public class Browse extends Composite {
 
   @UiField
   Button editPermissions;
-  
-  @UiField FlowPanel downloadSection;
-  
+
+  @UiField
+  FlowPanel downloadSection;
+
   @UiField
   Button download, submission, documentation, schemas;
 
@@ -487,7 +486,7 @@ public class Browse extends Composite {
       }
 
       // Set button visibility
-      
+
       createItem.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
@@ -497,6 +496,15 @@ public class Browse extends Composite {
       submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
+
+      if (AIPState.INACTIVE.equals(aip.getState())) {
+        this.addStyleName("inactive");
+        inactiveLabel.setVisible(true);
+      } else {
+        this.removeStyleName("inactive");
+        inactiveLabel.setVisible(false);
+      }
+
     } else {
       viewAction();
     }
@@ -528,9 +536,12 @@ public class Browse extends Composite {
     moveItem.setVisible(true);
     editPermissions.setVisible(true);
     remove.setVisible(true);
-    
+
     downloadSection.setVisible(false);
     download.setVisible(false);
+
+    this.removeStyleName("inactive");
+    inactiveLabel.setVisible(false);
   }
 
   private void removeHandlerRegistrations() {

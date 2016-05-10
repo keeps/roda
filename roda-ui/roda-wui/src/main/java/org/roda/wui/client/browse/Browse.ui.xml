@@ -22,6 +22,9 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 				</g:FlowPanel>
+				<g:Label styleName="label-danger" ui:field="inactiveLabel">
+					<ui:msg>Under appraisal</ui:msg>
+				</g:Label>
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">
@@ -75,10 +78,12 @@
 					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
 						<ui:msg>Start new process</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-clock" ui:field="preservationEvents">
+					<g:Button addStyleNames="btn btn-default btn-clock"
+						ui:field="preservationEvents">
 						<ui:msg>Events</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle" ui:field="risks">
+					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle"
+						ui:field="risks">
 						<ui:msg>Risks</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
@@ -86,16 +91,20 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Download</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-default btn-download" ui:field="download">
+					<g:Button addStyleNames="btn btn-default btn-download"
+						ui:field="download">
 						<ui:msg>Archival package</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download" ui:field="submission">
+					<g:Button addStyleNames="btn btn-default btn-download"
+						ui:field="submission">
 						<ui:msg>Submission</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download" ui:field="documentation">
+					<g:Button addStyleNames="btn btn-default btn-download"
+						ui:field="documentation">
 						<ui:msg>Documentation</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-default btn-download" ui:field="schemas">
+					<g:Button addStyleNames="btn btn-default btn-download"
+						ui:field="schemas">
 						<ui:msg>Schemas</ui:msg>
 					</g:Button>
 				</g:FlowPanel>

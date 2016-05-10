@@ -1756,6 +1756,12 @@ td.datePickerMonth, td.datePickerYear {
 /*******************************************************************/
 
 /* Browser v2*/
+
+.browse.inactive {
+	background-color: #efefef;
+	background-image: repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(255,255,255,.5) 35px, rgba(255,255,255,.5) 70px);
+}
+
 .browseTitle {
 	margin-bottom: 10px !important;
 }
@@ -1834,7 +1840,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .gwt-TabPanelBottom {
-	background-color: white;
+	background-color: transparent;
 	padding: 5px 10px;
 	margin-bottom: 20px;
 	min-height: 25px;
@@ -1887,7 +1893,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .browseItemMetadata .addTabWrapper {
-	background-color: white;
+	background-color: transparent;
 	color: #089de3;
 }
 
@@ -1929,7 +1935,7 @@ td.datePickerMonth, td.datePickerYear {
 
 .browseItemMetadata .gwt-TabBarItem-selected {
 	margin: 0;
-	background-color: white;
+	background-color: transparent;
 	border-bottom: none;
 	color: #089de3;
 }
@@ -3907,9 +3913,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .report .entry {
-/* 	display: list-item; */
-/*     margin-left: 16px; */
-/*     list-style-type: decimal; */
+
 }
 
 .report .entry_attr {
