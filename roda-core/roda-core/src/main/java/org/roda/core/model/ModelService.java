@@ -357,6 +357,10 @@ public class ModelService extends ModelObservable {
   public AIP moveAIP(String aipId, String parentId)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
+    if (aipId.equals(parentId)) {
+      throw new RequestNotValidException("Cannot set itself as its parent: " + aipId);
+    }
+
     AIP aip = ResourceParseUtils.getAIPMetadata(getStorage(), aipId);
     String oldParentId = aip.getParentId();
     aip.setParentId(parentId);

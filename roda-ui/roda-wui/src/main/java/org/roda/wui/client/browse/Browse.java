@@ -865,8 +865,9 @@ public class Browse extends Composite {
       // Move this item
 
       if (aipId != null && itemBundle != null) {
-        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
-          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+        Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+        // TODO add also OR new NotSimpleFilterParameter(RodaConstants.AIP_ID,
+        // aipId)
         SelectAipDialog selectAipDialog = new SelectAipDialog(messages.moveItemTitle(), filter);
         if (itemBundle.getAip().getParentID() != null) {
           selectAipDialog.setEmptyParentButtonVisible(true);
@@ -886,8 +887,9 @@ public class Browse extends Composite {
               @Override
               public void onSuccess(IndexedAIP result) {
                 if (result != null) {
-                  clear();
-                  viewAction(result.getId());
+                  Tools.newHistory(Browse.RESOLVER, result.getId());
+                } else {
+                  Tools.newHistory(Browse.RESOLVER);
                 }
               }
 
@@ -910,8 +912,7 @@ public class Browse extends Composite {
       Filter filter;
       boolean showEmptyParentButton;
       if (aipId != null) {
-        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId),
-          new NotSimpleFilterParameter(RodaConstants.AIP_ID, aipId));
+        filter = new Filter(new NotSimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
         showEmptyParentButton = true;
       } else {
         filter = new Filter();
@@ -933,8 +934,9 @@ public class Browse extends Composite {
             @Override
             public void onSuccessImpl(IndexedAIP result) {
               if (result != null) {
-                clear();
-                viewAction(result.getId());
+                Tools.newHistory(Browse.RESOLVER, result.getId());
+              } else {
+                Tools.newHistory(Browse.RESOLVER);
               }
             }
 

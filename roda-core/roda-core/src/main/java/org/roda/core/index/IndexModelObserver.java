@@ -433,11 +433,12 @@ public class IndexModelObserver implements ModelObserver {
   public void aipMoved(AIP aip, String oldParentId, String newParentId) {
 
     try {
+      LOGGER.debug("Reindexing moved aip " + aip.getId());
       SolrInputDocument aipDoc = SolrUtils.updateAIPParentId(aip.getId(), newParentId, model);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
 
+      LOGGER.debug("Finding descendents of moved aip " + aip.getId());
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
-
       SolrUtils.execute(index, IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
         @Override
@@ -445,6 +446,7 @@ public class IndexModelObserver implements ModelObserver {
           throws RequestNotValidException, GenericException, AuthorizationDeniedException {
           SolrInputDocument descendantDoc;
           try {
+            LOGGER.debug("Reindexing aip " + aip.getId() + " descendent " + item.getId());
             descendantDoc = SolrUtils.updateAIPAncestors(item.getId(), item.getParentID(), model);
             index.add(RodaConstants.INDEX_AIP, descendantDoc);
           } catch (SolrServerException | IOException e) {

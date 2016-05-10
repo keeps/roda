@@ -2083,6 +2083,10 @@ public class SolrUtils {
     List<String> ancestors = new ArrayList<>();
     String nextAncestorId = parentId;
     while (nextAncestorId != null) {
+      if (ancestors.contains(nextAncestorId)) {
+        LOGGER.warn("Found a cyclic ancestor relation for " + parentId);
+        break;
+      }
       try {
         AIP nextAncestor = model.retrieveAIP(nextAncestorId);
         ancestors.add(nextAncestorId);

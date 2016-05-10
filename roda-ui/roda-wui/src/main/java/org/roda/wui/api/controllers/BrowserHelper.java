@@ -750,19 +750,29 @@ public class BrowserHelper {
   public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     AlreadyExistsException, ValidationException {
-    List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
+    try {
+      List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
-    ModelService model = RodaCoreFactory.getModelService();
+      ModelService model = RodaCoreFactory.getModelService();
 
-    for (String aipId : aipIds) {
-      // XXX this method could be improved by moving all at once in the model
-      if (aipId != parentId) {
-        // laxing check of ancestry so a big list can be moved to one of the siblings
-        model.moveAIP(aipId, parentId);
+      for (String aipId : aipIds) {
+        // XXX this method could be improved by moving all at once in the model
+        if (!aipId.equals(parentId)) {
+          // laxing check of ancestry so a big list can be moved to one of the
+          // siblings
+          LOGGER.debug("Moving AIP " + aipId + " under " + parentId);
+          model.moveAIP(aipId, parentId);
+        }
       }
-    }
 
-    return RodaCoreFactory.getIndexService().retrieve(IndexedAIP.class, parentId);
+      IndexService index = RodaCoreFactory.getIndexService();
+      index.commit(IndexedAIP.class);
+
+      return index.retrieve(IndexedAIP.class, parentId);
+    } catch (Throwable e) {
+      LOGGER.error("Error moving in hierarchy", e);
+      return null;
+    }
   }
 
   public static AIP createAIP(String parentAipId, String type, Permissions permissions) throws GenericException,

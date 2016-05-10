@@ -94,32 +94,40 @@ public class UserManagementHelper {
   public static void registerUser(User user, String password)
     throws GenericException, UserAlreadyExistsException, EmailAlreadyExistsException {
     RodaCoreFactory.getModelService().registerUser(user, password, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static User addUser(User user, String password) throws GenericException, EmailAlreadyExistsException,
     UserAlreadyExistsException, IllegalOperationException, NotFoundException {
-    return RodaCoreFactory.getModelService().addUser(user, password, true, true);
+    User ret = RodaCoreFactory.getModelService().addUser(user, password, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
+    return ret;
   }
 
   public static void modifyUser(User user, String password)
     throws GenericException, AlreadyExistsException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyUser(user, password, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void removeUser(String username) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().removeUser(username, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void addGroup(Group group) throws GenericException, AlreadyExistsException {
     RodaCoreFactory.getModelService().addGroup(group, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void modifyGroup(Group group) throws GenericException, NotFoundException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().modifyGroup(group, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static void removeGroup(String groupname) throws GenericException, AuthorizationDeniedException {
     RodaCoreFactory.getModelService().removeGroup(groupname, true, true);
+    RodaCoreFactory.getIndexService().commit(RODAMember.class);
   }
 
   public static User confirmUserEmail(String username, String email, String emailConfirmationToken)
