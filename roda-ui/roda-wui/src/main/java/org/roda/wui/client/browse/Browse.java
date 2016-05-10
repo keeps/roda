@@ -204,6 +204,8 @@ public class Browse extends Composite {
   @UiField
   Button editPermissions;
   
+  @UiField FlowPanel downloadSection;
+  
   @UiField
   Button download, submission, documentation, schemas;
 
@@ -485,11 +487,13 @@ public class Browse extends Composite {
       }
 
       // Set button visibility
-      download.setVisible(true);
+      
       createItem.setVisible(true);
       moveItem.setVisible(true);
       editPermissions.setVisible(true);
       remove.setVisible(true);
+      downloadSection.setVisible(true);
+      download.setVisible(true);
       submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
@@ -520,11 +524,13 @@ public class Browse extends Composite {
     actionsSidebar.setVisible(true);
 
     // Set button visibility
-    download.setVisible(false);
     createItem.setVisible(true);
     moveItem.setVisible(true);
     editPermissions.setVisible(true);
     remove.setVisible(true);
+    
+    downloadSection.setVisible(false);
+    download.setVisible(false);
   }
 
   private void removeHandlerRegistrations() {

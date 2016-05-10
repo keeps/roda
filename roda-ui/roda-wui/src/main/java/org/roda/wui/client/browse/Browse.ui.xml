@@ -82,7 +82,7 @@
 						<ui:msg>Risks</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
-				<g:FlowPanel ui:field="otherInformation">
+				<g:FlowPanel ui:field="downloadSection">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Download</ui:msg>
 					</g:Label>
