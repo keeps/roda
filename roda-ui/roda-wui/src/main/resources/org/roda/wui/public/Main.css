@@ -3863,6 +3863,18 @@ td.datePickerMonth, td.datePickerYear {
     color: #089de3;
 }
 
+.report .entry, .report .valid{
+	border-bottom: 1px solid #ddd;
+}
+
+.report .entry .level{
+	display: none;
+}
+
+.report .level_error .value{
+	color: red;
+}
+
 /**********************************************
 				PRESERVATION EVENTS
 ************************************************/

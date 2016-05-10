@@ -37,6 +37,7 @@ public class Report implements Serializable, IsIndexed {
   private String plugin = null;
   private PluginState pluginState = PluginState.RUNNING;
   private String pluginDetails = "";
+  private boolean htmlPluginDetails = false;
 
   private List<Report> reports = new ArrayList<Report>();
 
@@ -174,6 +175,15 @@ public class Report implements Serializable, IsIndexed {
 
   public Report setPluginDetails(String pluginDetails) {
     this.pluginDetails = pluginDetails;
+    return this;
+  }
+
+  public boolean isHtmlPluginDetails() {
+    return htmlPluginDetails;
+  }
+
+  public Report setHtmlPluginDetails(boolean htmlPluginDetails) {
+    this.htmlPluginDetails = htmlPluginDetails;
     return this;
   }
 

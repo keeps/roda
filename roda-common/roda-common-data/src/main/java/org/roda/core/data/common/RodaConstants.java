@@ -398,6 +398,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_PLUGIN = "plugin";
   public static final String JOB_REPORT_PLUGIN_STATE = "pluginState";
   public static final String JOB_REPORT_PLUGIN_DETAILS = "pluginDetails";
+  public static final String JOB_REPORT_HTML_PLUGIN_DETAILS = "htmlPluginDetails";
   public static final String JOB_REPORT_REPORTS = "reports";
   public static final String JOB_REPORT_FILE_EXTENSION = ".json";
 

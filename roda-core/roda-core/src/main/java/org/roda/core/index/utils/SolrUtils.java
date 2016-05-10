@@ -144,6 +144,8 @@ import org.xml.sax.SAXException;
 public class SolrUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(SolrUtils.class);
 
+  private static final String DEFAULT_QUERY_PARSER_OPERATOR = "AND";
+
   private static final Set<String> NON_REPEATABLE_FIELDS = new HashSet<>(Arrays.asList(RodaConstants.AIP_TITLE,
     RodaConstants.AIP_LEVEL, RodaConstants.AIP_DATE_INITIAL, RodaConstants.AIP_DATE_FINAL));
 
@@ -192,7 +194,7 @@ public class SolrUtils {
     Sorter sorter, Sublist sublist, Facets facets) throws GenericException, RequestNotValidException {
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
-    query.setParam("q.op", "AND");
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
     query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
@@ -215,7 +217,7 @@ public class SolrUtils {
 
     IndexResult<T> ret;
     SolrQuery query = new SolrQuery();
-    query.setParam("q.op", "AND");
+    query.setParam("q.op", DEFAULT_QUERY_PARSER_OPERATOR);
     query.setQuery(parseFilter(filter));
     query.setSorts(parseSorter(sorter));
     query.setStart(sublist.getFirstElementIndex());
@@ -390,12 +392,6 @@ public class SolrUtils {
   // FIXME perhaps && and || are not being properly escaped: see how to do it
   public static String escapeSolrSpecialChars(String string) {
     return string.replaceAll("([+&|!(){}\\[\\-\\]\\^\\\\~?:\"/])", "\\\\$1");
-  }
-
-  public static void main(String[] args) {
-    String query = "+   -   &&   ||   !   (   )   {   }   [   ]   ^   \"   ~   *   ?   :   /   .";
-
-    System.out.println(escapeSolrSpecialChars(query));
   }
 
   private static List<String> objectToListString(Object object) {
@@ -781,6 +777,10 @@ public class SolrUtils {
     } else {
       appendWhiteSpaceTokenizedString(ret, key, value, operator);
     }
+  }
+
+  private static void appendKeyValue(StringBuilder ret, String key, String value) {
+    ret.append(key).append(":").append("(").append(value).append(")");
   }
 
   private static void appendWhiteSpaceTokenizedString(StringBuilder ret, String key, String value, String operator) {
@@ -1379,7 +1379,6 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());
     doc.addField(RodaConstants.MEMBERS_NAME, member.getName());
-    
     if (member.getAllGroups() != null) {
       doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(member.getAllGroups()));
     }
@@ -1670,6 +1669,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN, jobReport.getPlugin());
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_STATE, jobReport.getPluginState().toString());
     doc.addField(RodaConstants.JOB_REPORT_PLUGIN_DETAILS, jobReport.getPluginDetails());
+    doc.addField(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS, jobReport.isHtmlPluginDetails());
     doc.addField(RodaConstants.JOB_REPORT_REPORTS, JsonUtils.getJsonFromObject(jobReport.getReports()));
 
     return doc;
@@ -1691,6 +1691,7 @@ public class SolrUtils {
     jobReport.setPlugin(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN)));
     jobReport.setPluginState(PluginState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_STATE))));
     jobReport.setPluginDetails(objectToString(doc.get(RodaConstants.JOB_REPORT_PLUGIN_DETAILS)));
+    jobReport.setHtmlPluginDetails(objectToBoolean(doc.get(RodaConstants.JOB_REPORT_HTML_PLUGIN_DETAILS), false));
     try {
       jobReport
         .setReports(JsonUtils.getListFromJson(objectToString(doc.get(RodaConstants.JOB_REPORT_REPORTS)), Report.class));
@@ -2084,10 +2085,6 @@ public class SolrUtils {
     List<String> ancestors = new ArrayList<>();
     String nextAncestorId = parentId;
     while (nextAncestorId != null) {
-      if (ancestors.contains(nextAncestorId)) {
-        LOGGER.warn("Found a cyclic ancestor relation for " + parentId);
-        break;
-      }
       try {
         AIP nextAncestor = model.retrieveAIP(nextAncestorId);
         ancestors.add(nextAncestorId);

@@ -109,7 +109,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         createWellformedEventSuccess(model, index, transferredResource, aipCreated);
         LOGGER.debug("Done with converting {} to AIP {}", earkSIPPath, aipCreated.getId());
       } else {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(sip.getValidationReport().toString());
+        reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
+          .setPluginDetails(sip.getValidationReport().toHtml(true, true, true, false, false));
         LOGGER.debug("The SIP {} is not valid", earkSIPPath);
       }
 

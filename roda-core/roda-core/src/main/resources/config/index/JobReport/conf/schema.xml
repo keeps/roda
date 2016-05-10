@@ -117,6 +117,7 @@
    <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginState" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginDetails" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+   <field name="htmlPluginDetails" type="boolean" indexed="false" stored="true" required="false" multiValued="false" />
    
    <field name="reports" type="string" indexed="false" stored="true" required="false" multiValued="false" />
  
