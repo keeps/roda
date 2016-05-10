@@ -2024,6 +2024,11 @@ public class SolrUtils {
 
   public static Map<String, Object> set(Object value) {
     Map<String, Object> fieldModifier = new HashMap<>(1);
+    // 20160511 this workaround fixes solr wrong behaviour with partial update
+    // of empty lists
+    if (value instanceof List && ((List<?>) value).isEmpty()) {
+      value = null;
+    }
     fieldModifier.put("set", value);
     return fieldModifier;
   }

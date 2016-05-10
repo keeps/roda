@@ -9,11 +9,13 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.XMLUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -53,6 +55,8 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private static final String AIP_PERMISSIONS_SUCCESSFULLY_VERIFIED = "The user permissions are valid and the AIP permissions were updated";
   private static final String NO_CREATE_TOP_LEVEL_AIP_PERMISSION = "The user doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission";
 
+  private boolean hasFreeAccess = false;
+
   @Override
   public void init() throws PluginException {
     // do nothing
@@ -90,7 +94,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
-
     Job currentJob = getJob(index);
 
     for (AIP aip : list) {
@@ -120,7 +123,6 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
       report.addReport(reportItem);
-
       PluginHelper.updateJobReport(this, model, index, reportItem, true);
 
     }
@@ -131,17 +133,9 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   private void processAIPPermissions(IndexService index, ModelService model, Job currentJob, AIP aip,
     Report reportItem) {
     try {
-      List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
 
-      for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
-        Binary retrieveDescriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
-          descriptiveMetadata.getId());
-        InputStream createInputStream = retrieveDescriptiveMetadataBinary.getContent().createInputStream();
-        String useRestrict = XMLUtility.getStringFromFile(createInputStream, "/ead/archdesc/userestrict/p");
-        if (useRestrict.equals(RodaConstants.OBJECT_PERMISSIONS_FREE_ACCESS)) {
-          // TODO give access to all users
-        }
-      }
+      Permissions permissions = aip.getPermissions();
+      permissions = grantReadPermissionToUserGroup(model, aip, permissions);
 
       AIP parentAIP = null;
       String jobCreatorUsername = currentJob.getUsername();
@@ -154,9 +148,9 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
           if (userPermissions.contains(PermissionType.CREATE)) {
             LOGGER.debug("User '{}' has CREATE permission on parent AIP...Granting user permission to this aip",
               jobCreatorUsername);
-            grantPermissionToUser(jobCreatorUsername, aip, model);
+            permissions = grantAllPermissions(jobCreatorUsername, permissions, parentAIP.getPermissions());
           } else {
-            LOGGER.debug("User doesn't have CREATE permission on parent... Error...");
+            LOGGER.debug("User '{}' doesn't have CREATE permission on parent... Error...", jobCreatorUsername);
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_PERMISSION_TO_CREATE_UNDER_AIP);
           }
         } catch (NotFoundException nfe) {
@@ -170,12 +164,15 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
         if (member.getAllRoles().contains(CREATE_TOP_LEVEL_AIP_PERMISSION)) {
           LOGGER
             .debug("User have CREATE_TOP_LEVEL_AIP_PERMISSION permission... Granting user permission to this aip...");
-          grantPermissionToUser(jobCreatorUsername, aip, model);
+          permissions = grantPermissionToUser(jobCreatorUsername, permissions);
         } else {
           reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(NO_CREATE_TOP_LEVEL_AIP_PERMISSION);
           LOGGER.debug("User doesn't have CREATE_TOP_LEVEL_AIP_PERMISSION permission...");
         }
       }
+
+      aip.setPermissions(permissions);
+      model.updateAIPPermissions(aip);
     } catch (GenericException | RequestNotValidException | AuthorizationDeniedException | NotFoundException
       | IOException e) {
       reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
@@ -192,14 +189,50 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     return currentJob;
   }
 
-  private void grantPermissionToUser(String username, AIP aip, ModelService model)
+  private Permissions grantReadPermissionToUserGroup(ModelService model, AIP aip, Permissions permissions)
+    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException, IOException {
+    List<DescriptiveMetadata> descriptiveMetadataList = aip.getDescriptiveMetadata();
+    Set<PermissionType> readPermissionToUserGroup = new HashSet<PermissionType>();
+
+    for (DescriptiveMetadata descriptiveMetadata : descriptiveMetadataList) {
+      Binary retrieveDescriptiveMetadataBinary = model.retrieveDescriptiveMetadataBinary(aip.getId(),
+        descriptiveMetadata.getId());
+      InputStream createInputStream = retrieveDescriptiveMetadataBinary.getContent().createInputStream();
+      String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
+      String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
+
+      String useRestrict = XMLUtility.getStringFromFile(createInputStream, xpath);
+      if (useRestrict.equals(freeAccessTerm)) {
+        readPermissionToUserGroup.add(PermissionType.READ);
+        permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);
+        hasFreeAccess = true;
+      }
+    }
+
+    return permissions;
+  }
+
+  private Permissions grantAllPermissions(String username, Permissions permissions, Permissions parentPermissions)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
-    Permissions aipPermissions = aip.getPermissions();
+    permissions = grantPermissionToUser(username, permissions);
+
+    for (String name : parentPermissions.getUsernames()) {
+      permissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
+    }
+
+    for (String name : parentPermissions.getGroupnames()) {
+      permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
+    }
+
+    return permissions;
+  }
+
+  private Permissions grantPermissionToUser(String username, Permissions permissions)
+    throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
     Set<PermissionType> allPermissions = Stream.of(PermissionType.CREATE, PermissionType.DELETE, PermissionType.GRANT,
       PermissionType.READ, PermissionType.UPDATE).collect(Collectors.toSet());
-    aipPermissions.setUserPermissions(username, allPermissions);
-    aip.setPermissions(aipPermissions);
-    model.updateAIPPermissions(aip);
+    permissions.setUserPermissions(username, allPermissions);
+    return permissions;
   }
 
   @Override
@@ -238,7 +271,13 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.";
+    String description = "Producer permissions have been checked to ensure that he has sufficient authorization to store the AIP under the desired node of the classification scheme.";
+
+    if (hasFreeAccess) {
+      description += " It was given READ permission to the users group as indicated on the descriptive metadata";
+    }
+
+    return description;
   }
 
   @Override

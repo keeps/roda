@@ -293,8 +293,7 @@ public final class RodaConstants {
   public static final String OBJECT_PERMISSIONS_REMOVE_GROUPS = "removeGroups";
   public static final String OBJECT_PERMISSIONS_GRANT_USERS = "grantUsers";
   public static final String OBJECT_PERMISSIONS_GRANT_GROUPS = "grantGroups";
-  public static final String OBJECT_PERMISSIONS_FREE_ACCESS = "Livre";
-  public static final String OBJECT_PERMISSIONS_XPATH = "/ead/archdesc/userestrict/p[text()=\"Livre\"]";
+  public static final String OBJECT_PERMISSIONS_USER_GROUP = "users";
 
   public static final String REPOSITORY_PERMISSIONS_METADATA_EDITOR = "administration.metadata_editor";
   public static final String LOG_ACTION_COMPONENT = "actionComponent";

@@ -580,14 +580,24 @@ public class Browser extends RodaCoreService {
 
     // check user permissions
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+    Permissions permissions = new Permissions();
+
     if (parentId != null) {
       IndexedAIP parentSDO = BrowserHelper.retrieve(IndexedAIP.class, parentId);
       UserUtility.checkObjectPermissions(user, parentSDO, PermissionType.CREATE);
+      Permissions parentPermissions = parentSDO.getPermissions();
+
+      for (String name : parentPermissions.getUsernames()) {
+        permissions.setUserPermissions(name, parentPermissions.getUserPermissions(name));
+      }
+
+      for (String name : parentPermissions.getGroupnames()) {
+        permissions.setGroupPermissions(name, parentPermissions.getGroupPermissions(name));
+      }
     } else {
       // TODO check user role to create top-level AIPs
     }
 
-    Permissions permissions = new Permissions();
     permissions.setUserPermissions(user.getId(), new HashSet<PermissionType>(Arrays.asList(PermissionType.values())));
 
     // delegate

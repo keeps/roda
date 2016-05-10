@@ -36,6 +36,15 @@ public class Permissions implements Serializable {
   public Permissions() {
     users = new HashMap<>();
     groups = new HashMap<>();
+    init(users);
+    init(groups);
+  }
+
+  private void init(Map<PermissionType, Set<String>> permissionsMap) {
+
+    for (PermissionType type : PermissionType.values()) {
+      permissionsMap.put(type, new HashSet<String>());
+    }
   }
 
   public Map<PermissionType, Set<String>> getUsers() {

@@ -73,7 +73,7 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + id + ", objectId=" + objectId + ", risks=" + risks + "]";
+    return "RiskIncidence [id=" + id + ", objectId=" + objectId + ", risks=" + risks + "]";
   }
 
   @JsonIgnore

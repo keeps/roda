@@ -22,7 +22,6 @@ import org.roda.core.data.v2.user.RODAMember;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.dialogs.MemberSelectDialog;
-import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
@@ -117,6 +116,14 @@ public class EditPermissions extends Composite {
     Permissions permissions = aip.getPermissions();
     GWT.log("Permissions are: " + permissions);
 
+    if (permissions.getUsernames().size() == 0) {
+      userPermissionsHeader.setVisible(false);
+    }
+
+    if (permissions.getGroupnames().size() == 0) {
+      groupPermissionsHeader.setVisible(false);
+    }
+
     for (String username : permissions.getUsernames()) {
       userPermissionsPanel.add(new PermissionPanel(username, true, permissions.getUserPermissions(username)));
     }
@@ -129,8 +136,10 @@ public class EditPermissions extends Composite {
   public void addPermissionPanel(RODAMember member) {
     if (member.isUser()) {
       userPermissionsPanel.insert(new PermissionPanel(member), 0);
+      userPermissionsHeader.setVisible(true);
     } else {
       groupPermissionsPanel.insert(new PermissionPanel(member), 0);
+      groupPermissionsHeader.setVisible(true);
     }
   }
 
@@ -219,7 +228,7 @@ public class EditPermissions extends Composite {
         public void onSuccessImpl(Void result) {
           Toast.showInfo("Success", "Permissions changed");
         }
-        
+
       });
   }
 
