@@ -3903,15 +3903,48 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .report .entry, .report .valid{
-	border-bottom: 1px solid #ddd;
+/* 	border-bottom: 1px solid #ddd; */
 }
 
-.report .entry .level{
+.report .entry {
+/* 	display: list-item; */
+/*     margin-left: 16px; */
+/*     list-style-type: decimal; */
+}
+
+.report .entry_attr {
+	display: inline;
+}
+
+.report .entry_attr .label {
 	display: none;
 }
 
-.report .level_error .value{
+.report .entry_attr.valid .label {
+	display: inline;
+	margin-right: 1rem;
+}
+
+.report .entry_attr .value {
+	display: inline;
+	margin-right: 0.5em;
+	font-weight: 300;
+    font-size: 90%;
+}
+
+.report .entry_attr.level .value {
+	font-size: inherit;
+	display: inline-block;
+	font-weight: 400;
+	width: 3.5em;
+}
+
+.report .level_error .entry_attr.level .value {
 	color: red;
+}
+
+.report .entry_attr.related .value {
+	font-weight: 500;
 }
 
 /**********************************************
