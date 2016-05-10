@@ -305,9 +305,14 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       pluginReport = doAutoAccept(index, model, storage, aips);
       reports = mergeReports(reports, pluginReport);
       aips = recalculateAIPsList(model, resources, aips, reports, jobPluginInfo, true);
-      jobPluginInfo.setObjectsProcessedWithSuccess(resources.size() - jobPluginInfo.getObjectsProcessedWithFailure());
-      PluginHelper.updateJobInformation(this, jobPluginInfo.incrementStepsCompletedByOne());
+      jobPluginInfo.incrementStepsCompletedByOne();
     }
+
+    // X) final job info update
+    jobPluginInfo.setObjectsProcessedWithSuccess(resources.size() - jobPluginInfo.getObjectsProcessedWithFailure());
+    jobPluginInfo.setObjectsBeingProcessed(0);
+    jobPluginInfo.setObjectsWaitingToBeProcessed(0);
+    PluginHelper.updateJobInformation(this, jobPluginInfo);
 
     // delete SIP from transfer
     // FIXME 20160429 hsilva: actually this will happen in two very distinct
