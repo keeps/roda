@@ -35,10 +35,12 @@ public class Dialogs {
     Label messageLabel = new Label(message);
     Button cancelButton = new Button(cancelButtonText);
     Button confirmButton = new Button(confirmButtonText);
+    FlowPanel footer = new FlowPanel();
 
     layout.add(messageLabel);
-    layout.add(cancelButton);
-    layout.add(confirmButton);
+    layout.add(footer);
+    footer.add(cancelButton);
+    footer.add(confirmButton);
 
     dialogBox.setWidget(layout);
 
@@ -65,9 +67,10 @@ public class Dialogs {
 
     dialogBox.addStyleName("wui-dialog-confirm");
     layout.addStyleName("wui-dialog-layout");
+    footer.addStyleName("wui-dialog-layout-footer");
     messageLabel.addStyleName("wui-dialog-message");
-    cancelButton.addStyleName("btn btn-ban");
-    confirmButton.addStyleName("pull-right btn btn-play");
+    cancelButton.addStyleName("btn btn-link");
+    confirmButton.addStyleName("btn btn-play");
 
     dialogBox.center();
     dialogBox.show();

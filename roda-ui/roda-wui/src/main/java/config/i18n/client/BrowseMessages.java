@@ -315,6 +315,9 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("OK")
   String dialogOk();
+  
+  @DefaultMessage("Yes")
+  String dialogYes();
 
   /*** View representation ***/
 

@@ -25,16 +25,16 @@
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
 					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
-						Add
+						Add permission
 					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApply">
-						Apply
+						Save
 					</g:Button>
 					<g:Button addStyleNames="btn btn-play" ui:field="buttonApplyToAll">
 						Apply to all below
 					</g:Button>
-					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonClose">
-						Close
+					<g:Button addStyleNames="btn btn-default btn-times-circle" ui:field="buttonClose">
+						Back
 					</g:Button>
 				</g:FlowPanel>
 			</g:FlowPanel>

@@ -193,25 +193,19 @@ public class Browse extends Composite {
   FlowPanel preservationSidebar;
 
   @UiField
-  FlowPanel permissionsSidebar;
-
-  @UiField
   FlowPanel actionsSidebar;
 
   @UiField
   Button preservationEvents, risks, newProcess;
 
   @UiField
-  Button download, createItem, moveItem, remove;
+  Button createItem, moveItem, remove;
 
   @UiField
   Button editPermissions;
-
+  
   @UiField
-  FlowPanel otherInformation;
-
-  @UiField
-  Button submission, documentation, schemas;
+  Button download, submission, documentation, schemas;
 
   private boolean viewingTop;
 
@@ -356,7 +350,6 @@ public class Browse extends Composite {
 
     preservationSidebar.setVisible(false);
     actionsSidebar.setVisible(false);
-    permissionsSidebar.setVisible(false);
 
     // Set button visibility
     createItem.setVisible(false);
@@ -367,7 +360,6 @@ public class Browse extends Composite {
     submission.setVisible(false);
     documentation.setVisible(false);
     schemas.setVisible(false);
-    otherInformation.setVisible(submission.isVisible() || documentation.isVisible() || schemas.isVisible());
   }
 
   protected void showError(String id, Throwable caught) {
@@ -487,7 +479,6 @@ public class Browse extends Composite {
       sidebarData.setVisible(representations.size() > 0);
       preservationSidebar.setVisible(true);
       actionsSidebar.setVisible(true);
-      permissionsSidebar.setVisible(true);
 
       for (IndexedRepresentation rep : representations) {
         downloadList.add(createRepresentationDownloadButton(rep));
@@ -502,7 +493,6 @@ public class Browse extends Composite {
       submission.setVisible(aip.getNumberOfSubmissionFiles() > 0);
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
-      otherInformation.setVisible(submission.isVisible() || documentation.isVisible() || schemas.isVisible());
     } else {
       viewAction();
     }
@@ -759,7 +749,7 @@ public class Browse extends Composite {
 
       if (aipId != null) {
         Dialogs.showConfirmDialog(messages.browseRemoveConfirmDialogTitle(),
-          messages.browseRemoveConfirmDialogMessage(), messages.dialogCancel(), messages.dialogOk(),
+          messages.browseRemoveConfirmDialogMessage(), messages.dialogCancel(), messages.dialogYes(),
           new AsyncCallback<Boolean>() {
 
             @Override

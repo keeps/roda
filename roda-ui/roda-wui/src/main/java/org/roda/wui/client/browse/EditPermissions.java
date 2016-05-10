@@ -302,7 +302,7 @@ public class EditPermissions extends Composite {
       nameLabel.addStyleName("permission-name");
       rightPanel.addStyleName("pull-right");
       editPermissionsPanel.addStyleName("permission-edit");
-      removePanel.addStyleName("permission-remove btn btn-ban");
+      removePanel.addStyleName("permission-remove btn btn-danger btn-ban");
 
       removePanel.addClickHandler(new ClickHandler() {
 

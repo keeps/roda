@@ -493,18 +493,46 @@ pre>code {
 }
 
 .btn:hover {
-	background-color: #3998d0;
+	background-color: #2988c0;
 	cursor: pointer;
 	cursor: hand;
 	cursor: pointer;
 }
 
+.btn-default {
+	background-color: #777;
+}
+
+.btn-default:hover {
+	background-color: #666;
+}
+
+.btn-danger {
+	background-color: #d9534f;
+}
+
+.btn-danger:hover {
+	background-color: #c9302c;
+}
+
+
+.btn-link {
+	background-color: transparent;
+	color: #337ab7;
+}
+
+.btn-link:hover {
+    color: #23527c;
+    text-decoration: underline;
+    background-color: transparent;
+}
+
 .btn:disabled {
-	background-color: #ccc;
+	background-color: #ddd;
 }
 
 .btn:active {
-	background-color: #5bbeff;
+	opacity: 0.9;
 	cursor: pointer;
 	cursor: hand;
 }
@@ -529,6 +557,10 @@ pre>code {
 	float: right;
 	margin-top: 1px;
 	padding-left: 5px;
+}
+
+.btn-link:after {
+	display: none;
 }
 
 .btn-plus:after {
@@ -605,6 +637,10 @@ pre>code {
 
 .btn-previous-file:after {
 	content: "\f0a8";
+}
+
+.btn-exclamation-triangle:after {
+	content: "\f071";
 }
 
 .btn-incremental-list-add {
@@ -3091,6 +3127,9 @@ td.datePickerMonth, td.datePickerYear {
 
 .wui-dialog-layout {
 	padding: 10px;
+}
+.wui-dialog-layout-footer {
+	text-align: right;
 }
 
 .wui-dialog-message {

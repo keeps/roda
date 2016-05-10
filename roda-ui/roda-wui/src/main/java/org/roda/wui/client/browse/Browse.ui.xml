@@ -51,56 +51,51 @@
 					<g:FlowPanel ui:field="downloadList">
 					</g:FlowPanel>
 				</g:FlowPanel>
-				<g:FlowPanel ui:field="preservationSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:msg>Preservation</ui:msg>
-					</g:Label>
-					<g:Button addStyleNames="btn btn-clock" ui:field="preservationEvents">
-						<ui:msg>Events</ui:msg>
-					</g:Button>
-					<g:Button addStyleNames="btn btn-clock" ui:field="risks">
-						<ui:msg>Risks</ui:msg>
-					</g:Button>
-					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
-						<ui:msg>New process</ui:msg>
-					</g:Button>
-				</g:FlowPanel>
 				<g:FlowPanel ui:field="actionsSidebar">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Archival package</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-download" ui:field="download">
-						<ui:msg>Download</ui:msg>
-					</g:Button>
 					<g:Button addStyleNames="btn btn-plus" ui:field="createItem">
 						<ui:msg>New</ui:msg>
 					</g:Button>
 					<g:Button addStyleNames="btn btn-edit" ui:field="moveItem">
 						<ui:msg>Move</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="remove">
+					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
+						<ui:msg>Permissions</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="remove">
 						<ui:msg>Remove</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
-				<g:FlowPanel ui:field="permissionsSidebar">
+				<g:FlowPanel ui:field="preservationSidebar">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Permissions</ui:msg>
+						<ui:msg>Preservation</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-edit" ui:field="editPermissions">
-						<ui:msg>Edit</ui:msg>
+					<g:Button addStyleNames="btn btn-play" ui:field="newProcess">
+						<ui:msg>Start new process</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-default btn-clock" ui:field="preservationEvents">
+						<ui:msg>Events</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-default btn-exclamation-triangle" ui:field="risks">
+						<ui:msg>Risks</ui:msg>
 					</g:Button>
 				</g:FlowPanel>
 				<g:FlowPanel ui:field="otherInformation">
 					<g:Label addStyleNames="h4">
-						<ui:msg>Other</ui:msg>
+						<ui:msg>Download</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-download" ui:field="submission">
+					<g:Button addStyleNames="btn btn-default btn-download" ui:field="download">
+						<ui:msg>Archival package</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-default btn-download" ui:field="submission">
 						<ui:msg>Submission</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-download" ui:field="documentation">
+					<g:Button addStyleNames="btn btn-default btn-download" ui:field="documentation">
 						<ui:msg>Documentation</ui:msg>
 					</g:Button>
-					<g:Button addStyleNames="btn btn-download" ui:field="schemas">
+					<g:Button addStyleNames="btn btn-default btn-download" ui:field="schemas">
 						<ui:msg>Schemas</ui:msg>
 					</g:Button>
 				</g:FlowPanel>

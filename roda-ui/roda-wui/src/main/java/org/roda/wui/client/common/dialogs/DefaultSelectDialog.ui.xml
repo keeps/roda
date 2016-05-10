@@ -24,16 +24,18 @@
 			<g:ScrollPanel addStyleNames="selectAipResultsPanel">
 				<lists:AsyncTableCell ui:field="searchResultsPanel" />
 			</g:ScrollPanel>
-			<g:Button addStyleNames="btn btn-ban" ui:field="cancelButton">
-				<ui:text from='{messages.selectAipCancelButton}' />
-			</g:Button>
-			<g:Button addStyleNames="pull-right btn btn-play" ui:field="selectButton">
-				<ui:text from='{messages.selectAipSelectButton}' />
-			</g:Button>
-			<g:Button addStyleNames="pull-right btn btn-play {style.emptyParentButton}"
-				ui:field="emptyParentButton">
-				<ui:text from='{messages.selectAipEmptyParentButton}' />
-			</g:Button>
+			<g:FlowPanel addStyleNames="wui-dialog-layout-footer">
+				<g:Button addStyleNames="btn btn-link" ui:field="cancelButton">
+					<ui:text from='{messages.selectAipCancelButton}' />
+				</g:Button>
+				<g:Button addStyleNames="btn btn-play {style.emptyParentButton}"
+					ui:field="emptyParentButton">
+					<ui:text from='{messages.selectAipEmptyParentButton}' />
+				</g:Button>
+				<g:Button addStyleNames="btn btn-play" ui:field="selectButton">
+					<ui:text from='{messages.selectAipSelectButton}' />
+				</g:Button>
+			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>
 </ui:UiBinder>

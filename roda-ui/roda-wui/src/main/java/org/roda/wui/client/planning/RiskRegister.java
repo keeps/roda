@@ -191,10 +191,10 @@ public class RiskRegister extends Composite {
       }
     });
 
-    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<Risk>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<Risk> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
