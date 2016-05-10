@@ -1379,6 +1379,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.MEMBERS_IS_ACTIVE, member.isActive());
     doc.addField(RodaConstants.MEMBERS_IS_USER, member.isUser());
     doc.addField(RodaConstants.MEMBERS_NAME, member.getName());
+    
     if (member.getAllGroups() != null) {
       doc.addField(RodaConstants.MEMBERS_GROUPS_ALL, new ArrayList<String>(member.getAllGroups()));
     }

@@ -37,6 +37,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.RodaSimpleUser;
 import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.User;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.utils.ModelUtils;
 import org.slf4j.Logger;
@@ -106,24 +107,14 @@ public class UserUtility {
     RodaUser user = null;
     if (request.getSession().getAttribute(RODA_USER) != null) {
       RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
-
-      Filter filter = new Filter();
-      // FIXME 20160506 this should be a retrieve, giving that the ID is like
-      // "user:[username]"
-      filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_ID, rsu.getId()));
-      filter.add(new SimpleFilterParameter(RodaConstants.MEMBERS_IS_USER, "true"));
-      try {
-        IndexResult<RODAMember> indexUsers = indexService.find(RODAMember.class, filter, null, new Sublist(), null);
-        if (indexUsers.getTotalCount() == 1) {
-          user = (RodaUser) indexUsers.getResults().get(0);
-          user.setGuest(rsu.isGuest());
-          user.setIpAddress(request.getRemoteAddr());
-          LOGGER.trace("User obtained from index: {}\n" + "user in session: {}", user, rsu);
-        } else {
-          LOGGER.error("The number of users obtained from the index is different from 1");
+      if (!rsu.isGuest()) {
+        try {
+          user = UserUtility.getLdapUtility().getUser(rsu.getId());
+        } catch (LdapUtilityException e) {
+          LOGGER.error("Could not login", e);
         }
-      } catch (GenericException | RequestNotValidException e) {
-        LOGGER.error("Error obtaining user \"" + rsu.getId() + "\" from index", e);
+      } else {
+        user = getGuest();
       }
     } else {
       user = returnGuestIfNoUserInSession ? getGuest() : null;

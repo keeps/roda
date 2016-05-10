@@ -45,12 +45,14 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
 
   public RodaUser getAuthenticatedUser() throws RODAException {
     RodaUser user = UserUtility.getUser(this.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
-    logger.debug("Serving user " + user + " from user " + user);
+    logger.debug("Serving user " + user);
     return user;
   }
 
   public RodaUser login(String username, String password) throws AuthenticationDeniedException, GenericException {
-    return UserLogin.login(username, password, this.getThreadLocalRequest());
+    RodaUser user = UserLogin.login(username, password, this.getThreadLocalRequest());
+    logger.debug("Logged user " + user);
+    return user;
   }
 
   public Map<String, String> getRodaProperties() {

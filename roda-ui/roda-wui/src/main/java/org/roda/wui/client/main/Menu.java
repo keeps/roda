@@ -212,7 +212,7 @@ public class Menu extends Composite {
 
   private void updateVisibles(RodaUser user) {
 
-    logger.info("Updating menu visibility for user " + user.getName());
+    logger.info("Updating menu visibility for user " + user);
 
     leftMenu.clearItems();
     leftMenuItemCount = 0;
