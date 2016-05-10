@@ -20,20 +20,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
-import org.roda.core.data.adapter.facet.Facets;
-import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
-import org.roda.core.data.v2.common.Pair;
-import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Jobs;
-import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.controllers.JobsHelper;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
@@ -57,7 +49,9 @@ public class JobsResource {
   private HttpServletRequest request;
 
   @GET
-  @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Job.class, responseContainer = "List")
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "List Jobs", notes = "Gets a list of Jobs.", response = Jobs.class, responseContainer = "List")
   public Response listJobs(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
@@ -68,14 +62,7 @@ public class JobsResource {
     RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    boolean showInactive = true;
-    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.NONE,
-      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      showInactive);
-
-    // transform controller method output
-    Jobs jobs = JobsHelper.getJobsFromIndexResult(listJobsIndexResult);
+    Jobs jobs = JobsHelper.getJobsFromIndexResult(user, start, limit);
 
     return Response.ok(jobs, mediaType).build();
   }
@@ -90,6 +77,7 @@ public class JobsResource {
 
     // get user
     RodaUser user = UserUtility.getApiUser(request);
+
     // delegate action to controller
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
 
@@ -145,32 +133,27 @@ public class JobsResource {
     return Response.ok(new ApiResponseMessage(ApiResponseMessage.OK, "Job deleted"), mediaType).build();
   }
 
-  // FIXME WIP - not working yet
+
   @GET
   @Path("/{" + RodaConstants.API_PATH_PARAM_JOB_ID + "}/reports")
-  public Response getReport(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
-    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat) {
+  @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+  @ApiOperation(value = "List Job reports", notes = "Gets a list of Job reports.", response = Reports.class, responseContainer = "List")
+  public Response listJobReports(@PathParam(RodaConstants.API_PATH_PARAM_JOB_ID) String jobId,
+    @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
+    @ApiParam(value = "If just the failed reports should be included in the response or all the job reports", defaultValue = "false") @QueryParam(RodaConstants.API_PATH_PARAM_JOB_JUST_FAILED) boolean justFailed,
+    @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
+    @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
+    throws RODAException {
+    String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
-    try {
-      Filter filter = new Filter();
-      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
-      Sorter sorter = null;
-      Sublist sublist = new Sublist();
-      IndexResult<Report> find = RodaCoreFactory.getIndexService().find(Report.class, filter, sorter, sublist);
+    // get user
+    RodaUser user = UserUtility.getApiUser(request);
 
-      StringBuilder sb = new StringBuilder();
+    // delegate action to controller
+    Reports reports = JobsHelper.getJobReportsFromIndexResult(user, jobId, justFailed, start, limit);
 
-      for (Report Report : find.getResults()) {
-        sb.append(Report.toString());
-        sb.append("<br/>");
-      }
-
-      return Response.ok(sb.toString(), MediaType.TEXT_HTML).build();
-    } catch (RODAException e) {
-      LOGGER.error("Error getting jobs", e);
-    }
-    return Response.ok("PUM", MediaType.TEXT_HTML).build();
-
+    return Response.ok(reports, mediaType).build();
   }
 
 }

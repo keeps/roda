@@ -59,6 +59,7 @@ public final class RodaConstants {
    */
   public static final String CORE_DESCRIPTION_LEVELS_FILE = "roda-description-levels-hierarchy.properties";
   public static final String CORE_CONFIG_FOLDER = "config";
+  public static final String CORE_CONFIG_EXAMPLE_FOLDER = "config-example";
   public static final String CORE_I18N_FOLDER = "i18n";
   public static final String CORE_DATA_FOLDER = "data";
   public static final String CORE_STORAGE_FOLDER = "storage";
@@ -131,6 +132,7 @@ public final class RodaConstants {
   public static final String API_HTTP_HEADER_ACCEPT = "Accept";
   // job related params
   public static final String API_PATH_PARAM_JOB_ID = "jobId";
+  public static final String API_PATH_PARAM_JOB_JUST_FAILED = "jobJustFailed";
 
   /*
    * Controllers related
@@ -340,12 +342,16 @@ public final class RodaConstants {
   public static final String JOB_START_DATE = "startDate";
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
+  // FIXME 20160511 hsilva: add the following everywhere (schema.xml, SolrUtils,
+  // object, etc
+  public static final String JOB_STATUS_DETAILS = "statusDetails";
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_OBJECTS_COUNT = "objectsCount";
   public static final String JOB_OBJECTS_WAITING_TO_BE_PROCESSED = "objectsWaitingToBeProcessed";
   public static final String JOB_OBJECTS_BEING_PROCESSED = "objectsBeingProcessed";
   public static final String JOB_OBJECTS_PROCESSED_WITH_SUCCESS = "objectsProcessedWithSuccess";
   public static final String JOB_OBJECTS_PROCESSED_WITH_FAILURE = "objectsProcessedWithFailure";
+  // FIXME 20160511 hsilva: create counter for 'number of objects apraised'
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
@@ -388,6 +394,9 @@ public final class RodaConstants {
   public static final String JOB_REPORT_JOB_ID = "jobId";
   public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
+  // FIXME 20160511 hsilva: add the following everywhere (schema.xml, SolrUtils,
+  // object, etc
+  public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";
   public static final String JOB_REPORT_DATE_UPDATE = "dateUpdated";

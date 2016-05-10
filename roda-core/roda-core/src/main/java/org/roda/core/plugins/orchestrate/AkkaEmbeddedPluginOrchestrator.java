@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -66,16 +65,9 @@ import akka.routing.RoundRobinPool;
 import akka.util.Timeout;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
-import scala.concurrent.duration.Duration;
 
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEmbeddedPluginOrchestrator.class);
-
-  private static final int BLOCK_SIZE = 100;
-  private static final Sorter SORTER = null;
-  private static final int TIMEOUT = 1;
-  private static final TimeUnit TIMEOUT_UNIT = TimeUnit.HOURS;
-  private static final Timeout DEFAULT_TIMEOUT = new Timeout(Duration.create(TIMEOUT, TIMEOUT_UNIT));
 
   private final IndexService index;
   private final ModelService model;
@@ -99,7 +91,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     runningJobs = new HashMap<>();
     runningJobsObjectsCount = new HashMap<>();
 
-    numberOfWorkers = RodaCoreFactory.getNumberOfPluginWorkers();
+    numberOfWorkers = JobsHelper.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
 
     Props workersProps = new RoundRobinPool(numberOfWorkers)
@@ -108,6 +100,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
     jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
+
   }
 
   @Override
@@ -134,6 +127,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       IndexResult<T> find;
       int offset = 0;
       int multiplier = 0;
@@ -143,22 +137,27 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       plugin.beforeAllExecute(index, model, storage);
 
+      Timeout timeout = null;
       do {
         // XXX block size could be recommended by plugin
-        find = RodaCoreFactory.getIndexService().find(classToActOn, filter, SORTER, new Sublist(offset, BLOCK_SIZE));
+        find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
+          new Sublist(offset, blockSize));
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, innerPlugins,
           (int) find.getLimit());
         offset += find.getLimit();
         multiplier++;
 
         // FIXME 20160401 hsilva: this is not the right way to set the timeout
-        Timeout timeout = getTimeout(new Long(find.getTotalCount()).intValue());
+        if (timeout == null) {
+          timeout = JobsHelper.getPluginTimeout(plugin.getClass(), new Long(find.getTotalCount()).intValue(),
+            blockSize);
+        }
         futures.add(Patterns.ask(workersRouter, new PluginMessage<T>(find.getResults(), innerPlugin), timeout));
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<T> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -181,6 +180,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<>();
@@ -192,9 +192,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<AIP> block = new ArrayList<AIP>();
       while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, BLOCK_SIZE);
-          futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin), DEFAULT_TIMEOUT));
+        if (block.size() == blockSize) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, blockSize);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin),
+            JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
           block = new ArrayList<AIP>();
           multiplier++;
         }
@@ -206,12 +207,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -234,6 +236,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<>();
@@ -245,10 +248,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<Representation> block = new ArrayList<Representation>();
       while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, BLOCK_SIZE);
-          futures
-            .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+        if (block.size() == blockSize) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, blockSize);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin),
+            JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
           block = new ArrayList<Representation>();
           multiplier++;
         }
@@ -260,13 +263,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, block.size());
-        futures
-          .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -289,6 +292,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       Iterator<String> iter = ids.iterator();
       List<Future<Object>> futures = new ArrayList<>();
@@ -300,9 +304,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<File> block = new ArrayList<File>();
       while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, BLOCK_SIZE);
-          futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+        if (block.size() == blockSize) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, blockSize);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin),
+            JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
           block = new ArrayList<File>();
           multiplier++;
         }
@@ -314,12 +319,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -342,6 +348,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> iter = aips.iterator();
@@ -353,9 +360,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<AIP> block = new ArrayList<AIP>();
       while (iter.hasNext()) {
-        if (block.size() == BLOCK_SIZE) {
-          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, BLOCK_SIZE);
-          futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin), DEFAULT_TIMEOUT));
+        if (block.size() == blockSize) {
+          innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, blockSize);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin),
+            JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
           block = new ArrayList<AIP>();
           multiplier++;
         }
@@ -369,14 +377,15 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, AIP.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<AIP>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -398,6 +407,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
@@ -412,11 +422,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         OptionalWithCause<AIP> aip = aipIter.next();
         if (aip.isPresent()) {
           for (Representation representation : aip.get().getRepresentations()) {
-            if (block.size() == BLOCK_SIZE) {
+            if (block.size() == blockSize) {
               innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins,
-                BLOCK_SIZE);
-              futures.add(
-                Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+                blockSize);
+              futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin),
+                JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
               block = new ArrayList<Representation>();
               multiplier++;
             }
@@ -429,15 +439,15 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, Representation.class, innerPlugins, block.size());
-        futures
-          .add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<Representation>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -461,6 +471,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
       Iterator<OptionalWithCause<AIP>> aipIter = aips.iterator();
@@ -482,9 +493,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
             while (fileIter.hasNext()) {
 
-              if (block.size() == BLOCK_SIZE) {
-                innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, BLOCK_SIZE);
-                futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+              if (block.size() == blockSize) {
+                innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, blockSize);
+                futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin),
+                  JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
                 block = new ArrayList<File>();
                 multiplier++;
               }
@@ -507,14 +519,15 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, File.class, innerPlugins, block.size());
-        futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<File>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       IOUtils.closeQuietly(aips);
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -538,6 +551,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     List<TransferredResource> resources) {
     try {
       LOGGER.info("Started {}", plugin.getName());
+      int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<TransferredResource>> innerPlugins = new ArrayList<>();
@@ -547,11 +561,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
       for (TransferredResource resource : resources) {
-        if (block.size() == BLOCK_SIZE) {
+        if (block.size() == blockSize) {
           innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, innerPlugins,
-            BLOCK_SIZE);
-          futures.add(
-            Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin), DEFAULT_TIMEOUT));
+            blockSize);
+          futures.add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin),
+            JobsHelper.getPluginTimeout(innerPlugin.getClass(), blockSize, blockSize)));
           block = new ArrayList<TransferredResource>();
           multiplier++;
         }
@@ -562,13 +576,13 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       if (!block.isEmpty()) {
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, TransferredResource.class, innerPlugins,
           block.size());
-        futures.add(
-          Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin), DEFAULT_TIMEOUT));
+        futures.add(Patterns.ask(workersRouter, new PluginMessage<TransferredResource>(block, innerPlugin),
+          JobsHelper.getPluginTimeout(innerPlugin.getClass(), block.size(), blockSize)));
         multiplier++;
       }
 
       final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, Duration.create(multiplier * TIMEOUT, TIMEOUT_UNIT));
+      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
 
       for (Plugin<TransferredResource> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -594,8 +608,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     if (runningJobs.containsKey(job.getId())) {
       throw new JobAlreadyStartedException();
     } else {
-
-      Future<Object> future = Patterns.ask(jobWorkersRouter, job, getJobTimeout(job));
+      int blockSize = JobsHelper.getBlockSize();
+      Future<Object> future = Patterns.ask(jobWorkersRouter, job, JobsHelper.getJobTimeout(job, blockSize));
 
       future.onSuccess(new OnSuccess<Object>() {
         @Override
@@ -613,29 +627,30 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   }
 
-  private Timeout getJobTimeout(Job job) {
-    return getTimeout(job.getObjectsCount());
-  }
-
-  private Timeout getTimeout(int objectsCount) {
-    int blocks = 1;
-    if (objectsCount > 0) {
-      blocks = (objectsCount / BLOCK_SIZE);
-      if (objectsCount % BLOCK_SIZE != 0) {
-        blocks += 1;
-      }
-    }
-
-    return new Timeout(Duration.create(TIMEOUT * blocks, TIMEOUT_UNIT));
-  }
+  // private Timeout getJobTimeout(Job job) {
+  // return getTimeout(job.getObjectsCount());
+  // }
+  //
+  // private Timeout getTimeout(int objectsCount) {
+  // int blocks = 1;
+  // if (objectsCount > 0) {
+  // blocks = (objectsCount / BLOCK_SIZE);
+  // if (objectsCount % BLOCK_SIZE != 0) {
+  // blocks += 1;
+  // }
+  // }
+  //
+  // return new Timeout(Duration.create(TIMEOUT * blocks, TIMEOUT_UNIT));
+  // }
 
   @Override
   public void stopJob(Job job) {
     // FIXME 201603 hsilva: this is not the solution as the messages are sent
     // async and until the processing of the current message is done, no other
     // is read
-    Patterns.ask(workersRouter, new Broadcast(Kill.getInstance()), DEFAULT_TIMEOUT);
-    Patterns.ask(workersRouter, Kill.getInstance(), DEFAULT_TIMEOUT);
+    Timeout defaultTimeout = JobsHelper.getDefaultTimeout();
+    Patterns.ask(workersRouter, new Broadcast(Kill.getInstance()), defaultTimeout);
+    Patterns.ask(workersRouter, Kill.getInstance(), defaultTimeout);
   }
 
   @Override
@@ -756,17 +771,27 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) {
+  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) throws JobException {
     String jobId = PluginHelper.getJobId(plugin);
+    boolean jobIsAlive = true;
     if (jobId != null) {
       // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
       // it should block per job)
       synchronized (runningJobs) {
-        Integer jobObjectsCount = runningJobsObjectsCount.get(jobId);
         Map<Plugin<?>, JobPluginInfo> jobPluginInfos = runningJobs.get(jobId);
-        JobPluginInfo infoUpdated = info.processJobPluginInformation(plugin, jobObjectsCount, jobPluginInfos);
-        PluginHelper.updateJobInformation(plugin, model, infoUpdated);
+        if (jobPluginInfos != null) {
+          Integer jobObjectsCount = runningJobsObjectsCount.get(jobId);
+          JobPluginInfo infoUpdated = info.processJobPluginInformation(plugin, jobObjectsCount, jobPluginInfos);
+          PluginHelper.updateJobInformation(plugin, model, infoUpdated);
+        } else {
+          jobIsAlive = false;
+        }
       }
+    } else {
+      throw new JobException("Job id is null");
+    }
+    if (!jobIsAlive) {
+      throw new TimeoutJobException("Job timeout occurred");
     }
   }
 
@@ -779,7 +804,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       // FIXME what to do with the askFuture???
       Future<Object> future = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
-        DEFAULT_TIMEOUT);
+        JobsHelper.getPluginTimeout(plugin.getClass()));
 
       future.onSuccess(new OnSuccess<Object>() {
         @Override

@@ -76,6 +76,11 @@ public abstract class JobPluginInfo {
     this.objectsProcessedWithFailure = objectsProcessedWithFailure;
   }
 
+  public void incrementObjectsProcessedWithFailure() {
+    this.objectsProcessedWithFailure += 1;
+    this.objectsBeingProcessed -= 1;
+  }
+
   abstract <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin,
     Integer taskObjectsCount, Map<Plugin<?>, JobPluginInfo> jobInfos);
 }

@@ -49,6 +49,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
 import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
@@ -387,7 +388,7 @@ public final class PluginHelper {
    * Updates the job status
    */
   public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
-    JobPluginInfo jobPluginInfo) {
+    JobPluginInfo jobPluginInfo) throws JobException {
     RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
     return jobPluginInfo;
   }

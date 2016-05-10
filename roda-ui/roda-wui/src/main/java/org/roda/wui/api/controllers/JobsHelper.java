@@ -12,8 +12,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -22,14 +24,18 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.jobs.Reports;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
+import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,10 +98,17 @@ public class JobsHelper {
     return updatedJob;
   }
 
-  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(IndexResult<Job> jobsFromIndexResult) {
+  public static org.roda.core.data.v2.jobs.Jobs getJobsFromIndexResult(RodaUser user, String start, String limit)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
-    for (Job job : jobsFromIndexResult.getResults()) {
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    boolean showInactive = true;
+    IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.NONE,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
+
+    for (Job job : listJobsIndexResult.getResults()) {
       jobs.addJob(job);
     }
 
@@ -156,6 +169,28 @@ public class JobsHelper {
       }
 
     }
+  }
+
+  public static Reports getJobReportsFromIndexResult(RodaUser user, String jobId, boolean justFailed, String start,
+    String limit) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    Reports reports = new Reports();
+
+    Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
+    boolean showInactive = true;
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
+
+    if (justFailed) {
+      filter.add(new SimpleFilterParameter(RodaConstants.JOB_REPORT_PLUGIN_STATE, PluginState.FAILURE.toString()));
+    }
+    IndexResult<Report> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(Report.class, filter,
+      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
+      showInactive);
+
+    for (Report report : listJobReportsIndexResult.getResults()) {
+      reports.addReport(report);
+    }
+
+    return reports;
   }
 
 }

@@ -26,6 +26,7 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
@@ -75,33 +76,37 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
+    try {
 
-    LOGGER.debug("Creating risk incidences");
-    Report pluginReport = PluginHelper.createPluginReport(this);
+      LOGGER.debug("Creating risk incidences");
+      Report pluginReport = PluginHelper.createPluginReport(this);
 
-    RiskJobPluginInfo jobPluginInfo = new RiskJobPluginInfo();
-    PluginHelper.updateJobInformation(this, jobPluginInfo);
+      RiskJobPluginInfo jobPluginInfo = new RiskJobPluginInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-    if (!list.isEmpty()) {
-      if (riskIds != null) {
-        String[] risks = riskIds.split(",");
-        for (String riskId : risks) {
-          if (list.get(0) instanceof AIP) {
-            pluginReport = executeOnAIP(index, model, riskId, (List<AIP>) list, pluginReport);
-          } else if (list.get(0) instanceof Representation) {
-            pluginReport = executeOnRepresentation(model, riskId, (List<Representation>) list, pluginReport);
-          } else if (list.get(0) instanceof File) {
-            pluginReport = executeOnFile(model, riskId, (List<File>) list, pluginReport);
+      if (!list.isEmpty()) {
+        if (riskIds != null) {
+          String[] risks = riskIds.split(",");
+          for (String riskId : risks) {
+            if (list.get(0) instanceof AIP) {
+              pluginReport = executeOnAIP(index, model, riskId, (List<AIP>) list, pluginReport);
+            } else if (list.get(0) instanceof Representation) {
+              pluginReport = executeOnRepresentation(model, riskId, (List<Representation>) list, pluginReport);
+            } else if (list.get(0) instanceof File) {
+              pluginReport = executeOnFile(model, riskId, (List<File>) list, pluginReport);
+            }
+
+            jobPluginInfo.putRisk(riskId, 1);
           }
-
-          jobPluginInfo.putRisk(riskId, 1);
         }
       }
-    }
 
-    PluginHelper.updateJobInformation(this, jobPluginInfo);
-    LOGGER.debug("Done creating risk incidences");
-    return pluginReport;
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      LOGGER.debug("Done creating risk incidences");
+      return pluginReport;
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
   }
 
   public Report executeOnAIP(IndexService index, ModelService model, String riskId, List<AIP> list, Report pluginReport)
