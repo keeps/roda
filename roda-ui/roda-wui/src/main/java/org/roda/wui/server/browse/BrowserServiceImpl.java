@@ -133,7 +133,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public BrowseItemBundle getItemBundle(String aipId, String localeString)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getItemBundle(user, aipId, locale);
   }
@@ -141,7 +141,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public DescriptiveMetadataEditBundle getDescriptiveMetadataEditBundle(String aipId, String descId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.getDescriptiveMetadataEditBundle(user, aipId, descId);
   }
 
@@ -161,7 +161,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Sublist sublist, Facets facets, String localeString)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
-      RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+      RodaUser user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = parseClass(classNameToReturn);
       IndexResult<T> result = Browser.find(user, classToReturn, filter, sorter, sublist, facets);
       return I18nUtility.translate(result, classToReturn, localeString);
@@ -174,7 +174,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
     return Browser.count(user, classToReturn, filter);
   }
@@ -182,7 +182,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
     return Browser.retrieve(user, classToReturn, id);
   }
@@ -190,7 +190,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
     Browser.delete(user, classToReturn, ids);
   }
@@ -198,14 +198,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
     return Browser.suggest(user, classToReturn, field, query);
   }
 
   public List<IndexedAIP> getAncestors(IndexedAIP aip)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.getAncestors(user, aip);
   }
 
@@ -249,14 +249,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.moveInHierarchy(user, selected, parentId);
   }
 
   @Override
   public String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createAIP(user, parentId, type).getId();
 
   }
@@ -264,7 +264,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public String removeAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.removeAIP(user, aips);
   }
 
@@ -272,7 +272,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void createDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 
     String metadataId = bundle.getId();
     String descriptiveMetadataType = bundle.getType();
@@ -287,7 +287,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     ValidationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     String metadataId = bundle.getId();
     String metadataType = bundle.getType();
     String metadataVersion = bundle.getVersion();
@@ -299,20 +299,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   public void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.removeDescriptiveMetadataFile(user, itemId, descriptiveMetadataId);
   }
 
   public String createTransferredResourcesFolder(String parent, String folderName)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.createTransferredResourcesFolder(user, parent, folderName, false).getUUID();
   }
 
   @Override
   public void removeTransferredResources(SelectedItems<TransferredResource> selected)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.removeTransferredResources(user, selected);
   }
 
@@ -329,7 +329,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public JobBundle retrieveJobBundle(String jobId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Job job = Browser.retrieve(user, Job.class, jobId);
     List<PluginInfo> pluginsInfo = new ArrayList<>();
 
@@ -359,7 +359,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public Job createJob(Job job) throws RequestNotValidException, AuthorizationDeniedException, NotFoundException,
     GenericException, JobAlreadyStartedException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Jobs.createJob(user, job);
   }
 
@@ -413,7 +413,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public List<SupportedMetadataTypeBundle> getSupportedMetadata(String localeString)
     throws AuthorizationDeniedException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getSupportedMetadata(user, locale);
   }
@@ -421,7 +421,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public PreservationEventViewBundle retrievePreservationEventViewBundle(String eventId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrievePreservationEventViewBundle(user, eventId);
   }
 
@@ -429,7 +429,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   public DescriptiveMetadataVersionsBundle getDescriptiveMetadataVersionsBundle(String aipId,
     String descriptiveMetadataId, String localeString)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Locale locale = ServerTools.parseLocale(localeString);
     return Browser.getDescriptiveMetadataVersionsBundle(user, aipId, descriptiveMetadataId, locale);
   }
@@ -437,153 +437,153 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public void revertDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.revertDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
   }
 
   @Override
   public void removeDescriptiveMetadataVersion(String aipId, String descriptiveMetadataId, String versionId)
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.removeDescriptiveMetadataVersion(user, aipId, descriptiveMetadataId, versionId);
   }
 
   @Override
   public void updateAIPPermissions(String aipId, Permissions permissions, boolean recursive)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.updateAIPPermissions(user, aipId, permissions, recursive);
   }
 
   @Override
   public void modifyRisk(Risk risk, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.modifyRisk(user, risk, message);
   }
 
   @Override
   public void modifyFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.modifyFormat(user, format);
   }
 
   @Override
   public void modifyAgent(Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.modifyAgent(user, agent);
   }
 
   @Override
   public Risk addRisk(Risk risk)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.addRisk(user, risk);
   }
 
   @Override
   public Format addFormat(Format format)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.addFormat(user, format);
   }
 
   @Override
   public Agent addAgent(Agent agent)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.addAgent(user, agent);
   }
 
   @Override
   public List<Format> retrieveFormats(String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveFormats(user, agentId);
   }
 
   @Override
   public List<Agent> retrieveRequiredAgents(String agentId)
     throws AuthorizationDeniedException, NotFoundException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveRequiredAgents(user, agentId);
   }
 
   @Override
   public void revertRiskVersion(String riskId, String versionId, String message)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.revertRiskVersion(user, riskId, versionId, message);
   }
 
   @Override
   public void removeRiskVersion(String riskId, String versionId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.removeRiskVersion(user, riskId, versionId);
   }
 
   @Override
   public RiskVersionsBundle retrieveRiskVersions(String riskId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException, IOException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveRiskVersions(user, riskId);
   }
 
   @Override
   public boolean hasRiskVersions(String id)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.hasRiskVersions(user, id);
   }
 
   @Override
   public Risk retrieveRiskVersion(String riskId, String selectedVersion)
     throws AuthorizationDeniedException, RequestNotValidException, GenericException, NotFoundException, IOException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveRiskVersion(user, riskId, selectedVersion);
   }
 
   @Override
   public RiskMitigationBundle retrieveShowMitigationTerms(int preMitigationProbability, int preMitigationImpact,
     int posMitigationProbability, int posMitigationImpact) throws AuthorizationDeniedException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveShowMitigationTerms(user, preMitigationProbability, preMitigationImpact,
       posMitigationProbability, posMitigationImpact);
   }
 
   @Override
   public List<String> retrieveMitigationSeverityLimits() throws AuthorizationDeniedException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveMitigationSeverityLimits(user);
   }
 
   @Override
   public MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.retrieveAllMitigationProperties(user);
   }
 
   @Override
   public void deleteRisk(SelectedItems<Risk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteRisk(user, selected);
   }
 
   @Override
   public void deleteAgent(SelectedItems<Agent> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteAgent(user, selected);
   }
 
   @Override
   public void deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteFormat(user, selected);
   }
 
@@ -592,7 +592,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Map<String, String> value) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     GenericException, JobAlreadyStartedException {
 
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 
     Job job = new Job();
     job.setName(jobName);
@@ -618,14 +618,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   @Override
   public int getObjectRiskSize(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.getObjectRiskSize(user, aipId);
   }
 
   @Override
   public List<String> getRiskOnAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return Browser.getRiskOnAIP(user, aipId);
   }
 

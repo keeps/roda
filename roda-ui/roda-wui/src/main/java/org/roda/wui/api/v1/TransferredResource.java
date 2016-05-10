@@ -24,7 +24,6 @@ import javax.ws.rs.core.Response;
 
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -59,7 +58,7 @@ public class TransferredResource {
     throws AuthorizationDeniedException, NotFoundException, RequestNotValidException, GenericException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     StreamResponse response = Browser.getTransferredResource(user, resourceId);
 
@@ -75,7 +74,7 @@ public class TransferredResource {
     throws RODAException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.core.data.v2.ip.TransferredResource transferredResource = Browser.createTransferredResource(user,
       parentUUID, fileDetail.getFileName(), inputStream, name, true);
@@ -87,10 +86,11 @@ public class TransferredResource {
   public Response deleteResource(
     @ApiParam(value = "The id of the resource", required = true) @QueryParam("path") String path) throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     // TODO support remove multiple resources in one go
-    SelectedItemsList selected = new SelectedItemsList(Arrays.asList(path), TransferredResource.class.getName());
+    SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource> selected = new SelectedItemsList<org.roda.core.data.v2.ip.TransferredResource>(
+      Arrays.asList(path), TransferredResource.class.getName());
     Browser.removeTransferredResources(user, selected);
     // FIXME give a better answer
     return Response.ok().entity("{'status':'success'}").build();

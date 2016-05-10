@@ -64,8 +64,7 @@ public class UserUtility {
 
   // FIXME 20151002 hsilva: this method should be more auth scheme agnostic
   // (basic auth vs. cas)
-  public static RodaUser getApiUser(HttpServletRequest request, IndexService indexService)
-    throws AuthorizationDeniedException {
+  public static RodaUser getApiUser(HttpServletRequest request) throws AuthorizationDeniedException {
 
     RodaUser user;
     Pair<String, String> credentials = getUserCredentialsFromBasicAuth(request);
@@ -77,7 +76,7 @@ public class UserUtility {
         throw new AuthorizationDeniedException("Unable to authenticate user!");
       }
     } else {
-      user = getUser(request, indexService, false);
+      user = getUser(request, false);
       if (user == null) {
         throw new AuthorizationDeniedException("No user provided!");
       }
@@ -102,8 +101,7 @@ public class UserUtility {
     return ret;
   }
 
-  public static RodaUser getUser(HttpServletRequest request, IndexService indexService,
-    boolean returnGuestIfNoUserInSession) {
+  public static RodaUser getUser(HttpServletRequest request, boolean returnGuestIfNoUserInSession) {
     RodaUser user = null;
     if (request.getSession().getAttribute(RODA_USER) != null) {
       RodaSimpleUser rsu = (RodaSimpleUser) request.getSession().getAttribute(RODA_USER);
@@ -122,8 +120,8 @@ public class UserUtility {
     return user;
   }
 
-  public static RodaUser getUser(HttpServletRequest request, IndexService indexService) {
-    return getUser(request, indexService, true);
+  public static RodaUser getUser(HttpServletRequest request) {
+    return getUser(request, true);
   }
 
   public static void checkRoles(RodaUser rsu, List<String> rolesToCheck) throws AuthorizationDeniedException {

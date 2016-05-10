@@ -91,7 +91,7 @@ public class RodaCasAuthenticationFilter implements Filter {
           UserUtility.setUser(servletRequest, rsu);
         }
       } else {
-        UserUtility.setUser(servletRequest, UserUtility.getUser(servletRequest, RodaCoreFactory.getIndexService()));
+        UserUtility.setUser(servletRequest, UserUtility.getUser(servletRequest));
       }
 
       String url = servletRequest.getRequestURL().toString();

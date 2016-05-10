@@ -70,33 +70,33 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   @Override
   public Long getMemberCount(Filter filter)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.countMembers(user, filter);
   }
 
   @Override
   public IndexResult<RODAMember> findMembers(Filter filter, Sorter sorter, Sublist sublist, Facets facets,
     String localeString) throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     IndexResult<RODAMember> result = UserManagement.findMembers(user, filter, sorter, sublist, facets);
     return I18nUtility.translate(result, RODAMember.class, localeString);
   }
 
   @Override
   public Group getGroup(String groupname) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveGroup(user, groupname);
   }
 
   @Override
   public List<Group> listAllGroups() throws AuthorizationDeniedException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.listAllGroups(user);
   }
 
   @Override
   public User getUser(String username) throws RODAException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveUser(user, username);
   }
 
@@ -114,65 +114,65 @@ public class UserManagementServiceImpl extends RemoteServiceServlet implements U
   @Override
   public User addUser(User newUser, String password) throws AuthorizationDeniedException, NotFoundException,
     GenericException, EmailAlreadyExistsException, UserAlreadyExistsException, IllegalOperationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.addUser(user, newUser, password);
   }
 
   @Override
   public void editMyUser(User modifiedUser, String password) throws AuthorizationDeniedException, NotFoundException,
     AlreadyExistsException, GenericException, IllegalOperationException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.modifyMyUser(user, modifiedUser, password);
   }
 
   @Override
   public void modifyUser(User modifiedUser, String password)
     throws AuthorizationDeniedException, NotFoundException, AlreadyExistsException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.modifyUser(user, modifiedUser, password);
   }
 
   @Override
   public void removeUser(String username) throws AuthorizationDeniedException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.removeUser(user, username);
   }
 
   @Override
   public void addGroup(Group group) throws AuthorizationDeniedException, GenericException, AlreadyExistsException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.addGroup(user, group);
   }
 
   @Override
   public void modifyGroup(Group group) throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.modifyGroup(user, group);
   }
 
   @Override
   public void removeGroup(String groupname) throws AuthorizationDeniedException, GenericException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     UserManagement.removeGroup(user, groupname);
   }
 
   @Override
   public Long getLogEntriesCount(Filter filter) throws RODAException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.countLogEntries(user, filter);
   }
 
   @Override
   public IndexResult<LogEntry> findLogEntries(Filter filter, Sorter sorter, Sublist sublist, Facets facets)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.findLogEntries(user, filter, sorter, sublist, facets);
   }
 
   @Override
   public LogEntry retrieveLogEntry(String logEntryId)
     throws AuthorizationDeniedException, GenericException, NotFoundException {
-    RodaUser user = UserUtility.getUser(getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     return UserManagement.retrieveLogEntry(user, logEntryId);
   }
 

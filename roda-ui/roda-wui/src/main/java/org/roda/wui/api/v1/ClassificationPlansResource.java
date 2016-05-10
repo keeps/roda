@@ -50,7 +50,7 @@ public class ClassificationPlansResource {
       throws RODAException {
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     StreamResponse streamResponse = Browser.getClassificationPlan(user, type);

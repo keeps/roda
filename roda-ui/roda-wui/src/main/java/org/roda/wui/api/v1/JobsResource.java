@@ -64,7 +64,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -86,7 +86,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Job updatedJob = org.roda.wui.api.controllers.Jobs.createJob(user, job);
 
@@ -103,7 +103,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Jobs.startJob(user, jobId);
 
@@ -119,7 +119,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Job job = org.roda.wui.api.controllers.Browser.retrieve(user, Job.class, jobId);
 
@@ -135,7 +135,7 @@ public class JobsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Jobs.deleteJob(user, jobId);
 

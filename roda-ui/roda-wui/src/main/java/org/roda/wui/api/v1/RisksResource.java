@@ -61,7 +61,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -83,7 +83,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Risk newRisk = org.roda.wui.api.controllers.Risks.createRisk(user, risk);
 
@@ -99,7 +99,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, Risk.class, riskId);
 
@@ -115,7 +115,7 @@ public class RisksResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Risks.deleteRisk(user, riskId);
 

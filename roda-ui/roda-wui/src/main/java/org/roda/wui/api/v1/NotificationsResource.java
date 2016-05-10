@@ -60,7 +60,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
@@ -84,7 +84,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Notification newNotification = org.roda.wui.api.controllers.Notifications.createNotification(user, notification);
 
@@ -100,7 +100,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Notification notification = org.roda.wui.api.controllers.Browser.retrieve(user, Notification.class, notificationId);
 
@@ -116,7 +116,7 @@ public class NotificationsResource {
     String mediaType = ApiUtils.getMediaType(acceptFormat, request);
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Notifications.deleteNotification(user, notificationId);
 
@@ -138,7 +138,7 @@ public class NotificationsResource {
     }
 
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     org.roda.wui.api.controllers.Notifications.acknowledgeNotification(user, notificationId, token, email);
 

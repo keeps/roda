@@ -59,7 +59,7 @@ public class FilesResource {
     @ApiParam(value = "Choose format in which to get the file", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
       throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
 
     StreamResponse aipRepresentationFile = Browser.getAipRepresentationFile(user, fileUuid, acceptFormat);
 
@@ -105,7 +105,7 @@ public class FilesResource {
     @ApiParam(value = "The ID of the existing file", required = true) @PathParam(RodaConstants.API_PATH_PARAM_FILE_UUID) String fileUUID)
       throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Browser.removeRepresentationFile(user, fileUUID);
 

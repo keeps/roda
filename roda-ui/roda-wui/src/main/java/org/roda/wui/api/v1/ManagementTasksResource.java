@@ -76,7 +76,7 @@ public class ManagementTasksResource extends RodaCoreService {
     Date startDate = new Date();
 
     // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // FIXME see if this is the proper way to ensure that the user can execute
     // this task
     if (!user.getAllGroups().contains("administrators")) {
@@ -96,7 +96,7 @@ public class ManagementTasksResource extends RodaCoreService {
     Date startDate = new Date();
 
     // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // FIXME see if this is the proper way to ensure that the user can execute
     // this task
     if (!user.getAllGroups().contains("administrators")) {
@@ -117,7 +117,7 @@ public class ManagementTasksResource extends RodaCoreService {
     Date startDate = new Date();
 
     // get user & check permissions
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // FIXME see if this is the proper way to ensure that the user can execute
     // this task
     if (!user.getAllGroups().contains("administrators")) {

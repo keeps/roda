@@ -36,7 +36,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   @SuppressWarnings("unused")
   private static final String LOG_ACTION_WUI_LOGIN = "RODAWUI.login";
   private static final String WUI_LOGIN_CACHE = "WUI_LOGIN_CACHE";
-  private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu." ,"ui.role.");
+  private static final List<String> WUI_LOGIN_CACHE_PREFIXES = Arrays.asList("ui.menu.", "ui.role.");
   private static Logger logger = LoggerFactory.getLogger(UserLoginServiceImpl.class);
 
   public static UserLoginServiceImpl getInstance() {
@@ -44,7 +44,7 @@ public class UserLoginServiceImpl extends RemoteServiceServlet implements UserLo
   }
 
   public RodaUser getAuthenticatedUser() throws RODAException {
-    RodaUser user = UserUtility.getUser(this.getThreadLocalRequest(), RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getUser(this.getThreadLocalRequest());
     logger.debug("Serving user " + user);
     return user;
   }

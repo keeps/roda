@@ -59,7 +59,7 @@ public class RepresentationsResource {
     @ApiParam(value = "Choose format in which to get the representation", allowableValues = "json, bin") @QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse aipRepresentation = Browser.getAipRepresentation(user, representationUUID, acceptFormat);
 
@@ -75,7 +75,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The part of the representation to download", required = true, allowableValues = "data, metadata, documentation, schemas") @PathParam("part") String part)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     StreamResponse aipRepresentation = Browser.getAipRepresentationPart(user, representationUUID, part);
 
@@ -123,7 +123,7 @@ public class RepresentationsResource {
     @ApiParam(value = "The ID of the existing representation to delete", required = true) @PathParam(RodaConstants.API_PATH_PARAM_REPRESENTATION_ID) String representationId)
     throws RODAException {
     // get user
-    RodaUser user = UserUtility.getApiUser(request, RodaCoreFactory.getIndexService());
+    RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
     Browser.removeRepresentation(user, aipId, representationId);
 
