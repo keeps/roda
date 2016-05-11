@@ -773,5 +773,13 @@ public interface BrowseMessages extends Messages {
     "Permission to seach or access this archival package", "UPDATE",
     "Permission to change this archival package or any of its sub-components"})
   String objectPermissionDescription(@Select PermissionType permissionType);
+  
+  /************* Ingest appraisal ****************/
+  
+  @DefaultMessage("Accept")
+  String ingestAppraisalAcceptButton();
+  
+  @DefaultMessage("Reject")
+  String ingestAppraisalRejectButton();
 
 }

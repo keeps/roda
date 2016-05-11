@@ -19,6 +19,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -87,6 +88,7 @@ public class Menu extends Composite {
   private MenuItem ingest_pre;
   private MenuItem ingest_transfer;
   private MenuItem ingest_list;
+  private MenuItem ingest_appraisal;
 
   private final MenuBar administrationMenu;
   private MenuItem administration_actions;
@@ -130,6 +132,8 @@ public class Menu extends Composite {
       createCommand(IngestTransfer.RESOLVER.getHistoryPath()));
     ingest_list = ingestMenu.addItem(constants.title_ingest_list(),
       createCommand(IngestProcess.RESOLVER.getHistoryPath()));
+    ingest_appraisal = ingestMenu.addItem(constants.title_ingest_appraisal(),
+      createCommand(IngestAppraisal.RESOLVER.getHistoryPath()));
 
     administrationMenu = new MenuBar(true);
     administration_actions = administrationMenu.addItem(constants.title_administration_actions(),
@@ -231,6 +235,7 @@ public class Menu extends Composite {
     updateResolverSubItemVisibility(PreIngest.RESOLVER, ingest_pre);
     updateResolverSubItemVisibility(IngestTransfer.RESOLVER, ingest_transfer);
     updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_list);
+    updateResolverSubItemVisibility(IngestProcess.RESOLVER, ingest_appraisal);
     updateResolverTopItemVisibility(Ingest.RESOLVER, new MenuItem(constants.title_ingest(), ingestMenu), 3);
 
     // Administration

@@ -27,6 +27,7 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -65,7 +66,7 @@ public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
       public SafeHtml getValue(IndexedFile file) {
         if (file != null) {
           if (file.isDirectory()) {
-            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+            return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-open'></i>");
           } else {
             return SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
           }

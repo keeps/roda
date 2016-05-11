@@ -13,6 +13,7 @@ import java.util.List;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
@@ -106,6 +107,8 @@ public class Ingest {
         IngestTransfer.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestProcess.RESOLVER.getHistoryToken())) {
         IngestProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
+      }else if (historyTokens.get(0).equals(IngestAppraisal.RESOLVER.getHistoryToken())) {
+        IngestAppraisal.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

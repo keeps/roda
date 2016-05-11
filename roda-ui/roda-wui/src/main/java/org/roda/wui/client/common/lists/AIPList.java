@@ -126,8 +126,6 @@ public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      GWT.log("Filter: " + filter);
-
       Boolean showInactive = getObject();
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
         LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);

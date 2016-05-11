@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:i="urn:import:config.i18n.client" xmlns:search="urn:import:org.roda.wui.client.search"
+	xmlns:wcag="urn:import:org.roda.wui.common.client.widgets.wcag"
+	xmlns:common="urn:import:org.roda.wui.client.common" xmlns:d="urn:import:com.google.gwt.user.datepicker.client">
+
+	<ui:style>
+	</ui:style>
+
+	<ui:with field='messages' type='config.i18n.client.BrowseMessages' />
+
+	<g:FlowPanel styleName="ingestAppraisal" addStyleNames="wrapper skip_padding">
+		<g:FlowPanel addStyleNames="row full_width skip_padding">
+			<g:FlowPanel addStyleNames="col_10 content">
+				<g:HTML>
+					<h1>Ingest appraisal</h1>
+				</g:HTML>
+				<g:FlowPanel addStyleNames="page-description" ui:field="ingestAppraisalDescription">
+				</g:FlowPanel>
+				<common:SearchPanel ui:field="searchPanel" />
+				<g:FlowPanel addStyleNames="searchResults" ui:field="searchResultPanel" />
+			</g:FlowPanel>
+			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel styleName="sidebar-group" ui:field="itemsFacets">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Description levels
+						</g:Label>
+						<g:FlowPanel ui:field="facetDescriptionLevels" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Representations
+						</g:Label>
+						<g:FlowPanel ui:field="facetHasRepresentations" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<g:FlowPanel styleName="sidebar-group" ui:field="filesFacets">
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Formats
+						</g:Label>
+						<g:FlowPanel ui:field="facetFormats" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							PRONOM IDs
+						</g:Label>
+						<g:FlowPanel ui:field="facetPronoms" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Mimetypes
+						</g:Label>
+						<g:FlowPanel ui:field="facetMimetypes" />
+					</g:FlowPanel>
+				</g:FlowPanel>
+				<g:FlowPanel addStyleNames="sidebar-facet-panel">
+					<g:Label addStyleNames="h4">Actions</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="accept">
+						<ui:text from='{messages.ingestAppraisalAcceptButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-ban btn-danger" ui:field="reject">
+						<ui:text from='{messages.ingestAppraisalRejectButton}' />
+					</g:Button>
+				</g:FlowPanel>
+			</g:FlowPanel>
+		</g:FlowPanel>
+	</g:FlowPanel>
+</ui:UiBinder>

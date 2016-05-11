@@ -196,6 +196,10 @@ public interface MainConstants extends Constants, ConstantsWithLookup {
   @Key("title.ingest.list")
   @DefaultStringValue("Process")
   public String title_ingest_list();
+  
+  @Key("title.ingest.appraisal")
+  @DefaultStringValue("Appraisal")
+  public String title_ingest_appraisal();
 
   @Key("title.ingest.help")
   @DefaultStringValue("Help")

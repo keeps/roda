@@ -493,10 +493,6 @@ public class SolrUtils {
     return ret;
   }
 
-  private static Boolean objectToBoolean(Object object) {
-    return objectToBoolean(object, null);
-  }
-
   private static Boolean objectToBoolean(Object object, Boolean defaultValue) {
     Boolean ret;
     if (object == null) {
@@ -1076,7 +1072,7 @@ public class SolrUtils {
 
   public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE));
+    final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE), Boolean.FALSE);
     final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
@@ -1274,7 +1270,7 @@ public class SolrUtils {
     String originalName = objectToString(doc.get(RodaConstants.FILE_ORIGINALNAME));
     List<String> hash = objectToListString(doc.get(RodaConstants.FILE_HASH));
     long size = objectToLong(doc.get(RodaConstants.FILE_SIZE), 0L);
-    boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY));
+    boolean isDirectory = objectToBoolean(doc.get(RodaConstants.FILE_ISDIRECTORY), Boolean.FALSE);
     String storagePath = objectToString(doc.get(RodaConstants.FILE_STORAGEPATH));
 
     // format
@@ -1391,8 +1387,8 @@ public class SolrUtils {
 
   private static RODAMember solrDocumentToRodaMember(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.MEMBERS_ID));
-    final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE));
-    final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER));
+    final boolean isActive = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_ACTIVE), Boolean.FALSE);
+    final boolean isUser = objectToBoolean(doc.get(RodaConstants.MEMBERS_IS_USER), Boolean.FALSE);
     final String name = objectToString(doc.get(RodaConstants.MEMBERS_NAME));
     final Set<String> groups = new HashSet<String>();
     List<String> possibleGroups = objectToListString(doc.get(RodaConstants.MEMBERS_GROUPS_ALL));
@@ -1550,7 +1546,7 @@ public class SolrUtils {
       d = new Date();
     }
 
-    boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE));
+    boolean isFile = objectToBoolean(doc.get(RodaConstants.TRANSFERRED_RESOURCE_ISFILE), Boolean.FALSE);
     long size = objectToLong(doc.get(RodaConstants.TRANSFERRED_RESOURCE_SIZE), 0L);
     String name = objectToString(doc.get(RodaConstants.TRANSFERRED_RESOURCE_NAME));
 
@@ -1867,7 +1863,7 @@ public class SolrUtils {
     format.setDeveloper(objectToString(doc.get(RodaConstants.FORMAT_DEVELOPER)));
     format.setInitialRelease(objectToDate(doc.get(RodaConstants.FORMAT_INITIAL_RELEASE)));
     format.setStandard(objectToString(doc.get(RodaConstants.FORMAT_STANDARD)));
-    format.setOpenFormat(objectToBoolean(doc.get(RodaConstants.FORMAT_IS_OPEN_FORMAT)));
+    format.setOpenFormat(objectToBoolean(doc.get(RodaConstants.FORMAT_IS_OPEN_FORMAT), Boolean.FALSE));
     format.setWebsite(objectToString(doc.get(RodaConstants.FORMAT_WEBSITE)));
     format.setProvenanceInformation(objectToString(doc.get(RodaConstants.FORMAT_PROVENANCE_INFORMATION)));
     format.setExtensions(objectToListString(doc.get(RodaConstants.FORMAT_EXTENSIONS)));
@@ -1905,7 +1901,7 @@ public class SolrUtils {
     notification.setFromUser(objectToString(doc.get(RodaConstants.NOTIFICATION_FROM_USER)));
     notification.setRecipientUsers(objectToListString(doc.get(RodaConstants.NOTIFICATION_RECIPIENT_USERS)));
     notification.setAcknowledgeToken(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGE_TOKEN)));
-    notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED)));
+    notification.setAcknowledged(objectToBoolean(doc.get(RodaConstants.NOTIFICATION_IS_ACKNOWLEDGED), Boolean.FALSE));
     notification.setAcknowledgedUsers(
       JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.NOTIFICATION_ACKNOWLEDGED_USERS))));
 
