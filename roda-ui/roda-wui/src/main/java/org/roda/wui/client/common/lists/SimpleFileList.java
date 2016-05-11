@@ -42,11 +42,17 @@ public class SimpleFileList extends AsyncTableCell<IndexedFile, Boolean> {
   private TextColumn<IndexedFile> filenameColumn;
 
   public SimpleFileList() {
-    this(null, null, null, false, false);
+    super(null, null, null, false, false);
   }
 
   public SimpleFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
     super(filter, facets, summary, selectable, showInactive);
+    super.setSelectedClass(IndexedFile.class);
+  }
+
+  public SimpleFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive,
+    int initialPageSize, int pageSizeIncrement) {
+    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, showInactive);
     super.setSelectedClass(IndexedFile.class);
   }
 

@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.ingest.process.ActionProcess;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.UserLog;
@@ -108,6 +109,8 @@ public class Management {
         UserLog.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(NotificationRegister.RESOLVER.getHistoryToken())) {
         NotificationRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(ActionProcess.RESOLVER.getHistoryToken())) {
+        ActionProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

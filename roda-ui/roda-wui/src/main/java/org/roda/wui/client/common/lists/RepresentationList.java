@@ -47,11 +47,17 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Bo
   private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
-    this(null, null, null, false, false);
+    super(null, null, null, false, false);
   }
 
   public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
     super(filter, facets, summary, selectable, showInactive);
+    super.setSelectedClass(IndexedRepresentation.class);
+  }
+
+  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive,
+    int initialPageSize, int pageSizeIncrement) {
+    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, showInactive);
     super.setSelectedClass(IndexedRepresentation.class);
   }
 

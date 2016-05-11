@@ -118,7 +118,7 @@ public class EditRisk extends Composite {
 
           @Override
           public void onSuccess(Void result) {
-            Tools.newHistory(RiskRegister.RESOLVER, risk.getId());
+            Tools.newHistory(RiskRegister.RESOLVER);
           }
 
         });

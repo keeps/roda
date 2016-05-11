@@ -46,11 +46,17 @@ public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
   private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
-    this(null, null, null, false, Boolean.FALSE);
+    super(null, null, null, false, Boolean.FALSE);
   }
 
-  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, Boolean showInactive) {
+  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
     super(filter, facets, summary, selectable, showInactive);
+    super.setSelectedClass(IndexedAIP.class);
+  }
+
+  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive,
+    int initialPageSize, int pageSizeIncrement) {
+    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, showInactive);
     super.setSelectedClass(IndexedAIP.class);
   }
 

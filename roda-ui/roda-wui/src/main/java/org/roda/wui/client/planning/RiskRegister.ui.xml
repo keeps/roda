@@ -15,7 +15,7 @@
 	<g:FlowPanel styleName="wui-risk-register" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width skip_padding">
 			<g:FlowPanel addStyleNames="col_10 content">
-				<g:Label styleName="h1">
+				<g:Label styleName="h1" ui:field="riskRegisterTitle">
 					<ui:text from='{messages.riskRegisterTitle}' />
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">

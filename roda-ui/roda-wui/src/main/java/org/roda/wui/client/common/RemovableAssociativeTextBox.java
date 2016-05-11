@@ -8,15 +8,18 @@
 package org.roda.wui.client.common;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.dom.client.Document;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.DomEvent;
 import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.event.shared.HasHandlers;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -27,7 +30,7 @@ public class RemovableAssociativeTextBox extends Composite implements HasHandler
   }
 
   @UiField
-  TextBox itemName;
+  Label itemName;
 
   @UiField
   TextBox hiddenItemId;
@@ -74,9 +77,8 @@ public class RemovableAssociativeTextBox extends Composite implements HasHandler
 
   public void addSearchClickHandler(ClickHandler clickHandler) {
     dialogButton.addClickHandler(clickHandler);
+    // fires an event to automatically click on the button
+    DomEvent.fireNativeEvent(Document.get().createClickEvent(0, 0, 0, 0, 0, false, false, false, false), dialogButton);
   }
 
-  public void setEnabled(boolean enabled) {
-    itemName.setEnabled(enabled);
-  }
 }

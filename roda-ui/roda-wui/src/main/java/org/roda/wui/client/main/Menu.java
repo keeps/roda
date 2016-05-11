@@ -21,6 +21,7 @@ import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.Ingest;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.ingest.preingest.PreIngest;
+import org.roda.wui.client.ingest.process.ActionProcess;
 import org.roda.wui.client.ingest.process.IngestProcess;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.management.MemberManagement;
@@ -137,7 +138,7 @@ public class Menu extends Composite {
 
     administrationMenu = new MenuBar(true);
     administration_actions = administrationMenu.addItem(constants.title_administration_actions(),
-      createCommand(Management.RESOLVER.getHistoryPath()));
+      createCommand(ActionProcess.RESOLVER.getHistoryPath()));
     administration_user = administrationMenu.addItem(constants.title_administration_user(),
       createCommand(MemberManagement.RESOLVER.getHistoryPath()));
     administration_log = administrationMenu.addItem(constants.title_administration_log(),

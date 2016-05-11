@@ -51,6 +51,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.DateBox;
 import com.google.gwt.user.datepicker.client.DateBox.DefaultFormat;
@@ -115,6 +116,9 @@ public class RiskRegister extends Composite {
 
   private static final BrowseMessages defaultMessages = GWT.create(BrowseMessages.class);
   private static final RiskMessages messages = GWT.create(RiskMessages.class);
+
+  @UiField
+  Label riskRegisterTitle;
 
   @UiField
   FlowPanel riskRegisterDescription;
@@ -244,6 +248,7 @@ public class RiskRegister extends Composite {
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
+      riskRegisterTitle.setText(defaultMessages.riskRegisterTitle());
       riskList.setFilter(null);
       riskList.refresh();
       callback.onSuccess(this);
@@ -260,6 +265,7 @@ public class RiskRegister extends Composite {
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       final String riskIdConstant = RodaConstants.RISK_ID;
+      riskRegisterTitle.setText(defaultMessages.showRiskAIPTitle(aipId));
 
       BrowserService.Util.getInstance().getRiskOnAIP(aipId, new AsyncCallback<List<String>>() {
 

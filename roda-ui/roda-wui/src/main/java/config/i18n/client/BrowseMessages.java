@@ -124,6 +124,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Risks")
   String sidebarRisksTitle();
 
+  @DefaultMessage("Risks of AIP {0}")
+  String showRiskAIPTitle(String aipId);
+
   @DefaultMessage("Error in line {0}, column {1}: {2}")
   SafeHtml metadataParseError(int line, int column, String message);
 
@@ -273,7 +276,7 @@ public interface BrowseMessages extends Messages {
 
   /***** CREATE PROCESS JOB *********/
 
-  @DefaultMessage("New ingest process")
+  @DefaultMessage("New process")
   String createJobTitle();
 
   @DefaultMessage("Name")
@@ -315,7 +318,7 @@ public interface BrowseMessages extends Messages {
 
   @DefaultMessage("OK")
   String dialogOk();
-  
+
   @DefaultMessage("Yes")
   String dialogYes();
 

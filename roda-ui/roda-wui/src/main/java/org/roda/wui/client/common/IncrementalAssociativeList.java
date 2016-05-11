@@ -124,7 +124,6 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
 
   private void addTextBox(String elementId, String elementName) {
     final RemovableAssociativeTextBox box = new RemovableAssociativeTextBox(elementId, elementName);
-    box.setEnabled(false);
     textBoxPanel.add(box);
     textBoxes.add(box);
 

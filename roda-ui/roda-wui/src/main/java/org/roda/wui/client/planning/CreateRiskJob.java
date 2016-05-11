@@ -96,21 +96,22 @@ public class CreateRiskJob extends CreateJob<Risk> {
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
 
-          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive);
+          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
-          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive);
+          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive,
+            10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive);
+          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
@@ -119,19 +120,20 @@ public class CreateRiskJob extends CreateJob<Risk> {
         Filter filter = ((SelectedItemsFilter) getSelected()).getFilter();
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive);
+          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive);
+          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive,
+            10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive);
+          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
