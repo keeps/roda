@@ -18,8 +18,8 @@
 		<g:Label ui:field="error" addStyleNames="login-error"></g:Label>
 		<g:FlowPanel addStyleNames="login-buttons">
 		    <g:Button ui:field="login" addStyleNames="btn btn-play login-button">Login</g:Button>
-		    <g:Label ui:field="recover" addStyleNames="login-link">Recover password</g:Label>
-		    <g:Label ui:field="register" addStyleNames="login-link">Sign up</g:Label>
+		    <g:Label ui:field="recover" addStyleNames="btn btn-link login-link pull-right">Recover password</g:Label>
+		    <g:Label ui:field="register" addStyleNames="btn btn-link login-link pull-right">Sign up</g:Label>
 		</g:FlowPanel>		
 	</g:FlowPanel>
 

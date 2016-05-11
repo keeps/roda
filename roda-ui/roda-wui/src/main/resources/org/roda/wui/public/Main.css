@@ -355,7 +355,7 @@ pre>code {
 	border-radius: 1px;
 	box-sizing: border-box;
 	margin-bottom: 5px;
-	background-color: #f5f5f5;
+	background-color: #fff;
 	font-size: 1.5rem;
 	font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-weight: 300;
@@ -365,11 +365,6 @@ pre>code {
 	border: 0;
 	border-left: 2px solid #089de3;
 }
-
-.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox {
-	border: 1px solid #ccc;
-	background-color: #fff;
-} 
 
 .form-listbox {
 	color: #58595b;
@@ -3356,12 +3351,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .login-link {
-	display: inline;
-	float: right;
-	color: #089de3;
-	margin-top: 25px;
-	margin-left: 15px;
-	font-size: 1.2rem;
+	margin-top: 20px;
 }
 
 .login-link:hover {
@@ -3402,12 +3392,7 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .recover-link {
-	display: inline;
-	float: right;
-	color: #089de3;
-	margin-top: 25px;
-	margin-left: 15px;
-	font-size: 1.2rem;
+	margin-top: 20px;
 }
 
 .recover-link:hover {
