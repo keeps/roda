@@ -25,7 +25,6 @@ import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.logical.shared.AttachEvent;
@@ -34,7 +33,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -103,15 +101,6 @@ public class Login extends Composite {
   PasswordTextBox password;
 
   @UiField
-  Button login;
-
-  @UiField
-  Label recover;
-
-  @UiField
-  Label register;
-
-  @UiField
   Label error;
 
   private String service = null;
@@ -128,21 +117,6 @@ public class Login extends Composite {
       }
     });
 
-    register.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        Tools.newHistory(Register.RESOLVER);
-      }
-    });
-
-    recover.addClickHandler(new ClickHandler() {
-
-      @Override
-      public void onClick(ClickEvent event) {
-        Tools.newHistory(RecoverLogin.RESOLVER);
-      }
-    });
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
@@ -154,8 +128,18 @@ public class Login extends Composite {
   }
 
   @UiHandler("login")
-  void handleClick(ClickEvent e) {
+  void handleLogin(ClickEvent e) {
     doLogin();
+  }
+
+  @UiHandler("register")
+  void handleRegister(ClickEvent e) {
+    Tools.newHistory(Register.RESOLVER);
+  }
+
+  @UiHandler("recover")
+  void handleRecover(ClickEvent e) {
+    Tools.newHistory(RecoverLogin.RESOLVER);
   }
 
   @UiHandler("username")

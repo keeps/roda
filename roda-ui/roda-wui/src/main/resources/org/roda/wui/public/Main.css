@@ -355,11 +355,16 @@ pre>code {
 	border-radius: 1px;
 	box-sizing: border-box;
 	margin-bottom: 5px;
-	background-color: #fff;
+	background-color: #f5f5f5;
 	font-size: 1.5rem;
 	font-family: "Ubuntu", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
 	font-weight: 300;
 }
+
+.searchAdvancedPanel .fieldTextBox, .searchAdvancedPanel .form-textbox, .loginPanel .fieldTextBox {
+	border: 1px solid #ccc;
+	background-color: #fff;
+} 
 
 .content .fieldTextBox, .content .form-textbox {
 	border: 0;
@@ -3341,23 +3346,12 @@ td.datePickerMonth, td.datePickerYear {
 }
 
 .login-buttons {
-	height: 50px;
+	margin-top: 20px;
 }
 
 .login-button {
-	margin-top: 20px;
-	width: 120px;
-	float: left;
-}
-
-.login-link {
-	margin-top: 20px;
-}
-
-.login-link:hover {
-	text-decoration: underline;
-	cursor: hand;
-	cursor: pointer;
+	min-width: 12rem;
+	float: right;
 }
 
 .login-error {

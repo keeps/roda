@@ -44,23 +44,36 @@ Check these instructions: http://linux-audit.com/install-clamav-on-centos-7-usin
 Note: The user `clamav` must have permissions to access the storage. For some folders you might need to add permissions in apparmor file  at `/etc/apparmor.d/local/usr.sbin.clamd`, see [instructions for Ubuntu](https://help.ubuntu.com/community/AppArmor#Profile_customization).
 
 Install Siegfried (format identification)
-* Ubuntu
+* Ubuntu 14.04 LTS
 ```bash
 curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | sudo apt-key add -
 echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | sudo tee -a /etc/apt/sources.list
 sudo apt-get update -qq
 sudo apt-get install siegfried -y
 ```
-* CentOS 7
+
+* Ubuntu 16.04 LTS
 ```bash
-sudo yum install golang git
-go get github.com/richardlehane/siegfried/cmd/sf
+sudo apt-get install golang git
 echo "export GOPATH=\$HOME/gocode" >> ~/.bash_profile
 echo "export PATH=\$PATH:\$GOPATH/bin" >> ~/.bash_profile
 source ~/.bash_profile
+go get github.com/richardlehane/siegfried/cmd/sf
 sf -update
 ```
 
+* CentOS 7
+```bash
+sudo yum install golang git
+echo "export GOPATH=\$HOME/gocode" >> ~/.bash_profile
+echo "export PATH=\$PATH:\$GOPATH/bin" >> ~/.bash_profile
+source ~/.bash_profile
+go get github.com/richardlehane/siegfried/cmd/sf
+sf -update
+```
+
+NOTE: Please note that the user must have a correct HOME defined, if using a special user (e.g. `roda`), use `sudo -iu roda` to login and test siegfried install.
+NOTE: Please note that the install instruction above include new environment variables that need
 
 ### Format migration tools (optional)
 The following dependencies are only needed if support for file formation migration for the following format families are required.
