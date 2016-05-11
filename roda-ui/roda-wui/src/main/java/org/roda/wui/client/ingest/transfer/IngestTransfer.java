@@ -26,6 +26,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
@@ -34,7 +35,6 @@ import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.lists.TransferredResourceList;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.ingest.process.CreateIngestJob;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.common.client.ClientLogger;
@@ -552,7 +552,7 @@ public class IngestTransfer extends Composite {
 
   @UiHandler("startIngest")
   void buttonStartIngestHandler(ClickEvent e) {
-    Tools.newHistory(CreateIngestJob.RESOLVER);
+    Tools.newHistory(CreateJob.RESOLVER, "ingest");
   }
 
   public SelectedItems getSelected() {

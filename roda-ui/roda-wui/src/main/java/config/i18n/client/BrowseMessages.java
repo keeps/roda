@@ -298,6 +298,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Workflow")
   String createJobWorkflow();
 
+  @DefaultMessage("Empty")
+  String emptyAssociativeObjectLabel();
+
   /****** INGEST TRANSFER UPLOAD *********/
 
   @DefaultMessage("Ingest transfer upload")

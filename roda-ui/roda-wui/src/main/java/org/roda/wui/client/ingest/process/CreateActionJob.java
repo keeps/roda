@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.planning;
+package org.roda.wui.client.ingest.process;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,58 +27,27 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.CreateJob;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
-import org.roda.wui.client.search.Search;
-import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author Luis Faria
  * 
  */
-public class CreateRiskJob extends CreateJob<Risk> {
-
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
-        CreateRiskJob createRiskJob = new CreateRiskJob();
-        callback.onSuccess(createRiskJob);
-      } else {
-        Tools.newHistory(CreateRiskJob.RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {RiskRegister.RESOLVER}, false, callback);
-    }
-
-    public List<String> getHistoryPath() {
-      return Tools.concat(RiskRegister.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    public String getHistoryToken() {
-      return "create_risk_job";
-    }
-  };
+public class CreateActionJob extends CreateJob<Risk> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
   private static PluginType[] pluginTypes = {PluginType.RISK};
 
-  public CreateRiskJob() {
+  public CreateActionJob() {
     super(Risk.class, Arrays.asList(pluginTypes));
   }
 
@@ -162,7 +131,7 @@ public class CreateRiskJob extends CreateJob<Risk> {
         @Override
         public void onSuccess(Job result) {
           Toast.showInfo("Done", "New job process created");
-          Tools.newHistory(Search.RESOLVER);
+          Tools.newHistory(ActionProcess.RESOLVER);
         }
       });
 
@@ -170,7 +139,7 @@ public class CreateRiskJob extends CreateJob<Risk> {
 
   @Override
   public void cancel() {
-    Tools.newHistory(Search.RESOLVER);
+    Tools.newHistory(ActionProcess.RESOLVER);
   }
 
 }

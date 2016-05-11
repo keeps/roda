@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
@@ -38,7 +39,6 @@ import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SearchFileList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.ListboxUtils;
-import org.roda.wui.client.planning.CreateRiskJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -515,7 +515,7 @@ public class Search extends Composite {
 
   @UiHandler("newJobButton")
   void buttonStartIngestHandler(ClickEvent e) {
-    Tools.newHistory(CreateRiskJob.RESOLVER);
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
   public SelectedItems<?> getSelected() {

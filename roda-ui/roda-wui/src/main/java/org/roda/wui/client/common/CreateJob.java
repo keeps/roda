@@ -20,9 +20,14 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.PluginUtils;
+import org.roda.wui.client.ingest.process.CreateActionJob;
+import org.roda.wui.client.ingest.process.CreateIngestJob;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.search.Search;
+import org.roda.wui.common.client.HistoryResolver;
+import org.roda.wui.common.client.tools.Tools;
+import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -47,6 +52,41 @@ import config.i18n.client.BrowseMessages;
  * 
  */
 public abstract class CreateJob<T extends IsIndexed> extends Composite {
+
+  public static final HistoryResolver RESOLVER = new HistoryResolver() {
+
+    @Override
+    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
+      if (historyTokens.size() == 1) {
+        if (historyTokens.get(0).equals("ingest")) {
+          CreateIngestJob createIngestJob = new CreateIngestJob();
+          callback.onSuccess(createIngestJob);
+        } else if (historyTokens.get(0).equals("action")) {
+          CreateActionJob createActionJob = new CreateActionJob();
+          callback.onSuccess(createActionJob);
+        } else {
+          Tools.newHistory(CreateJob.RESOLVER);
+          callback.onSuccess(null);
+        }
+      } else {
+        Tools.newHistory(CreateJob.RESOLVER);
+        callback.onSuccess(null);
+      }
+    }
+
+    @Override
+    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Management.RESOLVER}, false, callback);
+    }
+
+    public List<String> getHistoryPath() {
+      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+    }
+
+    public String getHistoryToken() {
+      return "create_job";
+    }
+  };
 
   @SuppressWarnings("rawtypes")
   public interface MyUiBinder extends UiBinder<Widget, CreateJob> {

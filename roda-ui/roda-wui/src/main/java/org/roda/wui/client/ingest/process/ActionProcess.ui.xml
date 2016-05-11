@@ -33,6 +33,12 @@
 				<g:FlowPanel styleName="sidebar-group">
 					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 						<g:Label addStyleNames="h5 sidebar-facet-title">
+							Job Types
+						</g:Label>
+						<g:FlowPanel ui:field="jobTypeFacets" />
+					</g:FlowPanel>
+					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
+						<g:Label addStyleNames="h5 sidebar-facet-title">
 							Status
 						</g:Label>
 						<g:FlowPanel ui:field="stateFacets" />
@@ -42,12 +48,6 @@
 							Creators
 						</g:Label>
 						<g:FlowPanel ui:field="producerFacets" />
-					</g:FlowPanel>
-					<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
-						<g:Label addStyleNames="h5 sidebar-facet-title">
-							Job Types
-						</g:Label>
-						<g:FlowPanel ui:field="jobTypeFacets" />
 					</g:FlowPanel>
 					<!-- <g:Label addStyleNames="{style.other-producer-label}">Other producer:</g:Label> 
 						<g:TextBox addStyleNames="fieldTextBox {style.other-producer-input}" /> -->

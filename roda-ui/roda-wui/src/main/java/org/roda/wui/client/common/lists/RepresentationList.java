@@ -47,7 +47,7 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
   private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
-    super(null, false, null, null, false);
+    this(null, false, null, null, false);
   }
 
   public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {

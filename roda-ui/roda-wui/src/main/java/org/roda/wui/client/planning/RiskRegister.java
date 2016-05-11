@@ -32,6 +32,7 @@ import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.ingest.process.CreateActionJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
@@ -260,8 +261,8 @@ public class RiskRegister extends Composite {
       EditRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(RiskHistory.RESOLVER.getHistoryToken())) {
       RiskHistory.RESOLVER.resolve(Tools.tail(historyTokens), callback);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateRiskJob.RESOLVER.getHistoryToken())) {
-      CreateRiskJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
+      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       final String riskIdConstant = RodaConstants.RISK_ID;

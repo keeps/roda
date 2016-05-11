@@ -45,7 +45,7 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
   private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
-    super(null, false, null, null, false);
+    this(null, false, null, null, false);
   }
 
   public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {

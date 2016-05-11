@@ -13,6 +13,7 @@ package org.roda.wui.management.client;
 import java.util.Arrays;
 import java.util.List;
 
+import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.ingest.process.ActionProcess;
 import org.roda.wui.client.management.MemberManagement;
@@ -111,6 +112,8 @@ public class Management {
         NotificationRegister.getInstance().resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(ActionProcess.RESOLVER.getHistoryToken())) {
         ActionProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(CreateJob.RESOLVER.getHistoryToken())) {
+        CreateJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

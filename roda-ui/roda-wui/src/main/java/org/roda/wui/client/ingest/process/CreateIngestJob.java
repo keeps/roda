@@ -27,16 +27,13 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.Dialogs;
-import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.TransferredResourceList;
-import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 import config.i18n.client.BrowseMessages;
 
@@ -45,34 +42,6 @@ import config.i18n.client.BrowseMessages;
  * 
  */
 public class CreateIngestJob extends CreateJob<TransferredResource> {
-
-  public static final HistoryResolver RESOLVER = new HistoryResolver() {
-
-    @Override
-    public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      if (historyTokens.size() == 0) {
-        CreateIngestJob createIngestJob = new CreateIngestJob();
-        callback.onSuccess(createIngestJob);
-      } else {
-        Tools.newHistory(CreateIngestJob.RESOLVER);
-        callback.onSuccess(null);
-      }
-    }
-
-    @Override
-    public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      // TODO check for create job permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {IngestProcess.RESOLVER}, false, callback);
-    }
-
-    public List<String> getHistoryPath() {
-      return Tools.concat(IngestProcess.RESOLVER.getHistoryPath(), getHistoryToken());
-    }
-
-    public String getHistoryToken() {
-      return "create_ingest_job";
-    }
-  };
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);

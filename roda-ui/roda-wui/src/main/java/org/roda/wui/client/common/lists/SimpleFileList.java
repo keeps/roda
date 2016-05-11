@@ -42,7 +42,7 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
   private TextColumn<IndexedFile> filenameColumn;
 
   public SimpleFileList() {
-    super(null, true, null, null, false);
+    this(null, false, null, null, false);
   }
 
   public SimpleFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
