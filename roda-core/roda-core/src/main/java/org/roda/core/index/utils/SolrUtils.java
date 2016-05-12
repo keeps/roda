@@ -1944,7 +1944,7 @@ public class SolrUtils {
   }
 
   public static SolrInputDocument fileActiveFlagUpdateToSolrDocument(File file, boolean active) {
-    return activeFlagUpdateToSolrDocument(RodaConstants.FILE_UUID, file.getId(), active);
+    return activeFlagUpdateToSolrDocument(RodaConstants.FILE_UUID, IdUtils.getFileId(file), active);
   }
 
   public static SolrInputDocument preservationEventActiveFlagUpdateToSolrDocument(String preservationEventID,
