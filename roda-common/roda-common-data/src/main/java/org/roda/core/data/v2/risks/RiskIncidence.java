@@ -24,8 +24,9 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   private static final long serialVersionUID = -1089167070045254627L;
 
-  private String id;
-  private String objectId;
+  private String id = null;
+  private String objectId = null;
+  private String objectClass = null;
   private List<String> risks;
 
   public RiskIncidence() {
@@ -36,6 +37,7 @@ public class RiskIncidence implements IsIndexed, Serializable {
   public RiskIncidence(RiskIncidence incidence) {
     this.id = incidence.getId();
     this.setObjectId(incidence.getObjectId());
+    this.setObjectClass(incidence.getObjectClass());
     this.setRisks(incidence.getRisks());
   }
 
@@ -71,9 +73,18 @@ public class RiskIncidence implements IsIndexed, Serializable {
     this.risks.remove(riskId);
   }
 
+  public String getObjectClass() {
+    return objectClass;
+  }
+
+  public void setObjectClass(String objectClass) {
+    this.objectClass = objectClass;
+  }
+
   @Override
   public String toString() {
-    return "RiskIncidence [id=" + id + ", objectId=" + objectId + ", risks=" + risks + "]";
+    return "RiskIncidence [id=" + id + ", objectId=" + objectId + ", objectClass=" + objectClass + ", risks=" + risks
+      + "]";
   }
 
   @JsonIgnore

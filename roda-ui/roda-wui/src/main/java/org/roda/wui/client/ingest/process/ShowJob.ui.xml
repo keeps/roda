@@ -16,7 +16,7 @@
 				<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 					<g:FlowPanel addStyleNames="row full_width no_padding">
 						<g:FlowPanel addStyleNames="wui-data-panel">
-							<g:Label styleName="h1">Ingest process</g:Label>
+							<g:Label styleName="h1">Process</g:Label>
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									Name

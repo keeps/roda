@@ -373,6 +373,8 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_PARENT_ID = "parameter.parent_id";
   public static final String PLUGIN_PARAMS_FORCE_PARENT_ID = "parameter.force_parent_id";
   public static final String PLUGIN_PARAMS_RISK_ID = "parameter.risk_id";
+  public static final String PLUGIN_PARAMS_RISK_NAME = "parameter.risk_name";
+  public static final String PLUGIN_PARAMS_RISK_CATEGORY = "parameter.risk_category";
   public static final String PLUGIN_PARAMS_DO_VIRUS_CHECK = "parameter.do_virus_check";
   public static final String PLUGIN_PARAMS_DO_DESCRIPTIVE_METADATA_VALIDATION = "parameter.do_descriptive_metadata_validation";
   public static final String PLUGIN_PARAMS_CREATE_PREMIS_SKELETON = "parameter.create.premis.skeleton";
@@ -465,6 +467,7 @@ public final class RodaConstants {
 
   public static final String RISK_INCIDENCE_ID = "id";
   public static final String RISK_INCIDENCE_OBJECT_ID = "objectId";
+  public static final String RISK_INCIDENCE_OBJECT_CLASS = "objectClass";
   public static final String RISK_INCIDENCE_RISKS = "risks";
 
   public static final String RISK_INCIDENCE_FILE_EXTENSION = ".json";

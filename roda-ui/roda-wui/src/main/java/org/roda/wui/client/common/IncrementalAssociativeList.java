@@ -130,7 +130,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
     final RemovableAssociativeTextBox box = new RemovableAssociativeTextBox(elementId, elementName);
     textBoxPanel.add(box);
     textBoxes.add(box);
-    box.setNameTextBoxValue(messages.emptyAssociativeObjectLabel());
+    box.setVisible(false);
 
     box.addRemoveClickHandler(new ClickHandler() {
 
@@ -183,6 +183,7 @@ public class IncrementalAssociativeList extends Composite implements HasHandlers
             @Override
             public void onValueChange(ValueChangeEvent<NamedIndexedModel> event) {
               NamedIndexedModel modelValue = event.getValue();
+              box.setVisible(true);
               box.setNameTextBoxValue(modelValue.getName());
               box.setHiddenTextBoxValue(modelValue.getUUID());
               DomEvent.fireNativeEvent(Document.get().createChangeEvent(), box);

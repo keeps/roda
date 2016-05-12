@@ -514,6 +514,12 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     fireOnCheckboxSelectionChanged();
   }
 
+  public void clearSelected() {
+    selected.clear();
+    redraw();
+    fireOnCheckboxSelectionChanged();
+  }
+
   // LISTENER
 
   public interface CheckboxSelectionListener<T extends IsIndexed> {

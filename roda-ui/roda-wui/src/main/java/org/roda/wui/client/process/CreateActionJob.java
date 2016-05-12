@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.ingest.process;
+package org.roda.wui.client.process;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,12 +30,17 @@ import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.RepresentationList;
 import org.roda.wui.client.common.lists.SimpleFileList;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.Toast;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Button;
+
+import config.i18n.client.BrowseMessages;
 
 /**
  * @author Luis Faria
@@ -45,29 +50,52 @@ public class CreateActionJob extends CreateJob<Risk> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static PluginType[] pluginTypes = {PluginType.RISK};
+  private static PluginType[] pluginTypes = {PluginType.RISK, PluginType.AIP_TO_AIP, PluginType.MISC};
+
+  private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   public CreateActionJob() {
     super(Risk.class, Arrays.asList(pluginTypes));
   }
 
   @Override
-  public void updateObjectList() {
+  public boolean updateObjectList() {
 
     SelectedItems<?> selected = getSelected();
     boolean selectable = false;
     boolean justActive = true;
+    boolean isEmpty = false;
 
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
         List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
+        if (ids.size() == 0) {
+          getTargetPanel().clear();
+
+          Button searchButton = new Button();
+          searchButton.addStyleName("btn");
+          searchButton.addStyleName("btn-search");
+          searchButton.setText("Search");
+          searchButton.addClickHandler(new ClickHandler() {
+
+            @Override
+            public void onClick(ClickEvent event) {
+              Tools.newHistory(Search.RESOLVER);
+            }
+          });
+
+          getTargetPanel().add(searchButton);
+          setJobSelectedDescription(messages.createJobSelectedObject());
+          return true;
+        }
+
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
-
           AIPList list = new AIPList(filter, justActive, null, "AIPs", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedAIP());
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
@@ -76,6 +104,7 @@ public class CreateActionJob extends CreateJob<Risk> {
             10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedRepresentation());
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
@@ -83,6 +112,7 @@ public class CreateActionJob extends CreateJob<Risk> {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, "Files", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedFile());
         }
 
       } else if (getSelected() instanceof SelectedItemsFilter) {
@@ -92,6 +122,7 @@ public class CreateActionJob extends CreateJob<Risk> {
           AIPList list = new AIPList(filter, justActive, null, "AIPs", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedAIP());
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
@@ -99,19 +130,22 @@ public class CreateActionJob extends CreateJob<Risk> {
             10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedRepresentation());
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           SimpleFileList list = new SimpleFileList(filter, justActive, null, "Files", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
+          setJobSelectedDescription(messages.createJobSelectedFile());
         }
 
       } else {
-        // do nothing
+        isEmpty = true;
       }
     }
 
+    return isEmpty;
   }
 
   @Override

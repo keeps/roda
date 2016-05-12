@@ -30,6 +30,12 @@
 						<ui:text from='{constants.editUserCancel}' />
 					</g:Button>
 				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">Incidences</g:Label>
+					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+						Remove
+					</g:Button>
+				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

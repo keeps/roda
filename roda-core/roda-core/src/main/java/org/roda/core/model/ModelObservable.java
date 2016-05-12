@@ -242,15 +242,15 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {
+  protected void notifyRiskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.riskIncidenceCreatedOrUpdated(riskIncidence);
+      observer.riskIncidenceCreatedOrUpdated(riskIncidence, commit);
     }
   }
 
-  protected void notifyRiskIncidenceDeleted(String riskIncidenceId) {
+  protected void notifyRiskIncidenceDeleted(String riskIncidenceId, boolean commit) {
     for (ModelObserver observer : observers) {
-      observer.riskIncidenceDeleted(riskIncidenceId);
+      observer.riskIncidenceDeleted(riskIncidenceId, commit);
     }
   }
 

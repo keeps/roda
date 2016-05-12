@@ -23,6 +23,7 @@ import org.roda.wui.client.management.Register;
 import org.roda.wui.client.management.ResetPassword;
 import org.roda.wui.client.management.VerifyEmail;
 import org.roda.wui.client.planning.Planning;
+import org.roda.wui.client.process.Process;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.client.welcome.Welcome;
 import org.roda.wui.common.client.BadHistoryTokenException;
@@ -102,6 +103,7 @@ public class ContentPanel extends SimplePanel {
     resolvers.add(RecoverLogin.RESOLVER);
     resolvers.add(ResetPassword.RESOLVER);
     resolvers.add(VerifyEmail.RESOLVER);
+    resolvers.add(Process.RESOLVER);
   }
 
   /**

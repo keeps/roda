@@ -94,9 +94,9 @@ public interface ModelObserver {
 
   public void riskDeleted(String riskId, boolean commit);
 
-  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence);
+  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit);
 
-  public void riskIncidenceDeleted(String riskIncidenceId);
+  public void riskIncidenceDeleted(String riskIncidenceId, boolean commit);
 
   public void agentCreatedOrUpdated(Agent agent, boolean commit);
 

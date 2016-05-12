@@ -283,8 +283,20 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Name")
   String createJobName();
 
+  @DefaultMessage("Selected objects")
+  String createJobSelectedObject();
+
   @DefaultMessage("Selected submission information packages (SIP)")
   String createJobSelectedSIP();
+
+  @DefaultMessage("Selected archival information packages (AIP)")
+  String createJobSelectedAIP();
+
+  @DefaultMessage("Selected representations")
+  String createJobSelectedRepresentation();
+
+  @DefaultMessage("Selected files")
+  String createJobSelectedFile();
 
   @DefaultMessage("Ingest workflow")
   String createJobIngestWorkflow();

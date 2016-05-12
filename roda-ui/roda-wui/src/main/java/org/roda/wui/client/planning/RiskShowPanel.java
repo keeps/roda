@@ -8,8 +8,12 @@
 
 package org.roda.wui.client.planning;
 
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -131,14 +135,20 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   @UiField
   Label riskMitigationRelatedEventIdentifierValueKey, riskMitigationRelatedEventIdentifierValueValue;
 
+  @UiField(provided = true)
+  RiskIncidenceList incidenceList;
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
   public RiskShowPanel() {
+    incidenceList = new RiskIncidenceList(null, null, "Incidences", false);
     initWidget(uiBinder.createAndBindUi(this));
   }
 
   public RiskShowPanel(Risk risk, boolean hasTitle) {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
+    incidenceList = new RiskIncidenceList(filter, null, "Incidences", false);
     initWidget(uiBinder.createAndBindUi(this));
     title.setVisible(hasTitle);
     init(risk);

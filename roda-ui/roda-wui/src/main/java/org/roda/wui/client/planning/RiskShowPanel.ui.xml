@@ -3,7 +3,8 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:i="urn:import:config.i18n.client" xmlns:d="urn:import:com.google.gwt.user.datepicker.client"
-	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared">
+	xmlns:u="urn:import:org.roda.wui.management.user.client" xmlns:s="urn:import:com.google.gwt.safehtml.shared" 
+	xmlns:lists="urn:import:org.roda.wui.client.common.lists">
 
 	<ui:with field='constants' type='config.i18n.client.UserManagementConstants' />
 
@@ -103,6 +104,10 @@
 					<g:Label styleName="label" ui:field="riskPosMitigationNotesKey">Notes</g:Label>
 					<g:Label styleName="value text-area-whitespace-wrap" ui:field="riskPosMitigationNotesValue" />
 				</g:FlowPanel>
+				
+ 				<g:Label styleName="h4">Incidence List</g:Label> 
+ 				<lists:RiskIncidenceList addStyleNames="searchResults" ui:field="incidenceList" /> 
+				
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

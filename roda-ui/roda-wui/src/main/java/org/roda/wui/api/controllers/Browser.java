@@ -47,6 +47,7 @@ import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.storage.ContentPayload;
@@ -1446,6 +1447,21 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "getRiskOnAIP", null, duration, "aipId", aipId);
     return riskList;
+  }
+
+  public static void deleteRiskIncidences(RodaUser user, String id, SelectedItems<RiskIncidence> incidences)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.deleteRiskIncidences(user, id, incidences);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "deleteRiskIncidences", null, duration, "incidences", incidences);
   }
 
 }

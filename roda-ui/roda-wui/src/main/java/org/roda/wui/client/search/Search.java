@@ -540,4 +540,19 @@ public class Search extends Composite {
     return selected;
   }
 
+  public void clearSelected() {
+
+    if (itemsSearchResultPanel != null) {
+      itemsSearchResultPanel.clearSelected();
+    }
+
+    if (representationsSearchResultPanel != null) {
+      representationsSearchResultPanel.clearSelected();
+    }
+
+    if (filesSearchResultPanel != null) {
+      filesSearchResultPanel.clearSelected();
+    }
+  }
+
 }

@@ -35,6 +35,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
@@ -235,4 +236,7 @@ public interface BrowserService extends RemoteService {
 
   List<String> getRiskOnAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
+
+  void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

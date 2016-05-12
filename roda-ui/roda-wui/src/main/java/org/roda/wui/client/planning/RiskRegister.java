@@ -32,7 +32,7 @@ import org.roda.wui.client.common.lists.AsyncTableCell.CheckboxSelectionListener
 import org.roda.wui.client.common.lists.RiskList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
-import org.roda.wui.client.ingest.process.CreateActionJob;
+import org.roda.wui.client.process.CreateActionJob;
 import org.roda.wui.common.client.ClientLogger;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;

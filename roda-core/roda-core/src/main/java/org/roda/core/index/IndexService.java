@@ -193,7 +193,7 @@ public class IndexService {
   }
 
   public void reindexRiskIncidence(RiskIncidence riskIncidence) {
-    observer.riskIncidenceCreatedOrUpdated(riskIncidence);
+    observer.riskIncidenceCreatedOrUpdated(riskIncidence, false);
   }
 
   public void reindexAgent(Agent agent) {

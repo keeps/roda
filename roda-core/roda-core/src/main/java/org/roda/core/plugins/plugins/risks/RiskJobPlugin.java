@@ -46,6 +46,8 @@ import org.slf4j.LoggerFactory;
 public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
+  private String riskId;
+
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,

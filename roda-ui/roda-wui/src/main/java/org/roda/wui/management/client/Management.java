@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.ingest.process.ActionProcess;
 import org.roda.wui.client.management.MemberManagement;
 import org.roda.wui.client.management.NotificationRegister;
 import org.roda.wui.client.management.UserLog;
+import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.common.client.BadHistoryTokenException;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
@@ -45,7 +45,7 @@ public class Management {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       UserLogin.getInstance().checkRoles(new HistoryResolver[] {MemberManagement.RESOLVER, Statistics.getInstance(),
-        UserLog.RESOLVER, NotificationRegister.RESOLVER}, false, callback);
+        UserLog.RESOLVER, NotificationRegister.RESOLVER, ActionProcess.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {

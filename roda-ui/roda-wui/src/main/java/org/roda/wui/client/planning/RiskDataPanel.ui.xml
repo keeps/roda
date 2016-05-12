@@ -9,17 +9,19 @@
 	
 	<ui:style>
 		.postalAddress {
-		min-height: 84px;
+			min-height: 84px;
 		}
 
 		.section {
-		margin-top: 20px;
+			margin-top: 20px;
 		}
 	</ui:style>
 
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
+				<g:Label addStyleNames="form-label" ui:field="idLabel">Identifier</g:Label>
+				<g:Label ui:field="id" styleName="value" />
 				<g:Label addStyleNames="form-label">Name</g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Description</g:Label>
@@ -80,6 +82,9 @@
 				</g:FlowPanel>
 				<g:Label addStyleNames="form-label">Notes</g:Label>
 				<g:TextArea ui:field="posMitigationNotes" addStyleNames="form-textbox" />
+				
+				<g:Label styleName="h4">Incidences</g:Label>
+				<g:FlowPanel ui:field="incidenceListPanel"></g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

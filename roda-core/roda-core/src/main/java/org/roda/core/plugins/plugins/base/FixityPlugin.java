@@ -10,13 +10,18 @@ package org.roda.core.plugins.plugins.base;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
+import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
@@ -25,8 +30,11 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.metadata.Fixity;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
@@ -40,6 +48,29 @@ import org.slf4j.LoggerFactory;
 
 public class FixityPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
+
+  private String riskId;
+  private String riskName;
+  private String riskCategory;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risk identifier.", PluginParameterType.STRING, "",
+        false, false, "Add the risks that will be associated with the objects above."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_NAME, new PluginParameter(
+      RodaConstants.PLUGIN_PARAMS_RISK_NAME, "Risk name", PluginParameterType.STRING, "", false, false, "Risk name."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY, "Risk category", PluginParameterType.STRING, "",
+        false, false, "Risk category."));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
+        PluginParameterType.STRING, "", false, false,
+        "Send a notification, after finishing the process, to one or more e-mail addresses (comma separated)"));
+  }
 
   @Override
   public void init() {
@@ -63,6 +94,33 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
+      riskId = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_NAME)) {
+      riskName = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_NAME);
+    }
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY)) {
+      riskCategory = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY);
+    }
+  }
+
+  @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_NAME));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    return parameters;
   }
 
   @Override
@@ -110,6 +168,20 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                   okFileIDS.add(file.getId());
                 } else {
                   koFileIDS.add(file.getId());
+
+                  if (riskId != null && !riskId.equals("")) {
+                    try {
+                      model.retrieveRisk(riskId);
+                    } catch (NotFoundException e) {
+                      Risk risk = new Risk();
+                      risk.setName(riskName);
+                      risk.setCategory(riskCategory);
+                      model.createRisk(risk, riskId, false);
+                    }
+
+                    model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                      file.getId(), "RiskIncidence");
+                  }
                 }
               }
 

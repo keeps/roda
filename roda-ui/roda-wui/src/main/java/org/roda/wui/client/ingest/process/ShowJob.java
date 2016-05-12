@@ -24,11 +24,15 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
+import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.process.ActionProcess;
+import org.roda.wui.client.process.IngestProcess;
+import org.roda.wui.client.process.Process;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -83,7 +87,7 @@ public class ShowJob extends Composite {
               Toast.showError(caught.getClass().getName(), caught.getMessage());
             }
 
-            Tools.newHistory(IngestProcess.RESOLVER);
+            Tools.newHistory(Process.RESOLVER);
           }
 
           @Override
@@ -100,7 +104,7 @@ public class ShowJob extends Composite {
       } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJobReport.RESOLVER.getHistoryToken())) {
         ShowJobReport.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else {
-        Tools.newHistory(IngestProcess.RESOLVER);
+        Tools.newHistory(Process.RESOLVER);
         callback.onSuccess(null);
       }
     }
@@ -108,11 +112,11 @@ public class ShowJob extends Composite {
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
       // TODO check for show job permission
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {IngestProcess.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Process.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(IngestProcess.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
@@ -444,7 +448,11 @@ public class ShowJob extends Composite {
   }
 
   private void cancel() {
-    Tools.newHistory(IngestProcess.RESOLVER);
+    if (job.getPluginType().equals(PluginType.INGEST)) {
+      Tools.newHistory(IngestProcess.RESOLVER);
+    } else {
+      Tools.newHistory(ActionProcess.RESOLVER);
+    }
   }
 
 }

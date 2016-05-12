@@ -575,4 +575,5 @@ public class IngestTransfer extends Composite {
       Window.Location.assign(downloadUri.asString());
     }
   }
+
 }

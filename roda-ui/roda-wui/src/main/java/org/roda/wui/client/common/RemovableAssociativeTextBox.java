@@ -44,11 +44,13 @@ public class RemovableAssociativeTextBox extends Composite implements HasHandler
   public RemovableAssociativeTextBox() {
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
+    dialogButton.setVisible(false);
   }
 
   public RemovableAssociativeTextBox(String id, String name) {
     initWidget(uiBinder.createAndBindUi(this));
     hiddenItemId.setVisible(false);
+    dialogButton.setVisible(false);
     if (id != null) {
       hiddenItemId.setText(id);
       itemName.setText(name);

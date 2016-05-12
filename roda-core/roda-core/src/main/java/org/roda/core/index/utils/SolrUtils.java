@@ -1933,8 +1933,8 @@ public class SolrUtils {
 
     doc.addField(RodaConstants.RISK_INCIDENCE_ID, incidence.getId());
     doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_ID, incidence.getObjectId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, incidence.getObjectClass());
     doc.addField(RodaConstants.RISK_INCIDENCE_RISKS, incidence.getRisks());
-
     return doc;
   }
 
@@ -1943,8 +1943,8 @@ public class SolrUtils {
 
     incidence.setId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ID)));
     incidence.setObjectId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_ID)));
+    incidence.setObjectClass(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS)));
     incidence.setRisks(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_RISKS)));
-
     return incidence;
   }
 

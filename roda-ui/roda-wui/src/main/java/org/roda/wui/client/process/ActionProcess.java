@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.ingest.process;
+package org.roda.wui.client.process;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -19,18 +19,20 @@ import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.DateRangeFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
-import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobList;
-import org.roda.wui.client.ingest.Ingest;
-import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.ingest.process.ShowJob;
+import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.FacetUtils;
 import org.roda.wui.common.client.tools.Tools;
 import org.roda.wui.common.client.widgets.HTMLWidgetWrapper;
+import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -56,7 +58,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria
  * 
  */
-public class IngestProcess extends Composite {
+public class ActionProcess extends Composite {
 
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
@@ -77,27 +79,26 @@ public class IngestProcess extends Composite {
 
     @Override
     public List<String> getHistoryPath() {
-      return Tools.concat(Ingest.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
     }
   };
 
-  private static IngestProcess instance = null;
-  private static boolean isIngest = true;
+  private static ActionProcess instance = null;
 
   /**
    * Get the singleton instance
    * 
    * @return the instance
    */
-  public static IngestProcess getInstance() {
+  public static ActionProcess getInstance() {
     if (instance == null) {
-      instance = new IngestProcess();
+      instance = new ActionProcess();
     }
 
     return instance;
   }
 
-  interface MyUiBinder extends UiBinder<Widget, IngestProcess> {
+  interface MyUiBinder extends UiBinder<Widget, ActionProcess> {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -116,6 +117,9 @@ public class IngestProcess extends Composite {
   @UiField(provided = true)
   FlowPanel producerFacets;
 
+  @UiField(provided = true)
+  FlowPanel jobTypeFacets;
+
   @UiField
   DateBox inputDateInitial;
 
@@ -125,21 +129,24 @@ public class IngestProcess extends Composite {
   @UiField
   Button newJob;
 
-  private IngestProcess() {
+  private ActionProcess() {
 
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
+    Filter filter = new Filter(
+      new NotSimpleFilterParameter(RodaConstants.JOB_PLUGIN_TYPE, PluginType.INGEST.toString()));
 
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.JOB_STATE),
-      new SimpleFacetParameter(RodaConstants.JOB_USERNAME));
+      new SimpleFacetParameter(RodaConstants.JOB_USERNAME), new SimpleFacetParameter(RodaConstants.JOB_PLUGIN_TYPE));
 
     // TODO externalise strings
-    jobList = new JobList(filter, facets, "Ingest job list", false);
+    jobList = new JobList(filter, facets, "Job list", false);
     producerFacets = new FlowPanel();
     stateFacets = new FlowPanel();
+    jobTypeFacets = new FlowPanel();
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.JOB_STATE, stateFacets);
     facetPanels.put(RodaConstants.JOB_USERNAME, producerFacets);
+    facetPanels.put(RodaConstants.JOB_PLUGIN_TYPE, jobTypeFacets);
     FacetUtils.bindFacets(jobList, facetPanels);
 
     initWidget(uiBinder.createAndBindUi(this));
@@ -196,15 +203,16 @@ public class IngestProcess extends Composite {
 
   @UiHandler("newJob")
   void handleNewJobAction(ClickEvent e) {
-    Tools.newHistory(IngestTransfer.RESOLVER);
+    Search.getInstance().clearSelected();
+    Tools.newHistory(CreateJob.RESOLVER, "action");
   }
 
   public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
     if (historyTokens.size() == 0) {
       jobList.refresh();
       callback.onSuccess(this);
-    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateIngestJob.RESOLVER.getHistoryToken())) {
-      CreateIngestJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+    } else if (historyTokens.size() == 1 && historyTokens.get(0).equals(CreateActionJob.RESOLVER.getHistoryToken())) {
+      CreateActionJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else if (historyTokens.size() > 1 && historyTokens.get(0).equals(ShowJob.RESOLVER.getHistoryToken())) {
       ShowJob.RESOLVER.resolve(Tools.tail(historyTokens), callback);
     } else {

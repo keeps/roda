@@ -21,7 +21,7 @@
 					<ui:text from='{messages.createJobName}' />
 				</g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
-				<g:Label addStyleNames="form-label">
+				<g:Label addStyleNames="form-label" ui:field="selectedObject">
 					<ui:text from='{messages.createJobSelectedSIP}' />
 				</g:Label>
 				<g:FlowPanel ui:field="targetPanel"  />

@@ -20,14 +20,14 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.PluginUtils;
-import org.roda.wui.client.ingest.process.CreateActionJob;
-import org.roda.wui.client.ingest.process.CreateIngestJob;
 import org.roda.wui.client.ingest.process.PluginOptionsPanel;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
+import org.roda.wui.client.process.CreateActionJob;
+import org.roda.wui.client.process.CreateIngestJob;
+import org.roda.wui.client.process.Process;
 import org.roda.wui.client.search.Search;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Tools;
-import org.roda.wui.management.client.Management;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
@@ -76,15 +76,15 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
     @Override
     public void isCurrentUserPermitted(AsyncCallback<Boolean> callback) {
-      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Management.RESOLVER}, false, callback);
+      UserLogin.getInstance().checkRoles(new HistoryResolver[] {Process.RESOLVER}, false, callback);
     }
 
     public List<String> getHistoryPath() {
-      return Tools.concat(Management.RESOLVER.getHistoryPath(), getHistoryToken());
+      return Tools.concat(Process.RESOLVER.getHistoryPath(), getHistoryToken());
     }
 
     public String getHistoryToken() {
-      return "create_job";
+      return "create";
     }
   };
 
@@ -106,6 +106,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   @UiField
   FlowPanel targetPanel;
+
+  @UiField
+  Label selectedObject;
 
   @UiField
   ListBox workflowList;
@@ -156,8 +159,8 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     name.setText(messages.processNewDefaultName(new Date()));
     workflowOptions.setPlugins(plugins);
 
-    updateObjectList();
-    configurePlugins();
+    boolean isEmpty = updateObjectList();
+    configurePlugins(isEmpty, selected.getSelectedClass());
 
     workflowList.addChangeHandler(new ChangeHandler() {
 
@@ -172,10 +175,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     });
   }
 
-  public abstract void updateObjectList();
+  public abstract boolean updateObjectList();
 
-  protected void configurePlugins() {
-
+  protected void configurePlugins(boolean isEmpty, String selectedClass) {
+    // TODO filter pluginInfos considering the empty or selected type
     GWT.log(plugins.toString());
 
     if (plugins != null) {
@@ -266,6 +269,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   public PluginOptionsPanel getWorkflowOptions() {
     return this.workflowOptions;
+  }
+
+  public void setJobSelectedDescription(String text) {
+    selectedObject.setText(text);
   }
 
 }

@@ -831,14 +831,30 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence) {
+  public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
     addDocumentToIndex(RodaConstants.INDEX_RISK_INCIDENCE, SolrUtils.riskIncidenceToSolrDocument(riskIncidence),
       "Error creating Risk Incidence");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RiskIncidence.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
-  public void riskIncidenceDeleted(String riskIncidenceId) {
+  public void riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
     deleteDocumentFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, riskIncidenceId,
       "Error deleting Risk Incidence (id=" + riskIncidenceId + ")");
+
+    if (commit) {
+      try {
+        SolrUtils.commit(index, RiskIncidence.class);
+      } catch (GenericException e) {
+        LOGGER.warn("Commit did not run as expected");
+      }
+    }
   }
 
   public void agentCreatedOrUpdated(Agent agent, boolean commit) {

@@ -78,6 +78,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -1719,6 +1720,28 @@ public class BrowserHelper {
     } else {
       return new ArrayList<String>();
     }
+  }
+
+  public static void deleteRiskIncidences(RodaUser user, String riskId, SelectedItems<RiskIncidence> incidences)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> idList = consolidate(user, RiskIncidence.class, incidences, true);
+
+    Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_ID, idList));
+    IndexResult<RiskIncidence> incidenceList = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
+      new Sublist(0, 10));
+    String omType = "RiskIncidence";
+
+    for (RiskIncidence incidence : incidenceList.getResults()) {
+      if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
+        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getObjectId(), null, null, null,
+          omType);
+      } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
+        // TODO find a way to know aip id of a representation
+      } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
+        // TODO find a way to know aip and representation ids of a file
+      }
+    }
+
   }
 
 }

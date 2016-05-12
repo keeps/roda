@@ -29,6 +29,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
 import org.roda.wui.client.ingest.process.JobBundle;
 import org.roda.wui.client.planning.MitigationPropertiesBundle;
@@ -159,5 +160,7 @@ public interface BrowserServiceAsync {
     AsyncCallback<Job> asyncCallback);
 
   void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);
+
+  void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences, AsyncCallback<Void> asyncCallback);
 
 }

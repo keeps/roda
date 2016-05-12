@@ -8,7 +8,7 @@
 /**
  * 
  */
-package org.roda.wui.client.ingest.process;
+package org.roda.wui.client.process;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,9 +53,10 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
   }
 
   @Override
-  public void updateObjectList() {
+  public boolean updateObjectList() {
 
     SelectedItems selected = getSelected();
+    boolean isEmpty = false;
 
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
@@ -72,10 +73,13 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
         getTargetPanel().clear();
         getTargetPanel().add(list);
       } else {
-        // do nothing
+        isEmpty = true;
       }
+
+      setJobSelectedDescription(messages.createJobSelectedSIP());
     }
 
+    return isEmpty;
   }
 
   @Override

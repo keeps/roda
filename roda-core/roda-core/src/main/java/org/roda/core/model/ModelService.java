@@ -1503,8 +1503,16 @@ public class ModelService extends ModelObservable {
   /************************************************/
 
   public Risk createRisk(Risk risk, boolean commit) throws GenericException {
+    return createRisk(risk, null, commit);
+  }
+
+  public Risk createRisk(Risk risk, String id, boolean commit) throws GenericException {
     try {
-      risk.setId(UUID.randomUUID().toString());
+      if (id == null) {
+        risk.setId(UUID.randomUUID().toString());
+      } else {
+        risk.setId(id);
+      }
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());
       storage.createBinary(riskPath, new StringContentPayload(riskAsJson), false);
@@ -1612,10 +1620,13 @@ public class ModelService extends ModelObservable {
       riskIncidence.setId(UUID.randomUUID().toString());
       if (fileId != null) {
         riskIncidence.setObjectId(fileId);
+        riskIncidence.setObjectClass(File.class.getSimpleName());
       } else if (representationId != null) {
         riskIncidence.setObjectId(representationId);
+        riskIncidence.setObjectClass(Representation.class.getSimpleName());
       } else {
         riskIncidence.setObjectId(aipId);
+        riskIncidence.setObjectClass(AIP.class.getSimpleName());
       }
 
     }
@@ -1625,7 +1636,7 @@ public class ModelService extends ModelObservable {
       String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
       this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
         new StringContentPayload(riskIncidenceAsJson), true);
-      notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
+      notifyRiskIncidenceCreatedOrUpdated(riskIncidence, true);
 
     } catch (RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
       LOGGER.error("Error adding risk incidence in storage", e);
@@ -1653,11 +1664,11 @@ public class ModelService extends ModelObservable {
         if (riskIncidence.getRisks().size() > 0) {
           String riskIncidenceAsJson = JsonUtils.getJsonFromObject(riskIncidence);
           this.createOtherMetadata(aipId, representationId, fileDirectoryPath, fileId, fileSuffix, type,
-            new StringContentPayload(riskIncidenceAsJson), true);
-          notifyRiskIncidenceCreatedOrUpdated(riskIncidence);
+            new StringContentPayload(riskIncidenceAsJson), false);
+          notifyRiskIncidenceCreatedOrUpdated(riskIncidence, true);
         } else {
           storage.deleteResource(incidenceBinary.getStoragePath());
-          notifyRiskIncidenceDeleted(riskIncidence.getId());
+          notifyRiskIncidenceDeleted(riskIncidence.getId(), true);
         }
 
         Risk risk = this.retrieveRisk(riskId);

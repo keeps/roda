@@ -106,6 +106,7 @@
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="objectId" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="objectClass" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="risks" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />

@@ -11,8 +11,14 @@ package org.roda.wui.client.planning;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.search.SearchSuggestBox;
 import org.roda.wui.common.client.ClientLogger;
 
@@ -32,6 +38,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
@@ -60,6 +67,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     .create(UserManagementConstants.class);
 
   private static RiskMessages messages = GWT.create(RiskMessages.class);
+
+  @UiField
+  Label id, idLabel;
 
   @UiField
   TextBox name;
@@ -127,6 +137,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   @UiField
   TextBox mitigationRelatedEventIdentifierValue;
 
+  @UiField
+  FlowPanel incidenceListPanel;
+
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -139,6 +152,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private int severityHighLimit;
   private int probabilitiesSize;
   private int impactsSize;
+  private int riskCounter;
+  private RiskIncidenceList incidenceList;
 
   /**
    * Create a new user data panel
@@ -233,15 +248,17 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
         int severity = probability * impact;
         preMitigationSeverityValue.setHTML(getSeverityDefinition(severity, severityLowLimit, severityHighLimit));
 
-        if (posMitigationProbability.getSelectedIndex() == probabilitiesSize - 1
-          && preMitigationProbability.getSelectedIndex() != probabilitiesSize - 1) {
-          posMitigationProbability.setSelectedIndex(probability - 1);
-        }
-
-        if (posMitigationImpact.getSelectedIndex() == impactsSize - 1
-          && preMitigationImpact.getSelectedIndex() != impactsSize - 1) {
-          posMitigationImpact.setSelectedIndex(probability - 1);
-        }
+        // if (posMitigationProbability.getSelectedIndex() == probabilitiesSize
+        // - 1
+        // && preMitigationProbability.getSelectedIndex() != probabilitiesSize -
+        // 1) {
+        // posMitigationProbability.setSelectedIndex(probability - 1);
+        // }
+        //
+        // if (posMitigationImpact.getSelectedIndex() == impactsSize - 1
+        // && preMitigationImpact.getSelectedIndex() != impactsSize - 1) {
+        // posMitigationImpact.setSelectedIndex(probability - 1);
+        // }
 
         RiskDataPanel.this.onChange();
       }
@@ -315,7 +332,14 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
       posMitigationSeverityKey.setVisible(false);
       posMitigationSeverityValue.setVisible(false);
       this.preMitigationSeverityValue.setHTML(getSeverityDefinition(0, severityLowLimit, severityHighLimit));
+      this.id.setVisible(false);
+      this.idLabel.setVisible(false);
     } else {
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
+      incidenceList = new RiskIncidenceList(filter, null, "Incidences", true);
+      incidenceListPanel.add(incidenceList);
+      this.id.setVisible(true);
+      this.idLabel.setVisible(true);
       setRisk(risk);
     }
 
@@ -362,6 +386,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   }
 
   public void setRisk(Risk risk) {
+    this.id.setText(risk.getId());
     this.name.setText(risk.getName());
     this.description.setText(risk.getDescription());
     this.identifiedOn.setValue(risk.getIdentifiedOn());
@@ -403,6 +428,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.mitigationOwner.setValue(risk.getMitigationOwner());
     this.mitigationRelatedEventIdentifierType.setText(risk.getMitigationRelatedEventIdentifierType());
     this.mitigationRelatedEventIdentifierValue.setText(risk.getMitigationRelatedEventIdentifierValue());
+
+    this.riskCounter = risk.getObjectsSize();
   }
 
   public Risk getRisk() {
@@ -444,6 +471,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     risk.setMitigationOwner(mitigationOwner.getValue());
     risk.setMitigationRelatedEventIdentifierType(mitigationRelatedEventIdentifierType.getText());
     risk.setMitigationRelatedEventIdentifierValue(mitigationRelatedEventIdentifierValue.getText());
+
+    risk.setObjectsSize(this.riskCounter);
 
     return risk;
   }
@@ -528,5 +557,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   public Risk getValue() {
     return getRisk();
+  }
+
+  public SelectedItems<RiskIncidence> getSelectedIncidences() {
+    return incidenceList.getSelected();
   }
 }
