@@ -185,7 +185,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
         PluginState pluginResultState = PluginState.SUCCESS;
-        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -318,7 +318,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       aipId = representation.getAipId();
       PluginState pluginResultState = PluginState.SUCCESS;
       boolean notify = true;
-      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
 
       try {
         LOGGER.debug("Processing representation {}", representation);
@@ -446,7 +446,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         LOGGER.debug("Processing file {}", file.getId());
 
         newRepresentationID = UUID.randomUUID().toString();
-        reportItem = PluginHelper.createPluginReportItem(this, file.getId(), null);
+        reportItem = PluginHelper.createPluginReportItem(this, file.getId());
 
         if (!file.isDirectory()) {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));

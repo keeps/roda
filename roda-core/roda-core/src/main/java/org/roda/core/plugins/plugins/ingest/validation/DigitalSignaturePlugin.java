@@ -197,7 +197,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       boolean notify = true;
       // FIXME 20160329 hsilva: the report item should be at AIP level (and
       // not representation level)
-      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
 
       try {
         LOGGER.debug("Processing representation {}", representation);

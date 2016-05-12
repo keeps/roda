@@ -97,7 +97,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     try {
       sip = EARKSIP.parse(earkSIPPath);
       if (sip.getValidationReport().isValid()) {
-        String parentId = PluginHelper.getParentId(this, index, sip.getParentID());
+        String parentId = PluginHelper.computeParentId(this, index, sip.getParentID());
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
 
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);

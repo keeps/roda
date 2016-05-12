@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.roda.core.data.v2.index.IsIndexed;
+import org.roda.core.data.v2.ip.AIPState;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -27,6 +28,7 @@ public class Report implements Serializable, IsIndexed {
   private String jobId = null;
   private String sourceObjectId = null;
   private String outcomeObjectId = null;
+  private AIPState outcomeObjectState = AIPState.INACTIVE;
 
   private String title = null;
   private Date dateCreated = null;
@@ -95,6 +97,14 @@ public class Report implements Serializable, IsIndexed {
   public Report setOutcomeObjectId(String outcomeObjectId) {
     this.outcomeObjectId = outcomeObjectId;
     return this;
+  }
+
+  public AIPState getOutcomeObjectState() {
+    return outcomeObjectState;
+  }
+
+  public void setOutcomeObjectState(AIPState outcomeObjectState) {
+    this.outcomeObjectState = outcomeObjectState;
   }
 
   public String getTitle() {
@@ -219,10 +229,11 @@ public class Report implements Serializable, IsIndexed {
   @Override
   public String toString() {
     return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", outcomeObjectId="
-      + outcomeObjectId + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated
-      + ", completionPercentage=" + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps="
-      + totalSteps + ", plugin=" + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails
-      + ", reports=" + reports + "]";
+      + outcomeObjectId + ", outcomeObjectState=" + outcomeObjectState + ", title=" + title + ", dateCreated="
+      + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage=" + completionPercentage
+      + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin=" + plugin + ", pluginState="
+      + pluginState + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports="
+      + reports + "]";
   }
 
   @JsonIgnore

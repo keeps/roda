@@ -99,7 +99,7 @@ public class DigitalSignatureDIPPlugin extends AbstractPlugin<Representation> {
       String newRepresentationID = UUID.randomUUID().toString();
       aipId = representation.getAipId();
       boolean notify = true;
-      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
 
       try {
         LOGGER.debug("Processing representation {}", representation);

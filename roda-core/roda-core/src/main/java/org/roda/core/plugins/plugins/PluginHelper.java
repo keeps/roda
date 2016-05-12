@@ -51,7 +51,6 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.JobsHelper;
 import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
 import org.slf4j.Logger;
@@ -72,6 +71,10 @@ public final class PluginHelper {
     return createPluginReportItem(plugin, null, transferredResource.getUUID());
   }
 
+  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String outcomeObjectId) {
+    return createPluginReportItem(plugin, outcomeObjectId, null);
+  }
+
   public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     Report reportItem = new Report();
@@ -90,9 +93,30 @@ public final class PluginHelper {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
 
-  public static <T extends Serializable> Job getJob(Plugin<T> plugin, ModelService model)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    return model.retrieveJob(getJobId(plugin));
+  /**
+   * 20160329 hsilva: use this method only to get job information that most
+   * certainly won't change in time (e.g. username, etc.)
+   */
+  public static <T extends Serializable> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
+    throws NotFoundException, GenericException {
+    String jobID = getJobId(plugin);
+    if (jobID != null) {
+      return index.retrieve(Job.class, jobID);
+    } else {
+      throw new NotFoundException("Job not found");
+    }
+
+  }
+
+  public static <T extends Serializable> Job getJobFromModel(Plugin<T> plugin, ModelService model)
+    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    String jobId = getJobId(plugin);
+    if (jobId != null) {
+      return model.retrieveJob(jobId);
+    } else {
+      throw new NotFoundException("Job not found");
+    }
+
   }
 
   public static <T extends Serializable> void setPluginParameters(Plugin<T> plugin, Job job) {
@@ -142,7 +166,8 @@ public final class PluginHelper {
     return Boolean.parseBoolean(paramValue);
   }
 
-  public static <T extends Serializable> String getParentId(Plugin<T> plugin, IndexService index, String sipParentId) {
+  public static <T extends Serializable> String computeParentId(Plugin<T> plugin, IndexService index,
+    String sipParentId) {
     String parentId = sipParentId;
     String jobDefinedParentId = getParentIdFromParameters(plugin);
     boolean jobDefinedForceParentId = getForceParentIdFromParameters(plugin);
@@ -165,32 +190,6 @@ public final class PluginHelper {
     }
 
     return parentId;
-  }
-
-  /**
-   * 20160329 hsilva: use this method only to get job information that most
-   * certainly won't change in time (e.g. username, etc.)
-   */
-  public static <T extends Serializable> Job getJobFromIndex(Plugin<T> plugin, IndexService index)
-    throws NotFoundException, GenericException {
-    String jobID = getJobId(plugin);
-    if (jobID != null) {
-      return index.retrieve(Job.class, jobID);
-    } else {
-      throw new NotFoundException("Job not found");
-    }
-
-  }
-
-  public static <T extends Serializable> Job getJobFromModel(Plugin<T> plugin, ModelService model)
-    throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    String jobId = getJobId(plugin);
-    if (jobId != null) {
-      return model.retrieveJob(jobId);
-    } else {
-      throw new NotFoundException("Job not found");
-    }
-
   }
 
   public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
@@ -470,12 +469,31 @@ public final class PluginHelper {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
       Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
-      job = JobsHelper.setJobCounters(job, jobPluginInfo);
+      job = setJobCounters(job, jobPluginInfo);
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
       LOGGER.error("Unable to get or update Job from model", e);
     }
+  }
+
+  public static Job updateJobInTheStateStartedOrCreated(Job job) {
+    job.setState(JOB_STATE.FAILED_TO_COMPLETE);
+    job.setObjectsBeingProcessed(0);
+    job.setObjectsProcessedWithSuccess(0);
+    job.setObjectsProcessedWithFailure(job.getObjectsCount());
+    job.setObjectsWaitingToBeProcessed(0);
+    job.setEndDate(new Date());
+    return job;
+  }
+
+  public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
+    job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
+    job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
+    job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+    job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
+      - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+    return job;
   }
 
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {

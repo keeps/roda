@@ -95,7 +95,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.createPluginReport(this);
 
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
       PluginHelper.updateJobReport(this, model, index, reportItem, false);
 
       LOGGER.debug("Processing AIP {}", aip.getId());

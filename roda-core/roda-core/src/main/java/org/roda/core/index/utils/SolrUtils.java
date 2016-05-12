@@ -416,20 +416,21 @@ public class SolrUtils {
   }
 
   public static Integer objectToInteger(Object object, Integer defaultValue) {
-    Integer ret;
-    if (object instanceof Integer) {
-      ret = (Integer) object;
-    } else if (object instanceof String) {
-      try {
-        ret = Integer.parseInt((String) object);
-      } catch (NumberFormatException e) {
-        LOGGER.error("Could not convert Solr object to integer", e);
-        ret = defaultValue;
+    Integer ret = defaultValue;
+    if (object != null) {
+      if (object instanceof Integer) {
+        ret = (Integer) object;
+      } else if (object instanceof String) {
+        try {
+          ret = Integer.parseInt((String) object);
+        } catch (NumberFormatException e) {
+          LOGGER.error("Could not convert Solr object to integer", e);
+        }
+      } else {
+        LOGGER.error("Could not convert Solr object to integer ({})", object.getClass().getName());
       }
-    } else {
-      LOGGER.error("Could not convert Solr object to integer ({})", object.getClass().getName());
-      ret = defaultValue;
     }
+
     return ret;
   }
 
@@ -443,11 +444,9 @@ public class SolrUtils {
           ret = Long.parseLong((String) object);
         } catch (NumberFormatException e) {
           LOGGER.error("Could not convert Solr object to long", e);
-          ret = defaultValue;
         }
       } else {
         LOGGER.error("Could not convert Solr object to long ({})", object.getClass().getName());
-        ret = defaultValue;
       }
     }
     return ret;
@@ -494,16 +493,15 @@ public class SolrUtils {
   }
 
   private static Boolean objectToBoolean(Object object, Boolean defaultValue) {
-    Boolean ret;
-    if (object == null) {
-      ret = defaultValue;
-    } else if (object instanceof Boolean) {
-      ret = (Boolean) object;
-    } else if (object instanceof String) {
-      ret = Boolean.parseBoolean((String) object);
-    } else {
-      LOGGER.error("Could not convert Solr object to Boolean ({})", object.getClass().getName());
-      ret = null;
+    Boolean ret = defaultValue;
+    if (object != null) {
+      if (object instanceof Boolean) {
+        ret = (Boolean) object;
+      } else if (object instanceof String) {
+        ret = Boolean.parseBoolean((String) object);
+      } else {
+        LOGGER.error("Could not convert Solr object to Boolean ({})", object.getClass().getName());
+      }
     }
     return ret;
   }
@@ -1604,12 +1602,14 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_START_DATE, job.getStartDate());
     doc.addField(RodaConstants.JOB_END_DATE, job.getEndDate());
     doc.addField(RodaConstants.JOB_STATE, job.getState().toString());
+    doc.addField(RodaConstants.JOB_STATE_DETAILS, job.getStateDetails());
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
     doc.addField(RodaConstants.JOB_OBJECTS_COUNT, job.getObjectsCount());
     doc.addField(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED, job.getObjectsWaitingToBeProcessed());
     doc.addField(RodaConstants.JOB_OBJECTS_BEING_PROCESSED, job.getObjectsBeingProcessed());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS, job.getObjectsProcessedWithSuccess());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE, job.getObjectsProcessedWithFailure());
+    doc.addField(RodaConstants.JOB_OBJECTS_WITH_STATE_CHANGE, job.getObjectsWithStateChange());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
@@ -1628,12 +1628,14 @@ public class SolrUtils {
     job.setStartDate(objectToDate(doc.get(RodaConstants.JOB_START_DATE)));
     job.setEndDate(objectToDate(doc.get(RodaConstants.JOB_END_DATE)));
     job.setState(JOB_STATE.valueOf(objectToString(doc.get(RodaConstants.JOB_STATE))));
+    job.setStateDetails(objectToString(doc.get(RodaConstants.JOB_STATE_DETAILS)));
     job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE), 0));
     job.setObjectsCount(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_COUNT), 0));
     job.setObjectsWaitingToBeProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED), 0));
     job.setObjectsBeingProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_BEING_PROCESSED), 0));
     job.setObjectsProcessedWithSuccess(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
     job.setObjectsProcessedWithFailure(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE), 0));
+    job.setObjectsWithStateChange(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_WITH_STATE_CHANGE), 0));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
@@ -1656,6 +1658,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, jobReport.getOutcomeObjectId());
+    doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE, jobReport.getOutcomeObjectState().toString());
     doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
     doc.addField(RodaConstants.JOB_REPORT_DATE_CREATED, jobReport.getDateCreated());
     doc.addField(RodaConstants.JOB_REPORT_DATE_UPDATE, jobReport.getDateUpdated());
@@ -1678,6 +1681,8 @@ public class SolrUtils {
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
     jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID)));
     jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID)));
+    jobReport
+      .setOutcomeObjectState(AIPState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE))));
     jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));

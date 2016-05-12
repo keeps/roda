@@ -110,6 +110,7 @@
    <field name="startDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" /> 
    <field name="endDate" type="tdate" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="state" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="stateDetails" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    <field name="completionPercentage" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
@@ -122,6 +123,7 @@
    <field name="objectsBeingProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="objectsWithStateChange" type="int" indexed="true" stored="true" required="false" multiValued="false" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

@@ -202,17 +202,17 @@ public final class RodaConstants {
   /*
    * STORAGE CONTAINERS
    */
-  public static final String STORAGE_CONTAINER_SIP = "SIP";
-  public static final String STORAGE_CONTAINER_AIP = "AIP";
-  public static final String STORAGE_CONTAINER_PRESERVATION = "Preservation";
-  public static final String STORAGE_CONTAINER_ACTIONLOG = "Action log";
-  public static final String STORAGE_CONTAINER_JOB = "Job";
-  public static final String STORAGE_CONTAINER_JOB_REPORT = "Job report";
-  public static final String STORAGE_CONTAINER_RISK = "Risk";
-  public static final String STORAGE_CONTAINER_RISK_INCIDENCE = "RiskIncidence";
-  public static final String STORAGE_CONTAINER_AGENT = "Agent";
-  public static final String STORAGE_CONTAINER_FORMAT = "Format";
-  public static final String STORAGE_CONTAINER_NOTIFICATION = "Notification";
+  // public static final String STORAGE_CONTAINER_SIP = "SIP";
+  public static final String STORAGE_CONTAINER_AIP = "aip";
+  public static final String STORAGE_CONTAINER_PRESERVATION = "preservation";
+  public static final String STORAGE_CONTAINER_ACTIONLOG = "action-log";
+  public static final String STORAGE_CONTAINER_JOB = "job";
+  public static final String STORAGE_CONTAINER_JOB_REPORT = "job-report";
+  public static final String STORAGE_CONTAINER_RISK = "risk";
+  public static final String STORAGE_CONTAINER_RISK_INCIDENCE = "risk-incidence";
+  public static final String STORAGE_CONTAINER_AGENT = "agent";
+  public static final String STORAGE_CONTAINER_FORMAT = "format";
+  public static final String STORAGE_CONTAINER_NOTIFICATION = "notification";
 
   /*
    * STORAGE DIRECTORIES
@@ -342,16 +342,14 @@ public final class RodaConstants {
   public static final String JOB_START_DATE = "startDate";
   public static final String JOB_END_DATE = "endDate";
   public static final String JOB_STATE = "state";
-  // FIXME 20160511 hsilva: add the following everywhere (schema.xml, SolrUtils,
-  // object, etc
-  public static final String JOB_STATUS_DETAILS = "statusDetails";
+  public static final String JOB_STATE_DETAILS = "stateDetails";
   public static final String JOB_COMPLETION_PERCENTAGE = "completionPercentage";
   public static final String JOB_OBJECTS_COUNT = "objectsCount";
   public static final String JOB_OBJECTS_WAITING_TO_BE_PROCESSED = "objectsWaitingToBeProcessed";
   public static final String JOB_OBJECTS_BEING_PROCESSED = "objectsBeingProcessed";
   public static final String JOB_OBJECTS_PROCESSED_WITH_SUCCESS = "objectsProcessedWithSuccess";
   public static final String JOB_OBJECTS_PROCESSED_WITH_FAILURE = "objectsProcessedWithFailure";
-  // FIXME 20160511 hsilva: create counter for 'number of objects apraised'
+  public static final String JOB_OBJECTS_WITH_STATE_CHANGE = "objectsWithStateChange";
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";
@@ -394,8 +392,6 @@ public final class RodaConstants {
   public static final String JOB_REPORT_JOB_ID = "jobId";
   public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
-  // FIXME 20160511 hsilva: add the following everywhere (schema.xml, SolrUtils,
-  // object, etc
   public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
   public static final String JOB_REPORT_DATE_CREATED = "dateCreated";

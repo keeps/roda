@@ -89,7 +89,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
           throw new BagitNotValidException(result.getMessages() + "");
         }
 
-        String parentId = PluginHelper.getParentId(this, index, bag.getBagInfoTxt().get("parent"));
+        String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml", parentId);
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);

@@ -51,6 +51,8 @@ public class Job implements IsIndexed, Serializable {
   private Date endDate = null;
   // job state
   private JOB_STATE state = null;
+  // job state details
+  private String stateDetails = "";
   // 0-100 scale completion percentage
   private int completionPercentage = 0;
 
@@ -59,6 +61,7 @@ public class Job implements IsIndexed, Serializable {
   private int objectsBeingProcessed = 0;
   private int objectsProcessedWithSuccess = 0;
   private int objectsProcessedWithFailure = 0;
+  private int objectsWithStateChange = 0;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
@@ -151,6 +154,14 @@ public class Job implements IsIndexed, Serializable {
     this.state = state;
   }
 
+  public String getStateDetails() {
+    return stateDetails;
+  }
+
+  public void setStateDetails(String stateDetails) {
+    this.stateDetails = stateDetails;
+  }
+
   public int getCompletionPercentage() {
     return completionPercentage;
   }
@@ -198,6 +209,14 @@ public class Job implements IsIndexed, Serializable {
 
   public void setObjectsProcessedWithFailure(int objectsProcessedWithFailure) {
     this.objectsProcessedWithFailure = objectsProcessedWithFailure;
+  }
+
+  public int getObjectsWithStateChange() {
+    return objectsWithStateChange;
+  }
+
+  public void setObjectsWithStateChange(int objectsWithStateChange) {
+    this.objectsWithStateChange = objectsWithStateChange;
   }
 
   public String getPlugin() {
@@ -248,12 +267,13 @@ public class Job implements IsIndexed, Serializable {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + state + ", completionPercentage=" + completionPercentage + ", objectsCount="
-      + objectsCount + ", objectsWaitingToBeProcessed=" + objectsWaitingToBeProcessed + ", objectsBeingProcessed="
-      + objectsBeingProcessed + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess
-      + ", objectsProcessedWithFailure=" + objectsProcessedWithFailure + ", plugin=" + plugin + ", pluginType="
-      + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod=" + orchestratorMethod
-      + ", objects=" + objects + "]";
+      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", completionPercentage="
+      + completionPercentage + ", objectsCount=" + objectsCount + ", objectsWaitingToBeProcessed="
+      + objectsWaitingToBeProcessed + ", objectsBeingProcessed=" + objectsBeingProcessed
+      + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess + ", objectsProcessedWithFailure="
+      + objectsProcessedWithFailure + ", objectsWithStateChange=" + objectsWithStateChange + ", plugin=" + plugin
+      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
+      + orchestratorMethod + ", objects=" + objects + "]";
   }
 
   @JsonIgnore

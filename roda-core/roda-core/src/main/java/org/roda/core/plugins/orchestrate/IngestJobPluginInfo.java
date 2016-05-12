@@ -8,13 +8,26 @@
 package org.roda.core.plugins.orchestrate;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
 
 public class IngestJobPluginInfo extends JobPluginInfo {
   private int stepsCompleted = 0;
   private int totalSteps = 0;
+
+  // transferredResourceId > map<aipId, report>
+  private Map<String, Map<String, Report>> reports = new HashMap<>();
+  // transferredResourceId > list<aipId>
+  private Map<String, List<String>> transferredResourceToAipIds = new HashMap<>();
+  // aipId > transferredResourceId
+  private Map<String, String> aipIdToTransferredResourceId = new HashMap<>();
 
   public IngestJobPluginInfo() {
     super();
@@ -22,6 +35,12 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   public IngestJobPluginInfo(int completionPercentage) {
     super(completionPercentage);
+  }
+
+  public IngestJobPluginInfo(int objectsCount, int totalSteps) {
+    setObjectsCount(objectsCount);
+    setObjectsBeingProcessed(objectsCount);
+    this.totalSteps = totalSteps;
   }
 
   public int getStepsCompleted() {
@@ -81,6 +100,71 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     ingestInfoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
     ingestInfoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
     return ingestInfoUpdated;
+  }
+
+  public Map<String, Map<String, Report>> getReports() {
+    return reports;
+  }
+
+  public Map<String, List<String>> getTransferredResourceToAipIds() {
+    return transferredResourceToAipIds;
+  }
+
+  public List<String> getAipIds() {
+    return transferredResourceToAipIds.values().stream().flatMap(l -> l.stream()).collect(Collectors.toList());
+  }
+
+  public List<String> getAipIds(String transferredResource) {
+    return transferredResourceToAipIds.get(transferredResource);
+  }
+
+  public Map<String, String> getAipIdToTransferredResourceId() {
+    return aipIdToTransferredResourceId;
+  }
+
+  public int getBeingProcessedCounter() {
+    return transferredResourceToAipIds.size();
+  }
+
+  public void addReport(String sourceObjectId, String outcomeObjectId, Report report) {
+    if (StringUtils.isNotBlank(sourceObjectId) && StringUtils.isNotBlank(outcomeObjectId)) {
+      aipIdToTransferredResourceId.put(outcomeObjectId, sourceObjectId);
+      if (transferredResourceToAipIds.get(sourceObjectId) != null) {
+        transferredResourceToAipIds.get(sourceObjectId).add(outcomeObjectId);
+      } else {
+        List<String> aipIds = new ArrayList<>();
+        aipIds.add(outcomeObjectId);
+        transferredResourceToAipIds.put(sourceObjectId, aipIds);
+      }
+    }
+    if (reports.get(sourceObjectId) != null) {
+      reports.get(sourceObjectId).put(outcomeObjectId, report);
+    } else {
+      Map<String, Report> innerReports = new HashMap<>();
+      innerReports.put(outcomeObjectId, report);
+      reports.put(sourceObjectId, innerReports);
+    }
+  }
+
+  public void addReport(String outcomeObjectId, Report report) {
+    reports.get(aipIdToTransferredResourceId.get(outcomeObjectId)).get(outcomeObjectId).addReport(report);
+  }
+
+  public void remove(String transferredResourceId) {
+    reports.remove(transferredResourceId);
+    transferredResourceToAipIds.remove(transferredResourceId);
+  }
+
+  public void updateCounters() {
+    int beingProcessed = getBeingProcessedCounter();
+    setObjectsBeingProcessed(beingProcessed);
+    setObjectsProcessedWithFailure(getObjectsCount() - beingProcessed);
+  }
+
+  public void finalizeCounters() {
+    setObjectsProcessedWithSuccess(getObjectsCount() - getObjectsProcessedWithFailure());
+    setObjectsBeingProcessed(0);
+    setObjectsWaitingToBeProcessed(0);
   }
 
 }

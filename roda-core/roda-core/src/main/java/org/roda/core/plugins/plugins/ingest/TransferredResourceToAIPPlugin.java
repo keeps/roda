@@ -89,7 +89,7 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     throws PluginException {
     Report report = PluginHelper.createPluginReport(this);
 
-    String parentId = PluginHelper.getParentId(this, index, null);
+    String parentId = PluginHelper.computeParentId(this, index, null);
 
     for (TransferredResource transferredResource : list) {
       Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);

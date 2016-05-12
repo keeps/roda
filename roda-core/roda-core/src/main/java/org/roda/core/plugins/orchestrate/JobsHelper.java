@@ -7,12 +7,30 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
+import org.roda.core.data.adapter.sort.Sorter;
+import org.roda.core.data.adapter.sublist.Sublist;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.index.IndexService;
 import org.roda.core.plugins.Plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,13 +149,134 @@ public final class JobsHelper {
     return job;
   }
 
-  public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
-    job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
-    job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-    job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-    job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
-      - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
-    return job;
+  public static List<TransferredResource> getTransferredResourcesFromObjectIds(
+    SelectedItems<TransferredResource> selectedItems) {
+    List<TransferredResource> res = new ArrayList<TransferredResource>();
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<TransferredResource> list = (SelectedItemsList<TransferredResource>) selectedItems;
+      for (String objectId : list.getIds()) {
+        try {
+          res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
+        } catch (GenericException | NotFoundException e) {
+          LOGGER.error("Error retrieving TransferredResource", e);
+        }
+      }
+    } else {
+      LOGGER.error("Still not implemented!!!!!!!!");
+    }
+    return res;
+  }
+
+  public static List<String> getAIPs(SelectedItems<IndexedAIP> selectedItems) {
+    List<String> res = new ArrayList<String>();
+    if (selectedItems instanceof SelectedItemsList) {
+      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
+      res.addAll(list.getIds());
+    } else {
+      try {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter<IndexedAIP> selectedItemsFilter = (SelectedItemsFilter<IndexedAIP>) selectedItems;
+        long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), Sorter.NONE,
+            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE)).getResults();
+          for (IndexedAIP aip : aips) {
+            res.add(aip.getId());
+          }
+        }
+      } catch (Throwable e) {
+        LOGGER.error("Error while retrieving AIPs from index", e);
+      }
+    }
+    return res;
+  }
+
+  public static Pair<String, List<String>> getRepresentations(SelectedItems<IndexedRepresentation> selectedItems) {
+    Pair<String, List<String>> resultPair = new Pair<String, List<String>>();
+    try {
+
+      String aipId = null;
+      List<String> res = new ArrayList<String>();
+
+      if (selectedItems instanceof SelectedItemsList) {
+        SelectedItemsList<IndexedRepresentation> list = (SelectedItemsList<IndexedRepresentation>) selectedItems;
+
+        if (list.getIds().size() > 0) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, list.getIds()));
+          List<IndexedRepresentation> reps = RodaCoreFactory.getIndexService()
+            .find(IndexedRepresentation.class, filter, Sorter.NONE, new Sublist(0, list.getIds().size())).getResults();
+          for (IndexedRepresentation rep : reps) {
+            res.add(rep.getId());
+            aipId = rep.getAipId();
+          }
+        }
+      } else {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter<IndexedRepresentation> selectedItemsFilter = (SelectedItemsFilter<IndexedRepresentation>) selectedItems;
+        long count = index.count(IndexedRepresentation.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedRepresentation> reps = index.find(IndexedRepresentation.class, selectedItemsFilter.getFilter(),
+            null, new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE), null).getResults();
+          for (IndexedRepresentation rep : reps) {
+            res.add(rep.getId());
+            aipId = rep.getAipId();
+          }
+        }
+      }
+
+      resultPair.setFirst(aipId);
+      resultPair.setSecond(res);
+    } catch (Throwable e) {
+      LOGGER.error("Error while retrieving Representations from index", e);
+    }
+
+    return resultPair;
+  }
+
+  public static Pair<Pair<String, String>, List<String>> getFiles(SelectedItems<IndexedFile> selectedItems) {
+    Pair<Pair<String, String>, List<String>> resultPair = new Pair<Pair<String, String>, List<String>>();
+    try {
+
+      String aipId = null;
+      String representationId = null;
+      List<String> res = new ArrayList<String>();
+
+      if (selectedItems instanceof SelectedItemsList) {
+        SelectedItemsList<IndexedFile> list = (SelectedItemsList<IndexedFile>) selectedItems;
+
+        if (list.getIds().size() > 0) {
+          Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, list.getIds()));
+          List<IndexedFile> files = RodaCoreFactory.getIndexService()
+            .find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, list.getIds().size())).getResults();
+          for (IndexedFile file : files) {
+            res.add(file.getId());
+            aipId = file.getAipId();
+            representationId = file.getRepresentationId();
+          }
+        }
+      } else {
+        IndexService index = RodaCoreFactory.getIndexService();
+        SelectedItemsFilter<IndexedFile> selectedItemsFilter = (SelectedItemsFilter<IndexedFile>) selectedItems;
+        long count = index.count(IndexedFile.class, selectedItemsFilter.getFilter());
+        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
+          List<IndexedFile> files = index.find(IndexedFile.class, selectedItemsFilter.getFilter(), Sorter.NONE,
+            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE)).getResults();
+          for (IndexedFile file : files) {
+            res.add(file.getId());
+            aipId = file.getAipId();
+            representationId = file.getRepresentationId();
+          }
+        }
+      }
+
+      Pair<String, String> fileInfo = new Pair<String, String>(aipId, representationId);
+      resultPair.setFirst(fileInfo);
+      resultPair.setSecond(res);
+    } catch (Throwable e) {
+      LOGGER.error("Error while retrieving Representations from index", e);
+    }
+
+    return resultPair;
   }
 
 }

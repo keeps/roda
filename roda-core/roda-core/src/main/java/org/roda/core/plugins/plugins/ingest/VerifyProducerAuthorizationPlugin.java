@@ -99,7 +99,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     for (AIP aip : list) {
       LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
 
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
       PluginHelper.updateJobReport(this, model, index, reportItem, false);
 
       reportItem.setPluginState(PluginState.SUCCESS)

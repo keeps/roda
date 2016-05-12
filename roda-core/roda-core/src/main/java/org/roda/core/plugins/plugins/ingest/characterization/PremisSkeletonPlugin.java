@@ -92,7 +92,7 @@ public class PremisSkeletonPlugin extends AbstractPlugin<AIP> {
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId(), null);
+      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
       PluginHelper.updateJobReport(this, model, index, reportItem, false);
 
       try {

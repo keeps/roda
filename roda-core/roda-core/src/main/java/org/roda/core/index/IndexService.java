@@ -108,8 +108,7 @@ public class IndexService {
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist)
     throws GenericException, RequestNotValidException {
-    Facets facets = null;
-    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets);
+    return SolrUtils.find(index, returnClass, filter, sorter, sublist, Facets.NONE);
 
   }
 
