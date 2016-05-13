@@ -139,7 +139,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       Timeout timeout = JobsHelper.getPluginTimeout(plugin.getClass());
       do {
-        // XXX block size could be recommended by plugin
         find = RodaCoreFactory.getIndexService().find(classToActOn, filter, Sorter.NONE,
           new Sublist(offset, blockSize));
         innerPlugin = getNewPluginInstanceAndRunBeforeExecute(plugin, classToActOn, innerPlugins,
@@ -607,6 +606,113 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
+  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
+    try {
+      LOGGER.info("Started {}", plugin.getName());
+      plugin.beforeAllExecute(index, model, storage);
+      plugin.beforeBlockExecute(index, model, storage);
+
+      // FIXME what to do with the askFuture???
+      Future<Object> future = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
+        JobsHelper.getPluginTimeout(plugin.getClass()));
+
+      future.onSuccess(new OnSuccess<Object>() {
+        @Override
+        public void onSuccess(Object msg) throws Throwable {
+          // FIXME this should be sent inside a message that can be easily
+          // identified as a list of reports
+          if (msg != null && msg instanceof List<?>) {
+            LOGGER.info("Success running plugin: {}", (List<Report>) msg);
+          }
+
+          plugin.afterBlockExecute(index, model, storage);
+          plugin.afterAllExecute(index, model, storage);
+
+          PluginHelper.updateJobPercentage(plugin, 100);
+
+          LOGGER.info("Ended {}", plugin.getName());
+        }
+      }, workersSystem.dispatcher());
+      future.onFailure(new OnFailure() {
+        @Override
+        public void onFailure(Throwable error) throws Throwable {
+          LOGGER.error("Failure running plugin: {}", error);
+
+          plugin.afterBlockExecute(index, model, storage);
+          plugin.afterAllExecute(index, model, storage);
+
+          PluginHelper.updateJobPercentage(plugin, 100);
+
+          LOGGER.info("Ended {}", plugin.getName());
+        }
+      }, workersSystem.dispatcher());
+
+    } catch (Exception e) {
+      LOGGER.error("Error running plugin", e);
+    }
+  }
+
+  @Override
+  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
+    // FIXME
+    LOGGER.error("Method runPluginOnObjects@{} still not implemented!", this.getClass().getName());
+  }
+
+  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
+    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
+    throws InvalidParameterException, PluginException {
+    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
+      pluginClass);
+    innerPlugin.setParameterValues(plugin.getParameterValues());
+    innerPlugins.add(innerPlugin);
+    innerPlugin.beforeBlockExecute(index, model, storage);
+
+    // keep track of each job/plugin relation
+    String jobId = PluginHelper.getJobId(innerPlugin);
+    if (jobId != null) {
+      synchronized (runningJobs) {
+        if (PluginType.INGEST == plugin.getType()) {
+          IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
+        } else if (PluginType.RISK == plugin.getType()) {
+          RiskJobPluginInfo riskPluginInfo = new RiskJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, riskPluginInfo, objectsCount);
+        }
+      }
+    }
+
+    return innerPlugin;
+  }
+
+  private List<Report> mapToReports(Iterable<Object> reports) {
+    List<Report> ret;
+    ret = new ArrayList<>();
+    for (Object o : reports) {
+      if (o instanceof Report) {
+        ret.add((Report) o);
+      } else {
+        LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
+      }
+    }
+    return ret;
+  }
+
+  private <T extends Serializable> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId,
+    JobPluginInfo jobPluginInfo, int objectsCount) {
+    jobPluginInfo.setObjectsCount(objectsCount);
+    jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
+    if (runningJobs.get(jobId) != null) {
+      runningJobs.get(jobId).put(innerPlugin, jobPluginInfo);
+      runningJobsObjectsCount.put(jobId, runningJobsObjectsCount.get(jobId) + objectsCount);
+    } else {
+      Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
+      inner.put(innerPlugin, jobPluginInfo);
+      runningJobs.put(jobId, inner);
+      runningJobsObjectsCount.put(jobId, objectsCount);
+    }
+  }
+
+  @Override
   public void executeJob(Job job) throws JobAlreadyStartedException {
     LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
 
@@ -702,47 +808,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     }
   }
 
-  private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,
-    Class<T> pluginClass, List<Plugin<T>> innerPlugins, int objectsCount)
-    throws InvalidParameterException, PluginException {
-    Plugin<T> innerPlugin = RodaCoreFactory.getPluginManager().getPlugin(plugin.getClass().getCanonicalName(),
-      pluginClass);
-    innerPlugin.setParameterValues(plugin.getParameterValues());
-    innerPlugins.add(innerPlugin);
-    innerPlugin.beforeBlockExecute(index, model, storage);
-
-    // keep track of each job/plugin relation
-    String jobId = PluginHelper.getJobId(innerPlugin);
-    if (jobId != null) {
-      synchronized (runningJobs) {
-        if (PluginType.INGEST == plugin.getType()) {
-          IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
-          initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
-        } else if (PluginType.RISK == plugin.getType()) {
-          RiskJobPluginInfo riskPluginInfo = new RiskJobPluginInfo();
-          initJobPluginInfo(innerPlugin, jobId, riskPluginInfo, objectsCount);
-        }
-      }
-    }
-
-    return innerPlugin;
-  }
-
-  private <T extends Serializable> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId,
-    JobPluginInfo jobPluginInfo, int objectsCount) {
-    jobPluginInfo.setObjectsCount(objectsCount);
-    jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
-    if (runningJobs.get(jobId) != null) {
-      runningJobs.get(jobId).put(innerPlugin, jobPluginInfo);
-      runningJobsObjectsCount.put(jobId, runningJobsObjectsCount.get(jobId) + objectsCount);
-    } else {
-      Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
-      inner.put(innerPlugin, jobPluginInfo);
-      runningJobs.put(jobId, inner);
-      runningJobsObjectsCount.put(jobId, objectsCount);
-    }
-  }
-
   @Override
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     String jobId = PluginHelper.getJobId(plugin);
@@ -781,75 +846,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } else {
       throw new JobException("Job id is null");
     }
+    // FIXME 20160513 hsilva: this is not the right way to test if job has
+    // "timeouted"
     if (!jobIsAlive) {
       throw new TimeoutJobException("Job timeout occurred");
     }
-  }
-
-  @Override
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
-    try {
-      LOGGER.info("Started {}", plugin.getName());
-      plugin.beforeAllExecute(index, model, storage);
-      plugin.beforeBlockExecute(index, model, storage);
-
-      // FIXME what to do with the askFuture???
-      Future<Object> future = Patterns.ask(workersRouter, new PluginMessage<T>(new ArrayList<T>(), plugin),
-        JobsHelper.getPluginTimeout(plugin.getClass()));
-
-      future.onSuccess(new OnSuccess<Object>() {
-        @Override
-        public void onSuccess(Object msg) throws Throwable {
-          // FIXME this should be sent inside a message that can be easily
-          // identified as a list of reports
-          if (msg != null && msg instanceof List<?>) {
-            LOGGER.info("Success running plugin: {}", (List<Report>) msg);
-          }
-
-          plugin.afterBlockExecute(index, model, storage);
-          plugin.afterAllExecute(index, model, storage);
-
-          PluginHelper.updateJobPercentage(plugin, 100);
-
-          LOGGER.info("Ended {}", plugin.getName());
-        }
-      }, workersSystem.dispatcher());
-      future.onFailure(new OnFailure() {
-        @Override
-        public void onFailure(Throwable error) throws Throwable {
-          LOGGER.error("Failure running plugin: {}", error);
-
-          plugin.afterBlockExecute(index, model, storage);
-          plugin.afterAllExecute(index, model, storage);
-
-          PluginHelper.updateJobPercentage(plugin, 100);
-
-          LOGGER.info("Ended {}", plugin.getName());
-        }
-      }, workersSystem.dispatcher());
-
-    } catch (Exception e) {
-      LOGGER.error("Error running plugin", e);
-    }
-  }
-
-  @Override
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
-    // FIXME
-    LOGGER.error("Method runPluginOnObjects@{} still not implemented!", this.getClass().getName());
-  }
-
-  private List<Report> mapToReports(Iterable<Object> reports) {
-    List<Report> ret;
-    ret = new ArrayList<>();
-    for (Object o : reports) {
-      if (o instanceof Report) {
-        ret.add((Report) o);
-      } else {
-        LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
-      }
-    }
-    return ret;
   }
 
   // FIXME 20160329 hsilva: when this class is stable, add it to its own class

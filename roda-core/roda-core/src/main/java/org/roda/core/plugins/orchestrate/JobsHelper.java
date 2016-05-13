@@ -105,11 +105,11 @@ public final class JobsHelper {
     // try plugin timeout first
     String key = "core.orchestrator." + pluginClass + ".timeout_amount";
     int timeout = RodaCoreFactory.getRodaConfiguration().getInt(key, -1);
-    if (timeout == -1) {
+    if (timeout < 0) {
       // if the previous was not found, try configuration default
       key = "core.orchestrator.timeout_amount";
       timeout = RodaCoreFactory.getRodaConfiguration().getInt(key, -1);
-      if (timeout == -1) {
+      if (timeout < 0) {
         // if none of the above worked, set default value here
         timeout = DEFAULT_TIMEOUT;
       }

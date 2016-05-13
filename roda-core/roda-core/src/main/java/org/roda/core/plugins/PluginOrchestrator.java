@@ -24,6 +24,10 @@ import org.roda.core.plugins.orchestrate.JobPluginInfo;
 
 public interface PluginOrchestrator {
 
+  public void setup();
+
+  public void shutdown();
+
   public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
   public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
@@ -45,10 +49,6 @@ public interface PluginOrchestrator {
 
   public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids);
 
-  public void setup();
-
-  public void shutdown();
-
   /*
    * Job related methods
    * _________________________________________________________________________________________________________________
@@ -62,7 +62,8 @@ public interface PluginOrchestrator {
 
   public void cleanUnfinishedJobs();
 
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) throws JobException;
+  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+    throws JobException;
 
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage);
 

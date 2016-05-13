@@ -9,12 +9,32 @@
 	<logger name="org.roda.wui" additivity="false">
 		<!-- Client-side logging must be set in org.roda.wui.common.client.GWTLogger 
 			and is also influenced by this logger level -->
-		<level value="DEBUG" />
-		<appender-ref ref="WUI_FILEOUT" />
-	</logger>
-
-	<logger name="org.roda.disseminators" additivity="false">
 		<level value="INFO" />
 		<appender-ref ref="WUI_FILEOUT" />
 	</logger>
+
+	<!-- <logger name="org.roda.wui.common.server" additivity="false"> -->
+	<!-- <level value="DEBUG" /> -->
+	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
+	<!-- </logger> -->
+
+	<!-- <logger name="org.roda.wui.common" additivity="false"> -->
+	<!-- <level value="DEBUG" /> -->
+	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
+	<!-- </logger> -->
+
+	<!-- <logger name="org.roda.wui.filter" additivity="false"> -->
+	<!-- <level value="DEBUG" /> -->
+	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
+	<!-- </logger> -->
+
+	<!-- <logger name="org.roda.wui.ingest" additivity="false"> -->
+	<!-- <level value="INFO" /> -->
+	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
+	<!-- </logger> -->
+
+	<!-- <logger name="org.roda.disseminators" additivity="false"> -->
+	<!-- <level value="INFO" /> -->
+	<!-- <appender-ref ref="WUI_FILEOUT" /> -->
+	<!-- </logger> -->
 </included>
