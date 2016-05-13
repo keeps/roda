@@ -201,7 +201,7 @@ public final class JobsHelper {
       if (selectedItems instanceof SelectedItemsList) {
         SelectedItemsList<IndexedRepresentation> list = (SelectedItemsList<IndexedRepresentation>) selectedItems;
 
-        if (list.getIds().size() > 0) {
+        if (!list.getIds().isEmpty()) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, list.getIds()));
           List<IndexedRepresentation> reps = RodaCoreFactory.getIndexService()
             .find(IndexedRepresentation.class, filter, Sorter.NONE, new Sublist(0, list.getIds().size())).getResults();
@@ -244,7 +244,7 @@ public final class JobsHelper {
       if (selectedItems instanceof SelectedItemsList) {
         SelectedItemsList<IndexedFile> list = (SelectedItemsList<IndexedFile>) selectedItems;
 
-        if (list.getIds().size() > 0) {
+        if (!list.getIds().isEmpty()) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, list.getIds()));
           List<IndexedFile> files = RodaCoreFactory.getIndexService()
             .find(IndexedFile.class, filter, Sorter.NONE, new Sublist(0, list.getIds().size())).getResults();

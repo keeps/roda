@@ -87,8 +87,8 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(PluginState.SUCCESS);
         LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
       } catch (RODAException e) {
-        LOGGER.error("Error updating AIP (metadata attribute state=true)", e);
-        outcomeDetail = "Error updating AIP (metadata attribute state=true): " + e.getMessage();
+        LOGGER.error("Error updating AIP (metadata attribute state=ACTIVE)", e);
+        outcomeDetail = "Error updating AIP (metadata attribute state=ACTIVE): " + e.getMessage();
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail);
       }
 

@@ -121,7 +121,8 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
         if (report.isValid()) {
           reportItem.setPluginState(PluginState.SUCCESS);
         } else {
-          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(report.toString());
+          reportItem.setPluginState(PluginState.FAILURE).setHtmlPluginDetails(true)
+            .setPluginDetails(report.toHtml(false, false));
         }
 
         boolean notify = true;

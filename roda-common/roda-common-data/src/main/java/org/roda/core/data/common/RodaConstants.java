@@ -59,7 +59,7 @@ public final class RodaConstants {
    */
   public static final String CORE_DESCRIPTION_LEVELS_FILE = "roda-description-levels-hierarchy.properties";
   public static final String CORE_CONFIG_FOLDER = "config";
-  public static final String CORE_CONFIG_EXAMPLE_FOLDER = "config-example";
+  public static final String CORE_EXAMPLE_CONFIG_FOLDER = "example-config";
   public static final String CORE_I18N_FOLDER = "i18n";
   public static final String CORE_DATA_FOLDER = "data";
   public static final String CORE_STORAGE_FOLDER = "storage";

@@ -513,7 +513,6 @@ public class SolrUtils {
         ret = (String) object;
       } else {
         LOGGER.warn("Could not convert Solr object to string, unsupported class: {}", object.getClass().getName());
-        ret = object.toString();
       }
     }
     return ret;

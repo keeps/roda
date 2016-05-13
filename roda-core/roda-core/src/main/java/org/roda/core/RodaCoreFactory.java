@@ -151,7 +151,7 @@ public class RodaCoreFactory {
   private static Path dataPath;
   private static Path logPath;
   private static Path configPath;
-  private static Path configExamplePath;
+  private static Path exampleConfigPath;
   private static Path themePath;
   private static Path exampleThemePath;
 
@@ -315,7 +315,7 @@ public class RodaCoreFactory {
 
     // instantiate essential directories
     configPath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_FOLDER);
-    configExamplePath = rodaHomePath.resolve(RodaConstants.CORE_CONFIG_EXAMPLE_FOLDER);
+    exampleConfigPath = rodaHomePath.resolve(RodaConstants.CORE_EXAMPLE_CONFIG_FOLDER);
     dataPath = rodaHomePath.resolve(RodaConstants.CORE_DATA_FOLDER);
     logPath = dataPath.resolve(RodaConstants.CORE_LOG_FOLDER);
     storagePath = dataPath.resolve(RodaConstants.CORE_STORAGE_FOLDER);
@@ -385,14 +385,14 @@ public class RodaCoreFactory {
     // copy configs folder from classpath to example folder
     try {
       try {
-        FSUtils.deletePath(configExamplePath);
+        FSUtils.deletePath(exampleConfigPath);
       } catch (NotFoundException e) {
         // do nothing and carry on
       }
-      Files.createDirectories(configExamplePath);
-      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", configExamplePath, true);
+      Files.createDirectories(exampleConfigPath);
+      copyFilesFromClasspath(RodaConstants.CORE_CONFIG_FOLDER + "/", exampleConfigPath, true);
     } catch (GenericException | IOException e) {
-      LOGGER.error("Unable to create " + configExamplePath, e);
+      LOGGER.error("Unable to create " + exampleConfigPath, e);
     }
 
     // FIXME the following block should be invoked/injected from RodaWuiServlet
