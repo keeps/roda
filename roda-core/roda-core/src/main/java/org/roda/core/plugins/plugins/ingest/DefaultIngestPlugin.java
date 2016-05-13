@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginParameter;
@@ -238,12 +239,16 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       }
 
       // 10) Auto accept
-      if (!aips.isEmpty() && PluginHelper.verifyIfStepShouldBePerformed(this,
-        getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))) {
-        pluginReport = doAutoAccept(index, model, storage, aips);
-        jobPluginInfo = mergeReports(jobPluginInfo, pluginReport);
-        aips = recalculateAIPsList(model, resources, aips, jobPluginInfo, true);
-        jobPluginInfo.incrementStepsCompletedByOne();
+      if (!aips.isEmpty()) {
+        if (PluginHelper.verifyIfStepShouldBePerformed(this,
+          getPluginParameter(RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT))) {
+          pluginReport = doAutoAccept(index, model, storage, aips);
+          jobPluginInfo = mergeReports(jobPluginInfo, pluginReport);
+          aips = recalculateAIPsList(model, resources, aips, jobPluginInfo, true);
+          jobPluginInfo.incrementStepsCompletedByOne();
+        } else {
+          updateAIPsToBeAppraised(model, aips);
+        }
       }
 
       // X) final job info update
@@ -575,6 +580,17 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     }
 
     return report;
+  }
+
+  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips) {
+    for (AIP aip : aips) {
+      aip.setState(AIPState.UNDER_APPRAISAL);
+      try {
+        aip = model.updateAIPState(aip);
+      } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Error while updating AIP state to '{}'. Reason: {}", AIPState.UNDER_APPRAISAL, e.getMessage());
+      }
+    }
   }
 
   @Override

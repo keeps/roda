@@ -105,7 +105,7 @@ public interface BrowserServiceAsync {
     AsyncCallback<Void> callback);
 
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean showInactive, AsyncCallback<IndexResult<T>> callback);
+    Facets facets, String localeString, boolean justActive, AsyncCallback<IndexResult<T>> callback);
 
   <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive,
     AsyncCallback<Void> callback);

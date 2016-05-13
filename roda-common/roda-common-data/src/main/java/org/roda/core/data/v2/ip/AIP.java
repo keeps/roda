@@ -23,7 +23,7 @@ public class AIP implements Serializable {
   private String id;
   private String parentId;
   private String type;
-  private boolean active;
+  private AIPState state = AIPState.getDefault();
   private Permissions permissions;
 
   private List<DescriptiveMetadata> descriptiveMetadata;
@@ -34,18 +34,17 @@ public class AIP implements Serializable {
     super();
   }
 
-  public AIP(String id, String parentId, String type, boolean active, Permissions permissions) {
-    this(id, parentId, type, active, permissions, new ArrayList<DescriptiveMetadata>(),
-      new ArrayList<Representation>());
+  public AIP(String id, String parentId, String type, AIPState state, Permissions permissions) {
+    this(id, parentId, type, state, permissions, new ArrayList<DescriptiveMetadata>(), new ArrayList<Representation>());
   }
 
-  public AIP(String id, String parentId, String type, boolean active, Permissions permissions,
+  public AIP(String id, String parentId, String type, AIPState state, Permissions permissions,
     List<DescriptiveMetadata> descriptiveMetadata, List<Representation> representations) {
     super();
     this.id = id;
     this.parentId = parentId;
     this.type = type;
-    this.active = active;
+    this.state = state;
     this.permissions = permissions;
 
     this.descriptiveMetadata = descriptiveMetadata;
@@ -69,13 +68,6 @@ public class AIP implements Serializable {
    */
   public String getParentId() {
     return parentId;
-  }
-
-  /**
-   * @return the active
-   */
-  public boolean isActive() {
-    return active;
   }
 
   public void setId(String id) {
@@ -108,8 +100,12 @@ public class AIP implements Serializable {
     this.type = type;
   }
 
-  public void setActive(boolean active) {
-    this.active = active;
+  public AIPState getState() {
+    return state;
+  }
+
+  public void setState(AIPState state) {
+    this.state = state;
   }
 
   public Permissions getPermissions() {
@@ -140,7 +136,7 @@ public class AIP implements Serializable {
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + (active ? 1231 : 1237);
+    result = prime * result + ((state == null) ? 0 : state.hashCode());
     result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
@@ -159,7 +155,7 @@ public class AIP implements Serializable {
     if (getClass() != obj.getClass())
       return false;
     AIP other = (AIP) obj;
-    if (active != other.active)
+    if (state != other.state)
       return false;
     if (descriptiveMetadata == null) {
       if (other.descriptiveMetadata != null)
@@ -196,7 +192,7 @@ public class AIP implements Serializable {
 
   @Override
   public String toString() {
-    return "AIP [id=" + id + ", parentId=" + parentId + ", type=" + type + ", active=" + active + ", permissions="
+    return "AIP [id=" + id + ", parentId=" + parentId + ", type=" + type + ", state=" + state + ", permissions="
       + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations + "]";
   }
 

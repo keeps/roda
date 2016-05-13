@@ -498,7 +498,15 @@ public class Browse extends Composite {
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
 
-      if (AIPState.INACTIVE.equals(aip.getState())) {
+      // FIXME 20160513 hsilva: this should be rethought as new states exist
+      // if (AIPState.INACTIVE.equals(aip.getState())) {
+      // this.addStyleName("inactive");
+      // inactiveLabel.setVisible(true);
+      // } else {
+      // this.removeStyleName("inactive");
+      // inactiveLabel.setVisible(false);
+      // }
+      if (AIPState.ACTIVE != aip.getState()) {
         this.addStyleName("inactive");
         inactiveLabel.setVisible(true);
       } else {

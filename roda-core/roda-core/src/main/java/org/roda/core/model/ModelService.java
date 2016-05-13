@@ -52,6 +52,7 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
@@ -256,26 +257,26 @@ public class ModelService extends ModelObservable {
 
   public AIP createAIP(String parentId, String type, Permissions permissions) throws RequestNotValidException,
     NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
-    boolean active = true;
+    AIPState state = AIPState.ACTIVE;
     boolean notify = true;
-    return createAIP(active, parentId, type, permissions, notify);
+    return createAIP(state, parentId, type, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, String type, Permissions permissions)
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
     boolean notify = true;
-    return createAIP(active, parentId, type, permissions, notify);
+    return createAIP(state, parentId, type, permissions, notify);
   }
 
-  public AIP createAIP(boolean active, String parentId, String type, Permissions permissions, boolean notify)
+  public AIP createAIP(AIPState state, String parentId, String type, Permissions permissions, boolean notify)
     throws RequestNotValidException, NotFoundException, GenericException, AlreadyExistsException,
     AuthorizationDeniedException {
 
     Directory directory = storage.createRandomDirectory(DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AIP));
     String id = directory.getStoragePath().getName();
 
-    AIP aip = new AIP(id, parentId, type, active, permissions);
+    AIP aip = new AIP(id, parentId, type, state, permissions);
     createAIPMetadata(aip);
 
     if (notify) {
@@ -344,11 +345,11 @@ public class ModelService extends ModelObservable {
     return aip;
   }
 
-  public AIP updateAIPActiveFlag(AIP aip)
+  public AIP updateAIPState(AIP aip)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException {
 
     updateAIPMetadata(aip);
-    notifyAipActiveFlagUpdated(aip);
+    notifyAipStateUpdated(aip);
 
     return aip;
   }

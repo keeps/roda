@@ -21,6 +21,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.model.ModelService;
 import org.roda.core.storage.ContentPayload;
@@ -48,14 +49,14 @@ public class BagitToAIPPluginUtils {
     String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
     ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
-    boolean active = false;
+    AIPState state = AIPState.getDefault();
     Permissions permissions = new Permissions();
 
     boolean notify = false;
 
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    AIP aip = model.createAIP(active, parentId, aipType, permissions, notify);
+    AIP aip = model.createAIP(state, parentId, aipType, permissions, notify);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);

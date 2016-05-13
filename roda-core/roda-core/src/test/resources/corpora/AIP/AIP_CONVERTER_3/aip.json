@@ -1,6 +1,6 @@
 {
   "parentId": null,
-  "active": true,
+  "state": ACTIVE,
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{

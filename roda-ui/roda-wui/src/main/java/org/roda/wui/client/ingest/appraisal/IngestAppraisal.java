@@ -24,6 +24,7 @@ import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
@@ -99,11 +100,11 @@ public class IngestAppraisal extends Composite {
   };
 
   private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new SimpleFilterParameter(RodaConstants.ACTIVE, Boolean.FALSE.toString()));
+    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
   private static final Filter DEFAULT_FILTER_REPRESENTATIONS = new Filter(
-    new SimpleFilterParameter(RodaConstants.ACTIVE, Boolean.FALSE.toString()));
+    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
   private static final Filter DEFAULT_FILTER_FILES = new Filter(
-    new SimpleFilterParameter(RodaConstants.ACTIVE, Boolean.FALSE.toString()));
+    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
 
   private static IngestAppraisal instance = null;
 

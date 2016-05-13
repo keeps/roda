@@ -17,6 +17,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -81,13 +82,13 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
       try {
         LOGGER.debug("Auto accepting AIP {}", aip.getId());
 
-        aip.setActive(true);
-        aip = model.updateAIPActiveFlag(aip);
+        aip.setState(AIPState.ACTIVE);
+        aip = model.updateAIPState(aip);
         reportItem.setPluginState(PluginState.SUCCESS);
         LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
       } catch (RODAException e) {
-        LOGGER.error("Error updating AIP (metadata attribute active=true)", e);
-        outcomeDetail = "Error updating AIP (metadata attribute active=true): " + e.getMessage();
+        LOGGER.error("Error updating AIP (metadata attribute state=true)", e);
+        outcomeDetail = "Error updating AIP (metadata attribute state=true): " + e.getMessage();
         reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail);
       }
 

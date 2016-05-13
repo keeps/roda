@@ -103,10 +103,10 @@ public class JobsHelper {
     org.roda.core.data.v2.jobs.Jobs jobs = new org.roda.core.data.v2.jobs.Jobs();
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    boolean showInactive = true;
+    boolean justActive = false;
     IndexResult<Job> listJobsIndexResult = org.roda.wui.api.controllers.Browser.find(Job.class, Filter.NONE,
       Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      showInactive);
+      justActive);
 
     for (Job job : listJobsIndexResult.getResults()) {
       jobs.addJob(job);
@@ -176,7 +176,7 @@ public class JobsHelper {
     Reports reports = new Reports();
 
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    boolean showInactive = true;
+    boolean justActive = false;
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, jobId));
 
     if (justFailed) {
@@ -184,7 +184,7 @@ public class JobsHelper {
     }
     IndexResult<Report> listJobReportsIndexResult = org.roda.wui.api.controllers.Browser.find(Report.class, filter,
       Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      showInactive);
+      justActive);
 
     for (Report report : listJobReportsIndexResult.getResults()) {
       reports.addReport(report);

@@ -90,45 +90,45 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
-    
+
     index.commitAIPs();
 
     RodaUser user = null;
-    boolean showInactive = false;
+    boolean justActive = true;
     IndexResult<IndexedAIP> find1 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find1.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedAIP> find2 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(1, find2.getTotalCount());
 
     user = new RodaUser("testuser", "User with access", "", false);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedAIP> find3 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find3.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedAIP> find4 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(1, find4.getTotalCount());
 
     user = new RodaUser("guest", "User with access", "", true);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedAIP> find5 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find5.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedAIP> find6 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedAIP> find7 = index.find(IndexedAIP.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(1, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -144,7 +144,7 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
-    
+
     index.commitAIPs();
 
     RodaUser user = null;
@@ -199,7 +199,7 @@ public class PermissionsTest {
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
 
     index.commitAIPs();
-    
+
     RodaUser user = null;
     boolean showInactive = false;
     IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
@@ -250,7 +250,7 @@ public class PermissionsTest {
     // TODO move aip id to constants
     final AIP aip = model.createAIP(aipId, corporaService,
       DefaultStoragePath.parse(CorporaConstants.SOURCE_AIP_CONTAINER, CorporaConstants.SOURCE_AIP_PERMISSIONS));
-    
+
     index.commitAIPs();
 
     RodaUser user = null;

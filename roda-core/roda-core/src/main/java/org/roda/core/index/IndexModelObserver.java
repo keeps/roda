@@ -36,6 +36,7 @@ import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
@@ -318,39 +319,39 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void aipActiveFlagUpdated(AIP aip) {
+  public void aipStateUpdated(AIP aip) {
     try {
       // change AIP
-      SolrInputDocument aipDoc = SolrUtils.aipActiveFlagUpdateToSolrDocument(aip);
+      SolrInputDocument aipDoc = SolrUtils.aipStateUpdateToSolrDocument(aip);
       index.add(RodaConstants.INDEX_AIP, aipDoc);
     } catch (SolrServerException | IOException e) {
       LOGGER.error("Cannot do a partial update", e);
     }
 
     // change Representations and Files
-    representationsActiveFlagUpdated(aip);
+    representationsStateUpdated(aip);
     // change Preservation events
-    preservationEventsActiveFlagUpdated(aip);
+    preservationEventsStateUpdated(aip);
 
   }
 
-  private void representationsActiveFlagUpdated(final AIP aip) {
+  private void representationsStateUpdated(final AIP aip) {
     for (Representation representation : aip.getRepresentations()) {
-      representationActiveFlagUpdated(aip, representation);
+      representationStateUpdated(aip, representation);
     }
   }
 
-  private void representationActiveFlagUpdated(final AIP aip, final Representation representation) {
+  private void representationStateUpdated(final AIP aip, final Representation representation) {
     CloseableIterable<OptionalWithCause<File>> allFiles = null;
     try {
-      SolrInputDocument repDoc = SolrUtils.representationActiveFlagUpdateToSolrDocument(representation, aip.isActive());
+      SolrInputDocument repDoc = SolrUtils.representationStateUpdateToSolrDocument(representation, aip.getState());
       index.add(RodaConstants.INDEX_REPRESENTATION, repDoc);
       final boolean recursive = true;
       allFiles = model.listFilesUnder(representation.getAipId(), representation.getId(), recursive);
       for (OptionalWithCause<File> file : allFiles) {
         if (file.isPresent()) {
           boolean recursiveIndexFile = false;
-          fileActiveFlagUpdated(aip, file.get(), recursiveIndexFile);
+          fileStateUpdated(aip, file.get(), recursiveIndexFile);
         } else {
           LOGGER.error("Cannot do a partial update on File", file.getCause());
         }
@@ -364,8 +365,8 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void fileActiveFlagUpdated(AIP aip, File file, boolean recursive) {
-    SolrInputDocument fileDoc = SolrUtils.fileActiveFlagUpdateToSolrDocument(file, aip.isActive());
+  private void fileStateUpdated(AIP aip, File file, boolean recursive) {
+    SolrInputDocument fileDoc = SolrUtils.fileStateUpdateToSolrDocument(file, aip.getState());
     try {
       index.add(RodaConstants.INDEX_FILE, fileDoc);
 
@@ -378,7 +379,7 @@ public class IndexModelObserver implements ModelObserver {
         CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(file, true);
         for (OptionalWithCause<File> subfile : allFiles) {
           if (subfile.isPresent()) {
-            fileActiveFlagUpdated(aip, subfile.get(), false);
+            fileStateUpdated(aip, subfile.get(), false);
           } else {
             LOGGER.error("Cannot index file sub-resources", subfile.getCause());
           }
@@ -391,7 +392,7 @@ public class IndexModelObserver implements ModelObserver {
     }
   }
 
-  private void preservationEventsActiveFlagUpdated(final AIP aip) {
+  private void preservationEventsStateUpdated(final AIP aip) {
 
     CloseableIterable<OptionalWithCause<PreservationMetadata>> preservationMetadata = null;
     try {
@@ -402,7 +403,7 @@ public class IndexModelObserver implements ModelObserver {
           PreservationMetadata pm = opm.get();
           if (pm.getType().equals(PreservationMetadataType.EVENT)) {
             try {
-              preservationEventActiveFlagUpdated(pm, aip.isActive());
+              preservationEventStateUpdated(pm, aip.getState());
             } catch (SolrServerException | IOException | RequestNotValidException | GenericException | NotFoundException
               | AuthorizationDeniedException e) {
               LOGGER.error("Cannot index premis event", e);
@@ -420,11 +421,10 @@ public class IndexModelObserver implements ModelObserver {
 
   }
 
-  private void preservationEventActiveFlagUpdated(PreservationMetadata pm, boolean active)
-    throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException,
-    SolrServerException, IOException {
-    SolrInputDocument premisEventDocument = SolrUtils.preservationEventActiveFlagUpdateToSolrDocument(pm.getId(),
-      pm.getAipId(), active);
+  private void preservationEventStateUpdated(PreservationMetadata pm, AIPState state) throws RequestNotValidException,
+    GenericException, NotFoundException, AuthorizationDeniedException, SolrServerException, IOException {
+    SolrInputDocument premisEventDocument = SolrUtils.preservationEventStateUpdateToSolrDocument(pm.getId(),
+      pm.getAipId(), state);
 
     index.add(RodaConstants.INDEX_PRESERVATION_EVENTS, premisEventDocument);
   }

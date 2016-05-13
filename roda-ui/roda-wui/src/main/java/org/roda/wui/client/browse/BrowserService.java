@@ -158,7 +158,7 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException;
 
   <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, String localeString, boolean showInactive)
+    Facets facets, String localeString, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException;
 
   <T extends IsIndexed> Long count(String classNameToReturn, Filter filter)

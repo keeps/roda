@@ -118,13 +118,13 @@ public class IndexService {
   }
 
   public <T extends IsIndexed> IndexResult<T> find(Class<T> returnClass, Filter filter, Sorter sorter, Sublist sublist,
-    Facets facets, RodaUser user, boolean showInactive) throws GenericException, RequestNotValidException {
-    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, showInactive);
+    Facets facets, RodaUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    return SolrUtils.find(index, returnClass, filter, sorter, sublist, facets, user, justActive);
   }
 
-  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean showInactive)
+  public <T extends IsIndexed> Long count(Class<T> returnClass, Filter filter, RodaUser user, boolean justActive)
     throws GenericException, RequestNotValidException {
-    return SolrUtils.count(index, returnClass, filter, user, showInactive);
+    return SolrUtils.count(index, returnClass, filter, user, justActive);
   }
 
   public <T extends IsIndexed> T retrieve(Class<T> returnClass, String id) throws NotFoundException, GenericException {

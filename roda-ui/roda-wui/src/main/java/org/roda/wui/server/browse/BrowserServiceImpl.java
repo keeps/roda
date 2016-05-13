@@ -159,12 +159,12 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
   @Override
   public <T extends IsIndexed> IndexResult<T> find(String classNameToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, String localeString, boolean showInactive)
+    Sublist sublist, Facets facets, String localeString, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     try {
       RodaUser user = UserUtility.getUser(getThreadLocalRequest());
       Class<T> classToReturn = parseClass(classNameToReturn);
-      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, showInactive);
+      IndexResult<T> result = Browser.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
       return I18nUtility.translate(result, classToReturn, localeString);
     } catch (Throwable e) {
       LOGGER.error("Unexpected error in find", e);

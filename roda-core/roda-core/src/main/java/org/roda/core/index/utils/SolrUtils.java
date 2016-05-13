@@ -165,8 +165,8 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> Long count(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    RodaUser user, boolean showInactive) throws GenericException, RequestNotValidException {
-    return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, showInactive).getTotalCount();
+    RodaUser user, boolean justActive) throws GenericException, RequestNotValidException {
+    return find(index, classToRetrieve, filter, null, new Sublist(0, 0), null, user, justActive).getTotalCount();
   }
 
   public static <T extends IsIndexed> T retrieve(SolrClient index, Class<T> classToRetrieve, String id)
@@ -212,7 +212,7 @@ public class SolrUtils {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
-    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
+    Sorter sorter, Sublist sublist, Facets facets, RodaUser user, boolean justActive)
     throws GenericException, RequestNotValidException {
 
     IndexResult<T> ret;
@@ -224,7 +224,7 @@ public class SolrUtils {
     query.setRows(sublist.getMaximumElementCount());
     parseAndConfigureFacets(facets, query);
     if (hasPermissionFilters(classToRetrieve)) {
-      query.addFilterQuery(getFilterQueries(user, showInactive));
+      query.addFilterQuery(getFilterQueries(user, justActive));
     }
 
     try {
@@ -506,6 +506,22 @@ public class SolrUtils {
     return ret;
   }
 
+  private static String objectToString(Object object, String defaultValue) {
+    String ret = defaultValue;
+    if (object != null) {
+      if (object instanceof String) {
+        ret = (String) object;
+      } else {
+        LOGGER.warn("Could not convert Solr object to string, unsupported class: {}", object.getClass().getName());
+        ret = object.toString();
+      }
+    }
+    return ret;
+  }
+
+  /**
+   * @deprecated use {@link #objectToString(Object, String)} instead
+   */
   private static String objectToString(Object object) {
     String ret;
     if (object == null) {
@@ -974,7 +990,7 @@ public class SolrUtils {
    * Roda user > Apache Solr filter query
    * ____________________________________________________________________________________________________________________
    */
-  private static String getFilterQueries(RodaUser user, boolean showInactive) {
+  private static String getFilterQueries(RodaUser user, boolean justActive) {
 
     StringBuilder fq = new StringBuilder();
 
@@ -987,8 +1003,8 @@ public class SolrUtils {
       appendValuesUsingOROperator(fq, groupsKey, new ArrayList<>(user.getAllGroups()), true);
     }
 
-    if (!showInactive) {
-      appendExactMatch(fq, RodaConstants.ACTIVE, Boolean.TRUE.toString(), true, true);
+    if (justActive) {
+      appendExactMatch(fq, RodaConstants.STATE, AIPState.ACTIVE.toString(), true, true);
     }
 
     return fq.toString();
@@ -1070,8 +1086,8 @@ public class SolrUtils {
 
   public static IndexedAIP solrDocumentToIndexedAIP(SolrDocument doc) {
     final String id = objectToString(doc.get(RodaConstants.AIP_ID));
-    final Boolean active = objectToBoolean(doc.get(RodaConstants.ACTIVE), Boolean.FALSE);
-    final AIPState state = active ? AIPState.ACTIVE : AIPState.INACTIVE;
+    final AIPState state = AIPState
+      .valueOf(objectToString(doc.get(RodaConstants.STATE), AIPState.getDefault().toString()));
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
@@ -1098,7 +1114,7 @@ public class SolrUtils {
 
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
-    ret.addField(RodaConstants.ACTIVE, aip.isActive());
+    ret.addField(RodaConstants.STATE, aip.getState().toString());
 
     // set ancestors
     List<String> ancestors = getAncestors(aip.getParentId(), model);
@@ -1210,7 +1226,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.REPRESENTATION_NUMBER_OF_SCHEMA_FILES, numberOfSchemaFiles);
 
     // indexing active state and permissions
-    doc.addField(RodaConstants.ACTIVE, aip.isActive());
+    doc.addField(RodaConstants.STATE, aip.getState().toString());
     setPermissions(aip.getPermissions(), doc);
 
     return doc;
@@ -1247,7 +1263,7 @@ public class SolrUtils {
     }
 
     // indexing active state and permissions
-    doc.addField(RodaConstants.ACTIVE, aip.isActive());
+    doc.addField(RodaConstants.STATE, aip.getState().toString());
     setPermissions(aip.getPermissions(), doc);
 
     return doc;
@@ -1681,8 +1697,8 @@ public class SolrUtils {
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
     jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID)));
     jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID)));
-    jobReport
-      .setOutcomeObjectState(AIPState.valueOf(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE))));
+    jobReport.setOutcomeObjectState(AIPState.valueOf(
+      objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE), AIPState.getDefault().toString())));
     jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));
     jobReport.setDateCreated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_CREATED)));
     jobReport.setDateUpdated(objectToDate(doc.get(RodaConstants.JOB_REPORT_DATE_UPDATE)));
@@ -1938,33 +1954,33 @@ public class SolrUtils {
    * ____________________________________________________________________________________________________________________
    */
 
-  public static SolrInputDocument aipActiveFlagUpdateToSolrDocument(AIP aip) {
-    return activeFlagUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.isActive());
+  public static SolrInputDocument aipStateUpdateToSolrDocument(AIP aip) {
+    return stateUpdateToSolrDocument(RodaConstants.AIP_ID, aip.getId(), aip.getState());
   }
 
-  public static SolrInputDocument representationActiveFlagUpdateToSolrDocument(Representation representation,
-    boolean active) {
-    return activeFlagUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
-      IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), active);
+  public static SolrInputDocument representationStateUpdateToSolrDocument(Representation representation,
+    AIPState state) {
+    return stateUpdateToSolrDocument(RodaConstants.REPRESENTATION_UUID,
+      IdUtils.getRepresentationId(representation.getAipId(), representation.getId()), state);
   }
 
-  public static SolrInputDocument fileActiveFlagUpdateToSolrDocument(File file, boolean active) {
-    return activeFlagUpdateToSolrDocument(RodaConstants.FILE_UUID, IdUtils.getFileId(file), active);
+  public static SolrInputDocument fileStateUpdateToSolrDocument(File file, AIPState state) {
+    return stateUpdateToSolrDocument(RodaConstants.FILE_UUID, IdUtils.getFileId(file), state);
   }
 
-  public static SolrInputDocument preservationEventActiveFlagUpdateToSolrDocument(String preservationEventID,
-    String preservationEventAipId, boolean active) {
-    SolrInputDocument document = activeFlagUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID,
-      preservationEventID, active);
+  public static SolrInputDocument preservationEventStateUpdateToSolrDocument(String preservationEventID,
+    String preservationEventAipId, AIPState state) {
+    SolrInputDocument document = stateUpdateToSolrDocument(RodaConstants.PRESERVATION_EVENT_ID, preservationEventID,
+      state);
     document.addField(RodaConstants.PRESERVATION_EVENT_AIP_ID, preservationEventAipId);
     return document;
 
   }
 
-  private static SolrInputDocument activeFlagUpdateToSolrDocument(String idField, String idValue, boolean active) {
+  private static SolrInputDocument stateUpdateToSolrDocument(String idField, String idValue, AIPState state) {
     SolrInputDocument doc = new SolrInputDocument();
     doc.addField(idField, idValue);
-    doc.addField(RodaConstants.ACTIVE, set(active));
+    doc.addField(RodaConstants.STATE, set(state.toString()));
     return doc;
   }
 
@@ -2212,7 +2228,7 @@ public class SolrUtils {
 
       // indexing active state and permissions
       if (aip != null) {
-        doc.addField(RodaConstants.ACTIVE, aip.isActive());
+        doc.addField(RodaConstants.STATE, aip.getState().toString());
         setPermissions(aip.getPermissions(), doc);
       }
     }

@@ -157,7 +157,7 @@ public class Browser extends RodaCoreService {
   }
 
   public static <T extends IsIndexed> IndexResult<T> find(Class<T> classToReturn, Filter filter, Sorter sorter,
-    Sublist sublist, Facets facets, RodaUser user, boolean showInactive)
+    Sublist sublist, Facets facets, RodaUser user, boolean justActive)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -166,7 +166,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, BROWSE_ROLE);
 
     // delegate
-    IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, showInactive);
+    IndexResult<T> ret = BrowserHelper.find(classToReturn, filter, sorter, sublist, facets, user, justActive);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();

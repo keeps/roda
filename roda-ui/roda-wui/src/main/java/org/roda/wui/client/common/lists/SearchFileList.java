@@ -50,11 +50,11 @@ public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
   private TextColumn<IndexedFile> lengthColumn;
 
   public SearchFileList() {
-    this(null, null, null, false, false);
+    this(null, null, null, false, true);
   }
 
-  public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
-    super(filter, facets, summary, selectable, showInactive);
+  public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean justActive) {
+    super(filter, facets, summary, selectable, justActive);
     super.setSelectedClass(IndexedFile.class);
   }
 
@@ -183,9 +183,10 @@ public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      boolean showInactive = getObject();
+      // FIXME 20160513 hsilva: what to do here???
+      boolean justActive = getObject();
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
     }
   }
 }

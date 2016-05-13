@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -41,13 +42,13 @@ public class EARKSIPToAIPPluginUtils {
     throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
 
-    boolean active = false;
+    AIPState state = AIPState.getDefault();
     Permissions permissions = new Permissions();
     boolean notify = false;
 
     String aipType = IngestHelper.getType(sip);
 
-    AIP aip = model.createAIP(active, parentId, aipType, permissions, notify);
+    AIP aip = model.createAIP(state, parentId, aipType, permissions, notify);
 
     // process IP information
     processIPInformation(model, sip, aip, notify);

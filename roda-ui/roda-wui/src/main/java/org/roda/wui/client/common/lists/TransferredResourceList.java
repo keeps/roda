@@ -172,9 +172,9 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean showInactive = true;
+    boolean justActive = false;
     BrowserService.Util.getInstance().find(TransferredResource.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
   }
 
 }

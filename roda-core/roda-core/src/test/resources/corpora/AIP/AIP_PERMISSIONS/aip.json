@@ -1,6 +1,6 @@
 {
   "parentId": null,
-  "active": false,
+  "state": CREATED,
   "type": "MIXED",
   "permissions": {
     "users": {

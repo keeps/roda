@@ -1,6 +1,6 @@
 {
   "parentId": "AIP_1",
-  "active": true,
+  "state": ACTIVE,
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{

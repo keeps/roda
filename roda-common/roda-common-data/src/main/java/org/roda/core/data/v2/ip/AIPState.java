@@ -8,5 +8,10 @@
 package org.roda.core.data.v2.ip;
 
 public enum AIPState {
-  ACTIVE, INACTIVE, DELETED;
+  CREATED, INGEST_PROCESSING, UNDER_APPRAISAL, ACTIVE, DELETED;
+
+  public static AIPState getDefault() {
+    return CREATED;
+  }
+
 }

@@ -67,11 +67,11 @@ public class AgentsResource {
 
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
-    // TODO add show inactive to API
-    boolean showInactive = false;
+    // TODO add show just active to API
+    boolean justActive = true;
     IndexResult<Agent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(Agent.class, Filter.NONE,
       Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      showInactive);
+      justActive);
 
     // transform controller method output
     List<Agent> agents = org.roda.wui.api.controllers.Agents.retrieveAgents(listAgentsIndexResult);

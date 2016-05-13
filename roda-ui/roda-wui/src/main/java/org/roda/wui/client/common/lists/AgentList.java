@@ -103,8 +103,9 @@ public class AgentList extends BasicAsyncTableCell<Agent> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
+    boolean justActive = false;
     BrowserService.Util.getInstance().find(Agent.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), true, callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
   }
 
   @Override

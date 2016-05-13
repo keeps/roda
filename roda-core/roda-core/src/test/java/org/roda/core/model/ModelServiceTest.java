@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
+import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -49,6 +50,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -141,7 +143,7 @@ public class ModelServiceTest {
     assertNotNull(aip);
     assertEquals(aipId, aip.getId());
     assertNull("AIP_1 should not have a parent", aip.getParentId());
-    assertTrue(aip.isActive());
+    assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
@@ -286,7 +288,7 @@ public class ModelServiceTest {
     assertNotNull(aip);
     assertEquals(aipId, aip.getId());
     assertNull("AIP_1 should not have a parent", aip.getParentId());
-    assertTrue(aip.isActive());
+    assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());
@@ -328,7 +330,7 @@ public class ModelServiceTest {
     assertNotNull(aip);
     assertEquals(aipId, aip.getId());
     assertNull("AIP_1 should not have a parent", aip.getParentId());
-    assertTrue(aip.isActive());
+    assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
 
     List<String> descriptiveMetadataIds = aip.getDescriptiveMetadata().stream().map(dm -> dm.getId())
       .collect(Collectors.toList());

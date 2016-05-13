@@ -194,8 +194,8 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean showInactive = true;
+    boolean justActive = false;
     BrowserService.Util.getInstance().find(Report.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
+      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
   }
 }

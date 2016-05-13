@@ -28,7 +28,7 @@ public class Report implements Serializable, IsIndexed {
   private String jobId = null;
   private String sourceObjectId = null;
   private String outcomeObjectId = null;
-  private AIPState outcomeObjectState = AIPState.INACTIVE;
+  private AIPState outcomeObjectState = AIPState.getDefault();
 
   private String title = null;
   private Date dateCreated = null;

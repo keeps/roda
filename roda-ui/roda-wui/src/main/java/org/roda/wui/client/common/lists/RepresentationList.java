@@ -184,9 +184,10 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Bo
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      boolean showInactive = getObject();
+      // FIXME 20160513 hsilva: how to do here???
+      boolean justActive = getObject();
       BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
-        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
+        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
     }
   }
 

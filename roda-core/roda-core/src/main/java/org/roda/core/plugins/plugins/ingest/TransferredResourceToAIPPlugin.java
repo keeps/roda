@@ -24,6 +24,7 @@ import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
@@ -98,13 +99,13 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
         LOGGER.debug("Converting {} to AIP", transferredResourcePath);
 
-        boolean active = false;
+        AIPState state = AIPState.getDefault();
         Permissions permissions = new Permissions();
         boolean notifyCreatedAIP = false;
 
         String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-        final AIP aip = model.createAIP(active, parentId, aipType, permissions, notifyCreatedAIP);
+        final AIP aip = model.createAIP(state, parentId, aipType, permissions, notifyCreatedAIP);
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
         boolean notifyRepresentationCreated = false;

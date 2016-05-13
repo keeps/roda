@@ -61,9 +61,9 @@ public abstract class ModelObservable {
     }
   }
 
-  protected void notifyAipActiveFlagUpdated(AIP aip) {
+  protected void notifyAipStateUpdated(AIP aip) {
     for (ModelObserver observer : observers) {
-      observer.aipActiveFlagUpdated(aip);
+      observer.aipStateUpdated(aip);
     }
   }
 

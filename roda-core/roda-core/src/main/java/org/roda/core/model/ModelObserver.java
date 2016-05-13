@@ -32,7 +32,7 @@ public interface ModelObserver {
 
   public void aipUpdated(AIP aip);
 
-  public void aipActiveFlagUpdated(AIP aip);
+  public void aipStateUpdated(AIP aip);
 
   public void aipMoved(AIP aip, String oldParentId, String newParentId);
 

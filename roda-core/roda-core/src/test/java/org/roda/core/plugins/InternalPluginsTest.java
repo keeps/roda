@@ -7,6 +7,8 @@
  */
 package org.roda.core.plugins;
 
+import static org.junit.Assert.assertThat;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.URL;
@@ -31,6 +33,7 @@ import org.apache.jena.ext.com.google.common.collect.Iterables;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.xmlbeans.XmlException;
 import org.hamcrest.Matchers;
+import org.hamcrest.core.Is;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,6 +59,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -198,8 +202,6 @@ public class InternalPluginsTest {
       UUID.nameUUIDFromBytes("test".getBytes()).toString());
     return transferredResource;
   }
-
-  
 
   private AIP ingestCorpora() throws RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException, InvalidParameterException, InterruptedException, IOException,
@@ -544,7 +546,7 @@ public class InternalPluginsTest {
 
     aip = model.retrieveAIP(aip.getId());
 
-    Assert.assertTrue(aip.isActive());
+    assertThat(aip.getState(), Is.is(AIPState.ACTIVE));
   }
 
 }
