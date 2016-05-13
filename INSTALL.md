@@ -14,9 +14,7 @@ sudo apt-get install oracle-java8-set-default
 
 ### Application Server (required)
 Recommended application server is Apache Tomcat 8, but other Java EE application servers might work.
-
-* Ubuntu: `sudo apt-get install tomcat8 -y`
-* CentOS: `TBD`
+To install, [download Apache Tomcat}(http://tomcat.apache.org/) and unzip it to your preferred folder.
 
 ### Apache Solr (optional)
 
@@ -111,22 +109,63 @@ libreoffice-pdfimport multiarch-support sysv-rc sysvinit-utils -y
 
 [Download a RODA release](https://github.com/keeps/roda/releases) and install on your application server. Alternatively, [download the source-code](https://github.com/keeps/roda) and compile with `mvn clean package`, the release will be at `roda-ui/roda-wui/target/roda-wui-*.war`.
 
-To install in Apache Tomcat 8, find the webapps directory (see below) and copy the RODA WAR file there. Rename it to ROOT.war if you want it to be the default web application (also delete ROOT directory).
-
-Apache Tomcat 8 directory is at:
-* Ubuntu: `/var/lib/tomcat8/webapps`
-* CentOS: `TBD`
-
-Start-up Tomcat:
-* Ubuntu: `sudo service tomcat8 start`
-* CentOS: `TBD`
+To install in Apache Tomcat 8, find the webapps directory and copy the RODA WAR file there. Rename it to ROOT.war if you want it to be the default web application (also delete ROOT directory).
+Then you can start the service by running `./bin/startup.sh`.
 
 Check if it worked: http://localhost:8080
+
+Apache Tomcat should be added as a service to the system so it can be initiated at startup, this is dependent on the selected operative system.
 
 ## Configure
 
 RODA default configuration folder is available at `~/.roda/config`.
 By default no configuration is needed.
+
+To change the default configuration folder, add the following lines at the beginning of `catalina.sh` file in the Apache Tomcat bin folder.
+
+```
+RODA_HOME=/home/roda/roda
+JAVA_OPTS="$JAVA_OPTS -Droda.home=$RODA_HOME"
+```
+
+You might also force here which Java is being used and increase the memory limit.
+```
+JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+JAVA_OPTS="$JAVA_OPTS -Xmx4g"
+```
+
+### Use Siegfried format identifier as a service (recommended)
+
+Edit the config/roda-core.properties file and make sure these are the activated options. Comment the existing ones if necessary
+
+```
+core.tools.siegfried.mode = server
+#core.tools.siegfried.mode = standalone
+core.tools.siegfried.binary = sf
+core.tools.siegfried.server = http://localhost:5138
+```
+
+### Use ClamV antivirus as a service (recommended)
+
+Make sure you have the following settings activated. Comment the existing ones if necessary.
+
+```
+core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan
+core.plugins.internal.virus_check.clamav.params = -m --fdpass
+core.plugins.internal.virus_check.clamav.get_version = clamdscan --version
+```
+
+### Add risks based on Drambora (optional)
+
+
+Under the folder "$HOME/.roda/data/storage" run the following commands:
+
+```
+wget https://github.com/keeps/roda/archive/risks.zip
+unzip risks.zip; mv roda-risks Risk; rm risks.zip
+curl -X POST --header "Content-Type: application/json" --header "Accept: application/json" "http://localhost:8080/api/v1/management_tasks/index/reindex?entity=risk" -u USERNAME:PASSWORD
+```
+NOTE: On the last command change the "USERNAME" and "PASSWORD" to your admin credentials on RODA. Also update the URL if necessary. This will load the risks into the repository indexes.
 
 ### Configure Apache Solr (optional)
 
