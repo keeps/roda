@@ -35,6 +35,7 @@ import javax.ws.rs.core.StreamingOutput;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.net.util.Base64;
 import org.glassfish.jersey.media.multipart.FormDataContentDisposition;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
@@ -63,6 +64,7 @@ import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.agents.Agent;
@@ -99,7 +101,6 @@ import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
-import org.roda.core.model.utils.JsonUtils;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
@@ -1109,7 +1110,7 @@ public class BrowserHelper {
         IndexResult<IndexedAIP> collections = index.find(IndexedAIP.class, allButRepresentationsFilter, null,
           new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE));
         for (IndexedAIP aip : collections.getResults()) {
-          array.add(JsonUtils.aipToJSON(aip));
+          array.add(aipToJSON(aip));
         }
       }
       root.set("dos", array);
@@ -1126,6 +1127,57 @@ public class BrowserHelper {
       throw new GenericException("Error creating classification plan: " + e.getMessage());
     }
 
+  }
+
+  /**
+   * @deprecated this method should be replaced by a specialized class to
+   *             marshal and unmarshal a classification plans
+   */
+  @Deprecated
+  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
+    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+    JsonFactory factory = new JsonFactory();
+    ObjectMapper mapper = new ObjectMapper(factory);
+    ModelService model = RodaCoreFactory.getModelService();
+
+    ObjectNode node = mapper.createObjectNode();
+    if (indexedAIP.getTitle() != null) {
+      node = node.put("title", indexedAIP.getTitle());
+    }
+    if (indexedAIP.getId() != null) {
+      node = node.put("id", indexedAIP.getId());
+    }
+    if (indexedAIP.getParentID() != null) {
+      node = node.put("parentId", indexedAIP.getParentID());
+    }
+    if (indexedAIP.getLevel() != null) {
+      node = node.put("descriptionlevel", indexedAIP.getLevel());
+    }
+
+    AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
+    if (modelAIP != null) {
+      List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
+      if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
+        ArrayNode metadata = mapper.createArrayNode();
+        for (DescriptiveMetadata dm : descriptiveMetadata) {
+          ObjectNode dmNode = mapper.createObjectNode();
+          if (dm.getId() != null) {
+            dmNode = dmNode.put("id", dm.getId());
+          }
+          if (dm.getType() != null) {
+            dmNode = dmNode.put("type", dm.getType());
+          }
+          Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
+          InputStream is = b.getContent().createInputStream();
+          dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
+          IOUtils.closeQuietly(is);
+          dmNode = dmNode.put("contentEncoding", "Base64");
+          metadata = metadata.add(dmNode);
+        }
+        node.set("metadata", metadata);
+      }
+    }
+    return node;
   }
 
   public static List<SupportedMetadataTypeBundle> getSupportedMetadata(RodaUser user, Locale locale)

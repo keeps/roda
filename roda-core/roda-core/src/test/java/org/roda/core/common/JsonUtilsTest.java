@@ -13,8 +13,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 import org.roda.core.data.exceptions.GenericException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.model.utils.JsonUtils;
 
 public class JsonUtilsTest {
 

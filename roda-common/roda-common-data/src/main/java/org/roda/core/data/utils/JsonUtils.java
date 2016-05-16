@@ -5,7 +5,7 @@
  *
  * https://github.com/keeps/roda
  */
-package org.roda.core.model.utils;
+package org.roda.core.data.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,25 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.net.util.Base64;
-import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.exceptions.AuthorizationDeniedException;
 import org.roda.core.data.exceptions.GenericException;
-import org.roda.core.data.exceptions.NotFoundException;
-import org.roda.core.data.exceptions.RequestNotValidException;
-import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
-import org.roda.core.model.ModelService;
-import org.roda.core.storage.Binary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 
 public class JsonUtils {
@@ -140,50 +128,50 @@ public class JsonUtils {
    * @deprecated this method should be replaced by a specialized class to
    *             marshal and unmarshal a classification plans
    */
-  @Deprecated
-  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
-    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
-    JsonFactory factory = new JsonFactory();
-    ObjectMapper mapper = new ObjectMapper(factory);
-    ModelService model = RodaCoreFactory.getModelService();
-
-    ObjectNode node = mapper.createObjectNode();
-    if (indexedAIP.getTitle() != null) {
-      node = node.put("title", indexedAIP.getTitle());
-    }
-    if (indexedAIP.getId() != null) {
-      node = node.put("id", indexedAIP.getId());
-    }
-    if (indexedAIP.getParentID() != null) {
-      node = node.put("parentId", indexedAIP.getParentID());
-    }
-    if (indexedAIP.getLevel() != null) {
-      node = node.put("descriptionlevel", indexedAIP.getLevel());
-    }
-
-    AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
-    if (modelAIP != null) {
-      List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
-      if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
-        ArrayNode metadata = mapper.createArrayNode();
-        for (DescriptiveMetadata dm : descriptiveMetadata) {
-          ObjectNode dmNode = mapper.createObjectNode();
-          if (dm.getId() != null) {
-            dmNode = dmNode.put("id", dm.getId());
-          }
-          if (dm.getType() != null) {
-            dmNode = dmNode.put("type", dm.getType());
-          }
-          Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
-          InputStream is = b.getContent().createInputStream();
-          dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
-          IOUtils.closeQuietly(is);
-          dmNode = dmNode.put("contentEncoding", "Base64");
-          metadata = metadata.add(dmNode);
-        }
-        node.set("metadata", metadata);
-      }
-    }
-    return node;
-  }
+//  @Deprecated
+//  public static ObjectNode aipToJSON(IndexedAIP indexedAIP)
+//    throws IOException, RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
+//    JsonFactory factory = new JsonFactory();
+//    ObjectMapper mapper = new ObjectMapper(factory);
+//    ModelService model = RodaCoreFactory.getModelService();
+//
+//    ObjectNode node = mapper.createObjectNode();
+//    if (indexedAIP.getTitle() != null) {
+//      node = node.put("title", indexedAIP.getTitle());
+//    }
+//    if (indexedAIP.getId() != null) {
+//      node = node.put("id", indexedAIP.getId());
+//    }
+//    if (indexedAIP.getParentID() != null) {
+//      node = node.put("parentId", indexedAIP.getParentID());
+//    }
+//    if (indexedAIP.getLevel() != null) {
+//      node = node.put("descriptionlevel", indexedAIP.getLevel());
+//    }
+//
+//    AIP modelAIP = model.retrieveAIP(indexedAIP.getId());
+//    if (modelAIP != null) {
+//      List<DescriptiveMetadata> descriptiveMetadata = modelAIP.getDescriptiveMetadata();
+//      if (descriptiveMetadata != null && !descriptiveMetadata.isEmpty()) {
+//        ArrayNode metadata = mapper.createArrayNode();
+//        for (DescriptiveMetadata dm : descriptiveMetadata) {
+//          ObjectNode dmNode = mapper.createObjectNode();
+//          if (dm.getId() != null) {
+//            dmNode = dmNode.put("id", dm.getId());
+//          }
+//          if (dm.getType() != null) {
+//            dmNode = dmNode.put("type", dm.getType());
+//          }
+//          Binary b = model.retrieveDescriptiveMetadataBinary(modelAIP.getId(), dm.getId());
+//          InputStream is = b.getContent().createInputStream();
+//          dmNode = dmNode.put("content", new String(Base64.encodeBase64(IOUtils.toByteArray(is))));
+//          IOUtils.closeQuietly(is);
+//          dmNode = dmNode.put("contentEncoding", "Base64");
+//          metadata = metadata.add(dmNode);
+//        }
+//        node.set("metadata", metadata);
+//      }
+//    }
+//    return node;
+//  }
 }
