@@ -22,9 +22,7 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 				</g:FlowPanel>
-				<g:Label styleName="label-danger" ui:field="inactiveLabel">
-					<ui:msg>Under appraisal</ui:msg>
-				</g:Label>
+				<g:Label styleName="label-danger" ui:field="stateLabel" />
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">

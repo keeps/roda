@@ -13,6 +13,7 @@ package config.i18n.client;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 
 import com.google.gwt.i18n.client.Messages;
@@ -776,13 +777,18 @@ public interface BrowseMessages extends Messages {
     "Permission to seach or access this archival package", "UPDATE",
     "Permission to change this archival package or any of its sub-components"})
   String objectPermissionDescription(@Select PermissionType permissionType);
-  
+
   /************* Ingest appraisal ****************/
-  
+
   @DefaultMessage("Accept")
   String ingestAppraisalAcceptButton();
-  
+
   @DefaultMessage("Reject")
   String ingestAppraisalRejectButton();
+
+  @DefaultMessage("Unknown")
+  @AlternateMessage({"ACTIVE", "active", "CREATED", "created", "DELETED", "deleted", "INGEST_PROCESSING", "ingesting",
+    "UNDER_APPRAISAL", "under appraisal"})
+  String aipState(@Select AIPState state);
 
 }

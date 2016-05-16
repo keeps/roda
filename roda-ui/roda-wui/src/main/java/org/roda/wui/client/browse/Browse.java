@@ -167,7 +167,7 @@ public class Browse extends Composite {
   SimplePanel itemIcon;
 
   @UiField
-  Label inactiveLabel, itemTitle, itemId;
+  Label stateLabel, itemTitle, itemId;
 
   @UiField
   TabPanel itemMetadata;
@@ -362,6 +362,10 @@ public class Browse extends Composite {
     submission.setVisible(false);
     documentation.setVisible(false);
     schemas.setVisible(false);
+    
+    for (AIPState state : AIPState.values()) {
+      this.removeStyleName(state.toString().toLowerCase());
+    }
   }
 
   protected void showError(String id, Throwable caught) {
@@ -498,21 +502,13 @@ public class Browse extends Composite {
       documentation.setVisible(aip.getNumberOfDocumentationFiles() > 0);
       schemas.setVisible(aip.getNumberOfSchemaFiles() > 0);
 
-      // FIXME 20160513 hsilva: this should be rethought as new states exist
-      // if (AIPState.INACTIVE.equals(aip.getState())) {
-      // this.addStyleName("inactive");
-      // inactiveLabel.setVisible(true);
-      // } else {
-      // this.removeStyleName("inactive");
-      // inactiveLabel.setVisible(false);
-      // }
-      if (AIPState.ACTIVE != aip.getState()) {
-        this.addStyleName("inactive");
-        inactiveLabel.setVisible(true);
-      } else {
-        this.removeStyleName("inactive");
-        inactiveLabel.setVisible(false);
+      for (AIPState state : AIPState.values()) {
+        this.removeStyleName(state.toString().toLowerCase());
       }
+
+      this.addStyleName(aip.getState().toString().toLowerCase());
+      stateLabel.setText(messages.aipState(aip.getState()));
+      stateLabel.setVisible(AIPState.ACTIVE != aip.getState());
 
     } else {
       viewAction();
@@ -550,7 +546,7 @@ public class Browse extends Composite {
     download.setVisible(false);
 
     this.removeStyleName("inactive");
-    inactiveLabel.setVisible(false);
+    stateLabel.setVisible(false);
   }
 
   private void removeHandlerRegistrations() {
