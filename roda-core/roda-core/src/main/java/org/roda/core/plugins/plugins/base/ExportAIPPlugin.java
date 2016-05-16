@@ -94,7 +94,7 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> aips)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     FileOutputStream fos = null;
     // FIXME 20160418 hsilva: change all java.io to nio based code
     // FIXME 20160419 hsilva: when exporting single ZIP, name the file something

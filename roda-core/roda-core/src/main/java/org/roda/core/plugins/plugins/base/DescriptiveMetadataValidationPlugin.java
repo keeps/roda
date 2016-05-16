@@ -14,6 +14,7 @@ import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -108,11 +109,11 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
     String metadataType = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_TYPE);
     String metadataVersion = PluginHelper.getStringFromParameters(this, PARAMETER_METADATA_VERSION);
 
-    Report pluginReport = PluginHelper.createPluginReport(this);
+    Report pluginReport = PluginHelper.initPluginReport(this);
     List<ValidationReport> reports = new ArrayList<ValidationReport>();
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
       try {
         LOGGER.debug("Validating AIP {}", aip.getId());
         ValidationReport report = ValidationUtils.isAIPMetadataValid(forceDescriptiveMetadataType,
@@ -133,7 +134,7 @@ public class DescriptiveMetadataValidationPlugin extends AbstractPlugin<AIP> {
       }
 
       try {
-        PluginHelper.updateJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       } catch (Throwable e) {
         LOGGER.error("Error updating job report", e);
       }

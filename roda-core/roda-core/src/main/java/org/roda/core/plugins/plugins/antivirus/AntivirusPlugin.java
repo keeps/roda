@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -102,11 +103,11 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       VirusCheckResult virusCheckResult = null;
       Exception exception = null;
@@ -143,7 +144,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
         createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
         report.addReport(reportItem);
 
-        PluginHelper.updateJobReport(this, model, index, reportItem, true);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
       } catch (Throwable e) {
         LOGGER.error("Error updating event and job", e);

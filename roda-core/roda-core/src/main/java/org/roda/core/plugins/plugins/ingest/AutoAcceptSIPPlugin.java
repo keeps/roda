@@ -72,11 +72,11 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       String outcomeDetail = "";
       try {
@@ -84,18 +84,19 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
         aip.setState(AIPState.ACTIVE);
         aip = model.updateAIPState(aip);
-        reportItem.setPluginState(PluginState.SUCCESS);
+        reportItem.setPluginState(PluginState.SUCCESS).setOutcomeObjectState(AIPState.ACTIVE);
         LOGGER.debug("Done with auto accepting AIP {}", aip.getId());
       } catch (RODAException e) {
         LOGGER.error("Error updating AIP (metadata attribute state=ACTIVE)", e);
         outcomeDetail = "Error updating AIP (metadata attribute state=ACTIVE): " + e.getMessage();
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail);
+        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(outcomeDetail)
+          .setOutcomeObjectState(AIPState.UNDER_APPRAISAL);
       }
 
       createEvent(outcomeDetail, reportItem.getPluginState(), aip, model, index);
       report.addReport(reportItem);
 
-      PluginHelper.updateJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
     }
 
     return report;

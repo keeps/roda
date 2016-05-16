@@ -1448,7 +1448,7 @@ public class ModelService extends ModelObservable {
 
   public Report retrieveJobReport(String jobId, String aipId)
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
-    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, aipId);
+    StoragePath jobReportPath = ModelUtils.getJobReportStoragePath(jobId, IdUtils.getJobReportId(jobId, aipId));
     Binary binary = storage.getBinary(jobReportPath);
     Report ret;
     InputStream inputStream = null;
@@ -2074,7 +2074,7 @@ public class ModelService extends ModelObservable {
 
   /****************************************************************
    * 
-   * OTHER DIRECTORIES
+   * OTHER DIRECTORIES (submission, documentation, schemas)
    * 
    *********************************************************/
 

@@ -88,18 +88,18 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     String parentId = PluginHelper.computeParentId(this, index, null);
 
     for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
+      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
 
       try {
         Path transferredResourcePath = Paths.get(transferredResource.getFullPath());
         LOGGER.debug("Converting {} to AIP", transferredResourcePath);
 
-        AIPState state = AIPState.getDefault();
+        AIPState state = AIPState.INGEST_PROCESSING;
         Permissions permissions = new Permissions();
         boolean notifyCreatedAIP = false;
 
@@ -134,6 +134,8 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
         // TODO make the following strings constants
         model.createDescriptiveMetadata(aip.getId(), "metadata.xml", metadataPayload, METADATA_TYPE, METADATA_VERSION,
           notifyDescriptiveMetadataCreated);
+
+        // FIXME 20160516 hsilva: put "SIP" inside the AIP???
 
         model.notifyAIPCreated(aip.getId());
 

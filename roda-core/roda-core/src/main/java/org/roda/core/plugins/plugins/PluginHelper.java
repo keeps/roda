@@ -32,6 +32,7 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -62,23 +63,36 @@ public final class PluginHelper {
   private PluginHelper() {
   }
 
-  public static <T extends Serializable> Report createPluginReport(Plugin<T> plugin) {
-    return createPluginReportItem(plugin, null, null);
+  /***************** Job report related *****************/
+  /******************************************************/
+
+  public static <T extends Serializable> Report initPluginReport(Plugin<T> plugin) {
+    return initPluginReportItem(plugin, "", "");
   }
 
-  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin,
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
-    return createPluginReportItem(plugin, null, transferredResource.getUUID());
+    return initPluginReportItem(plugin, null, transferredResource.getUUID())
+      .setOutcomeObjectState(AIPState.INGEST_PROCESSING);
   }
 
-  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String outcomeObjectId) {
-    return createPluginReportItem(plugin, outcomeObjectId, null);
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+    AIPState initialOutcomeObjectState) {
+    return initPluginReportItem(plugin, outcomeObjectId, "").setOutcomeObjectState(initialOutcomeObjectState);
   }
 
-  public static <T extends Serializable> Report createPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
+    String jobId = getJobId(plugin);
     Report reportItem = new Report();
-    reportItem.setJobId(getJobId(plugin));
+    String jobReportPartialId = outcomeObjectId;
+    // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
+    // operation
+    if (jobReportPartialId == null || "".equals(jobReportPartialId)) {
+      jobReportPartialId = sourceObjectId;
+    }
+    reportItem.setId(IdUtils.getJobReportId(jobId, jobReportPartialId));
+    reportItem.setJobId(jobId);
     reportItem.setSourceObjectId(sourceObjectId);
     reportItem.setOutcomeObjectId(outcomeObjectId);
     reportItem.setTitle(plugin.getName());
@@ -89,6 +103,79 @@ public final class PluginHelper {
     return reportItem;
   }
 
+  public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
+    String jobId = getJobId(plugin);
+    Report report = new Report(reportItem);
+    String reportPartialId = reportItem.getOutcomeObjectId();
+    // FIXME 20160516 hsilva: this has problems when doing one to many SIP > AIP
+    // operation
+    if (reportPartialId == null || "".equals(reportPartialId)) {
+      reportPartialId = reportItem.getSourceObjectId();
+    }
+    reportItem.setId(IdUtils.getJobReportId(jobId, reportPartialId));
+    report.setId(IdUtils.getJobReportId(jobId, reportPartialId));
+    report.setJobId(jobId);
+    if (reportItem.getTotalSteps() != 0) {
+      report.setTotalSteps(reportItem.getTotalSteps());
+    } else {
+      report.setTotalSteps(getTotalStepsFromParameters(plugin));
+    }
+    report.addReport(reportItem);
+
+    try {
+      model.createOrUpdateJobReport(report);
+    } catch (GenericException e) {
+      LOGGER.error("Error creating Job Report", e);
+    }
+  }
+
+  public static <T extends Serializable> void updateJobReportState(Plugin<T> plugin, ModelService model, String aipId,
+    AIPState newState) {
+    try {
+      String jobId = getJobId(plugin);
+      Report jobReport = model.retrieveJobReport(jobId, aipId);
+      jobReport.setOutcomeObjectState(newState);
+      model.createOrUpdateJobReport(jobReport);
+    } catch (GenericException | RequestNotValidException | NotFoundException | AuthorizationDeniedException e) {
+      LOGGER.error("Error while updating Job Report", e);
+    }
+  }
+
+  public static <T extends Serializable> void updatePartialJobReport(Plugin<T> plugin, ModelService model,
+    IndexService index, Report reportItem, boolean replaceLastReportItemIfTheSame) {
+    String jobId = getJobId(plugin);
+    try {
+      Report jobReport;
+      try {
+        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId());
+      } catch (NotFoundException e) {
+        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId());
+
+        jobReport.setId(reportItem.getOutcomeObjectId());
+        jobReport.addReport(reportItem);
+      }
+
+      if (!replaceLastReportItemIfTheSame) {
+        jobReport.addReport(reportItem);
+      } else {
+        List<Report> reportItems = jobReport.getReports();
+        Report report = reportItems.get(reportItems.size() - 1);
+        if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
+          reportItems.remove(reportItems.size() - 1);
+          jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
+          jobReport.addReport(reportItem);
+        }
+      }
+
+      model.createOrUpdateJobReport(jobReport);
+    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Error while updating Job Report", e);
+    }
+
+  }
+
+  /***************** Job related *****************/
+  /***********************************************/
   public static <T extends Serializable> String getJobId(Plugin<T> plugin) {
     return plugin.getParameterValues().get(RodaConstants.PLUGIN_PARAMS_JOB_ID);
   }
@@ -119,6 +206,128 @@ public final class PluginHelper {
 
   }
 
+  /**
+   * Updates the job percentage
+   */
+  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
+    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, percentage);
+  }
+
+  /**
+   * Updates the job status
+   */
+  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
+    JobPluginInfo jobPluginInfo) throws JobException {
+    RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
+    return jobPluginInfo;
+  }
+
+  private static <T extends Serializable> Job getJobAndSetPercentage(Plugin<T> plugin, ModelService model,
+    int percentage) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
+    Job job = PluginHelper.getJobFromModel(plugin, model);
+    job.setCompletionPercentage(percentage);
+
+    if (percentage == 0) {
+      job.setState(JOB_STATE.STARTED);
+    } else if (percentage == 100) {
+      job.setState(JOB_STATE.COMPLETED);
+      job.setEndDate(new Date());
+    }
+    return job;
+  }
+
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   */
+  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, ModelService model,
+    int percentage) {
+    LOGGER.debug("New job completionPercentage: {}", percentage);
+    try {
+      Job job = getJobAndSetPercentage(plugin, model, percentage);
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   */
+  public static <T extends Serializable> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
+    Long objectsCount) {
+    try {
+      Job job = PluginHelper.getJobFromModel(plugin, model);
+      job.setObjectsCount(objectsCount.intValue());
+      job.setObjectsWaitingToBeProcessed(objectsCount.intValue());
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  /**
+   * 20160331 hsilva: Only orchestrators should invoke this method
+   * 
+   * @throws GenericException
+   */
+  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
+    JobPluginInfo jobPluginInfo) {
+
+    // do stuff with concrete JobPluginInfo
+    if (jobPluginInfo instanceof RiskJobPluginInfo) {
+      RiskJobPluginInfo riskJobPluginInfo = (RiskJobPluginInfo) jobPluginInfo;
+      List<Risk> countedRisks = new ArrayList<Risk>();
+      Map<String, Integer> riskCounter = riskJobPluginInfo.getRisks();
+
+      try {
+        for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
+          Risk risk = model.retrieveRisk(riskEntry.getKey());
+          risk.setObjectsSize(risk.getObjectsSize() + riskEntry.getValue());
+          countedRisks.add(risk);
+        }
+
+        model.updateRisks(countedRisks, null, true);
+      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
+        LOGGER.error("Could not update risk counters");
+      }
+    }
+
+    // update job
+    try {
+      int completionPercentage = jobPluginInfo.getCompletionPercentage();
+      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
+      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
+      job = setJobCounters(job, jobPluginInfo);
+
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
+    }
+  }
+
+  public static Job updateJobInTheStateStartedOrCreated(Job job) {
+    job.setState(JOB_STATE.FAILED_TO_COMPLETE);
+    job.setObjectsBeingProcessed(0);
+    job.setObjectsProcessedWithSuccess(0);
+    job.setObjectsProcessedWithFailure(job.getObjectsCount());
+    job.setObjectsWaitingToBeProcessed(0);
+    job.setEndDate(new Date());
+    return job;
+  }
+
+  public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
+    job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
+    job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
+    job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+    job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
+      - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+    return job;
+  }
+
+  /***************** Plugin parameters related *****************/
+  /*************************************************************/
   public static <T extends Serializable> void setPluginParameters(Plugin<T> plugin, Job job) {
     Map<String, String> parameters = new HashMap<String, String>(job.getPluginParameters());
     parameters.put(RodaConstants.PLUGIN_PARAMS_JOB_ID, job.getId());
@@ -192,64 +401,8 @@ public final class PluginHelper {
     return parentId;
   }
 
-  public static <T extends Serializable> void createJobReport(Plugin<T> plugin, ModelService model, Report reportItem) {
-    String jobId = getJobId(plugin);
-    Report jobReport = new Report(reportItem);
-    String outcomeObjectId = reportItem.getOutcomeObjectId();
-    if (outcomeObjectId == null) {
-      // 20160401 hsilva: this way, when there is no AIP created but still want
-      // to create a job report, we will not get a null in the job report Id
-      outcomeObjectId = reportItem.getSourceObjectId();
-    }
-    jobReport.setId(outcomeObjectId);
-    jobReport.setJobId(jobId);
-    if (reportItem.getTotalSteps() != 0) {
-      jobReport.setTotalSteps(reportItem.getTotalSteps());
-    } else {
-      jobReport.setTotalSteps(getTotalStepsFromParameters(plugin));
-    }
-    jobReport.addReport(reportItem);
-
-    try {
-      model.createOrUpdateJobReport(jobReport);
-    } catch (GenericException e) {
-      LOGGER.error("Error creating Job Report", e);
-    }
-  }
-
-  public static <T extends Serializable> void updateJobReport(Plugin<T> plugin, ModelService model, IndexService index,
-    Report reportItem, boolean replaceLastReportItemIfTheSame) {
-    String jobId = getJobId(plugin);
-    try {
-      Report jobReport;
-      try {
-        jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId());
-      } catch (NotFoundException e) {
-        jobReport = createPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId());
-
-        jobReport.setId(reportItem.getOutcomeObjectId());
-        jobReport.addReport(reportItem);
-      }
-
-      if (!replaceLastReportItemIfTheSame) {
-        jobReport.addReport(reportItem);
-      } else {
-        List<Report> reportItems = jobReport.getReports();
-        Report report = reportItems.get(reportItems.size() - 1);
-        if (report.getPlugin().equalsIgnoreCase(reportItem.getPlugin())) {
-          reportItems.remove(reportItems.size() - 1);
-          jobReport.setStepsCompleted(jobReport.getStepsCompleted() - 1);
-          jobReport.addReport(reportItem);
-        }
-      }
-
-      model.createOrUpdateJobReport(jobReport);
-    } catch (GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Error while updating Job Report", e);
-    }
-
-  }
-
+  /***************** Preservation events related *****************/
+  /***************************************************************/
   /**
    * For SIP > AIP
    */
@@ -374,126 +527,6 @@ public final class PluginHelper {
     pm.setId(id);
     pm.setType(PreservationMetadataType.EVENT);
     return pm;
-  }
-
-  /**
-   * Updates the job percentage
-   */
-  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
-    RodaCoreFactory.getPluginOrchestrator().updateJobPercentage(plugin, percentage);
-  }
-
-  /**
-   * Updates the job status
-   */
-  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
-    JobPluginInfo jobPluginInfo) throws JobException {
-    RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
-    return jobPluginInfo;
-  }
-
-  private static <T extends Serializable> Job getJobAndSetPercentage(Plugin<T> plugin, ModelService model,
-    int percentage) throws NotFoundException, GenericException, RequestNotValidException, AuthorizationDeniedException {
-    Job job = PluginHelper.getJobFromModel(plugin, model);
-    job.setCompletionPercentage(percentage);
-
-    if (percentage == 0) {
-      job.setState(JOB_STATE.STARTED);
-    } else if (percentage == 100) {
-      job.setState(JOB_STATE.COMPLETED);
-      job.setEndDate(new Date());
-    }
-    return job;
-  }
-
-  /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
-   */
-  public static <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, ModelService model,
-    int percentage) {
-    LOGGER.debug("New job completionPercentage: {}", percentage);
-    try {
-      Job job = getJobAndSetPercentage(plugin, model, percentage);
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
-   */
-  public static <T extends Serializable> void updateJobObjectsCount(Plugin<T> plugin, ModelService model,
-    Long objectsCount) {
-    try {
-      Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setObjectsCount(objectsCount.intValue());
-      job.setObjectsWaitingToBeProcessed(objectsCount.intValue());
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  /**
-   * 20160331 hsilva: Only orchestrators should invoke this method
-   * 
-   * @throws GenericException
-   */
-  public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
-    JobPluginInfo jobPluginInfo) {
-
-    // do stuff with concrete JobPluginInfo
-    if (jobPluginInfo instanceof RiskJobPluginInfo) {
-      RiskJobPluginInfo riskJobPluginInfo = (RiskJobPluginInfo) jobPluginInfo;
-      List<Risk> countedRisks = new ArrayList<Risk>();
-      Map<String, Integer> riskCounter = riskJobPluginInfo.getRisks();
-
-      try {
-        for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
-          Risk risk = model.retrieveRisk(riskEntry.getKey());
-          risk.setObjectsSize(risk.getObjectsSize() + riskEntry.getValue());
-          countedRisks.add(risk);
-        }
-
-        model.updateRisks(countedRisks, null, true);
-      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not update risk counters");
-      }
-    }
-
-    // update job
-    try {
-      int completionPercentage = jobPluginInfo.getCompletionPercentage();
-      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
-      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
-      job = setJobCounters(job, jobPluginInfo);
-
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
-    }
-  }
-
-  public static Job updateJobInTheStateStartedOrCreated(Job job) {
-    job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    job.setObjectsBeingProcessed(0);
-    job.setObjectsProcessedWithSuccess(0);
-    job.setObjectsProcessedWithFailure(job.getObjectsCount());
-    job.setObjectsWaitingToBeProcessed(0);
-    job.setEndDate(new Date());
-    return job;
-  }
-
-  public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
-    job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
-    job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-    job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-    job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
-      - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
-    return job;
   }
 
   public static LinkingIdentifier getLinkingIdentifier(TransferredResource transferredResource, String role) {

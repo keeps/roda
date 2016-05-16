@@ -79,7 +79,7 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
 
     LOGGER.debug("Removing old risk incidences");
-    Report pluginReport = PluginHelper.createPluginReport(this);
+    Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
       if (riskIds != null) {

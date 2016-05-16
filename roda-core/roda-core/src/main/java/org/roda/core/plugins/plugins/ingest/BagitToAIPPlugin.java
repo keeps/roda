@@ -74,10 +74,10 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
+      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
       Path bagitPath = Paths.get(transferredResource.getFullPath());
 
       try {

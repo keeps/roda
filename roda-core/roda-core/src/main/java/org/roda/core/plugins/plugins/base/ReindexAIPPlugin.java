@@ -74,7 +74,7 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
       index.reindexAIP(aip);
     }
 
-    return PluginHelper.createPluginReport(this);
+    return PluginHelper.initPluginReport(this);
   }
 
   @Override

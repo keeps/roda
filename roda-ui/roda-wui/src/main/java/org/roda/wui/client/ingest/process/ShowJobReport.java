@@ -19,6 +19,7 @@ import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.utils.JavascriptUtils;
+import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.common.client.HistoryResolver;
 import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.RestUtils;
@@ -134,7 +135,7 @@ public class ShowJobReport extends Composite {
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
     objectId.setText(jobReport.getSourceObjectId());
-    objectId.setHref(RestUtils.createTransferredResourceDownloadUri(jobReport.getSourceObjectId()));
+    objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
 
     if (jobReport.getOutcomeObjectId() != null) {
       aip.setText(jobReport.getOutcomeObjectId());

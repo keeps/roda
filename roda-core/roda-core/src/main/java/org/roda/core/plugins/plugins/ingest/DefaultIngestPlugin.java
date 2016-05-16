@@ -128,7 +128,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     List<TransferredResource> resources) throws PluginException {
     try {
       Date startDate = new Date();
-      Report report = PluginHelper.createPluginReport(this);
+      Report report = PluginHelper.initPluginReport(this);
       Report pluginReport;
 
       IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo(resources.size(), getTotalSteps());
@@ -247,7 +247,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
           aips = recalculateAIPsList(model, resources, aips, jobPluginInfo, true);
           jobPluginInfo.incrementStepsCompletedByOne();
         } else {
-          updateAIPsToBeAppraised(model, aips);
+          updateAIPsToBeAppraised(model, aips, jobPluginInfo);
         }
       }
 
@@ -315,7 +315,10 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
         if (StringUtils.isNotBlank(reportItem.getSourceObjectId())) {
           Report report = new Report();
           report.addReport(reportItem);
+          report.setId(reportItem.getId());
+          report.setJobId(reportItem.getJobId());
           report.setOutcomeObjectId(reportItem.getOutcomeObjectId());
+          report.setOutcomeObjectState(reportItem.getOutcomeObjectState());
           jobPluginInfo.addReport(reportItem.getSourceObjectId(), reportItem.getOutcomeObjectId(), report);
         } else if (StringUtils.isNotBlank(reportItem.getOutcomeObjectId())
           && aipIdToTransferredResourceId.get(reportItem.getOutcomeObjectId()) != null) {
@@ -582,11 +585,16 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     return report;
   }
 
-  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips) {
+  private void updateAIPsToBeAppraised(ModelService model, List<AIP> aips, IngestJobPluginInfo jobPluginInfo) {
+
     for (AIP aip : aips) {
       aip.setState(AIPState.UNDER_APPRAISAL);
       try {
         aip = model.updateAIPState(aip);
+
+        // update main report outcomeObjectState
+        PluginHelper.updateJobReportState(this, model, aip.getId(), AIPState.UNDER_APPRAISAL);
+
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.error("Error while updating AIP state to '{}'. Reason: {}", AIPState.UNDER_APPRAISAL, e.getMessage());
       }

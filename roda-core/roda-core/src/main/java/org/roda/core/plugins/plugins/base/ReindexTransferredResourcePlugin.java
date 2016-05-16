@@ -73,7 +73,7 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Transferred
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
     LOGGER.debug("Reindexing transferred resources");
-    Report pluginReport = PluginHelper.createPluginReport(this);
+    Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
       RodaCoreFactory.getTransferredResourcesScanner().updateAllTransferredResources(folderUUID, true);

@@ -49,7 +49,7 @@ public class BagitToAIPPluginUtils {
     String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
     ContentPayload metadataAsPayload = new StringContentPayload(metadataAsString);
 
-    AIPState state = AIPState.getDefault();
+    AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
 
     boolean notify = false;
@@ -82,6 +82,8 @@ public class BagitToAIPPluginUtils {
       }
     }
     bag.close();
+
+    // FIXME 20160516 hsilva: put SIP inside the AIP
 
     model.notifyAIPCreated(aip.getId());
 

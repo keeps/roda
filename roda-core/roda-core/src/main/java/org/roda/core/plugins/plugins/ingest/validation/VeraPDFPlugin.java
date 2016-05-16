@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -118,7 +119,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
       LOGGER.debug("Processing AIP {}", aip.getId());
@@ -127,7 +128,10 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         List<String> resourceList = new ArrayList<String>();
         // FIXME 20160324 hsilva: the report item should be at AIP level (and
         // not representation level)
-        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(),
+          AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         StringBuilder details = new StringBuilder();
 

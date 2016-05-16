@@ -91,7 +91,7 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
         LOGGER.error("Error while deleting AIP/Representation", e);
       }
     }
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     return report;
   }
 

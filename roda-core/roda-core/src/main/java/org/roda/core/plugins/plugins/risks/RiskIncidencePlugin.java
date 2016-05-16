@@ -79,7 +79,7 @@ public class RiskIncidencePlugin<T extends Serializable> extends AbstractPlugin<
     try {
 
       LOGGER.debug("Creating risk incidences");
-      Report pluginReport = PluginHelper.createPluginReport(this);
+      Report pluginReport = PluginHelper.initPluginReport(this);
 
       RiskJobPluginInfo jobPluginInfo = new RiskJobPluginInfo();
       PluginHelper.updateJobInformation(this, jobPluginInfo);

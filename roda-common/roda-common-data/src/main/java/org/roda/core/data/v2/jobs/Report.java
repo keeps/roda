@@ -103,8 +103,9 @@ public class Report implements Serializable, IsIndexed {
     return outcomeObjectState;
   }
 
-  public void setOutcomeObjectState(AIPState outcomeObjectState) {
+  public Report setOutcomeObjectState(AIPState outcomeObjectState) {
     this.outcomeObjectState = outcomeObjectState;
+    return this;
   }
 
   public String getTitle() {
@@ -211,6 +212,7 @@ public class Report implements Serializable, IsIndexed {
     }
     setPlugin(report.getPlugin());
     setPluginState(report.getPluginState());
+    setOutcomeObjectState(report.getOutcomeObjectState());
 
     reports.add(report);
 

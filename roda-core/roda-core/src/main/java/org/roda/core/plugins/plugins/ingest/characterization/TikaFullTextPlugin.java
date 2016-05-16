@@ -20,6 +20,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
@@ -106,11 +107,11 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       LOGGER.debug("Processing AIP {}", aip.getId());
       try {
@@ -130,7 +131,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
       report.addReport(reportItem);
 
-      PluginHelper.updateJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
       if (createsPluginEvent) {
         try {

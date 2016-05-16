@@ -25,6 +25,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -93,14 +94,14 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     Job currentJob = getJob(index);
 
     for (AIP aip : list) {
       LOGGER.debug("Checking producer authorization for AIPingest.submitP {}", aip.getId());
 
-      Report reportItem = PluginHelper.createPluginReportItem(this, aip.getId());
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       reportItem.setPluginState(PluginState.SUCCESS)
         .setPluginDetails(String.format("Done with checking producer authorization for AIP %s", aip.getId()));
@@ -123,7 +124,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       LOGGER.debug("Done with checking producer authorization for AIP {}", aip.getId());
 
       report.addReport(reportItem);
-      PluginHelper.updateJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
 
     }
 

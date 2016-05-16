@@ -42,7 +42,7 @@ public class EARKSIPToAIPPluginUtils {
     throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
     AlreadyExistsException, AuthorizationDeniedException {
 
-    AIPState state = AIPState.getDefault();
+    AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
     boolean notify = false;
 
@@ -57,6 +57,8 @@ public class EARKSIPToAIPPluginUtils {
     for (IPRepresentation representation : sip.getRepresentations()) {
       processIPRepresentationInformation(model, representation, aip.getId(), notify);
     }
+
+    // FIXME 20160516 hsilva: put SIP inside the AIP
 
     model.notifyAIPCreated(aip.getId());
 

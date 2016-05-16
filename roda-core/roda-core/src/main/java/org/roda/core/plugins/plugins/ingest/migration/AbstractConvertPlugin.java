@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -170,7 +171,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
   private Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     String detailExtension = "";
 
     for (AIP aip : list) {
@@ -185,7 +186,9 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         List<File> unchangedFiles = new ArrayList<File>();
         newRepresentationID = UUID.randomUUID().toString();
         PluginState pluginResultState = PluginState.SUCCESS;
-        Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.ACTIVE);
 
         try {
           LOGGER.debug("Processing representation {}", representation);
@@ -307,7 +310,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
 
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     String detailExtension = "";
 
     for (Representation representation : list) {
@@ -318,7 +321,8 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
       aipId = representation.getAipId();
       PluginState pluginResultState = PluginState.SUCCESS;
       boolean notify = true;
-      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
+      // FIXME 20160516 hsilva: see how to set initial initialOutcomeObjectState
+      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.ACTIVE);
 
       try {
         LOGGER.debug("Processing representation {}", representation);
@@ -438,7 +442,7 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
     String newFileId = null;
     ArrayList<File> newFiles = new ArrayList<File>();
     String detailExtension = "";
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
     Report reportItem = null;
 
     for (File file : list) {
@@ -446,7 +450,9 @@ public abstract class AbstractConvertPlugin<T extends Serializable> extends Abst
         LOGGER.debug("Processing file {}", file.getId());
 
         newRepresentationID = UUID.randomUUID().toString();
-        reportItem = PluginHelper.createPluginReportItem(this, file.getId());
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.ACTIVE);
 
         if (!file.isDirectory()) {
           IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));

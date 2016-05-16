@@ -63,11 +63,11 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<TransferredResource> list)
     throws PluginException {
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (TransferredResource transferredResource : list) {
-      Report reportItem = PluginHelper.createPluginReportItem(this, transferredResource);
-      PluginHelper.updateJobReport(this, model, index, reportItem, false);
+      Report reportItem = PluginHelper.initPluginReportItem(this, transferredResource);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
       try {
         LOGGER.debug("Removing SIP {}", transferredResource.getFullPath());
@@ -82,7 +82,7 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
         LOGGER.error("Error removing transferred resource " + transferredResource.getFullPath(), e);
       }
       report.addReport(reportItem);
-      PluginHelper.updateJobReport(this, model, index, reportItem, true);
+      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
     }
 
     return report;

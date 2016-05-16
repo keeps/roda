@@ -28,6 +28,7 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -182,7 +183,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
-    Report report = PluginHelper.createPluginReport(this);
+    Report report = PluginHelper.initPluginReport(this);
 
     for (Representation representation : list) {
       String newRepresentationID = UUID.randomUUID().toString();
@@ -197,7 +198,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       boolean notify = true;
       // FIXME 20160329 hsilva: the report item should be at AIP level (and
       // not representation level)
-      Report reportItem = PluginHelper.createPluginReportItem(this, representation.getId());
+      // FIXME 20160516 hsilva: see how to set initial initialOutcomeObjectState
+      Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
 
       try {
         LOGGER.debug("Processing representation {}", representation);
