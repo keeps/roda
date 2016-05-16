@@ -34,7 +34,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class SimpleFileList extends AsyncTableCell<IndexedFile, Boolean> {
+public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -42,17 +42,17 @@ public class SimpleFileList extends AsyncTableCell<IndexedFile, Boolean> {
   private TextColumn<IndexedFile> filenameColumn;
 
   public SimpleFileList() {
-    super(null, null, null, false, true);
+    super(null, true, null, null, false);
   }
 
-  public SimpleFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean justActive) {
-    super(filter, facets, summary, selectable, justActive);
+  public SimpleFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+    super(filter, justActive, facets, summary, selectable);
     super.setSelectedClass(IndexedFile.class);
   }
 
-  public SimpleFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean justActive,
+  public SimpleFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, justActive);
+    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
     super.setSelectedClass(IndexedFile.class);
   }
 
@@ -122,10 +122,8 @@ public class SimpleFileList extends AsyncTableCell<IndexedFile, Boolean> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      // FIXME 20160513 hsilva: what to do here???
-      boolean justActive = getObject();
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
     }
   }
 

@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,6 +26,9 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.data.v2.validation.ValidationIssue;
 import org.roda.core.data.v2.validation.ValidationReport;
+import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.InputStreamContentPayload;
+import org.roda.core.storage.InputStreamContentPayload.ProvidesInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +88,20 @@ public class MetadataUtils {
     saveToOutputStream(xmlObject, byteArrayStream, writeXMLDeclaration);
 
     return byteArrayStream.toString();
+  }
+
+  public static ContentPayload saveToContentPayload(final XmlObject xmlObject, final boolean writeXMLDeclaration) {
+    return new InputStreamContentPayload(new ProvidesInputStream() {
+
+      @Override
+      public InputStream createInputStream() throws IOException {
+        try {
+          return MetadataUtils.createInputStream(xmlObject, writeXMLDeclaration);
+        } catch (GenericException | ValidationException e) {
+          throw new IOException(e);
+        }
+      }
+    });
   }
 
   /**
@@ -154,6 +172,32 @@ public class MetadataUtils {
         logger.debug("Error serializing XML object - " + e.getMessage(), e);
         throw new GenericException("Error serializing XML object", e);
       }
+
+    } else {
+      throw new ValidationException(xmlValidationErrorsToValidationReport(errorList));
+    }
+  }
+
+  public static InputStream createInputStream(XmlObject xmlObject, boolean writeXMLDeclaration)
+    throws GenericException, ValidationException {
+
+    // Create an XmlOptions instance and set the error listener.
+    XmlOptions validateOptions = new XmlOptions();
+    List<XmlValidationError> errorList = new ArrayList<XmlValidationError>();
+    validateOptions.setErrorListener(errorList);
+
+    // Validate the XML.
+    boolean isValid = xmlObject.validate(validateOptions);
+    if (isValid) {
+
+      XmlOptions xmlSaveOptions = new XmlOptions().setUseDefaultNamespace().setSavePrettyPrint()
+        .setSaveAggressiveNamespaces();
+
+      if (!writeXMLDeclaration) {
+        xmlSaveOptions = xmlSaveOptions.setSaveNoXmlDecl();
+      }
+
+      return xmlObject.newInputStream(xmlSaveOptions);
 
     } else {
       throw new ValidationException(xmlValidationErrorsToValidationReport(errorList));

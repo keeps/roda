@@ -17,7 +17,7 @@ import com.google.gwt.core.client.GWT;
 
 import config.i18n.client.BrowseMessages;
 
-public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Boolean> {
+public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Void> {
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
@@ -30,9 +30,9 @@ public class SelectAipDialog extends DefaultSelectDialog<IndexedAIP, Boolean> {
     this(title, DEFAULT_FILTER_AIP, SHOW_INACTIVE);
   }
 
-  public SelectAipDialog(String title, Filter filter, boolean showInactive) {
+  public SelectAipDialog(String title, Filter filter, boolean justActive) {
     super(title, filter, RodaConstants.AIP_SEARCH,
-      new AIPList(filter, null, messages.selectAipSearchResults(), false, showInactive));
+      new AIPList(filter, justActive, null, messages.selectAipSearchResults(), false));
 
   }
 }

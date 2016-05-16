@@ -85,14 +85,13 @@ public interface BrowserService extends RemoteService {
 
   List<SearchField> getSearchFields(String locale) throws GenericException;
 
-  IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive)
-    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
-    AlreadyExistsException, ValidationException;
+  IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId) throws AuthorizationDeniedException,
+    GenericException, NotFoundException, RequestNotValidException, AlreadyExistsException, ValidationException;
 
   String createAIP(String parentId, String type) throws AuthorizationDeniedException, GenericException,
     NotFoundException, RequestNotValidException, AlreadyExistsException;
 
-  String removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive)
+  String removeAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   void removeDescriptiveMetadataFile(String itemId, String descriptiveMetadataId)
@@ -167,7 +166,7 @@ public interface BrowserService extends RemoteService {
   <T extends IsIndexed> T retrieve(String classNameToReturn, String id)
     throws AuthorizationDeniedException, GenericException, NotFoundException;
 
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive)
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException;
 
   <T extends IsIndexed> List<String> suggest(String classNameToReturn, String field, String query)

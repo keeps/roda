@@ -85,6 +85,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private final List<CheckboxSelectionListener<T>> listeners = new ArrayList<AsyncTableCell.CheckboxSelectionListener<T>>();
 
   private Filter filter;
+  private boolean justActive;
   private Facets facets;
   private boolean selectable;
 
@@ -97,15 +98,16 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   private final O object;
 
   public AsyncTableCell() {
-    this(null, null, null, false, 20, 100, null);
+    this(null, false, null, null, false, 20, 100, null);
   }
 
-  public AsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable, O object) {
-    this(filter, facets, summary, selectable, 20, 100, object);
+  public AsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+    O object) {
+    this(filter, justActive, facets, summary, selectable, 20, 100, object);
   }
 
-  public AsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
-    int pageSizeIncrement, O object) {
+  public AsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement, O object) {
     super();
 
     this.initialPageSize = initialPageSize;
@@ -117,6 +119,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     }
 
     this.filter = filter;
+    this.justActive = justActive;
     this.facets = facets;
     this.selectable = selectable;
 
@@ -355,6 +358,10 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
     return filter;
   }
 
+  public boolean getJustActive() {
+    return justActive;
+  }
+
   public void setFilter(Filter filter) {
     this.filter = filter;
     refresh();
@@ -487,7 +494,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
   public SelectedItems<T> getSelected() {
     SelectedItems<T> ret;
     if (isAllSelected()) {
-      ret = new SelectedItemsFilter<T>(getFilter(), selectedClass.getName());
+      ret = new SelectedItemsFilter<T>(getFilter(), selectedClass.getName(), getJustActive());
     } else {
       List<String> ids = new ArrayList<>();
       for (T item : selected) {

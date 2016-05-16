@@ -367,7 +367,7 @@ public class PremisV3Utils {
     EventOutcomeDetailComplexType eodct = outcomeInformation.addNewEventOutcomeDetail();
     eodct.setEventOutcomeDetailNote(outcomeDetailNote.toString());
 
-    return new StringContentPayload(MetadataUtils.saveToString(event, true));
+    return MetadataUtils.saveToContentPayload(event, true);
 
   }
 
@@ -404,8 +404,7 @@ public class PremisV3Utils {
       }
     }
 
-    return new StringContentPayload(MetadataUtils.saveToString(agent, true));
-
+    return MetadataUtils.saveToContentPayload(agent, true);
   }
 
   public static Representation createBaseRepresentation(String aipID, String representationId)
@@ -470,7 +469,7 @@ public class PremisV3Utils {
 
     document.setObject(file);
 
-    return new StringContentPayload(MetadataUtils.saveToString(document, true));
+    return MetadataUtils.saveToContentPayload(document, true);
   }
 
   public static List<Fixity> extractFixities(Binary premisFile) throws GenericException, XmlException, IOException {
@@ -580,14 +579,14 @@ public class PremisV3Utils {
   public static ContentPayload fileToBinary(gov.loc.premis.v3.File file) throws GenericException, ValidationException {
     ObjectDocument d = ObjectDocument.Factory.newInstance();
     d.setObject(file);
-    return new StringContentPayload(MetadataUtils.saveToString(d, true));
+    return MetadataUtils.saveToContentPayload(d, true);
   }
 
   public static ContentPayload representationToBinary(Representation representation)
     throws GenericException, ValidationException {
     ObjectDocument d = ObjectDocument.Factory.newInstance();
     d.setObject(representation);
-    return new StringContentPayload(MetadataUtils.saveToString(d, true));
+    return MetadataUtils.saveToContentPayload(d, true);
   }
 
   public static EventComplexType binaryToEvent(ContentPayload payload, boolean validate)
@@ -638,9 +637,8 @@ public class PremisV3Utils {
     return agent;
   }
 
-  public static SolrInputDocument getSolrDocument(Binary premisBinary)
-    throws GenericException {
-    
+  public static SolrInputDocument getSolrDocument(Binary premisBinary) throws GenericException {
+
     SolrInputDocument doc = new SolrInputDocument();
 
     InputStream inputStream = null;
@@ -737,7 +735,7 @@ public class PremisV3Utils {
 
   public static void linkFileToRepresentation(File file, String relationshipType, String relationshipSubType,
     Representation r) throws GenericException, RequestNotValidException, NotFoundException,
-      AuthorizationDeniedException, XmlException, IOException, ValidationException {
+    AuthorizationDeniedException, XmlException, IOException, ValidationException {
 
     RelationshipComplexType relationship = r.addNewRelationship();
     relationship.setRelationshipType(getStringPlusAuthority(relationshipType));
@@ -815,7 +813,7 @@ public class PremisV3Utils {
 
   public static IndexedPreservationAgent createPremisUserAgentBinary(Plugin<?> plugin, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
-      RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
+    RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
     IndexedPreservationAgent agent = null;
     Job job = null;
     try {

@@ -27,7 +27,6 @@ import org.roda.wui.common.client.tools.Humanize;
 import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -39,7 +38,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
+public class SearchFileList extends BasicAsyncTableCell<IndexedFile> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -50,11 +49,11 @@ public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
   private TextColumn<IndexedFile> lengthColumn;
 
   public SearchFileList() {
-    this(null, null, null, false, true);
+    this(null, true, null, null, false);
   }
 
-  public SearchFileList(Filter filter, Facets facets, String summary, boolean selectable, boolean justActive) {
-    super(filter, facets, summary, selectable, justActive);
+  public SearchFileList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+    super(filter, justActive, facets, summary, selectable);
     super.setSelectedClass(IndexedFile.class);
   }
 
@@ -183,10 +182,8 @@ public class SearchFileList extends AsyncTableCell<IndexedFile, Boolean> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      // FIXME 20160513 hsilva: what to do here???
-      boolean justActive = getObject();
       BrowserService.Util.getInstance().find(IndexedFile.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
     }
   }
 }

@@ -85,55 +85,55 @@ public class CreateRiskJob extends CreateJob<Risk> {
   @Override
   public void updateObjectList() {
 
-    SelectedItems selected = getSelected();
+    SelectedItems<?> selected = getSelected();
     boolean selectable = false;
-    boolean showInactive = false;
+    boolean justActive = true;
 
     if (selected != null) {
       if (selected instanceof SelectedItemsList) {
-        List<String> ids = ((SelectedItemsList) selected).getIds();
+        List<String> ids = ((SelectedItemsList<?>) selected).getIds();
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.AIP_ID, ids));
 
-          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive, 10, 10);
+          AIPList list = new AIPList(filter, justActive, null, "AIPs", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.REPRESENTATION_UUID, ids));
-          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive,
-            10, 10);
+          RepresentationList list = new RepresentationList(filter, justActive, null, "Representations", selectable, 10,
+            10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
           Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.FILE_UUID, ids));
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive, 10, 10);
+          SimpleFileList list = new SimpleFileList(filter, justActive, null, "Files", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
       } else if (getSelected() instanceof SelectedItemsFilter) {
-        Filter filter = ((SelectedItemsFilter) getSelected()).getFilter();
+        Filter filter = ((SelectedItemsFilter<?>) getSelected()).getFilter();
 
         if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-          AIPList list = new AIPList(filter, null, "AIPs", selectable, showInactive, 10, 10);
+          AIPList list = new AIPList(filter, justActive, null, "AIPs", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-          RepresentationList list = new RepresentationList(filter, null, "Representations", selectable, showInactive,
-            10, 10);
+          RepresentationList list = new RepresentationList(filter, justActive, null, "Representations", selectable, 10,
+            10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }
 
         if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-          SimpleFileList list = new SimpleFileList(filter, null, "Files", selectable, showInactive, 10, 10);
+          SimpleFileList list = new SimpleFileList(filter, justActive, null, "Files", selectable, 10, 10);
           getTargetPanel().clear();
           getTargetPanel().add(list);
         }

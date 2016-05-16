@@ -11,10 +11,19 @@ public abstract class BasicAsyncTableCell<T extends IsIndexed> extends AsyncTabl
 
   public BasicAsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable, int initialPageSize,
     int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
+    super(filter, false, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
+  }
+
+  public BasicAsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
+    int initialPageSize, int pageSizeIncrement) {
+    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement, null);
+  }
+
+  public BasicAsyncTableCell(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+    super(filter, justActive, facets, summary, selectable, null);
   }
 
   public BasicAsyncTableCell(Filter filter, Facets facets, String summary, boolean selectable) {
-    super(filter, facets, summary, selectable, null);
+    super(filter, false, facets, summary, selectable, null);
   }
 }

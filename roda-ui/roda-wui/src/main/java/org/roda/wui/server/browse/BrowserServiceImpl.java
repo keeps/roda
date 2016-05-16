@@ -189,11 +189,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive)
+  public <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Class<T> classToReturn = parseClass(classNameToReturn);
-    Browser.delete(user, classToReturn, ids, showInactive);
+    Browser.delete(user, classToReturn, ids);
   }
 
   @Override
@@ -247,11 +247,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive)
+  public IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
     AlreadyExistsException, ValidationException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.moveInHierarchy(selected, parentId, user, showInactive);
+    return Browser.moveInHierarchy(selected, parentId, user);
   }
 
   @Override
@@ -263,10 +263,10 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive)
+  public String removeAIP(SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.removeAIP(user, aips, showInactive);
+    return Browser.removeAIP(user, aips);
   }
 
   @Override

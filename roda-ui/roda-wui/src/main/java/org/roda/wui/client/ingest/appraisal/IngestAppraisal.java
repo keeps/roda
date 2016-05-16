@@ -429,8 +429,7 @@ public class IngestAppraisal extends Composite {
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, facets, messages.searchResults(), selectable,
-      justActive);
+    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, justActive, facets, messages.searchResults(), selectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
@@ -461,8 +460,8 @@ public class IngestAppraisal extends Composite {
   }
 
   private void createRepresentationsSearchResultPanel() {
-    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, Facets.NONE,
-      messages.searchResults(), selectable, justActive);
+    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, justActive, Facets.NONE,
+      messages.searchResults(), selectable);
 
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -492,8 +491,8 @@ public class IngestAppraisal extends Composite {
       new SimpleFacetParameter(RodaConstants.FILE_PRONOM),
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
 
-    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, facets, messages.searchResults(), selectable,
-      justActive);
+    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, justActive, facets, messages.searchResults(),
+      selectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);

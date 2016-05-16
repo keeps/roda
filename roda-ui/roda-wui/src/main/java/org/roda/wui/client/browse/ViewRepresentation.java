@@ -321,8 +321,8 @@ public class ViewRepresentation extends Composite {
     defaultFilter.add(new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_UUID, representationUUID));
 
     boolean selectable = false;
-    boolean showInactive = true;
-    filesList = new SimpleFileList(defaultFilter, null, null, selectable, showInactive);
+    boolean justActive = false;
+    filesList = new SimpleFileList(defaultFilter, justActive, null, null, selectable);
 
     searchPanel = new SearchPanel(defaultFilter, RodaConstants.FILE_SEARCH,
       messages.viewRepresentationSearchPlaceHolder(), false, false);

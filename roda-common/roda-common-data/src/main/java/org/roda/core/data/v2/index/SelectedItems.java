@@ -19,5 +19,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 public interface SelectedItems<T> extends Serializable {
 
   String getSelectedClass();
+  
+  Boolean justActive();
 
 }

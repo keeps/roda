@@ -51,12 +51,11 @@ public interface BrowserServiceAsync {
 
   void getSearchFields(String locale, AsyncCallback<List<SearchField>> callback);
 
-  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, boolean showInactive,
-    AsyncCallback<IndexedAIP> callback);
+  void moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, AsyncCallback<IndexedAIP> callback);
 
   void createAIP(String parentId, String type, AsyncCallback<String> callback);
 
-  void removeAIP(SelectedItems<IndexedAIP> aips, boolean showInactive, AsyncCallback<String> callback);
+  void removeAIP(SelectedItems<IndexedAIP> aips, AsyncCallback<String> callback);
 
   void updateDescriptiveMetadataFile(String aipId, DescriptiveMetadataEditBundle bundle, AsyncCallback<Void> callback);
 
@@ -107,8 +106,7 @@ public interface BrowserServiceAsync {
   <T extends IsIndexed> void find(String classNameToReturn, Filter filter, Sorter sorter, Sublist sublist,
     Facets facets, String localeString, boolean justActive, AsyncCallback<IndexResult<T>> callback);
 
-  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, boolean showInactive,
-    AsyncCallback<Void> callback);
+  <T extends IsIndexed> void delete(String classNameToReturn, SelectedItems<T> ids, AsyncCallback<Void> callback);
 
   void count(String classNameToReturn, Filter filter, AsyncCallback<Long> callback);
 

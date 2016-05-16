@@ -219,8 +219,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems<T> ids,
-    boolean showInactive)
+  public static <T extends IsIndexed> void delete(RodaUser user, Class<T> classToReturn, SelectedItems<T> ids)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date startDate = new Date();
 
@@ -229,7 +228,7 @@ public class Browser extends RodaCoreService {
     // TODO check object level permissions
 
     // delegate
-    BrowserHelper.delete(user, classToReturn, ids, showInactive);
+    BrowserHelper.delete(user, classToReturn, ids);
 
     long duration = new Date().getTime() - startDate.getTime();
     registerAction(user, BROWSER_COMPONENT, "delete", null, duration, "class", classToReturn.getSimpleName());
@@ -549,9 +548,9 @@ public class Browser extends RodaCoreService {
    * ---------------------------------------------------------------------------
    */
 
-  public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user,
-    boolean showInactive) throws AuthorizationDeniedException, GenericException, NotFoundException,
-    RequestNotValidException, AlreadyExistsException, ValidationException {
+  public static IndexedAIP moveInHierarchy(SelectedItems<IndexedAIP> selected, String parentId, RodaUser user)
+    throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException,
+    AlreadyExistsException, ValidationException {
     Date startDate = new Date();
 
     // check user permissions
@@ -564,7 +563,7 @@ public class Browser extends RodaCoreService {
     }
 
     // delegate
-    IndexedAIP returnAIP = BrowserHelper.moveInHierarchy(selected, parentId, user, showInactive);
+    IndexedAIP returnAIP = BrowserHelper.moveInHierarchy(selected, parentId, user);
 
     // register action
     long duration = new Date().getTime() - startDate.getTime();
@@ -610,7 +609,7 @@ public class Browser extends RodaCoreService {
     return aip;
   }
 
-  public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips, boolean showInactive)
+  public static String removeAIP(RodaUser user, SelectedItems<IndexedAIP> aips)
     throws AuthorizationDeniedException, GenericException, NotFoundException, RequestNotValidException {
     Date start = new Date();
 
@@ -618,12 +617,11 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    String parentId = BrowserHelper.removeAIP(aips, user, showInactive);
+    String parentId = BrowserHelper.removeAIP(aips, user);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
-    registerAction(user, BROWSER_COMPONENT, "removeAIP", null, duration, "selected", aips, "showInactive",
-      showInactive);
+    registerAction(user, BROWSER_COMPONENT, "removeAIP", null, duration, "selected", aips);
     return parentId;
   }
 
@@ -1050,9 +1048,8 @@ public class Browser extends RodaCoreService {
   }
 
   public static <T extends IsIndexed> List<String> consolidate(RodaUser user, Class<T> classToReturn,
-    SelectedItems<T> selected, boolean showInactive)
-    throws GenericException, AuthorizationDeniedException, RequestNotValidException {
-    return BrowserHelper.consolidate(user, classToReturn, selected, showInactive);
+    SelectedItems<T> selected) throws GenericException, AuthorizationDeniedException, RequestNotValidException {
+    return BrowserHelper.consolidate(user, classToReturn, selected);
   }
 
   public static void modifyRisk(RodaUser user, Risk risk, String message)
@@ -1389,7 +1386,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems selected)
+  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     Date start = new Date();

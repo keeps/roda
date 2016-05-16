@@ -148,41 +148,41 @@ public class PermissionsTest {
     index.commitAIPs();
 
     RodaUser user = null;
-    boolean showInactive = false;
+    boolean justActive = true;
     IndexResult<IndexedRepresentation> find1 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(0, find1.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedRepresentation> find2 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(2, find2.getTotalCount());
 
     user = new RodaUser("testuser", "User with access", "", false);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedRepresentation> find3 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(0, find3.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedRepresentation> find4 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(2, find4.getTotalCount());
 
     user = new RodaUser("guest", "User with access", "", true);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedRepresentation> find5 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(0, find5.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedRepresentation> find6 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedRepresentation> find7 = index.find(IndexedRepresentation.class, null, null, new Sublist(0, 10),
-      null, user, showInactive);
+      null, user, justActive);
     assertEquals(2, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -201,41 +201,41 @@ public class PermissionsTest {
     index.commitAIPs();
 
     RodaUser user = null;
-    boolean showInactive = false;
+    boolean justActive = true;
     IndexResult<IndexedFile> find1 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find1.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedFile> find2 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(4, find2.getTotalCount());
 
     user = new RodaUser("testuser", "User with access", "", false);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedFile> find3 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find3.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedFile> find4 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(4, find4.getTotalCount());
 
     user = new RodaUser("guest", "User with access", "", true);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedFile> find5 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find5.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedFile> find6 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedFile> find7 = index.find(IndexedFile.class, null, null, new Sublist(0, 10), null, user,
-      showInactive);
+      justActive);
     assertEquals(4, find7.getTotalCount());
 
     model.deleteAIP(aipId);
@@ -254,41 +254,41 @@ public class PermissionsTest {
     index.commitAIPs();
 
     RodaUser user = null;
-    boolean showInactive = false;
+    boolean justActive = true;
     IndexResult<IndexedPreservationEvent> find1 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(0, find1.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedPreservationEvent> find2 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(2, find2.getTotalCount());
 
     user = new RodaUser("testuser", "User with access", "", false);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedPreservationEvent> find3 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(0, find3.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedPreservationEvent> find4 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(2, find4.getTotalCount());
 
     user = new RodaUser("guest", "User with access", "", true);
-    showInactive = false;
+    justActive = true;
     IndexResult<IndexedPreservationEvent> find5 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(0, find5.getTotalCount());
 
-    showInactive = true;
+    justActive = false;
     IndexResult<IndexedPreservationEvent> find6 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(0, find6.getTotalCount());
 
     user.addGroup("testgroup");
     IndexResult<IndexedPreservationEvent> find7 = index.find(IndexedPreservationEvent.class, null, null,
-      new Sublist(0, 10), null, user, showInactive);
+      new Sublist(0, 10), null, user, justActive);
     assertEquals(2, find7.getTotalCount());
 
     model.deleteAIP(aipId);

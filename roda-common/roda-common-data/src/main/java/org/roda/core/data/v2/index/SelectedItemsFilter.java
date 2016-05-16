@@ -15,15 +15,17 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
 
   private Filter filter;
   private String selectedClass;
+  private Boolean justActive;
 
   public SelectedItemsFilter() {
     super();
   }
 
-  public SelectedItemsFilter(Filter filter, String selectedClass) {
+  public SelectedItemsFilter(Filter filter, String selectedClass, Boolean justActive) {
     super();
     this.filter = filter;
     this.selectedClass = selectedClass;
+    this.justActive = justActive;
   }
 
   public Filter getFilter() {
@@ -44,10 +46,21 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
   }
 
   @Override
+  public Boolean justActive() {
+    return justActive;
+  }
+
+  public void setJustActive(Boolean justActive) {
+    this.justActive = justActive;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((filter == null) ? 0 : filter.hashCode());
+    result = prime * result + ((justActive == null) ? 0 : justActive.hashCode());
+    result = prime * result + ((selectedClass == null) ? 0 : selectedClass.hashCode());
     return result;
   }
 
@@ -59,18 +72,29 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
       return false;
     if (getClass() != obj.getClass())
       return false;
-    SelectedItemsFilter other = (SelectedItemsFilter) obj;
+    SelectedItemsFilter<?> other = (SelectedItemsFilter<?>) obj;
     if (filter == null) {
       if (other.filter != null)
         return false;
     } else if (!filter.equals(other.filter))
+      return false;
+    if (justActive == null) {
+      if (other.justActive != null)
+        return false;
+    } else if (!justActive.equals(other.justActive))
+      return false;
+    if (selectedClass == null) {
+      if (other.selectedClass != null)
+        return false;
+    } else if (!selectedClass.equals(other.selectedClass))
       return false;
     return true;
   }
 
   @Override
   public String toString() {
-    return "SelectedItemsFilter [filter=" + filter + "]";
+    return "SelectedItemsFilter [filter=" + filter + ", selectedClass=" + selectedClass + ", justActive=" + justActive
+      + "]";
   }
 
 }

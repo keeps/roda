@@ -44,6 +44,11 @@ public class SelectedItemsList<T extends IsIndexed> implements SelectedItems<T> 
   }
 
   @Override
+  public Boolean justActive() {
+    return Boolean.FALSE;
+  }
+
+  @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;

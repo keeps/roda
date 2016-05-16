@@ -9,6 +9,7 @@ package org.roda.wui.api.v1;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,7 +34,9 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
+import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
@@ -151,11 +154,9 @@ public class AipsResource {
     RodaUser user = UserUtility.getApiUser(request);
 
     // delegate action to controller
-    SelectedItemsFilter<IndexedAIP> sif = new SelectedItemsFilter<IndexedAIP>(
-      new Filter(new SimpleFilterParameter(RodaConstants.AIP_ID, aipId)), AIP.class.getName());
-    // TODO get show inactive by parameters
-    boolean showInactive = false;
-    Browser.removeAIP(user, sif, showInactive);
+
+    SelectedItems<IndexedAIP> aips = new SelectedItemsList<>(Arrays.asList(aipId), IndexedAIP.class.getName());
+    Browser.removeAIP(user, aips);
 
     // FIXME give a better answer
     return Response.ok().entity(new ApiResponseMessage(ApiResponseMessage.OK, "Done!")).build();

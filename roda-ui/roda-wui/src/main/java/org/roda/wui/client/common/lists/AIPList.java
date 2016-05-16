@@ -25,7 +25,6 @@ import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -37,7 +36,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
+public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
 
   private final ClientLogger logger = new ClientLogger(getClass().getName());
 
@@ -46,17 +45,17 @@ public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
   private TextColumn<IndexedAIP> datesColumn;
 
   public AIPList() {
-    super(null, null, null, false, Boolean.FALSE);
+    super(null, false, null, null, false);
   }
 
-  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
-    super(filter, facets, summary, selectable, showInactive);
+  public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+    super(filter, justActive, facets, summary, selectable);
     super.setSelectedClass(IndexedAIP.class);
   }
 
-  public AIPList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive,
+  public AIPList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, showInactive);
+    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
     super.setSelectedClass(IndexedAIP.class);
   }
 
@@ -132,9 +131,8 @@ public class AIPList extends AsyncTableCell<IndexedAIP, Boolean> {
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      Boolean showInactive = getObject();
       BrowserService.Util.getInstance().find(IndexedAIP.class.getName(), filter, sorter, sublist, getFacets(),
-        LocaleInfo.getCurrentLocale().getLocaleName(), showInactive, callback);
+        LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
     }
   }
 

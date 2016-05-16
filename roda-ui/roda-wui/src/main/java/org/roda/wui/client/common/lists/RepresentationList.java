@@ -33,7 +33,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Label;
 
-public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Boolean> {
+public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentation> {
 
   @SuppressWarnings("unused")
   private final ClientLogger logger = new ClientLogger(getClass().getName());
@@ -47,17 +47,17 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Bo
   private TextColumn<IndexedRepresentation> numberOfSchemasFilesColumn;
 
   public RepresentationList() {
-    super(null, null, null, false, false);
+    super(null, false, null, null, false);
   }
 
-  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive) {
-    super(filter, facets, summary, selectable, showInactive);
+  public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable) {
+    super(filter, justActive, facets, summary, selectable);
     super.setSelectedClass(IndexedRepresentation.class);
   }
 
-  public RepresentationList(Filter filter, Facets facets, String summary, boolean selectable, boolean showInactive,
+  public RepresentationList(Filter filter, boolean justActive, Facets facets, String summary, boolean selectable,
     int initialPageSize, int pageSizeIncrement) {
-    super(filter, facets, summary, selectable, initialPageSize, pageSizeIncrement, showInactive);
+    super(filter, justActive, facets, summary, selectable, initialPageSize, pageSizeIncrement);
     super.setSelectedClass(IndexedRepresentation.class);
   }
 
@@ -184,10 +184,8 @@ public class RepresentationList extends AsyncTableCell<IndexedRepresentation, Bo
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-      // FIXME 20160513 hsilva: how to do here???
-      boolean justActive = getObject();
       BrowserService.Util.getInstance().find(IndexedRepresentation.class.getName(), filter, sorter, sublist,
-        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+        getFacets(), LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
     }
   }
 
