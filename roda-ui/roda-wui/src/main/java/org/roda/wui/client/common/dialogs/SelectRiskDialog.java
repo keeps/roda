@@ -10,10 +10,10 @@ package org.roda.wui.client.common.dialogs;
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.common.lists.RiskList;
 
-public class SelectRiskDialog extends DefaultSelectDialog<Risk, Void> {
+public class SelectRiskDialog extends DefaultSelectDialog<IndexedRisk, Void> {
 
   private static final Filter DEFAULT_FILTER_RISK = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));

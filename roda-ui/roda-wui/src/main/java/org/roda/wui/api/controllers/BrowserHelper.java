@@ -48,7 +48,9 @@ import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.tools.ZipTools;
 import org.roda.core.common.validation.ValidationUtils;
 import org.roda.core.data.adapter.facet.Facets;
+import org.roda.core.data.adapter.facet.SimpleFacetParameter;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.SortParameter;
@@ -71,6 +73,8 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
+import org.roda.core.data.v2.index.FacetFieldResult;
+import org.roda.core.data.v2.index.FacetValue;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -96,6 +100,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -795,38 +800,55 @@ public class BrowserHelper {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);
 
+    // removeIncidencesOfAIPs(selected, user);
     String parentId = null;
 
-    for (final String aipId : aipIds) {
-      try {
-        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
-        parentId = aip.getParentId();
-        RodaCoreFactory.getModelService().deleteAIP(aipId);
+    for (String aipId : aipIds) {
+      AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
+      parentId = aip.getParentId();
+      RodaCoreFactory.getModelService().deleteAIP(aip.getId());
 
-        Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aipId));
+      Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_ANCESTORS, aip.getId()));
+      RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
 
-        RodaCoreFactory.getIndexService().execute(IndexedAIP.class, filter, new IndexRunnable<IndexedAIP>() {
-
-          @Override
-          public void run(IndexedAIP item)
-            throws GenericException, RequestNotValidException, AuthorizationDeniedException {
-            try {
-              UserUtility.checkObjectPermissions(user, item, PermissionType.DELETE);
-              RodaCoreFactory.getModelService().deleteAIP(item.getId());
-            } catch (NotFoundException e) {
-              // already deleted, ignore
-            }
+        @Override
+        public void run(IndexedAIP item)
+          throws GenericException, RequestNotValidException, AuthorizationDeniedException {
+          try {
+            // UserUtility.checkObjectPermissions(user, item,
+            // PermissionType.DELETE);
+            RodaCoreFactory.getModelService().deleteAIP(item.getId());
+          } catch (NotFoundException e) {
+            // already deleted, ignore
           }
-        });
-
-      } catch (NotFoundException e) {
-        // already deleted
-      }
+        }
+      });
     }
 
     RodaCoreFactory.getIndexService().commitAIPs();
-
     return parentId;
+  }
+
+  private static void removeIncidencesOfAIPs(SelectedItems<IndexedAIP> selected, RodaUser user)
+    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
+    JobAlreadyStartedException {
+
+    RiskIncidenceRemoverPlugin plugin = new RiskIncidenceRemoverPlugin();
+    Map<String, String> parameters = new HashMap<String, String>();
+    parameters.put("aipRemoved", Boolean.TRUE.toString());
+
+    Date jobDate = new Date();
+    PluginInfo pluginInfo = new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(),
+      plugin.getDescription(), plugin.getType(), plugin.getParameters());
+
+    Job job = new Job();
+    job.setName(plugin.getName() + " " + jobDate);
+    job.setPlugin(pluginInfo.getId());
+    job.setPluginParameters(parameters);
+    job.setObjects(selected);
+    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS);
+
+    Jobs.createJob(user, job);
   }
 
   public static String removeAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaUser user)
@@ -1390,14 +1412,14 @@ public class BrowserHelper {
 
   public static Risk addRisk(Risk risk, boolean commit) throws GenericException, RequestNotValidException {
     Risk createdRisk = RodaCoreFactory.getModelService().createRisk(risk, commit);
-    RodaCoreFactory.getIndexService().commit(Risk.class);
+    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
     return createdRisk;
   }
 
   public static void modifyRisk(Risk risk, String message, boolean commit)
     throws GenericException, RequestNotValidException {
     RodaCoreFactory.getModelService().updateRisk(risk, message, commit);
-    RodaCoreFactory.getIndexService().commit(Risk.class);
+    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
   public static Agent addAgent(Agent agent, boolean commit) throws GenericException, RequestNotValidException {
@@ -1666,10 +1688,10 @@ public class BrowserHelper {
     return properties;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
+  public static void deleteRisk(RodaUser user, SelectedItems<IndexedRisk> selected)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
-    List<String> idList = consolidate(user, Risk.class, selected);
+    List<String> idList = consolidate(user, IndexedRisk.class, selected);
 
     for (String riskId : idList) {
       RodaCoreFactory.getModelService().deleteRisk(riskId, true);
@@ -1710,7 +1732,7 @@ public class BrowserHelper {
 
   public static List<String> getRiskOnAIP(String aipId) throws GenericException, RequestNotValidException {
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_OBJECT_ID, aipId));
+    filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
     IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
       new Sublist());
 
@@ -1724,7 +1746,7 @@ public class BrowserHelper {
 
   public static void deleteRiskIncidences(RodaUser user, String riskId, SelectedItems<RiskIncidence> incidences)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
-    List<String> idList = consolidate(user, RiskIncidence.class, incidences, true);
+    List<String> idList = consolidate(user, RiskIncidence.class, incidences);
 
     Filter filter = new Filter(new OneOfManyFilterParameter(RodaConstants.RISK_INCIDENCE_ID, idList));
     IndexResult<RiskIncidence> incidenceList = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
@@ -1733,15 +1755,58 @@ public class BrowserHelper {
 
     for (RiskIncidence incidence : incidenceList.getResults()) {
       if (AIP.class.getSimpleName().equals(incidence.getObjectClass())) {
-        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getObjectId(), null, null, null,
-          omType);
+        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(), null, null, null, omType);
       } else if (Representation.class.getSimpleName().equals(incidence.getObjectClass())) {
-        // TODO find a way to know aip id of a representation
+        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
+          incidence.getRepresentationId(), null, null, omType);
       } else if (File.class.getSimpleName().equals(incidence.getObjectClass())) {
-        // TODO find a way to know aip and representation ids of a file
+        RodaCoreFactory.getModelService().deleteRiskIncidence(riskId, incidence.getAipId(),
+          incidence.getRepresentationId(), incidence.getFilePath(), incidence.getFileId(), omType);
       }
     }
 
+  }
+
+  public static void updateRiskCounters() throws GenericException, RequestNotValidException, NotFoundException {
+    IndexResult<RiskIncidence> find = RodaCoreFactory.getIndexService().find(RiskIncidence.class, Filter.NONE,
+      Sorter.NONE, new Sublist(0, 0), new Facets(new SimpleFacetParameter(RodaConstants.RISK_INCIDENCE_RISKS)));
+
+    boolean findFlag = true;
+    int initialIndex = 0, interval = 20;
+    List<IndexedRisk> allIncidences = new ArrayList<IndexedRisk>();
+    Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.RISK_OBJECTS_SIZE, "0"));
+
+    while (findFlag) {
+      IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, filter, Sorter.NONE,
+        new Sublist(initialIndex, initialIndex + interval));
+      List<IndexedRisk> results = new ArrayList<IndexedRisk>(findAll.getResults());
+      allIncidences.addAll(results);
+
+      if (results.size() < interval) {
+        findFlag = false;
+      } else {
+        initialIndex += interval;
+      }
+    }
+
+    for (FacetFieldResult fieldResult : find.getFacetResults()) {
+      for (FacetValue facetValue : fieldResult.getValues()) {
+        String riskId = facetValue.getValue();
+        long counter = facetValue.getCount();
+
+        IndexedRisk risk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, riskId);
+        risk.setObjectsSize((int) counter);
+        RodaCoreFactory.getIndexService().reindexRisk(risk);
+        allIncidences.remove(risk);
+      }
+    }
+
+    for (IndexedRisk risk : allIncidences) {
+      risk.setObjectsSize(0);
+      RodaCoreFactory.getIndexService().reindexRisk(risk);
+    }
+
+    RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
   }
 
 }

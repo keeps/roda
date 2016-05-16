@@ -117,6 +117,7 @@ import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -261,7 +262,7 @@ public class SolrUtils {
       ret = resultClass.cast(solrDocumentToTransferredResource(doc));
     } else if (resultClass.equals(Job.class)) {
       ret = resultClass.cast(solrDocumentToJob(doc));
-    } else if (resultClass.equals(Risk.class)) {
+    } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       ret = resultClass.cast(solrDocumentToRisk(doc));
     } else if (resultClass.equals(Agent.class)) {
       ret = resultClass.cast(solrDocumentToAgent(doc));
@@ -302,7 +303,7 @@ public class SolrUtils {
       ret = transferredResourceToSolrDocument((TransferredResource) object);
     } else if (resultClass.equals(Job.class)) {
       ret = jobToSolrDocument((Job) object);
-    } else if (resultClass.equals(Risk.class)) {
+    } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       ret = riskToSolrDocument((Risk) object);
     } else if (resultClass.equals(Agent.class)) {
       ret = agentToSolrDocument((Agent) object);
@@ -356,7 +357,7 @@ public class SolrUtils {
       indexName = RodaConstants.INDEX_JOB;
     } else if (resultClass.equals(IndexedFile.class)) {
       indexName = RodaConstants.INDEX_FILE;
-    } else if (resultClass.equals(Risk.class)) {
+    } else if (resultClass.equals(Risk.class) || resultClass.equals(IndexedRisk.class)) {
       indexName = RodaConstants.INDEX_RISK;
     } else if (resultClass.equals(Agent.class)) {
       indexName = RodaConstants.INDEX_AGENT;
@@ -1749,14 +1750,19 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE,
       risk.getMitigationRelatedEventIdentifierValue());
 
-    doc.addField(RodaConstants.RISK_OBJECTS_SIZE, risk.getObjectsSize());
     doc.addField(RodaConstants.RISK_AFFECTED_OBJECTS, JsonUtils.getJsonFromObject(risk.getAffectedObjects()));
+
+    if (risk instanceof IndexedRisk) {
+      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, ((IndexedRisk) risk).getObjectsSize());
+    } else {
+      doc.addField(RodaConstants.RISK_OBJECTS_SIZE, 0);
+    }
 
     return doc;
   }
 
-  public static Risk solrDocumentToRisk(SolrDocument doc) {
-    Risk risk = new Risk();
+  public static IndexedRisk solrDocumentToRisk(SolrDocument doc) {
+    IndexedRisk risk = new IndexedRisk();
 
     risk.setId(objectToString(doc.get(RodaConstants.RISK_ID)));
     risk.setName(objectToString(doc.get(RodaConstants.RISK_NAME)));
@@ -1932,7 +1938,10 @@ public class SolrUtils {
     SolrInputDocument doc = new SolrInputDocument();
 
     doc.addField(RodaConstants.RISK_INCIDENCE_ID, incidence.getId());
-    doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_ID, incidence.getObjectId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_AIP_ID, incidence.getAipId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, incidence.getRepresentationId());
+    doc.addField(RodaConstants.RISK_INCIDENCE_FILE_PATH, incidence.getFilePath());
+    doc.addField(RodaConstants.RISK_INCIDENCE_FILE_ID, incidence.getFileId());
     doc.addField(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS, incidence.getObjectClass());
     doc.addField(RodaConstants.RISK_INCIDENCE_RISKS, incidence.getRisks());
     return doc;
@@ -1942,7 +1951,10 @@ public class SolrUtils {
     RiskIncidence incidence = new RiskIncidence();
 
     incidence.setId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ID)));
-    incidence.setObjectId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_ID)));
+    incidence.setAipId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID)));
+    incidence.setRepresentationId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID)));
+    incidence.setFilePath(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_PATH)));
+    incidence.setFileId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_FILE_ID)));
     incidence.setObjectClass(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS)));
     incidence.setRisks(objectToListString(doc.get(RodaConstants.RISK_INCIDENCE_RISKS)));
     return incidence;

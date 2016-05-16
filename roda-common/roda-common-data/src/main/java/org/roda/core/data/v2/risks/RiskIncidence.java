@@ -25,18 +25,25 @@ public class RiskIncidence implements IsIndexed, Serializable {
   private static final long serialVersionUID = -1089167070045254627L;
 
   private String id = null;
-  private String objectId = null;
+  private String aipId = null;
+  private String representationId = null;
+  private List<String> filePath = null;
+  private String fileId = null;
   private String objectClass = null;
   private List<String> risks;
 
   public RiskIncidence() {
     super();
     this.setRisks(new ArrayList<String>());
+    this.setFilePath(new ArrayList<String>());
   }
 
   public RiskIncidence(RiskIncidence incidence) {
     this.id = incidence.getId();
-    this.setObjectId(incidence.getObjectId());
+    this.setAipId(incidence.getAipId());
+    this.setRepresentationId(incidence.getRepresentationId());
+    this.setFilePath(incidence.getFilePath());
+    this.setFileId(incidence.getFileId());
     this.setObjectClass(incidence.getObjectClass());
     this.setRisks(incidence.getRisks());
   }
@@ -47,14 +54,6 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public String getObjectId() {
-    return objectId;
-  }
-
-  public void setObjectId(String objectId) {
-    this.objectId = objectId;
   }
 
   public List<String> getRisks() {
@@ -73,6 +72,38 @@ public class RiskIncidence implements IsIndexed, Serializable {
     this.risks.remove(riskId);
   }
 
+  public String getAipId() {
+    return aipId;
+  }
+
+  public void setAipId(String aipId) {
+    this.aipId = aipId;
+  }
+
+  public String getRepresentationId() {
+    return representationId;
+  }
+
+  public void setRepresentationId(String representationId) {
+    this.representationId = representationId;
+  }
+
+  public List<String> getFilePath() {
+    return filePath;
+  }
+
+  public void setFilePath(List<String> filePath) {
+    this.filePath = filePath;
+  }
+
+  public String getFileId() {
+    return fileId;
+  }
+
+  public void setFileId(String fileId) {
+    this.fileId = fileId;
+  }
+
   public String getObjectClass() {
     return objectClass;
   }
@@ -83,8 +114,8 @@ public class RiskIncidence implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "RiskIncidence [id=" + id + ", objectId=" + objectId + ", objectClass=" + objectClass + ", risks=" + risks
-      + "]";
+    return "RiskIncidence [id=" + id + ", aipId=" + aipId + ", representationId=" + representationId + ", fileId="
+      + fileId + ", objectClass=" + objectClass + ", risks=" + risks + "]";
   }
 
   @JsonIgnore

@@ -23,7 +23,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.SearchPanel;
@@ -154,6 +154,9 @@ public class RiskRegister extends Composite {
   @UiField
   Button startProcess;
 
+  @UiField
+  Button buttonRefresh;
+
   private static final Filter DEFAULT_FILTER = new Filter(
     new BasicSearchFilterParameter(RodaConstants.RISK_SEARCH, "*"));
 
@@ -189,17 +192,17 @@ public class RiskRegister extends Composite {
 
       @Override
       public void onSelectionChange(SelectionChangeEvent event) {
-        Risk selected = riskList.getSelectionModel().getSelectedObject();
+        IndexedRisk selected = riskList.getSelectionModel().getSelectedObject();
         if (selected != null) {
           Tools.newHistory(RESOLVER, ShowRisk.RESOLVER.getHistoryToken(), selected.getId());
         }
       }
     });
 
-    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<Risk>() {
+    riskList.addCheckboxSelectionListener(new CheckboxSelectionListener<IndexedRisk>() {
 
       @Override
-      public void onSelectionChange(SelectedItems<Risk> selected) {
+      public void onSelectionChange(SelectedItems<IndexedRisk> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
         if (empty) {
           buttonRemove.setEnabled(false);
@@ -294,12 +297,30 @@ public class RiskRegister extends Composite {
     Tools.newHistory(RESOLVER, CreateRisk.RESOLVER.getHistoryToken());
   }
 
+  @UiHandler("buttonRefresh")
+  void buttonRefreshRiskHandler(ClickEvent e) {
+    BrowserService.Util.getInstance().updateRiskCounters(new AsyncCallback<Void>() {
+
+      @Override
+      public void onFailure(Throwable caught) {
+        AsyncCallbackUtils.defaultFailureTreatment(caught);
+        riskList.refresh();
+      }
+
+      @Override
+      public void onSuccess(Void result) {
+        Toast.showInfo("Refresh action", "The refresh of risks is now done");
+        riskList.refresh();
+      }
+    });
+  }
+
   @UiHandler("buttonRemove")
   void buttonRemoveRiskHandler(ClickEvent e) {
 
-    final SelectedItems<Risk> selected = riskList.getSelected();
+    final SelectedItems<IndexedRisk> selected = riskList.getSelected();
 
-    SelectedItemsUtils.size(Risk.class, selected, new AsyncCallback<Long>() {
+    SelectedItemsUtils.size(IndexedRisk.class, selected, new AsyncCallback<Long>() {
 
       @Override
       public void onFailure(Throwable caught) {

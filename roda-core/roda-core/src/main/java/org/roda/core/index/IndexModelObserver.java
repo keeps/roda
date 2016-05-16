@@ -50,6 +50,7 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
@@ -470,7 +471,9 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
       "Error deleting files (aipId=" + aipId + ")");
     deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId,
-      "Error deleting files (aipId=" + aipId + ")");
+      "Error deleting preservation events (aipId=" + aipId + ")");
+    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId,
+      "Error deleting risk incidences (aipId=" + aipId + ")");
   }
 
   @Override
@@ -529,6 +532,10 @@ public class IndexModelObserver implements ModelObserver {
     deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS,
       RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID,
       "Error deleting files (aipId=" + aipId + "; representationId=" + representationId + ")");
+
+    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID,
+      representationId,
+      "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + ")");
   }
 
   @Override
@@ -552,6 +559,10 @@ public class IndexModelObserver implements ModelObserver {
   public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
     String id = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")");
+
+    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId,
+      "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + "; fileId=" + fileId
+        + ")");
   }
 
   @Override
@@ -812,7 +823,7 @@ public class IndexModelObserver implements ModelObserver {
 
     if (commit) {
       try {
-        SolrUtils.commit(index, Risk.class);
+        SolrUtils.commit(index, IndexedRisk.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }
@@ -824,7 +835,7 @@ public class IndexModelObserver implements ModelObserver {
 
     if (commit) {
       try {
-        SolrUtils.commit(index, Risk.class);
+        SolrUtils.commit(index, IndexedRisk.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }

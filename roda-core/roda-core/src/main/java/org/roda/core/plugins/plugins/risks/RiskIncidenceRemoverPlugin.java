@@ -24,6 +24,8 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
@@ -38,6 +40,7 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskIncidenceRemoverPlugin.class);
   private static String riskIds;
+  private static boolean aipRemoved;
   private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   @Override
@@ -72,6 +75,12 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
     if (parameters.containsKey("riskIds")) {
       riskIds = parameters.get("riskIds");
     }
+
+    if (parameters.containsKey("aipRemoved")) {
+      aipRemoved = Boolean.parseBoolean(parameters.get("aipRemoved"));
+    } else {
+      aipRemoved = false;
+    }
   }
 
   @Override
@@ -82,27 +91,10 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
     Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      if (riskIds != null) {
-        String[] risks = riskIds.split(",");
-        for (String riskId : risks) {
-          for (AIP aip : list) {
-            model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
-
-            for (Representation representation : aip.getRepresentations()) {
-              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
-
-              boolean recursive = true;
-              CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-                representation.getId(), recursive);
-
-              for (OptionalWithCause<File> ofile : allFiles) {
-                File file = ofile.get();
-                model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
-                  OTHER_METADATA_TYPE);
-              }
-            }
-          }
-        }
+      if (aipRemoved) {
+        executeWhenAipsRemoved(index, model, list);
+      } else {
+        executeWhenRisksRemoved(index, model, list);
       }
     } catch (GenericException | NotFoundException | AuthorizationDeniedException | RequestNotValidException e) {
       LOGGER.error("Could not delete risk incidence");
@@ -110,6 +102,67 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
 
     LOGGER.debug("Done removing old risk incidences");
     return pluginReport;
+  }
+
+  private void executeWhenAipsRemoved(IndexService index, ModelService model, List<AIP> list)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    for (AIP aip : list) {
+      RiskIncidence incidence = model.retrieveRiskIncidence(aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+      for (String riskId : incidence.getRisks()) {
+        model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+      }
+
+      for (Representation representation : aip.getRepresentations()) {
+        incidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
+        for (String riskId : incidence.getRisks()) {
+          model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
+        }
+
+        boolean recursive = true;
+        CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), representation.getId(),
+          recursive);
+
+        for (OptionalWithCause<File> ofile : allFiles) {
+          File file = ofile.get();
+          incidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(), file.getPath(), file.getId(),
+            OTHER_METADATA_TYPE);
+          for (String riskId : incidence.getRisks()) {
+            model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
+              OTHER_METADATA_TYPE);
+          }
+        }
+      }
+    }
+  }
+
+  private void executeWhenRisksRemoved(IndexService index, ModelService model, List<AIP> list)
+    throws GenericException, NotFoundException, AuthorizationDeniedException, RequestNotValidException {
+    if (riskIds != null) {
+      String[] risks = riskIds.split(",");
+      for (String riskId : risks) {
+        for (AIP aip : list) {
+          model.deleteRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+
+          for (Representation representation : aip.getRepresentations()) {
+            model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), null, null, OTHER_METADATA_TYPE);
+
+            boolean recursive = true;
+            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+              representation.getId(), recursive);
+
+            for (OptionalWithCause<File> ofile : allFiles) {
+              File file = ofile.get();
+              model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
+                OTHER_METADATA_TYPE);
+            }
+          }
+        }
+      }
+    }
+
+    if (aipRemoved) {
+      index.commit(Risk.class);
+    }
   }
 
   @Override

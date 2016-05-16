@@ -466,7 +466,10 @@ public final class RodaConstants {
   public static final String RISK_SEARCH = "search";
 
   public static final String RISK_INCIDENCE_ID = "id";
-  public static final String RISK_INCIDENCE_OBJECT_ID = "objectId";
+  public static final String RISK_INCIDENCE_AIP_ID = "aipId";
+  public static final String RISK_INCIDENCE_REPRESENTATION_ID = "representationId";
+  public static final String RISK_INCIDENCE_FILE_PATH = "filePath";
+  public static final String RISK_INCIDENCE_FILE_ID = "fileId";
   public static final String RISK_INCIDENCE_OBJECT_CLASS = "objectClass";
   public static final String RISK_INCIDENCE_RISKS = "risks";
 

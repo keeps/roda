@@ -276,23 +276,7 @@ public final class PluginHelper {
     JobPluginInfo jobPluginInfo) {
 
     // do stuff with concrete JobPluginInfo
-    if (jobPluginInfo instanceof RiskJobPluginInfo) {
-      RiskJobPluginInfo riskJobPluginInfo = (RiskJobPluginInfo) jobPluginInfo;
-      List<Risk> countedRisks = new ArrayList<Risk>();
-      Map<String, Integer> riskCounter = riskJobPluginInfo.getRisks();
-
-      try {
-        for (Entry<String, Integer> riskEntry : riskCounter.entrySet()) {
-          Risk risk = model.retrieveRisk(riskEntry.getKey());
-          risk.setObjectsSize(risk.getObjectsSize() + riskEntry.getValue());
-          countedRisks.add(risk);
-        }
-
-        model.updateRisks(countedRisks, null, true);
-      } catch (RequestNotValidException | GenericException | NotFoundException | AuthorizationDeniedException e) {
-        LOGGER.error("Could not update risk counters");
-      }
-    }
+   
 
     // update job
     try {

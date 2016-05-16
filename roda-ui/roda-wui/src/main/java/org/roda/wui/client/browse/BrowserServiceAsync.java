@@ -28,6 +28,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.ingest.process.CreateIngestJobBundle;
@@ -150,7 +151,7 @@ public interface BrowserServiceAsync {
 
   void retrieveAllMitigationProperties(AsyncCallback<MitigationPropertiesBundle> asyncCallback);
 
-  void deleteRisk(SelectedItems<Risk> selected, AsyncCallback<Void> asyncCallback);
+  void deleteRisk(SelectedItems<IndexedRisk> selected, AsyncCallback<Void> asyncCallback);
 
   void deleteAgent(SelectedItems<Agent> selected, AsyncCallback<Void> asyncCallback);
 
@@ -162,5 +163,7 @@ public interface BrowserServiceAsync {
   void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);
 
   void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences, AsyncCallback<Void> asyncCallback);
+
+  void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
 }

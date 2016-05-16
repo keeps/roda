@@ -12,6 +12,7 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
@@ -41,7 +42,7 @@ public class EditRisk extends Composite {
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
       if (historyTokens.size() == 1) {
         String riskId = historyTokens.get(0);
-        BrowserService.Util.getInstance().retrieve(Risk.class.getName(), riskId, new AsyncCallback<Risk>() {
+        BrowserService.Util.getInstance().retrieve(Risk.class.getName(), riskId, new AsyncCallback<IndexedRisk>() {
 
           @Override
           public void onFailure(Throwable caught) {
@@ -49,7 +50,7 @@ public class EditRisk extends Composite {
           }
 
           @Override
-          public void onSuccess(Risk risk) {
+          public void onSuccess(IndexedRisk risk) {
             EditRisk editRisk = new EditRisk(risk);
             callback.onSuccess(editRisk);
           }
@@ -79,7 +80,7 @@ public class EditRisk extends Composite {
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
 
-  private Risk risk;
+  private IndexedRisk risk;
   private static RiskMessages messages = GWT.create(RiskMessages.class);
 
   @UiField
@@ -100,7 +101,7 @@ public class EditRisk extends Composite {
    * @param user
    *          the user to create
    */
-  public EditRisk(Risk risk) {
+  public EditRisk(IndexedRisk risk) {
     this.risk = risk;
     this.riskDataPanel = new RiskDataPanel(true, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
       RodaConstants.RISK_MITIGATION_OWNER);

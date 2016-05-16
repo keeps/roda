@@ -15,6 +15,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.wui.client.browse.BrowserService;
@@ -164,7 +165,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
    *          the risk to use
    *
    */
-  public RiskDataPanel(final boolean editmode, final Risk risk, final String categoryField,
+  public RiskDataPanel(final boolean editmode, final IndexedRisk risk, final String categoryField,
     final String identifiedByField, final String ownerField) {
 
     category = new SearchSuggestBox<Risk>(Risk.class, categoryField);
@@ -187,7 +188,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     });
   }
 
-  public void init(boolean editmode, MitigationPropertiesBundle mitigationProperties, Risk risk) {
+  public void init(boolean editmode, MitigationPropertiesBundle mitigationProperties, IndexedRisk risk) {
     severityLowLimit = mitigationProperties.getSeverityLowLimit();
     severityHighLimit = mitigationProperties.getSeverityHighLimit();
 
@@ -385,7 +386,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     return valid;
   }
 
-  public void setRisk(Risk risk) {
+  public void setRisk(IndexedRisk risk) {
     this.id.setText(risk.getId());
     this.name.setText(risk.getName());
     this.description.setText(risk.getDescription());
@@ -432,8 +433,8 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     this.riskCounter = risk.getObjectsSize();
   }
 
-  public Risk getRisk() {
-    Risk risk = new Risk();
+  public IndexedRisk getRisk() {
+    IndexedRisk risk = new IndexedRisk();
     risk.setName(name.getText());
     risk.setDescription(description.getText());
     risk.setIdentifiedOn(identifiedOn.getValue());

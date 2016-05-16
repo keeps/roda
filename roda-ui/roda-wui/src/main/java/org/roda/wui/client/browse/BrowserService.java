@@ -34,6 +34,7 @@ import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.validation.ValidationException;
@@ -221,7 +222,7 @@ public interface BrowserService extends RemoteService {
 
   MitigationPropertiesBundle retrieveAllMitigationProperties() throws AuthorizationDeniedException;
 
-  void deleteRisk(SelectedItems<Risk> selected) throws AuthorizationDeniedException, GenericException,
+  void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException;
 
   void deleteAgent(SelectedItems<Agent> selected)
@@ -238,5 +239,8 @@ public interface BrowserService extends RemoteService {
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
   void deleteRiskIncidences(String id, SelectedItems<RiskIncidence> incidences)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
+
+  void updateRiskCounters()
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 }

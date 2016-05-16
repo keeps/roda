@@ -10,6 +10,7 @@ package org.roda.wui.client.planning;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -36,8 +37,7 @@ public class CreateRisk extends Composite {
 
     @Override
     public void resolve(List<String> historyTokens, final AsyncCallback<Widget> callback) {
-      Risk risk = new Risk();
-      CreateRisk createRisk = new CreateRisk(risk);
+      CreateRisk createRisk = new CreateRisk();
       callback.onSuccess(createRisk);
     }
 
@@ -59,8 +59,6 @@ public class CreateRisk extends Composite {
   }
 
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-
-  private Risk risk;
   private static RiskMessages messages = GWT.create(RiskMessages.class);
 
   @UiField
@@ -78,9 +76,8 @@ public class CreateRisk extends Composite {
    * @param user
    *          the user to create
    */
-  public CreateRisk(Risk risk) {
-    this.risk = risk;
-    this.riskDataPanel = new RiskDataPanel(false, risk, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
+  public CreateRisk() {
+    this.riskDataPanel = new RiskDataPanel(false, null, RodaConstants.RISK_CATEGORY, RodaConstants.RISK_IDENTIFIED_BY,
       RodaConstants.RISK_MITIGATION_OWNER);
     initWidget(uiBinder.createAndBindUi(this));
   }
@@ -88,7 +85,7 @@ public class CreateRisk extends Composite {
   @UiHandler("buttonApply")
   void buttonApplyHandler(ClickEvent e) {
     if (riskDataPanel.isValid()) {
-      risk = riskDataPanel.getRisk();
+      IndexedRisk risk = riskDataPanel.getRisk();
       BrowserService.Util.getInstance().addRisk(risk, new AsyncCallback<Risk>() {
 
         public void onFailure(Throwable caught) {

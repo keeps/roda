@@ -130,8 +130,8 @@
    <field name="mitigationRelatedEventIdentifierType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="mitigationRelatedEventIdentifierValue" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    
-   <field name="objectsSize" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="affectedObjects" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+   <field name="objectsSize" type="int" indexed="true" stored="true" required="true" multiValued="false" />
    
    <field name="search" type="text_general" indexed="true" stored="false" multiValued="true" />
    

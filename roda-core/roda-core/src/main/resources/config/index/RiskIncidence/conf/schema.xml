@@ -105,7 +105,10 @@
      installations. See the <uniqueKey> declaration below where <uniqueKey> is set to "id".
    -->   
    <field name="id" type="string" indexed="true" stored="true" required="true" multiValued="false" />
-   <field name="objectId" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="aipId" type="string" indexed="true" stored="true" required="true" multiValued="false" />
+   <field name="representationId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="filePath" type="string" indexed="true" stored="true" required="false" multiValued="true" />
+   <field name="fileId" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectClass" type="string" indexed="true" stored="true" required="true" multiValued="false" />
    <field name="risks" type="string" indexed="true" stored="true" required="false" multiValued="true" />
    

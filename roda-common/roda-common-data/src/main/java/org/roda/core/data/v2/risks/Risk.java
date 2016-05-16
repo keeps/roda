@@ -15,14 +15,13 @@ import java.util.Map;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.roda.core.data.v2.NamedIndexedModel;
-import org.roda.core.data.v2.index.IsIndexed;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @XmlRootElement(name = "risk")
 @JsonInclude(JsonInclude.Include.ALWAYS)
-public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
+public class Risk extends NamedIndexedModel implements Serializable {
 
   private static final long serialVersionUID = -585753367605901060L;
 
@@ -54,7 +53,6 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
   private String mitigationRelatedEventIdentifierType = null;
   private String mitigationRelatedEventIdentifierValue = null;
 
-  private int objectsSize = 0;
   private Map<String, String> affectedObjects = new HashMap<String, String>();
 
   public Risk() {
@@ -88,7 +86,6 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.mitigationRelatedEventIdentifierType = risk.getMitigationRelatedEventIdentifierType();
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
 
-    this.objectsSize = risk.getObjectsSize();
     this.affectedObjects = new HashMap<String, String>(risk.getAffectedObjects());
   }
 
@@ -276,14 +273,6 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
     this.mitigationRelatedEventIdentifierValue = mitigationRelatedEventIdentifierValue;
   }
 
-  public int getObjectsSize() {
-    return objectsSize;
-  }
-
-  public void setObjectsSize(int objectsSize) {
-    this.objectsSize = objectsSize;
-  }
-
   public Map<String, String> getAffectedObjects() {
     return affectedObjects;
   }
@@ -294,7 +283,7 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
 
   @Override
   public String toString() {
-    return "Format [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
+    return "Risk [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
       + ", identifiedOn=" + identifiedOn + ", identifiedBy=" + identifiedBy + ", category=" + category + ", notes="
       + notes + ", preMitigationProbability=" + preMitigationProbability + ", preMitigationImpact="
       + preMitigationImpact + ", preMitigationSeverity=" + preMitigationSeverity + ", preMitigationNotes="
@@ -303,8 +292,7 @@ public class Risk extends NamedIndexedModel implements IsIndexed, Serializable {
       + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
       + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
-      + mitigationRelatedEventIdentifierValue + ", objectsSize=" + objectsSize + ", affectedObjects=" + affectedObjects
-      + "]";
+      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
   }
 
   @JsonIgnore

@@ -46,6 +46,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -569,7 +570,7 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public void deleteRisk(SelectedItems<Risk> selected) throws AuthorizationDeniedException, GenericException,
+  public void deleteRisk(SelectedItems<IndexedRisk> selected) throws AuthorizationDeniedException, GenericException,
     RequestNotValidException, NotFoundException, InvalidParameterException, JobAlreadyStartedException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
 
@@ -630,6 +631,13 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.deleteRiskIncidences(user, id, incidences);
+  }
+
+  @Override
+  public void updateRiskCounters()
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.updateRiskCounters(user);
   }
 
 }

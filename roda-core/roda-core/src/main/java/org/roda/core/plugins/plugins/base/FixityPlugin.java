@@ -56,8 +56,8 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risk identifier.", PluginParameterType.STRING, "",
-        false, false, "Add the risks that will be associated with the objects above."));
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risk identifier", PluginParameterType.STRING, "", false,
+        false, "Add the risks that will be associated with the objects above."));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_NAME, new PluginParameter(
       RodaConstants.PLUGIN_PARAMS_RISK_NAME, "Risk name", PluginParameterType.STRING, "", false, false, "Risk name."));

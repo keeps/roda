@@ -19,7 +19,7 @@ import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 
 import com.google.gwt.cell.client.DateCell;
@@ -46,7 +46,7 @@ import config.i18n.client.RiskMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class RiskList extends BasicAsyncTableCell<Risk> {
+public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
 
   private static final int PAGE_SIZE = 20;
   private Filter filter;
@@ -56,12 +56,12 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
   // GWT.create(BrowseMessages.class);
   private static final RiskMessages messages = GWT.create(RiskMessages.class);
 
-  private TextColumn<Risk> nameColumn;
-  private Column<Risk, Date> identifiedOnColumn;
-  private TextColumn<Risk> categoryColumn;
-  private TextColumn<Risk> ownerColumn;
-  private Column<Risk, SafeHtml> severityColumn;
-  private TextColumn<Risk> objectCounterColumn;
+  private TextColumn<IndexedRisk> nameColumn;
+  private Column<IndexedRisk, Date> identifiedOnColumn;
+  private TextColumn<IndexedRisk> categoryColumn;
+  private TextColumn<IndexedRisk> ownerColumn;
+  private Column<IndexedRisk, SafeHtml> severityColumn;
+  private TextColumn<IndexedRisk> objectCounterColumn;
 
   public RiskList() {
     this(null, null, null, false);
@@ -69,47 +69,48 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
 
   public RiskList(Filter filter, Facets facets, String summary, boolean selectable) {
     super(filter, facets, summary, selectable);
-    super.setSelectedClass(Risk.class);
+    super.setSelectedClass(IndexedRisk.class);
     this.filter = filter;
   }
 
   @Override
-  protected void configureDisplay(CellTable<Risk> display) {
+  protected void configureDisplay(CellTable<IndexedRisk> display) {
 
-    nameColumn = new TextColumn<Risk>() {
+    nameColumn = new TextColumn<IndexedRisk>() {
 
       @Override
-      public String getValue(Risk risk) {
+      public String getValue(IndexedRisk risk) {
         return risk != null ? risk.getName() : null;
       }
     };
 
-    identifiedOnColumn = new Column<Risk, Date>(new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG))) {
+    identifiedOnColumn = new Column<IndexedRisk, Date>(
+      new DateCell(DateTimeFormat.getFormat(PredefinedFormat.DATE_LONG))) {
       @Override
-      public Date getValue(Risk risk) {
+      public Date getValue(IndexedRisk risk) {
         return risk != null ? risk.getIdentifiedOn() : null;
       }
     };
 
-    categoryColumn = new TextColumn<Risk>() {
+    categoryColumn = new TextColumn<IndexedRisk>() {
 
       @Override
-      public String getValue(Risk risk) {
+      public String getValue(IndexedRisk risk) {
         return risk != null ? risk.getCategory() : null;
       }
     };
 
-    ownerColumn = new TextColumn<Risk>() {
+    ownerColumn = new TextColumn<IndexedRisk>() {
 
       @Override
-      public String getValue(Risk risk) {
+      public String getValue(IndexedRisk risk) {
         return risk != null ? risk.getMitigationOwner() : null;
       }
     };
 
-    severityColumn = new Column<Risk, SafeHtml>(new SafeHtmlCell()) {
+    severityColumn = new Column<IndexedRisk, SafeHtml>(new SafeHtmlCell()) {
       @Override
-      public SafeHtml getValue(Risk risk) {
+      public SafeHtml getValue(IndexedRisk risk) {
         SafeHtml ret = null;
         if (risk != null) {
           String severity = risk.getPosMitigationSeverityLevel().toString();
@@ -127,9 +128,9 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
       }
     };
 
-    objectCounterColumn = new TextColumn<Risk>() {
+    objectCounterColumn = new TextColumn<IndexedRisk>() {
       @Override
-      public String getValue(Risk risk) {
+      public String getValue(IndexedRisk risk) {
         return Integer.toString(risk.getObjectsSize());
       }
     };
@@ -162,11 +163,12 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
   }
 
   @Override
-  protected void getData(Sublist sublist, ColumnSortList columnSortList, AsyncCallback<IndexResult<Risk>> callback) {
+  protected void getData(Sublist sublist, ColumnSortList columnSortList,
+    AsyncCallback<IndexResult<IndexedRisk>> callback) {
 
     Filter filter = getFilter();
 
-    Map<Column<Risk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Risk, ?>, List<String>>();
+    Map<Column<IndexedRisk, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<IndexedRisk, ?>, List<String>>();
     columnSortingKeyMap.put(nameColumn, Arrays.asList(RodaConstants.RISK_NAME));
     columnSortingKeyMap.put(identifiedOnColumn, Arrays.asList(RodaConstants.RISK_IDENTIFIED_ON));
     columnSortingKeyMap.put(categoryColumn, Arrays.asList(RodaConstants.RISK_CATEGORY));
@@ -176,17 +178,16 @@ public class RiskList extends BasicAsyncTableCell<Risk> {
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);
 
-    boolean justActive = false;
-    BrowserService.Util.getInstance().find(Risk.class.getName(), filter, sorter, sublist, getFacets(),
-      LocaleInfo.getCurrentLocale().getLocaleName(), justActive, callback);
+    BrowserService.Util.getInstance().find(IndexedRisk.class.getName(), filter, sorter, sublist, getFacets(),
+      LocaleInfo.getCurrentLocale().getLocaleName(), getJustActive(), callback);
   }
 
   @Override
-  protected ProvidesKey<Risk> getKeyProvider() {
-    return new ProvidesKey<Risk>() {
+  protected ProvidesKey<IndexedRisk> getKeyProvider() {
+    return new ProvidesKey<IndexedRisk>() {
 
       @Override
-      public Object getKey(Risk item) {
+      public Object getKey(IndexedRisk item) {
         return item.getId();
       }
     };

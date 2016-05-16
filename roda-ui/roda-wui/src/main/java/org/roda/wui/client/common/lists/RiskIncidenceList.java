@@ -60,7 +60,17 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
 
       @Override
       public String getValue(RiskIncidence incidence) {
-        return incidence != null ? incidence.getObjectId() : null;
+        if (incidence != null) {
+          if (incidence.getFileId() != null) {
+            return incidence.getFileId();
+          } else if (incidence.getRepresentationId() != null) {
+            return incidence.getRepresentationId();
+          } else if (incidence.getAipId() != null) {
+            return incidence.getAipId();
+          }
+        }
+
+        return null;
       }
     };
 
@@ -100,7 +110,8 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     } else {
 
       Map<Column<RiskIncidence, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<RiskIncidence, ?>, List<String>>();
-      columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_ID));
+      columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_AIP_ID,
+        RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, RodaConstants.RISK_INCIDENCE_FILE_ID));
       columnSortingKeyMap.put(objectTypeColumn, Arrays.asList(RodaConstants.RISK_INCIDENCE_OBJECT_CLASS));
 
       Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);

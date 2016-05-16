@@ -1618,14 +1618,16 @@ public class ModelService extends ModelObservable {
 
       riskIncidence = new RiskIncidence();
       riskIncidence.setId(UUID.randomUUID().toString());
+      riskIncidence.setFileId(fileId);
+      riskIncidence.setFilePath(fileDirectoryPath);
+      riskIncidence.setRepresentationId(representationId);
+      riskIncidence.setAipId(aipId);
+
       if (fileId != null) {
-        riskIncidence.setObjectId(fileId);
         riskIncidence.setObjectClass(File.class.getSimpleName());
       } else if (representationId != null) {
-        riskIncidence.setObjectId(representationId);
         riskIncidence.setObjectClass(Representation.class.getSimpleName());
       } else {
-        riskIncidence.setObjectId(aipId);
         riskIncidence.setObjectClass(AIP.class.getSimpleName());
       }
 
@@ -1671,9 +1673,9 @@ public class ModelService extends ModelObservable {
           notifyRiskIncidenceDeleted(riskIncidence.getId(), true);
         }
 
-        Risk risk = this.retrieveRisk(riskId);
-        risk.setObjectsSize(risk.getObjectsSize() - 1);
-        this.updateRisk(risk, null, false);
+        // Risk risk = this.retrieveRisk(riskId);
+        // risk.setObjectsSize(risk.getObjectsSize() - 1);
+        // this.updateRisk(risk, null, false);
 
       } catch (NotFoundException e) {
         // do nothing

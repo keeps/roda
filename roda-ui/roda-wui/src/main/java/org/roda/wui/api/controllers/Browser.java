@@ -46,6 +46,7 @@ import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Permissions.PermissionType;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
@@ -1106,7 +1107,7 @@ public class Browser extends RodaCoreService {
     UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
 
     // delegate
-    Risk ret = BrowserHelper.addRisk(risk, false);
+    Risk ret = BrowserHelper.addRisk(risk, true);
 
     // register action
     long duration = new Date().getTime() - start.getTime();
@@ -1387,7 +1388,7 @@ public class Browser extends RodaCoreService {
     return ret;
   }
 
-  public static void deleteRisk(RodaUser user, SelectedItems<Risk> selected)
+  public static void deleteRisk(RodaUser user, SelectedItems<IndexedRisk> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException,
     InvalidParameterException, JobAlreadyStartedException {
     Date start = new Date();
@@ -1462,6 +1463,21 @@ public class Browser extends RodaCoreService {
     // register action
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "deleteRiskIncidences", null, duration, "incidences", incidences);
+  }
+
+  public static void updateRiskCounters(RodaUser user)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.updateRiskCounters();
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "updateRiskCounters", null, duration);
   }
 
 }
