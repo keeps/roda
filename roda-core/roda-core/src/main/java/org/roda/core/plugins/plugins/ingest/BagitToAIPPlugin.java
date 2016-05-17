@@ -91,7 +91,8 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
         String parentId = PluginHelper.computeParentId(this, index, bag.getBagInfoTxt().get("parent"));
 
-        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml", parentId);
+        AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
+          transferredResource.getName(), reportItem.getJobId(), parentId);
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
         reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 

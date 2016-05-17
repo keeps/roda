@@ -52,6 +52,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
   // private Column<Report, SafeHtml> objectIdColumn;
   private TextColumn<Report> sourceObjectColumn;
+  private TextColumn<Report> outcomeObjectColumn;
   private Column<Report, Date> updatedDateColumn;
   private TextColumn<Report> lastPluginRunColumn;
   private Column<Report, SafeHtml> lastPluginRunStateColumn;
@@ -79,7 +80,24 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
       public String getValue(Report report) {
         String value = "";
         if (report != null) {
-          value = report.getSourceObjectId();
+          if ("".equals(report.getSourceObjectOriginalId())) {
+            value = report.getSourceObjectId();
+          } else {
+            value = report.getSourceObjectOriginalId();
+          }
+        }
+
+        return value;
+      }
+    };
+
+    outcomeObjectColumn = new TextColumn<Report>() {
+
+      @Override
+      public String getValue(Report report) {
+        String value = "";
+        if (report != null) {
+          value = report.getOutcomeObjectId();
         }
 
         return value;
@@ -155,6 +173,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
     };
 
     sourceObjectColumn.setSortable(true);
+    outcomeObjectColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
@@ -162,12 +181,13 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
     // TODO externalize strings into constants
     display.addColumn(sourceObjectColumn, "Submission Information Package");
+    display.addColumn(outcomeObjectColumn, "Archival Information Package");
     display.addColumn(updatedDateColumn, "Last updated at");
     display.addColumn(lastPluginRunColumn, "Last run task");
     display.addColumn(lastPluginRunStateColumn, "Status");
     display.addColumn(completionStatusColumn, "Progress");
 
-    display.setColumnWidth(sourceObjectColumn, "100%");
+    // display.setColumnWidth(sourceObjectColumn, "100%");
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
@@ -188,6 +208,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
     Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
     columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
+    columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));

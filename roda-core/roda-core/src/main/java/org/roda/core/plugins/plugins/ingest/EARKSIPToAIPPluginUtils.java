@@ -38,9 +38,9 @@ import org.slf4j.LoggerFactory;
 public class EARKSIPToAIPPluginUtils {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPluginUtils.class);
 
-  public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String parentId)
-    throws IOException, MigrationException, RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  public static AIP earkSIPToAIP(SIP sip, Path sipPath, ModelService model, StorageService storage, String ingestSIPId,
+    String ingestJobId, String parentId) throws IOException, MigrationException, RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     AIPState state = AIPState.INGEST_PROCESSING;
     Permissions permissions = new Permissions();
@@ -48,7 +48,7 @@ public class EARKSIPToAIPPluginUtils {
 
     String aipType = IngestHelper.getType(sip);
 
-    AIP aip = model.createAIP(state, parentId, aipType, permissions, notify);
+    AIP aip = model.createAIP(state, parentId, aipType, permissions, ingestSIPId, ingestJobId, notify);
 
     // process IP information
     processIPInformation(model, sip, aip, notify);

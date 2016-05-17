@@ -41,6 +41,9 @@ public class IndexedAIP implements IsIndexed {
   private Long numberOfDocumentationFiles;
   private Long numberOfSchemaFiles;
 
+  private String ingestSIPId;
+  private String ingestJobId;
+
   /**
    * Constructs an empty (<strong>invalid</strong>) {@link IndexedAIP}.
    */
@@ -250,6 +253,24 @@ public class IndexedAIP implements IsIndexed {
     this.permissions = permissions;
   }
 
+  public String getIngestSIPId() {
+    return ingestSIPId;
+  }
+
+  public IndexedAIP setIngestSIPId(String ingestSIPId) {
+    this.ingestSIPId = ingestSIPId;
+    return this;
+  }
+
+  public String getIngestJobId() {
+    return ingestJobId;
+  }
+
+  public IndexedAIP setIngestJobId(String ingestJobId) {
+    this.ingestJobId = ingestJobId;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -259,6 +280,8 @@ public class IndexedAIP implements IsIndexed {
     result = prime * result + ((dateInitial == null) ? 0 : dateInitial.hashCode());
     result = prime * result + ((description == null) ? 0 : description.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((ingestJobId == null) ? 0 : ingestJobId.hashCode());
+    result = prime * result + ((ingestSIPId == null) ? 0 : ingestSIPId.hashCode());
     result = prime * result + ((level == null) ? 0 : level.hashCode());
     result = prime * result + ((numberOfDocumentationFiles == null) ? 0 : numberOfDocumentationFiles.hashCode());
     result = prime * result + ((numberOfSchemaFiles == null) ? 0 : numberOfSchemaFiles.hashCode());
@@ -272,75 +295,117 @@ public class IndexedAIP implements IsIndexed {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (!(obj instanceof IndexedAIP)) {
       return false;
+    }
     IndexedAIP other = (IndexedAIP) obj;
     if (ancestors == null) {
-      if (other.ancestors != null)
+      if (other.ancestors != null) {
         return false;
-    } else if (!ancestors.equals(other.ancestors))
+      }
+    } else if (!ancestors.equals(other.ancestors)) {
       return false;
+    }
     if (dateFinal == null) {
-      if (other.dateFinal != null)
+      if (other.dateFinal != null) {
         return false;
-    } else if (!dateFinal.equals(other.dateFinal))
+      }
+    } else if (!dateFinal.equals(other.dateFinal)) {
       return false;
+    }
     if (dateInitial == null) {
-      if (other.dateInitial != null)
+      if (other.dateInitial != null) {
         return false;
-    } else if (!dateInitial.equals(other.dateInitial))
+      }
+    } else if (!dateInitial.equals(other.dateInitial)) {
       return false;
+    }
     if (description == null) {
-      if (other.description != null)
+      if (other.description != null) {
         return false;
-    } else if (!description.equals(other.description))
+      }
+    } else if (!description.equals(other.description)) {
       return false;
+    }
     if (id == null) {
-      if (other.id != null)
+      if (other.id != null) {
         return false;
-    } else if (!id.equals(other.id))
+      }
+    } else if (!id.equals(other.id)) {
       return false;
+    }
+    if (ingestJobId == null) {
+      if (other.ingestJobId != null) {
+        return false;
+      }
+    } else if (!ingestJobId.equals(other.ingestJobId)) {
+      return false;
+    }
+    if (ingestSIPId == null) {
+      if (other.ingestSIPId != null) {
+        return false;
+      }
+    } else if (!ingestSIPId.equals(other.ingestSIPId)) {
+      return false;
+    }
     if (level == null) {
-      if (other.level != null)
+      if (other.level != null) {
         return false;
-    } else if (!level.equals(other.level))
+      }
+    } else if (!level.equals(other.level)) {
       return false;
+    }
     if (numberOfDocumentationFiles == null) {
-      if (other.numberOfDocumentationFiles != null)
+      if (other.numberOfDocumentationFiles != null) {
         return false;
-    } else if (!numberOfDocumentationFiles.equals(other.numberOfDocumentationFiles))
+      }
+    } else if (!numberOfDocumentationFiles.equals(other.numberOfDocumentationFiles)) {
       return false;
+    }
     if (numberOfSchemaFiles == null) {
-      if (other.numberOfSchemaFiles != null)
+      if (other.numberOfSchemaFiles != null) {
         return false;
-    } else if (!numberOfSchemaFiles.equals(other.numberOfSchemaFiles))
+      }
+    } else if (!numberOfSchemaFiles.equals(other.numberOfSchemaFiles)) {
       return false;
+    }
     if (numberOfSubmissionFiles == null) {
-      if (other.numberOfSubmissionFiles != null)
+      if (other.numberOfSubmissionFiles != null) {
         return false;
-    } else if (!numberOfSubmissionFiles.equals(other.numberOfSubmissionFiles))
+      }
+    } else if (!numberOfSubmissionFiles.equals(other.numberOfSubmissionFiles)) {
       return false;
+    }
     if (parentID == null) {
-      if (other.parentID != null)
+      if (other.parentID != null) {
         return false;
-    } else if (!parentID.equals(other.parentID))
+      }
+    } else if (!parentID.equals(other.parentID)) {
       return false;
+    }
     if (permissions == null) {
-      if (other.permissions != null)
+      if (other.permissions != null) {
         return false;
-    } else if (!permissions.equals(other.permissions))
+      }
+    } else if (!permissions.equals(other.permissions)) {
       return false;
-    if (state != other.state)
+    }
+    if (state != other.state) {
       return false;
+    }
     if (title == null) {
-      if (other.title != null)
+      if (other.title != null) {
         return false;
-    } else if (!title.equals(other.title))
+      }
+    } else if (!title.equals(other.title)) {
       return false;
+    }
     return true;
   }
 
@@ -350,7 +415,8 @@ public class IndexedAIP implements IsIndexed {
       + dateInitial + ", dateFinal=" + dateFinal + ", description=" + description + ", parentID=" + parentID
       + ", ancestors=" + ancestors + ", permissions=" + permissions + ", numberOfSubmissionFiles="
       + numberOfSubmissionFiles + ", numberOfDocumentationFiles=" + numberOfDocumentationFiles
-      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + "]";
+      + ", numberOfSchemaFiles=" + numberOfSchemaFiles + ", ingestSIPId=" + ingestSIPId + ", ingestJobId=" + ingestJobId
+      + "]";
   }
 
   @Override

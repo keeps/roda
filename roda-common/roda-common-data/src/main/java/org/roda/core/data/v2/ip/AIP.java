@@ -30,6 +30,9 @@ public class AIP implements Serializable {
 
   private List<Representation> representations;
 
+  private String ingestSIPId = "";
+  private String ingestJobId = "";
+
   public AIP() {
     super();
   }
@@ -132,68 +135,119 @@ public class AIP implements Serializable {
     this.representations = representations;
   }
 
+  public String getIngestSIPId() {
+    return ingestSIPId;
+  }
+
+  public AIP setIngestSIPId(String ingestSIPId) {
+    this.ingestSIPId = ingestSIPId;
+    return this;
+  }
+
+  public String getIngestJobId() {
+    return ingestJobId;
+  }
+
+  public AIP setIngestJobId(String ingestJobId) {
+    this.ingestJobId = ingestJobId;
+    return this;
+  }
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
-    result = prime * result + ((state == null) ? 0 : state.hashCode());
     result = prime * result + ((descriptiveMetadata == null) ? 0 : descriptiveMetadata.hashCode());
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((ingestJobId == null) ? 0 : ingestJobId.hashCode());
+    result = prime * result + ((ingestSIPId == null) ? 0 : ingestSIPId.hashCode());
     result = prime * result + ((parentId == null) ? 0 : parentId.hashCode());
     result = prime * result + ((permissions == null) ? 0 : permissions.hashCode());
     result = prime * result + ((representations == null) ? 0 : representations.hashCode());
+    result = prime * result + ((state == null) ? 0 : state.hashCode());
     result = prime * result + ((type == null) ? 0 : type.hashCode());
     return result;
   }
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (!(obj instanceof AIP)) {
       return false;
+    }
     AIP other = (AIP) obj;
-    if (state != other.state)
-      return false;
     if (descriptiveMetadata == null) {
-      if (other.descriptiveMetadata != null)
+      if (other.descriptiveMetadata != null) {
         return false;
-    } else if (!descriptiveMetadata.equals(other.descriptiveMetadata))
+      }
+    } else if (!descriptiveMetadata.equals(other.descriptiveMetadata)) {
       return false;
+    }
     if (id == null) {
-      if (other.id != null)
+      if (other.id != null) {
         return false;
-    } else if (!id.equals(other.id))
+      }
+    } else if (!id.equals(other.id)) {
       return false;
+    }
+    if (ingestJobId == null) {
+      if (other.ingestJobId != null) {
+        return false;
+      }
+    } else if (!ingestJobId.equals(other.ingestJobId)) {
+      return false;
+    }
+    if (ingestSIPId == null) {
+      if (other.ingestSIPId != null) {
+        return false;
+      }
+    } else if (!ingestSIPId.equals(other.ingestSIPId)) {
+      return false;
+    }
     if (parentId == null) {
-      if (other.parentId != null)
+      if (other.parentId != null) {
         return false;
-    } else if (!parentId.equals(other.parentId))
+      }
+    } else if (!parentId.equals(other.parentId)) {
       return false;
+    }
     if (permissions == null) {
-      if (other.permissions != null)
+      if (other.permissions != null) {
         return false;
-    } else if (!permissions.equals(other.permissions))
+      }
+    } else if (!permissions.equals(other.permissions)) {
       return false;
+    }
     if (representations == null) {
-      if (other.representations != null)
+      if (other.representations != null) {
         return false;
-    } else if (!representations.equals(other.representations))
+      }
+    } else if (!representations.equals(other.representations)) {
       return false;
+    }
+    if (state != other.state) {
+      return false;
+    }
     if (type == null) {
-      if (other.type != null)
+      if (other.type != null) {
         return false;
-    } else if (!type.equals(other.type))
+      }
+    } else if (!type.equals(other.type)) {
       return false;
+    }
     return true;
   }
 
   @Override
   public String toString() {
     return "AIP [id=" + id + ", parentId=" + parentId + ", type=" + type + ", state=" + state + ", permissions="
-      + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations + "]";
+      + permissions + ", descriptiveMetadata=" + descriptiveMetadata + ", representations=" + representations
+      + ", ingestSIPId=" + ingestSIPId + ", ingestJobId=" + ingestJobId + "]";
   }
 
 }

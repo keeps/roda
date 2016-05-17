@@ -24,19 +24,20 @@ public class Report implements Serializable, IsIndexed {
     SUCCESS, PARTIAL_SUCCESS, FAILURE, RUNNING
   }
 
-  private String id = null;
-  private String jobId = null;
-  private String sourceObjectId = null;
-  private String outcomeObjectId = null;
+  private String id = "";
+  private String jobId = "";
+  private String sourceObjectId = "";
+  private String sourceObjectOriginalId = "";
+  private String outcomeObjectId = "";
   private AIPState outcomeObjectState = AIPState.getDefault();
 
-  private String title = null;
+  private String title = "";
   private Date dateCreated = null;
   private Date dateUpdated = null;
   private Integer completionPercentage = 0;
   private Integer stepsCompleted = 0;
   private Integer totalSteps = 0;
-  private String plugin = null;
+  private String plugin = "";
   private PluginState pluginState = PluginState.RUNNING;
   private String pluginDetails = "";
   private boolean htmlPluginDetails = false;
@@ -47,12 +48,17 @@ public class Report implements Serializable, IsIndexed {
     super();
   }
 
+  /**
+   * Copy constructor (only doesn't copy the reports)
+   */
   public Report(Report report) {
     super();
     this.id = report.getId();
     this.jobId = report.getJobId();
     this.sourceObjectId = report.getSourceObjectId();
+    this.sourceObjectOriginalId = report.getSourceObjectOriginalId();
     this.outcomeObjectId = report.getOutcomeObjectId();
+    this.outcomeObjectState = report.getOutcomeObjectState();
     this.title = report.getTitle();
     this.dateCreated = report.getDateCreated();
     this.dateUpdated = report.getDateUpdated();
@@ -87,6 +93,15 @@ public class Report implements Serializable, IsIndexed {
 
   public Report setSourceObjectId(String sourceObjectId) {
     this.sourceObjectId = sourceObjectId;
+    return this;
+  }
+
+  public String getSourceObjectOriginalId() {
+    return sourceObjectOriginalId;
+  }
+
+  public Report setSourceObjectOriginalId(String sourceObjectOriginalId) {
+    this.sourceObjectOriginalId = sourceObjectOriginalId;
     return this;
   }
 
@@ -230,12 +245,12 @@ public class Report implements Serializable, IsIndexed {
 
   @Override
   public String toString() {
-    return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", outcomeObjectId="
-      + outcomeObjectId + ", outcomeObjectState=" + outcomeObjectState + ", title=" + title + ", dateCreated="
-      + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage=" + completionPercentage
-      + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin=" + plugin + ", pluginState="
-      + pluginState + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails=" + htmlPluginDetails + ", reports="
-      + reports + "]";
+    return "Report [id=" + id + ", jobId=" + jobId + ", sourceObjectId=" + sourceObjectId + ", sourceObjectOriginalId="
+      + sourceObjectOriginalId + ", outcomeObjectId=" + outcomeObjectId + ", outcomeObjectState=" + outcomeObjectState
+      + ", title=" + title + ", dateCreated=" + dateCreated + ", dateUpdated=" + dateUpdated + ", completionPercentage="
+      + completionPercentage + ", stepsCompleted=" + stepsCompleted + ", totalSteps=" + totalSteps + ", plugin="
+      + plugin + ", pluginState=" + pluginState + ", pluginDetails=" + pluginDetails + ", htmlPluginDetails="
+      + htmlPluginDetails + ", reports=" + reports + "]";
   }
 
   @JsonIgnore

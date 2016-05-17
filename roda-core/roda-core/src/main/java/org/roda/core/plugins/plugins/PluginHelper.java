@@ -72,7 +72,7 @@ public final class PluginHelper {
 
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin,
     TransferredResource transferredResource) {
-    return initPluginReportItem(plugin, null, transferredResource.getUUID())
+    return initPluginReportItem(plugin, "", transferredResource.getUUID())
       .setOutcomeObjectState(AIPState.INGEST_PROCESSING);
   }
 

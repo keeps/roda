@@ -1089,6 +1089,8 @@ public class SolrUtils {
     final AIPState state = AIPState
       .valueOf(objectToString(doc.get(RodaConstants.STATE), AIPState.getDefault().toString()));
     final String parentId = objectToString(doc.get(RodaConstants.AIP_PARENT_ID));
+    final String ingestSIPId = objectToString(doc.get(RodaConstants.AIP_INGEST_SIP_ID), "");
+    final String ingestJobId = objectToString(doc.get(RodaConstants.AIP_INGEST_JOB_ID), "");
     final List<String> ancestors = objectToListString(doc.get(RodaConstants.AIP_ANCESTORS));
     final List<String> levels = objectToListString(doc.get(RodaConstants.AIP_LEVEL));
     final List<String> titles = objectToListString(doc.get(RodaConstants.AIP_TITLE));
@@ -1105,7 +1107,8 @@ public class SolrUtils {
     final String description = descriptions.isEmpty() ? null : descriptions.get(0);
 
     return new IndexedAIP(id, state, level, title, dateInitial, dateFinal, description, parentId, ancestors,
-      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles);
+      permissions, numberOfSubmissionFiles, numberOfDocumentationFiles, numberOfSchemaFiles).setIngestSIPId(ingestSIPId)
+        .setIngestJobId(ingestJobId);
   }
 
   public static SolrInputDocument aipToSolrInputDocument(AIP aip, ModelService model, boolean safemode)
@@ -1115,6 +1118,9 @@ public class SolrUtils {
     ret.addField(RodaConstants.AIP_ID, aip.getId());
     ret.addField(RodaConstants.AIP_PARENT_ID, aip.getParentId());
     ret.addField(RodaConstants.STATE, aip.getState().toString());
+
+    ret.addField(RodaConstants.AIP_INGEST_SIP_ID, aip.getIngestSIPId());
+    ret.addField(RodaConstants.AIP_INGEST_JOB_ID, aip.getIngestJobId());
 
     // set ancestors
     List<String> ancestors = getAncestors(aip.getParentId(), model);
@@ -1673,6 +1679,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_REPORT_ID, jobReport.getId());
     doc.addField(RodaConstants.JOB_REPORT_JOB_ID, jobReport.getJobId());
     doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID, jobReport.getSourceObjectId());
+    doc.addField(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID, jobReport.getSourceObjectOriginalId());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID, jobReport.getOutcomeObjectId());
     doc.addField(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE, jobReport.getOutcomeObjectState().toString());
     doc.addField(RodaConstants.JOB_REPORT_TITLE, jobReport.getTitle());
@@ -1695,8 +1702,10 @@ public class SolrUtils {
 
     jobReport.setId(objectToString(doc.get(RodaConstants.JOB_REPORT_ID)));
     jobReport.setJobId(objectToString(doc.get(RodaConstants.JOB_REPORT_JOB_ID)));
-    jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID)));
-    jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID)));
+    jobReport.setSourceObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID), ""));
+    jobReport
+      .setSourceObjectOriginalId(objectToString(doc.get(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID), ""));
+    jobReport.setOutcomeObjectId(objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID), ""));
     jobReport.setOutcomeObjectState(AIPState.valueOf(
       objectToString(doc.get(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_STATE), AIPState.getDefault().toString())));
     jobReport.setTitle(objectToString(doc.get(RodaConstants.JOB_REPORT_TITLE)));

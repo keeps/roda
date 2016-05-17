@@ -96,9 +96,12 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     SIP sip = null;
     try {
       sip = EARKSIP.parse(earkSIPPath);
+      reportItem.setSourceObjectOriginalId(sip.getId());
+
       if (sip.getValidationReport().isValid()) {
         String parentId = PluginHelper.computeParentId(this, index, sip.getParentID());
-        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, parentId);
+        AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
+          reportItem.getJobId(), parentId);
 
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
         reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);

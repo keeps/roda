@@ -105,7 +105,8 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
         String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-        final AIP aip = model.createAIP(state, parentId, aipType, permissions, notifyCreatedAIP);
+        final AIP aip = model.createAIP(state, parentId, aipType, permissions, transferredResource.getName(),
+          reportItem.getJobId(), notifyCreatedAIP);
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
         boolean notifyRepresentationCreated = false;

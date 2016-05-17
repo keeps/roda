@@ -41,9 +41,9 @@ public class BagitToAIPPluginUtils {
   private static final String METADATA_VERSION = null;
   private static final String BAGIT_FILE_PATH_SEPARATOR = "/";
 
-  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String parentId)
-    throws BagitNotValidException, IOException, RequestNotValidException, NotFoundException, GenericException,
-    AlreadyExistsException, AuthorizationDeniedException {
+  public static AIP bagitToAip(Bag bag, Path bagitPath, ModelService model, String metadataFilename, String ingestSIPId,
+    String ingestJobId, String parentId) throws BagitNotValidException, IOException, RequestNotValidException,
+    NotFoundException, GenericException, AlreadyExistsException, AuthorizationDeniedException {
 
     BagInfoTxt bagInfoTxt = bag.getBagInfoTxt();
     String metadataAsString = MetadataFileUtils.generateMetadataFile(bagInfoTxt);
@@ -56,7 +56,7 @@ public class BagitToAIPPluginUtils {
 
     String aipType = RodaConstants.AIP_TYPE_MIXED;
 
-    AIP aip = model.createAIP(state, parentId, aipType, permissions, notify);
+    AIP aip = model.createAIP(state, parentId, aipType, permissions, ingestSIPId, ingestJobId, notify);
 
     model.createDescriptiveMetadata(aip.getId(), metadataFilename, metadataAsPayload, METADATA_TYPE, METADATA_VERSION,
       notify);

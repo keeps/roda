@@ -142,9 +142,8 @@ public final class JobsHelper {
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
     job.setObjectsBeingProcessed(0);
-    job.setObjectsProcessedWithSuccess(0);
-    job.setObjectsProcessedWithFailure(job.getObjectsCount());
     job.setObjectsWaitingToBeProcessed(0);
+    job.setObjectsProcessedWithFailure(job.getObjectsCount() - job.getObjectsProcessedWithSuccess());
     job.setEndDate(new Date());
     return job;
   }

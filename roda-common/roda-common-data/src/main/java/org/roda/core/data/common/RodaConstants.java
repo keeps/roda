@@ -248,12 +248,17 @@ public final class RodaConstants {
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";
   public static final String AIP_HAS_REPRESENTATIONS = "hasRepresentations";
-  public static final String AIP_PRESERVATION_OBJECTS_ID = "preservationObjectsId";
-  public static final String AIP_PRESERVATION_EVENTS_ID = "preservationEventsId";
+  // public static final String AIP_PRESERVATION_OBJECTS_ID =
+  // "preservationObjectsId";
+  // public static final String AIP_PRESERVATION_EVENTS_ID =
+  // "preservationEventsId";
 
   public static final String AIP_NUMBER_OF_SUBMISSION_FILES = "numberOfSubmissionFiles";
   public static final String AIP_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String AIP_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
+
+  public static final String AIP_INGEST_SIP_ID = "ingestSIPId";
+  public static final String AIP_INGEST_JOB_ID = "ingestJobId";
 
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";
@@ -393,6 +398,7 @@ public final class RodaConstants {
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_JOB_ID = "jobId";
   public static final String JOB_REPORT_SOURCE_OBJECT_ID = "sourceObjectId";
+  public static final String JOB_REPORT_SOURCE_OBJECT_ORIGINAL_ID = "sourceObjectOriginalId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_ID = "outcomeObjectId";
   public static final String JOB_REPORT_OUTCOME_OBJECT_STATE = "outcomeObjectState";
   public static final String JOB_REPORT_TITLE = "title";
