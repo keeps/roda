@@ -19,6 +19,13 @@
 	<prerequisites>
 		<maven>2.2.1</maven>
 	</prerequisites>
+	<distributionManagement>
+		<repository>
+			<id>keeps_artifactory</id>
+			<name>KEEP SOLUTIONS artifactory</name>
+			<url>http://artifactory.keep.pt/keep</url>
+		</repository>
+	</distributionManagement>
 	<repositories>
 		<repository>
 			<id>temporary_dependencies_repository</id>
@@ -144,20 +151,26 @@
 				<activeByDefault>true</activeByDefault>
 			</activation>
 			<modules>
-				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-certification</module>
+				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-core/roda-plugins</module>
-				<module>roda-ui/roda-wui</module>
+				<module>roda-ui</module>
+			</modules>
+		</profile>
+		<profile>
+			<id>all</id>
+			<modules>
+				<module>roda-common</module>
+				<module>roda-cas</module>
+				<module>roda-core/roda-core</module>
+				<module>roda-core/roda-plugins</module>
+				<module>roda-ui</module>
 			</modules>
 		</profile>
 		<profile>
 			<id>wui-with-cas</id>
 			<modules>
-				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-certification</module>
+				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
 				<module>roda-cas</module>
@@ -166,9 +179,7 @@
 		<profile>
 			<id>wui</id>
 			<modules>
-				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-certification</module>
+				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
 				<module>roda-ui/roda-wui</module>
 			</modules>
@@ -176,9 +187,7 @@
 		<profile>
 			<id>common</id>
 			<modules>
-				<module>roda-common/roda-common-data</module>
-				<module>roda-common/roda-common-utils</module>
-				<module>roda-common/roda-common-certification</module>
+				<module>roda-common</module>
 				<module>roda-core/roda-core</module>
 			</modules>
 		</profile>
