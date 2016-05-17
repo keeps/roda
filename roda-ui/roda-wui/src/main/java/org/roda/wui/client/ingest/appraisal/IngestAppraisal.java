@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.common.Dialogs;
 import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
@@ -57,6 +58,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
@@ -525,23 +527,48 @@ public class IngestAppraisal extends Composite {
 
   @UiHandler("acceptButton")
   void buttonAcceptHandler(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
     boolean accept = true;
     SelectedItems<?> selected = getSelected();
     String rejectReason = null;
     // TODO support accept of reps and files
-    BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+    BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
+      new LoadingAsyncCallback<Void>() {
 
-      @Override
-      public void onSuccessImpl(Void result) {
-        Toast.showInfo("Done", "All selected items were accepted");
-      }
-    });
+        @Override
+        public void onSuccessImpl(Void result) {
+          Toast.showInfo("Done", "All selected items were accepted");
+          refresh();
+        }
+      });
   }
 
   @UiHandler("rejectButton")
   void buttonRejectHandler(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+    final boolean accept = false;
+    final SelectedItems<?> selected = getSelected();
+    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting this SIP?", RegExp.compile(".+"),
+      messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+
+        @Override
+        public void onSuccess(final String rejectReason) {
+          // TODO support accept of reps and files
+          BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
+            new LoadingAsyncCallback<Void>() {
+
+              @Override
+              public void onSuccessImpl(Void result) {
+                Toast.showInfo("Done", "All selected items were rejected");
+                refresh();
+              }
+            });
+        }
+      });
+
   }
 
   public SelectedItems<?> getSelected() {
@@ -564,6 +591,22 @@ public class IngestAppraisal extends Composite {
     }
 
     return selected;
+  }
+
+  public void refresh() {
+
+    if (itemsSearchAdvancedFieldsPanel.isVisible()) {
+      itemsSearchResultPanel.refresh();
+    }
+
+    if (representationsSearchResultPanel != null && representationsSearchAdvancedFieldsPanel.isVisible()) {
+      representationsSearchResultPanel.refresh();
+    }
+
+    if (filesSearchResultPanel != null && filesSearchAdvancedFieldsPanel.isVisible()) {
+      filesSearchResultPanel.refresh();
+    }
+
   }
 
 }

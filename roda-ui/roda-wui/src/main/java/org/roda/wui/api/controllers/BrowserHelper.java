@@ -1826,6 +1826,8 @@ public class BrowserHelper {
         // TODO record reject
       }
     }
+    
+    RodaCoreFactory.getIndexService().commit(IndexedAIP.class);
 
   }
 
