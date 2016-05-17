@@ -95,6 +95,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     super.setParameterValues(parameters);
     totalSteps = calculateEfectiveTotalSteps();
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_TOTAL_STEPS, getTotalSteps() + "");
+    Boolean createSubmission = RodaCoreFactory.getRodaConfiguration()
+      .getBoolean("core.ingest.sip2aip.create_submission", false);
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION, createSubmission.toString());
   }
 
   public abstract PluginParameter getPluginParameter(String pluginParameterId);

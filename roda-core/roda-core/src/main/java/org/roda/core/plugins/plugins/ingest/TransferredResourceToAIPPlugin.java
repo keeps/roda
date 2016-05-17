@@ -18,10 +18,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import org.roda.core.common.MetadataFileUtils;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
@@ -47,6 +49,8 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   private static final String METADATA_VERSION = null;
   private static final String UNPACK_DESCRIPTION = "Extracted objects from package in file/folder format.";
 
+  private boolean createSubmission = false;
+
   @Override
   public void init() throws PluginException {
   }
@@ -69,6 +73,15 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
+      createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
+    }
   }
 
   @Override
@@ -107,6 +120,9 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
 
         final AIP aip = model.createAIP(state, parentId, aipType, permissions, transferredResource.getName(),
           reportItem.getJobId(), notifyCreatedAIP);
+
+        PluginHelper.createSubmission(model, createSubmission, transferredResourcePath, aip.getId());
+
         final String representationId = UUID.randomUUID().toString();
         final boolean original = true;
         boolean notifyRepresentationCreated = false;

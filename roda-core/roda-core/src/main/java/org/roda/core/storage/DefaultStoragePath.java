@@ -39,6 +39,10 @@ public class DefaultStoragePath implements StoragePath {
     return parse(pathPartials);
   }
 
+  public static DefaultStoragePath empty() {
+    return new DefaultStoragePath(new ArrayList<>());
+  }
+
   private static boolean isValid(List<String> path) {
     return path != null && !path.isEmpty();
   }
@@ -132,7 +136,5 @@ public class DefaultStoragePath implements StoragePath {
       return false;
     return true;
   }
-
-
 
 }

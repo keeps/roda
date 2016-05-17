@@ -393,6 +393,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_DO_AUTO_ACCEPT = "parameter.do_auto_accept";
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
+  public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";

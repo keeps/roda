@@ -10,7 +10,10 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
@@ -32,6 +35,8 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(BagitToAIPPlugin.class);
 
   private static String UNPACK_DESCRIPTION = "Extracted objects from package in Bagit format.";
+
+  private boolean createSubmission = false;
 
   @Override
   public void init() throws PluginException {
@@ -55,6 +60,15 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
+      createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
+    }
   }
 
   @Override
@@ -93,6 +107,9 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
         AIP aipCreated = BagitToAIPPluginUtils.bagitToAip(bag, bagitPath, model, "metadata.xml",
           transferredResource.getName(), reportItem.getJobId(), parentId);
+
+        PluginHelper.createSubmission(model, createSubmission, bagitPath, aipCreated.getId());
+
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
         reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
 

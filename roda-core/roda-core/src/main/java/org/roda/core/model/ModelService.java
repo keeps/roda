@@ -2116,6 +2116,19 @@ public class ModelService extends ModelObservable {
     return storage.getDirectory(ModelUtils.getSubmissionStoragePath(aipId));
   }
 
+  public void createSubmission(StorageService submissionStorage, StoragePath submissionStoragePath, String aipId)
+    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+    storage.copy(submissionStorage, submissionStoragePath, ModelUtils.getSubmissionStoragePath(aipId));
+  }
+
+  public void createSubmission(Path submissionPath, String aipId) throws AlreadyExistsException, GenericException,
+    RequestNotValidException, NotFoundException, AuthorizationDeniedException {
+    StoragePath submissionStoragePath = DefaultStoragePath.parse(ModelUtils.getSubmissionStoragePath(aipId),
+      submissionPath.getFileName().toString());
+    storage.createBinary(submissionStoragePath, new FSPathContentPayload(submissionPath), false);
+  }
+
   public Directory getDocumentationDirectory(String aipId)
     throws RequestNotValidException, NotFoundException, GenericException, AuthorizationDeniedException {
     return storage.getDirectory(ModelUtils.getDocumentationStoragePath(aipId));

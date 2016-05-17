@@ -8,13 +8,14 @@
 package org.roda.core.plugins.plugins;
 
 import java.io.Serializable;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +36,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
@@ -45,15 +47,16 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
-import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultStoragePath;
+import org.roda.core.storage.StorageService;
+import org.roda.core.storage.fs.FileStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -276,7 +279,6 @@ public final class PluginHelper {
     JobPluginInfo jobPluginInfo) {
 
     // do stuff with concrete JobPluginInfo
-   
 
     // update job
     try {
@@ -383,6 +385,22 @@ public final class PluginHelper {
     }
 
     return parentId;
+  }
+
+  /***************** Plugin related *****************/
+  /**************************************************/
+  public static void createSubmission(ModelService model, boolean createSubmission, Path submissionPath, String aipID)
+    throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+    if (createSubmission) {
+      if (Files.isDirectory(submissionPath)) {
+        StorageService submissionStorage = new FileStorageService(submissionPath);
+        StoragePath submissionStoragePath = DefaultStoragePath.empty();
+        model.createSubmission(submissionStorage, submissionStoragePath, aipID);
+      } else {
+        model.createSubmission(submissionPath, aipID);
+      }
+    }
   }
 
   /***************** Preservation events related *****************/

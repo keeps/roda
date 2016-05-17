@@ -10,8 +10,11 @@ package org.roda.core.plugins.plugins.ingest;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
 
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Report;
@@ -32,6 +35,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   private static final Logger LOGGER = LoggerFactory.getLogger(EARKSIPToAIPPlugin.class);
 
   public static String UNPACK_DESCRIPTION = "Extracted objects from package in E-ARK SIP format.";
+
+  private boolean createSubmission = false;
 
   @Override
   public void init() throws PluginException {
@@ -55,6 +60,15 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   @Override
   public String getVersionImpl() {
     return "1.0";
+  }
+
+  @Override
+  public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
+    super.setParameterValues(parameters);
+
+    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION)) {
+      createSubmission = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION));
+    }
   }
 
   @Override
@@ -82,7 +96,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
       Path earkSIPPath = Paths.get(transferredResource.getFullPath());
       LOGGER.debug("Converting {} to AIP", earkSIPPath);
 
-      transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, reportItem);
+      transformTransferredResourceIntoAnAIP(index, model, storage, transferredResource, earkSIPPath, createSubmission,
+        reportItem);
       report.addReport(reportItem);
 
       PluginHelper.createJobReport(this, model, reportItem);
@@ -92,7 +107,7 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
   }
 
   private void transformTransferredResourceIntoAnAIP(IndexService index, ModelService model, StorageService storage,
-    TransferredResource transferredResource, Path earkSIPPath, Report reportItem) {
+    TransferredResource transferredResource, Path earkSIPPath, boolean createSubmission, Report reportItem) {
     SIP sip = null;
     try {
       sip = EARKSIP.parse(earkSIPPath);
@@ -102,6 +117,8 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
         String parentId = PluginHelper.computeParentId(this, index, sip.getParentID());
         AIP aipCreated = EARKSIPToAIPPluginUtils.earkSIPToAIP(sip, earkSIPPath, model, storage, sip.getId(),
           reportItem.getJobId(), parentId);
+
+        PluginHelper.createSubmission(model, createSubmission, earkSIPPath, aipCreated.getId());
 
         createUnpackingEventSuccess(model, index, transferredResource, aipCreated, UNPACK_DESCRIPTION);
         reportItem.setOutcomeObjectId(aipCreated.getId()).setPluginState(PluginState.SUCCESS);
