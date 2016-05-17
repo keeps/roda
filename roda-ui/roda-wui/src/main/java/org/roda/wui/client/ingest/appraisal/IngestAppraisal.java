@@ -31,6 +31,7 @@ import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.browse.ViewRepresentation;
+import org.roda.wui.client.common.LoadingAsyncCallback;
 import org.roda.wui.client.common.SearchPanel;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.AIPList;
@@ -160,7 +161,7 @@ public class IngestAppraisal extends Composite {
   FlowPanel representationsSearchAdvancedFieldsPanel;
 
   @UiField
-  Button accept, reject;
+  Button acceptButton, rejectButton;
 
   ListBox searchAdvancedFieldOptions;
 
@@ -260,8 +261,8 @@ public class IngestAppraisal extends Composite {
     createFilesSearchAdvancedFieldsPanel();
     showSearchAdvancedFieldsPanel();
 
-    accept.setEnabled(false);
-    reject.setEnabled(false);
+    acceptButton.setEnabled(false);
+    rejectButton.setEnabled(false);
   }
 
   private void createRepresentationsSearchAdvancedFieldsPanel() {
@@ -452,8 +453,8 @@ public class IngestAppraisal extends Composite {
       @Override
       public void onSelectionChange(SelectedItems<IndexedAIP> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
-        accept.setEnabled(!empty);
-        reject.setEnabled(!empty);
+        acceptButton.setEnabled(!empty);
+        rejectButton.setEnabled(!empty);
       }
     });
 
@@ -480,8 +481,8 @@ public class IngestAppraisal extends Composite {
         @Override
         public void onSelectionChange(SelectedItems<IndexedRepresentation> selected) {
           boolean empty = SelectedItemsUtils.isEmpty(selected);
-          accept.setEnabled(!empty);
-          reject.setEnabled(!empty);
+          acceptButton.setEnabled(!empty);
+          rejectButton.setEnabled(!empty);
         }
       });
   }
@@ -516,18 +517,29 @@ public class IngestAppraisal extends Composite {
       @Override
       public void onSelectionChange(SelectedItems<IndexedFile> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
-        accept.setEnabled(!empty);
-        reject.setEnabled(!empty);
+        acceptButton.setEnabled(!empty);
+        rejectButton.setEnabled(!empty);
       }
     });
   }
 
-  @UiHandler("accept")
+  @UiHandler("acceptButton")
   void buttonAcceptHandler(ClickEvent e) {
     Toast.showInfo("Sorry", "Feature not yet implemented");
+    boolean accept = true;
+    SelectedItems<?> selected = getSelected();
+    String rejectReason = null;
+    // TODO support accept of reps and files
+    BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+
+      @Override
+      public void onSuccessImpl(Void result) {
+        Toast.showInfo("Done", "All selected items were accepted");
+      }
+    });
   }
 
-  @UiHandler("reject")
+  @UiHandler("rejectButton")
   void buttonRejectHandler(ClickEvent e) {
     Toast.showInfo("Sorry", "Feature not yet implemented");
   }

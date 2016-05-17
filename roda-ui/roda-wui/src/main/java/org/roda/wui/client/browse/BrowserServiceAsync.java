@@ -166,4 +166,6 @@ public interface BrowserServiceAsync {
 
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
+  void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
+
 }

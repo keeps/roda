@@ -103,8 +103,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
       @Override
       public String getValue(Job job) {
-        if (job == null || JOB_STATE.FAILED_DURING_CREATION.equals(job.getState())
-          || JOB_STATE.FAILED_TO_COMPLETE.equals(job.getState())) {
+        if (job == null) {
           return null;
         }
         Date end = job.getEndDate() != null ? job.getEndDate() : getDate();

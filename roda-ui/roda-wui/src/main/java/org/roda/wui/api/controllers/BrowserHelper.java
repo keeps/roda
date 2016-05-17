@@ -82,6 +82,7 @@ import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -1807,6 +1808,25 @@ public class BrowserHelper {
     }
 
     RodaCoreFactory.getIndexService().commit(IndexedRisk.class);
+  }
+
+  public static void appraisal(RodaUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
+
+    for (String aipId : listOfIds) {
+      if (accept) {
+        // Accept AIP
+        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
+        aip.setState(AIPState.ACTIVE);
+        RodaCoreFactory.getModelService().updateAIPState(aip);
+      } else {
+        // Reject AIP
+        RodaCoreFactory.getModelService().deleteAIP(aipId);
+        // TODO record reject
+      }
+    }
+
   }
 
 }

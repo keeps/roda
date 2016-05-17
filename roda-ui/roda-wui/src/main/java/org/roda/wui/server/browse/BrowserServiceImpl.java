@@ -640,4 +640,11 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     Browser.updateRiskCounters(user);
   }
 
+  @Override
+  public void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    Browser.appraisal(user, selected, accept, rejectReason);
+  }
+
 }

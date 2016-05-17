@@ -1480,4 +1480,21 @@ public class Browser extends RodaCoreService {
     registerAction(user, BROWSER_COMPONENT, "updateRiskCounters", null, duration);
   }
 
+  public static void appraisal(RodaUser user, SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
+    throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
+    Date start = new Date();
+
+    // check user permissions
+    // TODO define appraisal role
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    BrowserHelper.appraisal(user, selected, accept, rejectReason);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "appraisal", null, duration, "selected", selected, "accept", accept,
+      "rejectReason", rejectReason);
+  }
+
 }

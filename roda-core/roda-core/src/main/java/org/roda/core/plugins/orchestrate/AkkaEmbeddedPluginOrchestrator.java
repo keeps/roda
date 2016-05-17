@@ -9,6 +9,7 @@ package org.roda.core.plugins.orchestrate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.adapter.filter.Filter;
+import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
@@ -780,8 +782,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public void cleanUnfinishedJobs() {
     Filter filter = new Filter();
-    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.STARTED.toString()));
-    filter.add(new SimpleFilterParameter(RodaConstants.JOB_STATE, Job.JOB_STATE.CREATED.toString()));
+    filter.add(new OneOfManyFilterParameter(RodaConstants.JOB_STATE,
+      Arrays.asList(Job.JOB_STATE.STARTED.toString(), Job.JOB_STATE.CREATED.toString())));
     Sublist sublist = new Sublist(0, RodaConstants.DEFAULT_PAGINATION_VALUE);
     IndexResult<Job> jobs = null;
     List<Job> jobsToBeCleaned = new ArrayList<>();

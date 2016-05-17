@@ -59,10 +59,10 @@
 				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel">
 					<g:Label addStyleNames="h4">Actions</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="accept">
+					<g:Button addStyleNames="btn btn-play" ui:field="acceptButton">
 						<ui:text from='{messages.ingestAppraisalAcceptButton}' />
 					</g:Button>
-					<g:Button addStyleNames="btn btn-ban btn-danger" ui:field="reject">
+					<g:Button addStyleNames="btn btn-ban btn-danger" ui:field="rejectButton">
 						<ui:text from='{messages.ingestAppraisalRejectButton}' />
 					</g:Button>
 				</g:FlowPanel>
