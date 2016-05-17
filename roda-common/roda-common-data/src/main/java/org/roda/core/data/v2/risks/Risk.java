@@ -9,8 +9,6 @@ package org.roda.core.data.v2.risks;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -53,8 +51,6 @@ public class Risk extends NamedIndexedModel implements Serializable {
   private String mitigationRelatedEventIdentifierType = null;
   private String mitigationRelatedEventIdentifierValue = null;
 
-  private Map<String, String> affectedObjects = new HashMap<String, String>();
-
   public Risk() {
     super();
     this.identifiedOn = new Date();
@@ -85,8 +81,6 @@ public class Risk extends NamedIndexedModel implements Serializable {
     this.mitigationOwner = risk.getMitigationOwner();
     this.mitigationRelatedEventIdentifierType = risk.getMitigationRelatedEventIdentifierType();
     this.mitigationRelatedEventIdentifierValue = risk.getMitigationRelatedEventIdentifierValue();
-
-    this.affectedObjects = new HashMap<String, String>(risk.getAffectedObjects());
   }
 
   public String getId() {
@@ -273,14 +267,6 @@ public class Risk extends NamedIndexedModel implements Serializable {
     this.mitigationRelatedEventIdentifierValue = mitigationRelatedEventIdentifierValue;
   }
 
-  public Map<String, String> getAffectedObjects() {
-    return affectedObjects;
-  }
-
-  public void setAffectedObjects(Map<String, String> affectedObjects) {
-    this.affectedObjects = affectedObjects;
-  }
-
   @Override
   public String toString() {
     return "Risk [id=" + super.getId() + ", name=" + super.getName() + ", description=" + description
@@ -292,7 +278,7 @@ public class Risk extends NamedIndexedModel implements Serializable {
       + posMitigationNotes + ", mitigationStrategy=" + mitigationStrategy + ", mitigationOwnerType="
       + mitigationOwnerType + ", mitigationOwner=" + mitigationOwner + ", mitigationRelatedEventIdentifierType="
       + mitigationRelatedEventIdentifierType + ", mitigationRelatedEventIdentifierValue="
-      + mitigationRelatedEventIdentifierValue + ", affectedObjects=" + affectedObjects + "]";
+      + mitigationRelatedEventIdentifierValue + "]";
   }
 
   @JsonIgnore

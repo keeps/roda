@@ -1750,8 +1750,6 @@ public class SolrUtils {
     doc.addField(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE,
       risk.getMitigationRelatedEventIdentifierValue());
 
-    doc.addField(RodaConstants.RISK_AFFECTED_OBJECTS, JsonUtils.getJsonFromObject(risk.getAffectedObjects()));
-
     if (risk instanceof IndexedRisk) {
       doc.addField(RodaConstants.RISK_OBJECTS_SIZE, ((IndexedRisk) risk).getObjectsSize());
     } else {
@@ -1795,8 +1793,6 @@ public class SolrUtils {
       objectToString(doc.get(RodaConstants.RISK_MITIGATION_RELATED_EVENT_IDENTIFIER_VALUE)));
 
     risk.setObjectsSize(objectToInteger(doc.get(RodaConstants.RISK_OBJECTS_SIZE), 0));
-    risk.setAffectedObjects(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.RISK_AFFECTED_OBJECTS))));
-
     return risk;
   }
 

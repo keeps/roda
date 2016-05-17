@@ -1774,16 +1774,17 @@ public class BrowserHelper {
 
     boolean findFlag = true;
     int initialIndex = 0, interval = 20;
-    List<IndexedRisk> allIncidences = new ArrayList<IndexedRisk>();
+    List<String> allRisks = new ArrayList<String>();
     Filter filter = new Filter(new NotSimpleFilterParameter(RodaConstants.RISK_OBJECTS_SIZE, "0"));
 
     while (findFlag) {
       IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, filter, Sorter.NONE,
         new Sublist(initialIndex, initialIndex + interval));
-      List<IndexedRisk> results = new ArrayList<IndexedRisk>(findAll.getResults());
-      allIncidences.addAll(results);
+      for (IndexedRisk risk : findAll.getResults()) {
+        allRisks.add(risk.getId());
+      }
 
-      if (results.size() < interval) {
+      if (findAll.getResults().size() < interval) {
         findFlag = false;
       } else {
         initialIndex += interval;
@@ -1798,11 +1799,16 @@ public class BrowserHelper {
         IndexedRisk risk = RodaCoreFactory.getIndexService().retrieve(IndexedRisk.class, riskId);
         risk.setObjectsSize((int) counter);
         RodaCoreFactory.getIndexService().reindexRisk(risk);
-        allIncidences.remove(risk);
+
+        allRisks.remove(risk.getId());
       }
     }
 
-    for (IndexedRisk risk : allIncidences) {
+    for (String riskId : allRisks) {
+      Filter riskFilter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_ID, riskId));
+      IndexResult<IndexedRisk> findAll = RodaCoreFactory.getIndexService().find(IndexedRisk.class, riskFilter,
+        Sorter.NONE, new Sublist(0, 1));
+      IndexedRisk risk = findAll.getResults().get(0);
       risk.setObjectsSize(0);
       RodaCoreFactory.getIndexService().reindexRisk(risk);
     }

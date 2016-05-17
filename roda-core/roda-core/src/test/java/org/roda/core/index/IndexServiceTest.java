@@ -584,11 +584,7 @@ public class IndexServiceTest {
       risk.setMitigationRelatedEventIdentifierType("Mitigation REI type");
       risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
 
-      HashMap<String, String> affectedObjects = new HashMap<String, String>();
-      affectedObjects.put("Affected related type", "Affected related value");
-      risk.setAffectedObjects(affectedObjects);
       model.createRisk(risk, false);
-
       index.commit(Risk.class);
 
       Risk risk2 = model.retrieveRisk(risk.getId());
