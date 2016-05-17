@@ -534,7 +534,7 @@ public class IndexModelObserver implements ModelObserver {
       "Error deleting files (aipId=" + aipId + "; representationId=" + representationId + ")");
 
     deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID,
-      representationId,
+      representationUUID,
       "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + ")");
   }
 
@@ -688,7 +688,7 @@ public class IndexModelObserver implements ModelObserver {
   private void deleteDocumentsFromIndex(String indexName, String fieldName, String fieldValue, String errorLogMessage) {
     try {
       index.deleteByQuery(indexName, fieldName + ":" + fieldValue);
-    } catch (SolrServerException | IOException e) {
+    } catch (SolrServerException | SolrException | IOException e) {
       LOGGER.error(errorLogMessage, e);
     }
   }
