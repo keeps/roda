@@ -38,13 +38,13 @@ import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
-import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.plugins.plugins.base.ActionLogCleanerPlugin;
 import org.roda.core.plugins.plugins.base.ExportAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexAIPPlugin;
 import org.roda.core.plugins.plugins.base.ReindexActionLogPlugin;
 import org.roda.core.plugins.plugins.base.ReindexJobPlugin;
+import org.roda.core.plugins.plugins.base.ReindexRiskIncidencePlugin;
 import org.roda.core.plugins.plugins.base.ReindexRodaEntityPlugin;
 import org.roda.core.plugins.plugins.base.ReindexTransferredResourcePlugin;
 import org.roda.wui.api.controllers.Jobs;
@@ -226,10 +226,9 @@ public class ManagementTasksResource extends RodaCoreService {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'Risk Incidences' job")
       .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
-      .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
+      .setPlugin(ReindexRiskIncidencePlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, RiskIncidence.class.getCanonicalName());
     job.setPluginParameters(pluginParameters);
     try {
       Job jobCreated = Jobs.createJob(user, job);

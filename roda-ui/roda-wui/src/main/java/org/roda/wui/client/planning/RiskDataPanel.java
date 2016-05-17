@@ -70,7 +70,10 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   private static RiskMessages messages = GWT.create(RiskMessages.class);
 
   @UiField
-  Label id, idLabel;
+  Label id;
+
+  @UiField
+  TextBox idBox;
 
   @UiField
   TextBox name;
@@ -332,15 +335,13 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
     if (!editmode) {
       posMitigationSeverityKey.setVisible(false);
       posMitigationSeverityValue.setVisible(false);
-      this.preMitigationSeverityValue.setHTML(getSeverityDefinition(0, severityLowLimit, severityHighLimit));
+      preMitigationSeverityValue.setHTML(getSeverityDefinition(0, severityLowLimit, severityHighLimit));
       this.id.setVisible(false);
-      this.idLabel.setVisible(false);
     } else {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
       incidenceList = new RiskIncidenceList(filter, null, "Incidences", true);
       incidenceListPanel.add(incidenceList);
-      this.id.setVisible(true);
-      this.idLabel.setVisible(true);
+      this.idBox.setVisible(false);
       setRisk(risk);
     }
 
@@ -435,6 +436,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
 
   public IndexedRisk getRisk() {
     IndexedRisk risk = new IndexedRisk();
+    if (idBox.isVisible() && idBox.getText() != null && !idBox.getText().equals("")) {
+      risk.setId(idBox.getText());
+    }
     risk.setName(name.getText());
     risk.setDescription(description.getText());
     risk.setIdentifiedOn(identifiedOn.getValue());

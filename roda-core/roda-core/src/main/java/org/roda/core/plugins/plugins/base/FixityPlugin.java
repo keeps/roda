@@ -174,9 +174,10 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                       model.retrieveRisk(riskId);
                     } catch (NotFoundException e) {
                       Risk risk = new Risk();
+                      risk.setId(riskId);
                       risk.setName(riskName);
                       risk.setCategory(riskCategory);
-                      model.createRisk(risk, riskId, false);
+                      model.createRisk(risk, false);
                     }
 
                     model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),

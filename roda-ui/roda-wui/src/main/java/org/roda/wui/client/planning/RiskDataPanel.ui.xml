@@ -20,8 +20,9 @@
 	<g:FlowPanel styleName="wui-user-data" addStyleNames="wrapper skip_padding">
 		<g:FlowPanel addStyleNames="row full_width no_padding">
 			<g:FlowPanel addStyleNames="wui-data-panel">
-				<g:Label addStyleNames="form-label" ui:field="idLabel">Identifier</g:Label>
+				<g:Label addStyleNames="form-label">Identifier</g:Label>
 				<g:Label ui:field="id" styleName="value" />
+				<g:TextBox ui:field="idBox" styleName="form-textbox" />
 				<g:Label addStyleNames="form-label">Name</g:Label>
 				<g:TextBox ui:field="name" addStyleNames="form-textbox" />
 				<g:Label addStyleNames="form-label">Description</g:Label>

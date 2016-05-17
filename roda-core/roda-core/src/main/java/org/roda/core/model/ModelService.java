@@ -1520,15 +1520,9 @@ public class ModelService extends ModelObservable {
   /************************************************/
 
   public Risk createRisk(Risk risk, boolean commit) throws GenericException {
-    return createRisk(risk, null, commit);
-  }
-
-  public Risk createRisk(Risk risk, String id, boolean commit) throws GenericException {
     try {
-      if (id == null) {
+      if (risk.getId() == null) {
         risk.setId(UUID.randomUUID().toString());
-      } else {
-        risk.setId(id);
       }
       String riskAsJson = JsonUtils.getJsonFromObject(risk);
       StoragePath riskPath = ModelUtils.getRiskStoragePath(risk.getId());

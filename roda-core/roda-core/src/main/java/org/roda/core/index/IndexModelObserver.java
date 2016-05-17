@@ -560,7 +560,7 @@ public class IndexModelObserver implements ModelObserver {
     String id = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
     deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")");
 
-    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId,
+    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_FILE_ID, id,
       "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + "; fileId=" + fileId
         + ")");
   }

@@ -14,11 +14,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -29,6 +31,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.RiskJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -46,7 +50,8 @@ import org.slf4j.LoggerFactory;
 public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   private static final Logger LOGGER = LoggerFactory.getLogger(RiskJobPlugin.class);
 
-  private String riskId;
+  private static String riskIds = null;
+  private static String OTHER_METADATA_TYPE = "RiskIncidence";
 
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
@@ -100,7 +105,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<Serializable> resources)
     throws PluginException {
-    Report report = executePlugin(index, model, storage, resources, RiskIncidencePlugin.class.getName());
+    Report report = executePlugin(index, model, storage, resources);
     return report;
   }
 
@@ -135,27 +140,66 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   }
 
   private Report executePlugin(IndexService index, ModelService model, StorageService storage,
-    List<Serializable> objects, String pluginClassName) {
-    return executePlugin(index, model, storage, objects, pluginClassName, null);
-  }
-
-  private Report executePlugin(IndexService index, ModelService model, StorageService storage,
-    List<Serializable> objects, String pluginClassName, Map<String, String> params) {
+    List<Serializable> objects) {
     Report report = null;
-    Plugin<Serializable> plugin = (Plugin<Serializable>) RodaCoreFactory.getPluginManager().getPlugin(pluginClassName);
     Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
-    if (params != null) {
-      mergedParams.putAll(params);
+
+    if (mergedParams.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
+      riskIds = mergedParams.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
     }
 
     try {
-      plugin.setParameterValues(mergedParams);
-      report = plugin.execute(index, model, storage, objects);
+      report = executeAction(index, model, storage, objects);
     } catch (Throwable e) {
       LOGGER.error("Error executing plug-in", e);
     }
 
     return report;
+  }
+
+  public <T extends Serializable> Report executeAction(IndexService index, ModelService model, StorageService storage,
+    List<T> list) throws PluginException {
+    try {
+
+      LOGGER.debug("Creating risk incidences");
+      Report pluginReport = PluginHelper.initPluginReport(this);
+
+      RiskJobPluginInfo jobPluginInfo = new RiskJobPluginInfo();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      if (!list.isEmpty() && riskIds != null) {
+        String[] risks = riskIds.split(",");
+
+        for (String riskId : risks) {
+          if (list.get(0) instanceof AIP) {
+            List<AIP> aipList = (List<AIP>) list;
+            for (AIP aip : aipList) {
+              model.addRiskIncidence(riskId, aip.getId(), null, null, null, OTHER_METADATA_TYPE);
+            }
+          } else if (list.get(0) instanceof Representation) {
+            List<Representation> representationList = (List<Representation>) list;
+            for (Representation representation : representationList) {
+              model.addRiskIncidence(riskId, representation.getAipId(), representation.getId(), null, null,
+                OTHER_METADATA_TYPE);
+            }
+          } else if (list.get(0) instanceof File) {
+            List<File> fileList = (List<File>) list;
+            for (File file : fileList) {
+              model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
+                OTHER_METADATA_TYPE);
+            }
+          }
+        }
+      }
+
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+      LOGGER.debug("Done creating risk incidences");
+      return pluginReport;
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    } catch (GenericException e) {
+      throw new PluginException("Risk incidence was not added", e);
+    }
   }
 
   @Override
