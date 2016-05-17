@@ -145,7 +145,7 @@ public class IndexServiceTest {
       assertEquals(groupsSet1, groupsSet2);
     }
 
-    assertEquals(aip.getState(), indexedAIP.getState().equals(AIPState.ACTIVE));
+    assertEquals(AIPState.ACTIVE, aip.getState());
   }
 
   @Test
@@ -171,7 +171,7 @@ public class IndexServiceTest {
 
     final IndexedAIP aipFromList = indexAips.getResults().get(0);
     assertEquals(aip.getId(), aipFromList.getId());
-    assertEquals(aip.getState(), AIPState.ACTIVE.equals(aipFromList.getState()));
+    assertEquals(aip.getState(), aipFromList.getState());
     assertEquals(aip.getParentId(), aipFromList.getParentID());
 
     assertEquals(indexedAip, aipFromList);

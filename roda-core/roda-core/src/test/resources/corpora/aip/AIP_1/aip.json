@@ -1,12 +1,11 @@
 {
   "parentId": null,
-  "state": ACTIVE,
+  "state": "ACTIVE",
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
-    "id": "ead_unknown.xml",
-    "type": "ead",
-    "version": "unknown"
+    "id": "ead-c.xml",
+    "type": "ead-c"
   }],
   "representations": [{
     "id": "representation_1",

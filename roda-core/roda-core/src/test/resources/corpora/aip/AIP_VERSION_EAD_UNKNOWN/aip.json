@@ -1,18 +1,12 @@
 {
   "parentId": null,
-  "state": CREATED,
+  "state": "ACTIVE",
   "type": "MIXED",
-  "permissions": {
-    "users": {
-      "READ": ["testuser"]
-    },
-    "groups": {
-      "READ": ["testgroup"]
-    }
-  },
+  "permissions": {},
   "descriptiveMetadata": [{
-    "id": "ead-c.xml",
-    "type": "ead-c"
+    "id": "ead_unknown.xml",
+    "type": "ead",
+    "version": "unknown"
   }],
   "representations": [{
     "id": "representation_1",

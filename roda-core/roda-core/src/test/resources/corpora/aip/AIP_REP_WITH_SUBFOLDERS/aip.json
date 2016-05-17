@@ -1,14 +1,14 @@
 {
-  "parentId": null,
-  "state": ACTIVE,
+  "parentId": "AIP_1",
+  "state": "ACTIVE",
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
-    "id": "metadata.xml",
-    "type": "key-value"
+    "id": "dc.xml",
+    "type": "DC"
   }],
   "representations": [{
-    "id": "50b2c085-ce4a-44d1-8279-d99086400349",
+    "id": "representation_1",
     "original": true,
     "type": "MIXED"
   }]

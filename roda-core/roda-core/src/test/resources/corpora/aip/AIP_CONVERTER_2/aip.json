@@ -1,6 +1,6 @@
 {
   "parentId": null,
-  "state": ACTIVE,
+  "state": "ACTIVE",
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
@@ -8,7 +8,7 @@
     "type": "key-value"
   }],
   "representations": [{
-    "id": "b5dfaadc-2048-4082-b8b8-2a8e0ea1ad03",
+    "id": "50b2c085-ce4a-44d1-8279-d99086400349",
     "original": true,
     "type": "MIXED"
   }]

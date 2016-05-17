@@ -1,15 +1,19 @@
 {
-  "parentId": "AIP_1",
-  "state": ACTIVE,
+  "parentId": null,
+  "state": "ACTIVE",
   "type": "MIXED",
   "permissions": {},
   "descriptiveMetadata": [{
-    "id": "dc.xml",
-    "type": "DC"
+    "id": "ead-c.xml",
+    "type": "ead-c"
   }],
   "representations": [{
     "id": "representation_1",
     "original": true,
+    "type": "MIXED"
+  }, {
+    "id": "representation_2",
+    "original": false,
     "type": "MIXED"
   }]
 }

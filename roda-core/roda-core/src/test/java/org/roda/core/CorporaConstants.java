@@ -20,9 +20,9 @@ import org.roda.core.data.common.RodaConstants;
  */
 public class CorporaConstants {
   // Corpora constants
-  public static final String SOURCE_AIP_CONTAINER = "AIP";
-  public static final String SOURCE_PRESERVATION_CONTAINER = "Preservation";
-  public static final String SOURCE_AGENT_CONTAINER = "agents";
+  public static final String SOURCE_AIP_CONTAINER = RodaConstants.STORAGE_CONTAINER_AIP;
+  public static final String SOURCE_PRESERVATION_CONTAINER = RodaConstants.STORAGE_CONTAINER_PRESERVATION;
+  public static final String SOURCE_AGENT_CONTAINER = RodaConstants.STORAGE_CONTAINER_AGENT;
   public static final String SOURCE_AIP_ID = "AIP_1";
   public static final String SOURCE_AIP_ID_3 = "AIP_3";
   public static final String SOURCE_AIP_VERSION_EAD_3 = "AIP_VERSION_EAD_3";
@@ -74,13 +74,13 @@ public class CorporaConstants {
 
   // public static final String OTHER_AIP_PATH = "AIP/AIP_2";
   public static final String OTHER_AIP_ID = "AIP_2";
-  public static final List<String> OTHER_DESCRIPTIVE_METADATA_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "metadata",
+  public static final List<String> OTHER_DESCRIPTIVE_METADATA_STORAGEPATH = Arrays.asList(SOURCE_AIP_CONTAINER, "AIP_2", "metadata",
     "descriptive", "dc.xml");
   public static final String OTHER_DESCRIPTIVE_METADATA_TYPE = "dcxml";
   public static final String OTHER_DESCRIPTIVE_METADATA_VERSION = null;
-  public static final List<String> OTHER_REPRESENTATION_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "representations",
+  public static final List<String> OTHER_REPRESENTATION_STORAGEPATH = Arrays.asList(SOURCE_AIP_CONTAINER, "AIP_2", "representations",
     "representation_1");
-  public static final List<String> OTHER_FILE_STORAGEPATH = Arrays.asList("AIP", "AIP_2", "representations",
+  public static final List<String> OTHER_FILE_STORAGEPATH = Arrays.asList(SOURCE_AIP_CONTAINER, "AIP_2", "representations",
     "representation_1", "data", "2012-roda-promo-en.pdf");
   // puid=fmt/101
 

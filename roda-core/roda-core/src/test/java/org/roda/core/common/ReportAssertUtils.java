@@ -2,10 +2,12 @@ package org.roda.core.common;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+
 
 public class ReportAssertUtils {
   public static void assertReports(List<Report> reports, List<String> outcomeObjectIds) {
@@ -24,11 +26,11 @@ public class ReportAssertUtils {
         Assert.fail("Report failure: " + report);
       }
 
-      if (outcomeObjectIds != null && report.getOutcomeObjectId() != null) {
+      if (outcomeObjectIds != null && StringUtils.isNotBlank(report.getOutcomeObjectId())) {
         Assert.assertThat(report.getOutcomeObjectId(), Matchers.isIn(outcomeObjectIds));
       }
 
-      if (sourceObjectIds != null && report.getSourceObjectId() != null) {
+      if (sourceObjectIds != null && StringUtils.isNotBlank(report.getSourceObjectId())) {
         Assert.assertThat(report.getSourceObjectId(), Matchers.isIn(sourceObjectIds));
       }
 
