@@ -202,7 +202,7 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
       String xpath = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "xpath");
       String freeAccessTerm = RodaCoreFactory.getRodaConfigurationAsString("core", "permissions", "freeaccess");
 
-      String useRestrict = XMLUtility.getStringFromFile(createInputStream, xpath);
+      String useRestrict = XMLUtility.getString(createInputStream, xpath);
       if (useRestrict.equals(freeAccessTerm)) {
         readPermissionToUserGroup.add(PermissionType.READ);
         permissions.setGroupPermissions(RodaConstants.OBJECT_PERMISSIONS_USER_GROUP, readPermissionToUserGroup);

@@ -1,7 +1,16 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
 package org.roda.core.common;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -18,7 +27,21 @@ import org.xml.sax.SAXException;
 
 public class XMLUtility {
 
-  public static String getStringFromFile(InputStream inputStream, String xPath) {
+  public static String getStringFromFile(Path file, String xpath) {
+    String ret = "";
+    try {
+      InputStream inputStream = Files.newInputStream(file);
+      return getString(inputStream, xpath);
+    } catch (IOException e) {
+      // do nothing
+    }
+    return ret;
+  }
+
+  /**
+   * 20160518 hsilva: the inputStream gets closed in the end
+   */
+  public static String getString(InputStream inputStream, String xpath) {
     String ret = "";
     try {
       DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -26,8 +49,8 @@ public class XMLUtility {
       Document doc;
       doc = builder.parse(inputStream);
       XPathFactory xPathfactory = XPathFactory.newInstance();
-      XPath xpath = xPathfactory.newXPath();
-      XPathExpression expr = xpath.compile(xPath);
+      XPath xPath = xPathfactory.newXPath();
+      XPathExpression expr = xPath.compile(xpath);
       ret = (String) expr.evaluate(doc, XPathConstants.STRING);
     } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
       // do nothing and return already defined OTHER
