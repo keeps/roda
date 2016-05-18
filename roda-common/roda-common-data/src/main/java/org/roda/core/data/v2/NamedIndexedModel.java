@@ -7,9 +7,9 @@
  */
 package org.roda.core.data.v2;
 
-import org.roda.core.data.v2.index.IsIndexed;
+import java.io.Serializable;
 
-public abstract class NamedIndexedModel implements IsIndexed {
+public abstract class NamedIndexedModel implements Serializable {
 
   private static final long serialVersionUID = 6489779852980849279L;
 
@@ -43,9 +43,5 @@ public abstract class NamedIndexedModel implements IsIndexed {
     this.name = name;
   }
 
-  @Override
-  public String getUUID() {
-    return getId();
-  }
-
+  public abstract String getUUID();
 }

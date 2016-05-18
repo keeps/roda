@@ -21,7 +21,7 @@ public class SelectDialogFactory {
       return new SelectFormatDialog(title, filter);
     } else if (actualClass.getSimpleName().equals("Agent")) {
       return new SelectAgentDialog(title, filter);
-    } else if (actualClass.getSimpleName().equals("Risk")) {
+    } else if (actualClass.getSimpleName().equals("IndexedRisk")) {
       return new SelectRiskDialog(title, filter);
     } else {
       throw new NotFoundException();

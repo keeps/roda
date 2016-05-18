@@ -284,7 +284,7 @@ public class Risk extends NamedIndexedModel implements Serializable {
   @JsonIgnore
   @Override
   public String getUUID() {
-    return getId();
+    return this.getId();
   }
 
 }

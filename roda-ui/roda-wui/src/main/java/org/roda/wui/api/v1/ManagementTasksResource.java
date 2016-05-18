@@ -225,7 +225,7 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAllRiskIncidences(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'Risk Incidences' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS)
       .setPlugin(ReindexRiskIncidencePlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");

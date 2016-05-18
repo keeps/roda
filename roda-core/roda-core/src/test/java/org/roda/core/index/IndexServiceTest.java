@@ -65,6 +65,7 @@ import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.log.LogEntry;
 import org.roda.core.data.v2.log.LogEntryParameter;
 import org.roda.core.data.v2.notifications.Notification;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.Risk.SEVERITY_LEVEL;
 import org.roda.core.data.v2.user.Group;
@@ -585,17 +586,17 @@ public class IndexServiceTest {
       risk.setMitigationRelatedEventIdentifierValue("Mitigation REI value");
 
       model.createRisk(risk, false);
-      index.commit(Risk.class);
+      index.commit(IndexedRisk.class);
 
       Risk risk2 = model.retrieveRisk(risk.getId());
       assertNotNull(risk2);
       assertEquals(risk.getId(), risk2.getId());
       assertEquals(risk.getName(), risk2.getName());
 
-      IndexResult<Risk> find = index.find(Risk.class, null, null, new Sublist(0, 10));
+      IndexResult<IndexedRisk> find = index.find(IndexedRisk.class, null, null, new Sublist(0, 10));
       assertEquals(1, find.getTotalCount());
 
-      Risk risk3 = index.retrieve(Risk.class, risk.getId());
+      Risk risk3 = index.retrieve(IndexedRisk.class, risk.getId());
       assertNotNull(risk3);
       assertEquals(risk.getId(), risk3.getId());
       assertEquals(risk.getName(), risk3.getName());
@@ -603,7 +604,7 @@ public class IndexServiceTest {
       risk3.setName("Risk New Name");
       model.updateRisk(risk3, "Risk updated", false);
 
-      Risk risk4 = index.retrieve(Risk.class, risk.getId());
+      Risk risk4 = index.retrieve(IndexedRisk.class, risk.getId());
       assertNotNull(risk4);
       assertEquals(risk.getId(), risk4.getId());
       assertEquals(risk4.getName(), "Risk New Name");

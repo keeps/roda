@@ -833,28 +833,6 @@ public class BrowserHelper {
     return parentId;
   }
 
-  private static void removeIncidencesOfAIPs(SelectedItems<IndexedAIP> selected, RodaUser user)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException {
-
-    RiskIncidenceRemoverPlugin plugin = new RiskIncidenceRemoverPlugin();
-    Map<String, String> parameters = new HashMap<String, String>();
-    parameters.put("aipRemoved", Boolean.TRUE.toString());
-
-    Date jobDate = new Date();
-    PluginInfo pluginInfo = new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(),
-      plugin.getDescription(), plugin.getType(), plugin.getParameters());
-
-    Job job = new Job();
-    job.setName(plugin.getName() + " " + jobDate);
-    job.setPlugin(pluginInfo.getId());
-    job.setPluginParameters(parameters);
-    job.setObjects(selected);
-    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS);
-
-    Jobs.createJob(user, job);
-  }
-
   public static String removeAIPRepresentations(SelectedItems<IndexedAIP> selected, RodaUser user)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException {
     List<String> aipIds = consolidate(user, IndexedAIP.class, selected);

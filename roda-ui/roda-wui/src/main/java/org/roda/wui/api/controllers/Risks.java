@@ -18,6 +18,7 @@ import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.common.RodaCoreService;
@@ -71,9 +72,9 @@ public class Risks extends RodaCoreService {
     registerAction(user, RISKS_COMPONENT, "deleteRisk", null, duration, "riskId", riskId);
   }
 
-  public static List<Risk> retrieveRisks(IndexResult<Risk> listRisksIndexResult) {
-    List<Risk> risks = new ArrayList<Risk>();
-    for (Risk risk : listRisksIndexResult.getResults()) {
+  public static List<IndexedRisk> retrieveRisks(IndexResult<IndexedRisk> listRisksIndexResult) {
+    List<IndexedRisk> risks = new ArrayList<IndexedRisk>();
+    for (IndexedRisk risk : listRisksIndexResult.getResults()) {
       risks.add(risk);
     }
     return risks;

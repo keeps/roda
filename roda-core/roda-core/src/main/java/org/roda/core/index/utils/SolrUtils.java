@@ -1954,7 +1954,6 @@ public class SolrUtils {
 
   public static RiskIncidence solrDocumentToRiskIncidence(SolrDocument doc) {
     RiskIncidence incidence = new RiskIncidence();
-
     incidence.setId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_ID)));
     incidence.setAipId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_AIP_ID)));
     incidence.setRepresentationId(objectToString(doc.get(RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID)));

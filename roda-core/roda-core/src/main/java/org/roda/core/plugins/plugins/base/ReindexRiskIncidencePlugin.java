@@ -83,7 +83,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
         LOGGER.debug("Reindexing incidences of AIP {}", aip.getId());
         try {
           RiskIncidence aipIncidence = model.retrieveRiskIncidence(aip.getId(), null, null, null, OTHER_METADATA_TYPE);
-          index.reindexRiskIncidence(aipIncidence);
+          index.create(RiskIncidence.class, aipIncidence);
         } catch (NotFoundException e) {
           // do nothing
         }
@@ -92,7 +92,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
           try {
             RiskIncidence repIncidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(), null, null,
               OTHER_METADATA_TYPE);
-            index.reindexRiskIncidence(repIncidence);
+            index.create(RiskIncidence.class, repIncidence);
           } catch (NotFoundException e) {
             // do nothing
           }
@@ -106,7 +106,7 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
             try {
               RiskIncidence fileIncidence = model.retrieveRiskIncidence(aip.getId(), representation.getId(),
                 file.getPath(), file.getId(), OTHER_METADATA_TYPE);
-              index.reindexRiskIncidence(fileIncidence);
+              index.create(RiskIncidence.class, fileIncidence);
             } catch (NotFoundException e) {
               // do nothing
             }

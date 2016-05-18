@@ -16,7 +16,7 @@ import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.IncrementalAssociativeList;
 import org.roda.wui.client.common.dialogs.SelectAipDialog;
@@ -89,7 +89,7 @@ public class PluginParameterPanel extends Composite {
 
   private void createSelectRiskLayout() {
     Label parameterName = new Label(parameter.getName());
-    IncrementalAssociativeList list = new IncrementalAssociativeList(Risk.class, RodaConstants.RISK_ID,
+    IncrementalAssociativeList list = new IncrementalAssociativeList(IndexedRisk.class, RodaConstants.RISK_ID,
       RodaConstants.RISK_SEARCH, riskMessages.getRisksDialogName());
 
     list.addChangeHandler(new ChangeHandler() {

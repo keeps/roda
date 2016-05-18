@@ -24,4 +24,9 @@ public class IndexedRisk extends Risk implements IsIndexed {
     this.objectsSize = objectsSize;
   }
 
+  @Override
+  public String getUUID() {
+    return getId();
+  }
+
 }

@@ -7,10 +7,6 @@
  */
 package org.roda.wui.api.v1;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +22,6 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.UserUtility;
 import org.roda.core.data.adapter.facet.Facets;
 import org.roda.core.data.adapter.filter.Filter;
@@ -36,12 +31,17 @@ import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 @Path(RisksResource.ENDPOINT)
 @Api(value = RisksResource.SWAGGER_ENDPOINT)
@@ -68,12 +68,12 @@ public class RisksResource {
     // delegate action to controller
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     boolean justActive = false;
-    IndexResult<Risk> listRisksIndexResult = org.roda.wui.api.controllers.Browser.find(Risk.class, Filter.NONE,
-      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      justActive);
+    IndexResult<IndexedRisk> listRisksIndexResult = org.roda.wui.api.controllers.Browser.find(IndexedRisk.class,
+      Filter.NONE, Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())),
+      Facets.NONE, user, justActive);
 
     // transform controller method output
-    List<Risk> risks = org.roda.wui.api.controllers.Risks.retrieveRisks(listRisksIndexResult);
+    List<IndexedRisk> risks = org.roda.wui.api.controllers.Risks.retrieveRisks(listRisksIndexResult);
 
     return Response.ok(risks, mediaType).build();
   }
@@ -105,7 +105,7 @@ public class RisksResource {
     // get user
     RodaUser user = UserUtility.getApiUser(request);
     // delegate action to controller
-    Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, Risk.class, riskId);
+    Risk risk = org.roda.wui.api.controllers.Browser.retrieve(user, IndexedRisk.class, riskId);
 
     return Response.ok(risk, mediaType).build();
   }

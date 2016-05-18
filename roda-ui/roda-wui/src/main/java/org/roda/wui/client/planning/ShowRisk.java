@@ -12,6 +12,7 @@ package org.roda.wui.client.planning;
 
 import java.util.List;
 
+import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
@@ -119,7 +120,7 @@ public class ShowRisk extends Composite {
 
     if (historyTokens.size() == 1) {
       String riskId = historyTokens.get(0);
-      BrowserService.Util.getInstance().retrieve(Risk.class.getName(), riskId, new AsyncCallback<Risk>() {
+      BrowserService.Util.getInstance().retrieve(IndexedRisk.class.getName(), riskId, new AsyncCallback<IndexedRisk>() {
 
         @Override
         public void onFailure(Throwable caught) {
@@ -127,7 +128,7 @@ public class ShowRisk extends Composite {
         }
 
         @Override
-        public void onSuccess(Risk result) {
+        public void onSuccess(IndexedRisk result) {
           ShowRisk riskPanel = new ShowRisk(result);
           callback.onSuccess(riskPanel);
         }

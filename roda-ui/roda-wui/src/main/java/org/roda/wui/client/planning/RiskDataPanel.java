@@ -85,10 +85,10 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   DateBox identifiedOn;
 
   @UiField(provided = true)
-  SearchSuggestBox<Risk> identifiedBy;
+  SearchSuggestBox<IndexedRisk> identifiedBy;
 
   @UiField(provided = true)
-  SearchSuggestBox<Risk> category;
+  SearchSuggestBox<IndexedRisk> category;
 
   @UiField
   TextArea notes;
@@ -133,7 +133,7 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   TextBox mitigationOwnerType;
 
   @UiField(provided = true)
-  SearchSuggestBox<Risk> mitigationOwner;
+  SearchSuggestBox<IndexedRisk> mitigationOwner;
 
   @UiField
   TextBox mitigationRelatedEventIdentifierType;
@@ -171,9 +171,9 @@ public class RiskDataPanel extends Composite implements HasValueChangeHandlers<R
   public RiskDataPanel(final boolean editmode, final IndexedRisk risk, final String categoryField,
     final String identifiedByField, final String ownerField) {
 
-    category = new SearchSuggestBox<Risk>(Risk.class, categoryField);
-    identifiedBy = new SearchSuggestBox<Risk>(Risk.class, identifiedByField);
-    mitigationOwner = new SearchSuggestBox<Risk>(Risk.class, ownerField);
+    category = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, categoryField);
+    identifiedBy = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, identifiedByField);
+    mitigationOwner = new SearchSuggestBox<IndexedRisk>(IndexedRisk.class, ownerField);
 
     initWidget(uiBinder.createAndBindUi(this));
 

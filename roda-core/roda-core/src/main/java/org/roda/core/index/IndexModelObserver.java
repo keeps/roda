@@ -9,6 +9,7 @@ package org.roda.core.index;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -35,14 +36,20 @@ import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexRunnable;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.ip.metadata.DescriptiveMetadata;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -54,6 +61,8 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
+import org.roda.core.data.v2.user.RodaGroup;
+import org.roda.core.data.v2.user.RodaUser;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
@@ -464,16 +473,11 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void aipDeleted(String aipId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_AIP, aipId,
-      "Error deleting AIP (from " + RodaConstants.INDEX_AIP + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_REPRESENTATION, RodaConstants.REPRESENTATION_AIP_ID, aipId,
-      "Error deleting representations (aipId=" + aipId + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_AIPID, aipId,
-      "Error deleting files (aipId=" + aipId + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId,
-      "Error deleting preservation events (aipId=" + aipId + ")");
-    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId,
-      "Error deleting risk incidences (aipId=" + aipId + ")");
+    deleteDocumentFromIndex(IndexedAIP.class, aipId);
+    deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId);
+    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIPID, aipId);
+    deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId);
+    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId);
   }
 
   @Override
@@ -523,19 +527,11 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void representationDeleted(String aipId, String representationId) {
     String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
-    deleteDocumentFromIndex(RodaConstants.INDEX_REPRESENTATION, representationUUID,
-      "Error deleting Representation (aipId=" + aipId + "; representationId=" + representationId + ")");
-
-    deleteDocumentsFromIndex(RodaConstants.INDEX_FILE, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID,
-      "Error deleting Representation files (aipId=" + aipId + "; representationId=" + representationId + ")");
-
-    deleteDocumentsFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS,
-      RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID, representationUUID,
-      "Error deleting files (aipId=" + aipId + "; representationId=" + representationId + ")");
-
-    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID,
-      representationUUID,
-      "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + ")");
+    deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID);
+    deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID);
+    deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
+      representationUUID);
+    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId);
   }
 
   @Override
@@ -557,23 +553,20 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
-    String id = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
-    deleteDocumentFromIndex(RodaConstants.INDEX_FILE, id, "Error deleting File (id=" + id + ")");
+    String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
 
-    deleteDocumentsFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, RodaConstants.RISK_INCIDENCE_FILE_ID, id,
-      "Error deleting risk incidences (aipId=" + aipId + "; representationId=" + representationId + "; fileId=" + fileId
-        + ")");
+    deleteDocumentFromIndex(IndexedFile.class, uuid);
+    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId);
   }
 
   @Override
   public void logEntryCreated(LogEntry entry) {
-    addDocumentToIndex(RodaConstants.INDEX_ACTION_LOG, SolrUtils.logEntryToSolrDocument(entry),
-      "Error creating Log entry");
+    addDocumentToIndex(LogEntry.class, entry);
   }
 
   @Override
   public void userCreated(User user) {
-    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(user), "Error creating User");
+    addDocumentToIndex(RodaUser.class, user);
   }
 
   @Override
@@ -584,12 +577,12 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void userDeleted(String userID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, userID, "Error deleting User (id=" + userID + ")");
+    deleteDocumentFromIndex(RodaUser.class, userID);
   }
 
   @Override
   public void groupCreated(Group group) {
-    addDocumentToIndex(RodaConstants.INDEX_MEMBERS, SolrUtils.rodaMemberToSolrDocument(group), "Error creating Group");
+    addDocumentToIndex(RodaGroup.class, group);
   }
 
   @Override
@@ -600,7 +593,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void groupDeleted(String groupID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_MEMBERS, groupID, "Error deleting Group (id=" + groupID + ")");
+    deleteDocumentFromIndex(RodaGroup.class, groupID);
   }
 
   @Override
@@ -634,11 +627,9 @@ public class IndexModelObserver implements ModelObserver {
     PreservationMetadataType type = preservationMetadata.getType();
     String preservationMetadataId = preservationMetadata.getId();
     if (type.equals(PreservationMetadataType.EVENT)) {
-      deleteDocumentFromIndex(RodaConstants.INDEX_PRESERVATION_EVENTS, preservationMetadataId,
-        "Error deleting PreservationMetadata event (id=" + preservationMetadataId + ")");
+      deleteDocumentFromIndex(IndexedPreservationEvent.class, preservationMetadataId);
     } else if (type.equals(PreservationMetadataType.AGENT)) {
-      deleteDocumentFromIndex(RodaConstants.INDEX_PRESERVATION_AGENTS, preservationMetadataId,
-        "Error deleting PreservationMetadata agent (id=" + preservationMetadataId + ")");
+      deleteDocumentFromIndex(IndexedPreservationAgent.class, preservationMetadataId);
     }
   }
 
@@ -661,48 +652,47 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void jobCreatedOrUpdated(Job job) {
-    addDocumentToIndex(RodaConstants.INDEX_JOB, SolrUtils.jobToSolrDocument(job), "Error creating Job");
+    addDocumentToIndex(Job.class, job);
   }
 
   @Override
   public void jobDeleted(String jobId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_JOB, jobId, "Error deleting Job (id=" + jobId + ")");
+    deleteDocumentFromIndex(Job.class, jobId);
   }
 
-  private void addDocumentToIndex(String indexName, SolrInputDocument document, String errorLogMessage) {
+  private <T extends IsIndexed> void addDocumentToIndex(Class<T> classToAdd, T instance) {
     try {
-      index.add(indexName, document);
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error(errorLogMessage, e);
+      SolrUtils.create(index, classToAdd, instance);
+    } catch (SolrException | GenericException e) {
+      LOGGER.error("Error adding document to index", e);
     }
   }
 
-  private void deleteDocumentFromIndex(String indexName, String documentId, String errorLogMessage) {
+  private <T extends IsIndexed> void deleteDocumentFromIndex(Class<T> classToDelete, String... ids) {
     try {
-      index.deleteById(indexName, documentId);
-    } catch (SolrServerException | IOException e) {
-      LOGGER.error(errorLogMessage, e);
+      SolrUtils.delete(index, classToDelete, Arrays.asList(ids));
+    } catch (GenericException e) {
+      LOGGER.error("Error deleting document from index", e);
     }
   }
 
-  private void deleteDocumentsFromIndex(String indexName, String fieldName, String fieldValue, String errorLogMessage) {
+  private <T extends IsIndexed> void deleteDocumentsFromIndex(Class<T> classToDelete, String fieldName,
+    String fieldValue) {
     try {
-      index.deleteByQuery(indexName, fieldName + ":" + fieldValue);
-    } catch (SolrServerException | SolrException | IOException e) {
-      LOGGER.error(errorLogMessage, e);
+      SolrUtils.delete(index, classToDelete, new Filter(new SimpleFilterParameter(fieldName, fieldValue)));
+    } catch (GenericException | RequestNotValidException e) {
+      LOGGER.error("Error deleting from index", e);
     }
   }
 
   @Override
   public void jobReportCreatedOrUpdated(Report jobReport) {
-    addDocumentToIndex(RodaConstants.INDEX_JOB_REPORT, SolrUtils.jobReportToSolrDocument(jobReport),
-      "Error creating Job Report");
+    addDocumentToIndex(Report.class, jobReport);
   }
 
   @Override
   public void jobReportDeleted(String jobReportId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_JOB_REPORT, jobReportId,
-      "Error deleting Job Report(id=" + jobReportId + ")");
+    deleteDocumentFromIndex(Report.class, jobReportId);
   }
 
   @Override
@@ -819,7 +809,12 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void riskCreatedOrUpdated(Risk risk, boolean commit) {
-    addDocumentToIndex(RodaConstants.INDEX_RISK, SolrUtils.riskToSolrDocument(risk), "Error creating Risk");
+    SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk);
+    try {
+      index.add(RodaConstants.INDEX_RISK, riskDoc);
+    } catch (SolrServerException | IOException e1) {
+      LOGGER.error("Risk document was not added to index");
+    }
 
     if (commit) {
       try {
@@ -831,7 +826,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void riskDeleted(String riskId, boolean commit) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_RISK, riskId, "Error deleting Risk (id=" + riskId + ")");
+    deleteDocumentFromIndex(IndexedRisk.class, riskId);
 
     if (commit) {
       try {
@@ -843,8 +838,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void riskIncidenceCreatedOrUpdated(RiskIncidence riskIncidence, boolean commit) {
-    addDocumentToIndex(RodaConstants.INDEX_RISK_INCIDENCE, SolrUtils.riskIncidenceToSolrDocument(riskIncidence),
-      "Error creating Risk Incidence");
+    addDocumentToIndex(RiskIncidence.class, riskIncidence);
 
     if (commit) {
       try {
@@ -856,8 +850,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void riskIncidenceDeleted(String riskIncidenceId, boolean commit) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_RISK_INCIDENCE, riskIncidenceId,
-      "Error deleting Risk Incidence (id=" + riskIncidenceId + ")");
+    deleteDocumentFromIndex(RiskIncidence.class, riskIncidenceId);
 
     if (commit) {
       try {
@@ -869,11 +862,11 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void agentCreatedOrUpdated(Agent agent, boolean commit) {
-    addDocumentToIndex(RodaConstants.INDEX_AGENT, SolrUtils.agentToSolrDocument(agent), "Error creating Agent");
+    addDocumentToIndex(Agent.class, agent);
 
     if (commit) {
       try {
-        SolrUtils.commit(index, Risk.class);
+        SolrUtils.commit(index, Agent.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }
@@ -881,7 +874,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void agentDeleted(String agentId, boolean commit) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_AGENT, agentId, "Error deleting Agent (id=" + agentId + ")");
+    deleteDocumentFromIndex(Agent.class, agentId);
 
     if (commit) {
       try {
@@ -893,11 +886,11 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void formatCreatedOrUpdated(Format format, boolean commit) {
-    addDocumentToIndex(RodaConstants.INDEX_FORMAT, SolrUtils.formatToSolrDocument(format), "Error creating Format");
+    addDocumentToIndex(Format.class, format);
 
     if (commit) {
       try {
-        SolrUtils.commit(index, Risk.class);
+        SolrUtils.commit(index, Format.class);
       } catch (GenericException e) {
         LOGGER.warn("Commit did not run as expected");
       }
@@ -905,7 +898,7 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   public void formatDeleted(String formatId, boolean commit) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_FORMAT, formatId, "Error deleting Format (id=" + formatId + ")");
+    deleteDocumentFromIndex(Format.class, formatId);
 
     if (commit) {
       try {
@@ -918,18 +911,15 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void transferredResourceDeleted(String transferredResourceID) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_TRANSFERRED_RESOURCE, transferredResourceID,
-      "Error deleting Transferred Resource(id=" + transferredResourceID + ")");
+    deleteDocumentFromIndex(TransferredResource.class, transferredResourceID);
   }
 
   public void notificationCreatedOrUpdated(Notification notification) {
-    addDocumentToIndex(RodaConstants.INDEX_NOTIFICATION, SolrUtils.notificationToSolrDocument(notification),
-      "Error creating NotificationId");
+    addDocumentToIndex(Notification.class, notification);
   }
 
   public void notificationDeleted(String notificationId) {
-    deleteDocumentFromIndex(RodaConstants.INDEX_NOTIFICATION, notificationId,
-      "Error deleting Notification (id=" + notificationId + ")");
+    deleteDocumentFromIndex(Notification.class, notificationId);
   }
 
 }

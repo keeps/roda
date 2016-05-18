@@ -16,6 +16,7 @@ import java.util.List;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.OneOfManyFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -24,7 +25,6 @@ import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.PluginType;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.CreateJob;
 import org.roda.wui.client.common.lists.AIPList;
@@ -46,7 +46,7 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria
  * 
  */
-public class CreateActionJob extends CreateJob<Risk> {
+public class CreateActionJob extends CreateJob<IsIndexed> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
@@ -55,7 +55,7 @@ public class CreateActionJob extends CreateJob<Risk> {
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   public CreateActionJob() {
-    super(Risk.class, Arrays.asList(pluginTypes));
+    super(IsIndexed.class, Arrays.asList(pluginTypes));
   }
 
   @Override
