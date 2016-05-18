@@ -131,6 +131,11 @@ public class IndexService {
     return SolrUtils.retrieve(index, returnClass, id);
   }
 
+  public <T extends IsIndexed> List<T> retrieve(Class<T> returnClass, List<String> ids)
+    throws NotFoundException, GenericException {
+    return SolrUtils.retrieve(index, returnClass, ids);
+  }
+
   public void reindexAIPs()
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     CloseableIterable<OptionalWithCause<AIP>> aips = null;

@@ -34,13 +34,13 @@ import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
-import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -49,28 +49,15 @@ import org.slf4j.LoggerFactory;
 public class FixityPlugin extends AbstractPlugin<AIP> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FixityPlugin.class);
 
-  private String riskId;
-  private String riskName;
-  private String riskCategory;
-
   private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
   static {
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_ID,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_ID, "Risk identifier", PluginParameterType.STRING, "", false,
-        false, "Add the risks that will be associated with the objects above."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_NAME, new PluginParameter(
-      RodaConstants.PLUGIN_PARAMS_RISK_NAME, "Risk name", PluginParameterType.STRING, "", false, false, "Risk name."));
-
-    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY,
-      new PluginParameter(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY, "Risk category", PluginParameterType.STRING, "",
-        false, false, "Risk category."));
-
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
         PluginParameterType.STRING, "", false, false,
         "Send a notification, after finishing the process, to one or more e-mail addresses (comma separated)"));
   }
+
+  private static String riskId = "R36";
 
   @Override
   public void init() {
@@ -99,26 +86,11 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
-      riskId = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_NAME)) {
-      riskName = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_NAME);
-    }
-
-    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY)) {
-      riskCategory = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY);
-    }
   }
 
   @Override
   public List<PluginParameter> getParameters() {
     ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_NAME));
-    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_RISK_CATEGORY));
     parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
     return parameters;
   }
@@ -126,12 +98,13 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
 
     for (AIP aip : list) {
 
       for (Representation r : aip.getRepresentations()) {
-        boolean inotify = false;
         LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
+
         try {
           boolean recursive = true;
           CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(), r.getId(), recursive);
@@ -169,20 +142,14 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                 } else {
                   koFileIDS.add(file.getId());
 
-                  if (riskId != null && !riskId.equals("")) {
-                    try {
-                      model.retrieveRisk(riskId);
-                    } catch (NotFoundException e) {
-                      Risk risk = new Risk();
-                      risk.setId(riskId);
-                      risk.setName(riskName);
-                      risk.setCategory(riskCategory);
-                      model.createRisk(risk, false);
-                    }
-
-                    model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
-                      file.getId(), "RiskIncidence");
+                  try {
+                    model.retrieveRisk(riskId);
+                  } catch (NotFoundException e) {
+                    PluginHelper.createDefaultRisk(model, riskId, FixityPlugin.class);
                   }
+
+                  model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                    file.getId(), "RiskIncidence");
                 }
               }
 
@@ -219,14 +186,15 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                  * "Checksums recorded in PREMIS were compared with the files in the repository"
                  * , Arrays.asList(r.getId()), null, "success", okFileIDS.size()
                  * + " files checked successfully", okFileIDS.toString(),
-                 * inotify); notifyUserOfFixityCheckSucess(r.getId(), okFileIDS,
-                 * koFileIDS, pm);
+                 * inotify); notifyUserOfFixityCheckSuccess(r.getId(),
+                 * okFileIDS, koFileIDS, pm);
                  */
               }
             } else {
               LOGGER.error("Cannot process File", oFile.getCause());
             }
           }
+
           IOUtils.closeQuietly(allFiles);
           model.notifyAIPUpdated(aip.getId());
         } catch (IOException | RODAException | XmlException e) {
@@ -236,7 +204,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
       }
     }
 
-    return null;
+    return report;
   }
 
   private void notifyUserOfFixityCheckUndetermined(String representationID, PreservationMetadata event,
@@ -244,7 +212,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     // TODO Auto-generated method stub
   }
 
-  private void notifyUserOfFixityCheckSucess(String representationID, List<String> okFileIDS, List<String> koFileIDS,
+  private void notifyUserOfFixityCheckSuccess(String representationID, List<String> okFileIDS, List<String> koFileIDS,
     PreservationMetadata event) {
     // TODO Auto-generated method stub
   }

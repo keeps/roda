@@ -25,6 +25,26 @@
 					ui:field="riskList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel ui:field="risksSidebar">
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarRisksTitle}' />
+					</g:Label>
+					<g:Button addStyleNames="btn btn-refresh" ui:field="buttonRefresh">Refresh</g:Button>
+					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
+						<ui:text from='{messages.riskRegisterNewButton}' />
+					</g:Button>
+					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
+						<ui:text from='{messages.riskRegisterRemoveButton}' />
+					</g:Button>
+				</g:FlowPanel>
+				<g:FlowPanel>
+					<g:Label addStyleNames="h4">
+						<ui:text from='{messages.sidebarActionsTitle}' />
+					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="startProcess">
+						<ui:text from='{messages.riskRegisterProcessButton}' />
+					</g:Button>
+				</g:FlowPanel>
 				<g:FlowPanel addStyleNames="sidebar-facet-panel facet-empty">
 					<g:Label addStyleNames="h5 sidebar-facet-title">
 						<ui:text from='{messages.riskRegisterCategory}' />
@@ -53,26 +73,6 @@
 				<d:DateBox
 					addStyleNames="sidebar-facet-input fieldTextBox sidebar-facet-input-date"
 					ui:field="inputDateFinal" />
-				<g:FlowPanel ui:field="risksSidebar">
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarRisksTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-refresh" ui:field="buttonRefresh">Refresh</g:Button>
-					<g:Button addStyleNames="btn btn-plus" ui:field="buttonAdd">
-						<ui:text from='{messages.riskRegisterNewButton}' />
-					</g:Button>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonRemove">
-						<ui:text from='{messages.riskRegisterRemoveButton}' />
-					</g:Button>
-				</g:FlowPanel>
-				<g:FlowPanel>
-					<g:Label addStyleNames="h4">
-						<ui:text from='{messages.sidebarActionsTitle}' />
-					</g:Label>
-					<g:Button addStyleNames="btn btn-play" ui:field="startProcess">
-						<ui:text from='{messages.riskRegisterProcessButton}' />
-					</g:Button>
-				</g:FlowPanel>
 			</g:FlowPanel>
 		</g:FlowPanel>
 	</g:FlowPanel>

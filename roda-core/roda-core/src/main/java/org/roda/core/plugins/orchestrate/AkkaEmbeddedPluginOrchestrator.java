@@ -232,16 +232,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids) {
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      Iterator<String> iter = ids.iterator();
+      List<Representation> representations = JobsHelper.getRepresentations(model, index, ids);
+      Iterator<Representation> iter = representations.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<Representation>> innerPlugins = new ArrayList<>();
       Plugin<Representation> innerPlugin;
-      String representationId;
 
       plugin.beforeAllExecute(index, model, storage);
 
@@ -255,8 +255,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           multiplier++;
         }
 
-        representationId = iter.next();
-        block.add(model.retrieveRepresentation(aipId, representationId));
+        block.add(iter.next());
 
       }
 
@@ -289,16 +288,16 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids) {
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      Iterator<String> iter = ids.iterator();
+      List<File> files = JobsHelper.getFiles(model, index, ids);
+      Iterator<File> iter = files.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<File>> innerPlugins = new ArrayList<>();
       Plugin<File> innerPlugin;
-      String fileId;
 
       plugin.beforeAllExecute(index, model, storage);
 
@@ -312,8 +311,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           multiplier++;
         }
 
-        fileId = iter.next();
-        block.add(model.retrieveFile(aipId, representationId, new ArrayList<>(), fileId));
+        block.add(iter.next());
 
       }
 

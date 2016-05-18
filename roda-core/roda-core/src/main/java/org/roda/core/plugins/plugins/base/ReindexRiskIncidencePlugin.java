@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.base;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
@@ -111,6 +112,8 @@ public class ReindexRiskIncidencePlugin extends AbstractPlugin<AIP> {
               // do nothing
             }
           }
+
+          IOUtils.closeQuietly(allFiles);
         }
       }
 

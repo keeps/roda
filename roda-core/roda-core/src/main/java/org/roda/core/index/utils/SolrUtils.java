@@ -186,6 +186,21 @@ public class SolrUtils {
     return ret;
   }
 
+  public static <T extends IsIndexed> List<T> retrieve(SolrClient index, Class<T> classToRetrieve, List<String> id)
+    throws NotFoundException, GenericException {
+    List<T> ret = new ArrayList<>();
+    ;
+    try {
+      SolrDocumentList docs = index.getById(getIndexName(classToRetrieve), id);
+      for (SolrDocument doc : docs) {
+        ret.add(solrDocumentTo(classToRetrieve, doc));
+      }
+    } catch (SolrServerException | IOException e) {
+      throw new GenericException("Could not retrieve AIP from index", e);
+    }
+    return ret;
+  }
+
   public static <T extends IsIndexed> IndexResult<T> find(SolrClient index, Class<T> classToRetrieve, Filter filter,
     Sorter sorter, Sublist sublist) throws GenericException, RequestNotValidException {
     return find(index, classToRetrieve, filter, sorter, sublist, null);
@@ -347,7 +362,7 @@ public class SolrUtils {
       LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), User.class.getCanonicalName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(Group.class)) {
-      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), User.class.getCanonicalName());
+      LOGGER.warn("Use {} instead of {}", RODAMember.class.getCanonicalName(), Group.class.getCanonicalName());
       indexName = RodaConstants.INDEX_MEMBERS;
     } else if (resultClass.equals(RODAMember.class)) {
       indexName = RodaConstants.INDEX_MEMBERS;

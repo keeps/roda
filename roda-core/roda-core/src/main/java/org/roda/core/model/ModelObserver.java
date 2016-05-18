@@ -36,7 +36,7 @@ public interface ModelObserver {
 
   public void aipMoved(AIP aip, String oldParentId, String newParentId);
 
-  public void aipDeleted(String aipId);
+  public void aipDeleted(String aipId, boolean deleteIncidences);
 
   public void descriptiveMetadataCreated(DescriptiveMetadata descriptiveMetadataBinary);
 
@@ -48,13 +48,14 @@ public interface ModelObserver {
 
   public void representationUpdated(Representation representation);
 
-  public void representationDeleted(String aipId, String representationId);
+  public void representationDeleted(String aipId, String representationId, boolean deleteIncidences);
 
   public void fileCreated(File file);
 
   public void fileUpdated(File file);
 
-  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId);
+  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+    boolean deleteIncidences);
 
   public void logEntryCreated(LogEntry entry);
 

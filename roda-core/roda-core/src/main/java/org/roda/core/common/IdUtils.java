@@ -16,7 +16,6 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetada
 public final class IdUtils {
   private static final String ID_SEPARATOR = "-";
 
-
   /** Private empty constructor */
   private IdUtils() {
 
@@ -58,7 +57,6 @@ public final class IdUtils {
     return type + ":" + getFileId(aipId, representationId, fileDirectoryPath, fileId, type.toString(), ID_SEPARATOR);
   }
 
-  
   public static String getOtherMetadataId(String type, String aipId, String representationId,
     List<String> fileDirectoryPath, String fileId) {
     return getFileId(aipId, representationId, fileDirectoryPath, fileId, type, ID_SEPARATOR);
@@ -67,8 +65,6 @@ public final class IdUtils {
   public static String getJobReportId(String jobId, String aipId) {
     return jobId + ID_SEPARATOR + aipId;
   }
-
-  
 
   private static String getFileId(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
     String type, String separator) {
@@ -103,6 +99,10 @@ public final class IdUtils {
       }
     }
     return idBuilder;
+  }
+
+  public static String getRiskId(String prefix, String suffix) {
+    return prefix + ID_SEPARATOR + suffix;
   }
 
 }

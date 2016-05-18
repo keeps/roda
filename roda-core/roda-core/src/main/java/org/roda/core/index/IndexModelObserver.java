@@ -61,8 +61,7 @@ import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
 import org.roda.core.data.v2.user.Group;
-import org.roda.core.data.v2.user.RodaGroup;
-import org.roda.core.data.v2.user.RodaUser;
+import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.user.User;
 import org.roda.core.index.utils.SolrUtils;
 import org.roda.core.model.ModelObserver;
@@ -324,7 +323,7 @@ public class IndexModelObserver implements ModelObserver {
   @Override
   public void aipUpdated(AIP aip) {
     // TODO Is this the best way to update?
-    aipDeleted(aip.getId());
+    aipDeleted(aip.getId(), false);
     aipCreated(aip);
   }
 
@@ -472,12 +471,15 @@ public class IndexModelObserver implements ModelObserver {
   }
 
   @Override
-  public void aipDeleted(String aipId) {
+  public void aipDeleted(String aipId, boolean deleteIncidences) {
     deleteDocumentFromIndex(IndexedAIP.class, aipId);
     deleteDocumentsFromIndex(IndexedRepresentation.class, RodaConstants.REPRESENTATION_AIP_ID, aipId);
     deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_AIPID, aipId);
     deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_AIP_ID, aipId);
-    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_AIP_ID, aipId);
+    }
   }
 
   @Override
@@ -520,18 +522,21 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void representationUpdated(Representation representation) {
-    representationDeleted(representation.getAipId(), representation.getId());
+    representationDeleted(representation.getAipId(), representation.getId(), false);
     representationCreated(representation);
   }
 
   @Override
-  public void representationDeleted(String aipId, String representationId) {
+  public void representationDeleted(String aipId, String representationId, boolean deleteIncidences) {
     String representationUUID = IdUtils.getRepresentationId(aipId, representationId);
     deleteDocumentFromIndex(IndexedRepresentation.class, representationUUID);
     deleteDocumentsFromIndex(IndexedFile.class, RodaConstants.FILE_REPRESENTATION_UUID, representationUUID);
     deleteDocumentsFromIndex(IndexedPreservationEvent.class, RodaConstants.PRESERVATION_EVENT_REPRESENTATION_UUID,
       representationUUID);
-    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_REPRESENTATION_ID, representationId);
+    }
   }
 
   @Override
@@ -546,17 +551,21 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void fileUpdated(File file) {
-    fileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId());
+    fileDeleted(file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(), false);
     fileCreated(file);
 
   }
 
   @Override
-  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId) {
+  public void fileDeleted(String aipId, String representationId, List<String> fileDirectoryPath, String fileId,
+    boolean deleteIncidences) {
     String uuid = IdUtils.getFileId(aipId, representationId, fileDirectoryPath, fileId);
 
     deleteDocumentFromIndex(IndexedFile.class, uuid);
-    deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId);
+
+    if (deleteIncidences) {
+      deleteDocumentsFromIndex(RiskIncidence.class, RodaConstants.RISK_INCIDENCE_FILE_ID, fileId);
+    }
   }
 
   @Override
@@ -566,7 +575,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void userCreated(User user) {
-    addDocumentToIndex(RodaUser.class, user);
+    addDocumentToIndex(RODAMember.class, user);
   }
 
   @Override
@@ -577,12 +586,12 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void userDeleted(String userID) {
-    deleteDocumentFromIndex(RodaUser.class, userID);
+    deleteDocumentFromIndex(RODAMember.class, userID);
   }
 
   @Override
   public void groupCreated(Group group) {
-    addDocumentToIndex(RodaGroup.class, group);
+    addDocumentToIndex(RODAMember.class, group);
   }
 
   @Override
@@ -593,7 +602,7 @@ public class IndexModelObserver implements ModelObserver {
 
   @Override
   public void groupDeleted(String groupID) {
-    deleteDocumentFromIndex(RodaGroup.class, groupID);
+    deleteDocumentFromIndex(RODAMember.class, groupID);
   }
 
   @Override
@@ -810,6 +819,7 @@ public class IndexModelObserver implements ModelObserver {
 
   public void riskCreatedOrUpdated(Risk risk, boolean commit) {
     SolrInputDocument riskDoc = SolrUtils.riskToSolrDocument(risk);
+
     try {
       index.add(RodaConstants.INDEX_RISK, riskDoc);
     } catch (SolrServerException | IOException e1) {

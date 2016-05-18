@@ -69,7 +69,7 @@ public abstract class ModelObservable {
 
   protected void notifyAipDeleted(String aipId) {
     for (ModelObserver observer : observers) {
-      observer.aipDeleted(aipId);
+      observer.aipDeleted(aipId, true);
     }
   }
 
@@ -105,7 +105,7 @@ public abstract class ModelObservable {
 
   protected void notifyRepresentationDeleted(String aipId, String representationId) {
     for (ModelObserver observer : observers) {
-      observer.representationDeleted(aipId, representationId);
+      observer.representationDeleted(aipId, representationId, true);
     }
   }
 
@@ -124,7 +124,7 @@ public abstract class ModelObservable {
   protected void notifyFileDeleted(String aipId, String representationId, List<String> fileDirectoryPath,
     String fileId) {
     for (ModelObserver observer : observers) {
-      observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId);
+      observer.fileDeleted(aipId, representationId, fileDirectoryPath, fileId, true);
     }
   }
 

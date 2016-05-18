@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.io.IOUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -100,6 +101,8 @@ public class RiskIncidenceRemoverPlugin extends AbstractPlugin<AIP> {
                 model.deleteRiskIncidence(riskId, aip.getId(), representation.getId(), new ArrayList<>(), file.getId(),
                   OTHER_METADATA_TYPE);
               }
+
+              IOUtils.closeQuietly(allFiles);
             }
           }
         }

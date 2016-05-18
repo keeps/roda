@@ -185,8 +185,10 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
           } else if (list.get(0) instanceof File) {
             List<File> fileList = (List<File>) list;
             for (File file : fileList) {
-              model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(), file.getId(),
-                OTHER_METADATA_TYPE);
+              if (!file.isDirectory()) {
+                model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
+                  file.getId(), OTHER_METADATA_TYPE);
+              }
             }
           }
         }

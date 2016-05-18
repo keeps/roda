@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
+import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -71,15 +71,33 @@ public class AkkaJobWorkerActor extends UntypedActor {
         reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnAIPs((Plugin<AIP>) plugin,
           JobsHelper.getAIPs((SelectedItems<IndexedAIP>) job.getObjects()));
       } else if (ORCHESTRATOR_METHOD.ON_REPRESENTATIONS == job.getOrchestratorMethod()) {
-        Pair<String, List<String>> representations = JobsHelper
-          .getRepresentations((SelectedItems<IndexedRepresentation>) job.getObjects());
-        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
-          representations.getFirst(), representations.getSecond());
+        if (job.getObjects() instanceof SelectedItemsFilter) {
+          SelectedItemsFilter<IndexedRepresentation> selectedItems = (SelectedItemsFilter<IndexedRepresentation>) job
+            .getObjects();
+
+          Long objectsCount = RodaCoreFactory.getIndexService().count(IndexedRepresentation.class,
+            selectedItems.getFilter());
+          PluginHelper.updateJobObjectsCount(plugin, RodaCoreFactory.getModelService(), objectsCount);
+
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(IndexedRepresentation.class,
+            selectedItems.getFilter(), (Plugin<IndexedRepresentation>) plugin);
+        } else {
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnRepresentations((Plugin<Representation>) plugin,
+            ((SelectedItemsList<IndexedRepresentation>) job.getObjects()).getIds());
+        }
       } else if (ORCHESTRATOR_METHOD.ON_FILES == job.getOrchestratorMethod()) {
-        Pair<Pair<String, String>, List<String>> files = JobsHelper
-          .getFiles((SelectedItems<IndexedFile>) job.getObjects());
-        reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles((Plugin<File>) plugin,
-          files.getFirst().getFirst(), files.getFirst().getSecond(), files.getSecond());
+        if (job.getObjects() instanceof SelectedItemsFilter) {
+          SelectedItemsFilter<IndexedFile> selectedItems = (SelectedItemsFilter<IndexedFile>) job.getObjects();
+
+          Long objectsCount = RodaCoreFactory.getIndexService().count(IndexedFile.class, selectedItems.getFilter());
+          PluginHelper.updateJobObjectsCount(plugin, RodaCoreFactory.getModelService(), objectsCount);
+
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginFromIndex(IndexedFile.class,
+            selectedItems.getFilter(), (Plugin<IndexedFile>) plugin);
+        } else {
+          reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnFiles((Plugin<File>) plugin,
+            ((SelectedItemsList<IndexedFile>) job.getObjects()).getIds());
+        }
       } else if (ORCHESTRATOR_METHOD.RUN_PLUGIN == job.getOrchestratorMethod()) {
         RodaCoreFactory.getPluginOrchestrator().runPlugin(plugin);
       }

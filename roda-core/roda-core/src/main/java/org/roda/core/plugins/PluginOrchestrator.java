@@ -30,11 +30,11 @@ public interface PluginOrchestrator {
 
   public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids);
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids);
 
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, String aipId, List<String> ids);
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids);
 
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, String aipId, String representationId, List<String> ids);
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids);
 
   public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin);
 
@@ -47,7 +47,7 @@ public interface PluginOrchestrator {
 
   public <T extends Serializable> void runPlugin(Plugin<T> plugin);
 
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids);
+  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> uuids);
 
   /*
    * Job related methods

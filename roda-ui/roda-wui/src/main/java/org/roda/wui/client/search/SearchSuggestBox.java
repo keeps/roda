@@ -22,6 +22,7 @@ public class SearchSuggestBox<T extends IsIndexed> extends Composite {
     suggestBox = new SuggestBox(new SearchSuggestOracle<T>(classToRequest, facet));
     initWidget(suggestBox);
     suggestBox.addStyleName("form-textbox");
+
   }
 
   public String getValue() {

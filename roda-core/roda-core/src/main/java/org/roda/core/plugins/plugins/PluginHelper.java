@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins;
 
+import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.tika.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
 import org.roda.core.common.IdUtils;
 import org.roda.core.common.PremisV3Utils;
@@ -30,6 +32,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
+import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
 import org.roda.core.data.v2.LinkingObjectUtils.LinkingObjectType;
 import org.roda.core.data.v2.ip.AIP;
@@ -47,9 +50,11 @@ import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
+import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
+import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
@@ -400,6 +405,27 @@ public final class PluginHelper {
       } else {
         model.createSubmission(submissionPath, aipID);
       }
+    }
+  }
+
+  public static <T extends AbstractPlugin> void createDefaultRisk(ModelService model, String riskId,
+    Class<T> pluginClass) throws AlreadyExistsException, GenericException, RequestNotValidException, NotFoundException,
+    AuthorizationDeniedException {
+    String configurationFile = RodaCoreFactory.getRodaConfigurationAsString("core.plugins.risk",
+      pluginClass.getCanonicalName(), "path");
+
+    if (configurationFile != null) {
+      InputStream inputStream = RodaCoreFactory.getConfigurationFileAsStream(configurationFile);
+
+      try {
+        Risk risk = JsonUtils.getObjectFromJson(inputStream, Risk.class);
+        risk.setId(riskId);
+        model.createRisk(risk, false);
+      } catch (GenericException e) {
+        LOGGER.error("Could not create a default risk");
+      }
+
+      IOUtils.closeQuietly(inputStream);
     }
   }
 
