@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.TimeoutException;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -80,10 +82,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private ActorRef jobWorkersRouter;
   private int numberOfWorkers;
 
-  // Map< jobId, Map <plugin, jobplugininfo>>
-  private Map<String, Map<Plugin<?>, JobPluginInfo>> runningJobs;
-  // Map< jobId, total number of objects>
-  private Map<String, Integer> runningJobsObjectsCount;
+  // Map< jobId, JobInfo>
+  private Map<String, JobInfo> runningJobs;
 
   public AkkaEmbeddedPluginOrchestrator() {
     index = RodaCoreFactory.getIndexService();
@@ -91,7 +91,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     storage = RodaCoreFactory.getStorageService();
 
     runningJobs = new HashMap<>();
-    runningJobsObjectsCount = new HashMap<>();
 
     numberOfWorkers = JobsHelper.getNumberOfPluginWorkers();
     workersSystem = ActorSystem.create("WorkersSystem");
@@ -152,8 +151,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<T> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -209,8 +207,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -265,8 +262,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -321,8 +317,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -382,8 +377,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -446,8 +440,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -460,7 +453,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       return mapToReports(reports);
 
     } catch (Exception e) {
-      e.printStackTrace();
       LOGGER.error("Error running plugin on all representations", e);
     }
 
@@ -527,8 +519,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -583,8 +574,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
-      Iterable<Object> reports = Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier));
+      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<TransferredResource> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -684,14 +674,34 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     return innerPlugin;
   }
 
-  private List<Report> mapToReports(Iterable<Object> reports) {
-    List<Report> ret;
-    ret = new ArrayList<>();
-    for (Object o : reports) {
-      if (o instanceof Report) {
-        ret.add((Report) o);
-      } else {
-        LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
+  private <T extends Serializable> Optional<Iterable<Object>> waitForFuturesToComplete(Plugin<T> plugin, int multiplier,
+    List<Future<Object>> futures) {
+    final Future<Iterable<Object>> sequenceResult = Futures.sequence(futures, workersSystem.dispatcher());
+    Optional<Iterable<Object>> reports = Optional.empty();
+    try {
+      reports = Optional
+        .ofNullable(Await.result(sequenceResult, JobsHelper.getDuration(plugin.getClass(), multiplier)));
+    } catch (TimeoutException e) {
+      String jobId = PluginHelper.getJobId(plugin);
+      if (jobId != null) {
+        runningJobs.get(jobId).setHasTimeoutOccurred(true);
+      }
+      LOGGER.error("A timeout occured while waiting for futures to complete", e);
+    } catch (Exception e) {
+      LOGGER.error("Error while waiting for futures to complete", e);
+    }
+    return reports;
+  }
+
+  private List<Report> mapToReports(Optional<Iterable<Object>> reports) {
+    List<Report> ret = new ArrayList<>();
+    if (reports.isPresent()) {
+      for (Object o : reports.get()) {
+        if (o instanceof Report) {
+          ret.add((Report) o);
+        } else {
+          LOGGER.warn("Got a response that was not a report: {}", o.getClass().getName());
+        }
       }
     }
     return ret;
@@ -702,13 +712,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     jobPluginInfo.setObjectsCount(objectsCount);
     jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
     if (runningJobs.get(jobId) != null) {
-      runningJobs.get(jobId).put(innerPlugin, jobPluginInfo);
-      runningJobsObjectsCount.put(jobId, runningJobsObjectsCount.get(jobId) + objectsCount);
+      runningJobs.get(jobId).put(innerPlugin, jobPluginInfo, objectsCount);
     } else {
-      Map<Plugin<?>, JobPluginInfo> inner = new HashMap<>();
-      inner.put(innerPlugin, jobPluginInfo);
-      runningJobs.put(jobId, inner);
-      runningJobsObjectsCount.put(jobId, objectsCount);
+      JobInfo jobState = new JobInfo();
+      jobState.put(innerPlugin, jobPluginInfo, objectsCount);
+      runningJobs.put(jobId, jobState);
     }
   }
 
@@ -717,30 +725,18 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     LOGGER.info("Adding job '{}' ({}) to be executed", job.getName(), job.getId());
 
     if (runningJobs.containsKey(job.getId())) {
+      LOGGER.info("Job '{}' ({}) is already queued to be executed", job.getName(), job.getId());
       throw new JobAlreadyStartedException();
     } else {
-      int blockSize = JobsHelper.getBlockSize();
-      Future<Object> future = Patterns.ask(jobWorkersRouter, job, JobsHelper.getJobTimeout(job, blockSize));
-
-      future.onSuccess(new OnSuccess<Object>() {
-        @Override
-        public void onSuccess(Object msg) throws Throwable {
-          LOGGER.info("Success executing job '{}' ({})", job.getName(), job.getId());
-        }
-      }, workersSystem.dispatcher());
-      future.onFailure(new OnFailure() {
-        @Override
-        public void onFailure(Throwable error) throws Throwable {
-          LOGGER.error("Failure executing job '{}' ({}): {}", job.getName(), job.getId(), error);
-        }
-      }, workersSystem.dispatcher());
+      jobWorkersRouter.tell(job, ActorRef.noSender());
+      LOGGER.info("Success adding job '{}' ({})", job.getName(), job.getId());
     }
 
   }
 
   @Override
   public void stopJob(Job job) {
-    // FIXME 201603 hsilva: this is not the solution as the messages are sent
+    // FIXME 20160328 hsilva: this is not the solution as the messages are sent
     // async and until the processing of the current message is done, no other
     // is read
     Timeout defaultTimeout = JobsHelper.getDefaultTimeout();
@@ -818,7 +814,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         PluginHelper.updateJobPercentage(plugin, model, percentage);
         if (percentage == 100) {
           runningJobs.remove(jobId);
-          runningJobsObjectsCount.remove(jobId);
         }
       }
     } else {
@@ -829,27 +824,23 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo info) throws JobException {
     String jobId = PluginHelper.getJobId(plugin);
-    boolean jobIsAlive = true;
     if (jobId != null) {
       // FIXME 20160331 hsilva: this will block the update of all jobs (whereas
       // it should block per job)
       synchronized (runningJobs) {
-        Map<Plugin<?>, JobPluginInfo> jobPluginInfos = runningJobs.get(jobId);
-        if (jobPluginInfos != null) {
-          Integer jobObjectsCount = runningJobsObjectsCount.get(jobId);
-          JobPluginInfo infoUpdated = info.processJobPluginInformation(plugin, jobObjectsCount, jobPluginInfos);
-          PluginHelper.updateJobInformation(plugin, model, infoUpdated);
-        } else {
-          jobIsAlive = false;
+        JobInfo jobInfo = runningJobs.get(jobId);
+        if (jobInfo != null) {
+          if (jobInfo.isHasTimeoutOccurred()) {
+            throw new TimeoutJobException("Job timeout occurred");
+          } else {
+            Integer jobObjectsCount = jobInfo.getObjectsCount();
+            JobPluginInfo infoUpdated = info.processJobPluginInformation(plugin, jobObjectsCount, jobInfo.getJobInfo());
+            PluginHelper.updateJobInformation(plugin, model, infoUpdated);
+          }
         }
       }
     } else {
       throw new JobException("Job id is null");
-    }
-    // FIXME 20160513 hsilva: this is not the right way to test if job has
-    // "timeouted"
-    if (!jobIsAlive) {
-      throw new TimeoutJobException("Job timeout occurred");
     }
   }
 

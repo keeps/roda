@@ -216,7 +216,8 @@ public class Menu extends Composite {
   }
 
   private void updateVisibles(RodaUser user) {
-
+    // FIXME 20160518 hsilva: this should not be info & it should be more
+    // efficient(avoid string concatenation)
     logger.info("Updating menu visibility for user " + user);
 
     leftMenu.clearItems();
