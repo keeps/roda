@@ -28,7 +28,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 /**
@@ -79,17 +78,12 @@ public class FormatList extends BasicAsyncTableCell<Format> {
     categoryColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(nameColumn, "Name");
-    display.addColumn(categoryColumn, "Category");
-
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(nameColumn, "100%");
+    addColumn(nameColumn, "Name", false, false);
+    addColumn(categoryColumn, "Category", true, false);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(nameColumn, false));
 
-    categoryColumn.setCellStyleNames("nowrap");
   }
 
   @Override

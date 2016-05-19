@@ -24,20 +24,12 @@
 	border-bottom: 1px solid #eee;
 }
 
-.cellTableSelectedRow {
-	background-color: #90c0dd !important;
-}
-
 .cellTableKeyboardSelectedRow {
 	background: none;
 }
 
 .cellTableKeyboardSelectedCell {
 	border: none;
-}
-
-.cellTableSelectedRowCell {
-	border: 2px solid #90c0dd !important;
 }
 
 .cellTableHoveredRow {
@@ -48,6 +40,62 @@
 	overflow: hidden;
 	text-overflow: ellipsis;
 	font-size: 1.3rem;
+}
+
+.cellTableOddRow {
+	background: #f8f8f8;
+}
+
+.cellTableOddRowCell {
+	border-color: #f8f8f8;
+}
+
+.cellTableHoveredRow {
+	background: #eee;
+}
+
+.cellTableHoveredRowCell {
+	border-color: #eee;
+}
+
+.cellTableSelectedRow {
+	background: #5bbeff;
+}
+
+.cellTableSelectedRowCell {
+	border-color: #5bbeff;
+}
+
+@external .cellTableFadeOut;
+
+.cellTableFadeOut {
+    white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+.cellTableFadeOut:after {
+    content: "";
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 2em;
+    height: 100%;
+    background: -webkit-linear-gradient(right,#fff 30%,rgba(255,255,255,0) 100%);
+    background: linear-gradient(-90deg,#fff 30%,rgba(255,255,255,0) 100%);
+}
+
+.cellTableOddRowCell.cellTableFadeOut:after {
+	background: linear-gradient(-90deg,#f8f8f8 30%,rgba(255,255,255,0) 100%);
+}
+
+.cellTableHoveredRowCell.cellTableFadeOut:after {
+	background: linear-gradient(-90deg,#eee 30%,rgba(255,255,255,0) 100%);
+}
+
+.cellTableSelectedRowCell.cellTableFadeOut:after {
+	background: linear-gradient(-90deg,#5bbeff 30%,rgba(255,255,255,0) 100%);
 }
 
 

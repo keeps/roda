@@ -22,7 +22,7 @@
 				</g:Label>
 				<g:FlowPanel addStyleNames="page-description" ui:field="browseDescription">
 				</g:FlowPanel>
-				<g:Label styleName="label-danger" ui:field="stateLabel" />
+				<g:HTML ui:field="aipState" />
 				<g:FlowPanel styleName="browseItemPanel browseTitle-allCollections-wrapper">
 					<g:SimplePanel styleName="browseItemIcon" ui:field="itemIcon" />
 					<g:FlowPanel styleName="browseItemPanelText">

@@ -144,7 +144,8 @@ public class RepresentationList extends BasicAsyncTableCell<IndexedRepresentatio
 
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(idColumn, "100%");
+    
+//    display.setColumnWidth(idColumn, "100%");
 
     originalColumn.setCellStyleNames("nowrap");
     typeColumn.setCellStyleNames("nowrap");

@@ -143,23 +143,16 @@ public class RiskList extends BasicAsyncTableCell<IndexedRisk> {
     objectCounterColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(nameColumn, "Name");
-    display.addColumn(categoryColumn, "Category");
-    display.addColumn(ownerColumn, "Owner");
-    display.addColumn(identifiedOnColumn, "Identified on");
-    display.addColumn(severityColumn, "Severity");
-    display.addColumn(objectCounterColumn, "Objects");
-
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
+    addColumn(nameColumn, "Name", false, false);
+    addColumn(categoryColumn, "Category", false, false);
+    addColumn(ownerColumn, "Owner", false, false);
+    addColumn(identifiedOnColumn, "Identified on", false, false, 8);
+    addColumn(severityColumn, "Severity", false, false, 8);
+    addColumn(objectCounterColumn, "Objects", false, false, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(severityColumn, false));
 
-    identifiedOnColumn.setCellStyleNames("nowrap");
-    ownerColumn.setCellStyleNames("nowrap");
-    severityColumn.setCellStyleNames("nowrap");
-    objectCounterColumn.setCellStyleNames("nowrap");
   }
 
   @Override

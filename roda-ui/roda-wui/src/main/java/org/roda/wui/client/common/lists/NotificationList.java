@@ -36,7 +36,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 import config.i18n.client.BrowseMessages;
@@ -120,22 +119,15 @@ public class NotificationList extends BasicAsyncTableCell<Notification> {
 
     // TODO externalize strings into constants
 
-    // display.addColumn(idColumn, "Id");
-    display.addColumn(fromUser, "From");
-    // display.addColumn(recipientUser, "To");
-    display.addColumn(sentOn, "Sent On");
-    display.addColumn(subject, "Subject");
-    display.addColumn(acknowledged, "Acknowledged");
-
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
+    addColumn(fromUser, "From", true, false);
+    addColumn(sentOn, "Sent On", true, false, 13);
+    addColumn(subject, "Subject", true, false);
+    addColumn(acknowledged, "Ack.", true, false, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(sentOn, false));
 
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
-    // relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
   }
 
   @Override

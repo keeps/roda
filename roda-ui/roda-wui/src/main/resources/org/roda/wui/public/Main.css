@@ -196,6 +196,18 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 	color: #999;
 }
 
+.inline {
+	display: inline;
+}
+
+div.inline {
+	display: inline-block;
+}
+
+.inline + .inline {
+	margin-left: 1rem;
+}
+
 .fade-out {
     white-space: nowrap;
     position: relative;
@@ -783,6 +795,7 @@ pre>code {
 
 .my-asyncdatagrid-display {
 	width: 100%;
+	table-layout:fixed;
 }
 
 .my-asyncdatagrid .panel {

@@ -116,33 +116,13 @@ public class PreservationEventList extends BasicAsyncTableCell<IndexedPreservati
     eventOutcomeColumn.setSortable(true);
     // eventAgentColumn.setSortable(true);
 
-    // TODO externalize strings into constants
-    display.addColumn(eventDateTimeColumn, messages.preservationEventListHeaderDate());
-    // display.addColumn(eventAgentColumn,
-    // messages.preservationEventListHeaderAgent());
-    display.addColumn(eventTypeColumn, messages.preservationEventListHeaderType());
-    display.addColumn(eventDetailColumn, messages.preservationEventListHeaderDetail());
-    // display.addColumn(eventSourceObjectColumn,
-    // messages.preservationEventListHeaderSourceObject());
-    // display.addColumn(eventOutcomeObjectColumn,
-    // messages.preservationEventListHeaderOutcomeObject());
-    display.addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome());
-
-    // display.setColumnWidth(eventDetailColumn, "100%");
-
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
+    addColumn(eventDateTimeColumn, messages.preservationEventListHeaderDate(), true, false, 11);
+    addColumn(eventTypeColumn, messages.preservationEventListHeaderType(), false, false, 13);
+    addColumn(eventDetailColumn, messages.preservationEventListHeaderDetail(), false, false);
+    addColumn(eventOutcomeColumn, messages.preservationEventListHeaderOutcome(), true, false, 7);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(eventDateTimeColumn, false));
-
-    eventDateTimeColumn.setCellStyleNames("nowrap");
-    // eventAgentColumn.setCellStyleNames("nowrap");
-    // eventTypeColumn.setCellStyleNames("nowrap");
-    eventOutcomeColumn.setCellStyleNames("nowrap");
-    // eventSourceObjectColumn.setCellStyleNames("nowrap");
-    // eventOutcomeObjectColumn.setCellStyleNames("nowrap");
-    // eventAgentColumn.setCellStyleNames("nowrap");
 
   }
 

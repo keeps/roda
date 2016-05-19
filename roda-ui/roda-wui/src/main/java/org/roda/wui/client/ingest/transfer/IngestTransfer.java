@@ -216,10 +216,10 @@ public class IngestTransfer extends Composite {
       }
     });
 
-    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener() {
+    transferredResourceList.addCheckboxSelectionListener(new CheckboxSelectionListener<TransferredResource>() {
 
       @Override
-      public void onSelectionChange(SelectedItems selected) {
+      public void onSelectionChange(SelectedItems<TransferredResource> selected) {
         boolean empty = SelectedItemsUtils.isEmpty(selected);
 
         remove.setText(empty ? messages.ingestTransferButtonRemoveWholeFolder()

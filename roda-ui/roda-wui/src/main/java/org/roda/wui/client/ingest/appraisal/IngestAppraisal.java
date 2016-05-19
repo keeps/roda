@@ -169,7 +169,11 @@ public class IngestAppraisal extends Composite {
 
   private final Map<String, SearchField> searchFields = new HashMap<String, SearchField>();
 
-  boolean selectable = true;
+  // cannot let reps and files to be selectable for now
+  // boolean selectable = true;
+  boolean itemsSelectable = true;
+  boolean representationsSelectable = false;
+  boolean filesSelectable = false;
   boolean justActive = false;
 
   private IngestAppraisal() {
@@ -432,7 +436,9 @@ public class IngestAppraisal extends Composite {
   private void createItemsSearchResultPanel() {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
-    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, justActive, facets, messages.searchResults(), selectable);
+
+    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, justActive, facets, messages.searchResults(),
+      itemsSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
@@ -464,7 +470,7 @@ public class IngestAppraisal extends Composite {
 
   private void createRepresentationsSearchResultPanel() {
     representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, justActive, Facets.NONE,
-      messages.searchResults(), selectable);
+      messages.searchResults(), representationsSelectable);
 
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -495,7 +501,7 @@ public class IngestAppraisal extends Composite {
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
 
     filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, justActive, facets, messages.searchResults(),
-      selectable);
+      filesSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);
@@ -530,7 +536,7 @@ public class IngestAppraisal extends Composite {
     boolean accept = true;
     SelectedItems<?> selected = getSelected();
     String rejectReason = null;
-    // TODO support accept of reps and files
+    // not supporing accept of reps and files for now
     BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
       new LoadingAsyncCallback<Void>() {
 

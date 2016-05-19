@@ -31,7 +31,6 @@ import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.view.client.ProvidesKey;
 
 public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
@@ -86,19 +85,11 @@ public class SimpleRodaMemberList extends BasicAsyncTableCell<RODAMember> {
     nameColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"));
-    display.addColumn(idColumn, "Identifier");
-    display.addColumn(nameColumn, "Name");
-
-    // display.setAutoHeaderRefreshDisabled(true);
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    // display.setColumnWidth(nameColumn, "100%");
-
-    display.setColumnWidth(typeColumn, "15px");
+    addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 2);
+    addColumn(idColumn, "Identifier", true, false);
+    addColumn(nameColumn, "Name", true, false);
 
     addStyleName("my-list-rodamember");
-    emptyInfo.addStyleName("my-list-rodamember-empty-info");
   }
 
   @Override

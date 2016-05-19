@@ -104,22 +104,13 @@ public class RodaMemberList extends BasicAsyncTableCell<RODAMember> {
     activeColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"));
-    display.addColumn(idColumn, "Identifier");
-    display.addColumn(nameColumn, "Name");
-    display.addColumn(groupsColumn, "Groups");
-    display.addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"));
-
-    // display.setAutoHeaderRefreshDisabled(true);
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    // display.setColumnWidth(nameColumn, "100%");
-
-    display.setColumnWidth(activeColumn, "15px");
-    display.setColumnWidth(typeColumn, "15px");
+    addColumn(typeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-user'></i>"), false, false, 3);
+    addColumn(idColumn, "Identifier", true, false);
+    addColumn(nameColumn, "Name", true, false);
+    addColumn(groupsColumn, "Groups", true, false);
+    addColumn(activeColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-check-circle'></i>"), false, false, 2);
 
     addStyleName("my-list-rodamember");
-    emptyInfo.addStyleName("my-list-rodamember-empty-info");
   }
 
   @Override

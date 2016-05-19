@@ -13,11 +13,13 @@ package org.roda.wui.client.ingest.process;
 import java.util.List;
 
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.common.utils.JavascriptUtils;
 import org.roda.wui.client.ingest.transfer.IngestTransfer;
 import org.roda.wui.client.process.IngestProcess;
@@ -29,6 +31,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -108,6 +111,9 @@ public class ShowJobReport extends Composite {
   @UiField
   Anchor aip;
   @UiField
+  HTML aipState;
+
+  @UiField
   Anchor objectId;
   @UiField
   Label dateCreated;
@@ -141,15 +147,17 @@ public class ShowJobReport extends Composite {
     if (jobReport.getOutcomeObjectId() != null) {
       aip.setText(jobReport.getOutcomeObjectId());
       aip.setHref(Tools.createHistoryHashLink(Browse.RESOLVER, jobReport.getOutcomeObjectId()));
+      aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(jobReport.getOutcomeObjectState()));
     } else {
       // TODO show better message
       aip.setText("No AIP created");
+      aipState.setText("");
     }
     DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
     dateCreated.setText(dateTimeFormat.format(jobReport.getDateCreated()));
     dateUpdated.setText(dateTimeFormat.format(jobReport.getDateUpdated()));
     duration.setText(Humanize.durationInDHMS(jobReport.getDateCreated(), jobReport.getDateUpdated()));
-    status.setHTML(getPluginStateHTML(jobReport.getPluginState()));
+    status.setHTML(HtmlSnippetUtils.getPluginStateHTML(jobReport.getPluginState()));
     progress.setText(messages.showJobReportProgress(jobReport.getCompletionPercentage(), jobReport.getStepsCompleted(),
       jobReport.getTotalSteps()));
 
@@ -195,7 +203,7 @@ public class ShowJobReport extends Composite {
       attributeLabel = new Label("Outcome");
       attributeLabel.setStyleName("label");
       panelBody.add(attributeLabel);
-      HTML outcomeHTML = new HTML(getPluginStateHTML(reportItem.getPluginState()));
+      HTML outcomeHTML = new HTML(HtmlSnippetUtils.getPluginStateHTML(reportItem.getPluginState()));
       panelBody.add(outcomeHTML);
 
       if (reportItem.getPluginDetails() != null && !"".equals(reportItem.getPluginDetails())) {
@@ -211,23 +219,6 @@ public class ShowJobReport extends Composite {
         panelBody.add(attributeValue);
       }
     }
-  }
-
-  private SafeHtml getPluginStateHTML(PluginState pluginState) {
-    SafeHtml pluginStateHTML;
-    switch (pluginState) {
-      case SUCCESS:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + pluginState + "</span>");
-        break;
-      case RUNNING:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + pluginState + "</span>");
-        break;
-      case FAILURE:
-      default:
-        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + pluginState + "</span>");
-        break;
-    }
-    return pluginStateHTML;
   }
 
   @UiHandler("buttonBack")

@@ -420,7 +420,7 @@ public interface BrowseMessages extends Messages {
   String processNewMissingMandatoryInfoDialogMessage(List<String> missingPluginNames);
 
   /************* Ingest process show ****************/
-  @DefaultMessage("waiting to start")
+  @DefaultMessage("waiting")
   String showJobStatusCreated();
 
   @DefaultMessage("running")

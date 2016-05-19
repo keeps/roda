@@ -134,24 +134,17 @@ public class LogEntryList extends BasicAsyncTableCell<LogEntry> {
 
     // TODO externalize strings into constants
 
-    // display.addColumn(idColumn, "Id");
-    display.addColumn(dateColumn, "Date and time");
-    display.addColumn(actionComponentColumn, "Component");
-    display.addColumn(actionMethodColumn, "Method");
-    // display.addColumn(relatedObjectColumn, "Related object");
-    display.addColumn(usernameColumn, "User");
-    display.addColumn(durationColumn, "Duration");
-    display.addColumn(addressColumn, "Address");
-
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
+    addColumn(dateColumn, "Date and time", true, false, 14);
+    addColumn(actionComponentColumn, "Component", true, false);
+    addColumn(actionMethodColumn, "Method", true, false);
+    addColumn(usernameColumn, "User", true, false);
+    addColumn(durationColumn, "Duration", true, true, 5);
+    addColumn(addressColumn, "Address", true, false);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(dateColumn, false));
 
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
-    // relatedObjectColumn.setCellStyleNames("my-collections-table-cell-link");
   }
 
   @Override

@@ -37,9 +37,10 @@
 								<g:Label addStyleNames="label">
 									Archival Information Package
 								</g:Label>
-								<g:Anchor ui:field="aip" />
+								<g:Anchor ui:field="aip" addStyleNames="inline" />
+								<g:HTML ui:field="aipState" addStyleNames="inline small" />
 							</g:FlowPanel>
-							
+
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									Date created
@@ -75,8 +76,8 @@
 							</g:Label>
 							<g:FlowPanel ui:field="reportAttributes" />
 							<g:FlowPanel ui:field="reportItems" />
-							</g:FlowPanel>
 						</g:FlowPanel>
+					</g:FlowPanel>
 				</g:FlowPanel>
 
 			</g:FlowPanel>

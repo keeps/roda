@@ -86,17 +86,13 @@ public class RiskIncidenceList extends BasicAsyncTableCell<RiskIncidence> {
     objectTypeColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(objectColumn, "Object ID");
-    display.addColumn(objectTypeColumn, "Object Type");
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(objectColumn, "100%");
-    objectTypeColumn.setCellStyleNames("nowrap");
+    addColumn(objectColumn, "Object ID", false, false);
+    addColumn(objectTypeColumn, "Object Type", true, true, 8);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(objectTypeColumn, true));
     addStyleName("my-collections-table");
-    emptyInfo.addStyleName("my-collections-empty-info");
+    
   }
 
   @Override

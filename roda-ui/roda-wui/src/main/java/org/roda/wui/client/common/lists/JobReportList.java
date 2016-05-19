@@ -180,12 +180,12 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
     completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
-    display.addColumn(sourceObjectColumn, "Submission Information Package");
-    display.addColumn(outcomeObjectColumn, "Archival Information Package");
-    display.addColumn(updatedDateColumn, "Last updated at");
-    display.addColumn(lastPluginRunColumn, "Last run task");
-    display.addColumn(lastPluginRunStateColumn, "Status");
-    display.addColumn(completionStatusColumn, "Progress");
+    addColumn(sourceObjectColumn, "SIP", true, false);
+    addColumn(outcomeObjectColumn, "AIP", true, false);
+    addColumn(updatedDateColumn, "Last updated at", true, false, 11);
+    addColumn(lastPluginRunColumn, "Last run task", true, false);
+    addColumn(lastPluginRunStateColumn, "Status", true, false, 8);
+    addColumn(completionStatusColumn, "Progress", true, false, 8);
 
     // display.setColumnWidth(sourceObjectColumn, "100%");
 
@@ -194,10 +194,6 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(updatedDateColumn, false));
-
-    updatedDateColumn.setCellStyleNames("nowrap");
-    lastPluginRunColumn.setCellStyleNames("nowrap");
-    completionStatusColumn.setCellStyleNames("nowrap");
 
   }
 

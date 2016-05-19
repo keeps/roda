@@ -1,10 +1,13 @@
 package org.roda.wui.client.common.utils;
 
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.safehtml.shared.SafeHtml;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 
 import config.i18n.client.BrowseMessages;
@@ -40,6 +43,44 @@ public class HtmlSnippetUtils {
       }
     }
     return ret;
+  }
+
+  public static SafeHtml getAIPStateHTML(AIPState aipState) {
+    SafeHtmlBuilder b = new SafeHtmlBuilder();
+
+    switch (aipState) {
+      case ACTIVE:
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-success'>"));
+        break;
+      case UNDER_APPRAISAL:
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-warning'>"));
+        break;
+      default:
+        b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>"));
+        break;
+    }
+
+    b.append(SafeHtmlUtils.fromString(messages.aipState(aipState)));
+    b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
+
+    return b.toSafeHtml();
+  }
+
+  public static SafeHtml getPluginStateHTML(PluginState pluginState) {
+    SafeHtml pluginStateHTML;
+    switch (pluginState) {
+      case SUCCESS:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-success'>" + pluginState + "</span>");
+        break;
+      case RUNNING:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-default'>" + pluginState + "</span>");
+        break;
+      case FAILURE:
+      default:
+        pluginStateHTML = SafeHtmlUtils.fromSafeConstant("<span class='label-danger'>" + pluginState + "</span>");
+        break;
+    }
+    return pluginStateHTML;
   }
 
 }

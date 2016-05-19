@@ -92,20 +92,14 @@ public class SimpleFileList extends BasicAsyncTableCell<IndexedFile> {
     filenameColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"));
-    display.addColumn(filenameColumn, "Name");
-    // display.addColumn(mimetypeColumn, "Mimetype");
-    // display.addColumn(lengthColumn, "Length");
-    display.setColumnWidth(iconColumn, "35px");
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(filenameColumn, "100%");
+    addColumn(iconColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-files-o'></i>"), false, false, 2);
+    addColumn(filenameColumn, "Name", false, false);
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(filenameColumn, false));
 
     addStyleName("my-files-table");
-    emptyInfo.addStyleName("my-files-empty-info");
+
   }
 
   @Override

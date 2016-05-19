@@ -25,6 +25,7 @@ import org.roda.wui.common.client.tools.DescriptionLevelUtils;
 import org.roda.wui.common.client.tools.Humanize;
 
 import com.google.gwt.cell.client.SafeHtmlCell;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -99,13 +100,15 @@ public class AIPList extends BasicAsyncTableCell<IndexedAIP> {
     display.addColumn(levelColumn, SafeHtmlUtils.fromSafeConstant("<i class='fa fa-tag'></i>&nbsp;Level"));
     display.addColumn(titleColumn, "Title");
     display.addColumn(datesColumn, "Dates");
-    display.setColumnWidth(levelColumn, "35px");
+
     Label emptyInfo = new Label("No items to display");
     display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(titleColumn, "100%");
 
     // define default sorting
     display.getColumnSortList().push(new ColumnSortInfo(datesColumn, false));
+
+    display.setColumnWidth(levelColumn, 5.0, Unit.EM);
+    display.setColumnWidth(datesColumn, 13.0, Unit.EM);
 
     levelColumn.setCellStyleNames("nowrap");
     datesColumn.setCellStyleNames("nowrap");

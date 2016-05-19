@@ -38,6 +38,7 @@ import org.roda.wui.client.common.dialogs.SelectAipDialog;
 import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
+import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.planning.RiskRegister;
@@ -167,7 +168,10 @@ public class Browse extends Composite {
   SimplePanel itemIcon;
 
   @UiField
-  Label stateLabel, itemTitle, itemId;
+  HTML aipState;
+
+  @UiField
+  Label itemTitle, itemId;
 
   @UiField
   TabPanel itemMetadata;
@@ -507,8 +511,8 @@ public class Browse extends Composite {
       }
 
       this.addStyleName(aip.getState().toString().toLowerCase());
-      stateLabel.setText(messages.aipState(aip.getState()));
-      stateLabel.setVisible(AIPState.ACTIVE != aip.getState());
+      aipState.setHTML(HtmlSnippetUtils.getAIPStateHTML(aip.getState()));
+      aipState.setVisible(AIPState.ACTIVE != aip.getState());
 
     } else {
       viewAction();
@@ -546,7 +550,7 @@ public class Browse extends Composite {
     download.setVisible(false);
 
     this.removeStyleName("inactive");
-    stateLabel.setVisible(false);
+    aipState.setVisible(false);
   }
 
   private void removeHandlerRegistrations() {

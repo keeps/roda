@@ -20,7 +20,6 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.JOB_STATE;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.common.client.tools.Humanize;
@@ -38,7 +37,6 @@ import com.google.gwt.user.cellview.client.ColumnSortList;
 import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
 
 /**
  * 
@@ -213,36 +211,22 @@ public class JobList extends BasicAsyncTableCell<Job> {
     progressColumn.setSortable(true);
 
     // TODO externalize strings into constants
-    display.addColumn(nameColumn, "Name");
-    display.addColumn(usernameColumn, "Creator");
-    display.addColumn(startDateColumn, "Start date");
-    display.addColumn(durationColumn, "Duration");
-    display.addColumn(statusColumn, "Status");
-    display.addColumn(progressColumn, "Progress");
-    display.addColumn(objectsTotalCountColumn, "Total");
-    display.addColumn(objectsSuccessCountColumn, "Successful");
-    display.addColumn(objectsFailureCountColumn, "Failed");
-    display.addColumn(objectsProcessingCountColumn, "Processing");
-    display.addColumn(objectsWaitingCountColumn, "Waiting");
 
-    Label emptyInfo = new Label("No items to display");
-    display.setEmptyTableWidget(emptyInfo);
-    display.setColumnWidth(nameColumn, "100%");
+    addColumn(nameColumn, "Name", true, false);
+    addColumn(usernameColumn, "Creator", true, false);
+    addColumn(startDateColumn, "Start date", true, false, 11);
+    addColumn(durationColumn, "Duration", true, true, 6);
+    addColumn(statusColumn, "Status", true, false, 7);
+    addColumn(progressColumn, "Progress", true, true, 5);
+    addColumn(objectsTotalCountColumn, "Total", true, true, 5);
+    addColumn(objectsSuccessCountColumn, "Successful", true, true, 6);
+    addColumn(objectsFailureCountColumn, "Failed", true, true, 5);
+    addColumn(objectsProcessingCountColumn, "Processing", true, true, 6);
+    addColumn(objectsWaitingCountColumn, "Waiting", true, true, 5);
 
     // default sorting
     display.getColumnSortList().push(new ColumnSortInfo(startDateColumn, false));
 
-    nameColumn.setCellStyleNames("nowrap");
-    startDateColumn.setCellStyleNames("nowrap");
-    statusColumn.setCellStyleNames("nowrap");
-    usernameColumn.setCellStyleNames("nowrap");
-    durationColumn.setCellStyleNames("nowrap text-align-right");
-    progressColumn.setCellStyleNames("nowrap text-align-right");
-    objectsTotalCountColumn.setCellStyleNames("nowrap text-align-right");
-    objectsSuccessCountColumn.setCellStyleNames("nowrap text-align-right");
-    objectsFailureCountColumn.setCellStyleNames("nowrap text-align-right");
-    objectsProcessingCountColumn.setCellStyleNames("nowrap text-align-right");
-    objectsWaitingCountColumn.setCellStyleNames("nowrap text-align-right");
   }
 
   @Override

@@ -33,10 +33,12 @@ import com.google.gwt.cell.client.CheckboxCell;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.cell.client.ValueUpdater;
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
@@ -46,6 +48,7 @@ import com.google.gwt.user.cellview.client.ColumnSortList.ColumnSortInfo;
 import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSelectionPolicy;
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.PageSizePager;
+import com.google.gwt.user.cellview.client.SafeHtmlHeader;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -184,6 +187,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
         hideSelectAllPanel();
       }
     });
+
+    Label emptyInfo = new Label("No items to display");
+    display.setEmptyTableWidget(emptyInfo);
   }
 
   private void configure(final CellTable<T> display) {
@@ -605,6 +611,35 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
   public void setSelectedClass(Class<T> selectedClass) {
     this.selectedClass = selectedClass;
+  }
+
+  protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight) {
+    SafeHtmlHeader header = new SafeHtmlHeader(headerHTML);
+
+    display.addColumn(column, header);
+
+    if (nowrap && alignRight) {
+      header.setHeaderStyleNames("nowrap text-align-right");
+      column.setCellStyleNames("nowrap text-align-right");
+    } else if (nowrap) {
+      header.setHeaderStyleNames("cellTableFadeOut");
+      column.setCellStyleNames("cellTableFadeOut");
+    }
+  }
+
+  protected void addColumn(Column<T, ?> column, SafeHtml headerHTML, boolean nowrap, boolean alignRight,
+    double fixedSize) {
+    addColumn(column, headerHTML, nowrap, alignRight);
+    display.setColumnWidth(column, fixedSize, Unit.EM);
+  }
+
+  protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap, boolean alignRight) {
+    addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight);
+  }
+
+  protected void addColumn(Column<T, ?> column, String headerText, boolean nowrap, boolean alignRight,
+    double fixedSize) {
+    addColumn(column, SafeHtmlUtils.fromString(headerText), nowrap, alignRight, fixedSize);
   }
 
 }
