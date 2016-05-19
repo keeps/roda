@@ -100,7 +100,9 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.PluginInfo;
+import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -109,6 +111,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -1821,18 +1824,36 @@ public class BrowserHelper {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
     for (String aipId : listOfIds) {
+      ModelService model = RodaCoreFactory.getModelService();
+      AIP aip = model.retrieveAIP(aipId);
       if (accept) {
         // Accept AIP
-        AIP aip = RodaCoreFactory.getModelService().retrieveAIP(aipId);
         aip.setState(AIPState.ACTIVE);
-        RodaCoreFactory.getModelService().updateAIPState(aip);
+        model.updateAIPState(aip);
+        // TODO create preservation event
       } else {
         // Reject AIP
-        RodaCoreFactory.getModelService().deleteAIP(aipId);
-        // TODO record reject
+        String jobId = aip.getIngestJobId();
+        model.deleteAIP(aipId);
+
+        // create job report
+
+        Report report = model.retrieveJobReport(jobId, aipId);
+
+        Report reportItem = new Report();
+        reportItem.setTitle("Manual appraisal");
+        reportItem.setPlugin(user.getName());
+        reportItem.setPluginDetails(rejectReason);
+        reportItem.setPluginState(PluginState.FAILURE);
+        reportItem.setOutcomeObjectState(AIPState.DELETED);
+        reportItem.setDateCreated(new Date());
+        report.addReport(reportItem);
+
+        model.createOrUpdateJobReport(report);
+
       }
     }
-    
+
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class);
 
   }

@@ -81,7 +81,7 @@ public class TransferredResourceList extends BasicAsyncTableCell<TransferredReso
         } else if (r.isFile()) {
           ret = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-file-o'></i>");
         } else {
-          ret = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder-o'></i>");
+          ret = SafeHtmlUtils.fromSafeConstant("<i class='fa fa-folder'></i>");
         }
         return ret;
       }
