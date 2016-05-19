@@ -452,7 +452,8 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
   private int calculateEfectiveTotalSteps() {
     List<String> parameterIdsToIgnore = Arrays.asList(RodaConstants.PLUGIN_PARAMS_FORCE_PARENT_ID,
-      RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION);
+      RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, RodaConstants.PLUGIN_PARAMS_DO_FULL_TEXT_EXTRACTION,
+      RodaConstants.PLUGIN_PARAMS_DO_AUTO_ACCEPT);
     int effectiveTotalSteps = getTotalSteps();
     boolean tikaParameters = false, dontDoFeatureExtraction = false, dontDoFulltext = false;
 

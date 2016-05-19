@@ -1826,6 +1826,7 @@ public class BrowserHelper {
     for (String aipId : listOfIds) {
       ModelService model = RodaCoreFactory.getModelService();
       AIP aip = model.retrieveAIP(aipId);
+      String jobId = aip.getIngestJobId();
       if (accept) {
         // Accept AIP
         aip.setState(AIPState.ACTIVE);
@@ -1833,25 +1834,23 @@ public class BrowserHelper {
         // TODO create preservation event
       } else {
         // Reject AIP
-        String jobId = aip.getIngestJobId();
         model.deleteAIP(aipId);
 
-        // create job report
-
-        Report report = model.retrieveJobReport(jobId, aipId);
-
-        Report reportItem = new Report();
-        reportItem.setTitle("Manual appraisal");
-        reportItem.setPlugin(user.getName());
-        reportItem.setPluginDetails(rejectReason);
-        reportItem.setPluginState(PluginState.FAILURE);
-        reportItem.setOutcomeObjectState(AIPState.DELETED);
-        reportItem.setDateCreated(new Date());
-        report.addReport(reportItem);
-
-        model.createOrUpdateJobReport(report);
-
       }
+
+      // create job report
+      Report report = model.retrieveJobReport(jobId, aipId);
+
+      Report reportItem = new Report();
+      reportItem.setTitle("Manual appraisal");
+      reportItem.setPlugin(user.getName());
+      reportItem.setPluginDetails(rejectReason);
+      reportItem.setPluginState(accept ? PluginState.SUCCESS : PluginState.FAILURE);
+      reportItem.setOutcomeObjectState(accept ? AIPState.ACTIVE : AIPState.DELETED);
+      reportItem.setDateCreated(new Date());
+      report.addReport(reportItem);
+
+      model.createOrUpdateJobReport(report);
     }
 
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class);
