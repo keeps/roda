@@ -81,6 +81,7 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IndexRunnable;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
 import org.roda.core.data.v2.ip.AIP;
@@ -101,7 +102,6 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -1039,10 +1039,11 @@ public class BrowserHelper {
     if (selected instanceof SelectedItemsList) {
       ret = ((SelectedItemsList<T>) selected).getIds();
     } else if (selected instanceof SelectedItemsFilter) {
-      Filter filter = ((SelectedItemsFilter<T>) selected).getFilter();
+      SelectedItemsFilter<T> selectedItemsFilter = (SelectedItemsFilter<T>) selected;
+      Filter filter = selectedItemsFilter.getFilter();
       Long count = count(classToReturn, filter, user);
       IndexResult<T> find = find(classToReturn, filter, Sorter.NONE, new Sublist(0, count.intValue()), Facets.NONE,
-        user, selected.justActive());
+        user, selectedItemsFilter.justActive());
       ret = find.getResults().stream().map(i -> i.getUUID()).collect(Collectors.toList());
     } else {
       throw new RequestNotValidException("Class not supported: " + selected.getClass().getName());
@@ -1691,7 +1692,7 @@ public class BrowserHelper {
     job.setName(plugin.getName() + " " + jobDate);
     job.setPlugin(pluginInfo.getId());
     job.setPluginParameters(parameters);
-    job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS);
+    job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getCanonicalName()));
 
     Jobs.createJob(user, job);
   }
@@ -1894,8 +1895,8 @@ public class BrowserHelper {
       Job job = model.retrieveJob(jobId);
       if (rejected > 0) {
         // change counter to failure
-        job.setObjectsProcessedWithSuccess(job.getObjectsProcessedWithSuccess() - rejected);
-        job.setObjectsProcessedWithFailure(job.getObjectsProcessedWithFailure() + rejected);
+        job.setSourceObjectsProcessedWithSuccess(job.getSourceObjectsProcessedWithSuccess() - rejected);
+        job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsProcessedWithFailure() + rejected);
       }
 
       // decrement manual interaction counter

@@ -70,6 +70,11 @@ import akka.util.Timeout;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 
+/*
+ * 20160520 hsilva: use kamon to obtain metrics about akka, Graphite & Grafana for collecting and dashboard (http://kamon.io/integrations/akka/overview/ & 
+ * http://www.lightbend.com/activator/template/akka-monitoring-kamon-statsd)
+ * 
+ * */
 public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   private static final Logger LOGGER = LoggerFactory.getLogger(AkkaEmbeddedPluginOrchestrator.class);
 
@@ -101,6 +106,17 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     Props jobsProps = new RoundRobinPool(numberOfWorkers).props(Props.create(AkkaJobWorkerActor.class));
     jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
+
+    // FiniteDuration within = FiniteDuration.create(10, TimeUnit.MILLISECONDS);
+    // FiniteDuration interval = FiniteDuration.create(1, TimeUnit.MINUTES);
+    // Props workersProps = new TailChoppingPool(numberOfWorkers, within,
+    // interval)
+    // .props(Props.create(AkkaWorkerActor.class, storage, model, index));
+    // workersRouter = workersSystem.actorOf(workersProps, "WorkersRouter");
+    //
+    // Props jobsProps = new TailChoppingPool(numberOfWorkers, within, interval)
+    // .props(Props.create(AkkaJobWorkerActor.class));
+    // jobWorkersRouter = workersSystem.actorOf(jobsProps, "JobWorkersRouter");
 
   }
 
@@ -173,12 +189,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      Iterator<String> iter = ids.iterator();
+      Iterator<String> iter = uuids.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
@@ -229,12 +245,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      List<Representation> representations = JobsHelper.getRepresentations(model, index, ids);
+      List<Representation> representations = JobsHelper.getRepresentations(model, index, uuids);
       Iterator<Representation> iter = representations.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<Representation>> innerPlugins = new ArrayList<>();
@@ -284,12 +300,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      List<File> files = JobsHelper.getFiles(model, index, ids);
+      List<File> files = JobsHelper.getFiles(model, index, uuids);
       Iterator<File> iter = files.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<File>> innerPlugins = new ArrayList<>();
@@ -541,12 +557,12 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
-    List<TransferredResource> resources) {
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
+      List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<TransferredResource>> innerPlugins = new ArrayList<>();
       Plugin<TransferredResource> innerPlugin;
@@ -574,7 +590,9 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
+      LOGGER.info("Before waitForFuturesToComplete");
       Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      LOGGER.info("After waitForFuturesToComplete");
 
       for (Plugin<TransferredResource> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -640,12 +658,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
     } catch (Exception e) {
       LOGGER.error("Error running plugin", e);
     }
-  }
-
-  @Override
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
-    // FIXME
-    LOGGER.error("Method runPluginOnObjects@{} still not implemented!", this.getClass().getName());
   }
 
   private <T extends Serializable> Plugin<T> getNewPluginInstanceAndRunBeforeExecute(Plugin<T> plugin,

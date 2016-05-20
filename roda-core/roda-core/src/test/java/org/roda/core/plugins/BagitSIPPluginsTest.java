@@ -141,7 +141,7 @@ public class BagitSIPPluginsTest {
     FileAlreadyExistsException, SolrServerException {
     String parentId = null;
     String aipType = RodaConstants.AIP_TYPE_MIXED;
-      
+
     AIP root = model.createAIP(parentId, aipType, new Permissions());
 
     Plugin<TransferredResource> plugin = new BagitToAIPPlugin();
@@ -153,7 +153,7 @@ public class BagitSIPPluginsTest {
     Assert.assertNotNull(transferredResource);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-      Arrays.asList(transferredResource));
+      Arrays.asList(transferredResource.getUUID()));
     assertReports(reports);
 
     IndexResult<IndexedAIP> find = index.find(IndexedAIP.class,

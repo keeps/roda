@@ -60,7 +60,7 @@ import scala.concurrent.duration.FiniteDuration;
  * > https://github.com/typesafehub/activator-akka-distributed-workers-java 
  * */
 public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin implements PluginOrchestrator {
-  private final Logger logger = LoggerFactory.getLogger(getClass());
+  private static final Logger LOGGER = LoggerFactory.getLogger(AkkaDistributedPluginOrchestrator.class);
 
   private final IndexService index;
   private final ModelService model;
@@ -133,54 +133,67 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
-    return null;
-  }
-
-  @Override
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
-    return null;
-  }
-
-  @Override
-  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
-    return null;
-  }
-
-  @Override
-  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
-    return null;
-  }
-
-  @Override
-  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
-    return null;
-  }
-
-  @Override
   public void setup() {
-
-  }
-
-  @Override
-  public void shutdown() {
-
-  }
-
-  @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
-    List<TransferredResource> paths) {
-    return null;
-  }
-
-  @Override
-  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
+  public void shutdown() {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
     // TODO Auto-generated method stub
 
   }
@@ -193,17 +206,6 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
 
   @Override
   public void stopJob(Job job) {
-    // TODO
-  }
-
-  @Override
-  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     // TODO Auto-generated method stub
 
   }
@@ -221,15 +223,16 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
+  public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo)
+    throws JobException {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
+  public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
 }

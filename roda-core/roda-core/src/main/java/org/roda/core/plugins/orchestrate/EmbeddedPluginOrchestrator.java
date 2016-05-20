@@ -326,10 +326,11 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
-    List<TransferredResource> resources) {
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
+
+      List<TransferredResource> resources = JobsHelper.getTransferredResources(index, uuids);
 
       List<TransferredResource> block = new ArrayList<TransferredResource>();
       for (TransferredResource resource : resources) {
@@ -359,12 +360,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   @Override
   public <T extends Serializable> void runPlugin(Plugin<T> plugin) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> ids) {
     // TODO Auto-generated method stub
 
   }

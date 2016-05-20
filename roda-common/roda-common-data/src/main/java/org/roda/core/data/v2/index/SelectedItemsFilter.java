@@ -45,7 +45,6 @@ public class SelectedItemsFilter<T extends IsIndexed> implements SelectedItems<T
     this.selectedClass = selectedClass;
   }
 
-  @Override
   public Boolean justActive() {
     return justActive;
   }

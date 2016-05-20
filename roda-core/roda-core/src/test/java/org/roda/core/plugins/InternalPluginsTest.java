@@ -58,6 +58,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
@@ -69,7 +70,6 @@ import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -148,7 +148,7 @@ public class InternalPluginsTest {
     Job fakeJob = new Job();
     fakeJob.setId(FAKE_JOB_ID);
     fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    fakeJob.setSourceObjects(SelectedItemsNone.create());
     model.createJob(fakeJob);
     index.commit(Job.class);
   }
@@ -219,9 +219,10 @@ public class InternalPluginsTest {
     TransferredResource transferredResource = createCorpora();
     Assert.assertNotNull(transferredResource);
 
-    List<TransferredResource> items = Arrays.asList(transferredResource);
-    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, items);
-    ReportAssertUtils.assertReports(reports, null, items.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
+    List<String> transferredResourcesUUIDs = Arrays.asList(transferredResource.getUUID());
+    List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+      transferredResourcesUUIDs);
+    ReportAssertUtils.assertReports(reports, null, transferredResourcesUUIDs);
 
     index.commitAIPs();
 

@@ -46,13 +46,13 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -114,7 +114,7 @@ public class EARKSIPPluginsTest {
     Job fakeJob = new Job();
     fakeJob.setId(FAKE_JOB_ID);
     fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    fakeJob.setSourceObjects(SelectedItemsNone.create());
     model.createJob(fakeJob);
     index.commit(Job.class);
   }
@@ -165,7 +165,7 @@ public class EARKSIPPluginsTest {
     Assert.assertNotNull(transferredResource);
 
     List<Report> reports = RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
-      Arrays.asList(transferredResource));
+      Arrays.asList(transferredResource.getUUID()));
     assertReports(reports);
 
     index.commitAIPs();

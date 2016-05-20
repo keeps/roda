@@ -122,8 +122,8 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public String getValue(Job job) {
         String ret = "";
         if (job != null) {
-          if (job.getObjectsCount() > 0) {
-            ret = job.getObjectsCount() + "";
+          if (job.getSourceObjectsCount() > 0) {
+            ret = job.getSourceObjectsCount() + "";
           }
         }
         return ret;
@@ -135,9 +135,9 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getObjectsProcessedWithSuccess() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+          b.append(job.getSourceObjectsProcessedWithSuccess() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
             : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getObjectsProcessedWithSuccess());
+          b.append(job.getSourceObjectsProcessedWithSuccess());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -150,13 +150,13 @@ public class JobList extends BasicAsyncTableCell<Job> {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(SafeHtmlUtils.fromSafeConstant("<span"));
-          if (job.getObjectsProcessedWithFailure() > 0) {
+          if (job.getSourceObjectsProcessedWithFailure() > 0) {
             b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-failed-column'"));
           } else {
             b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-counter-0'"));
           }
           b.append(SafeHtmlUtils.fromSafeConstant(">"));
-          b.append(job.getObjectsProcessedWithFailure());
+          b.append(job.getSourceObjectsProcessedWithFailure());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -168,9 +168,9 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getObjectsWaitingToBeProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+          b.append(job.getSourceObjectsWaitingToBeProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
             : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getObjectsWaitingToBeProcessed());
+          b.append(job.getSourceObjectsWaitingToBeProcessed());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -182,9 +182,9 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getObjectsBeingProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+          b.append(job.getSourceObjectsBeingProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
             : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getObjectsBeingProcessed());
+          b.append(job.getSourceObjectsBeingProcessed());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -239,12 +239,12 @@ public class JobList extends BasicAsyncTableCell<Job> {
     columnSortingKeyMap.put(startDateColumn, Arrays.asList(RodaConstants.JOB_START_DATE));
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_STATE));
     columnSortingKeyMap.put(progressColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
-    columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_COUNT));
-    columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS));
-    columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE));
-    columnSortingKeyMap.put(objectsProcessingCountColumn, Arrays.asList(RodaConstants.JOB_OBJECTS_BEING_PROCESSED));
+    columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
+    columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
+    columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsProcessingCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED));
     columnSortingKeyMap.put(objectsWaitingCountColumn,
-      Arrays.asList(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED));
+      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));
 
     Sorter sorter = createSorter(columnSortList, columnSortingKeyMap);

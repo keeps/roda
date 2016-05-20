@@ -115,14 +115,14 @@
    <field name="plugin" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginType" type="string" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="pluginParameters" type="string" indexed="false" stored="true" required="false" multiValued="false" />
-   <field name="orchestratorMethod" type="string" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objects" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjects" type="string" indexed="false" stored="true" required="false" multiValued="false" />
+   <field name="outcomeObjectsClass" type="string" indexed="false" stored="true" required="false" multiValued="false" />
    
-   <field name="objectsCount" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectsWaitingToBeProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectsBeingProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectsCount" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectsWaitingToBeProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectsBeingProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="sourceObjectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="outcomeObjectsWithManualIntervention" type="int" indexed="true" stored="true" required="false" multiValued="false" />
 
    <!-- Dynamic field definitions allow using convention over configuration

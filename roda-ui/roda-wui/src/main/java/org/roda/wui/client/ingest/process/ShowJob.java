@@ -292,29 +292,29 @@ public class ShowJob extends Composite {
     b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-default'>"));
     b.append(messages.showJobProgressCompletionPercentage(job.getCompletionPercentage()));
     b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    if (job.getObjectsCount() > 0) {
+    if (job.getSourceObjectsCount() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-default'>"));
-      b.append(messages.showJobProgressTotalCount(job.getObjectsCount()));
+      b.append(messages.showJobProgressTotalCount(job.getSourceObjectsCount()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getObjectsProcessedWithSuccess() > 0) {
+    if (job.getSourceObjectsProcessedWithSuccess() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-success'>"));
-      b.append(messages.showJobProgressSuccessfulCount(job.getObjectsProcessedWithSuccess()));
+      b.append(messages.showJobProgressSuccessfulCount(job.getSourceObjectsProcessedWithSuccess()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getObjectsProcessedWithFailure() > 0) {
+    if (job.getSourceObjectsProcessedWithFailure() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-danger'>"));
-      b.append(messages.showJobProgressFailedCount(job.getObjectsProcessedWithFailure()));
+      b.append(messages.showJobProgressFailedCount(job.getSourceObjectsProcessedWithFailure()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getObjectsBeingProcessed() > 0) {
+    if (job.getSourceObjectsBeingProcessed() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-info'>"));
-      b.append(messages.showJobProgressProcessingCount(job.getObjectsBeingProcessed()));
+      b.append(messages.showJobProgressProcessingCount(job.getSourceObjectsBeingProcessed()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getObjectsWaitingToBeProcessed() > 0) {
+    if (job.getSourceObjectsWaitingToBeProcessed() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
-      b.append(messages.showJobProgressWaitingCount(job.getObjectsWaitingToBeProcessed()));
+      b.append(messages.showJobProgressWaitingCount(job.getSourceObjectsWaitingToBeProcessed()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
 

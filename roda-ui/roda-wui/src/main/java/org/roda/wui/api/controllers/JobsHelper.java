@@ -7,8 +7,6 @@
  */
 package org.roda.wui.api.controllers;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.RodaCoreFactory;
@@ -27,7 +25,6 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.Reports;
@@ -42,15 +39,12 @@ import org.slf4j.LoggerFactory;
 public class JobsHelper {
   private static final Logger LOGGER = LoggerFactory.getLogger(JobsHelper.class);
 
-  private static final List<ORCHESTRATOR_METHOD> ORCHESTRATOR_METHODS = Arrays.asList(
-    ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES, ORCHESTRATOR_METHOD.ON_AIPS, ORCHESTRATOR_METHOD.ON_REPRESENTATIONS,
-    ORCHESTRATOR_METHOD.ON_FILES, ORCHESTRATOR_METHOD.ON_ALL_AIPS, ORCHESTRATOR_METHOD.RUN_PLUGIN,
-    ORCHESTRATOR_METHOD.RUN_PLUGIN_ON_OBJECTS);
-
   protected static void validateAndSetCreateJobInformation(RodaUser user, Job job) throws RequestNotValidException {
-    if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
-      throw new RequestNotValidException("Invalid orchestrator method '" + job.getOrchestratorMethod() + "'");
-    }
+    // FIXME 20160530 hsilva: how to validate this now?
+    // if (!ORCHESTRATOR_METHODS.contains(job.getOrchestratorMethod())) {
+    // throw new RequestNotValidException("Invalid orchestrator method '" +
+    // job.getOrchestratorMethod() + "'");
+    // }
 
     validateJobPluginInformation(job);
 
@@ -63,7 +57,7 @@ public class JobsHelper {
     }
     job.setUsername(user.getName());
 
-    job.setObjectsCount(job.getObjectsCount());
+    job.setSourceObjectsCount(job.getSourceObjectsCount());
   }
 
   private static void validateJobPluginInformation(Job job) throws RequestNotValidException {

@@ -34,11 +34,6 @@ public class Job implements IsIndexed, Serializable {
     CREATED, STARTED, COMPLETED, FAILED_DURING_CREATION, FAILED_TO_COMPLETE;
   }
 
-  public static enum ORCHESTRATOR_METHOD {
-    RUN_PLUGIN, RUN_PLUGIN_ON_OBJECTS, ON_TRANSFERRED_RESOURCES, ON_AIPS, ON_REPRESENTATIONS, ON_FILES, ON_ALL_AIPS,
-    ON_ALL_REPRESENTATIONS, ON_ALL_FILES;
-  }
-
   // job identifier
   private String id = null;
   // job name
@@ -56,11 +51,11 @@ public class Job implements IsIndexed, Serializable {
   // 0-100 scale completion percentage
   private int completionPercentage = 0;
 
-  private int objectsCount = 0;
-  private int objectsWaitingToBeProcessed = 0;
-  private int objectsBeingProcessed = 0;
-  private int objectsProcessedWithSuccess = 0;
-  private int objectsProcessedWithFailure = 0;
+  private int sourceObjectsCount = 0;
+  private int sourceObjectsWaitingToBeProcessed = 0;
+  private int sourceObjectsBeingProcessed = 0;
+  private int sourceObjectsProcessedWithSuccess = 0;
+  private int sourceObjectsProcessedWithFailure = 0;
   private int outcomeObjectsWithManualIntervention = 0;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
@@ -70,12 +65,9 @@ public class Job implements IsIndexed, Serializable {
   // plugin parameters
   private Map<String, String> pluginParameters = new HashMap<String, String>();
 
-  // type of method that orchestrator should execute (e.g.
-  // runPluginOnTransferredResources, runPluginOnAIPs, etc.)
-  private ORCHESTRATOR_METHOD orchestratorMethod = null;
-
-  // objects to act upon
-  private SelectedItems<?> objects = null;
+  // objects to act upon (All, ListOfIds, Filter, etc.)
+  private SelectedItems<?> sourceObjects = null;
+  private String outcomeObjectsClass = "";
 
   public Job() {
     super();
@@ -91,12 +83,11 @@ public class Job implements IsIndexed, Serializable {
     this.pluginType = job.getPluginType();
     this.plugin = job.getPlugin();
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
-    this.orchestratorMethod = job.getOrchestratorMethod();
-    this.objects = job.getObjects();
-    if (objects instanceof SelectedItemsList) {
-      this.objectsCount = ((SelectedItemsList<?>) objects).getIds().size();
+    this.sourceObjects = job.getSourceObjects();
+    if (sourceObjects instanceof SelectedItemsList) {
+      this.sourceObjectsCount = ((SelectedItemsList<?>) sourceObjects).getIds().size();
     } else {
-      this.objectsCount = 0;
+      this.sourceObjectsCount = 0;
     }
   }
 
@@ -171,44 +162,44 @@ public class Job implements IsIndexed, Serializable {
     return this;
   }
 
-  public int getObjectsCount() {
-    return objectsCount;
+  public int getSourceObjectsCount() {
+    return sourceObjectsCount;
   }
 
-  public void setObjectsCount(int objectsCount) {
-    this.objectsCount = objectsCount;
+  public void setSourceObjectsCount(int sourceObjectsCount) {
+    this.sourceObjectsCount = sourceObjectsCount;
   }
 
-  public int getObjectsWaitingToBeProcessed() {
-    return objectsWaitingToBeProcessed;
+  public int getSourceObjectsWaitingToBeProcessed() {
+    return sourceObjectsWaitingToBeProcessed;
   }
 
-  public void setObjectsWaitingToBeProcessed(int objectsWaitingToBeProcessed) {
-    this.objectsWaitingToBeProcessed = objectsWaitingToBeProcessed;
+  public void setSourceObjectsWaitingToBeProcessed(int sourceObjectsWaitingToBeProcessed) {
+    this.sourceObjectsWaitingToBeProcessed = sourceObjectsWaitingToBeProcessed;
   }
 
-  public int getObjectsBeingProcessed() {
-    return objectsBeingProcessed;
+  public int getSourceObjectsBeingProcessed() {
+    return sourceObjectsBeingProcessed;
   }
 
-  public void setObjectsBeingProcessed(int objectsBeingProcessed) {
-    this.objectsBeingProcessed = objectsBeingProcessed;
+  public void setSourceObjectsBeingProcessed(int sourceObjectsBeingProcessed) {
+    this.sourceObjectsBeingProcessed = sourceObjectsBeingProcessed;
   }
 
-  public int getObjectsProcessedWithSuccess() {
-    return objectsProcessedWithSuccess;
+  public int getSourceObjectsProcessedWithSuccess() {
+    return sourceObjectsProcessedWithSuccess;
   }
 
-  public void setObjectsProcessedWithSuccess(int objectsProcessedWithSuccess) {
-    this.objectsProcessedWithSuccess = objectsProcessedWithSuccess;
+  public void setSourceObjectsProcessedWithSuccess(int sourceObjectsProcessedWithSuccess) {
+    this.sourceObjectsProcessedWithSuccess = sourceObjectsProcessedWithSuccess;
   }
 
-  public int getObjectsProcessedWithFailure() {
-    return objectsProcessedWithFailure;
+  public int getSourceObjectsProcessedWithFailure() {
+    return sourceObjectsProcessedWithFailure;
   }
 
-  public void setObjectsProcessedWithFailure(int objectsProcessedWithFailure) {
-    this.objectsProcessedWithFailure = objectsProcessedWithFailure;
+  public void setSourceObjectsProcessedWithFailure(int sourceObjectsProcessedWithFailure) {
+    this.sourceObjectsProcessedWithFailure = sourceObjectsProcessedWithFailure;
   }
 
   public int getOutcomeObjectsWithManualIntervention() {
@@ -238,25 +229,26 @@ public class Job implements IsIndexed, Serializable {
     return this;
   }
 
-  public ORCHESTRATOR_METHOD getOrchestratorMethod() {
-    return orchestratorMethod;
-  }
-
-  public Job setOrchestratorMethod(ORCHESTRATOR_METHOD orchestratorMethod) {
-    this.orchestratorMethod = orchestratorMethod;
-    return this;
-  }
-
   public PluginType getPluginType() {
     return pluginType;
   }
 
-  public SelectedItems<?> getObjects() {
-    return objects;
+  public SelectedItems<?> getSourceObjects() {
+    return sourceObjects;
   }
 
-  public void setObjects(SelectedItems<?> objects) {
-    this.objects = objects;
+  public Job setSourceObjects(SelectedItems<?> sourceObjects) {
+    this.sourceObjects = sourceObjects;
+    return this;
+  }
+
+  public String getOutcomeObjectsClass() {
+    return outcomeObjectsClass;
+  }
+
+  public Job setOutcomeObjectsClass(String outcomeObjectsClass) {
+    this.outcomeObjectsClass = outcomeObjectsClass;
+    return this;
   }
 
   public Job setPluginType(PluginType pluginType) {
@@ -268,12 +260,13 @@ public class Job implements IsIndexed, Serializable {
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
       + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", completionPercentage="
-      + completionPercentage + ", objectsCount=" + objectsCount + ", objectsWaitingToBeProcessed="
-      + objectsWaitingToBeProcessed + ", objectsBeingProcessed=" + objectsBeingProcessed
-      + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess + ", objectsProcessedWithFailure="
-      + objectsProcessedWithFailure + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention
-      + ", plugin=" + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters
-      + ", orchestratorMethod=" + orchestratorMethod + ", objects=" + objects + "]";
+      + completionPercentage + ", sourceObjectsCount=" + sourceObjectsCount + ", sourceObjectsWaitingToBeProcessed="
+      + sourceObjectsWaitingToBeProcessed + ", sourceObjectsBeingProcessed=" + sourceObjectsBeingProcessed
+      + ", sourceObjectsProcessedWithSuccess=" + sourceObjectsProcessedWithSuccess
+      + ", sourceObjectsProcessedWithFailure=" + sourceObjectsProcessedWithFailure
+      + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention + ", plugin=" + plugin
+      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects
+      + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
   }
 
   @JsonIgnore

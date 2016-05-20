@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.orchestrate;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,6 +19,7 @@ import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.index.SelectedItemsFilter;
 import org.roda.core.data.v2.index.SelectedItemsList;
@@ -68,8 +70,12 @@ public final class JobsHelper {
     return Duration.create(getTimeout(pluginClass) * blocks, getTimeoutTimeUnit(pluginClass));
   }
 
+  public static Duration getDefaultDuration() {
+    return getDuration("", 1);
+  }
+
   public static Timeout getJobTimeout(Job job, int blockSize) {
-    return getTimeout(job.getPlugin(), job.getObjectsCount(), blockSize);
+    return getTimeout(job.getPlugin(), job.getSourceObjectsCount(), blockSize);
   }
 
   public static Timeout getDefaultTimeout() {
@@ -141,28 +147,22 @@ public final class JobsHelper {
 
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    job.setObjectsBeingProcessed(0);
-    job.setObjectsWaitingToBeProcessed(0);
-    job.setObjectsProcessedWithFailure(job.getObjectsCount() - job.getObjectsProcessedWithSuccess());
+    job.setSourceObjectsBeingProcessed(0);
+    job.setSourceObjectsWaitingToBeProcessed(0);
+    job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsCount() - job.getSourceObjectsProcessedWithSuccess());
     job.setEndDate(new Date());
     return job;
   }
 
-  public static List<TransferredResource> getTransferredResourcesFromObjectIds(
-    SelectedItems<TransferredResource> selectedItems) {
+  public static List<TransferredResource> getTransferredResources(IndexService index, List<String> uuids) {
     List<TransferredResource> res = new ArrayList<TransferredResource>();
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<TransferredResource> list = (SelectedItemsList<TransferredResource>) selectedItems;
-      for (String objectId : list.getIds()) {
-        try {
-          res.add(RodaCoreFactory.getIndexService().retrieve(TransferredResource.class, objectId));
-        } catch (GenericException | NotFoundException e) {
-          LOGGER.error("Error retrieving TransferredResource", e);
-        }
-      }
-    } else {
-      LOGGER.error("Still not implemented!!!!!!!!");
+
+    try {
+      res.addAll(index.retrieve(TransferredResource.class, uuids));
+    } catch (NotFoundException | GenericException e) {
+      LOGGER.error("Error retrieving TransferredResource", e);
     }
+
     return res;
   }
 
@@ -228,6 +228,37 @@ public final class JobsHelper {
     }
 
     return filesToReturn;
+  }
+
+  public static Class<Serializable> getSelectedClassFromString(String selectedClass) throws GenericException {
+    try {
+      Class<?> clazz = Class.forName(selectedClass);
+      if (clazz instanceof Serializable) {
+        return (Class<Serializable>) clazz;
+      } else {
+        throw new GenericException("Error while getting class from string");
+      }
+    } catch (ClassNotFoundException e) {
+      throw new GenericException("Error while getting class from string");
+    }
+  }
+
+  public static Class<IsIndexed> getIsIndexedSelectedClassFromString(String selectedClass) throws GenericException {
+    try {
+      Class<?> clazz = Class.forName(selectedClass);
+      if (clazz instanceof Serializable) {
+        try {
+          IsIndexed.class.cast(clazz);
+          return (Class<IsIndexed>) clazz;
+        } catch (ClassCastException e) {
+          // do nothing and let exception in the end of the method be thrown
+        }
+      }
+    } catch (ClassNotFoundException e) {
+      // do nothing and let exception in the end of the method be thrown
+    }
+
+    throw new GenericException("Error while getting class from string");
   }
 
 }

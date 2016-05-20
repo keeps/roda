@@ -1,0 +1,29 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.data.v2.index;
+
+public class SelectedItemsNone<T extends IsIndexed> implements SelectedItems<T> {
+
+  private static final long serialVersionUID = -5364779540199737165L;
+
+  private static SelectedItemsNone selectedItemsNone = new SelectedItemsNone<>();
+
+  public static <T extends IsIndexed> SelectedItemsNone<T> create() {
+    return selectedItemsNone;
+  }
+
+  public SelectedItemsNone() {
+    super();
+  }
+
+  @Override
+  public String getSelectedClass() {
+    return "";
+  }
+
+}

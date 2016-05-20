@@ -367,7 +367,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();
 
-      if (job.getObjectsProcessedWithFailure() > 0) {
+      if (job.getSourceObjectsProcessedWithFailure() > 0) {
         outcome = PluginState.FAILURE.toString();
       }
 
@@ -380,9 +380,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Map<String, Object> scopes = new HashMap<String, Object>();
       scopes.put("outcome", outcome);
       scopes.put("type", CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, job.getPluginType().toString()));
-      scopes.put("sips", job.getObjectsCount());
-      scopes.put("success", job.getObjectsProcessedWithSuccess());
-      scopes.put("failed", job.getObjectsProcessedWithFailure());
+      scopes.put("sips", job.getSourceObjectsCount());
+      scopes.put("success", job.getSourceObjectsProcessedWithSuccess());
+      scopes.put("failed", job.getSourceObjectsProcessedWithFailure());
       scopes.put("name", job.getName());
       scopes.put("creator", job.getUsername());
 

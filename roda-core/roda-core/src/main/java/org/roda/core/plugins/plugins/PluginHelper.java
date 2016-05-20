@@ -273,8 +273,8 @@ public final class PluginHelper {
     Long objectsCount) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setObjectsCount(objectsCount.intValue());
-      job.setObjectsWaitingToBeProcessed(objectsCount.intValue());
+      job.setSourceObjectsCount(objectsCount.intValue());
+      job.setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -314,20 +314,20 @@ public final class PluginHelper {
 
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    job.setObjectsBeingProcessed(0);
-    job.setObjectsProcessedWithSuccess(0);
-    job.setObjectsProcessedWithFailure(job.getObjectsCount());
-    job.setObjectsWaitingToBeProcessed(0);
+    job.setSourceObjectsBeingProcessed(0);
+    job.setSourceObjectsProcessedWithSuccess(0);
+    job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsCount());
+    job.setSourceObjectsWaitingToBeProcessed(0);
     job.setEndDate(new Date());
     return job;
   }
 
   public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
-    job.setObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
-    job.setObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-    job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-    job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
-      - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+    job.setSourceObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
+    job.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
+    job.setSourceObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
+    job.setSourceObjectsWaitingToBeProcessed(job.getSourceObjectsCount() - job.getSourceObjectsBeingProcessed()
+      - job.getSourceObjectsProcessedWithFailure() - job.getSourceObjectsProcessedWithSuccess());
     job.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
     return job;
   }

@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.roda.common.certification.PDFSignatureUtils;
 import org.roda.core.CorporaConstants;
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.common.ReportAssertUtils;
 import org.roda.core.common.iterables.CloseableIterable;
 import org.roda.core.common.monitor.TransferredResourcesScanner;
 import org.roda.core.data.adapter.filter.Filter;
@@ -48,6 +47,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
@@ -56,7 +56,6 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -119,7 +118,7 @@ public class InternalConvertPluginsTest {
     Job fakeJob = new Job();
     fakeJob.setId(FAKE_JOB_ID);
     fakeJob.setPluginType(PluginType.MISC);
-    fakeJob.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN);
+    fakeJob.setSourceObjects(SelectedItemsNone.create());
     model.createJob(fakeJob);
     index.commit(Job.class);
   }
@@ -176,7 +175,8 @@ public class InternalConvertPluginsTest {
     transferredResources = createCorpora(corporaId);
 
     Assert.assertEquals(1, transferredResources.size());
-    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin, transferredResources);
+    RodaCoreFactory.getPluginOrchestrator().runPluginOnTransferredResources(plugin,
+      transferredResources.stream().map(tr -> tr.getUUID()).collect(Collectors.toList()));
 
     index.commitAIPs();
 

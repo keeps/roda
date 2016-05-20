@@ -110,7 +110,6 @@ import org.roda.core.data.v2.ip.metadata.OtherMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -189,7 +188,6 @@ public class SolrUtils {
   public static <T extends IsIndexed> List<T> retrieve(SolrClient index, Class<T> classToRetrieve, List<String> id)
     throws NotFoundException, GenericException {
     List<T> ret = new ArrayList<>();
-    ;
     try {
       SolrDocumentList docs = index.getById(getIndexName(classToRetrieve), id);
       for (SolrDocument doc : docs) {
@@ -1641,17 +1639,18 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_STATE, job.getState().toString());
     doc.addField(RodaConstants.JOB_STATE_DETAILS, job.getStateDetails());
     doc.addField(RodaConstants.JOB_COMPLETION_PERCENTAGE, job.getCompletionPercentage());
-    doc.addField(RodaConstants.JOB_OBJECTS_COUNT, job.getObjectsCount());
-    doc.addField(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED, job.getObjectsWaitingToBeProcessed());
-    doc.addField(RodaConstants.JOB_OBJECTS_BEING_PROCESSED, job.getObjectsBeingProcessed());
-    doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS, job.getObjectsProcessedWithSuccess());
-    doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE, job.getObjectsProcessedWithFailure());
-    doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION, job.getOutcomeObjectsWithManualIntervention());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_COUNT, job.getSourceObjectsCount());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED, job.getSourceObjectsWaitingToBeProcessed());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED, job.getSourceObjectsBeingProcessed());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS, job.getSourceObjectsProcessedWithSuccess());
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE, job.getSourceObjectsProcessedWithFailure());
+    doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION,
+      job.getOutcomeObjectsWithManualIntervention());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
-    doc.addField(RodaConstants.JOB_ORCHESTRATOR_METHOD, job.getOrchestratorMethod().toString());
-    doc.addField(RodaConstants.JOB_OBJECTS, JsonUtils.getJsonFromObject(job.getObjects()));
+    doc.addField(RodaConstants.JOB_SOURCE_OBJECTS, JsonUtils.getJsonFromObject(job.getSourceObjects()));
+    doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS, job.getOutcomeObjectsClass());
 
     return doc;
   }
@@ -1667,23 +1666,26 @@ public class SolrUtils {
     job.setState(JOB_STATE.valueOf(objectToString(doc.get(RodaConstants.JOB_STATE))));
     job.setStateDetails(objectToString(doc.get(RodaConstants.JOB_STATE_DETAILS)));
     job.setCompletionPercentage(objectToInteger(doc.get(RodaConstants.JOB_COMPLETION_PERCENTAGE), 0));
-    job.setObjectsCount(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_COUNT), 0));
-    job.setObjectsWaitingToBeProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_WAITING_TO_BE_PROCESSED), 0));
-    job.setObjectsBeingProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_BEING_PROCESSED), 0));
-    job.setObjectsProcessedWithSuccess(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
-    job.setObjectsProcessedWithFailure(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE), 0));
-    job.setOutcomeObjectsWithManualIntervention(objectToInteger(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION), 0));
+    job.setSourceObjectsCount(objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_COUNT), 0));
+    job.setSourceObjectsWaitingToBeProcessed(
+      objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED), 0));
+    job.setSourceObjectsBeingProcessed(objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED), 0));
+    job.setSourceObjectsProcessedWithSuccess(
+      objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
+    job.setSourceObjectsProcessedWithFailure(
+      objectToInteger(doc.get(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE), 0));
+    job.setOutcomeObjectsWithManualIntervention(
+      objectToInteger(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION), 0));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));
-    job.setOrchestratorMethod(
-      ORCHESTRATOR_METHOD.valueOf(objectToString(doc.get(RodaConstants.JOB_ORCHESTRATOR_METHOD))));
     try {
-      job.setObjects(
-        JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_OBJECTS)), SelectedItems.class));
+      job.setSourceObjects(
+        JsonUtils.getObjectFromJson(objectToString(doc.get(RodaConstants.JOB_SOURCE_OBJECTS)), SelectedItems.class));
     } catch (GenericException e) {
       LOGGER.error("Error parsing report in job objects", e);
     }
+    job.setOutcomeObjectsClass(objectToString(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_CLASS), ""));
 
     return job;
   }

@@ -32,10 +32,12 @@ import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsAll;
 import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.SelectedItemsNone;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.notifications.Notification;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.user.RodaUser;
@@ -164,8 +166,8 @@ public class ManagementTasksResource extends RodaCoreService {
     try {
       Job job = new Job();
       SelectedItems selectedItems = JsonUtils.getObjectFromJson(selected, SelectedItems.class);
-      job.setName("Management Task | Export 'AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
-        .setPlugin(ExportAIPPlugin.class.getCanonicalName()).setObjects(selectedItems);
+      job.setName("Management Task | Export 'AIPs' job").setPlugin(ExportAIPPlugin.class.getCanonicalName())
+        .setSourceObjects(selectedItems);
       Map<String, String> parameters = new HashMap<String, String>();
       parameters.put(ExportAIPPlugin.EXPORT_FOLDER_PARAMETER, outputFolder);
       parameters.put(ExportAIPPlugin.EXPORT_TYPE, type.toString());
@@ -185,8 +187,8 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAllJobs(RodaUser user, Date startDate) {
     ApiResponseMessage response;
     response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Jobs' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN).setPlugin(ReindexJobPlugin.class.getCanonicalName());
+    Job job = new Job().setName("Management Task | Reindex 'Jobs' job").setSourceObjects(SelectedItemsNone.create())
+      .setPlugin(ReindexJobPlugin.class.getCanonicalName());
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex Jobs job created (" + jobCreated + ")");
@@ -202,8 +204,7 @@ public class ManagementTasksResource extends RodaCoreService {
 
   private ApiResponseMessage createJobToReindexAllRisks(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Risks' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+    Job job = new Job().setName("Management Task | Reindex 'Risks' job").setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
@@ -225,7 +226,7 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAllRiskIncidences(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'Risk Incidences' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS)
+      .setSourceObjects(new SelectedItemsAll<>(AIP.class.getCanonicalName()))
       .setPlugin(ReindexRiskIncidencePlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
@@ -245,8 +246,7 @@ public class ManagementTasksResource extends RodaCoreService {
 
   private ApiResponseMessage createJobToReindexAllAgents(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Agents' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+    Job job = new Job().setName("Management Task | Reindex 'Agents' job").setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
@@ -267,8 +267,7 @@ public class ManagementTasksResource extends RodaCoreService {
 
   private ApiResponseMessage createJobToReindexAllFormats(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
-    Job job = new Job().setName("Management Task | Reindex 'Formats' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+    Job job = new Job().setName("Management Task | Reindex 'Formats' job").setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
@@ -290,8 +289,7 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAllNotifications(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'Notifications' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
-      .setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
+      .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexRodaEntityPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLASS_CANONICAL_NAME, Notification.class.getCanonicalName());
@@ -313,7 +311,7 @@ public class ManagementTasksResource extends RodaCoreService {
     List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'TransferredResources' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+      .setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ReindexTransferredResourcePlugin.class.getCanonicalName());
     if (!params.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<>();
@@ -336,7 +334,7 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexActionlogs(RodaUser user, Date startDate, List<String> params) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job().setName("Management Task | Reindex 'ActionLogs' job")
-      .setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN).setPlugin(ReindexActionLogPlugin.class.getCanonicalName());
+      .setSourceObjects(SelectedItemsNone.create()).setPlugin(ReindexActionLogPlugin.class.getCanonicalName());
     if (!params.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<>();
       pluginParameters.put(RodaConstants.PLUGIN_PARAMS_INT_VALUE, params.get(0));
@@ -358,7 +356,8 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAllAIPs(RodaUser user, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
-    job.setName("Management Task | Reindex 'all AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_ALL_AIPS)
+    job.setName("Management Task | Reindex 'all AIPs' job")
+      .setSourceObjects(new SelectedItemsAll<>(AIP.class.getCanonicalName()))
       .setPlugin(ReindexAIPPlugin.class.getCanonicalName());
     Map<String, String> pluginParameters = new HashMap<>();
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "true");
@@ -379,9 +378,8 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobToReindexAIPs(RodaUser user, List<String> params, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
-    job.setName("Management Task | Reindex 'AIPs' job").setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS)
-      .setPlugin(ReindexAIPPlugin.class.getCanonicalName())
-      .setObjects(new SelectedItemsList(params, IndexedAIP.class.getName()));
+    job.setName("Management Task | Reindex 'AIPs' job").setPlugin(ReindexAIPPlugin.class.getCanonicalName())
+      .setSourceObjects(new SelectedItemsList(params, IndexedAIP.class.getName()));
     try {
       Job jobCreated = Jobs.createJob(user, job);
       response.setMessage("Reindex job created (" + jobCreated + ")");
@@ -398,7 +396,7 @@ public class ManagementTasksResource extends RodaCoreService {
   private ApiResponseMessage createJobForRunningActionlogCleaner(RodaUser user, String daysToKeep, Date startDate) {
     ApiResponseMessage response = new ApiResponseMessage(ApiResponseMessage.OK, "Action done!");
     Job job = new Job();
-    job.setName("Management Task | Log cleaner job").setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN)
+    job.setName("Management Task | Log cleaner job").setSourceObjects(SelectedItemsNone.create())
       .setPlugin(ActionLogCleanerPlugin.class.getCanonicalName());
     if (!daysToKeep.isEmpty()) {
       Map<String, String> pluginParameters = new HashMap<String, String>();

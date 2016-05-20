@@ -37,12 +37,9 @@ import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
-import org.roda.core.data.v2.ip.IndexedFile;
-import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -601,21 +598,9 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
 
     Job job = new Job();
     job.setName(jobName);
-    job.setObjects(selected);
+    job.setSourceObjects(selected);
     job.setPlugin(id);
     job.setPluginParameters(value);
-
-    if (IndexedAIP.class.getName().equals(selected.getSelectedClass())) {
-      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_AIPS);
-    } else if (IndexedRepresentation.class.getName().equals(selected.getSelectedClass())) {
-      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_REPRESENTATIONS);
-    } else if (IndexedFile.class.getName().equals(selected.getSelectedClass())) {
-      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_FILES);
-    } else if (TransferredResource.class.getName().equals(selected.getSelectedClass())) {
-      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.ON_TRANSFERRED_RESOURCES);
-    } else {
-      job.setOrchestratorMethod(ORCHESTRATOR_METHOD.RUN_PLUGIN_ON_OBJECTS);
-    }
 
     return Jobs.createJob(user, job);
   }

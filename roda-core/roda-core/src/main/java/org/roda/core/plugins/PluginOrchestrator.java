@@ -42,12 +42,9 @@ public interface PluginOrchestrator {
 
   public List<Report> runPluginOnAllFiles(Plugin<File> plugin);
 
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin,
-    List<TransferredResource> paths);
+  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids);
 
   public <T extends Serializable> void runPlugin(Plugin<T> plugin);
-
-  public <T extends Serializable> void runPluginOnObjects(Plugin<T> plugin, List<String> uuids);
 
   /*
    * Job related methods
