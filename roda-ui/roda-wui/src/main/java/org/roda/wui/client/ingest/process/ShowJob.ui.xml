@@ -84,9 +84,8 @@
 					<g:Label addStyleNames="h4">
 						<ui:msg>Actions</ui:msg>
 					</g:Label>
-					<g:Button addStyleNames="btn btn-ban" ui:field="buttonStop">
-						Stop
-						process
+					<g:Button addStyleNames="btn btn-play" ui:field="buttonAppraisal">
+						Appraisal
 					</g:Button>
 					<g:Button addStyleNames="btn btn-times-circle" ui:field="buttonBack">
 						Back

@@ -30,6 +30,7 @@ import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
 import org.roda.wui.client.common.lists.JobReportList;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
 import org.roda.wui.client.process.IngestProcess;
 import org.roda.wui.client.process.Process;
@@ -167,7 +168,7 @@ public class ShowJob extends Composite {
   JobReportList jobReports;
 
   @UiField
-  Button buttonStop, buttonBack;
+  Button buttonAppraisal, buttonBack;
 
   private final DateTimeFormat dateTimeFormat = DateTimeFormat.getFormat(RodaConstants.DEFAULT_DATETIME_FORMAT);
 
@@ -218,9 +219,6 @@ public class ShowJob extends Composite {
         createStringLayout(parameter);
       }
     }
-
-    // set button visibility
-    buttonStop.setVisible(isJobRunning());
   }
 
   private boolean isJobRunning() {
@@ -276,8 +274,11 @@ public class ShowJob extends Composite {
 
     progress.setHTML(b.toSafeHtml());
 
+    buttonAppraisal.setText("Appraisal (" + job.getOutcomeObjectsWithManualIntervention() + ")");
+
     // set button visibility
-    buttonStop.setVisible(isJobRunning());
+    // buttonStop.setVisible(isJobRunning());
+    buttonAppraisal.setVisible(job.getOutcomeObjectsWithManualIntervention() > 0);
 
     scheduleUpdateStatus();
   }
@@ -438,9 +439,10 @@ public class ShowJob extends Composite {
     }
   }
 
-  @UiHandler("buttonStop")
-  void buttonStopHandler(ClickEvent e) {
-    Toast.showInfo("Sorry", "Feature not yet implemented");
+  @UiHandler("buttonAppraisal")
+  void buttonAppraisalHandler(ClickEvent e) {
+    // TODO filter by job
+    Tools.newHistory(IngestAppraisal.RESOLVER);
   }
 
   @UiHandler("buttonBack")

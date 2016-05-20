@@ -21,6 +21,13 @@ public class LinkingIdentifier implements Serializable {
     super();
   }
 
+  public LinkingIdentifier(String type, String value, List<String> roles) {
+    super();
+    this.type = type;
+    this.value = value;
+    this.roles = roles;
+  }
+
   public String getType() {
     return type;
   }

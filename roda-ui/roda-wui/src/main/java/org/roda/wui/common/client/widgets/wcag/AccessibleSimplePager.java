@@ -32,4 +32,12 @@ public class AccessibleSimplePager extends SimplePager {
     WCAGUtilities.getInstance().makeAccessible(this.getElement());
   }
 
+  public AccessibleSimplePager(TextLocation location, SimplePager.Resources resources, boolean showFastForwardButton,
+    int fastForwardRows, boolean showLastPageButton, boolean showFirstPageButton,
+    SimplePager.ImageButtonsConstants imageButtonConstants) {
+    super(location, resources, showFastForwardButton, fastForwardRows, showLastPageButton, showFirstPageButton,
+      imageButtonConstants);
+    WCAGUtilities.getInstance().makeAccessible(this.getElement());
+  }
+
 }

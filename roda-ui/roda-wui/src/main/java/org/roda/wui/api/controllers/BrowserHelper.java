@@ -58,6 +58,7 @@ import org.roda.core.data.adapter.sort.SortParameter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -66,6 +67,7 @@ import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.exceptions.IsStillUpdatingException;
 import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
+import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.utils.JsonUtils;
 import org.roda.core.data.v2.LinkingObjectUtils;
@@ -112,6 +114,7 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
+import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -1802,6 +1805,7 @@ public class BrowserHelper {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
     ModelService model = RodaCoreFactory.getModelService();
+    Date now = new Date();
 
     // map of job -> (total, accepted)
     Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
@@ -1814,6 +1818,37 @@ public class BrowserHelper {
         aip.setState(AIPState.ACTIVE);
         model.updateAIPState(aip);
         // TODO create preservation event
+
+        IndexedPreservationAgent userAgent = null;
+        try {
+          boolean notifyAgent = true;
+          userAgent = PremisV3Utils.createPremisUserAgentBinary(plugin, model, index, notifyAgent);
+        } catch (AlreadyExistsException e) {
+          userAgent = PremisV3Utils.getPreservationUserAgent(plugin, model, index);
+        } catch (RODAException e) {
+          LOGGER.error("Error creating PREMIS agent", e);
+        }
+
+        String id = UUID.randomUUID().toString();
+        PreservationEventType type = PreservationEventType.ACCESSION;
+        String preservationEventDescription = "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+        List<LinkingIdentifier> sources = new ArrayList<>();
+        List<LinkingIdentifier> outcomes = Arrays
+          .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
+        PluginState outcome = PluginState.SUCCESS;
+        String outcomeDetailNote = null;
+        String outcomeDetailExtension = null;
+        boolean notify = false;
+        ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
+          preservationEventDescription, sources, outcomes, outcome.name(), outcomeDetailNote, outcomeDetailExtension,
+          Arrays.asList(userAgent));
+        model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
+          notify);
+        PreservationMetadata pm = new PreservationMetadata();
+        pm.setAipId(aipId);
+        pm.setId(id);
+        pm.setType(PreservationMetadataType.EVENT);
+
       } else {
         // Reject AIP
         model.deleteAIP(aipId);
@@ -1829,7 +1864,7 @@ public class BrowserHelper {
       reportItem.setPluginDetails(rejectReason);
       reportItem.setPluginState(accept ? PluginState.SUCCESS : PluginState.FAILURE);
       reportItem.setOutcomeObjectState(accept ? AIPState.ACTIVE : AIPState.DELETED);
-      reportItem.setDateCreated(new Date());
+      reportItem.setDateCreated(now);
       report.addReport(reportItem);
 
       model.createOrUpdateJobReport(report);
@@ -1856,7 +1891,10 @@ public class BrowserHelper {
         job.setObjectsProcessedWithSuccess(job.getObjectsProcessedWithSuccess() - rejected);
         job.setObjectsProcessedWithFailure(job.getObjectsProcessedWithFailure() + rejected);
       }
-      // TODO decrement manual interaction counter
+
+      // decrement manual interaction counter
+      job.setOutcomeObjectsWithManualIntervention(job.getOutcomeObjectsWithManualIntervention() - total);
+
       model.createOrUpdateJob(job);
 
     }

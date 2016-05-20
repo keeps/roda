@@ -49,6 +49,7 @@ import com.google.gwt.user.cellview.client.HasKeyboardSelectionPolicy.KeyboardSe
 import com.google.gwt.user.cellview.client.Header;
 import com.google.gwt.user.cellview.client.PageSizePager;
 import com.google.gwt.user.cellview.client.SafeHtmlHeader;
+import com.google.gwt.user.cellview.client.SimplePager;
 import com.google.gwt.user.client.Random;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -150,7 +151,9 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
 
     dataProvider.addDataDisplay(display);
 
-    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.LEFT, false, true);
+    resultsPager = new AccessibleSimplePager(AccessibleSimplePager.TextLocation.LEFT,
+      (SimplePager.Resources) GWT.create(SimplePager.Resources.class), false, initialPageSize, false, false,
+      (SimplePager.ImageButtonsConstants) GWT.create(SimplePager.ImageButtonsConstants.class));
     resultsPager.setDisplay(display);
 
     pageSizePager = new PageSizePager(getPageSizePagerIncrement());
