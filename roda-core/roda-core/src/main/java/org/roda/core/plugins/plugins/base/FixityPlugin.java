@@ -40,6 +40,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.StorageService;
@@ -100,7 +102,15 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
+    SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
+    try {
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e1) {
+      LOGGER.error("Could not update Job information");
+    }
+
     for (AIP aip : list) {
+      boolean isAipFailed = false;
 
       for (Representation r : aip.getRepresentations()) {
         LOGGER.debug("Checking fixity for files in representation " + r.getId() + " of AIP " + aip.getId());
@@ -150,6 +160,12 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
                   model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
                     file.getId(), "RiskIncidence");
+
+                  if (!isAipFailed) {
+                    jobPluginInfo.incrementObjectsProcessedWithFailure();
+                    PluginHelper.updateJobInformation(this, jobPluginInfo);
+                    isAipFailed = true;
+                  }
                 }
               }
 
@@ -202,8 +218,23 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
         }
 
       }
+
+      if (isAipFailed) {
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        try {
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
+        } catch (JobException e) {
+          LOGGER.error("Could not update Job information");
+        }
+      }
     }
 
+    jobPluginInfo.setPluginExecutionIsDone(true);
+    try {
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
+    }
     return report;
   }
 

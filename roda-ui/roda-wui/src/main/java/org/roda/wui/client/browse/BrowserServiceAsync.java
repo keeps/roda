@@ -18,6 +18,7 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -167,5 +168,10 @@ public interface BrowserServiceAsync {
   void updateRiskCounters(AsyncCallback<Void> asyncCallback);
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
+
+  void getRepresentationUUID(String representationId, AsyncCallback<String> asyncCallback);
+
+  void getRepresentationAndFileUUID(String representationId, String fileId,
+    AsyncCallback<Pair<String, String>> asyncCallback);
 
 }

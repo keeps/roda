@@ -1902,4 +1902,24 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
+  public static String getRepresentationUUID(RodaUser user, String representationId)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
+    IndexResult<IndexedRepresentation> results = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
+      filter, Sorter.NONE, new Sublist(0, 1));
+    IndexedRepresentation rep = results.getResults().get(0);
+    return rep.getUUID();
+
+  }
+
+  public static Pair<String, String> getRepresentationAndFileUUID(RodaUser user, String representationId, String fileId)
+    throws NotFoundException, GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId),
+      new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId));
+    IndexResult<IndexedFile> results = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
+      new Sublist(0, 1));
+    IndexedFile file = results.getResults().get(0);
+    return new Pair<String, String>(file.getRepresentationUUID(), file.getUUID());
+  }
+
 }

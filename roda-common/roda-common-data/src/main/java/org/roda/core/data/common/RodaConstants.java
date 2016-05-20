@@ -421,6 +421,7 @@ public final class RodaConstants {
   public static final String FILE_AIPID = "aipId";
   public static final String FILE_FORMAT_MIMETYPE = "formatMimetype";
   public static final String FILE_FORMAT_VERSION = "formatVersion";
+  public static final String FILE_ID = "id";
   public static final String FILE_FILEID = "fileId";
   public static final String FILE_REPRESENTATION_UUID = "representationUUID";
   public static final String FILE_REPRESENTATION_ID = "representationId";

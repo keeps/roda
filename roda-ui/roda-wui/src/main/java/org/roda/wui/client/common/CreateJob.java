@@ -117,6 +117,9 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Label workflowListDescription;
 
   @UiField
+  FlowPanel workflowPanel;
+
+  @UiField
   PluginOptionsPanel workflowOptions;
 
   @UiField
@@ -211,7 +214,12 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         workflowListDescription.setVisible(false);
       }
 
-      workflowOptions.setPluginInfo(selectedPlugin);
+      if (selectedPlugin.getParameters().size() == 0) {
+        workflowPanel.setVisible(false);
+      } else {
+        workflowPanel.setVisible(true);
+        workflowOptions.setPluginInfo(selectedPlugin);
+      }
 
     }
   }

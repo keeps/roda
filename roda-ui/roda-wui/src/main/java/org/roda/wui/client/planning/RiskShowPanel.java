@@ -11,11 +11,19 @@ package org.roda.wui.client.planning;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
+import org.roda.core.data.v2.common.Pair;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.risks.Risk;
+import org.roda.core.data.v2.risks.RiskIncidence;
+import org.roda.wui.client.browse.Browse;
 import org.roda.wui.client.browse.BrowserService;
+import org.roda.wui.client.browse.ViewRepresentation;
 import org.roda.wui.client.common.lists.RiskIncidenceList;
 import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.common.client.ClientLogger;
+import org.roda.wui.common.client.tools.Tools;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
@@ -33,6 +41,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.SelectionChangeEvent;
 
 import config.i18n.client.RiskMessages;
 import config.i18n.client.UserManagementConstants;
@@ -149,6 +158,50 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
   public RiskShowPanel(Risk risk, boolean hasTitle) {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_RISKS, risk.getId()));
     incidenceList = new RiskIncidenceList(filter, null, "Incidences", false);
+
+    incidenceList.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+
+      @Override
+      public void onSelectionChange(SelectionChangeEvent event) {
+        final RiskIncidence selected = incidenceList.getSelectionModel().getSelectedObject();
+        if (selected != null) {
+          if (selected.getObjectClass().equals(AIP.class.getSimpleName())) {
+            Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+          } else if (selected.getObjectClass().equals(Representation.class.getSimpleName())) {
+            BrowserService.Util.getInstance().getRepresentationUUID(selected.getRepresentationId(),
+              new AsyncCallback<String>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+                }
+
+                @Override
+                public void onSuccess(String result) {
+                  Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), selected.getAipId(),
+                    result);
+                }
+              });
+          } else if (selected.getObjectClass().equals(File.class.getSimpleName())) {
+            BrowserService.Util.getInstance().getRepresentationAndFileUUID(selected.getRepresentationId(),
+              selected.getFileId(), new AsyncCallback<Pair<String, String>>() {
+
+                @Override
+                public void onFailure(Throwable caught) {
+                  Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+                }
+
+                @Override
+                public void onSuccess(Pair<String, String> result) {
+                  Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), selected.getAipId(),
+                    result.getFirst(), result.getSecond());
+                }
+              });
+          }
+        }
+      }
+    });
+
     initWidget(uiBinder.createAndBindUi(this));
     title.setVisible(hasTitle);
     init(risk);

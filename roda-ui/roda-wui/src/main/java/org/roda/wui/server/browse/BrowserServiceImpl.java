@@ -31,6 +31,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -645,6 +646,20 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
     Browser.appraisal(user, selected, accept, rejectReason);
+  }
+
+  @Override
+  public String getRepresentationUUID(String representationId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.getRepresentationUUID(user, representationId);
+  }
+
+  @Override
+  public Pair<String, String> getRepresentationAndFileUUID(String representationId, String fileId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+    return Browser.getRepresentationAndFileUUID(user, representationId, fileId);
   }
 
 }

@@ -257,7 +257,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       });
 
       display.addColumn(selectColumn, selectHeader);
-      display.setColumnWidth(selectColumn, "35px");
+      display.setColumnWidth(selectColumn, "45px");
     }
     configureDisplay(display);
   }

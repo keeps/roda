@@ -24,6 +24,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -246,4 +247,10 @@ public interface BrowserService extends RemoteService {
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
+
+  String getRepresentationUUID(String representationId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
+  Pair<String, String> getRepresentationAndFileUUID(String representationId, String fileId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
 }

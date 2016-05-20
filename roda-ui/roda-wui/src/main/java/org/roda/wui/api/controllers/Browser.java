@@ -34,6 +34,7 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
+import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
@@ -1495,6 +1496,41 @@ public class Browser extends RodaCoreService {
     long duration = new Date().getTime() - start.getTime();
     registerAction(user, BROWSER_COMPONENT, "appraisal", null, duration, "selected", selected, "accept", accept,
       "rejectReason", rejectReason);
+  }
+
+  public static String getRepresentationUUID(RodaUser user, String representationId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    // TODO define appraisal role
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    String ret = BrowserHelper.getRepresentationUUID(user, representationId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getRepresentationUUID", null, duration, "representationId",
+      representationId);
+    return ret;
+  }
+
+  public static Pair<String, String> getRepresentationAndFileUUID(RodaUser user, String representationId, String fileId)
+    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+    Date start = new Date();
+
+    // check user permissions
+    // TODO define appraisal role
+    UserUtility.checkRoles(user, ADMINISTRATION_METADATA_EDITOR_ROLE);
+
+    // delegate
+    Pair<String, String> ret = BrowserHelper.getRepresentationAndFileUUID(user, representationId, fileId);
+
+    // register action
+    long duration = new Date().getTime() - start.getTime();
+    registerAction(user, BROWSER_COMPONENT, "getRepresentationAndFileUUID", null, duration, "fileId", fileId);
+    return ret;
   }
 
 }

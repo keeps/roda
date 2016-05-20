@@ -30,7 +30,7 @@
 				</g:Label>
 				<g:ListBox addStyleNames="form-listbox" ui:field="workflowList" />
 				<g:Label addStyleNames="form-help" ui:field="workflowListDescription" />
-				<g:FlowPanel styleName="panel">
+				<g:FlowPanel styleName="panel" ui:field="workflowPanel">
 					<p:PluginOptionsPanel styleName="panel-body"
 						ui:field="workflowOptions" />
 				</g:FlowPanel>
