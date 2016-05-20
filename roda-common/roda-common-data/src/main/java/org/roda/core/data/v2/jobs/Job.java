@@ -61,7 +61,7 @@ public class Job implements IsIndexed, Serializable {
   private int objectsBeingProcessed = 0;
   private int objectsProcessedWithSuccess = 0;
   private int objectsProcessedWithFailure = 0;
-  private int objectsWithStateChange = 0;
+  private int outcomeObjectsWithManualIntervention = 0;
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
@@ -211,12 +211,12 @@ public class Job implements IsIndexed, Serializable {
     this.objectsProcessedWithFailure = objectsProcessedWithFailure;
   }
 
-  public int getObjectsWithStateChange() {
-    return objectsWithStateChange;
+  public int getOutcomeObjectsWithManualIntervention() {
+    return outcomeObjectsWithManualIntervention;
   }
 
-  public void setObjectsWithStateChange(int objectsWithStateChange) {
-    this.objectsWithStateChange = objectsWithStateChange;
+  public void setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
+    this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
   }
 
   public String getPlugin() {
@@ -271,9 +271,9 @@ public class Job implements IsIndexed, Serializable {
       + completionPercentage + ", objectsCount=" + objectsCount + ", objectsWaitingToBeProcessed="
       + objectsWaitingToBeProcessed + ", objectsBeingProcessed=" + objectsBeingProcessed
       + ", objectsProcessedWithSuccess=" + objectsProcessedWithSuccess + ", objectsProcessedWithFailure="
-      + objectsProcessedWithFailure + ", objectsWithStateChange=" + objectsWithStateChange + ", plugin=" + plugin
-      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", orchestratorMethod="
-      + orchestratorMethod + ", objects=" + objects + "]";
+      + objectsProcessedWithFailure + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention
+      + ", plugin=" + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters
+      + ", orchestratorMethod=" + orchestratorMethod + ", objects=" + objects + "]";
   }
 
   @JsonIgnore

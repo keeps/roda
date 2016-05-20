@@ -1646,7 +1646,7 @@ public class SolrUtils {
     doc.addField(RodaConstants.JOB_OBJECTS_BEING_PROCESSED, job.getObjectsBeingProcessed());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS, job.getObjectsProcessedWithSuccess());
     doc.addField(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE, job.getObjectsProcessedWithFailure());
-    doc.addField(RodaConstants.JOB_OBJECTS_WITH_STATE_CHANGE, job.getObjectsWithStateChange());
+    doc.addField(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION, job.getOutcomeObjectsWithManualIntervention());
     doc.addField(RodaConstants.JOB_PLUGIN_TYPE, job.getPluginType().toString());
     doc.addField(RodaConstants.JOB_PLUGIN, job.getPlugin());
     doc.addField(RodaConstants.JOB_PLUGIN_PARAMETERS, JsonUtils.getJsonFromObject(job.getPluginParameters()));
@@ -1672,7 +1672,7 @@ public class SolrUtils {
     job.setObjectsBeingProcessed(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_BEING_PROCESSED), 0));
     job.setObjectsProcessedWithSuccess(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_SUCCESS), 0));
     job.setObjectsProcessedWithFailure(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_PROCESSED_WITH_FAILURE), 0));
-    job.setObjectsWithStateChange(objectToInteger(doc.get(RodaConstants.JOB_OBJECTS_WITH_STATE_CHANGE), 0));
+    job.setOutcomeObjectsWithManualIntervention(objectToInteger(doc.get(RodaConstants.JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION), 0));
     job.setPluginType(PluginType.valueOf(objectToString(doc.get(RodaConstants.JOB_PLUGIN_TYPE))));
     job.setPlugin(objectToString(doc.get(RodaConstants.JOB_PLUGIN)));
     job.setPluginParameters(JsonUtils.getMapFromJson(objectToString(doc.get(RodaConstants.JOB_PLUGIN_PARAMETERS))));

@@ -354,7 +354,7 @@ public final class RodaConstants {
   public static final String JOB_OBJECTS_BEING_PROCESSED = "objectsBeingProcessed";
   public static final String JOB_OBJECTS_PROCESSED_WITH_SUCCESS = "objectsProcessedWithSuccess";
   public static final String JOB_OBJECTS_PROCESSED_WITH_FAILURE = "objectsProcessedWithFailure";
-  public static final String JOB_OBJECTS_WITH_STATE_CHANGE = "objectsWithStateChange";
+  public static final String JOB_OUTCOME_OBJECTS_WITH_MANUAL_INTERVENTION = "outcomeObjectsWithManualIntervention";
   public static final String JOB_PLUGIN = "plugin";
   public static final String JOB_PLUGIN_TYPE = "pluginType";
   public static final String JOB_PLUGIN_PARAMETERS = "pluginParameters";

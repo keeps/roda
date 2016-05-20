@@ -598,6 +598,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
         // update main report outcomeObjectState
         PluginHelper.updateJobReportState(this, model, aip.getId(), AIPState.UNDER_APPRAISAL);
+        
+        // update counters of manual intervention
+        jobPluginInfo.incrementOutcomeObjectsWithManualIntervention();
 
       } catch (GenericException | NotFoundException | RequestNotValidException | AuthorizationDeniedException e) {
         LOGGER.error("Error while updating AIP state to '{}'. Reason: {}", AIPState.UNDER_APPRAISAL, e.getMessage());

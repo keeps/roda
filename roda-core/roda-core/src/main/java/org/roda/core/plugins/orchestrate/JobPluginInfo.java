@@ -19,6 +19,7 @@ public abstract class JobPluginInfo {
   private int objectsWaitingToBeProcessed = 0;
   private int objectsProcessedWithSuccess = 0;
   private int objectsProcessedWithFailure = 0;
+  private int outcomeObjectsWithManualIntervention = 0;
 
   public JobPluginInfo() {
 
@@ -76,6 +77,14 @@ public abstract class JobPluginInfo {
     this.objectsProcessedWithFailure = objectsProcessedWithFailure;
   }
 
+  public int getOutcomeObjectsWithManualIntervention() {
+    return outcomeObjectsWithManualIntervention;
+  }
+
+  public void setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
+    this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
+  }
+
   public void incrementObjectsProcessedWithFailure() {
     this.objectsProcessedWithFailure += 1;
     this.objectsBeingProcessed -= 1;
@@ -84,6 +93,10 @@ public abstract class JobPluginInfo {
   public void incrementObjectsProcessedWithSuccess() {
     this.objectsProcessedWithSuccess += 1;
     this.objectsBeingProcessed -= 1;
+  }
+
+  public void incrementOutcomeObjectsWithManualIntervention() {
+    this.outcomeObjectsWithManualIntervention += 1;
   }
 
   abstract <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin,

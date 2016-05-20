@@ -123,7 +123,7 @@
    <field name="objectsBeingProcessed" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithSuccess" type="int" indexed="true" stored="true" required="false" multiValued="false" />
    <field name="objectsProcessedWithFailure" type="int" indexed="true" stored="true" required="false" multiValued="false" />
-   <field name="objectsWithStateChange" type="int" indexed="true" stored="true" required="false" multiValued="false" />
+   <field name="outcomeObjectsWithManualIntervention" type="int" indexed="true" stored="true" required="false" multiValued="false" />
 
    <!-- Dynamic field definitions allow using convention over configuration
        for fields via the specification of patterns to match field names. 

@@ -314,6 +314,7 @@ public final class PluginHelper {
     job.setObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
     job.setObjectsWaitingToBeProcessed(job.getObjectsCount() - job.getObjectsBeingProcessed()
       - job.getObjectsProcessedWithFailure() - job.getObjectsProcessedWithSuccess());
+    job.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
     return job;
   }
 
