@@ -253,4 +253,5 @@ public interface BrowserService extends RemoteService {
 
   Pair<String, String> getRepresentationAndFileUUID(String representationId, String fileId)
     throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+
 }

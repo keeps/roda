@@ -162,7 +162,13 @@ public class ShowJob extends Composite {
   Label plugin;
 
   @UiField
+  FlowPanel pluginPanel;
+
+  @UiField
   FlowPanel pluginOptions;
+
+  @UiField
+  Label reportsLabel;
 
   @UiField(provided = true)
   JobReportList jobReports;
@@ -203,6 +209,14 @@ public class ShowJob extends Composite {
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));
+
+    if (pluginInfo.getParameters().isEmpty()) {
+      pluginPanel.setVisible(false);
+      pluginOptions.setVisible(false);
+    } else {
+      pluginPanel.setVisible(true);
+      pluginOptions.setVisible(true);
+    }
 
     for (PluginParameter parameter : pluginInfo.getParameters()) {
 

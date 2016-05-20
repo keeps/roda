@@ -78,9 +78,11 @@ import org.roda.core.model.utils.ResourceParseUtils;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
 import org.roda.core.storage.ContentPayload;
+import org.roda.core.storage.DefaultBinary;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.Directory;
 import org.roda.core.storage.EmptyClosableIterable;
+import org.roda.core.storage.Entity;
 import org.roda.core.storage.Resource;
 import org.roda.core.storage.StorageService;
 import org.roda.core.storage.StringContentPayload;
@@ -723,8 +725,15 @@ public class ModelService extends ModelObservable {
     throws RequestNotValidException, GenericException, NotFoundException, AuthorizationDeniedException {
     File file;
     StoragePath filePath = ModelUtils.getFileStoragePath(aipId, representationId, directoryPath, fileId);
-    Binary binary = storage.getBinary(filePath);
-    file = ResourceParseUtils.convertResourceToFile(binary);
+    Class<? extends Entity> entity = storage.getEntity(filePath);
+
+    if (entity.equals(Binary.class) || entity.equals(DefaultBinary.class)) {
+      Binary binary = storage.getBinary(filePath);
+      file = ResourceParseUtils.convertResourceToFile(binary);
+    } else {
+      Directory directory = storage.getDirectory(filePath);
+      file = ResourceParseUtils.convertResourceToFile(directory);
+    }
 
     return file;
   }

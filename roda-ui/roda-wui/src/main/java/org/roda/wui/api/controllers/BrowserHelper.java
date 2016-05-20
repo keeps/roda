@@ -1907,9 +1907,14 @@ public class BrowserHelper {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
     IndexResult<IndexedRepresentation> results = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
       filter, Sorter.NONE, new Sublist(0, 1));
-    IndexedRepresentation rep = results.getResults().get(0);
-    return rep.getUUID();
 
+    // TODO 20160520 use optional to avoid testing nulls (gwt 2.7 does not
+    // support it)
+    if (results.getResults().size() > 0) {
+      return results.getResults().get(0).getUUID();
+    } else {
+      return null;
+    }
   }
 
   public static Pair<String, String> getRepresentationAndFileUUID(RodaUser user, String representationId, String fileId)
@@ -1918,8 +1923,19 @@ public class BrowserHelper {
       new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId));
     IndexResult<IndexedFile> results = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
       new Sublist(0, 1));
-    IndexedFile file = results.getResults().get(0);
-    return new Pair<String, String>(file.getRepresentationUUID(), file.getUUID());
+
+    // TODO 20160520 use optional to avoid testing nulls (gwt 2.7 does not
+    // support it)
+    Pair<String, String> resultPair;
+
+    if (results.getResults().size() > 0) {
+      resultPair = new Pair<String, String>(results.getResults().get(0).getRepresentationUUID(),
+        results.getResults().get(0).getUUID());
+    } else {
+      resultPair = new Pair<String, String>(null, null);
+    }
+
+    return resultPair;
   }
 
 }

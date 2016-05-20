@@ -59,18 +59,29 @@
 								</g:Label>
 								<g:HTML ui:field="progress" />
 							</g:FlowPanel>
+							<g:FlowPanel styleName="field">
+								
+							</g:FlowPanel>
 
 							<g:FlowPanel styleName="field">
 								<g:Label addStyleNames="label">
 									Plugin
 								</g:Label>
-								<g:Label ui:field="plugin" />
-								<g:FlowPanel styleName="panel">
+								<g:Label styleName="value" ui:field="plugin" />
+								<g:Label addStyleNames="label" ui:field="pluginMethod">
+									Method
+								</g:Label>
+								<g:Label styleName="value" ui:field="pluginMethodValue" />
+								<g:FlowPanel styleName="panel" ui:field="pluginPanel">
 									<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
 								</g:FlowPanel>
+								<g:Label addStyleNames="label" ui:field="objectList">
+									Objects
+								</g:Label>
+								<g:FlowPanel ui:field="objectListValue" />
 							</g:FlowPanel>
 
-							<g:Label addStyleNames="h4">
+							<g:Label addStyleNames="h4" ui:field="reportsLabel">
 								Processed
 							</g:Label>
 							<lists:JobReportList ui:field="jobReports" />

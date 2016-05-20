@@ -178,8 +178,12 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
                 @Override
                 public void onSuccess(String result) {
-                  Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), selected.getAipId(),
-                    result);
+                  if (result != null) {
+                    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                      selected.getAipId(), result);
+                  } else {
+                    Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+                  }
                 }
               });
           } else if (selected.getObjectClass().equals(File.class.getSimpleName())) {
@@ -193,8 +197,13 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
 
                 @Override
                 public void onSuccess(Pair<String, String> result) {
-                  Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), selected.getAipId(),
-                    result.getFirst(), result.getSecond());
+                  if (result.getFirst() != null && result.getSecond() != null) {
+                    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
+                      selected.getAipId(), result.getFirst(), result.getSecond());
+
+                  } else {
+                    Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+                  }
                 }
               });
           }

@@ -665,8 +665,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
           initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
         } else if (PluginType.RISK == plugin.getType()) {
-          RiskJobPluginInfo riskPluginInfo = new RiskJobPluginInfo();
-          initJobPluginInfo(innerPlugin, jobId, riskPluginInfo, objectsCount);
+          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, pluginInfo, objectsCount);
+        } else if (PluginType.AIP_TO_AIP == plugin.getType()) {
+          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo();
+          initJobPluginInfo(innerPlugin, jobId, pluginInfo, objectsCount);
         }
       }
     }
