@@ -273,6 +273,7 @@ public class ShowJob extends Composite {
       b.append(messages.showJobProgressWaitingCount(job.getObjectsWaitingToBeProcessed()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
+
     progress.setHTML(b.toSafeHtml());
 
     // set button visibility

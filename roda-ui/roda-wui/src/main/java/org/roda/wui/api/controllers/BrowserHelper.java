@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -100,9 +101,9 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.ORCHESTRATOR_METHOD;
-import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
+import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.IndexedRisk;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -111,7 +112,6 @@ import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -1801,8 +1801,12 @@ public class BrowserHelper {
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
+    ModelService model = RodaCoreFactory.getModelService();
+
+    // map of job -> (total, accepted)
+    Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
+
     for (String aipId : listOfIds) {
-      ModelService model = RodaCoreFactory.getModelService();
       AIP aip = model.retrieveAIP(aipId);
       String jobId = aip.getIngestJobId();
       if (accept) {
@@ -1829,10 +1833,35 @@ public class BrowserHelper {
       report.addReport(reportItem);
 
       model.createOrUpdateJobReport(report);
+
+      // save job state
+      Pair<Integer, Integer> pair = jobState.get(jobId);
+      if (pair == null) {
+        jobState.put(jobId, Pair.create(1, accept ? 1 : 0));
+      } else {
+        jobState.put(jobId, Pair.create(pair.getFirst() + 1, pair.getSecond() + (accept ? 1 : 0)));
+      }
+
     }
 
-    RodaCoreFactory.getIndexService().commit(IndexedAIP.class);
+    // update job counters
+    for (Entry<String, Pair<Integer, Integer>> entry : jobState.entrySet()) {
+      String jobId = entry.getKey();
+      int total = entry.getValue().getFirst();
+      int accepted = entry.getValue().getSecond();
+      int rejected = total - accepted;
+      Job job = model.retrieveJob(jobId);
+      if (rejected > 0) {
+        // change counter to failure
+        job.setObjectsProcessedWithSuccess(job.getObjectsProcessedWithSuccess() - rejected);
+        job.setObjectsProcessedWithFailure(job.getObjectsProcessedWithFailure() + rejected);
+      }
+      // TODO decrement manual interaction counter
+      model.createOrUpdateJob(job);
 
+    }
+
+    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class);
   }
 
 }
