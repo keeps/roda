@@ -45,6 +45,17 @@
 				<lists:AIPList ui:field="aipList" />
 			</g:FlowPanel>
 			<g:FlowPanel addStyleNames="col_2 last sidebar">
+				<g:FlowPanel ui:field="appraisalSidebar">
+					<g:Label addStyleNames="h4">
+						<ui:msg>Appraisal</ui:msg>
+					</g:Label>
+					<g:Button addStyleNames="btn btn-play" ui:field="appraisalAccept">
+						<ui:msg>Accept</ui:msg>
+					</g:Button>
+					<g:Button addStyleNames="btn btn-danger btn-ban" ui:field="appraisalReject">
+						<ui:msg>Reject</ui:msg>
+					</g:Button>
+				</g:FlowPanel>
 				<g:FlowPanel ui:field="sidebarData">
 					<g:Label addStyleNames="h4">
 						<ui:msg>Representations</ui:msg>

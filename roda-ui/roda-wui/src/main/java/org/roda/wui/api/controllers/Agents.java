@@ -71,13 +71,6 @@ public class Agents extends RodaCoreService {
     registerAction(user, AGENTS_COMPONENT, "deleteAgent", null, duration, "agentId", agentId);
   }
 
-  public static List<Agent> retrieveAgents(IndexResult<Agent> listAgentsIndexResult) {
-    List<Agent> agents = new ArrayList<Agent>();
-    for (Agent agent : listAgentsIndexResult.getResults()) {
-      agents.add(agent);
-    }
-    return agents;
-  }
 
   /*
    * ---------------------------------------------------------------------------

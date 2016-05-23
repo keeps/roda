@@ -39,6 +39,7 @@ import org.roda.wui.client.common.lists.AIPList;
 import org.roda.wui.client.common.lists.SelectedItemsUtils;
 import org.roda.wui.client.common.utils.AsyncCallbackUtils;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
+import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.main.BreadcrumbItem;
 import org.roda.wui.client.main.BreadcrumbPanel;
 import org.roda.wui.client.planning.RiskRegister;
@@ -67,6 +68,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.i18n.client.LocaleInfo;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -187,6 +189,9 @@ public class Browse extends Composite {
 
   @UiField
   FlowPanel sidebarData;
+
+  @UiField
+  FlowPanel appraisalSidebar;
 
   @UiField
   FlowPanel downloadList;
@@ -354,6 +359,7 @@ public class Browse extends Composite {
     downloadList.clear();
     sidebarData.setVisible(false);
 
+    appraisalSidebar.setVisible(false);
     preservationSidebar.setVisible(false);
     actionsSidebar.setVisible(false);
 
@@ -486,6 +492,7 @@ public class Browse extends Composite {
       Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.AIP_PARENT_ID, aip.getId()));
       aipList.setFilter(filter);
 
+      appraisalSidebar.setVisible(aip.getState().equals(AIPState.UNDER_APPRAISAL));
       sidebarData.setVisible(representations.size() > 0);
       preservationSidebar.setVisible(true);
       actionsSidebar.setVisible(true);
@@ -1016,5 +1023,47 @@ public class Browse extends Composite {
     SafeUri downloadUri = null;
     downloadUri = RestUtils.createAIPPartDownloadUri(aipId, RodaConstants.STORAGE_DIRECTORY_SCHEMAS);
     Window.Location.assign(downloadUri.asString());
+  }
+
+  @UiHandler("appraisalAccept")
+  void appraisalAcceptHandler(ClickEvent e) {
+    final boolean accept = true;
+    final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
+    String rejectReason = null;
+    BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+
+      @Override
+      public void onSuccessImpl(Void result) {
+        Toast.showInfo("Done", "Item was accepted");
+        // reload
+        viewAction(aipId);
+      }
+    });
+  }
+
+  @UiHandler("appraisalReject")
+  void appraisalRejectHandler(ClickEvent e) {
+    final boolean accept = false;
+    final SelectedItems<IndexedAIP> selected = SelectedItemsList.create(IndexedAIP.class, aipId);
+    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting this item?", RegExp.compile(".+"),
+      messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
+
+        @Override
+        public void onFailure(Throwable caught) {
+          // nothing to do
+        }
+
+        @Override
+        public void onSuccess(final String rejectReason) {
+          BrowserService.Util.getInstance().appraisal(selected, accept, rejectReason, new LoadingAsyncCallback<Void>() {
+
+            @Override
+            public void onSuccessImpl(Void result) {
+              Toast.showInfo("Done", "Item was rejected");
+              Tools.newHistory(IngestAppraisal.RESOLVER);
+            }
+          });
+        }
+      });
   }
 }

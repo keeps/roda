@@ -37,6 +37,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.v2.agents.Agent;
 import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.index.IndexResult;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.user.RodaUser;
 import org.roda.wui.api.v1.utils.ApiResponseMessage;
 import org.roda.wui.api.v1.utils.ApiUtils;
@@ -55,7 +56,7 @@ public class AgentsResource {
   private HttpServletRequest request;
 
   @GET
-  @ApiOperation(value = "List Agents", notes = "Gets a list of Agents.", response = Agent.class, responseContainer = "List")
+  @ApiOperation(value = "List Agents", notes = "Gets a list of Agents.", response = IndexedPreservationAgent.class, responseContainer = "List")
   public Response listAgents(@QueryParam(RodaConstants.API_QUERY_KEY_ACCEPT_FORMAT) String acceptFormat,
     @ApiParam(value = "Index of the first element to return", defaultValue = "0") @QueryParam(RodaConstants.API_QUERY_KEY_START) String start,
     @ApiParam(value = "Maximum number of elements to return", defaultValue = "100") @QueryParam(RodaConstants.API_QUERY_KEY_LIMIT) String limit)
@@ -69,14 +70,11 @@ public class AgentsResource {
     Pair<Integer, Integer> pagingParams = ApiUtils.processPagingParams(start, limit);
     // TODO add show just active to API
     boolean justActive = true;
-    IndexResult<Agent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(Agent.class, Filter.NONE,
-      Sorter.NONE, new Sublist(new Sublist(pagingParams.getFirst(), pagingParams.getSecond())), Facets.NONE, user,
-      justActive);
+    IndexResult<IndexedPreservationAgent> listAgentsIndexResult = org.roda.wui.api.controllers.Browser.find(
+      IndexedPreservationAgent.class, Filter.NONE, Sorter.NONE,
+      new Sublist(pagingParams.getFirst(), pagingParams.getSecond()), Facets.NONE, user, justActive);
 
-    // transform controller method output
-    List<Agent> agents = org.roda.wui.api.controllers.Agents.retrieveAgents(listAgentsIndexResult);
-
-    return Response.ok(agents, mediaType).build();
+    return Response.ok(listAgentsIndexResult.getResults(), mediaType).build();
   }
 
   @POST

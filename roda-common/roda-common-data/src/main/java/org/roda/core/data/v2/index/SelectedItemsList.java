@@ -7,11 +7,16 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class SelectedItemsList<T extends IsIndexed> implements SelectedItems<T> {
 
   private static final long serialVersionUID = -5364779540199737165L;
+
+  public static <T extends IsIndexed> SelectedItemsList<T> create(Class<T> classToCreate, String... ids) {
+    return new SelectedItemsList<>(Arrays.asList(ids), classToCreate.getName());
+  }
 
   private List<String> ids;
   private String selectedClass;

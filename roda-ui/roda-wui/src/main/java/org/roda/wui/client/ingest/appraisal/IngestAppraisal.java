@@ -536,7 +536,7 @@ public class IngestAppraisal extends Composite {
     boolean accept = true;
     SelectedItems<?> selected = getSelected();
     String rejectReason = null;
-    // not supporing accept of reps and files for now
+    // not supporting accept of reps and files for now
     BrowserService.Util.getInstance().appraisal((SelectedItems<IndexedAIP>) selected, accept, rejectReason,
       new LoadingAsyncCallback<Void>() {
 
@@ -552,7 +552,7 @@ public class IngestAppraisal extends Composite {
   void buttonRejectHandler(ClickEvent e) {
     final boolean accept = false;
     final SelectedItems<?> selected = getSelected();
-    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting this SIP?", RegExp.compile(".+"),
+    Dialogs.showPromptDialog("Reject message", "What is the reason for rejecting these SIPs?", RegExp.compile(".+"),
       messages.dialogCancel(), messages.dialogOk(), new AsyncCallback<String>() {
 
         @Override

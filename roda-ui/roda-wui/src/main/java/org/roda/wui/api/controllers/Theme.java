@@ -55,7 +55,16 @@ public class Theme extends RodaCoreService {
       }
     };
 
-    streamResponse = new StreamResponse(resourceId, Files.probeContentType(filePath), streamingOutput);
+    String mimeType;
+    if (filePath.endsWith(".html")) {
+      mimeType = "text/html";
+    } else if (filePath.endsWith(".css")) {
+      mimeType = "text/css";
+    } else {
+      mimeType = Files.probeContentType(filePath);
+    }
+
+    streamResponse = new StreamResponse(resourceId, mimeType, streamingOutput);
 
     return streamResponse;
   }

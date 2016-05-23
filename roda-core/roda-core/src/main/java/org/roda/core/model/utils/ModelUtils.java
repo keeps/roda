@@ -532,7 +532,7 @@ public final class ModelUtils {
   public static StoragePath getAgentStoragePath(String agentId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AGENT,
       agentId + RodaConstants.AGENT_FILE_EXTENSION);
-  }
+  }        
 
   public static StoragePath getFormatContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT);
