@@ -102,13 +102,13 @@ public class Ingest {
       callback.onSuccess(layout);
     } else {
       if (historyTokens.get(0).equals(PreIngest.RESOLVER.getHistoryToken())) {
-        PreIngest.getInstance().resolve(Tools.tail(historyTokens), callback);
+        PreIngest.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestTransfer.RESOLVER.getHistoryToken())) {
-        IngestTransfer.getInstance().resolve(Tools.tail(historyTokens), callback);
+        IngestTransfer.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals(IngestProcess.RESOLVER.getHistoryToken())) {
-        IngestProcess.getInstance().resolve(Tools.tail(historyTokens), callback);
-      }else if (historyTokens.get(0).equals(IngestAppraisal.RESOLVER.getHistoryToken())) {
-        IngestAppraisal.getInstance().resolve(Tools.tail(historyTokens), callback);
+        IngestProcess.RESOLVER.resolve(Tools.tail(historyTokens), callback);
+      } else if (historyTokens.get(0).equals(IngestAppraisal.RESOLVER.getHistoryToken())) {
+        IngestAppraisal.RESOLVER.resolve(Tools.tail(historyTokens), callback);
       } else if (historyTokens.get(0).equals("help")) {
         callback.onSuccess(getHelp());
       } else {

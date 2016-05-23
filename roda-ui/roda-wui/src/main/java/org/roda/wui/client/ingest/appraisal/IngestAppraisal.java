@@ -79,11 +79,24 @@ import config.i18n.client.BrowseMessages;
  */
 public class IngestAppraisal extends Composite {
 
+  private static final Filter BASE_FILTER = new Filter(
+    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
+
   public static final HistoryResolver RESOLVER = new HistoryResolver() {
 
     @Override
     public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-      getInstance().resolve(historyTokens, callback);
+
+      Filter filter = new Filter(BASE_FILTER);
+      for (int i = 0; i < historyTokens.size() - 1; i++) {
+        String name = historyTokens.get(i);
+        String value = historyTokens.get(i + 1);
+        filter.add(new SimpleFilterParameter(name, value));
+      }
+
+      IngestAppraisal ingestAppraisal = new IngestAppraisal(filter);
+      callback.onSuccess(ingestAppraisal);
+
     }
 
     @Override
@@ -102,22 +115,6 @@ public class IngestAppraisal extends Composite {
     }
   };
 
-  private static final Filter DEFAULT_FILTER_AIP = new Filter(
-    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
-  private static final Filter DEFAULT_FILTER_REPRESENTATIONS = new Filter(
-    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
-  private static final Filter DEFAULT_FILTER_FILES = new Filter(
-    new SimpleFilterParameter(RodaConstants.STATE, AIPState.UNDER_APPRAISAL.toString()));
-
-  private static IngestAppraisal instance = null;
-
-  public static IngestAppraisal getInstance() {
-    if (instance == null) {
-      instance = new IngestAppraisal();
-    }
-    return instance;
-  }
-
   interface MyUiBinder extends UiBinder<Widget, IngestAppraisal> {
   }
 
@@ -127,6 +124,8 @@ public class IngestAppraisal extends Composite {
 
   @SuppressWarnings("unused")
   private ClientLogger logger = new ClientLogger(getClass().getName());
+
+  private final Filter filter;
 
   @UiField
   FlowPanel ingestAppraisalDescription;
@@ -176,7 +175,8 @@ public class IngestAppraisal extends Composite {
   boolean filesSelectable = false;
   boolean justActive = false;
 
-  private IngestAppraisal() {
+  private IngestAppraisal(Filter filter) {
+    this.filter = filter;
     facetDescriptionLevels = new FlowPanel();
     facetHasRepresentations = new FlowPanel();
 
@@ -188,8 +188,7 @@ public class IngestAppraisal extends Composite {
     filesSearchAdvancedFieldsPanel = new FlowPanel();
     representationsSearchAdvancedFieldsPanel = new FlowPanel();
 
-    searchPanel = new SearchPanel(DEFAULT_FILTER_AIP, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true,
-      true);
+    searchPanel = new SearchPanel(BASE_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true);
 
     searchAdvancedFieldOptions = new ListBox();
 
@@ -354,16 +353,6 @@ public class IngestAppraisal extends Composite {
     return filter;
   }
 
-  public void resolve(List<String> historyTokens, AsyncCallback<Widget> callback) {
-    if (historyTokens.size() == 0) {
-      itemsSearchResultPanel.refresh();
-      callback.onSuccess(this);
-    } else {
-      Tools.newHistory(RESOLVER);
-      callback.onSuccess(null);
-    }
-  }
-
   private void addSearchFieldPanel(final SearchFieldPanel searchFieldPanel) {
     itemsSearchAdvancedFieldsPanel.add(searchFieldPanel);
     itemsSearchAdvancedFieldsPanel.removeStyleName("empty");
@@ -390,7 +379,7 @@ public class IngestAppraisal extends Composite {
       createItemsSearchResultPanel();
     }
 
-    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
+    searchPanel.setVariables(filter, RodaConstants.REPRESENTATION_SEARCH, itemsSearchResultPanel,
       itemsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(true);
 
@@ -406,8 +395,8 @@ public class IngestAppraisal extends Composite {
       createRepresentationsSearchResultPanel();
     }
 
-    searchPanel.setVariables(DEFAULT_FILTER_REPRESENTATIONS, RodaConstants.REPRESENTATION_SEARCH,
-      representationsSearchResultPanel, representationsSearchAdvancedFieldsPanel);
+    searchPanel.setVariables(filter, RodaConstants.REPRESENTATION_SEARCH, representationsSearchResultPanel,
+      representationsSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
 
     searchResultPanel.clear();
@@ -422,8 +411,7 @@ public class IngestAppraisal extends Composite {
       createFilesSearchResultPanel();
     }
 
-    searchPanel.setVariables(DEFAULT_FILTER_FILES, RodaConstants.FILE_SEARCH, filesSearchResultPanel,
-      filesSearchAdvancedFieldsPanel);
+    searchPanel.setVariables(filter, RodaConstants.FILE_SEARCH, filesSearchResultPanel, filesSearchAdvancedFieldsPanel);
     searchPanel.setSearchAdvancedFieldOptionsAddVisible(false);
 
     searchResultPanel.clear();
@@ -437,8 +425,7 @@ public class IngestAppraisal extends Composite {
     Facets facets = new Facets(new SimpleFacetParameter(RodaConstants.AIP_LEVEL),
       new SimpleFacetParameter(RodaConstants.AIP_HAS_REPRESENTATIONS));
 
-    itemsSearchResultPanel = new AIPList(DEFAULT_FILTER_AIP, justActive, facets, messages.searchResults(),
-      itemsSelectable);
+    itemsSearchResultPanel = new AIPList(BASE_FILTER, justActive, facets, messages.searchResults(), itemsSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.AIP_LEVEL, facetDescriptionLevels);
@@ -469,8 +456,8 @@ public class IngestAppraisal extends Composite {
   }
 
   private void createRepresentationsSearchResultPanel() {
-    representationsSearchResultPanel = new RepresentationList(DEFAULT_FILTER_REPRESENTATIONS, justActive, Facets.NONE,
-      messages.searchResults(), representationsSelectable);
+    representationsSearchResultPanel = new RepresentationList(filter, justActive, Facets.NONE, messages.searchResults(),
+      representationsSelectable);
 
     representationsSearchResultPanel.getSelectionModel().addSelectionChangeHandler(new Handler() {
 
@@ -500,8 +487,7 @@ public class IngestAppraisal extends Composite {
       new SimpleFacetParameter(RodaConstants.FILE_PRONOM),
       new SimpleFacetParameter(RodaConstants.FILE_FORMAT_MIMETYPE));
 
-    filesSearchResultPanel = new SearchFileList(DEFAULT_FILTER_FILES, justActive, facets, messages.searchResults(),
-      filesSelectable);
+    filesSearchResultPanel = new SearchFileList(filter, justActive, facets, messages.searchResults(), filesSelectable);
 
     Map<String, FlowPanel> facetPanels = new HashMap<String, FlowPanel>();
     facetPanels.put(RodaConstants.FILE_FILEFORMAT, facetFormats);
@@ -531,6 +517,7 @@ public class IngestAppraisal extends Composite {
     });
   }
 
+  @SuppressWarnings("unchecked")
   @UiHandler("acceptButton")
   void buttonAcceptHandler(ClickEvent e) {
     boolean accept = true;
@@ -560,6 +547,7 @@ public class IngestAppraisal extends Composite {
           // nothing to do
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public void onSuccess(final String rejectReason) {
           // TODO support accept of reps and files

@@ -441,8 +441,7 @@ public class ShowJob extends Composite {
 
   @UiHandler("buttonAppraisal")
   void buttonAppraisalHandler(ClickEvent e) {
-    // TODO filter by job
-    Tools.newHistory(IngestAppraisal.RESOLVER);
+    Tools.newHistory(IngestAppraisal.RESOLVER, RodaConstants.AIP_INGEST_JOB_ID, job.getId());
   }
 
   @UiHandler("buttonBack")
