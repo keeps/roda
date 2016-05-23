@@ -211,14 +211,11 @@ public class BrowserHelper {
     throws GenericException, RequestNotValidException, AuthorizationDeniedException, NotFoundException {
     ModelService model = RodaCoreFactory.getModelService();
     List<DescriptiveMetadata> listDescriptiveMetadataBinaries = model.retrieveAIP(aipId).getDescriptiveMetadata();
-
-    List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<DescriptiveMetadataViewBundle>();
+    List<DescriptiveMetadataViewBundle> descriptiveMetadataList = new ArrayList<>();
 
     for (DescriptiveMetadata descriptiveMetadata : listDescriptiveMetadataBinaries) {
       DescriptiveMetadataViewBundle bundle = getDescriptiveMetadataBundle(aipId, descriptiveMetadata, locale);
-
       descriptiveMetadataList.add(bundle);
-
     }
 
     return descriptiveMetadataList;

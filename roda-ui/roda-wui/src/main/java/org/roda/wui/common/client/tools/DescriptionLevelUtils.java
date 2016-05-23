@@ -10,11 +10,15 @@ package org.roda.wui.common.client.tools;
 import java.util.List;
 
 import org.roda.core.data.descriptionLevels.DescriptionLevel;
+import org.roda.core.data.descriptionLevels.DescriptionLevelCategory;
 import org.roda.core.data.descriptionLevels.DescriptionLevelInfo;
+import org.roda.wui.client.common.utils.StringUtils;
 import org.roda.wui.client.main.DescriptionLevelInfoPack;
 import org.roda.wui.client.main.DescriptionLevelServiceAsync;
 import org.roda.wui.common.client.ClientLogger;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -86,8 +90,18 @@ public class DescriptionLevelUtils {
   }
 
   public static SafeHtml getElementLevelIconSafeHtml(String level, boolean showText) {
+    final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
+
     StringBuilder b = new StringBuilder();
-    b.append("<i class='").append(getElementLevelIconClasses(level)).append("'>");
+    DescriptionLevelCategory category = levelInfo != null ? levelInfo.getCategory() : null;
+    b.append("<i class='").append(getElementLevelIconClasses(category));
+    if (levelInfo != null) {
+      String label = levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName());
+      if (StringUtils.isNotBlank(label)) {
+        b.append(" alt='").append(levelInfo.getLabel(LocaleInfo.getCurrentLocale().getLocaleName())).append("'");
+      }
+    }
+    b.append("'>");
     b.append("</i>");
     if (showText && level != null && level.length() > 0) {
       b.append("&nbsp;");
@@ -96,11 +110,10 @@ public class DescriptionLevelUtils {
     return SafeHtmlUtils.fromSafeConstant(b.toString());
   }
 
-  public static String getElementLevelIconClasses(String level) {
+  public static String getElementLevelIconClasses(DescriptionLevelCategory descriptionLevelCategory) {
     String ret;
-    final DescriptionLevelInfo levelInfo = DescriptionLevelUtils.getDescriptionLevel(level);
-    if (levelInfo != null) {
-      ret = "description-level description-level-" + levelInfo.getCategory().getCategory();
+    if (descriptionLevelCategory != null) {
+      ret = "description-level description-level-" + descriptionLevelCategory.getCategory();
     } else {
       ret = "description-level";
     }
