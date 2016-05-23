@@ -55,6 +55,11 @@ public class Pair<K, V> implements Serializable {
   }
 
   @Override
+  public String toString() {
+    return "(" + first + ", " + second + ")";
+  }
+
+  @Override
   public boolean equals(Object obj) {
     if (this == obj) {
       return true;

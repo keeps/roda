@@ -14,7 +14,7 @@ sudo apt-get install oracle-java8-set-default
 
 ### Application Server (required)
 Recommended application server is Apache Tomcat 8, but other Java EE application servers might work.
-To install, [download Apache Tomcat}(http://tomcat.apache.org/) and unzip it to your preferred folder.
+To install, [download Apache Tomcat](http://tomcat.apache.org/) and unzip it to your preferred folder.
 
 ### Apache Solr (optional)
 

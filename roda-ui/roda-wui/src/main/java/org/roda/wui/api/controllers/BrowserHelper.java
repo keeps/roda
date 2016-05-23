@@ -115,6 +115,7 @@ import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.plugins.PluginHelper;
+import org.roda.core.plugins.plugins.ingest.AutoAcceptSIPPlugin;
 import org.roda.core.plugins.plugins.risks.RiskIncidenceRemoverPlugin;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.BinaryVersion;
@@ -1805,10 +1806,22 @@ public class BrowserHelper {
     List<String> listOfIds = consolidate(user, IndexedAIP.class, selected);
 
     ModelService model = RodaCoreFactory.getModelService();
+    IndexService index = RodaCoreFactory.getIndexService();
     Date now = new Date();
 
-    // map of job -> (total, accepted)
+    // map of job id -> (total, accepted)
     Map<String, Pair<Integer, Integer>> jobState = new HashMap<>();
+
+    String userAgentId;
+    try {
+      boolean notifyAgent = true;
+      PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(user.getName(), model, index, notifyAgent);
+      userAgentId = pm.getId();
+    } catch (AlreadyExistsException e) {
+      userAgentId = IdUtils.getUserAgentId(user.getName());
+    } catch (ValidationException e) {
+      throw new GenericException(e);
+    }
 
     for (String aipId : listOfIds) {
       AIP aip = model.retrieveAIP(aipId);
@@ -1817,37 +1830,28 @@ public class BrowserHelper {
         // Accept AIP
         aip.setState(AIPState.ACTIVE);
         model.updateAIPState(aip);
-        // TODO create preservation event
 
-        IndexedPreservationAgent userAgent = null;
-        try {
-          boolean notifyAgent = true;
-          userAgent = PremisV3Utils.createPremisUserAgentBinary(plugin, model, index, notifyAgent);
-        } catch (AlreadyExistsException e) {
-          userAgent = PremisV3Utils.getPreservationUserAgent(plugin, model, index);
-        } catch (RODAException e) {
-          LOGGER.error("Error creating PREMIS agent", e);
-        }
-
+        // create preservation event
         String id = UUID.randomUUID().toString();
         PreservationEventType type = PreservationEventType.ACCESSION;
-        String preservationEventDescription = "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+        String preservationEventDescription = AutoAcceptSIPPlugin.DESCRIPTION;
         List<LinkingIdentifier> sources = new ArrayList<>();
         List<LinkingIdentifier> outcomes = Arrays
           .asList(PluginHelper.getLinkingIdentifier(aipId, RodaConstants.PRESERVATION_LINKING_OBJECT_OUTCOME));
         PluginState outcome = PluginState.SUCCESS;
-        String outcomeDetailNote = null;
+        String outcomeDetailNote = AutoAcceptSIPPlugin.SUCCESS_MESSAGE;
         String outcomeDetailExtension = null;
-        boolean notify = false;
-        ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
-          preservationEventDescription, sources, outcomes, outcome.name(), outcomeDetailNote, outcomeDetailExtension,
-          Arrays.asList(userAgent));
-        model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
-          notify);
-        PreservationMetadata pm = new PreservationMetadata();
-        pm.setAipId(aipId);
-        pm.setId(id);
-        pm.setType(PreservationMetadataType.EVENT);
+        boolean notifyEvent = true;
+        try {
+          ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, now, type.toString(),
+            preservationEventDescription, sources, outcomes, outcome.name(), outcomeDetailNote, outcomeDetailExtension,
+            Arrays.asList(userAgentId));
+
+          model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipId, null, null, null, premisEvent,
+            notifyEvent);
+        } catch (AlreadyExistsException | ValidationException e) {
+          throw new GenericException(e);
+        }
 
       } else {
         // Reject AIP
@@ -1899,7 +1903,7 @@ public class BrowserHelper {
 
     }
 
-    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class);
+    RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
 }

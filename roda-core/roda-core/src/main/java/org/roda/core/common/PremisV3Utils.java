@@ -50,20 +50,17 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.metadata.Fixity;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
-import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.user.RODAMember;
 import org.roda.core.data.v2.validation.ValidationException;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.Plugin;
-import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.Binary;
 import org.roda.core.storage.ContentPayload;
-import org.roda.core.storage.StringContentPayload;
 import org.roda.core.storage.fs.FSUtils;
 import org.roda.core.util.FileUtility;
 import org.slf4j.Logger;
@@ -318,7 +315,7 @@ public class PremisV3Utils {
 
   public static ContentPayload createPremisEventBinary(String eventID, Date date, String type, String details,
     List<LinkingIdentifier> sources, List<LinkingIdentifier> outcomes, String outcome, String detailNote,
-    String detailExtension, List<IndexedPreservationAgent> agents) throws GenericException, ValidationException {
+    String detailExtension, List<String> agentIds) throws GenericException, ValidationException {
     EventDocument event = EventDocument.Factory.newInstance();
     EventComplexType ect = event.addNewEvent();
     EventIdentifierComplexType eict = ect.addNewEventIdentifier();
@@ -350,12 +347,12 @@ public class PremisV3Utils {
       }
     }
 
-    if (agents != null) {
-      for (IndexedPreservationAgent agent : agents) {
+    if (agentIds != null) {
+      for (String agentId : agentIds) {
         LinkingAgentIdentifierComplexType agentIdentifier = ect.addNewLinkingAgentIdentifier();
+        // FIXME lfaria 20160523: put agent identifier type in constant
         agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("local"));
-        agentIdentifier.setLinkingAgentIdentifierValue(agent.getId());
-        agentIdentifier.setLinkingAgentIdentifierType(getStringPlusAuthority("simple"));
+        agentIdentifier.setLinkingAgentIdentifierValue(agentId);
       }
     }
     EventOutcomeInformationComplexType outcomeInformation = ect.addNewEventOutcomeInformation();
@@ -711,26 +708,14 @@ public class PremisV3Utils {
     return doc;
   }
 
-  public static IndexedPreservationAgent createPremisAgentBinary(Plugin<?> plugin, ModelService model, boolean notify)
+  public static PreservationMetadata createPremisAgentBinary(Plugin<?> plugin, ModelService model, boolean notify)
     throws GenericException, NotFoundException, RequestNotValidException, AuthorizationDeniedException,
     ValidationException, AlreadyExistsException {
-    String id = plugin.getClass().getName() + "@" + plugin.getVersion();
-    ContentPayload agentPayload;
-
-    // TODO set agent extension
-    agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(), "",
-      plugin.getDescription(), plugin.getVersion());
-    model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
-    IndexedPreservationAgent agent = getPreservationAgent(plugin, model);
-    return agent;
-  }
-
-  public static IndexedPreservationAgent getPreservationAgent(Plugin<?> plugin, ModelService model) {
-    String id = plugin.getClass().getName() + "@" + plugin.getVersion();
-    IndexedPreservationAgent agent = new IndexedPreservationAgent();
-    agent.setId(id);
-    agent.setName(plugin.getName());
-    return agent;
+    String id = IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion());
+    String extension = "";
+    ContentPayload agentPayload = PremisV3Utils.createPremisAgentBinary(id, plugin.getName(), plugin.getAgentType(),
+      extension, plugin.getDescription(), plugin.getVersion());
+    return model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
   }
 
   public static void linkFileToRepresentation(File file, String relationshipType, String relationshipSubType,
@@ -811,38 +796,40 @@ public class PremisV3Utils {
     return dst;
   }
 
-  public static IndexedPreservationAgent createPremisUserAgentBinary(Plugin<?> plugin, ModelService model,
+  public static PreservationMetadata createPremisUserAgentBinary(String username, ModelService model,
     IndexService index, boolean notify) throws GenericException, ValidationException, NotFoundException,
     RequestNotValidException, AuthorizationDeniedException, AlreadyExistsException {
-    IndexedPreservationAgent agent = null;
-    Job job = null;
-    try {
-      job = PluginHelper.getJobFromIndex(plugin, index);
-    } catch (NotFoundException e) {
-      LOGGER.warn("Could not create PREMIS user agent because job could not be found: " + e.getMessage());
-    }
-    if (job != null && job.getUsername() != null) {
-      RODAMember member = index.retrieve(RODAMember.class, job.getUsername());
-      String id = job.getUsername();
+    PreservationMetadata pm = null;
+
+    if (StringUtils.isNotBlank(username)) {
+      RODAMember member = index.retrieve(RODAMember.class, username);
+      String id = IdUtils.getUserAgentId(username);
       ContentPayload agentPayload;
 
       // TODO set agent extension
-      agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON, "",
-        "", "");
-      model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
-      agent = getPreservationAgent(plugin, model);
+      String extension = "";
+      String note = "";
+      String version = "";
+      agentPayload = PremisV3Utils.createPremisAgentBinary(id, member.getFullName(), PreservationAgentType.PERSON,
+        extension, note, version);
+      pm = model.createPreservationMetadata(PreservationMetadataType.AGENT, id, agentPayload, notify);
     }
 
-    return agent;
+    return pm;
   }
 
-  public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?> plugin, ModelService model,
-    IndexService index) throws NotFoundException, GenericException {
-    Job job = PluginHelper.getJobFromIndex(plugin, index);
-    String id = job.getUsername();
-    IndexedPreservationAgent agent = new IndexedPreservationAgent();
-    agent.setId(id);
-    agent.setName(plugin.getName());
-    return agent;
-  }
+  // /**
+  // * @deprecated
+  // */
+  // @Deprecated
+  // public static IndexedPreservationAgent getPreservationUserAgent(Plugin<?>
+  // plugin, ModelService model,
+  // IndexService index) throws NotFoundException, GenericException {
+  // Job job = PluginHelper.getJobFromIndex(plugin, index);
+  // String id = job.getUsername();
+  // IndexedPreservationAgent agent = new IndexedPreservationAgent();
+  // agent.setId(id);
+  // agent.setName(plugin.getName());
+  // return agent;
+  // }
 }

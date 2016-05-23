@@ -41,7 +41,6 @@ import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
 import org.roda.core.data.v2.ip.TransferredResource;
-import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
@@ -521,22 +520,25 @@ public final class PluginHelper {
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
 
-    IndexedPreservationAgent agent = null;
+    Job job = getJobFromIndex(plugin, index);
+    List<String> agentIds = new ArrayList<>();
+
     try {
       boolean notifyAgent = true;
-      agent = PremisV3Utils.createPremisAgentBinary(plugin, model, notifyAgent);
+      PreservationMetadata pm = PremisV3Utils.createPremisAgentBinary(plugin, model, notifyAgent);
+      agentIds.add(pm.getId());
     } catch (AlreadyExistsException e) {
-      agent = PremisV3Utils.getPreservationAgent(plugin, model);
+      agentIds.add(IdUtils.getPluginAgentId(plugin.getClass().getName(), plugin.getVersion()));
     } catch (RODAException e) {
       LOGGER.error("Error creating PREMIS agent", e);
     }
 
-    IndexedPreservationAgent userAgent = null;
     try {
       boolean notifyAgent = true;
-      userAgent = PremisV3Utils.createPremisUserAgentBinary(plugin, model, index, notifyAgent);
+      PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(job.getUsername(), model, index, notifyAgent);
+      agentIds.add(pm.getId());
     } catch (AlreadyExistsException e) {
-      userAgent = PremisV3Utils.getPreservationUserAgent(plugin, model, index);
+      agentIds.add(IdUtils.getUserAgentId(job.getUsername()));
     } catch (RODAException e) {
       LOGGER.error("Error creating PREMIS agent", e);
     }
@@ -546,14 +548,13 @@ public final class PluginHelper {
       : plugin.getPreservationEventFailureMessage();
     ContentPayload premisEvent = PremisV3Utils.createPremisEventBinary(id, startDate,
       plugin.getPreservationEventType().toString(), plugin.getPreservationEventDescription(), sources, outcomes,
-      outcome.name(), outcomeDetailNote, outcomeDetailExtension,
-      userAgent != null ? Arrays.asList(agent, userAgent) : Arrays.asList(agent));
+      outcome.name(), outcomeDetailNote, outcomeDetailExtension, agentIds);
     model.createPreservationMetadata(PreservationMetadataType.EVENT, id, aipID, representationID, filePath, fileID,
       premisEvent, notify);
     PreservationMetadata pm = new PreservationMetadata();
+    pm.setId(id);
     pm.setAipId(aipID);
     pm.setRepresentationId(representationID);
-    pm.setId(id);
     pm.setType(PreservationMetadataType.EVENT);
     return pm;
   }

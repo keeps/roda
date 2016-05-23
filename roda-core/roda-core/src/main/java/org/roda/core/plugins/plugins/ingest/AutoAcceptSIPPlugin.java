@@ -33,6 +33,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
+  public static final String FAILURE_MESSAGE = "Failed to add the AIP to the repository's inventory.";
+  public static final String SUCCESS_MESSAGE = "The AIP was successfully added to the repository's inventory.";
+  public static final String DESCRIPTION = "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
   private static final Logger LOGGER = LoggerFactory.getLogger(AutoAcceptSIPPlugin.class);
 
   @Override
@@ -150,17 +153,17 @@ public class AutoAcceptSIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public String getPreservationEventDescription() {
-    return "Added package to the inventory. After this point, the responsibility for the digital content’s preservation is passed on to the repository.";
+    return DESCRIPTION;
   }
 
   @Override
   public String getPreservationEventSuccessMessage() {
-    return "The AIP was successfully added to the repository's inventory.";
+    return SUCCESS_MESSAGE;
   }
 
   @Override
   public String getPreservationEventFailureMessage() {
-    return "Failed to add the AIP to the repository's inventory.";
+    return FAILURE_MESSAGE;
   }
 
   @Override

@@ -105,4 +105,12 @@ public final class IdUtils {
     return prefix + ID_SEPARATOR + suffix;
   }
 
+  public static String getPluginAgentId(String pluginClassName, String version) {
+    return pluginClassName + "@" + version;
+  }
+  
+  public static String getUserAgentId(String username) {
+    return username;
+  }
+
 }
