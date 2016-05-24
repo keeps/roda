@@ -302,7 +302,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public PluginType getType() {
-    return PluginType.RISK;
+    return PluginType.MISC;
   }
 
   @Override
@@ -349,5 +349,10 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public String getPreservationEventFailureMessage() {
     return "Risk was not successfully associated with objects";
+  }
+
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList("risk", "tested");
   }
 }

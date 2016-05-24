@@ -203,4 +203,10 @@ public class ReindexRodaEntityPlugin<T extends Serializable> extends AbstractPlu
     return "An error occured while reindexing all " + clazz.getSimpleName();
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

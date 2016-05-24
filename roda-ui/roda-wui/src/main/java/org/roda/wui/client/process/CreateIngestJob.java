@@ -50,6 +50,7 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
 
   public CreateIngestJob() {
     super(TransferredResource.class, Arrays.asList(pluginTypes));
+    super.setCategoryListBoxVisible(false);
   }
 
   @Override

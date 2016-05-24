@@ -129,6 +129,11 @@ public interface Plugin<T extends Serializable> {
   public PluginType getType();
 
   /**
+   * Method to return Plugin categories
+   */
+  public List<String> getCategories();
+
+  /**
    * Method used by PluginManager to obtain a new instance of a plugin, from the
    * current loaded Plugin, to provide to PluginOrchestrator
    */

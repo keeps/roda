@@ -456,4 +456,10 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

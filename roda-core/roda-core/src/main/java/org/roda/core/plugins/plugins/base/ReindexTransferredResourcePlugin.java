@@ -149,4 +149,10 @@ public class ReindexTransferredResourcePlugin extends AbstractPlugin<Transferred
   public String getPreservationEventFailureMessage() {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

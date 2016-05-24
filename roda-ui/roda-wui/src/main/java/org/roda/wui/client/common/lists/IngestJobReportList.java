@@ -61,7 +61,7 @@ public class IngestJobReportList extends BasicAsyncTableCell<Report> {
   private final Map<String, PluginInfo> pluginsInfo;
 
   public IngestJobReportList() {
-    this(null, null, null, null, false);
+    this(null, null, null, new HashMap<String, PluginInfo>(), false);
   }
 
   public IngestJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,

@@ -171,4 +171,10 @@ public class EARKSIPToAIPPlugin extends SIPToAIPPlugin {
     return true;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -60,7 +60,7 @@ public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
   private final Map<String, PluginInfo> pluginsInfo;
 
   public SimpleJobReportList() {
-    this(null, null, null, null, false);
+    this(null, null, null, new HashMap<String, PluginInfo>(), false);
   }
 
   public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,

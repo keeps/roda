@@ -97,4 +97,10 @@ public class ImageMagickConvertPlugin<T extends Serializable> extends CommandCon
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

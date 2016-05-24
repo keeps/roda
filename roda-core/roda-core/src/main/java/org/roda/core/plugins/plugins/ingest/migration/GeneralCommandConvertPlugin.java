@@ -87,4 +87,10 @@ public class GeneralCommandConvertPlugin<T extends Serializable> extends Command
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

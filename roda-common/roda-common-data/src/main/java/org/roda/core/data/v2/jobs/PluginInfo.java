@@ -32,6 +32,8 @@ public class PluginInfo implements Serializable {
 
   private PluginType type = PluginType.MISC;
 
+  private List<String> categories = null;
+
   private List<PluginParameter> parameters = new ArrayList<PluginParameter>();
 
   /**
@@ -48,7 +50,7 @@ public class PluginInfo implements Serializable {
    */
   public PluginInfo(PluginInfo pluginInfo) {
     this(pluginInfo.getId(), pluginInfo.getName(), pluginInfo.getVersion(), pluginInfo.getDescription(),
-      pluginInfo.getType(), pluginInfo.getParameters());
+      pluginInfo.getType(), pluginInfo.getCategories(), pluginInfo.getParameters());
   }
 
   /**
@@ -61,12 +63,13 @@ public class PluginInfo implements Serializable {
    * @param parameters
    */
   public PluginInfo(String id, String name, String version, String description, PluginType type,
-    List<PluginParameter> parameters) {
+    List<String> categories, List<PluginParameter> parameters) {
     setId(id);
     setName(name);
     setVersion(version);
     setDescription(description);
     setType(type);
+    setCategories(categories);
     setParameters(parameters);
   }
 
@@ -99,7 +102,7 @@ public class PluginInfo implements Serializable {
   @Override
   public String toString() {
     return "PluginInfo [id=" + id + ", name=" + name + ", version=" + version + ", description=" + description
-      + ", type=" + type + ", parameters=" + parameters + "]";
+      + ", type=" + type + ", categories=" + categories + ", parameters=" + parameters + "]";
   }
 
   /**
@@ -168,6 +171,14 @@ public class PluginInfo implements Serializable {
 
   public void setType(PluginType type) {
     this.type = type;
+  }
+
+  public List<String> getCategories() {
+    return categories;
+  }
+
+  public void setCategories(List<String> categories) {
+    this.categories = categories;
   }
 
   /**

@@ -109,4 +109,10 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

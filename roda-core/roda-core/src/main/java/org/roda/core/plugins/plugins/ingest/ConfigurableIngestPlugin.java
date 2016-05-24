@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -156,6 +157,11 @@ public class ConfigurableIngestPlugin extends DefaultIngestPlugin {
   @Override
   public void setTotalSteps() {
     this.totalSteps = 10;
+  }
+
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList("ingest");
   }
 
 }

@@ -303,4 +303,10 @@ public class VerifyProducerAuthorizationPlugin extends AbstractPlugin<AIP> {
     // do nothing
     return null;
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

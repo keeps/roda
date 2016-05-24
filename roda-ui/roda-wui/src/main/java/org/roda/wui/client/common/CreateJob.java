@@ -10,6 +10,7 @@
  */
 package org.roda.wui.client.common;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -111,6 +112,12 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Label selectedObject;
 
   @UiField
+  Label workflowCategoryLabel;
+
+  @UiField
+  ListBox workflowCategoryList;
+
+  @UiField
   ListBox workflowList;
 
   @UiField
@@ -176,6 +183,36 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         updateWorkflowOptions();
       }
     });
+
+    final List<PluginInfo> finalPlugins = plugins;
+
+    workflowCategoryList.addChangeHandler(new ChangeHandler() {
+
+      @Override
+      public void onChange(ChangeEvent event) {
+        String selectedCategory = workflowCategoryList.getSelectedValue();
+        workflowList.clear();
+
+        if (finalPlugins != null) {
+          PluginUtils.sortByName(finalPlugins);
+          for (PluginInfo pluginInfo : finalPlugins) {
+            if (pluginInfo != null) {
+              if (selectedCategory.equals(messages.allCategoryItem())
+                || (pluginInfo.getCategories() != null && pluginInfo.getCategories().contains(selectedCategory))) {
+                workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                  pluginInfo.getId());
+              }
+            }
+          }
+        }
+
+        String selectedPluginId = workflowList.getSelectedValue();
+        if (selectedPluginId != null) {
+          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+        }
+        updateWorkflowOptions();
+      }
+    });
   }
 
   public abstract boolean updateObjectList();
@@ -183,11 +220,23 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   protected void configurePlugins(boolean isEmpty, String selectedClass) {
     // TODO filter pluginInfos considering the empty or selected type
     GWT.log(plugins.toString());
+    List<String> categoriesOnListBox = new ArrayList<String>();
 
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
+      workflowCategoryList.addItem(messages.allCategoryItem());
+
       for (PluginInfo pluginInfo : plugins) {
         if (pluginInfo != null) {
+          if (pluginInfo.getCategories() != null) {
+            for (String category : pluginInfo.getCategories()) {
+              if (!categoriesOnListBox.contains(category)) {
+                workflowCategoryList.addItem(category);
+                categoriesOnListBox.add(category);
+              }
+            }
+          }
+
           workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()), pluginInfo.getId());
         } else {
           GWT.log("Got a null plugin");
@@ -281,6 +330,11 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
   public void setJobSelectedDescription(String text) {
     selectedObject.setText(text);
+  }
+
+  public void setCategoryListBoxVisible(boolean visible) {
+    workflowCategoryLabel.setVisible(visible);
+    workflowCategoryList.setVisible(visible);
   }
 
 }

@@ -1685,7 +1685,7 @@ public class BrowserHelper {
 
     Date jobDate = new Date();
     PluginInfo pluginInfo = new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(),
-      plugin.getDescription(), plugin.getType(), plugin.getParameters());
+      plugin.getDescription(), plugin.getType(), plugin.getCategories(), plugin.getParameters());
 
     Job job = new Job();
     job.setName(plugin.getName() + " " + jobDate);

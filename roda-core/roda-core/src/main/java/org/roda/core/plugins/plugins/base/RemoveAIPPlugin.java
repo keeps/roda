@@ -152,4 +152,10 @@ public class RemoveAIPPlugin extends AbstractPlugin<AIP> {
   public String getPreservationEventFailureMessage() {
     return "The AIPs were not removed";
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

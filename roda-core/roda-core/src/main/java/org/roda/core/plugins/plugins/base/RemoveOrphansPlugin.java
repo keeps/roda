@@ -145,4 +145,10 @@ public class RemoveOrphansPlugin extends AbstractPlugin<IndexedAIP> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

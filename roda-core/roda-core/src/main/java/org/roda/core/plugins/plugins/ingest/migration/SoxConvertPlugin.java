@@ -97,4 +97,10 @@ public class SoxConvertPlugin<T extends Serializable> extends CommandConvertPlug
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

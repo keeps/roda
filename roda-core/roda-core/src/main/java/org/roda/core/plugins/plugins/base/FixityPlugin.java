@@ -10,6 +10,7 @@ package org.roda.core.plugins.plugins.base;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -159,7 +160,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                   }
 
                 } else {
-                  LOGGER.error("Cannot process File", oFile.getCause());
+                  LOGGER.warn("Cannot process File", oFile.getCause());
                 }
               }
             }
@@ -318,5 +319,10 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
     return null;
+  }
+
+  @Override
+  public List<String> getCategories() {
+    return Arrays.asList("fixity_check", "tested");
   }
 }

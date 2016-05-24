@@ -129,4 +129,10 @@ public class AvconvConvertPlugin<T extends Serializable> extends CommandConvertP
     // do nothing
     return null;
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

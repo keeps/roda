@@ -310,6 +310,12 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Workflow")
   String createJobWorkflow();
 
+  @DefaultMessage("Category")
+  String createJobCategoryWorkflow();
+
+  @DefaultMessage("All")
+  String allCategoryItem();
+
   @DefaultMessage("Empty")
   String emptyAssociativeObjectLabel();
 

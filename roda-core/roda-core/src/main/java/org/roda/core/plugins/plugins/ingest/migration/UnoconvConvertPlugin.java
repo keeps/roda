@@ -98,4 +98,10 @@ public class UnoconvConvertPlugin<T extends Serializable> extends CommandConvert
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -130,8 +130,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         // not representation level)
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(),
-          AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
         StringBuilder details = new StringBuilder();
 
@@ -311,6 +310,12 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     // do nothing
+    return null;
+  }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
     return null;
   }
 

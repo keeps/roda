@@ -207,4 +207,10 @@ public class ReindexJobPlugin extends AbstractPlugin<Job> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

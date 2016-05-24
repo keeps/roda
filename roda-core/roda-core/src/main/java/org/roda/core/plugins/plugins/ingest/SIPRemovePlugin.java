@@ -150,4 +150,10 @@ public class SIPRemovePlugin extends AbstractPlugin<TransferredResource> {
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -240,4 +240,10 @@ public class TransferredResourceToAIPPlugin extends SIPToAIPPlugin {
     return true;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

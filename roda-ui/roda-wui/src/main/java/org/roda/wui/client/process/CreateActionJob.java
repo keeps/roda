@@ -50,7 +50,7 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
 
   @SuppressWarnings("unused")
   private static MyUiBinder uiBinder = GWT.create(MyUiBinder.class);
-  private static PluginType[] pluginTypes = {PluginType.RISK, PluginType.AIP_TO_AIP, PluginType.MISC};
+  private static PluginType[] pluginTypes = {PluginType.AIP_TO_AIP, PluginType.MISC};
 
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 

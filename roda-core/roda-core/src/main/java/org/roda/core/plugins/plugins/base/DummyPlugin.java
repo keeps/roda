@@ -123,4 +123,10 @@ public class DummyPlugin extends AbstractPlugin<AIP> {
     return null;
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

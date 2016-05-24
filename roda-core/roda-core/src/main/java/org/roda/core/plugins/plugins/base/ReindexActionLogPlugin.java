@@ -273,4 +273,10 @@ public class ReindexActionLogPlugin extends AbstractPlugin<LogEntry> {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
 
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

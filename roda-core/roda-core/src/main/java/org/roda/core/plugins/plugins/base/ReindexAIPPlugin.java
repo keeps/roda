@@ -159,4 +159,10 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   public String getPreservationEventFailureMessage() {
     return "XXXXXXXXXXXXXXXXXXXXXXXXXX";
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }

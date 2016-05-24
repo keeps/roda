@@ -190,4 +190,10 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
   public String getPreservationEventFailureMessage() {
     return "The AIPs were not exported";
   }
+
+  @Override
+  public List<String> getCategories() {
+    // TODO Auto-generated method stub
+    return null;
+  }
 }
