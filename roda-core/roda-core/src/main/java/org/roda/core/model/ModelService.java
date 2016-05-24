@@ -1967,7 +1967,9 @@ public class ModelService extends ModelObservable {
       notification.setAcknowledgeToken(UUID.randomUUID().toString());
       List<String> recipients = notification.getRecipientUsers();
 
-      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream("templates/" + templateName + ".vm");
+      String templatePath = RodaCoreFactory.getRodaConfigurationAsString("core", "notification", "template_path");
+
+      InputStream templateStream = RodaCoreFactory.getConfigurationFileAsStream(templatePath + templateName + ".vm");
       String template = IOUtils.toString(templateStream, "UTF-8");
       IOUtils.closeQuietly(templateStream);
 

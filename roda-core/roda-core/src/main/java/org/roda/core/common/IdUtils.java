@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 
 public final class IdUtils {
@@ -19,6 +20,10 @@ public final class IdUtils {
   /** Private empty constructor */
   private IdUtils() {
 
+  }
+
+  public static String getRepresentationId(Representation representation) {
+    return getRepresentationId(representation.getAipId(), representation.getId());
   }
 
   public static String getRepresentationId(String aipId, String representationId) {

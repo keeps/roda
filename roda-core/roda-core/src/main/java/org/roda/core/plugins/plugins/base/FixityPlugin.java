@@ -27,6 +27,7 @@ import org.roda.core.data.exceptions.RODAException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
@@ -144,6 +145,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
                       okFileIDS.add(file.getId());
                     } else {
                       koFileIDS.add(file.getId());
+                      isAipFailed = true;
 
                       try {
                         model.retrieveRisk(riskId);
@@ -153,12 +155,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
                       model.addRiskIncidence(riskId, file.getAipId(), file.getRepresentationId(), file.getPath(),
                         file.getId(), "RiskIncidence");
-
-                      if (!isAipFailed) {
-                        jobPluginInfo.incrementObjectsProcessedWithFailure();
-                        PluginHelper.updateJobInformation(this, jobPluginInfo);
-                        isAipFailed = true;
-                      }
                     }
                   }
 
@@ -214,13 +210,22 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
         }
 
         try {
+          Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.ACTIVE);
+
           if (!isAipFailed) {
+            reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
             PluginHelper.updateJobInformation(this, jobPluginInfo);
             PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
           } else {
+            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fixity checking did not run successfully");
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            PluginHelper.updateJobInformation(this, jobPluginInfo);
             PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
           }
+
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
         } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
           | ValidationException | AlreadyExistsException e) {
           LOGGER.error("Could not create a Fixity Plugin event");
@@ -229,6 +234,8 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
       jobPluginInfo.setPluginExecutionIsDone(true);
       PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      // model.createOrUpdateJobReport(report);
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
     }

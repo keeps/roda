@@ -28,7 +28,8 @@ import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.wui.client.browse.BrowserService;
 import org.roda.wui.client.common.UserLogin;
-import org.roda.wui.client.common.lists.JobReportList;
+import org.roda.wui.client.common.lists.IngestJobReportList;
+import org.roda.wui.client.common.lists.SimpleJobReportList;
 import org.roda.wui.client.common.utils.HtmlSnippetUtils;
 import org.roda.wui.client.ingest.appraisal.IngestAppraisal;
 import org.roda.wui.client.process.ActionProcess;
@@ -171,7 +172,10 @@ public class ShowJob extends Composite {
   Label reportsLabel;
 
   @UiField(provided = true)
-  JobReportList jobReports;
+  IngestJobReportList jobReports;
+
+  @UiField(provided = true)
+  SimpleJobReportList simpleJobReports;
 
   @UiField
   Button buttonAppraisal, buttonBack;
@@ -181,31 +185,59 @@ public class ShowJob extends Composite {
   public ShowJob(Job job, Map<String, PluginInfo> pluginsInfo) {
     this.job = job;
     this.pluginsInfo = pluginsInfo;
+    boolean isIngest = false;
 
     // TODO get better name for job report list
-    jobReports = new JobReportList(new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())),
-      null, "Job report list", pluginsInfo, false);
+    if (job.getPluginType().equals(PluginType.INGEST)) {
+      jobReports = new IngestJobReportList(
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list",
+        pluginsInfo, false);
+      simpleJobReports = new SimpleJobReportList();
+      isIngest = true;
+    } else {
+      simpleJobReports = new SimpleJobReportList(
+        new Filter(new SimpleFilterParameter(RodaConstants.JOB_REPORT_JOB_ID, job.getId())), null, "Job report list",
+        pluginsInfo, false);
+      jobReports = new IngestJobReportList();
+    }
 
     initWidget(uiBinder.createAndBindUi(this));
+    simpleJobReports.setVisible(!isIngest);
+    jobReports.setVisible(isIngest);
 
     name.setText(job.getName());
     creator.setText(job.getUsername());
     dateStarted.setText(dateTimeFormat.format(job.getStartDate()));
     update();
 
-    if (isJobRunning()) {
-      jobReports.autoUpdate(PERIOD_MILLIS);
-    }
-
-    jobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
-
-      @Override
-      public void onSelectionChange(SelectionChangeEvent event) {
-        Report jobReport = jobReports.getSelectionModel().getSelectedObject();
-        GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
-        Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+    if (isIngest) {
+      if (isJobRunning()) {
+        jobReports.autoUpdate(PERIOD_MILLIS);
       }
-    });
+
+      jobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+        @Override
+        public void onSelectionChange(SelectionChangeEvent event) {
+          Report jobReport = jobReports.getSelectionModel().getSelectedObject();
+          GWT.log("new history: " + ShowJobReport.RESOLVER.getHistoryPath() + "/" + jobReport.getId());
+          Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+        }
+      });
+    } else {
+      if (isJobRunning()) {
+        simpleJobReports.autoUpdate(PERIOD_MILLIS);
+      }
+
+      simpleJobReports.getSelectionModel().addSelectionChangeHandler(new Handler() {
+
+        @Override
+        public void onSelectionChange(SelectionChangeEvent event) {
+          Report jobReport = simpleJobReports.getSelectionModel().getSelectedObject();
+          Tools.newHistory(ShowJobReport.RESOLVER, jobReport.getId());
+        }
+      });
+    }
 
     PluginInfo pluginInfo = pluginsInfo.get(job.getPlugin());
     plugin.setText(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()));

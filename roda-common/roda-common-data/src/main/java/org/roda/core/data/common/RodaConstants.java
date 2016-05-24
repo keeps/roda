@@ -89,6 +89,8 @@ public final class RodaConstants {
   public static final String CORE_FORMAT_FOLDER = "format";
   public static final String CORE_NOTIFICATION_FOLDER = "notification";
   public static final String CORE_RISKINCIDENCE_FOLDER = "riskincidence";
+  public static final String CORE_MAIL_TEMPLATE_FOLDER = "mail/templates";
+  public static final String CORE_CERTIFICATES_FOLDER = "certificates";
 
   public static final String DEFAULT_NODE_HOSTNAME = "localhost";
   public static final String DEFAULT_NODE_PORT = "2551";

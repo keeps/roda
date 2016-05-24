@@ -45,14 +45,13 @@ import config.i18n.client.BrowseMessages;
  * @author Luis Faria <lfaria@keep.pt>
  *
  */
-public class JobReportList extends BasicAsyncTableCell<Report> {
+public class SimpleJobReportList extends BasicAsyncTableCell<Report> {
 
   // private final ClientLogger logger = new ClientLogger(getClass().getName());
   private static final BrowseMessages messages = GWT.create(BrowseMessages.class);
 
   // private Column<Report, SafeHtml> objectIdColumn;
-  private TextColumn<Report> sourceObjectColumn;
-  private TextColumn<Report> outcomeObjectColumn;
+  private TextColumn<Report> objectColumn;
   private Column<Report, Date> updatedDateColumn;
   private TextColumn<Report> lastPluginRunColumn;
   private Column<Report, SafeHtml> lastPluginRunStateColumn;
@@ -60,11 +59,11 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
 
   private final Map<String, PluginInfo> pluginsInfo;
 
-  public JobReportList() {
+  public SimpleJobReportList() {
     this(null, null, null, null, false);
   }
 
-  public JobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
+  public SimpleJobReportList(Filter filter, Facets facets, String summary, Map<String, PluginInfo> pluginsInfo,
     boolean selectable) {
     super(filter, facets, summary, selectable);
     super.setSelectedClass(Report.class);
@@ -74,24 +73,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
   @Override
   protected void configureDisplay(CellTable<Report> display) {
 
-    sourceObjectColumn = new TextColumn<Report>() {
-
-      @Override
-      public String getValue(Report report) {
-        String value = "";
-        if (report != null) {
-          if ("".equals(report.getSourceObjectOriginalId())) {
-            value = report.getSourceObjectId();
-          } else {
-            value = report.getSourceObjectOriginalId();
-          }
-        }
-
-        return value;
-      }
-    };
-
-    outcomeObjectColumn = new TextColumn<Report>() {
+    objectColumn = new TextColumn<Report>() {
 
       @Override
       public String getValue(Report report) {
@@ -172,16 +154,14 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
       }
     };
 
-    sourceObjectColumn.setSortable(true);
-    outcomeObjectColumn.setSortable(true);
+    objectColumn.setSortable(true);
     updatedDateColumn.setSortable(true);
     lastPluginRunColumn.setSortable(true);
     lastPluginRunStateColumn.setSortable(true);
     completionStatusColumn.setSortable(false);
 
     // TODO externalize strings into constants
-    addColumn(sourceObjectColumn, "SIP", true, false);
-    addColumn(outcomeObjectColumn, "AIP", true, false);
+    addColumn(objectColumn, "Object Id", true, false);
     addColumn(updatedDateColumn, "Last updated at", true, false, 11);
     addColumn(lastPluginRunColumn, "Last run task", true, false);
     addColumn(lastPluginRunStateColumn, "Status", true, false, 8);
@@ -203,8 +183,7 @@ public class JobReportList extends BasicAsyncTableCell<Report> {
     Filter filter = getFilter();
 
     Map<Column<Report, ?>, List<String>> columnSortingKeyMap = new HashMap<Column<Report, ?>, List<String>>();
-    columnSortingKeyMap.put(sourceObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_SOURCE_OBJECT_ID));
-    columnSortingKeyMap.put(outcomeObjectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
+    columnSortingKeyMap.put(objectColumn, Arrays.asList(RodaConstants.JOB_REPORT_OUTCOME_OBJECT_ID));
     columnSortingKeyMap.put(updatedDateColumn, Arrays.asList(RodaConstants.JOB_REPORT_DATE_UPDATE));
     columnSortingKeyMap.put(lastPluginRunColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN));
     columnSortingKeyMap.put(lastPluginRunStateColumn, Arrays.asList(RodaConstants.JOB_REPORT_PLUGIN_STATE));

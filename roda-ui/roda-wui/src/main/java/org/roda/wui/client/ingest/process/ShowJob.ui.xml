@@ -68,23 +68,16 @@
 									Plugin
 								</g:Label>
 								<g:Label styleName="value" ui:field="plugin" />
-								<g:Label addStyleNames="label" ui:field="pluginMethod">
-									Method
-								</g:Label>
-								<g:Label styleName="value" ui:field="pluginMethodValue" />
 								<g:FlowPanel styleName="panel" ui:field="pluginPanel">
 									<g:FlowPanel styleName="panel-body" ui:field="pluginOptions" />
 								</g:FlowPanel>
-								<g:Label addStyleNames="label" ui:field="objectList">
-									Objects
-								</g:Label>
-								<g:FlowPanel ui:field="objectListValue" />
 							</g:FlowPanel>
 
 							<g:Label addStyleNames="h4" ui:field="reportsLabel">
 								Processed
 							</g:Label>
-							<lists:JobReportList ui:field="jobReports" />
+							<lists:IngestJobReportList ui:field="jobReports" />
+							<lists:SimpleJobReportList ui:field="simpleJobReports" />
 						</g:FlowPanel>
 					</g:FlowPanel>
 				</g:FlowPanel>
