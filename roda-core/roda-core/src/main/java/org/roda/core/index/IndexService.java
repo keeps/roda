@@ -196,6 +196,7 @@ public class IndexService {
       for (OptionalWithCause<PreservationMetadata> opm : iterable) {
         observer.preservationMetadataCreated(opm.get());
       }
+      IOUtils.closeQuietly(iterable);
     } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
       LOGGER.error("Could not reindex preservation agents");
     }

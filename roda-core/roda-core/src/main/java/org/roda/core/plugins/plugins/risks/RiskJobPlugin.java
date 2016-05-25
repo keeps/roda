@@ -159,11 +159,10 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
     }
 
     try {
-
       LOGGER.debug("Creating risk incidences");
       Report pluginReport = PluginHelper.initPluginReport(this);
 
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       if (!list.isEmpty() && riskIds != null) {
@@ -188,6 +187,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
       jobPluginInfo.done();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       LOGGER.debug("Done creating risk incidences");
+
       return pluginReport;
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);

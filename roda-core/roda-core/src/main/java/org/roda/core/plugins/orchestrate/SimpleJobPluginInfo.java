@@ -22,13 +22,12 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
   <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
     Map<Plugin<?>, JobPluginInfo> jobInfos) {
 
-    SimpleJobPluginInfo info = this;
     SimpleJobPluginInfo jobPluginInfo = (SimpleJobPluginInfo) jobInfos.get(plugin);
-    jobPluginInfo.setCompletionPercentage(info.getCompletionPercentage());
-    jobPluginInfo.setObjectsBeingProcessed(pluginExecutionIsDone ? 0 : info.getObjectsBeingProcessed());
-    jobPluginInfo.setObjectsWaitingToBeProcessed(pluginExecutionIsDone ? 0 : info.getObjectsWaitingToBeProcessed());
-    jobPluginInfo.setObjectsProcessedWithSuccess(info.getObjectsProcessedWithSuccess());
-    jobPluginInfo.setObjectsProcessedWithFailure(info.getObjectsProcessedWithFailure());
+    jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
+    jobPluginInfo.setObjectsBeingProcessed(pluginExecutionIsDone ? 0 : this.getObjectsBeingProcessed());
+    jobPluginInfo.setObjectsWaitingToBeProcessed(pluginExecutionIsDone ? 0 : this.getObjectsWaitingToBeProcessed());
+    jobPluginInfo.setObjectsProcessedWithSuccess(this.getObjectsProcessedWithSuccess());
+    jobPluginInfo.setObjectsProcessedWithFailure(this.getObjectsProcessedWithFailure());
 
     int beingProcessed = 0;
     int processedWithSuccess = 0;

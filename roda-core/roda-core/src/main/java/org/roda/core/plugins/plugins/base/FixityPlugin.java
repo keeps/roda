@@ -100,7 +100,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
     Report report = PluginHelper.initPluginReport(this);
 
     try {
-      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo();
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {

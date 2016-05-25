@@ -664,17 +664,15 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         if (PluginType.INGEST == plugin.getType()) {
           IngestJobPluginInfo jobPluginInfo = new IngestJobPluginInfo();
           initJobPluginInfo(innerPlugin, jobId, jobPluginInfo, objectsCount);
-        } else if (PluginType.MISC == plugin.getType()) {
-          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo(objectsCount);
-          initJobPluginInfo(innerPlugin, jobId, pluginInfo, objectsCount);
-        } else if (PluginType.AIP_TO_AIP == plugin.getType()) {
-          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo(objectsCount);
+        } else if (PluginType.MISC == plugin.getType() || PluginType.AIP_TO_AIP == plugin.getType()) {
+          SimpleJobPluginInfo pluginInfo = new SimpleJobPluginInfo();
           initJobPluginInfo(innerPlugin, jobId, pluginInfo, objectsCount);
         }
       }
     }
 
     return innerPlugin;
+
   }
 
   private <T extends Serializable> Optional<Iterable<Object>> waitForFuturesToComplete(Plugin<T> plugin, int multiplier,
