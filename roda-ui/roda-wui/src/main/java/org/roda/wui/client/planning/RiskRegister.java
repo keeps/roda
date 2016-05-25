@@ -122,6 +122,9 @@ public class RiskRegister extends Composite {
   Label riskRegisterTitle;
 
   @UiField
+  Label riskRegisterSubtitle;
+
+  @UiField
   FlowPanel riskRegisterDescription;
 
   @UiField(provided = true)
@@ -255,6 +258,7 @@ public class RiskRegister extends Composite {
       riskRegisterTitle.setText(defaultMessages.riskRegisterTitle());
       riskList.setFilter(null);
       riskList.refresh();
+      riskRegisterSubtitle.setVisible(false);
       callback.onSuccess(this);
     } else if (historyTokens.size() == 2 && historyTokens.get(0).equals(ShowRisk.RESOLVER.getHistoryToken())) {
       ShowRisk.RESOLVER.resolve(Tools.tail(historyTokens), callback);
@@ -269,7 +273,8 @@ public class RiskRegister extends Composite {
     } else if (historyTokens.size() == 1) {
       final String aipId = historyTokens.get(0);
       final String riskIdConstant = RodaConstants.RISK_ID;
-      riskRegisterTitle.setText(defaultMessages.showRiskAIPTitle(aipId));
+      riskRegisterSubtitle.setText(defaultMessages.showRiskAIPTitle(aipId));
+      riskRegisterSubtitle.setVisible(true);
 
       BrowserService.Util.getInstance().getRiskOnAIP(aipId, new AsyncCallback<List<String>>() {
 

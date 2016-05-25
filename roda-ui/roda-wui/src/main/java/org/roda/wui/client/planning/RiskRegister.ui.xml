@@ -18,6 +18,7 @@
 				<g:Label styleName="h1" ui:field="riskRegisterTitle">
 					<ui:text from='{messages.riskRegisterTitle}' />
 				</g:Label>
+				<g:Label styleName="h5" ui:field="riskRegisterSubtitle"/>
 				<g:FlowPanel addStyleNames="page-description" ui:field="riskRegisterDescription">
 				</g:FlowPanel>
 				<common:SearchPanel ui:field="searchPanel" />

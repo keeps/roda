@@ -40,7 +40,9 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.IndexedRepresentation;
+import org.roda.core.data.v2.ip.metadata.IndexedPreservationAgent;
 import org.roda.core.data.v2.ip.metadata.IndexedPreservationEvent;
+import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.log.LogEntry;
@@ -152,6 +154,7 @@ public class IndexService {
       }
       LOGGER.info("{} > Optimizing indexes", new Date().getTime());
 
+      reindexPreservationAgents();
       commitAIPs();
       optimizeAIPs();
       LOGGER.info("{} > Done", new Date().getTime());
@@ -167,7 +170,8 @@ public class IndexService {
   }
 
   public void commitAIPs() throws GenericException {
-    commit(IndexedAIP.class, IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class);
+    commit(IndexedAIP.class, IndexedRepresentation.class, IndexedFile.class, IndexedPreservationEvent.class,
+      IndexedPreservationAgent.class);
   }
 
   public void optimizeAIPs() throws GenericException {
@@ -176,6 +180,7 @@ public class IndexService {
       index.optimize(RodaConstants.INDEX_FILE);
       index.optimize(RodaConstants.INDEX_REPRESENTATION);
       index.optimize(RodaConstants.INDEX_PRESERVATION_EVENTS);
+      index.optimize(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } catch (SolrServerException | IOException e) {
       throw new GenericException("Error while optimizing indexes", e);
     }
@@ -183,6 +188,17 @@ public class IndexService {
 
   public void reindexAIP(AIP aip) {
     observer.aipCreated(aip);
+  }
+
+  public void reindexPreservationAgents() {
+    try {
+      CloseableIterable<OptionalWithCause<PreservationMetadata>> iterable = model.listPreservationAgents();
+      for (OptionalWithCause<PreservationMetadata> opm : iterable) {
+        observer.preservationMetadataCreated(opm.get());
+      }
+    } catch (RequestNotValidException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Could not reindex preservation agents");
+    }
   }
 
   public void reindexJob(Job job) {

@@ -1717,12 +1717,18 @@ public class BrowserHelper {
     filter.add(new SimpleFilterParameter(RodaConstants.RISK_INCIDENCE_AIP_ID, aipId));
     IndexResult<RiskIncidence> incidences = RodaCoreFactory.getIndexService().find(RiskIncidence.class, filter, null,
       new Sublist());
+    List<String> emptyList = Arrays.asList("");
 
     if (incidences.getResults().size() == 1) {
       RiskIncidence incidence = incidences.getResults().get(0);
-      return incidence.getRisks();
+
+      if (!incidence.getRisks().isEmpty()) {
+        return incidence.getRisks();
+      } else {
+        return emptyList;
+      }
     } else {
-      return new ArrayList<String>();
+      return emptyList;
     }
   }
 

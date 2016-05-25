@@ -105,10 +105,14 @@ public class ShowJobReport extends Composite {
   @UiField
   Anchor job;
   @UiField
+  Label aipLabel;
+  @UiField
   Anchor aip;
   @UiField
   HTML aipState;
 
+  @UiField
+  Label objectLabel;
   @UiField
   Anchor objectId;
   @UiField
@@ -136,9 +140,18 @@ public class ShowJobReport extends Composite {
 
     job.setText(jobReport.getJobId());
     job.setHref(Tools.createHistoryHashLink(ShowJob.RESOLVER, jobReport.getJobId()));
-    objectId.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
-      : jobReport.getSourceObjectId());
-    objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+
+    boolean isIngest = true;
+    if (!jobReport.getSourceObjectOriginalId().isEmpty() || !jobReport.getSourceObjectId().isEmpty()) {
+      objectId.setText(!"".equals(jobReport.getSourceObjectOriginalId()) ? jobReport.getSourceObjectOriginalId()
+        : jobReport.getSourceObjectId());
+      objectId.setHref(Tools.createHistoryHashLink(IngestTransfer.RESOLVER, jobReport.getSourceObjectId()));
+    } else {
+      isIngest = false;
+    }
+
+    objectLabel.setVisible(isIngest);
+    objectId.setVisible(isIngest);
 
     if (jobReport.getOutcomeObjectId() != null) {
       aip.setText(jobReport.getOutcomeObjectId());

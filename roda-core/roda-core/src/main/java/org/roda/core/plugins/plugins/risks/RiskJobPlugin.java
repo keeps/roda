@@ -185,7 +185,7 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         }
       }
 
-      jobPluginInfo.setPluginExecutionIsDone(true);
+      jobPluginInfo.done();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
       LOGGER.debug("Done creating risk incidences");
       return pluginReport;
@@ -353,6 +353,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList("risk", "tested");
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_TESTED);
   }
 }

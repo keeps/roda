@@ -397,6 +397,18 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
 
+  public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
+  public static final String PLUGIN_CATEGORY_CHARACTERISATION = "characterisation";
+  public static final String PLUGIN_CATEGORY_FORMAT_VALIDATION = "format_validation";
+  public static final String PLUGIN_CATEGORY_RISK_MANAGEMENT = "risk_management";
+  public static final String PLUGIN_CATEGORY_FEATURE_EXTRACTION = "feature_extraction";
+  public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
+  public static final String PLUGIN_CATEGORY_INGEST = "ingest";
+  public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
+
+  // FIXME this category will be deleted in the future
+  public static final String PLUGIN_CATEGORY_TESTED = "tested";
+
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";
   public static final String JOB_REPORT_JOB_ID = "jobId";

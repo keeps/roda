@@ -13,8 +13,9 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     super();
   }
 
-  public SimpleJobPluginInfo(int completionPercentage) {
-    super(completionPercentage);
+  public SimpleJobPluginInfo(int objectsCount) {
+    setObjectsCount(objectsCount);
+    setObjectsBeingProcessed(objectsCount);
   }
 
   @Override
@@ -52,6 +53,10 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
 
   public void setPluginExecutionIsDone(boolean pluginExecutionIsDone) {
     this.pluginExecutionIsDone = pluginExecutionIsDone;
+  }
+
+  public void done() {
+    this.pluginExecutionIsDone = false;
   }
 
 }

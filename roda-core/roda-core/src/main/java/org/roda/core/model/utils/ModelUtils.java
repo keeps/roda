@@ -431,6 +431,12 @@ public final class ModelUtils {
     return getPreservationMetadataStoragePath(id, type, aipId, representationId, null, null);
   }
 
+  public static StoragePath getPreservationAgentStoragePath() throws RequestNotValidException {
+    List<String> path = Arrays.asList(RodaConstants.STORAGE_CONTAINER_PRESERVATION,
+      RodaConstants.STORAGE_DIRECTORY_AGENTS);
+    return DefaultStoragePath.parse(path);
+  }
+
   public static StoragePath getPreservationMetadataStoragePath(String id, PreservationMetadataType type, String aipId,
     String representationId, List<String> fileDirectoryPath, String fileId) throws RequestNotValidException {
     List<String> path = null;
@@ -532,7 +538,7 @@ public final class ModelUtils {
   public static StoragePath getAgentStoragePath(String agentId) throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_AGENT,
       agentId + RodaConstants.AGENT_FILE_EXTENSION);
-  }        
+  }
 
   public static StoragePath getFormatContainerPath() throws RequestNotValidException {
     return DefaultStoragePath.parse(RodaConstants.STORAGE_CONTAINER_FORMAT);
@@ -660,6 +666,7 @@ public final class ModelUtils {
     }
     return zipEntries;
   }
+
   /**
    * @deprecated use DownloadUtils instead.
    */

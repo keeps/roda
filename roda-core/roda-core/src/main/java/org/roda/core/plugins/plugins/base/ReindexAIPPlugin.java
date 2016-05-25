@@ -80,12 +80,14 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report beforeAllExecute(IndexService index, ModelService model, StorageService storage)
     throws PluginException {
+
     if (clearIndexes) {
       LOGGER.debug("Clearing indexes");
       try {
         index.clearIndex(RodaConstants.INDEX_AIP);
         index.clearIndex(RodaConstants.INDEX_REPRESENTATION);
         index.clearIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
+        index.clearIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
         index.clearIndex(RodaConstants.INDEX_FILE);
       } catch (GenericException e) {
         throw new PluginException("Error clearing index", e);
@@ -112,11 +114,15 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report afterAllExecute(IndexService index, ModelService model, StorageService storage) throws PluginException {
     LOGGER.debug("Optimizing indexes");
+
+    index.reindexPreservationAgents();
+
     try {
       index.optimizeIndex(RodaConstants.INDEX_AIP);
       index.optimizeIndex(RodaConstants.INDEX_REPRESENTATION);
       index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_EVENTS);
       index.optimizeIndex(RodaConstants.INDEX_FILE);
+      index.optimizeIndex(RodaConstants.INDEX_PRESERVATION_AGENTS);
     } catch (GenericException e) {
       throw new PluginException("Error optimizing index", e);
     }

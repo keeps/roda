@@ -989,6 +989,21 @@ public class ModelService extends ModelObservable {
     return ret;
   }
 
+  public CloseableIterable<OptionalWithCause<PreservationMetadata>> listPreservationAgents()
+    throws RequestNotValidException, GenericException, AuthorizationDeniedException {
+    CloseableIterable<OptionalWithCause<PreservationMetadata>> ret;
+    StoragePath storagePath = ModelUtils.getPreservationAgentStoragePath();
+
+    try {
+      CloseableIterable<Resource> resources = storage.listResourcesUnderDirectory(storagePath, true);
+      ret = ResourceParseUtils.convert(getStorage(), resources, PreservationMetadata.class);
+    } catch (NotFoundException e) {
+      ret = new EmptyClosableIterable<OptionalWithCause<PreservationMetadata>>();
+    }
+
+    return ret;
+  }
+
   /***************** Other metadata related *****************/
   /**********************************************************/
 

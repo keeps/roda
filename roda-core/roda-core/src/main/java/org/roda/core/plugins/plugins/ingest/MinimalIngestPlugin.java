@@ -109,7 +109,7 @@ public class MinimalIngestPlugin extends DefaultIngestPlugin {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList("ingest");
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_INGEST);
   }
 
 }

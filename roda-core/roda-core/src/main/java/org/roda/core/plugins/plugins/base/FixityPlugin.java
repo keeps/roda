@@ -18,6 +18,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.xmlbeans.XmlException;
 import org.roda.core.common.PremisV3Utils;
 import org.roda.core.common.iterables.CloseableIterable;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
 import org.roda.core.data.exceptions.AuthorizationDeniedException;
@@ -233,7 +234,7 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
         }
       }
 
-      jobPluginInfo.setPluginExecutionIsDone(true);
+      jobPluginInfo.done();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       // model.createOrUpdateJobReport(report);
@@ -323,6 +324,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList("fixity_check", "tested");
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FIXITY_CHECK, RodaConstants.PLUGIN_CATEGORY_TESTED);
   }
 }
