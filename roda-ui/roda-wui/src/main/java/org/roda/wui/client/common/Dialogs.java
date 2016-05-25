@@ -197,7 +197,7 @@ public class Dialogs {
     layout.addStyleName("wui-dialog-layout");
     messageLabel.addStyleName("wui-dialog-message");
     inputBox.addStyleName("form-textbox wui-dialog-message");
-    cancelButton.addStyleName("btn btn-ban");
+    cancelButton.addStyleName("btn btn-link");
     confirmButton.addStyleName("pull-right btn btn-play");
 
     dialogBox.center();

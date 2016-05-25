@@ -1036,6 +1036,7 @@ public class Browse extends Composite {
       public void onSuccessImpl(Void result) {
         Toast.showInfo("Done", "Item was accepted");
         // reload
+        clear();
         viewAction(aipId);
       }
     });
