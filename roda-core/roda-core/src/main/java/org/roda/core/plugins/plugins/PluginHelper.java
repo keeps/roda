@@ -520,7 +520,6 @@ public final class PluginHelper {
     String outcomeDetailExtension, boolean notify, Date startDate) throws RequestNotValidException, NotFoundException,
     GenericException, AuthorizationDeniedException, ValidationException, AlreadyExistsException {
 
-    Job job = getJobFromIndex(plugin, index);
     List<String> agentIds = new ArrayList<>();
 
     try {
@@ -533,14 +532,26 @@ public final class PluginHelper {
       LOGGER.error("Error creating PREMIS agent", e);
     }
 
+    Job job;
     try {
-      boolean notifyAgent = true;
-      PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(job.getUsername(), model, index, notifyAgent);
-      agentIds.add(pm.getId());
-    } catch (AlreadyExistsException e) {
-      agentIds.add(IdUtils.getUserAgentId(job.getUsername()));
-    } catch (RODAException e) {
-      LOGGER.error("Error creating PREMIS agent", e);
+      job = getJobFromIndex(plugin, index);
+    } catch (NotFoundException e) {
+      job = null;
+    }
+
+    if (job != null) {
+      try {
+        boolean notifyAgent = true;
+        PreservationMetadata pm = PremisV3Utils.createPremisUserAgentBinary(job.getUsername(), model, index,
+          notifyAgent);
+        if (pm != null) {
+          agentIds.add(pm.getId());
+        }
+      } catch (AlreadyExistsException e) {
+        agentIds.add(IdUtils.getUserAgentId(job.getUsername()));
+      } catch (RODAException e) {
+        LOGGER.error("Error creating PREMIS agent", e);
+      }
     }
 
     String id = UUID.randomUUID().toString();

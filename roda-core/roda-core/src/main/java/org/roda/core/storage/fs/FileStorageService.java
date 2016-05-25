@@ -421,7 +421,7 @@ public class FileStorageService implements StorageService {
   }
 
   @Override
-  public Class<? extends Entity> getEntity(StoragePath storagePath) throws GenericException {
+  public Class<? extends Entity> getEntity(StoragePath storagePath) throws NotFoundException {
     Path entity = FSUtils.getEntityPath(basePath, storagePath);
     if (Files.exists(entity)) {
       if (Files.isDirectory(entity)) {
@@ -434,7 +434,7 @@ public class FileStorageService implements StorageService {
         return DefaultBinary.class;
       }
     } else {
-      throw new GenericException("There isn't a Container or Directory or Binary representated by " + storagePath);
+      throw new NotFoundException("Entity was not found: " + storagePath);
     }
   }
 
