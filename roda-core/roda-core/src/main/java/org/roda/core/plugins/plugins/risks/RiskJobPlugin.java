@@ -79,6 +79,10 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
+
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
+      riskIds = parameters.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
+    }
   }
 
   @Override
@@ -140,7 +144,9 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         notification.setFromUser(this.getClass().getSimpleName());
         notification.setRecipientUsers(emailList);
         Map<String, Object> scopes = new HashMap<String, Object>();
-        model.createNotification(notification, RodaConstants.RISK_EMAIL_TEMPLATE, scopes);
+
+        // FIXME template has to be created and changed here
+        model.createNotification(notification, RodaConstants.INGEST_EMAIL_TEMPLATE, scopes);
       }
 
     } catch (GenericException e) {
@@ -153,15 +159,10 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
   public <T extends Serializable> Report executePlugin(IndexService index, ModelService model, StorageService storage,
     List<T> list) throws PluginException {
 
-    Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
-    if (mergedParams.containsKey(RodaConstants.PLUGIN_PARAMS_RISK_ID)) {
-      riskIds = mergedParams.get(RodaConstants.PLUGIN_PARAMS_RISK_ID);
-    }
+    LOGGER.debug("Creating risk incidences");
+    Report pluginReport = PluginHelper.initPluginReport(this);
 
     try {
-      LOGGER.debug("Creating risk incidences");
-      Report pluginReport = PluginHelper.initPluginReport(this);
-
       SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
@@ -186,12 +187,11 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
       jobPluginInfo.done();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-      LOGGER.debug("Done creating risk incidences");
-
-      return pluginReport;
     } catch (JobException e) {
       throw new PluginException("A job exception has occurred", e);
     }
+
+    return pluginReport;
   }
 
   private <T extends Serializable> Pair<SimpleJobPluginInfo, Report> addIncidenceToAIPList(ModelService model,
@@ -209,7 +209,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         state = PluginState.FAILURE;
       }
 
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
       Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.ACTIVE);
       reportItem.setPluginState(state).setPluginDetails("Risk job plugin ran on an AIP");
       pluginReport.addReport(reportItem);
@@ -241,8 +240,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
         jobPluginInfo.incrementObjectsProcessedWithFailure();
         state = PluginState.FAILURE;
       }
-
-      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       try {
         IndexedRepresentation iRepresentation = index.retrieve(IndexedRepresentation.class,

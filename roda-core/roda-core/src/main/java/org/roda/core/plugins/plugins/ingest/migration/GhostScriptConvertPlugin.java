@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
 import org.roda.core.RodaCoreFactory;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -73,7 +74,7 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
 
   @Override
   public List<String> getConvertableTo() {
-    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("tools", TOOLNAME, "outputFormats");
+    String outputFormats = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", TOOLNAME, "outputFormats");
     return Arrays.asList(outputFormats.split("\\s+"));
   }
 
@@ -104,8 +105,7 @@ public class GhostScriptConvertPlugin<T extends Serializable> extends CommandCon
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
 }

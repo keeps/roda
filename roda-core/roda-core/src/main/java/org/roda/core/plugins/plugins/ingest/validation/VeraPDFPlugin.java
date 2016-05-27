@@ -49,6 +49,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DirectResourceAccess;
@@ -67,7 +69,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   static {
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE, "PDF Profile", PluginParameterType.STRING, "1b",
-        true, false, "Validation of the file is always based on the profile"));
+        VeraPDFPluginUtils.getProfileList(), true, false, "Validation of the file is always based on the profile"));
 
     pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
       new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
@@ -128,9 +130,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
-    Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
-    if (mergedParams.containsKey(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE)) {
-      profile = mergedParams.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE);
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE)) {
+      profile = parameters.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE);
     }
 
   }
@@ -138,83 +139,104 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
-
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      LOGGER.debug("Processing AIP {}", aip.getId());
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      for (Representation representation : aip.getRepresentations()) {
-        List<String> resourceList = new ArrayList<String>();
-        // FIXME 20160324 hsilva: the report item should be at AIP level (and
-        // not representation level)
-        // FIXME 20160516 hsilva: see how to set initial
-        // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
+      for (AIP aip : list) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
         PluginState pluginResultState = PluginState.SUCCESS;
-        StringBuilder details = new StringBuilder();
+        PluginState reportState = PluginState.SUCCESS;
 
-        try {
-          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+        for (Representation representation : aip.getRepresentations()) {
+          List<String> resourceList = new ArrayList<String>();
+          // FIXME 20160516 hsilva: see how to set initial
+          // initialOutcomeObjectState
+          StringBuilder details = new StringBuilder();
 
-          boolean recursive = true;
-          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
-            representation.getId(), recursive);
+          try {
+            LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
 
-          for (OptionalWithCause<File> oFile : allFiles) {
-            if (oFile.isPresent()) {
-              File file = oFile.get();
-              LOGGER.debug("Processing file: {}", file);
-              if (!file.isDirectory()) {
-                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
-                String fileMimetype = ifile.getFileFormat().getMimeType();
-                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+            boolean recursive = true;
+            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+              representation.getId(), recursive);
 
-                if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
-                  LOGGER.debug("Running veraPDF validator on {}", file.getId());
-                  StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
-                  DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
-                  Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+            for (OptionalWithCause<File> oFile : allFiles) {
+              if (oFile.isPresent()) {
+                File file = oFile.get();
+                LOGGER.debug("Processing file: {}", file);
+                if (!file.isDirectory()) {
+                  IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                  String fileMimetype = ifile.getFileFormat().getMimeType();
+                  String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1,
+                    ifile.getId().length());
 
-                  if (veraPDFResult != null) {
-                    ContentPayload payload = new FSPathContentPayload(veraPDFResult);
-                    InputStream inputStream = payload.createInputStream();
-                    String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                    IOUtils.closeQuietly(inputStream);
+                  if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
+                    LOGGER.debug("Running veraPDF validator on {}", file.getId());
+                    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                    DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                    Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
 
-                    Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
-                    Matcher matcher = pattern.matcher(xmlReport);
+                    if (veraPDFResult != null) {
+                      ContentPayload payload = new FSPathContentPayload(veraPDFResult);
+                      InputStream inputStream = payload.createInputStream();
+                      String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                      IOUtils.closeQuietly(inputStream);
 
-                    if (matcher.find()) {
-                      resourceList.add(file.getId());
+                      Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
+                      Matcher matcher = pattern.matcher(xmlReport);
+
+                      if (matcher.find()) {
+                        resourceList.add(file.getId());
+                        pluginResultState = PluginState.PARTIAL_SUCCESS;
+                        details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
+                      }
+
+                    } else {
                       pluginResultState = PluginState.PARTIAL_SUCCESS;
-                      details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
                     }
 
-                  } else {
-                    pluginResultState = PluginState.PARTIAL_SUCCESS;
+                    IOUtils.closeQuietly(directAccess);
                   }
-
-                  IOUtils.closeQuietly(directAccess);
                 }
+              } else {
+                LOGGER.error("Cannot process AIP representation file", oFile.getCause());
               }
-            } else {
-              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
             }
-          }
 
-          reportItem.setPluginState(pluginResultState);
-          IOUtils.closeQuietly(allFiles);
-        } catch (Throwable e) {
-          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
-          pluginResultState = PluginState.FAILURE;
-          reportItem.setPluginState(pluginResultState);
-        } finally {
-          LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
-          report.addReport(reportItem);
-          createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
+            IOUtils.closeQuietly(allFiles);
+            if (!pluginResultState.equals(PluginState.SUCCESS)) {
+              reportState = PluginState.FAILURE;
+            }
+
+          } catch (Throwable e) {
+            LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+            pluginResultState = PluginState.FAILURE;
+            reportState = PluginState.FAILURE;
+          } finally {
+            LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
+            createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
+          }
         }
+
+        if (reportState.equals(PluginState.SUCCESS)) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+
+        reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on AIP");
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;

@@ -21,7 +21,7 @@ public class ImageMagickConvertPluginUtils {
   public static String executeImageMagick(Path input, Path output, String outputFormat, String commandArguments)
     throws CommandException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "imagemagickconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", outputFormat + ":" + output.toString());
     command = command.replace("{arguments}", commandArguments);
@@ -34,7 +34,8 @@ public class ImageMagickConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "imagemagickconvert", "versionCommand");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "imagemagickconvert",
+      "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));

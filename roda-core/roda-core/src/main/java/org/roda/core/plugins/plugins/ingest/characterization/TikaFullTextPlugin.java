@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest.characterization;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +25,8 @@ import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.Representation;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -32,6 +36,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -46,9 +52,23 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   public static final String OTHER_METADATA_TYPE = "ApacheTika";
 
   private boolean createsPluginEvent = true;
-
   private boolean doFeatureExtraction = true;
   private boolean doFulltextExtraction = false;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT, "Creates plugin event",
+        PluginParameterType.BOOLEAN, "true", true, false, "Creates plugin event after executing"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION, "Do feature extraction",
+        PluginParameterType.BOOLEAN, "true", true, false, "Does Tika feature extraction"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION, "Do full text extraction",
+        PluginParameterType.BOOLEAN, "true", true, false, "Does Tika full text extraction"));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -84,6 +104,15 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CREATES_PLUGIN_EVENT));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FEATURE_EXTRACTION));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_DO_FULLTEXT_EXTRACTION));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
 
@@ -110,40 +139,53 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      LOGGER.debug("Processing AIP {}", aip.getId());
-      try {
-        for (Representation representation : aip.getRepresentations()) {
-          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-          reportItem = TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(reportItem, index, model, storage, aip,
-            representation, doFeatureExtraction, doFulltextExtraction);
-          model.notifyRepresentationUpdated(representation);
-        }
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (RODAException e) {
-        LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
-      }
-
-      report.addReport(reportItem);
-
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
-      if (createsPluginEvent) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
         try {
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
-          | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating preservation event", e);
+          for (Representation representation : aip.getRepresentations()) {
+            LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+            reportItem = TikaFullTextPluginUtils.runTikaFullTextOnRepresentation(reportItem, index, model, storage, aip,
+              representation, doFeatureExtraction, doFulltextExtraction);
+            model.notifyRepresentationUpdated(representation);
+          }
+
+          reportItem.setPluginState(PluginState.SUCCESS);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } catch (RODAException e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error running Tika " + aip.getId() + ": " + e.getMessage());
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
         }
 
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+        if (createsPluginEvent) {
+          try {
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, reportItem.getPluginState(), "", notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating preservation event", e);
+          }
+
+        }
       }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;
@@ -219,7 +261,7 @@ public class TikaFullTextPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FEATURE_EXTRACTION);
   }
 
 }

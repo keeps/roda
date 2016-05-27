@@ -9,9 +9,11 @@ package org.roda.core.plugins.plugins.ingest.migration;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
@@ -19,6 +21,13 @@ import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 public abstract class CommandConvertPlugin<T extends Serializable> extends AbstractConvertPlugin<T> {
 
   private String commandArguments;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS, "Command arguments",
+        PluginParameterType.STRING, "", true, true, "Command arguments to modify the command to execute"));
+  }
 
   protected CommandConvertPlugin() {
     super();
@@ -36,12 +45,8 @@ public abstract class CommandConvertPlugin<T extends Serializable> extends Abstr
   @Override
   public List<PluginParameter> getParameters() {
     List<PluginParameter> params = new ArrayList<PluginParameter>();
-
-    PluginParameter commandArgs = new PluginParameter("commandArgs", "Command arguments", PluginParameterType.STRING,
-      "", true, true, "Command arguments to modify the command to execute");
-
-    params.add(commandArgs);
     params.addAll(super.getParameters());
+    params.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS));
     return params;
   }
 
@@ -50,8 +55,8 @@ public abstract class CommandConvertPlugin<T extends Serializable> extends Abstr
     super.setParameterValues(parameters);
 
     // add command arguments
-    if (parameters.containsKey("commandArguments")) {
-      setCommandArguments(parameters.get("commandArguments").trim());
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS)) {
+      setCommandArguments(parameters.get(RodaConstants.PLUGIN_PARAMS_COMMAND_ARGUMENTS).trim());
     }
   }
 

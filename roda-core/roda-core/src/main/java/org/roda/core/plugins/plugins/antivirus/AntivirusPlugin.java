@@ -32,6 +32,8 @@ import org.roda.core.model.utils.ModelUtils;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.DirectResourceAccess;
 import org.roda.core.storage.StorageService;
@@ -107,50 +109,68 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      VirusCheckResult virusCheckResult = null;
-      Exception exception = null;
-      DirectResourceAccess directAccess = null;
-      try {
-        LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
-        StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        directAccess = storage.getDirectAccess(aipPath);
-        virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
+        VirusCheckResult virusCheckResult = null;
+        Exception exception = null;
+        DirectResourceAccess directAccess = null;
+        try {
+          LOGGER.debug("Checking if AIP {} is clean of virus", aip.getId());
+          StoragePath aipPath = ModelUtils.getAIPStoragePath(aip.getId());
 
-        reportItem.setPluginState(virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE)
-          .setPluginDetails(virusCheckResult.getReport());
+          directAccess = storage.getDirectAccess(aipPath);
+          virusCheckResult = getAntiVirus().checkForVirus(directAccess.getPath());
 
-        LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
-          virusCheckResult.isClean());
-      } catch (Exception e) {
-        reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          PluginState reportState = virusCheckResult.isClean() ? PluginState.SUCCESS : PluginState.FAILURE;
+          reportItem.setPluginState(reportState).setPluginDetails(virusCheckResult.getReport());
 
-        exception = e;
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-      } catch (Throwable e) {
-        LOGGER.error("Error processing AIP " + aip.getId(), e);
-        throw new PluginException(e);
-      } finally {
-        IOUtils.closeQuietly(directAccess);
+          if (reportState.equals(PluginState.SUCCESS)) {
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } else {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
+
+          LOGGER.debug("Done with checking if AIP {} has virus. Is clean of virus: {}", aip.getId(),
+            virusCheckResult.isClean());
+        } catch (Exception e) {
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+
+          exception = e;
+          LOGGER.error("Error processing AIP " + aip.getId(), e);
+        } catch (Throwable e) {
+          LOGGER.error("Error processing AIP " + aip.getId(), e);
+          throw new PluginException(e);
+        } finally {
+          IOUtils.closeQuietly(directAccess);
+        }
+
+        // FIXME 20160314 hsilva: perhaps the following code should be put
+        // inside
+        // the above finally block, because if an error occurs the event
+        // creation
+        // will never happen
+        try {
+          boolean notify = true;
+          createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+
+        } catch (Throwable e) {
+          LOGGER.error("Error updating event and job", e);
+        }
       }
 
-      // FIXME 20160314 hsilva: perhaps the following code should be put inside
-      // the above finally block, because if an error occurs the event creation
-      // will never happen
-      try {
-        boolean notify = true;
-        createEvent(virusCheckResult, exception, reportItem.getPluginState(), aip, model, index, notify);
-        report.addReport(reportItem);
-
-        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
-
-      } catch (Throwable e) {
-        LOGGER.error("Error updating event and job", e);
-      }
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
 
     return report;
@@ -256,7 +276,7 @@ public class AntivirusPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_VALIDATION);
   }
 
 }

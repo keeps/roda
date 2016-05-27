@@ -33,6 +33,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -96,45 +98,61 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
     Report report = PluginHelper.initPluginReport(this);
 
-    for (AIP aip : list) {
-      Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
 
-      LOGGER.debug("Processing AIP {}", aip.getId());
-      List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
-      try {
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, false);
 
-        for (Representation representation : aip.getRepresentations()) {
-          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
-          SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, storage, aip, representation);
-          sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
-            RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
-          model.notifyRepresentationUpdated(representation);
-        }
-        reportItem.setPluginState(PluginState.SUCCESS);
-      } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
-        | AuthorizationDeniedException | AlreadyExistsException e) {
-        LOGGER.error("Error running Siegfried " + aip.getId() + ": " + e.getMessage(), e);
-
-        reportItem.setPluginState(PluginState.FAILURE)
-          .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
-      }
-
-      report.addReport(reportItem);
-
-      if (createsPluginEvent) {
+        LOGGER.debug("Processing AIP {}", aip.getId());
+        List<LinkingIdentifier> sources = new ArrayList<LinkingIdentifier>();
         try {
-          List<LinkingIdentifier> outcomes = null;
-          boolean notify = true;
-          PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
-            reportItem.getPluginState(), "", notify);
-        } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+
+          for (Representation representation : aip.getRepresentations()) {
+            LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+            SiegfriedPluginUtils.runSiegfriedOnRepresentation(this, index, model, storage, aip, representation);
+            sources.add(PluginHelper.getLinkingIdentifier(aip.getId(), representation.getId(),
+              RodaConstants.PRESERVATION_LINKING_OBJECT_SOURCE));
+            model.notifyRepresentationUpdated(representation);
+          }
+
+          reportItem.setPluginState(PluginState.SUCCESS);
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
+        } catch (PluginException | NotFoundException | GenericException | RequestNotValidException
           | AuthorizationDeniedException | AlreadyExistsException e) {
-          LOGGER.error("Error creating event: " + e.getMessage(), e);
+          LOGGER.error("Error running Siegfried " + aip.getId() + ": " + e.getMessage(), e);
+
+          reportItem.setPluginState(PluginState.FAILURE)
+            .setPluginDetails("Error running Siegfried " + aip.getId() + ": " + e.getMessage());
+
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+          PluginHelper.updateJobInformation(this, jobPluginInfo);
         }
+
+        report.addReport(reportItem);
+
+        if (createsPluginEvent) {
+          try {
+            List<LinkingIdentifier> outcomes = null;
+            boolean notify = true;
+            PluginHelper.createPluginEvent(this, aip.getId(), model, index, sources, outcomes,
+              reportItem.getPluginState(), "", notify);
+          } catch (ValidationException | RequestNotValidException | NotFoundException | GenericException
+            | AuthorizationDeniedException | AlreadyExistsException e) {
+            LOGGER.error("Error creating event: " + e.getMessage(), e);
+          }
+        }
+
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
       }
 
-      PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
     }
     return report;
   }

@@ -21,7 +21,7 @@ public class AvconvConvertPluginUtils {
   public static String executeAvconv(Path input, Path output, String commandArguments, String outputArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avconvconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{arguments}", commandArguments);
@@ -35,7 +35,7 @@ public class AvconvConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "avconvconvert", "versionCommand");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "avconvconvert", "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));

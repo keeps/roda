@@ -23,6 +23,8 @@ import org.roda.core.model.ModelService;
 import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.PluginException;
+import org.roda.core.plugins.orchestrate.JobException;
+import org.roda.core.plugins.orchestrate.SimpleJobPluginInfo;
 import org.roda.core.plugins.plugins.PluginHelper;
 import org.roda.core.storage.StorageService;
 import org.slf4j.Logger;
@@ -70,9 +72,20 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
 
-    for (AIP aip : list) {
-      LOGGER.debug("Reindexing AIP {}", aip.getId());
-      index.reindexAIP(aip);
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (AIP aip : list) {
+        LOGGER.debug("Reindexing AIP {}", aip.getId());
+        index.reindexAIP(aip);
+        jobPluginInfo.incrementObjectsProcessedWithSuccess();
+      }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      LOGGER.error("Could not update Job information");
     }
 
     return PluginHelper.initPluginReport(this);
@@ -169,6 +182,6 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_REINDEX);
   }
 }

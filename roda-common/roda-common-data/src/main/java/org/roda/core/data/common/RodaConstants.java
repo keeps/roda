@@ -397,6 +397,12 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
   public static final String PLUGIN_PARAMS_PDF_PROFILE = "parameter.pdf_profile";
+  public static final String PLUGIN_PARAMS_SIGNATURE_VERIFY = "parameter.signature_verify";
+  public static final String PLUGIN_PARAMS_SIGNATURE_EXTRACT = "parameter.signature_extract";
+  public static final String PLUGIN_PARAMS_SIGNATURE_STRIP = "parameter.signature_strip";
+  public static final String PLUGIN_PARAMS_INPUT_FORMAT = "parameter.input_format";
+  public static final String PLUGIN_PARAMS_OUTPUT_FORMAT = "parameter.output_format";
+  public static final String PLUGIN_PARAMS_COMMAND_ARGUMENTS = "parameter.command_arguments";
 
   public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERISATION = "characterisation";
@@ -406,6 +412,7 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_FORMAT_IDENTIFICATION = "format_identification";
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
+  public static final String PLUGIN_CATEGORY_REINDEX = "reindex";
 
   public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
@@ -699,6 +706,5 @@ public final class RodaConstants {
 
   /* Template Constants */
   public static final String INGEST_EMAIL_TEMPLATE = "ingestion-template";
-  public static final String RISK_EMAIL_TEMPLATE = "risk-template";
 
 }

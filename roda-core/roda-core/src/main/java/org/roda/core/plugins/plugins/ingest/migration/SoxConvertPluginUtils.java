@@ -18,10 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class SoxConvertPluginUtils {
 
-  public static String executeSox(Path input, Path output, String commandArguments) throws CommandException,
-    IOException, UnsupportedOperationException {
+  public static String executeSox(Path input, Path output, String commandArguments)
+    throws CommandException, IOException, UnsupportedOperationException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "soxconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
@@ -39,7 +39,7 @@ public class SoxConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "soxconvert", "versionCommand");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "soxconvert", "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.replace(" ", "");

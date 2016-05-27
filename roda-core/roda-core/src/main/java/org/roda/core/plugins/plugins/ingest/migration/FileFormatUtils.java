@@ -18,10 +18,11 @@ public class FileFormatUtils {
 
   public static Map<String, List<String>> getPronomToExtension(String tool) {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("tools", tool, "inputFormatPronoms");
+    String inputFormatPronoms = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
+      "inputFormatPronoms");
 
     for (String pronom : Arrays.asList(inputFormatPronoms.split(" "))) {
-      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "pronom", pronom);
+      String pronomExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "pronom", pronom);
       map.put(pronom, Arrays.asList(pronomExtensions.split(" ")));
     }
 
@@ -30,10 +31,11 @@ public class FileFormatUtils {
 
   public static Map<String, List<String>> getMimetypeToExtension(String tool) {
     Map<String, List<String>> map = new HashMap<>();
-    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("tools", tool, "inputFormatMimetypes");
+    String inputFormatMimetypes = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
+      "inputFormatMimetypes");
 
     for (String mimetype : Arrays.asList(inputFormatMimetypes.split(" "))) {
-      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", "mimetype", mimetype);
+      String mimeExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "mimetype", mimetype);
       map.put(mimetype, Arrays.asList(mimeExtensions.split(" ")));
     }
 
@@ -41,7 +43,8 @@ public class FileFormatUtils {
   }
 
   public static List<String> getInputExtensions(String tool) {
-    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("tools", tool, "inputFormatExtensions");
+    String inputFormatExtensions = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", tool,
+      "inputFormatExtensions");
     return Arrays.asList(inputFormatExtensions.split(" "));
   }
 }

@@ -14,6 +14,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 
@@ -32,8 +34,8 @@ import org.verapdf.report.MachineReadableReport;
 
 public class VeraPDFPluginUtils {
 
-  public static Path runVeraPDF(Path input, String profile, boolean hasFeatures) throws IOException, JAXBException,
-    IllegalArgumentException, VeraPDFException {
+  public static Path runVeraPDF(Path input, String profile, boolean hasFeatures)
+    throws IOException, JAXBException, IllegalArgumentException, VeraPDFException {
     Path p = null;
 
     PDFAFlavour flavour = getFlavourFromProfileString(profile);
@@ -91,6 +93,10 @@ public class VeraPDFPluginUtils {
       default:
         return PDFAFlavour.PDFA_1_B;
     }
+  }
+
+  public static List<String> getProfileList() {
+    return Arrays.asList("1a", "1b", "2a", "2b", "2u", "3a", "3b", "3u");
   }
 
 }

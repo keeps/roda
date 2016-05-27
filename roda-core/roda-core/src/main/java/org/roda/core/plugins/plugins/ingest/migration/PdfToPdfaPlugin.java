@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.ghost4j.GhostscriptException;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
@@ -111,8 +112,7 @@ public class PdfToPdfaPlugin<T extends Serializable> extends AbstractConvertPlug
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
 }

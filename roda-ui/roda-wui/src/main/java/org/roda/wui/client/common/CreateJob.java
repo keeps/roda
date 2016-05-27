@@ -278,8 +278,10 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         }
       }
 
-      workflowList.setSelectedIndex(0);
-      selectedPlugin = plugins.get(0);
+      String selectedPluginId = workflowList.getSelectedValue();
+      if (selectedPluginId != null) {
+        CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+      }
       updateWorkflowOptions();
     }
   }

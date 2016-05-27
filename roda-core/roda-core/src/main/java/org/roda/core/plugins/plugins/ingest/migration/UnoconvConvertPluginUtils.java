@@ -21,7 +21,7 @@ public class UnoconvConvertPluginUtils {
   public static String executeUnoconvConvert(Path input, Path output, String outputFormat, String commandArguments)
     throws CommandException, IOException, UnsupportedOperationException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "unoconvconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
     command = command.replace("{output_format}", outputFormat);
@@ -35,7 +35,7 @@ public class UnoconvConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "unoconvconvert", "versionCommand");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "unoconvconvert", "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));

@@ -18,10 +18,10 @@ import org.roda.core.util.CommandUtility;
 
 public class GhostScriptConvertPluginUtils {
 
-  public static String executeGS(Path input, Path output, String commandArguments) throws GhostscriptException,
-    IOException, UnsupportedOperationException {
+  public static String executeGS(Path input, Path output, String commandArguments)
+    throws GhostscriptException, IOException, UnsupportedOperationException {
 
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "commandLine");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ghostscriptconvert", "commandLine");
     command = command.replace("{input_file}", input.toString());
     command = command.replace("{output_file}", output.toString());
 
@@ -46,7 +46,8 @@ public class GhostScriptConvertPluginUtils {
   }
 
   public static String getVersion() throws CommandException, IOException, UnsupportedOperationException {
-    String command = RodaCoreFactory.getRodaConfigurationAsString("tools", "ghostscriptconvert", "versionCommand");
+    String command = RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "ghostscriptconvert",
+      "versionCommand");
     String version = CommandUtility.execute(command.split("\\s+"));
     if (version.indexOf('\n') > 0) {
       version = version.substring(0, version.indexOf('\n'));

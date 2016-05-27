@@ -217,12 +217,10 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
           if (!isAipFailed) {
             reportItem.setPluginState(PluginState.SUCCESS).setPluginDetails("Fixity checking ran successfully");
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
-            PluginHelper.updateJobInformation(this, jobPluginInfo);
             PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.SUCCESS, "", true);
           } else {
             reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Fixity checking did not run successfully");
             jobPluginInfo.incrementObjectsProcessedWithFailure();
-            PluginHelper.updateJobInformation(this, jobPluginInfo);
             PluginHelper.createPluginEvent(this, aip.getId(), model, index, PluginState.FAILURE, "", true);
           }
 
@@ -236,8 +234,6 @@ public class FixityPlugin extends AbstractPlugin<AIP> {
 
       jobPluginInfo.done();
       PluginHelper.updateJobInformation(this, jobPluginInfo);
-
-      // model.createOrUpdateJobReport(report);
     } catch (JobException e) {
       LOGGER.error("Could not update Job information");
     }
