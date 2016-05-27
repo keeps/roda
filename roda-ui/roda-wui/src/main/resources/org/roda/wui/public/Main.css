@@ -191,9 +191,12 @@ table .label-success, table .label-danger, table .label-warning, table .label-in
 	font-size: 75%;
 }
 
-.small-and-gray {
-	font-size: 75%;
-	color: #999;
+.xsmall {
+	font-size: 60%;
+}
+
+.gray {
+ 	color: #a7a9ac;
 }
 
 .inline {
@@ -205,7 +208,7 @@ div.inline {
 }
 
 .inline + .inline {
-	margin-left: 1rem;
+	margin-left: 0.5em;
 }
 
 .fade-out {
@@ -3699,10 +3702,6 @@ td.datePickerMonth, td.datePickerYear {
 	position: relative;
 }
 
-.wui-ingest-transfer .searchPanel {
-	margin-bottom: 20px;
-	margin-top: 10px;
-}
 
 .ingest-transfer-lastscanned {
 	font-size: 1.1rem;

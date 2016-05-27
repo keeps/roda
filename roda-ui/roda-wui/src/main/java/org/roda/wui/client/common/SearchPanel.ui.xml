@@ -50,5 +50,6 @@
 					ui:field="searchAdvancedGo" enabled="false">Search</g:Button>
 			</g:FlowPanel>
 		</g:FlowPanel>
+		<g:FlowPanel addStyleNames="searchPreFilters" ui:field="searchPreFilters"/>
 	</g:FlowPanel>
 </ui:UiBinder>

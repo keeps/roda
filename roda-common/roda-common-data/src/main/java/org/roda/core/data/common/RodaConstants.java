@@ -247,6 +247,8 @@ public final class RodaConstants {
   public static final String AIP_PARENT_ID = "parentId";
   public static final String AIP_ANCESTORS = "ancestors";
   public static final String STATE = "state";
+  public static final String INGEST_SIP_ID = "ingestSIPId";
+  public static final String INGEST_JOB_ID = "ingestJobId";
 
   public static final String AIP_DESCRIPTIVE_METADATA_ID = "descriptiveMetadataId";
   public static final String AIP_REPRESENTATION_ID = "representationId";
@@ -259,9 +261,6 @@ public final class RodaConstants {
   public static final String AIP_NUMBER_OF_SUBMISSION_FILES = "numberOfSubmissionFiles";
   public static final String AIP_NUMBER_OF_DOCUMENTATION_FILES = "numberOfDocumentationFiles";
   public static final String AIP_NUMBER_OF_SCHEMA_FILES = "numberOfSchemaFiles";
-
-  public static final String AIP_INGEST_SIP_ID = "ingestSIPId";
-  public static final String AIP_INGEST_JOB_ID = "ingestJobId";
 
   public static final String AIP_LEVEL = "level";
   public static final String AIP_TITLE = "title";

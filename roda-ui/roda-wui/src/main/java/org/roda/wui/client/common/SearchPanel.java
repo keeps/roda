@@ -11,8 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.roda.core.data.adapter.filter.BasicSearchFilterParameter;
+import org.roda.core.data.adapter.filter.EmptyKeyFilterParameter;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.FilterParameter;
+import org.roda.core.data.adapter.filter.NotSimpleFilterParameter;
+import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.wui.client.common.lists.AsyncTableCell;
 import org.roda.wui.client.search.Dropdown;
 import org.roda.wui.client.search.SearchFieldPanel;
@@ -21,16 +24,22 @@ import org.roda.wui.common.client.widgets.wcag.AccessibleFocusPanel;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -67,6 +76,9 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
   @UiField
   Button searchAdvancedGo;
 
+  @UiField
+  FlowPanel searchPreFilters;
+
   private Filter defaultFilter;
   private String allFilter;
   private boolean defaultFilterIncremental = false;
@@ -89,11 +101,13 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     searchAdvancedDisclosureButton.setVisible(showSearchAdvancedDisclosureButton);
     searchAdvancedPanel.setVisible(false);
 
-    searchInputBox.addValueChangeHandler(new ValueChangeHandler<String>() {
-
+    searchInputBox.addKeyDownHandler(new KeyDownHandler() {
+      
       @Override
-      public void onValueChange(ValueChangeEvent<String> event) {
-        doSearch();
+      public void onKeyDown(KeyDownEvent event) {
+        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+          doSearch();
+        }
       }
     });
 
@@ -123,6 +137,65 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
     if (showSearchAdvancedDisclosureButton) {
       searchPanel.addStyleName("searchPanelAdvanced");
+    }
+
+    searchPreFilters.setVisible(!defaultFilter.getParameters().isEmpty());
+    drawSearchPreFilters();
+  }
+
+  private void drawSearchPreFilters() {
+    searchPreFilters.clear();
+    HTML header = new HTML(SafeHtmlUtils.fromSafeConstant("<i class='fa fa-filter' aria-hidden='true'></i>"));
+    header.addStyleName("inline gray");
+    searchPreFilters.add(header);
+        
+    for (FilterParameter parameter : defaultFilter.getParameters()) {
+      if (parameter instanceof SimpleFilterParameter) {
+        SimpleFilterParameter sfp = (SimpleFilterParameter) parameter;
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromString(sfp.getName()));
+        b.append(SafeHtmlUtils.fromSafeConstant(": "));
+        b.append(SafeHtmlUtils.fromString(sfp.getValue()));
+        HTML html = new HTML(b.toSafeHtml());
+        html.addStyleName("xsmall gray inline");
+        searchPreFilters.add(html);
+      } else if (parameter instanceof BasicSearchFilterParameter) {
+        BasicSearchFilterParameter bsfp = (BasicSearchFilterParameter) parameter;
+        // TODO put '*' in some constant, see Search
+        if (!"*".equals(bsfp.getValue())) {
+          SafeHtmlBuilder b = new SafeHtmlBuilder();
+          b.append(SafeHtmlUtils.fromString(bsfp.getName()));
+          b.append(SafeHtmlUtils.fromSafeConstant(": "));
+          b.append(SafeHtmlUtils.fromString(bsfp.getValue()));
+          HTML html = new HTML(b.toSafeHtml());
+          html.addStyleName("xsmall gray inline");
+          searchPreFilters.add(html);
+        }
+      } else if (parameter instanceof NotSimpleFilterParameter) {
+        NotSimpleFilterParameter nsfp = (NotSimpleFilterParameter) parameter;
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromSafeConstant("NOT "));
+        b.append(SafeHtmlUtils.fromString(nsfp.getName()));
+        b.append(SafeHtmlUtils.fromSafeConstant(": "));
+        b.append(SafeHtmlUtils.fromString(nsfp.getValue()));
+        HTML html = new HTML(b.toSafeHtml());
+        html.addStyleName("xsmall gray inline");
+        searchPreFilters.add(html);
+      } else if (parameter instanceof EmptyKeyFilterParameter) {
+        EmptyKeyFilterParameter ekfp = (EmptyKeyFilterParameter) parameter;
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromSafeConstant("NO "));
+        b.append(SafeHtmlUtils.fromString(ekfp.getName()));
+        HTML html = new HTML(b.toSafeHtml());
+        html.addStyleName("xsmall gray inline");
+        searchPreFilters.add(html);
+      } else {
+        SafeHtmlBuilder b = new SafeHtmlBuilder();
+        b.append(SafeHtmlUtils.fromString(parameter.getClass().getSimpleName()));
+        HTML html = new HTML(b.toSafeHtml());
+        html.addStyleName("xsmall gray inline");
+        searchPreFilters.add(html);
+      }
     }
   }
 
@@ -155,10 +228,16 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
     if (defaultFilterIncremental) {
       filter = new Filter(defaultFilter);
       filter.add(parameters);
+      searchPreFilters.setVisible(defaultFilter.getParameters().size() > 0);
+      GWT.log("Incremental filter: " + filter);
     } else if (parameters.size() == 0) {
       filter = defaultFilter;
+      searchPreFilters.setVisible(defaultFilter.getParameters().size() > 0);
+      GWT.log("Default filter: " + filter);
     } else {
       filter = new Filter(parameters);
+      searchPreFilters.setVisible(false);
+      GWT.log("New filter: " + filter);
     }
 
     return filter;
@@ -202,6 +281,7 @@ public class SearchPanel extends Composite implements HasValueChangeHandlers<Str
 
   public void setDefaultFilter(Filter defaultFilter) {
     this.defaultFilter = defaultFilter;
+    drawSearchPreFilters();
   }
 
   public void setAllFilter(String allFilter) {

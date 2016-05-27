@@ -188,7 +188,7 @@ public class IngestAppraisal extends Composite {
     filesSearchAdvancedFieldsPanel = new FlowPanel();
     representationsSearchAdvancedFieldsPanel = new FlowPanel();
 
-    searchPanel = new SearchPanel(BASE_FILTER, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true);
+    searchPanel = new SearchPanel(filter, RodaConstants.AIP_SEARCH, messages.searchPlaceHolder(), true, true);
 
     searchAdvancedFieldOptions = new ListBox();
 

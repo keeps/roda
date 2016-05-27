@@ -487,7 +487,7 @@ public class ShowJob extends Composite {
 
   @UiHandler("buttonAppraisal")
   void buttonAppraisalHandler(ClickEvent e) {
-    Tools.newHistory(IngestAppraisal.RESOLVER, RodaConstants.AIP_INGEST_JOB_ID, job.getId());
+    Tools.newHistory(IngestAppraisal.RESOLVER, RodaConstants.INGEST_JOB_ID, job.getId());
   }
 
   @UiHandler("buttonBack")
