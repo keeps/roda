@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -168,7 +169,6 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 }

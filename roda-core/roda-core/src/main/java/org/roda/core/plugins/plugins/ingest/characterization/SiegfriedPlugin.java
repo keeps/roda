@@ -8,6 +8,7 @@
 package org.roda.core.plugins.plugins.ingest.characterization;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -208,8 +209,7 @@ public class SiegfriedPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
 }

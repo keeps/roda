@@ -9,6 +9,7 @@ package org.roda.core.plugins.plugins.ingest;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -156,8 +157,7 @@ public class BagitToAIPPlugin extends SIPToAIPPlugin {
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 
 }

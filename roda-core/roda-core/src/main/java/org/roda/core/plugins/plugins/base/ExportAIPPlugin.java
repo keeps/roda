@@ -10,12 +10,14 @@ package org.roda.core.plugins.plugins.base;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.common.tools.ZipEntryInfo;
 import org.roda.core.common.tools.ZipTools;
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.common.RodaConstants.ExportType;
 import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.AlreadyExistsException;
@@ -193,7 +195,6 @@ public class ExportAIPPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE);
   }
 }

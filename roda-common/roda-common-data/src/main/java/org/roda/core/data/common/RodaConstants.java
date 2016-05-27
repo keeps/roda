@@ -396,6 +396,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_EMAIL_NOTIFICATION = "parameter.email_notification";
   public static final String PLUGIN_PARAMS_CREATES_PLUGIN_EVENT = "createsPluginEvent";
   public static final String PLUGIN_PARAMS_CREATE_SUBMISSION = "parameter.create_submission";
+  public static final String PLUGIN_PARAMS_PDF_PROFILE = "parameter.pdf_profile";
 
   public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERISATION = "characterisation";
@@ -406,8 +407,7 @@ public final class RodaConstants {
   public static final String PLUGIN_CATEGORY_INGEST = "ingest";
   public static final String PLUGIN_CATEGORY_FIXITY_CHECK = "fixity_check";
 
-  // FIXME this category will be deleted in the future
-  public static final String PLUGIN_CATEGORY_TESTED = "tested";
+  public static final String PLUGIN_CATEGORY_NOT_LISTABLE = "not_listable";
 
   /* Job Report */
   public static final String JOB_REPORT_ID = "id";

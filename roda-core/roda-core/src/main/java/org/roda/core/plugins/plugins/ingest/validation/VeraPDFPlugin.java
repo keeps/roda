@@ -12,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -36,6 +37,8 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.StoragePath;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -60,11 +63,24 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   private boolean hasFeatures = false;
   private boolean hasPartialSuccessOnOutcome;
 
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE, "PDF Profile", PluginParameterType.STRING, "1b",
+        true, false, "Validation of the file is always based on the profile"));
+
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION, "Job finished notification",
+        PluginParameterType.STRING, "", false, false,
+        "Send a notification, after finishing the process, to one or more e-mail addresses (comma separated)"));
+  }
+
   public VeraPDFPlugin() {
     profile = "1b";
-    hasFeatures = false;
-    hasPartialSuccessOnOutcome = Boolean
-      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("tools", "allplugins", "hasPartialSuccessOnOutcome"));
+    hasFeatures = Boolean
+      .parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools", "verapdf", "hasFeatures"));
+    hasPartialSuccessOnOutcome = Boolean.parseBoolean(RodaCoreFactory.getRodaConfigurationAsString("core", "tools",
+      "convert", "allplugins", "hasPartialSuccessOnOutcome"));
   }
 
   @Override
@@ -101,16 +117,20 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE));
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    // indicates what validation profile will be used
-    if (parameters.containsKey("profile")) {
-      profile = parameters.get("profile");
-    }
 
-    // indicates if the final report will integrate the features information
-    if (parameters.containsKey("hasFeatures")) {
-      hasFeatures = Boolean.parseBoolean(parameters.get("hasFeatures"));
+    Map<String, String> mergedParams = new HashMap<String, String>(getParameterValues());
+    if (mergedParams.containsKey(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE)) {
+      profile = mergedParams.get(RodaConstants.PLUGIN_PARAMS_PDF_PROFILE);
     }
 
   }
@@ -315,8 +335,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
 
   @Override
   public List<String> getCategories() {
-    // TODO Auto-generated method stub
-    return null;
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_FORMAT_VALIDATION);
   }
 
 }

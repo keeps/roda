@@ -353,6 +353,6 @@ public class RiskJobPlugin extends AbstractPlugin<Serializable> {
 
   @Override
   public List<String> getCategories() {
-    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT, RodaConstants.PLUGIN_CATEGORY_TESTED);
+    return Arrays.asList(RodaConstants.PLUGIN_CATEGORY_RISK_MANAGEMENT);
   }
 }

@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.TransferredResource;
@@ -34,11 +35,14 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.uibinder.client.UiHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.CheckBox;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -115,7 +119,7 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Label workflowCategoryLabel;
 
   @UiField
-  ListBox workflowCategoryList;
+  FlowPanel workflowCategoryList;
 
   @UiField
   ListBox workflowList;
@@ -183,36 +187,6 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
         updateWorkflowOptions();
       }
     });
-
-    final List<PluginInfo> finalPlugins = plugins;
-
-    workflowCategoryList.addChangeHandler(new ChangeHandler() {
-
-      @Override
-      public void onChange(ChangeEvent event) {
-        String selectedCategory = workflowCategoryList.getSelectedValue();
-        workflowList.clear();
-
-        if (finalPlugins != null) {
-          PluginUtils.sortByName(finalPlugins);
-          for (PluginInfo pluginInfo : finalPlugins) {
-            if (pluginInfo != null) {
-              if (selectedCategory.equals(messages.allCategoryItem())
-                || (pluginInfo.getCategories() != null && pluginInfo.getCategories().contains(selectedCategory))) {
-                workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
-                  pluginInfo.getId());
-              }
-            }
-          }
-        }
-
-        String selectedPluginId = workflowList.getSelectedValue();
-        if (selectedPluginId != null) {
-          CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
-        }
-        updateWorkflowOptions();
-      }
-    });
   }
 
   public abstract boolean updateObjectList();
@@ -224,20 +198,81 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
     if (plugins != null) {
       PluginUtils.sortByName(plugins);
-      workflowCategoryList.addItem(messages.allCategoryItem());
 
       for (PluginInfo pluginInfo : plugins) {
         if (pluginInfo != null) {
-          if (pluginInfo.getCategories() != null) {
-            for (String category : pluginInfo.getCategories()) {
-              if (!categoriesOnListBox.contains(category)) {
-                workflowCategoryList.addItem(category);
+
+          List<String> pluginCategories = pluginInfo.getCategories();
+
+          if (pluginCategories != null) {
+            for (String category : pluginCategories) {
+              if (!categoriesOnListBox.contains(category)
+                && !category.equals(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+
+                CheckBox box = new CheckBox();
+                box.setText(category);
+
+                box.addValueChangeHandler(new ValueChangeHandler<Boolean>() {
+
+                  @Override
+                  public void onValueChange(ValueChangeEvent<Boolean> event) {
+                    workflowList.clear();
+                    boolean noChecks = true;
+
+                    if (plugins != null) {
+                      PluginUtils.sortByName(plugins);
+                      for (PluginInfo pluginInfo : plugins) {
+                        if (pluginInfo != null) {
+                          List<String> categories = pluginInfo.getCategories();
+
+                          if (categories != null) {
+                            for (int i = 0; i < workflowCategoryList.getWidgetCount(); i++) {
+                              CheckBox checkbox = (CheckBox) workflowCategoryList.getWidget(i);
+
+                              if (checkbox.isChecked()) {
+                                if (categories.contains(checkbox.getText())
+                                  && !categories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                  workflowList.addItem(
+                                    messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                                    pluginInfo.getId());
+                                }
+
+                                noChecks = false;
+                              }
+                            }
+
+                            if (noChecks) {
+                              if (!pluginInfo.getCategories().contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+                                workflowList.addItem(
+                                  messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                                  pluginInfo.getId());
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+
+                    String selectedPluginId = workflowList.getSelectedValue();
+                    if (selectedPluginId != null) {
+                      CreateJob.this.selectedPlugin = lookupPlugin(selectedPluginId);
+                    }
+                    updateWorkflowOptions();
+                  }
+
+                });
+
+                workflowCategoryList.add(box);
                 categoriesOnListBox.add(category);
               }
             }
+
+            if (!pluginCategories.contains(RodaConstants.PLUGIN_CATEGORY_NOT_LISTABLE)) {
+              workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()),
+                pluginInfo.getId());
+            }
           }
 
-          workflowList.addItem(messages.pluginLabel(pluginInfo.getName(), pluginInfo.getVersion()), pluginInfo.getId());
         } else {
           GWT.log("Got a null plugin");
         }

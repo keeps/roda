@@ -28,7 +28,7 @@
 				<g:Label addStyleNames="form-label" ui:field="workflowCategoryLabel">
 					<ui:text from='{messages.createJobCategoryWorkflow}' />
 				</g:Label>
-				<g:ListBox addStyleNames="form-listbox" ui:field="workflowCategoryList" />
+				<g:FlowPanel addStyleNames="form-listbox" ui:field="workflowCategoryList" />
 				<g:Label addStyleNames="form-label">
 					<ui:text from='{messages.createJobWorkflow}' />
 				</g:Label>
