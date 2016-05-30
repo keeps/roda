@@ -98,6 +98,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
     Boolean createSubmission = RodaCoreFactory.getRodaConfiguration()
       .getBoolean("core.ingest.sip2aip.create_submission", false);
     getParameterValues().put(RodaConstants.PLUGIN_PARAMS_CREATE_SUBMISSION, createSubmission.toString());
+    getParameterValues().put(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS, getClass().getCanonicalName());
   }
 
   public abstract PluginParameter getPluginParameter(String pluginParameterId);
@@ -598,7 +599,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
 
         // update main report outcomeObjectState
         PluginHelper.updateJobReportState(this, model, aip.getId(), AIPState.UNDER_APPRAISAL);
-        
+
         // update counters of manual intervention
         jobPluginInfo.incrementOutcomeObjectsWithManualIntervention();
 

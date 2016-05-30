@@ -290,25 +290,18 @@ public final class PluginHelper {
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
 
-    Map<String, String> parameterValues = plugin.getParameterValues();
+    // do stuff with concrete JobPluginInfo
 
-    if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
-      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS) && parameterValues
-        .get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getCanonicalName()))) {
+    // update job
+    try {
+      int completionPercentage = jobPluginInfo.getCompletionPercentage();
+      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
+      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
+      job = setJobCounters(job, jobPluginInfo);
 
-      // do stuff with concrete JobPluginInfo
-
-      // update job
-      try {
-        int completionPercentage = jobPluginInfo.getCompletionPercentage();
-        LOGGER.debug("New job completionPercentage: {}", completionPercentage);
-        Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
-        job = setJobCounters(job, jobPluginInfo);
-
-        model.createOrUpdateJob(job);
-      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-        LOGGER.error("Unable to get or update Job from model", e);
-      }
+      model.createOrUpdateJob(job);
+    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+      LOGGER.error("Unable to get or update Job from model", e);
     }
   }
 
