@@ -32,17 +32,15 @@ public class AkkaWorkerActor extends UntypedActor {
 
   @Override
   public void onReceive(Object msg) throws Exception {
-    Object returnMessage = null;
     if (msg instanceof PluginMessage) {
       PluginMessage message = (PluginMessage) msg;
       Plugin<?> plugin = message.getPlugin();
       try {
-        returnMessage = plugin.execute(index, model, storage, message.getList());
-        getSender().tell(returnMessage, getSelf());
+        plugin.execute(index, model, storage, message.getList());
+        // getSender().tell(returnMessage, getSelf());
       } catch (Throwable e) {
         logger.error("Error executing action!", e);
-        returnMessage = new akka.actor.Status.Failure(e);
-        getSender().tell(returnMessage, getSelf());
+        // getSender().tell(returnMessage, getSelf());
         throw e;
       }
     } else {

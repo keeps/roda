@@ -28,21 +28,21 @@ public interface PluginOrchestrator {
 
   public void shutdown();
 
-  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin);
 
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids);
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids);
 
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids);
+  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids);
 
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids);
+  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids);
 
-  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin);
+  public void runPluginOnAllAIPs(Plugin<AIP> plugin);
 
-  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin);
+  public void runPluginOnAllRepresentations(Plugin<Representation> plugin);
 
-  public List<Report> runPluginOnAllFiles(Plugin<File> plugin);
+  public void runPluginOnAllFiles(Plugin<File> plugin);
 
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids);
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids);
 
   public <T extends Serializable> void runPlugin(Plugin<T> plugin);
 

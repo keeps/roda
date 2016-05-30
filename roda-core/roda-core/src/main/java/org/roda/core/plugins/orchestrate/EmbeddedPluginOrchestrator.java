@@ -93,7 +93,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       IndexResult<T> find;
@@ -113,9 +113,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO this exception handling should be reviewed
       LOGGER.error("Error running plugin from index", e);
     }
-
-    return null;
-
   }
 
   private <T extends Serializable> void submitPlugin(List<T> list, Plugin<T> plugin) {
@@ -148,7 +145,7 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> ids) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       Iterator<String> iter = ids.iterator();
@@ -177,13 +174,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on AIPs: " + ids, e);
     }
-
-    // TODO return plugin reports
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -218,14 +212,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all AIPs", e);
     }
-
-    // TODO return reports
-    return null;
-
   }
 
   @Override
-  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -262,13 +252,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all representations", e);
     }
-
-    // TODO return all reports
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
       CloseableIterable<OptionalWithCause<AIP>> aips = model.listAIPs();
@@ -320,13 +307,10 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on all files", e);
     }
-
-    // TODO return all reports
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       plugin.beforeBlockExecute(index, model, storage);
 
@@ -352,10 +336,6 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
       // TODO review this exception handling
       LOGGER.error("Error running plugin on transferred resources", e);
     }
-
-    // TODO return all reports
-    return null;
-
   }
 
   @Override
@@ -377,37 +357,31 @@ public class EmbeddedPluginOrchestrator implements PluginOrchestrator {
   @Override
   public <T extends Serializable> void updateJobInformation(Plugin<T> plugin, JobPluginInfo jobPluginInfo) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public <T extends Serializable> void updateJobPercentage(Plugin<T> plugin, int percentage) {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void startJobsInTheStateCreated() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
   public void cleanUnfinishedJobs() {
     // TODO Auto-generated method stub
-
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
+  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> ids) {
     // TODO Auto-generated method stub
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
+  public void runPluginOnFiles(Plugin<File> plugin, List<String> ids) {
     // TODO Auto-generated method stub
-    return null;
   }
 
 }

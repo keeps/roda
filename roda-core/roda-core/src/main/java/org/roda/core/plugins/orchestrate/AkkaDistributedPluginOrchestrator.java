@@ -19,7 +19,6 @@ import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -145,51 +144,51 @@ public class AkkaDistributedPluginOrchestrator extends AkkaDistributedPlugin imp
   }
 
   @Override
-  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
+  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
+  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Plugin<File> plugin) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     // TODO Auto-generated method stub
-    return null;
+
   }
 
   @Override

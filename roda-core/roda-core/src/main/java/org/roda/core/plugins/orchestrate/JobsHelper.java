@@ -14,15 +14,10 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.roda.core.RodaCoreFactory;
-import org.roda.core.data.adapter.sort.Sorter;
-import org.roda.core.data.adapter.sublist.Sublist;
-import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.v2.index.IsIndexed;
-import org.roda.core.data.v2.index.SelectedItems;
-import org.roda.core.data.v2.index.SelectedItemsFilter;
-import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedAIP;
 import org.roda.core.data.v2.ip.IndexedFile;
@@ -166,39 +161,34 @@ public final class JobsHelper {
     return res;
   }
 
-  public static List<String> getAIPs(SelectedItems<IndexedAIP> selectedItems) {
-    List<String> res = new ArrayList<String>();
-    if (selectedItems instanceof SelectedItemsList) {
-      SelectedItemsList<IndexedAIP> list = (SelectedItemsList<IndexedAIP>) selectedItems;
-      res.addAll(list.getIds());
-    } else {
+  public static List<AIP> getAIPs(ModelService model, IndexService index, List<String> uuids) {
+    List<AIP> aipsToReturn = new ArrayList<>();
+
+    if (!uuids.isEmpty()) {
       try {
-        IndexService index = RodaCoreFactory.getIndexService();
-        SelectedItemsFilter<IndexedAIP> selectedItemsFilter = (SelectedItemsFilter<IndexedAIP>) selectedItems;
-        long count = index.count(IndexedAIP.class, selectedItemsFilter.getFilter());
-        for (int i = 0; i < count; i += RodaConstants.DEFAULT_PAGINATION_VALUE) {
-          List<IndexedAIP> aips = index.find(IndexedAIP.class, selectedItemsFilter.getFilter(), Sorter.NONE,
-            new Sublist(i, RodaConstants.DEFAULT_PAGINATION_VALUE)).getResults();
-          for (IndexedAIP aip : aips) {
-            res.add(aip.getId());
-          }
+        List<IndexedAIP> retrieve = index.retrieve(IndexedAIP.class, uuids);
+
+        for (IndexedAIP indexedAIP : retrieve) {
+          aipsToReturn.add(model.retrieveAIP(indexedAIP.getId()));
         }
+
       } catch (Throwable e) {
-        LOGGER.error("Error while retrieving AIPs from index", e);
+        LOGGER.error("Error while retrieving representations from index", e);
       }
     }
-    return res;
+
+    return aipsToReturn;
   }
 
   public static List<Representation> getRepresentations(ModelService model, IndexService index, List<String> uuids) {
-    List<Representation> filesToReturn = new ArrayList<>();
+    List<Representation> representationsToReturn = new ArrayList<>();
 
     if (!uuids.isEmpty()) {
       try {
         List<IndexedRepresentation> retrieve = index.retrieve(IndexedRepresentation.class, uuids);
 
         for (IndexedRepresentation indexedRepresentation : retrieve) {
-          filesToReturn
+          representationsToReturn
             .add(model.retrieveRepresentation(indexedRepresentation.getAipId(), indexedRepresentation.getId()));
         }
 
@@ -207,7 +197,7 @@ public final class JobsHelper {
       }
     }
 
-    return filesToReturn;
+    return representationsToReturn;
   }
 
   public static List<File> getFiles(ModelService model, IndexService index, List<String> uuids) {

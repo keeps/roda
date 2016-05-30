@@ -141,7 +141,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
   }
 
   @Override
-  public <T extends IsIndexed> List<Report> runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
+  public <T extends IsIndexed> void runPluginFromIndex(Class<T> classToActOn, Filter filter, Plugin<T> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -167,7 +167,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       } while (find.getTotalCount() > find.getOffset() + find.getLimit());
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<T> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -177,7 +177,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin from index", e);
@@ -185,20 +184,19 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
+  public void runPluginOnAIPs(Plugin<AIP> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
       int multiplier = 0;
-      Iterator<String> iter = uuids.iterator();
+      List<AIP> aips = JobsHelper.getAIPs(model, index, uuids);
+      Iterator<AIP> iter = aips.iterator();
       List<Future<Object>> futures = new ArrayList<>();
       List<Plugin<AIP>> innerPlugins = new ArrayList<>();
       Plugin<AIP> innerPlugin;
-      String aipId;
 
       plugin.beforeAllExecute(index, model, storage);
 
@@ -212,9 +210,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
           multiplier++;
         }
 
-        aipId = iter.next();
-        block.add(model.retrieveAIP(aipId));
-
+        block.add(iter.next());
       }
 
       if (!block.isEmpty()) {
@@ -223,7 +219,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -233,7 +229,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on AIPs", e);
@@ -241,11 +236,10 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
   }
 
   @Override
-  public List<Report> runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
+  public void runPluginOnRepresentations(Plugin<Representation> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -278,7 +272,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -288,7 +282,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Representations", e);
@@ -296,11 +289,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
+  public void runPluginOnFiles(Plugin<File> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -333,7 +326,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
         multiplier++;
       }
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -343,7 +336,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on Files", e);
@@ -351,11 +343,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllAIPs(Plugin<AIP> plugin) {
+  public void runPluginOnAllAIPs(Plugin<AIP> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -393,7 +385,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<AIP> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -403,7 +395,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all AIPs", e);
@@ -411,11 +402,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllRepresentations(Plugin<Representation> plugin) {
+  public void runPluginOnAllRepresentations(Plugin<Representation> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -456,7 +447,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<Representation> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -466,7 +457,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all representations", e);
@@ -474,11 +464,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnAllFiles(Plugin<File> plugin) {
+  public void runPluginOnAllFiles(Plugin<File> plugin) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -535,7 +525,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       IOUtils.closeQuietly(aips);
 
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
 
       for (Plugin<File> p : innerPlugins) {
         p.afterBlockExecute(index, model, storage);
@@ -545,7 +535,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on all files", e);
@@ -553,11 +542,11 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
-  public List<Report> runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
+  public void runPluginOnTransferredResources(Plugin<TransferredResource> plugin, List<String> uuids) {
     try {
       LOGGER.info("Started {}", plugin.getName());
       int blockSize = JobsHelper.getBlockSize();
@@ -591,7 +580,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
       }
 
       LOGGER.info("Before waitForFuturesToComplete");
-      Optional<Iterable<Object>> reports = waitForFuturesToComplete(plugin, multiplier, futures);
+      waitForFuturesToComplete(plugin, multiplier, futures);
       LOGGER.info("After waitForFuturesToComplete");
 
       for (Plugin<TransferredResource> p : innerPlugins) {
@@ -602,7 +591,6 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
       PluginHelper.updateJobPercentage(plugin, 100);
       LOGGER.info("Ended {}", plugin.getName());
-      return mapToReports(reports);
 
     } catch (Exception e) {
       LOGGER.error("Error running plugin on transferred resources", e);
@@ -610,7 +598,7 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
     PluginHelper.updateJobPercentage(plugin, 100);
     LOGGER.info("Ended {}", plugin.getName());
-    return null;
+
   }
 
   @Override
