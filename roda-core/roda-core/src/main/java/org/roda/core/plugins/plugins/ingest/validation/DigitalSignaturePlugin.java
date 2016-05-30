@@ -7,6 +7,7 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -60,7 +61,7 @@ import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
+public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlugin<T> {
 
   private static Logger LOGGER = LoggerFactory.getLogger(DigitalSignaturePlugin.class);
   private boolean doVerify;
@@ -206,8 +207,182 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<Representation> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
     throws PluginException {
+
+    if (!list.isEmpty()) {
+      if (list.get(0) instanceof AIP) {
+        return executeOnAIP(index, model, storage, (List<AIP>) list);
+      } else if (list.get(0) instanceof Representation) {
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
+      } else if (list.get(0) instanceof File) {
+        return executeOnFile(index, model, storage, (List<File>) list);
+      }
+    }
+
+    return new Report();
+  }
+
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+    throws PluginException {
+    List<String> newRepresentations = new ArrayList<String>();
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (AIP aip : list) {
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        PluginState reportState = PluginState.SUCCESS;
+
+        try {
+          for (Representation representation : aip.getRepresentations()) {
+            String newRepresentationID = UUID.randomUUID().toString();
+            List<File> unchangedFiles = new ArrayList<File>();
+            List<File> alteredFiles = new ArrayList<File>();
+            List<File> extractedFiles = new ArrayList<File>();
+            List<File> newFiles = new ArrayList<File>();
+            Map<String, String> verifiedFiles = new HashMap<String, String>();
+            String verification = null;
+            boolean notify = true;
+            // FIXME 20160516 hsilva: see how to set initial
+            // initialOutcomeObjectState
+
+            LOGGER.debug("Processing representation {}", representation);
+            boolean recursive = true;
+            CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(representation.getAipId(),
+              representation.getId(), recursive);
+
+            for (OptionalWithCause<File> oFile : allFiles) {
+              if (oFile.isPresent()) {
+                File file = oFile.get();
+                LOGGER.debug("Processing file {}", file);
+
+                if (!file.isDirectory()) {
+                  IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                  String fileMimetype = ifile.getFileFormat().getMimeType();
+                  String filePronom = ifile.getFileFormat().getPronom();
+                  String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+
+                  if (((filePronom != null && pronomToExtension.containsKey(filePronom))
+                    || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+                    || (applicableTo.contains(fileFormat)))) {
+
+                    fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
+                    StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                    DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                    LOGGER.debug("Running DigitalSignaturePlugin on {}", file.getId());
+
+                    if (doVerify) {
+                      LOGGER.debug("Verifying digital signatures on {}", file.getId());
+
+                      verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(),
+                        fileFormat, fileMimetype);
+                      verifiedFiles.put(file.getId(), verification);
+
+                      if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
+                        reportState = PluginState.FAILURE;
+                      }
+                    }
+
+                    if (doExtract) {
+                      LOGGER.debug("Extracting digital signatures information of {}", file.getId());
+                      int extractResultSize = DigitalSignaturePluginUtils.runDigitalSignatureExtraction(model, file,
+                        directAccess.getPath(), fileFormat, fileMimetype);
+
+                      if (extractResultSize > 0) {
+                        extractedFiles.add(file);
+                      }
+                    }
+
+                    if (doStrip) {
+                      LOGGER.debug("Stripping digital signatures from {}", file.getId());
+                      Path pluginResult = DigitalSignaturePluginUtils.runDigitalSignatureStrip(directAccess.getPath(),
+                        fileFormat, fileMimetype);
+
+                      if (pluginResult != null) {
+                        ContentPayload payload = new FSPathContentPayload(pluginResult);
+
+                        if (!newRepresentations.contains(newRepresentationID)) {
+                          LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, aip.getId());
+                          boolean original = false;
+                          newRepresentations.add(newRepresentationID);
+                          model.createRepresentation(aip.getId(), newRepresentationID, original,
+                            representation.getType(), notify);
+                        }
+
+                        // update file on new representation
+                        String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + fileFormat);
+                        File f = model.createFile(aip.getId(), newRepresentationID, file.getPath(), newFileId, payload,
+                          notify);
+                        alteredFiles.add(file);
+                        newFiles.add(f);
+
+                      } else {
+                        LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
+                          representation.getId(), aip.getId());
+                        reportState = PluginState.FAILURE;
+                      }
+                    }
+                    IOUtils.closeQuietly(directAccess);
+
+                  } else {
+                    unchangedFiles.add(file);
+                  }
+                }
+              } else {
+                LOGGER.error("Cannot process representation file", oFile.getCause());
+              }
+            }
+            IOUtils.closeQuietly(allFiles);
+
+            // add unchanged files to the new representation
+            if (!alteredFiles.isEmpty()) {
+              for (File f : unchangedFiles) {
+                StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
+                Binary binary = storage.getBinary(fileStoragePath);
+                Path uriPath = Paths.get(binary.getContent().getURI());
+                ContentPayload payload = new FSPathContentPayload(uriPath);
+                model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
+              }
+            }
+
+            LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
+            boolean notifyEvent = true;
+            createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, aip, newRepresentationID, model, index,
+              reportState, notifyEvent);
+          }
+
+          if (reportState.equals(PluginState.SUCCESS)) {
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+            reportItem.setPluginState(PluginState.SUCCESS);
+          } else {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+            reportItem.setPluginState(PluginState.FAILURE).setPluginDetails("Digital signature process failed");
+          }
+
+        } catch (Throwable e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+          reportItem.setPluginState(PluginState.FAILURE).setPluginDetails(e.getMessage());
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        } finally {
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        }
+      }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    List<Representation> list) throws PluginException {
     List<String> newRepresentations = new ArrayList<String>();
     String aipId = null;
     Report report = PluginHelper.initPluginReport(this);
@@ -224,7 +399,6 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
         List<File> newFiles = new ArrayList<File>();
         Map<String, String> verifiedFiles = new HashMap<String, String>();
         aipId = representation.getAipId();
-        int pluginResultState = 1;
         String verification = null;
         boolean notify = true;
         // FIXME 20160329 hsilva: the report item should be at AIP level (and
@@ -268,7 +442,7 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                     verifiedFiles.put(file.getId(), verification);
 
                     if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
-                      pluginResultState = 0;
+                      reportState = PluginState.FAILURE;
                     }
                   }
 
@@ -303,21 +477,15 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
                       File f = model.createFile(aipId, newRepresentationID, file.getPath(), newFileId, payload, notify);
                       alteredFiles.add(file);
                       newFiles.add(f);
-
-                      if (pluginResultState == 1) {
-                        reportItem.setPluginState(PluginState.SUCCESS);
-                        jobPluginInfo.incrementObjectsProcessedWithSuccess();
-                      }
+                      reportItem.setPluginState(reportState);
 
                     } else {
                       LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
                         representation.getId(), aipId);
-                      pluginResultState = 0;
 
                       reportState = PluginState.FAILURE;
                       reportItem.setPluginState(reportState).setPluginDetails("Convert process failed on file "
                         + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
-                      jobPluginInfo.incrementObjectsProcessedWithFailure();
                     }
                   }
                   IOUtils.closeQuietly(directAccess);
@@ -340,19 +508,21 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
               ContentPayload payload = new FSPathContentPayload(uriPath);
               model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
             }
-
-            // AbstractConvertPluginUtils.reIndexingRepresentationAfterConversion(this,
-            // index, model, storage, aipId, newRepresentationID);
           }
 
           LOGGER.debug("Creating digital signature plugin event for the representation {}", representation.getId());
           boolean notifyEvent = true;
           createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
-            newRepresentationID, model, index, pluginResultState, notifyEvent);
+            newRepresentationID, model, index, reportState, notifyEvent);
+
+          if (reportState.equals(PluginState.SUCCESS)) {
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } else {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
 
         } catch (Throwable e) {
           LOGGER.error("Error processing Representation " + representation.getId() + ": " + e.getMessage(), e);
-          pluginResultState = 0;
           reportState = PluginState.FAILURE;
           reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
           jobPluginInfo.incrementObjectsProcessedWithFailure();
@@ -371,36 +541,194 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
     return report;
   }
 
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+    List<String> newRepresentations = new ArrayList<String>();
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      String newRepresentationID = UUID.randomUUID().toString();
+      List<File> unchangedFiles = new ArrayList<File>();
+      List<File> alteredFiles = new ArrayList<File>();
+      List<File> extractedFiles = new ArrayList<File>();
+      List<File> newFiles = new ArrayList<File>();
+      Map<String, String> verifiedFiles = new HashMap<String, String>();
+
+      String verification = null;
+      boolean notify = true;
+      // FIXME 20160329 hsilva: the report item should be at AIP level (and
+      // not representation level)
+      // FIXME 20160516 hsilva: see how to set initial
+      // initialOutcomeObjectState
+
+      for (File file : list) {
+        LOGGER.debug("Processing file {}", file);
+        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.INGEST_PROCESSING);
+        PluginState reportState = PluginState.SUCCESS;
+
+        try {
+
+          if (!file.isDirectory()) {
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String fileMimetype = ifile.getFileFormat().getMimeType();
+            String filePronom = ifile.getFileFormat().getPronom();
+            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1);
+
+            if (((filePronom != null && pronomToExtension.containsKey(filePronom))
+              || (fileMimetype != null && getMimetypeToExtension().containsKey(fileMimetype))
+              || (applicableTo.contains(fileFormat)))) {
+
+              fileFormat = getNewFileFormat(fileFormat, filePronom, fileMimetype);
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+              LOGGER.debug("Running DigitalSignaturePlugin on {}", file.getId());
+
+              if (doVerify) {
+                LOGGER.debug("Verifying digital signatures on {}", file.getId());
+
+                verification = DigitalSignaturePluginUtils.runDigitalSignatureVerify(directAccess.getPath(), fileFormat,
+                  fileMimetype);
+                verifiedFiles.put(file.getId(), verification);
+
+                if (!verification.equals("Passed") && verificationAffectsOnOutcome) {
+                  reportState = PluginState.FAILURE;
+                }
+              }
+
+              if (doExtract) {
+                LOGGER.debug("Extracting digital signatures information of {}", file.getId());
+                int extractResultSize = DigitalSignaturePluginUtils.runDigitalSignatureExtraction(model, file,
+                  directAccess.getPath(), fileFormat, fileMimetype);
+
+                if (extractResultSize > 0) {
+                  extractedFiles.add(file);
+                }
+              }
+
+              if (doStrip) {
+                LOGGER.debug("Stripping digital signatures from {}", file.getId());
+                Path pluginResult = DigitalSignaturePluginUtils.runDigitalSignatureStrip(directAccess.getPath(),
+                  fileFormat, fileMimetype);
+
+                if (pluginResult != null) {
+                  ContentPayload payload = new FSPathContentPayload(pluginResult);
+
+                  if (!newRepresentations.contains(newRepresentationID)) {
+                    LOGGER.debug("Creating a new representation {} on AIP {}", newRepresentationID, file.getAipId());
+                    boolean original = false;
+                    newRepresentations.add(newRepresentationID);
+                    Representation representation = model.retrieveRepresentation(file.getAipId(),
+                      file.getRepresentationId());
+                    model.createRepresentation(file.getAipId(), newRepresentationID, original, representation.getType(),
+                      notify);
+                  }
+
+                  // update file on new representation
+                  String newFileId = file.getId().replaceFirst("[.][^.]+$", "." + fileFormat);
+                  File f = model.createFile(file.getAipId(), newRepresentationID, file.getPath(), newFileId, payload,
+                    notify);
+                  alteredFiles.add(file);
+                  newFiles.add(f);
+                  reportItem.setPluginState(reportState);
+
+                } else {
+                  LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
+                    file.getRepresentationId(), file.getAipId());
+
+                  reportState = PluginState.FAILURE;
+                  reportItem.setPluginState(reportState)
+                    .setPluginDetails("Convert process failed on file " + file.getId() + " of representation "
+                      + file.getRepresentationId() + " from AIP " + file.getAipId());
+                }
+              }
+              IOUtils.closeQuietly(directAccess);
+            } else {
+              unchangedFiles.add(file);
+            }
+          }
+
+          // add unchanged files to the new representation
+          if (!alteredFiles.isEmpty()) {
+            for (File f : unchangedFiles) {
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(f);
+              Binary binary = storage.getBinary(fileStoragePath);
+              Path uriPath = Paths.get(binary.getContent().getURI());
+              ContentPayload payload = new FSPathContentPayload(uriPath);
+              model.createFile(f.getAipId(), newRepresentationID, f.getPath(), f.getId(), payload, notify);
+            }
+          }
+
+          reportItem.setPluginState(reportState);
+
+        } catch (Throwable e) {
+          LOGGER.error("Error processing Representation " + file.getRepresentationId() + ": " + e.getMessage(), e);
+          reportState = PluginState.FAILURE;
+          reportItem.setPluginState(reportState).setPluginDetails(e.getMessage());
+        } finally {
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        }
+
+        LOGGER.debug("Creating digital signature plugin event for the representation {}", file.getRepresentationId());
+        boolean notifyEvent = true;
+        createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(file.getAipId()),
+          newRepresentationID, model, index, reportState, notifyEvent);
+
+        if (reportState.equals(PluginState.SUCCESS)) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+      }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error retrieving aip from file");
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
   private void createEvent(List<File> alteredFiles, List<File> extractedFiles, List<File> newFiles,
     Map<String, String> verifiedFiles, AIP aip, String newRepresentationID, ModelService model, IndexService index,
-    int pluginResultState, boolean notify) throws PluginException {
+    PluginState pluginResultState, boolean notify) throws PluginException {
 
     List<LinkingIdentifier> premisSourceFilesIdentifiers = new ArrayList<LinkingIdentifier>();
     List<LinkingIdentifier> premisTargetFilesIdentifiers = new ArrayList<LinkingIdentifier>();
 
     // building the detail for the plugin event
-    PluginState state = PluginState.SUCCESS;
     StringBuilder stringBuilder = new StringBuilder();
 
     if (doVerify) {
-      stringBuilder.append("The DS verification ran on: ");
-      String verifies = "";
-      for (String fileId : verifiedFiles.keySet()) {
-        verifies += fileId + " (" + verifiedFiles.get(fileId) + "), ";
+      if (!verifiedFiles.isEmpty()) {
+        stringBuilder.append("The DS verification ran on: ");
+        String verifies = "";
+        for (String fileId : verifiedFiles.keySet()) {
+          verifies += fileId + " (" + verifiedFiles.get(fileId) + "), ";
+        }
+        stringBuilder.append(verifies.substring(0, verifies.lastIndexOf(',')) + ". ");
       }
-      stringBuilder.append(verifies.substring(0, verifies.lastIndexOf(',')) + ". ");
     }
 
     if (doExtract) {
-      stringBuilder.append("The following files DS information were extracted: ");
-      String extracts = "";
+      if (!extractedFiles.isEmpty()) {
+        stringBuilder.append("The following files DS information were extracted: ");
+        String extracts = "";
 
-      for (File file : extractedFiles) {
-        extracts += file.getId() + ", ";
+        for (File file : extractedFiles) {
+          extracts += file.getId() + ", ";
+        }
+
+        if (extracts.length() > 0) {
+          stringBuilder.append(extracts.substring(0, extracts.lastIndexOf(',')) + ". ");
+        }
       }
-
-      if (extracts.length() > 0)
-        stringBuilder.append(extracts.substring(0, extracts.lastIndexOf(',')) + ". ");
     }
 
     if (alteredFiles.isEmpty()) {
@@ -417,14 +745,10 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
       }
     }
 
-    // Digital Signature plugin did not run correctly
-    if (pluginResultState == 0)
-      state = PluginState.FAILURE;
-
     // FIXME revise PREMIS generation
     try {
       PluginHelper.createPluginEvent(this, aip.getId(), model, index, premisSourceFilesIdentifiers,
-        premisTargetFilesIdentifiers, state, stringBuilder.toString(), notify);
+        premisTargetFilesIdentifiers, pluginResultState, stringBuilder.toString(), notify);
     } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
       | ValidationException | AlreadyExistsException e) {
       throw new PluginException(e.getMessage(), e);
@@ -462,8 +786,8 @@ public class DigitalSignaturePlugin extends AbstractPlugin<Representation> {
   }
 
   @Override
-  public Plugin<Representation> cloneMe() {
-    return new DigitalSignaturePlugin();
+  public Plugin<T> cloneMe() {
+    return new DigitalSignaturePlugin<T>();
   }
 
   @Override

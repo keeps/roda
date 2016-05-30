@@ -403,6 +403,7 @@ public final class RodaConstants {
   public static final String PLUGIN_PARAMS_INPUT_FORMAT = "parameter.input_format";
   public static final String PLUGIN_PARAMS_OUTPUT_FORMAT = "parameter.output_format";
   public static final String PLUGIN_PARAMS_COMMAND_ARGUMENTS = "parameter.command_arguments";
+  public static final String PLUGIN_PARAMS_REPORTING_CLASS = "parameter.reporting_class";
 
   public static final String PLUGIN_CATEGORY_FORMAT_CONVERSION = "format_conversion";
   public static final String PLUGIN_CATEGORY_CHARACTERISATION = "characterisation";

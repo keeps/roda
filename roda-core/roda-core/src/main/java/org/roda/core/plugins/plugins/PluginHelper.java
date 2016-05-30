@@ -225,7 +225,15 @@ public final class PluginHelper {
    */
   public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
     JobPluginInfo jobPluginInfo) throws JobException {
-    RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
+
+    Map<String, String> parameterValues = plugin.getParameterValues();
+
+    if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
+      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS) && parameterValues
+        .get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getCanonicalName()))) {
+      RodaCoreFactory.getPluginOrchestrator().updateJobInformation(plugin, jobPluginInfo);
+    }
+
     return jobPluginInfo;
   }
 
@@ -282,18 +290,25 @@ public final class PluginHelper {
   public static <T extends Serializable> void updateJobInformation(Plugin<T> plugin, ModelService model,
     JobPluginInfo jobPluginInfo) {
 
-    // do stuff with concrete JobPluginInfo
+    Map<String, String> parameterValues = plugin.getParameterValues();
 
-    // update job
-    try {
-      int completionPercentage = jobPluginInfo.getCompletionPercentage();
-      LOGGER.debug("New job completionPercentage: {}", completionPercentage);
-      Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
-      job = setJobCounters(job, jobPluginInfo);
+    if (!parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS)
+      || (parameterValues.containsKey(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS) && parameterValues
+        .get(RodaConstants.PLUGIN_PARAMS_REPORTING_CLASS).equals(plugin.getClass().getCanonicalName()))) {
 
-      model.createOrUpdateJob(job);
-    } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
-      LOGGER.error("Unable to get or update Job from model", e);
+      // do stuff with concrete JobPluginInfo
+
+      // update job
+      try {
+        int completionPercentage = jobPluginInfo.getCompletionPercentage();
+        LOGGER.debug("New job completionPercentage: {}", completionPercentage);
+        Job job = getJobAndSetPercentage(plugin, model, completionPercentage);
+        job = setJobCounters(job, jobPluginInfo);
+
+        model.createOrUpdateJob(job);
+      } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
+        LOGGER.error("Unable to get or update Job from model", e);
+      }
     }
   }
 

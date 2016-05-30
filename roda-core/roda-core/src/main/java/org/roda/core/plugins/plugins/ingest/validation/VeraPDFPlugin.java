@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.ingest.validation;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.io.IOUtils;
 import org.roda.core.RodaCoreFactory;
@@ -58,8 +62,9 @@ import org.roda.core.storage.StorageService;
 import org.roda.core.storage.fs.FSPathContentPayload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.verapdf.core.VeraPDFException;
 
-public class VeraPDFPlugin extends AbstractPlugin<AIP> {
+public class VeraPDFPlugin<T extends Serializable> extends AbstractPlugin<T> {
   private static final Logger LOGGER = LoggerFactory.getLogger(VeraPDFPlugin.class);
   private String profile;
   private boolean hasFeatures = false;
@@ -137,7 +142,23 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
+  public Report execute(IndexService index, ModelService model, StorageService storage, List<T> list)
+    throws PluginException {
+
+    if (!list.isEmpty()) {
+      if (list.get(0) instanceof AIP) {
+        return executeOnAIP(index, model, storage, (List<AIP>) list);
+      } else if (list.get(0) instanceof Representation) {
+        return executeOnRepresentation(index, model, storage, (List<Representation>) list);
+      } else if (list.get(0) instanceof File) {
+        return executeOnFile(index, model, storage, (List<File>) list);
+      }
+    }
+
+    return new Report();
+  }
+
+  public Report executeOnAIP(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
     Report report = PluginHelper.initPluginReport(this);
 
@@ -174,7 +195,7 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
                   String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1,
                     ifile.getId().length());
 
-                  if ((fileFormat.equalsIgnoreCase("pdf") || fileMimetype.equals("application/pdf"))) {
+                  if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
                     LOGGER.debug("Running veraPDF validator on {}", file.getId());
                     StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
                     DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
@@ -231,6 +252,194 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
         reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on AIP");
         report.addReport(reportItem);
         PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    }
+
+    return report;
+  }
+
+  public Report executeOnRepresentation(IndexService index, ModelService model, StorageService storage,
+    List<Representation> list) throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      for (Representation representation : list) {
+        List<String> resourceList = new ArrayList<String>();
+        // FIXME 20160516 hsilva: see how to set initial
+        // initialOutcomeObjectState
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
+        PluginState pluginResultState = PluginState.SUCCESS;
+        PluginState reportState = PluginState.SUCCESS;
+        StringBuilder details = new StringBuilder();
+        AIP aip = model.retrieveAIP(representation.getAipId());
+
+        try {
+          LOGGER.debug("Processing representation {} of AIP {}", representation.getId(), aip.getId());
+
+          boolean recursive = true;
+          CloseableIterable<OptionalWithCause<File>> allFiles = model.listFilesUnder(aip.getId(),
+            representation.getId(), recursive);
+
+          for (OptionalWithCause<File> oFile : allFiles) {
+            if (oFile.isPresent()) {
+              File file = oFile.get();
+              LOGGER.debug("Processing file: {}", file);
+              if (!file.isDirectory()) {
+                IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+                String fileMimetype = ifile.getFileFormat().getMimeType();
+                String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+
+                if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
+                  LOGGER.debug("Running veraPDF validator on {}", file.getId());
+                  StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+                  DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+                  Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+
+                  if (veraPDFResult != null) {
+                    ContentPayload payload = new FSPathContentPayload(veraPDFResult);
+                    InputStream inputStream = payload.createInputStream();
+                    String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                    IOUtils.closeQuietly(inputStream);
+
+                    Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
+                    Matcher matcher = pattern.matcher(xmlReport);
+
+                    if (matcher.find()) {
+                      resourceList.add(file.getId());
+                      pluginResultState = PluginState.PARTIAL_SUCCESS;
+                      details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
+                    }
+
+                  } else {
+                    pluginResultState = PluginState.PARTIAL_SUCCESS;
+                  }
+
+                  IOUtils.closeQuietly(directAccess);
+                }
+              }
+            } else {
+              LOGGER.error("Cannot process AIP representation file", oFile.getCause());
+            }
+          }
+
+          IOUtils.closeQuietly(allFiles);
+          if (!pluginResultState.equals(PluginState.SUCCESS)) {
+            reportState = PluginState.FAILURE;
+          }
+
+        } catch (Throwable e) {
+          LOGGER.error("Error processing AIP " + aip.getId() + ": " + e.getMessage(), e);
+          pluginResultState = PluginState.FAILURE;
+          reportState = PluginState.FAILURE;
+        } finally {
+          LOGGER.debug("Creating veraPDF event for the representation {}", representation.getId());
+          createEvent(resourceList, aip, representation.getId(), model, index, pluginResultState, details);
+        }
+
+        if (reportState.equals(PluginState.SUCCESS)) {
+          jobPluginInfo.incrementObjectsProcessedWithSuccess();
+        } else {
+          jobPluginInfo.incrementObjectsProcessedWithFailure();
+        }
+
+        reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on Representation");
+        report.addReport(reportItem);
+        PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+      }
+
+      jobPluginInfo.done();
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+    } catch (JobException e) {
+      throw new PluginException("A job exception has occurred", e);
+    } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException e) {
+      LOGGER.error("Error retrieving aip on VeraPDF representation validation");
+    }
+
+    return report;
+  }
+
+  public Report executeOnFile(IndexService index, ModelService model, StorageService storage, List<File> list)
+    throws PluginException {
+    Report report = PluginHelper.initPluginReport(this);
+
+    try {
+      SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());
+      PluginHelper.updateJobInformation(this, jobPluginInfo);
+
+      try {
+        for (File file : list) {
+          List<String> resourceList = new ArrayList<String>();
+          // FIXME 20160516 hsilva: see how to set initial
+          // initialOutcomeObjectState
+          Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.INGEST_PROCESSING);
+          PluginState pluginResultState = PluginState.SUCCESS;
+          PluginState reportState = PluginState.SUCCESS;
+          StringBuilder details = new StringBuilder();
+          AIP aip = model.retrieveAIP(file.getAipId());
+
+          LOGGER.debug("Processing file: {}", file);
+          if (!file.isDirectory()) {
+            IndexedFile ifile = index.retrieve(IndexedFile.class, IdUtils.getFileId(file));
+            String fileMimetype = ifile.getFileFormat().getMimeType();
+            String fileFormat = ifile.getId().substring(ifile.getId().lastIndexOf('.') + 1, ifile.getId().length());
+
+            if ("pdf".equalsIgnoreCase(fileFormat) || "application/pdf".equals(fileMimetype)) {
+              LOGGER.debug("Running veraPDF validator on {}", file.getId());
+              StoragePath fileStoragePath = ModelUtils.getFileStoragePath(file);
+              DirectResourceAccess directAccess = storage.getDirectAccess(fileStoragePath);
+              Path veraPDFResult = VeraPDFPluginUtils.runVeraPDF(directAccess.getPath(), profile, hasFeatures);
+
+              if (veraPDFResult != null) {
+                ContentPayload payload = new FSPathContentPayload(veraPDFResult);
+                InputStream inputStream = payload.createInputStream();
+                String xmlReport = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+                IOUtils.closeQuietly(inputStream);
+
+                Pattern pattern = Pattern.compile("<validationReport.*?compliant=\"false\">");
+                Matcher matcher = pattern.matcher(xmlReport);
+
+                if (matcher.find()) {
+                  resourceList.add(file.getId());
+                  pluginResultState = PluginState.PARTIAL_SUCCESS;
+                  details.append(xmlReport.substring(xmlReport.indexOf('\n') + 1));
+                }
+
+              } else {
+                pluginResultState = PluginState.PARTIAL_SUCCESS;
+              }
+
+              IOUtils.closeQuietly(directAccess);
+            }
+          }
+
+          if (!pluginResultState.equals(PluginState.SUCCESS)) {
+            reportState = PluginState.FAILURE;
+          }
+
+          createEvent(resourceList, aip, file.getRepresentationId(), model, index, pluginResultState, details);
+
+          if (reportState.equals(PluginState.SUCCESS)) {
+            jobPluginInfo.incrementObjectsProcessedWithSuccess();
+          } else {
+            jobPluginInfo.incrementObjectsProcessedWithFailure();
+          }
+
+          reportItem.setPluginState(reportState).setPluginDetails("VeraPDF validation on File");
+          report.addReport(reportItem);
+          PluginHelper.updatePartialJobReport(this, model, index, reportItem, true);
+        }
+      } catch (RequestNotValidException | NotFoundException | GenericException | AuthorizationDeniedException
+        | IOException | IllegalArgumentException | JAXBException | VeraPDFException e) {
+        jobPluginInfo.incrementObjectsProcessedWithFailure();
+        LOGGER.error("Could not run VeraPDF successfully");
       }
 
       jobPluginInfo.done();
@@ -308,8 +517,8 @@ public class VeraPDFPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
-  public Plugin<AIP> cloneMe() {
-    return new VeraPDFPlugin();
+  public Plugin<T> cloneMe() {
+    return new VeraPDFPlugin<T>();
   }
 
   @Override
