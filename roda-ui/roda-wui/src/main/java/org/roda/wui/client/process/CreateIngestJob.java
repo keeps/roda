@@ -92,7 +92,7 @@ public class CreateIngestJob extends CreateJob<TransferredResource> {
     if (missingMandatoryParameters.isEmpty()) {
 
       BrowserService.Util.getInstance().createProcess(jobName, getSelected(), getSelectedPlugin().getId(),
-        getWorkflowOptions().getValue(), new AsyncCallback<Job>() {
+        getWorkflowOptions().getValue(), null, new AsyncCallback<Job>() {
 
           @Override
           public void onFailure(Throwable caught) {

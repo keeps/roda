@@ -11,9 +11,10 @@ package org.roda.wui.client.planning;
 import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.filter.SimpleFilterParameter;
 import org.roda.core.data.common.RodaConstants;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.risks.Risk;
 import org.roda.core.data.v2.risks.RiskIncidence;
@@ -168,8 +169,8 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
           if (selected.getObjectClass().equals(AIP.class.getSimpleName())) {
             Tools.newHistory(Browse.RESOLVER, selected.getAipId());
           } else if (selected.getObjectClass().equals(Representation.class.getSimpleName())) {
-            BrowserService.Util.getInstance().getRepresentationUUID(selected.getRepresentationId(),
-              new AsyncCallback<String>() {
+            BrowserService.Util.getInstance().getRepresentationFromId(selected.getRepresentationId(),
+              new AsyncCallback<IndexedRepresentation>() {
 
                 @Override
                 public void onFailure(Throwable caught) {
@@ -177,35 +178,34 @@ public class RiskShowPanel extends Composite implements HasValueChangeHandlers<R
                 }
 
                 @Override
-                public void onSuccess(String result) {
+                public void onSuccess(IndexedRepresentation result) {
                   if (result != null) {
-                    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                      selected.getAipId(), result);
+                    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
+                      result.getUUID());
                   } else {
                     Tools.newHistory(Browse.RESOLVER, selected.getAipId());
                   }
                 }
               });
           } else if (selected.getObjectClass().equals(File.class.getSimpleName())) {
-            BrowserService.Util.getInstance().getRepresentationAndFileUUID(selected.getRepresentationId(),
-              selected.getFileId(), new AsyncCallback<Pair<String, String>>() {
+            BrowserService.Util.getInstance().getFileFromId(selected.getFileId(), new AsyncCallback<IndexedFile>() {
 
-                @Override
-                public void onFailure(Throwable caught) {
+              @Override
+              public void onFailure(Throwable caught) {
+                Tools.newHistory(Browse.RESOLVER, selected.getAipId());
+              }
+
+              @Override
+              public void onSuccess(IndexedFile result) {
+                if (result != null) {
+                  Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(), result.getAipId(),
+                    result.getRepresentationUUID(), result.getUUID());
+
+                } else {
                   Tools.newHistory(Browse.RESOLVER, selected.getAipId());
                 }
-
-                @Override
-                public void onSuccess(Pair<String, String> result) {
-                  if (result.getFirst() != null && result.getSecond() != null) {
-                    Tools.newHistory(Browse.RESOLVER, ViewRepresentation.RESOLVER.getHistoryToken(),
-                      selected.getAipId(), result.getFirst(), result.getSecond());
-
-                  } else {
-                    Tools.newHistory(Browse.RESOLVER, selected.getAipId());
-                  }
-                }
-              });
+              }
+            });
           }
         }
       }

@@ -91,6 +91,12 @@ public final class PluginHelper {
     return initPluginReportItem(plugin, outcomeObjectId, "").setOutcomeObjectState(initialOutcomeObjectState);
   }
 
+  public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String objectId,
+    Class<T> clazz) {
+    return initPluginReportItem(plugin, objectId, objectId).setSourceObjectClass(clazz.getCanonicalName())
+      .setOutcomeObjectClass(clazz.getCanonicalName());
+  }
+
   public static <T extends Serializable> Report initPluginReportItem(Plugin<T> plugin, String outcomeObjectId,
     String sourceObjectId) {
     String jobId = getJobId(plugin);
@@ -159,7 +165,9 @@ public final class PluginHelper {
       try {
         jobReport = model.retrieveJobReport(jobId, reportItem.getOutcomeObjectId());
       } catch (NotFoundException e) {
-        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId());
+        jobReport = initPluginReportItem(plugin, reportItem.getOutcomeObjectId(), reportItem.getSourceObjectId())
+          .setSourceObjectClass(reportItem.getSourceObjectClass())
+          .setOutcomeObjectClass(reportItem.getOutcomeObjectClass());
 
         jobReport.setId(reportItem.getOutcomeObjectId());
         jobReport.addReport(reportItem);

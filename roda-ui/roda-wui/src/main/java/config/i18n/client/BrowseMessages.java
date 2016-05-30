@@ -286,6 +286,9 @@ public interface BrowseMessages extends Messages {
   @DefaultMessage("Selected objects")
   String createJobSelectedObject();
 
+  @DefaultMessage("Run on all objects")
+  String createJobSelectedAllObject();
+
   @DefaultMessage("Selected submission information packages (SIP)")
   String createJobSelectedSIP();
 

@@ -17,6 +17,10 @@ import java.util.List;
 import org.roda.core.data.common.RodaConstants;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.ip.File;
+import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -35,6 +39,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
 import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
 import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -47,6 +52,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.ListBox;
+import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -105,9 +111,16 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   private SelectedItems selected = null;
   private List<PluginInfo> plugins = null;
   private PluginInfo selectedPlugin = null;
+  private String selectedClass = null;
 
   @UiField
   TextBox name;
+
+  @UiField
+  Label runOnAllObjectsLabel;
+
+  @UiField
+  FlowPanel runOnAllObjectsPanel;
 
   @UiField
   FlowPanel targetPanel;
@@ -140,16 +153,34 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   Button buttonCancel;
 
   public CreateJob(Class<T> classToReceive, final List<PluginType> pluginType) {
-    SelectedItems<?> selectedItems = null;
-
-    if (classToReceive.getName().equals(TransferredResource.class.getName())) {
-      selectedItems = IngestTransfer.getInstance().getSelected();
+    if (classToReceive.getCanonicalName().equals(TransferredResource.class.getCanonicalName())) {
+      this.selected = IngestTransfer.getInstance().getSelected();
+      initWidget(uiBinder.createAndBindUi(this));
+      runOnAllObjectsLabel.setVisible(false);
+      runOnAllObjectsPanel.setVisible(false);
     } else {
-      selectedItems = Search.getInstance().getSelected();
-    }
+      this.selected = Search.getInstance().getSelected();
+      initWidget(uiBinder.createAndBindUi(this));
 
-    initWidget(uiBinder.createAndBindUi(this));
-    final SelectedItems<?> items = selectedItems;
+      if (this.selected instanceof SelectedItemsList && ((SelectedItemsList) this.selected).getIds().size() == 0) {
+        runOnAllObjectsLabel.setVisible(true);
+        runOnAllObjectsPanel.setVisible(true);
+
+        if (runOnAllObjectsPanel.getWidgetCount() == 0) {
+          RadioButton aipRadio = getRadioButton(AIP.class);
+          setSelectedClass(AIP.class.getCanonicalName());
+          aipRadio.setValue(true);
+
+          runOnAllObjectsPanel.add(aipRadio);
+          runOnAllObjectsPanel.add(getRadioButton(Representation.class));
+          runOnAllObjectsPanel.add(getRadioButton(File.class));
+        }
+      } else {
+        runOnAllObjectsLabel.setVisible(false);
+        runOnAllObjectsPanel.setVisible(false);
+        setSelectedClass(null);
+      }
+    }
 
     BrowserService.Util.getInstance().getPluginsInfo(pluginType, new AsyncCallback<List<PluginInfo>>() {
 
@@ -160,14 +191,13 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
 
       @Override
       public void onSuccess(List<PluginInfo> pluginsInfo) {
-        init(items, pluginsInfo);
+        init(pluginsInfo);
       }
     });
   }
 
-  public void init(SelectedItems selected, List<PluginInfo> plugins) {
+  public void init(List<PluginInfo> plugins) {
 
-    this.selected = selected;
     this.plugins = plugins;
 
     name.setText(messages.processNewDefaultName(new Date()));
@@ -323,6 +353,34 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
     return p;
   }
 
+  private RadioButton getRadioButton(Class<?> radioClass) {
+    RadioButton aipRadio = new RadioButton(radioClass.getCanonicalName(), radioClass.getSimpleName());
+
+    aipRadio.addClickHandler(new ClickHandler() {
+
+      @Override
+      public void onClick(ClickEvent event) {
+
+        RadioButton sourceButton = (RadioButton) event.getSource();
+        setSelectedClass(sourceButton.getName());
+
+        if (sourceButton.getValue()) {
+          for (int i = 0; i < runOnAllObjectsPanel.getWidgetCount(); i++) {
+            Widget widget = runOnAllObjectsPanel.getWidget(i);
+            RadioButton button = (RadioButton) widget;
+
+            if (!sourceButton.equals(button)) {
+              button.setValue(false);
+            }
+          }
+        }
+      }
+
+    });
+
+    return aipRadio;
+  }
+
   @UiHandler("buttonCreate")
   public abstract void buttonCreateHandler(ClickEvent e);
 
@@ -372,6 +430,14 @@ public abstract class CreateJob<T extends IsIndexed> extends Composite {
   public void setCategoryListBoxVisible(boolean visible) {
     workflowCategoryLabel.setVisible(visible);
     workflowCategoryList.setVisible(visible);
+  }
+
+  public String getSelectedClass() {
+    return selectedClass;
+  }
+
+  public void setSelectedClass(String selectedClass) {
+    this.selectedClass = selectedClass;
   }
 
 }

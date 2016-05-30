@@ -102,7 +102,6 @@ import org.roda.core.data.v2.ip.metadata.LinkingIdentifier;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
-import org.roda.core.data.v2.jobs.PluginInfo;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
 import org.roda.core.data.v2.risks.IndexedRisk;
@@ -1680,17 +1679,12 @@ public class BrowserHelper {
       RodaCoreFactory.getModelService().deleteRisk(riskId, true);
     }
 
-    RiskIncidenceRemoverPlugin plugin = new RiskIncidenceRemoverPlugin();
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("riskIds", StringUtils.join(idList, ","));
 
-    Date jobDate = new Date();
-    PluginInfo pluginInfo = new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(),
-      plugin.getDescription(), plugin.getType(), plugin.getCategories(), plugin.getParameters());
-
     Job job = new Job();
-    job.setName(plugin.getName() + " " + jobDate);
-    job.setPlugin(pluginInfo.getId());
+    job.setName(RiskIncidenceRemoverPlugin.getStaticName() + " " + job.getStartDate());
+    job.setPlugin(RiskIncidenceRemoverPlugin.class.getCanonicalName());
     job.setPluginParameters(parameters);
     job.setSourceObjects(new SelectedItemsAll<>(AIP.class.getCanonicalName()));
 
@@ -1912,40 +1906,30 @@ public class BrowserHelper {
     RodaCoreFactory.getIndexService().commit(IndexedAIP.class, Job.class, Report.class, IndexedPreservationEvent.class);
   }
 
-  public static String getRepresentationUUID(RodaUser user, String representationId)
-    throws NotFoundException, GenericException, RequestNotValidException {
+  public static IndexedRepresentation getRepresentationFromId(RodaUser user, String representationId)
+    throws GenericException, RequestNotValidException {
     Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.REPRESENTATION_ID, representationId));
-    IndexResult<IndexedRepresentation> results = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
+    IndexResult<IndexedRepresentation> reps = RodaCoreFactory.getIndexService().find(IndexedRepresentation.class,
       filter, Sorter.NONE, new Sublist(0, 1));
 
-    // TODO 20160520 use optional to avoid testing nulls (gwt 2.7 does not
-    // support it)
-    if (results.getResults().size() > 0) {
-      return results.getResults().get(0).getUUID();
-    } else {
+    if (reps.getResults().isEmpty()) {
       return null;
+    } else {
+      return reps.getResults().get(0);
     }
   }
 
-  public static Pair<String, String> getRepresentationAndFileUUID(RodaUser user, String representationId, String fileId)
-    throws NotFoundException, GenericException, RequestNotValidException {
-    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId),
-      new SimpleFilterParameter(RodaConstants.FILE_REPRESENTATION_ID, representationId));
-    IndexResult<IndexedFile> results = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
+  public static IndexedFile getFileFromId(RodaUser user, String fileId)
+    throws GenericException, RequestNotValidException {
+    Filter filter = new Filter(new SimpleFilterParameter(RodaConstants.FILE_FILEID, fileId));
+    IndexResult<IndexedFile> files = RodaCoreFactory.getIndexService().find(IndexedFile.class, filter, Sorter.NONE,
       new Sublist(0, 1));
 
-    // TODO 20160520 use optional to avoid testing nulls (gwt 2.7 does not
-    // support it)
-    Pair<String, String> resultPair;
-
-    if (results.getResults().size() > 0) {
-      resultPair = new Pair<String, String>(results.getResults().get(0).getRepresentationUUID(),
-        results.getResults().get(0).getUUID());
+    if (files.getResults().isEmpty()) {
+      return null;
     } else {
-      resultPair = new Pair<String, String>(null, null);
+      return files.getResults().get(0);
     }
-
-    return resultPair;
   }
 
 }

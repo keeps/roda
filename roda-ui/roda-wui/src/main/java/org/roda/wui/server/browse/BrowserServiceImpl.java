@@ -31,12 +31,16 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
+import org.roda.core.data.v2.index.SelectedItemsAll;
+import org.roda.core.data.v2.index.SelectedItemsList;
+import org.roda.core.data.v2.index.SelectedItemsNone;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -590,11 +594,19 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public Job createProcess(String jobName, SelectedItems<TransferredResource> selected, String id,
-    Map<String, String> value) throws AuthorizationDeniedException, RequestNotValidException, NotFoundException,
-    GenericException, JobAlreadyStartedException {
+  public <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
+    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, JobAlreadyStartedException {
 
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
+
+    if (selected instanceof SelectedItemsList) {
+      SelectedItemsList items = (SelectedItemsList) selected;
+
+      if (items.getIds().isEmpty()) {
+        selected = getAllItemsByClass(selectedClass);
+      }
+    }
 
     Job job = new Job();
     job.setName(jobName);
@@ -603,6 +615,14 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
     job.setPluginParameters(value);
 
     return Jobs.createJob(user, job);
+  }
+
+  private SelectedItems getAllItemsByClass(String selectedClass) {
+    if (selectedClass == null) {
+      return new SelectedItemsNone<>();
+    } else {
+      return new SelectedItemsAll<>(selectedClass);
+    }
   }
 
   @Override
@@ -634,17 +654,17 @@ public class BrowserServiceImpl extends RemoteServiceServlet implements BrowserS
   }
 
   @Override
-  public String getRepresentationUUID(String representationId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public IndexedRepresentation getRepresentationFromId(String representationId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.getRepresentationUUID(user, representationId);
+    return Browser.getRepresentationFromId(user, representationId);
   }
 
   @Override
-  public Pair<String, String> getRepresentationAndFileUUID(String representationId, String fileId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException {
+  public IndexedFile getFileFromId(String fileId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException {
     RodaUser user = UserUtility.getUser(getThreadLocalRequest());
-    return Browser.getRepresentationAndFileUUID(user, representationId, fileId);
+    return Browser.getFileFromId(user, fileId);
   }
 
 }

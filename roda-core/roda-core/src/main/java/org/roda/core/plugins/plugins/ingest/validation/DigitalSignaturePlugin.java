@@ -31,7 +31,6 @@ import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.common.OptionalWithCause;
 import org.roda.core.data.v2.ip.AIP;
-import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.File;
 import org.roda.core.data.v2.ip.IndexedFile;
 import org.roda.core.data.v2.ip.Representation;
@@ -233,7 +232,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
       PluginHelper.updateJobInformation(this, jobPluginInfo);
 
       for (AIP aip : list) {
-        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, aip.getId(), (Class<T>) AIP.class);
         PluginState reportState = PluginState.SUCCESS;
 
         try {
@@ -405,7 +404,8 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
         // not representation level)
         // FIXME 20160516 hsilva: see how to set initial
         // initialOutcomeObjectState
-        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, representation.getId(),
+          (Class<T>) Representation.class);
         PluginState reportState = PluginState.SUCCESS;
 
         try {
@@ -482,10 +482,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
                     } else {
                       LOGGER.debug("Process failed on file {} of representation {} from AIP {}", file.getId(),
                         representation.getId(), aipId);
-
                       reportState = PluginState.FAILURE;
-                      reportItem.setPluginState(reportState).setPluginDetails("Convert process failed on file "
-                        + file.getId() + " of representation " + representation.getId() + " from AIP " + aipId);
                     }
                   }
                   IOUtils.closeQuietly(directAccess);
@@ -514,6 +511,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
           boolean notifyEvent = true;
           createEvent(alteredFiles, extractedFiles, newFiles, verifiedFiles, model.retrieveAIP(aipId),
             newRepresentationID, model, index, reportState, notifyEvent);
+          reportItem.setPluginState(reportState);
 
           if (reportState.equals(PluginState.SUCCESS)) {
             jobPluginInfo.incrementObjectsProcessedWithSuccess();
@@ -566,7 +564,7 @@ public class DigitalSignaturePlugin<T extends Serializable> extends AbstractPlug
 
       for (File file : list) {
         LOGGER.debug("Processing file {}", file);
-        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), AIPState.INGEST_PROCESSING);
+        Report reportItem = PluginHelper.initPluginReportItem(this, file.getId(), (Class<T>) File.class);
         PluginState reportState = PluginState.SUCCESS;
 
         try {

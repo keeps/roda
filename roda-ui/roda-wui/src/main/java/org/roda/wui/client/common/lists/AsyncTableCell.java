@@ -506,6 +506,7 @@ public abstract class AsyncTableCell<T extends IsIndexed, O> extends FlowPanel
       ret = new SelectedItemsFilter<T>(getFilter(), selectedClass.getName(), getJustActive());
     } else {
       List<String> ids = new ArrayList<>();
+
       for (T item : selected) {
         ids.add(item.getUUID());
       }

@@ -154,7 +154,7 @@ public class CreateActionJob extends CreateJob<IsIndexed> {
     String jobName = getName().getText();
 
     BrowserService.Util.getInstance().createProcess(jobName, getSelected(), getSelectedPlugin().getId(),
-      getWorkflowOptions().getValue(), new AsyncCallback<Job>() {
+      getWorkflowOptions().getValue(), getSelectedClass(), new AsyncCallback<Job>() {
 
         @Override
         public void onFailure(Throwable caught) {

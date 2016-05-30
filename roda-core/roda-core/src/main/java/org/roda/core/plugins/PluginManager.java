@@ -207,8 +207,8 @@ public class PluginManager {
   }
 
   private <T extends Serializable> PluginInfo getPluginInfo(Plugin<T> plugin) {
-    return new PluginInfo(plugin.getClass().getName(), plugin.getName(), plugin.getVersion(), plugin.getDescription(),
-      plugin.getType(), plugin.getCategories(), plugin.getParameters());
+    return new PluginInfo(plugin.getClass().getCanonicalName(), plugin.getName(), plugin.getVersion(),
+      plugin.getDescription(), plugin.getType(), plugin.getCategories(), plugin.getParameters());
   }
 
   private void loadPlugins() {

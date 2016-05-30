@@ -24,12 +24,13 @@ import org.roda.core.data.exceptions.JobAlreadyStartedException;
 import org.roda.core.data.exceptions.NotFoundException;
 import org.roda.core.data.exceptions.RequestNotValidException;
 import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -232,9 +233,9 @@ public interface BrowserService extends RemoteService {
   void deleteFormat(SelectedItems<Format> selected)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException, NotFoundException;
 
-  Job createProcess(String jobName, SelectedItems<TransferredResource> selected, String id, Map<String, String> value)
-    throws AuthorizationDeniedException, RequestNotValidException, NotFoundException, GenericException,
-    JobAlreadyStartedException;
+  <T extends IsIndexed> Job createProcess(String jobName, SelectedItems<T> selected, String id,
+    Map<String, String> value, String selectedClass) throws AuthorizationDeniedException, RequestNotValidException,
+    NotFoundException, GenericException, JobAlreadyStartedException;
 
   List<String> getRiskOnAIP(String aipId)
     throws AuthorizationDeniedException, GenericException, RequestNotValidException;
@@ -248,10 +249,10 @@ public interface BrowserService extends RemoteService {
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason)
     throws GenericException, AuthorizationDeniedException, RequestNotValidException, NotFoundException;
 
-  String getRepresentationUUID(String representationId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  IndexedRepresentation getRepresentationFromId(String representationId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
-  Pair<String, String> getRepresentationAndFileUUID(String representationId, String fileId)
-    throws AuthorizationDeniedException, NotFoundException, GenericException, RequestNotValidException;
+  IndexedFile getFileFromId(String fileId)
+    throws AuthorizationDeniedException, GenericException, RequestNotValidException;
 
 }

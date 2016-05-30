@@ -7,7 +7,9 @@
  */
 package org.roda.core.plugins.plugins.base;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +18,8 @@ import org.roda.core.data.common.RodaConstants.PreservationEventType;
 import org.roda.core.data.exceptions.GenericException;
 import org.roda.core.data.exceptions.InvalidParameterException;
 import org.roda.core.data.v2.ip.AIP;
+import org.roda.core.data.v2.jobs.PluginParameter;
+import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.index.IndexService;
@@ -34,6 +38,13 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(ReindexAIPPlugin.class);
   private boolean clearIndexes = false;
+
+  private static Map<String, PluginParameter> pluginParameters = new HashMap<>();
+  static {
+    pluginParameters.put(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES,
+      new PluginParameter(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES, "Clear indexes", PluginParameterType.BOOLEAN,
+        "false", false, false, "Clear all the AIP indexes before reindexing them."));
+  }
 
   @Override
   public void init() throws PluginException {
@@ -61,9 +72,16 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   }
 
   @Override
+  public List<PluginParameter> getParameters() {
+    ArrayList<PluginParameter> parameters = new ArrayList<PluginParameter>();
+    parameters.add(pluginParameters.get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
+    return parameters;
+  }
+
+  @Override
   public void setParameterValues(Map<String, String> parameters) throws InvalidParameterException {
     super.setParameterValues(parameters);
-    if (getParameterValues().containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
+    if (parameters.containsKey(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES)) {
       clearIndexes = Boolean.parseBoolean(getParameterValues().get(RodaConstants.PLUGIN_PARAMS_CLEAR_INDEXES));
     }
   }
@@ -71,6 +89,8 @@ public class ReindexAIPPlugin extends AbstractPlugin<AIP> {
   @Override
   public Report execute(IndexService index, ModelService model, StorageService storage, List<AIP> list)
     throws PluginException {
+
+    LOGGER.debug("Reindexing a total of {} AIPs", list.size());
 
     try {
       SimpleJobPluginInfo jobPluginInfo = new SimpleJobPluginInfo(list.size());

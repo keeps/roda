@@ -6,9 +6,8 @@ import java.util.Map;
 import org.roda.core.plugins.Plugin;
 
 public class SimpleJobPluginInfo extends JobPluginInfo {
-  private static final long serialVersionUID = 402391793635402897L;
 
-  private boolean pluginExecutionIsDone = false;
+  private boolean pluginExecutionDone = false;
 
   public SimpleJobPluginInfo() {
     super();
@@ -24,39 +23,43 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
 
     SimpleJobPluginInfo jobPluginInfo = (SimpleJobPluginInfo) jobInfos.get(plugin);
     jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
-    jobPluginInfo.setSourceObjectsBeingProcessed(pluginExecutionIsDone ? 0 : this.getSourceObjectsBeingProcessed());
+    jobPluginInfo.setSourceObjectsCount(this.getSourceObjectsCount());
+    jobPluginInfo.setSourceObjectsBeingProcessed(pluginExecutionDone ? 0 : this.getSourceObjectsBeingProcessed());
     jobPluginInfo
-      .setSourceObjectsWaitingToBeProcessed(pluginExecutionIsDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
+      .setSourceObjectsWaitingToBeProcessed(pluginExecutionDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
     jobPluginInfo.setSourceObjectsProcessedWithSuccess(this.getSourceObjectsProcessedWithSuccess());
     jobPluginInfo.setSourceObjectsProcessedWithFailure(this.getSourceObjectsProcessedWithFailure());
 
-    int sourceObjectsBeingProcessed = 0;
-    int sourceObjectsProcessedWithSuccess = 0;
-    int sourceObjectsProcessedWithFailure = 0;
-    for (JobPluginInfoInterface jpi : jobInfos.values()) {
+    int objectsCount = 0;
+    int beingProcessed = 0;
+    int processedWithSuccess = 0;
+    int processedWithFailure = 0;
+    for (JobPluginInfo jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
-      sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
-      sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
-      sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
+      objectsCount += pluginInfo.getSourceObjectsCount();
+      processedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
+      processedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
+      beingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
     }
 
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
-    infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
-    infoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
-    infoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
+    infoUpdated.setSourceObjectsCount(objectsCount);
+    infoUpdated.setSourceObjectsBeingProcessed(beingProcessed);
+    infoUpdated.setSourceObjectsProcessedWithSuccess(processedWithSuccess);
+    infoUpdated.setSourceObjectsProcessedWithFailure(processedWithFailure);
     return infoUpdated;
   }
 
-  public boolean isPluginExecutionIsDone() {
-    return pluginExecutionIsDone;
+  public boolean isPluginExecutionDone() {
+    return pluginExecutionDone;
   }
 
-  public void setPluginExecutionIsDone(boolean pluginExecutionIsDone) {
-    this.pluginExecutionIsDone = pluginExecutionIsDone;
+  public void setPluginExecutionDone(boolean pluginExecutionIsDone) {
+    this.pluginExecutionDone = pluginExecutionIsDone;
   }
 
   public void done() {
-    this.pluginExecutionIsDone = false;
+    this.pluginExecutionDone = false;
   }
 
 }

@@ -18,12 +18,13 @@ import org.roda.core.data.adapter.filter.Filter;
 import org.roda.core.data.adapter.sort.Sorter;
 import org.roda.core.data.adapter.sublist.Sublist;
 import org.roda.core.data.v2.agents.Agent;
-import org.roda.core.data.v2.common.Pair;
 import org.roda.core.data.v2.formats.Format;
 import org.roda.core.data.v2.index.IndexResult;
 import org.roda.core.data.v2.index.IsIndexed;
 import org.roda.core.data.v2.index.SelectedItems;
 import org.roda.core.data.v2.ip.IndexedAIP;
+import org.roda.core.data.v2.ip.IndexedFile;
+import org.roda.core.data.v2.ip.IndexedRepresentation;
 import org.roda.core.data.v2.ip.Permissions;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
@@ -159,7 +160,7 @@ public interface BrowserServiceAsync {
   void deleteFormat(SelectedItems<Format> selected, AsyncCallback<Void> asyncCallback);
 
   void createProcess(String jobName, SelectedItems<?> selected, String id, Map<String, String> value,
-    AsyncCallback<Job> asyncCallback);
+    String selectedClass, AsyncCallback<Job> asyncCallback);
 
   void getRiskOnAIP(String aipId, AsyncCallback<List<String>> asyncCallback);
 
@@ -169,9 +170,8 @@ public interface BrowserServiceAsync {
 
   void appraisal(SelectedItems<IndexedAIP> selected, boolean accept, String rejectReason, AsyncCallback<Void> callback);
 
-  void getRepresentationUUID(String representationId, AsyncCallback<String> asyncCallback);
+  void getRepresentationFromId(String representationId, AsyncCallback<IndexedRepresentation> asyncCallback);
 
-  void getRepresentationAndFileUUID(String representationId, String fileId,
-    AsyncCallback<Pair<String, String>> asyncCallback);
+  void getFileFromId(String fileId, AsyncCallback<IndexedFile> asyncCallback);
 
 }

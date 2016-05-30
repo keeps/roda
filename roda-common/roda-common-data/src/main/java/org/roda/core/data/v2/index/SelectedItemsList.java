@@ -7,6 +7,7 @@
  */
 package org.roda.core.data.v2.index;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -23,6 +24,7 @@ public class SelectedItemsList<T extends IsIndexed> implements SelectedItems<T> 
 
   public SelectedItemsList() {
     super();
+    ids = new ArrayList<String>();
   }
 
   public SelectedItemsList(List<String> ids, String selectedClass) {
