@@ -130,7 +130,11 @@
 						<groupId>com.spotify</groupId>
 						<artifactId>docker-maven-plugin</artifactId>
 						<configuration>
-							<imageName>roda-wui</imageName>
+							<imageName>keeps/roda</imageName>
+							<imageTags>
+								<imageTag>${project.version}</imageTag>
+								<imageTag>latest</imageTag>
+							</imageTags>
 							<dockerDirectory>${project.basedir}/docker-files</dockerDirectory>
 							<resources>
 								<resource>

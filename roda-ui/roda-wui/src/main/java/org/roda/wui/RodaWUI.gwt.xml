@@ -11,8 +11,6 @@
 
 	<!-- Inherit required libraries -->
 	<inherits name="com.bytebybyte.gwt.fontawesome.FontAwesomeLib" />
-	<!-- Libraries to remove -->
-	<inherits name='com.netthreads.gwt.simile.timeline.Timeline' />
 
 	<!-- Inherit sub-projects -->
 	<inherits name="org.roda.wui.management.Management" />
@@ -26,6 +24,4 @@
 	<stylesheet src="Main.css" />
 	<stylesheet src="/api/v1/theme?resourceId=theme.css" />
 
-	<set-configuration-property name='xsiframe.failIfScriptTag'
-		value='FALSE' />
 </module>
