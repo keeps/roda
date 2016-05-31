@@ -1895,12 +1895,15 @@ public class BrowserHelper {
       Job job = model.retrieveJob(jobId);
       if (rejected > 0) {
         // change counter to failure
-        job.setSourceObjectsProcessedWithSuccess(job.getSourceObjectsProcessedWithSuccess() - rejected);
-        job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsProcessedWithFailure() + rejected);
+        job.getJobStats()
+          .setSourceObjectsProcessedWithSuccess(job.getJobStats().getSourceObjectsProcessedWithSuccess() - rejected);
+        job.getJobStats()
+          .setSourceObjectsProcessedWithFailure(job.getJobStats().getSourceObjectsProcessedWithFailure() + rejected);
       }
 
       // decrement manual interaction counter
-      job.setOutcomeObjectsWithManualIntervention(job.getOutcomeObjectsWithManualIntervention() - total);
+      job.getJobStats()
+        .setOutcomeObjectsWithManualIntervention(job.getJobStats().getOutcomeObjectsWithManualIntervention() - total);
 
       model.createOrUpdateJob(job);
 

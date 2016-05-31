@@ -122,8 +122,8 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public String getValue(Job job) {
         String ret = "";
         if (job != null) {
-          if (job.getSourceObjectsCount() > 0) {
-            ret = job.getSourceObjectsCount() + "";
+          if (job.getJobStats().getSourceObjectsCount() > 0) {
+            ret = job.getJobStats().getSourceObjectsCount() + "";
           }
         }
         return ret;
@@ -135,9 +135,10 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getSourceObjectsProcessedWithSuccess() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
-            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getSourceObjectsProcessedWithSuccess());
+          b.append(
+            job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+              : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getJobStats().getSourceObjectsProcessedWithSuccess());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -150,13 +151,13 @@ public class JobList extends BasicAsyncTableCell<Job> {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
           b.append(SafeHtmlUtils.fromSafeConstant("<span"));
-          if (job.getSourceObjectsProcessedWithFailure() > 0) {
+          if (job.getJobStats().getSourceObjectsProcessedWithFailure() > 0) {
             b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-failed-column'"));
           } else {
             b.append(SafeHtmlUtils.fromSafeConstant(" class='ingest-process-counter-0'"));
           }
           b.append(SafeHtmlUtils.fromSafeConstant(">"));
-          b.append(job.getSourceObjectsProcessedWithFailure());
+          b.append(job.getJobStats().getSourceObjectsProcessedWithFailure());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -168,9 +169,10 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getSourceObjectsWaitingToBeProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
-            : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getSourceObjectsWaitingToBeProcessed());
+          b.append(
+            job.getJobStats().getSourceObjectsWaitingToBeProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+              : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
+          b.append(job.getJobStats().getSourceObjectsWaitingToBeProcessed());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -182,9 +184,9 @@ public class JobList extends BasicAsyncTableCell<Job> {
       public SafeHtml getValue(Job job) {
         SafeHtmlBuilder b = new SafeHtmlBuilder();
         if (job != null) {
-          b.append(job.getSourceObjectsBeingProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
+          b.append(job.getJobStats().getSourceObjectsBeingProcessed() > 0 ? SafeHtmlUtils.fromSafeConstant("<span>")
             : SafeHtmlUtils.fromSafeConstant("<span class='ingest-process-counter-0'>"));
-          b.append(job.getSourceObjectsBeingProcessed());
+          b.append(job.getJobStats().getSourceObjectsBeingProcessed());
           b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
         }
         return b.toSafeHtml();
@@ -195,7 +197,7 @@ public class JobList extends BasicAsyncTableCell<Job> {
 
       @Override
       public String getValue(Job job) {
-        return job != null ? job.getCompletionPercentage() + "%" : null;
+        return job != null ? job.getJobStats().getCompletionPercentage() + "%" : null;
       }
     };
 
@@ -240,9 +242,12 @@ public class JobList extends BasicAsyncTableCell<Job> {
     columnSortingKeyMap.put(statusColumn, Arrays.asList(RodaConstants.JOB_STATE));
     columnSortingKeyMap.put(progressColumn, Arrays.asList(RodaConstants.JOB_COMPLETION_PERCENTAGE));
     columnSortingKeyMap.put(objectsTotalCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_COUNT));
-    columnSortingKeyMap.put(objectsSuccessCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
-    columnSortingKeyMap.put(objectsFailureCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
-    columnSortingKeyMap.put(objectsProcessingCountColumn, Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED));
+    columnSortingKeyMap.put(objectsSuccessCountColumn,
+      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_SUCCESS));
+    columnSortingKeyMap.put(objectsFailureCountColumn,
+      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_PROCESSED_WITH_FAILURE));
+    columnSortingKeyMap.put(objectsProcessingCountColumn,
+      Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_BEING_PROCESSED));
     columnSortingKeyMap.put(objectsWaitingCountColumn,
       Arrays.asList(RodaConstants.JOB_SOURCE_OBJECTS_WAITING_TO_BE_PROCESSED));
     columnSortingKeyMap.put(usernameColumn, Arrays.asList(RodaConstants.JOB_USERNAME));

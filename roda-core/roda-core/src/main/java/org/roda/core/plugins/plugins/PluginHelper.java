@@ -46,6 +46,7 @@ import org.roda.core.data.v2.ip.metadata.PreservationMetadata;
 import org.roda.core.data.v2.ip.metadata.PreservationMetadata.PreservationMetadataType;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.data.v2.jobs.Report.PluginState;
@@ -57,6 +58,7 @@ import org.roda.core.plugins.AbstractPlugin;
 import org.roda.core.plugins.Plugin;
 import org.roda.core.plugins.orchestrate.JobException;
 import org.roda.core.plugins.orchestrate.JobPluginInfo;
+import org.roda.core.plugins.orchestrate.JobPluginInfoInterface;
 import org.roda.core.storage.ContentPayload;
 import org.roda.core.storage.DefaultStoragePath;
 import org.roda.core.storage.StorageService;
@@ -224,7 +226,7 @@ public final class PluginHelper {
   /**
    * Updates the job status
    */
-  public static <T extends Serializable> JobPluginInfo updateJobInformation(Plugin<T> plugin,
+  public static <T extends Serializable> JobPluginInfoInterface updateJobInformation(Plugin<T> plugin,
     JobPluginInfo jobPluginInfo) throws JobException {
 
     Map<String, String> parameterValues = plugin.getParameterValues();
@@ -262,8 +264,8 @@ public final class PluginHelper {
     Long objectsCount) {
     try {
       Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setSourceObjectsCount(objectsCount.intValue());
-      job.setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
+      job.getJobStats().setSourceObjectsCount(objectsCount.intValue());
+      job.getJobStats().setSourceObjectsWaitingToBeProcessed(objectsCount.intValue());
 
       model.createOrUpdateJob(job);
     } catch (NotFoundException | GenericException | RequestNotValidException | AuthorizationDeniedException e) {
@@ -284,7 +286,7 @@ public final class PluginHelper {
       int completionPercentage = jobPluginInfo.getCompletionPercentage();
       LOGGER.debug("New job completionPercentage: {}", completionPercentage);
       Job job = PluginHelper.getJobFromModel(plugin, model);
-      job.setCompletionPercentage(completionPercentage);
+      job.getJobStats().setCompletionPercentage(completionPercentage);
       job = setJobCounters(job, jobPluginInfo);
 
       model.createOrUpdateJob(job);
@@ -295,21 +297,24 @@ public final class PluginHelper {
 
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    job.setSourceObjectsBeingProcessed(0);
-    job.setSourceObjectsProcessedWithSuccess(0);
-    job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsCount());
-    job.setSourceObjectsWaitingToBeProcessed(0);
+    JobStats jobStats = job.getJobStats();
+    jobStats.setSourceObjectsBeingProcessed(0);
+    jobStats.setSourceObjectsProcessedWithSuccess(0);
+    jobStats.setSourceObjectsProcessedWithFailure(jobStats.getSourceObjectsCount());
+    jobStats.setSourceObjectsWaitingToBeProcessed(0);
     job.setEndDate(new Date());
     return job;
   }
 
   public static Job setJobCounters(Job job, JobPluginInfo jobPluginInfo) {
-    job.setSourceObjectsBeingProcessed(jobPluginInfo.getObjectsBeingProcessed());
-    job.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getObjectsProcessedWithSuccess());
-    job.setSourceObjectsProcessedWithFailure(jobPluginInfo.getObjectsProcessedWithFailure());
-    job.setSourceObjectsWaitingToBeProcessed(job.getSourceObjectsCount() - job.getSourceObjectsBeingProcessed()
-      - job.getSourceObjectsProcessedWithFailure() - job.getSourceObjectsProcessedWithSuccess());
-    job.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
+    JobStats jobStats = job.getJobStats();
+    jobStats.setSourceObjectsBeingProcessed(jobPluginInfo.getSourceObjectsBeingProcessed());
+    jobStats.setSourceObjectsProcessedWithSuccess(jobPluginInfo.getSourceObjectsProcessedWithSuccess());
+    jobStats.setSourceObjectsProcessedWithFailure(jobPluginInfo.getSourceObjectsProcessedWithFailure());
+    jobStats
+      .setSourceObjectsWaitingToBeProcessed(jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsBeingProcessed()
+        - jobStats.getSourceObjectsProcessedWithFailure() - jobStats.getSourceObjectsProcessedWithSuccess());
+    jobStats.setOutcomeObjectsWithManualIntervention(jobPluginInfo.getOutcomeObjectsWithManualIntervention());
     return job;
   }
 

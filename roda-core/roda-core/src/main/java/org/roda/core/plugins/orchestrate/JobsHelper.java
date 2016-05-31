@@ -26,6 +26,7 @@ import org.roda.core.data.v2.ip.Representation;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
 import org.roda.core.data.v2.jobs.Job.JOB_STATE;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.index.IndexService;
 import org.roda.core.model.ModelService;
 import org.roda.core.plugins.Plugin;
@@ -70,7 +71,7 @@ public final class JobsHelper {
   }
 
   public static Timeout getJobTimeout(Job job, int blockSize) {
-    return getTimeout(job.getPlugin(), job.getSourceObjectsCount(), blockSize);
+    return getTimeout(job.getPlugin(), job.getJobStats().getSourceObjectsCount(), blockSize);
   }
 
   public static Timeout getDefaultTimeout() {
@@ -142,9 +143,11 @@ public final class JobsHelper {
 
   public static Job updateJobInTheStateStartedOrCreated(Job job) {
     job.setState(JOB_STATE.FAILED_TO_COMPLETE);
-    job.setSourceObjectsBeingProcessed(0);
-    job.setSourceObjectsWaitingToBeProcessed(0);
-    job.setSourceObjectsProcessedWithFailure(job.getSourceObjectsCount() - job.getSourceObjectsProcessedWithSuccess());
+    JobStats jobStats = job.getJobStats();
+    jobStats.setSourceObjectsBeingProcessed(0);
+    jobStats.setSourceObjectsWaitingToBeProcessed(0);
+    jobStats.setSourceObjectsProcessedWithFailure(
+      jobStats.getSourceObjectsCount() - jobStats.getSourceObjectsProcessedWithSuccess());
     job.setEndDate(new Date());
     return job;
   }

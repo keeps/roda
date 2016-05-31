@@ -7,98 +7,25 @@
  */
 package org.roda.core.plugins.orchestrate;
 
-import java.io.Serializable;
-import java.util.Map;
+import org.roda.core.data.v2.jobs.JobStats;
 
-import org.roda.core.plugins.Plugin;
-
-public abstract class JobPluginInfo {
-  private int completionPercentage = 0;
-  private int objectsCount = 0;
-  private int objectsBeingProcessed = 0;
-  private int objectsWaitingToBeProcessed = 0;
-  private int objectsProcessedWithSuccess = 0;
-  private int objectsProcessedWithFailure = 0;
-  private int outcomeObjectsWithManualIntervention = 0;
+public abstract class JobPluginInfo extends JobStats implements JobPluginInfoInterface {
+  private static final long serialVersionUID = 2106710222456788707L;
 
   public JobPluginInfo() {
-
+    super();
   }
 
-  public JobPluginInfo(int completionPercentage) {
-    this.completionPercentage = completionPercentage;
+  public JobPluginInfo(int sourceObjectsCount) {
+    super();
+    setSourceObjectsCount(sourceObjectsCount);
+    setSourceObjectsBeingProcessed(sourceObjectsCount);
   }
 
-  public int getCompletionPercentage() {
-    return completionPercentage;
+  public void finalizeCounters() {
+    setSourceObjectsProcessedWithSuccess(getSourceObjectsCount() - getSourceObjectsProcessedWithFailure());
+    setSourceObjectsBeingProcessed(0);
+    setSourceObjectsWaitingToBeProcessed(0);
+    setCompletionPercentage(100);
   }
-
-  public void setCompletionPercentage(int completionPercentage) {
-    this.completionPercentage = completionPercentage;
-  }
-
-  public int getObjectsCount() {
-    return objectsCount;
-  }
-
-  public void setObjectsCount(int objectsCount) {
-    this.objectsCount = objectsCount;
-  }
-
-  public int getObjectsBeingProcessed() {
-    return objectsBeingProcessed;
-  }
-
-  public void setObjectsBeingProcessed(int objectsBeingProcessed) {
-    this.objectsBeingProcessed = objectsBeingProcessed;
-  }
-
-  public int getObjectsWaitingToBeProcessed() {
-    return objectsWaitingToBeProcessed;
-  }
-
-  public void setObjectsWaitingToBeProcessed(int objectsWaitingToBeProcessed) {
-    this.objectsWaitingToBeProcessed = objectsWaitingToBeProcessed;
-  }
-
-  public int getObjectsProcessedWithSuccess() {
-    return objectsProcessedWithSuccess;
-  }
-
-  public void setObjectsProcessedWithSuccess(int objectsProcessedWithSuccess) {
-    this.objectsProcessedWithSuccess = objectsProcessedWithSuccess;
-  }
-
-  public int getObjectsProcessedWithFailure() {
-    return objectsProcessedWithFailure;
-  }
-
-  public void setObjectsProcessedWithFailure(int objectsProcessedWithFailure) {
-    this.objectsProcessedWithFailure = objectsProcessedWithFailure;
-  }
-
-  public int getOutcomeObjectsWithManualIntervention() {
-    return outcomeObjectsWithManualIntervention;
-  }
-
-  public void setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
-    this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
-  }
-
-  public void incrementObjectsProcessedWithFailure() {
-    this.objectsProcessedWithFailure += 1;
-    this.objectsBeingProcessed -= 1;
-  }
-
-  public void incrementObjectsProcessedWithSuccess() {
-    this.objectsProcessedWithSuccess += 1;
-    this.objectsBeingProcessed -= 1;
-  }
-
-  public void incrementOutcomeObjectsWithManualIntervention() {
-    this.outcomeObjectsWithManualIntervention += 1;
-  }
-
-  abstract <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin,
-    Integer taskObjectsCount, Map<Plugin<?>, JobPluginInfo> jobInfos);
 }

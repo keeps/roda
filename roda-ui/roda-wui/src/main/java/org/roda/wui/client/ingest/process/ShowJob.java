@@ -290,41 +290,41 @@ public class ShowJob extends Composite {
     // set counters
     SafeHtmlBuilder b = new SafeHtmlBuilder();
     b.append(SafeHtmlUtils.fromSafeConstant("<span class='label-default'>"));
-    b.append(messages.showJobProgressCompletionPercentage(job.getCompletionPercentage()));
+    b.append(messages.showJobProgressCompletionPercentage(job.getJobStats().getCompletionPercentage()));
     b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
-    if (job.getSourceObjectsCount() > 0) {
+    if (job.getJobStats().getSourceObjectsCount() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-default'>"));
-      b.append(messages.showJobProgressTotalCount(job.getSourceObjectsCount()));
+      b.append(messages.showJobProgressTotalCount(job.getJobStats().getSourceObjectsCount()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getSourceObjectsProcessedWithSuccess() > 0) {
+    if (job.getJobStats().getSourceObjectsProcessedWithSuccess() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-success'>"));
-      b.append(messages.showJobProgressSuccessfulCount(job.getSourceObjectsProcessedWithSuccess()));
+      b.append(messages.showJobProgressSuccessfulCount(job.getJobStats().getSourceObjectsProcessedWithSuccess()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getSourceObjectsProcessedWithFailure() > 0) {
+    if (job.getJobStats().getSourceObjectsProcessedWithFailure() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-danger'>"));
-      b.append(messages.showJobProgressFailedCount(job.getSourceObjectsProcessedWithFailure()));
+      b.append(messages.showJobProgressFailedCount(job.getJobStats().getSourceObjectsProcessedWithFailure()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getSourceObjectsBeingProcessed() > 0) {
+    if (job.getJobStats().getSourceObjectsBeingProcessed() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-info'>"));
-      b.append(messages.showJobProgressProcessingCount(job.getSourceObjectsBeingProcessed()));
+      b.append(messages.showJobProgressProcessingCount(job.getJobStats().getSourceObjectsBeingProcessed()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
-    if (job.getSourceObjectsWaitingToBeProcessed() > 0) {
+    if (job.getJobStats().getSourceObjectsWaitingToBeProcessed() > 0) {
       b.append(SafeHtmlUtils.fromSafeConstant("&nbsp;<span class='label-warning'>"));
-      b.append(messages.showJobProgressWaitingCount(job.getSourceObjectsWaitingToBeProcessed()));
+      b.append(messages.showJobProgressWaitingCount(job.getJobStats().getSourceObjectsWaitingToBeProcessed()));
       b.append(SafeHtmlUtils.fromSafeConstant("</span>"));
     }
 
     progress.setHTML(b.toSafeHtml());
 
-    buttonAppraisal.setText("Appraisal (" + job.getOutcomeObjectsWithManualIntervention() + ")");
+    buttonAppraisal.setText("Appraisal (" + job.getJobStats().getOutcomeObjectsWithManualIntervention() + ")");
 
     // set button visibility
     // buttonStop.setVisible(isJobRunning());
-    buttonAppraisal.setVisible(job.getOutcomeObjectsWithManualIntervention() > 0);
+    buttonAppraisal.setVisible(job.getJobStats().getOutcomeObjectsWithManualIntervention() > 0);
 
     scheduleUpdateStatus();
   }

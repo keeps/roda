@@ -28,7 +28,7 @@ public class HtmlSnippetUtils {
     if (job != null) {
       JOB_STATE state = job.getState();
       if (JOB_STATE.COMPLETED.equals(state)) {
-        if (job.getSourceObjectsCount() == job.getSourceObjectsProcessedWithSuccess()) {
+        if (job.getJobStats().getSourceObjectsCount() == job.getJobStats().getSourceObjectsProcessedWithSuccess()) {
           ret = SafeHtmlUtils
             .fromSafeConstant("<span class='label-success'>" + messages.showJobStatusCompleted() + "</span>");
         } else {

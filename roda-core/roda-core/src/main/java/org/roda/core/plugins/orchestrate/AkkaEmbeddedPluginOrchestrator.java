@@ -684,8 +684,8 @@ public class AkkaEmbeddedPluginOrchestrator implements PluginOrchestrator {
 
   private <T extends Serializable> void initJobPluginInfo(Plugin<T> innerPlugin, String jobId,
     JobPluginInfo jobPluginInfo, int objectsCount) {
-    jobPluginInfo.setObjectsCount(objectsCount);
-    jobPluginInfo.setObjectsWaitingToBeProcessed(objectsCount);
+    jobPluginInfo.setSourceObjectsCount(objectsCount);
+    jobPluginInfo.setSourceObjectsWaitingToBeProcessed(objectsCount);
     if (runningJobs.get(jobId) != null) {
       runningJobs.get(jobId).put(innerPlugin, jobPluginInfo, objectsCount);
     } else {

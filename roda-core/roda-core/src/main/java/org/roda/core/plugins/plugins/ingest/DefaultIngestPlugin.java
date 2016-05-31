@@ -30,6 +30,7 @@ import org.roda.core.data.v2.ip.AIP;
 import org.roda.core.data.v2.ip.AIPState;
 import org.roda.core.data.v2.ip.TransferredResource;
 import org.roda.core.data.v2.jobs.Job;
+import org.roda.core.data.v2.jobs.JobStats;
 import org.roda.core.data.v2.jobs.PluginParameter;
 import org.roda.core.data.v2.jobs.PluginParameter.PluginParameterType;
 import org.roda.core.data.v2.jobs.PluginType;
@@ -361,6 +362,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
   private void sendNotification(ModelService model)
     throws GenericException, RequestNotValidException, NotFoundException, AuthorizationDeniedException {
     Job job = PluginHelper.getJobFromModel(this, model);
+    JobStats jobStats = job.getJobStats();
 
     String emails = PluginHelper.getStringFromParameters(this,
       getPluginParameter(RodaConstants.PLUGIN_PARAMS_EMAIL_NOTIFICATION));
@@ -370,7 +372,7 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Notification notification = new Notification();
       String outcome = PluginState.SUCCESS.toString();
 
-      if (job.getSourceObjectsProcessedWithFailure() > 0) {
+      if (jobStats.getSourceObjectsProcessedWithFailure() > 0) {
         outcome = PluginState.FAILURE.toString();
       }
 
@@ -383,9 +385,9 @@ public abstract class DefaultIngestPlugin extends AbstractPlugin<TransferredReso
       Map<String, Object> scopes = new HashMap<String, Object>();
       scopes.put("outcome", outcome);
       scopes.put("type", CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, job.getPluginType().toString()));
-      scopes.put("sips", job.getSourceObjectsCount());
-      scopes.put("success", job.getSourceObjectsProcessedWithSuccess());
-      scopes.put("failed", job.getSourceObjectsProcessedWithFailure());
+      scopes.put("sips", jobStats.getSourceObjectsCount());
+      scopes.put("success", jobStats.getSourceObjectsProcessedWithSuccess());
+      scopes.put("failed", jobStats.getSourceObjectsProcessedWithFailure());
       scopes.put("name", job.getName());
       scopes.put("creator", job.getUsername());
 

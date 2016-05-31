@@ -19,6 +19,8 @@ import org.roda.core.data.v2.jobs.Report;
 import org.roda.core.plugins.Plugin;
 
 public class IngestJobPluginInfo extends JobPluginInfo {
+  private static final long serialVersionUID = -7993848868644990995L;
+
   private int stepsCompleted = 0;
   private int totalSteps = 0;
 
@@ -33,13 +35,8 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     super();
   }
 
-  public IngestJobPluginInfo(int completionPercentage) {
-    super(completionPercentage);
-  }
-
-  public IngestJobPluginInfo(int objectsCount, int totalSteps) {
-    setObjectsCount(objectsCount);
-    setObjectsBeingProcessed(objectsCount);
+  public IngestJobPluginInfo(int sourceObjectsCount, int totalSteps) {
+    super(sourceObjectsCount);
     this.totalSteps = totalSteps;
   }
 
@@ -72,37 +69,37 @@ public class IngestJobPluginInfo extends JobPluginInfo {
     jobPluginInfo.setTotalSteps(this.getTotalSteps());
     jobPluginInfo.setStepsCompleted(this.getStepsCompleted());
     jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
-    jobPluginInfo.setObjectsBeingProcessed(pluginIsDone ? 0 : this.getObjectsBeingProcessed());
-    jobPluginInfo.setObjectsWaitingToBeProcessed(pluginIsDone ? 0 : this.getObjectsWaitingToBeProcessed());
-    jobPluginInfo.setObjectsProcessedWithSuccess(this.getObjectsProcessedWithSuccess());
-    jobPluginInfo.setObjectsProcessedWithFailure(this.getObjectsProcessedWithFailure());
+    jobPluginInfo.setSourceObjectsBeingProcessed(pluginIsDone ? 0 : this.getSourceObjectsBeingProcessed());
+    jobPluginInfo.setSourceObjectsWaitingToBeProcessed(pluginIsDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
+    jobPluginInfo.setSourceObjectsProcessedWithSuccess(this.getSourceObjectsProcessedWithSuccess());
+    jobPluginInfo.setSourceObjectsProcessedWithFailure(this.getSourceObjectsProcessedWithFailure());
     jobPluginInfo.setOutcomeObjectsWithManualIntervention(this.getOutcomeObjectsWithManualIntervention());
 
     // calculate general counters
     float percentage = 0f;
-    int beingProcessed = 0;
-    int processedWithSuccess = 0;
-    int processedWithFailure = 0;
+    int sourceObjectsBeingProcessed = 0;
+    int sourceObjectsProcessedWithSuccess = 0;
+    int sourceObjectsProcessedWithFailure = 0;
     int outcomeObjectsWithManualIntervention = 0;
-    for (JobPluginInfo jpi : jobInfos.values()) {
+    for (JobPluginInfoInterface jpi : jobInfos.values()) {
       IngestJobPluginInfo pluginInfo = (IngestJobPluginInfo) jpi;
       if (pluginInfo.getTotalSteps() > 0) {
         float pluginPercentage = ((float) pluginInfo.getStepsCompleted()) / pluginInfo.getTotalSteps();
-        float pluginWeight = ((float) pluginInfo.getObjectsCount()) / taskObjectsCount;
+        float pluginWeight = ((float) pluginInfo.getSourceObjectsCount()) / taskObjectsCount;
         percentage += (pluginPercentage * pluginWeight);
 
-        processedWithSuccess += pluginInfo.getObjectsProcessedWithSuccess();
-        processedWithFailure += pluginInfo.getObjectsProcessedWithFailure();
+        sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
+        sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
         outcomeObjectsWithManualIntervention += pluginInfo.getOutcomeObjectsWithManualIntervention();
       }
-      beingProcessed += pluginInfo.getObjectsBeingProcessed();
+      sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
     }
 
     IngestJobPluginInfo ingestInfoUpdated = new IngestJobPluginInfo();
     ingestInfoUpdated.setCompletionPercentage(Math.round((percentage * 100)));
-    ingestInfoUpdated.setObjectsBeingProcessed(beingProcessed);
-    ingestInfoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
-    ingestInfoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
+    ingestInfoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
+    ingestInfoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
+    ingestInfoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
     ingestInfoUpdated.setOutcomeObjectsWithManualIntervention(outcomeObjectsWithManualIntervention);
     return ingestInfoUpdated;
   }
@@ -162,14 +159,13 @@ public class IngestJobPluginInfo extends JobPluginInfo {
 
   public void updateCounters() {
     int beingProcessed = getBeingProcessedCounter();
-    setObjectsBeingProcessed(beingProcessed);
-    setObjectsProcessedWithFailure(getObjectsCount() - beingProcessed);
+    setSourceObjectsBeingProcessed(beingProcessed);
+    setSourceObjectsProcessedWithFailure(getSourceObjectsCount() - beingProcessed);
   }
 
   public void finalizeCounters() {
-    setObjectsProcessedWithSuccess(getObjectsCount() - getObjectsProcessedWithFailure());
-    setObjectsBeingProcessed(0);
-    setObjectsWaitingToBeProcessed(0);
+    super.finalizeCounters();
+    setStepsCompleted(getTotalSteps());
   }
 
 }

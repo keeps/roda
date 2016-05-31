@@ -6,6 +6,7 @@ import java.util.Map;
 import org.roda.core.plugins.Plugin;
 
 public class SimpleJobPluginInfo extends JobPluginInfo {
+  private static final long serialVersionUID = 402391793635402897L;
 
   private boolean pluginExecutionIsDone = false;
 
@@ -13,36 +14,36 @@ public class SimpleJobPluginInfo extends JobPluginInfo {
     super();
   }
 
-  public SimpleJobPluginInfo(int objectsCount) {
-    setObjectsCount(objectsCount);
-    setObjectsBeingProcessed(objectsCount);
+  public SimpleJobPluginInfo(int sourceObjectsCount) {
+    super(sourceObjectsCount);
   }
 
   @Override
-  <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
+  public <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
     Map<Plugin<?>, JobPluginInfo> jobInfos) {
 
     SimpleJobPluginInfo jobPluginInfo = (SimpleJobPluginInfo) jobInfos.get(plugin);
     jobPluginInfo.setCompletionPercentage(this.getCompletionPercentage());
-    jobPluginInfo.setObjectsBeingProcessed(pluginExecutionIsDone ? 0 : this.getObjectsBeingProcessed());
-    jobPluginInfo.setObjectsWaitingToBeProcessed(pluginExecutionIsDone ? 0 : this.getObjectsWaitingToBeProcessed());
-    jobPluginInfo.setObjectsProcessedWithSuccess(this.getObjectsProcessedWithSuccess());
-    jobPluginInfo.setObjectsProcessedWithFailure(this.getObjectsProcessedWithFailure());
+    jobPluginInfo.setSourceObjectsBeingProcessed(pluginExecutionIsDone ? 0 : this.getSourceObjectsBeingProcessed());
+    jobPluginInfo
+      .setSourceObjectsWaitingToBeProcessed(pluginExecutionIsDone ? 0 : this.getSourceObjectsWaitingToBeProcessed());
+    jobPluginInfo.setSourceObjectsProcessedWithSuccess(this.getSourceObjectsProcessedWithSuccess());
+    jobPluginInfo.setSourceObjectsProcessedWithFailure(this.getSourceObjectsProcessedWithFailure());
 
-    int beingProcessed = 0;
-    int processedWithSuccess = 0;
-    int processedWithFailure = 0;
-    for (JobPluginInfo jpi : jobInfos.values()) {
+    int sourceObjectsBeingProcessed = 0;
+    int sourceObjectsProcessedWithSuccess = 0;
+    int sourceObjectsProcessedWithFailure = 0;
+    for (JobPluginInfoInterface jpi : jobInfos.values()) {
       SimpleJobPluginInfo pluginInfo = (SimpleJobPluginInfo) jpi;
-      processedWithSuccess += pluginInfo.getObjectsProcessedWithSuccess();
-      processedWithFailure += pluginInfo.getObjectsProcessedWithFailure();
-      beingProcessed += pluginInfo.getObjectsBeingProcessed();
+      sourceObjectsProcessedWithSuccess += pluginInfo.getSourceObjectsProcessedWithSuccess();
+      sourceObjectsProcessedWithFailure += pluginInfo.getSourceObjectsProcessedWithFailure();
+      sourceObjectsBeingProcessed += pluginInfo.getSourceObjectsBeingProcessed();
     }
 
     SimpleJobPluginInfo infoUpdated = new SimpleJobPluginInfo();
-    infoUpdated.setObjectsBeingProcessed(beingProcessed);
-    infoUpdated.setObjectsProcessedWithSuccess(processedWithSuccess);
-    infoUpdated.setObjectsProcessedWithFailure(processedWithFailure);
+    infoUpdated.setSourceObjectsBeingProcessed(sourceObjectsBeingProcessed);
+    infoUpdated.setSourceObjectsProcessedWithSuccess(sourceObjectsProcessedWithSuccess);
+    infoUpdated.setSourceObjectsProcessedWithFailure(sourceObjectsProcessedWithFailure);
     return infoUpdated;
   }
 

@@ -1,0 +1,19 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE file at the root of the source
+ * tree and available online at
+ *
+ * https://github.com/keeps/roda
+ */
+package org.roda.core.plugins.orchestrate;
+
+import java.io.Serializable;
+import java.util.Map;
+
+import org.roda.core.plugins.Plugin;
+
+public interface JobPluginInfoInterface {
+
+  <T extends Serializable> JobPluginInfo processJobPluginInformation(Plugin<T> plugin, Integer taskObjectsCount,
+    Map<Plugin<?>, JobPluginInfo> jobInfos);
+}

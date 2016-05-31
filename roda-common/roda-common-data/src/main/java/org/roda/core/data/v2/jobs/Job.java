@@ -48,15 +48,9 @@ public class Job implements IsIndexed, Serializable {
   private JOB_STATE state = null;
   // job state details
   private String stateDetails = "";
-  // 0-100 scale completion percentage
-  private int completionPercentage = 0;
 
-  private int sourceObjectsCount = 0;
-  private int sourceObjectsWaitingToBeProcessed = 0;
-  private int sourceObjectsBeingProcessed = 0;
-  private int sourceObjectsProcessedWithSuccess = 0;
-  private int sourceObjectsProcessedWithFailure = 0;
-  private int outcomeObjectsWithManualIntervention = 0;
+  // job statistics (total source objects, etc.)
+  JobStats jobStats = new JobStats();
 
   // plugin full class (e.g. org.roda.core.plugins.plugins.base.FixityPlugin)
   private String plugin = null;
@@ -85,9 +79,7 @@ public class Job implements IsIndexed, Serializable {
     this.pluginParameters = new HashMap<String, String>(job.getPluginParameters());
     this.sourceObjects = job.getSourceObjects();
     if (sourceObjects instanceof SelectedItemsList) {
-      this.sourceObjectsCount = ((SelectedItemsList<?>) sourceObjects).getIds().size();
-    } else {
-      this.sourceObjectsCount = 0;
+      jobStats.setSourceObjectsCount(((SelectedItemsList<?>) sourceObjects).getIds().size());
     }
   }
 
@@ -153,61 +145,8 @@ public class Job implements IsIndexed, Serializable {
     this.stateDetails = stateDetails;
   }
 
-  public int getCompletionPercentage() {
-    return completionPercentage;
-  }
-
-  public Job setCompletionPercentage(int completionPercentage) {
-    this.completionPercentage = completionPercentage;
-    return this;
-  }
-
-  public int getSourceObjectsCount() {
-    return sourceObjectsCount;
-  }
-
-  public void setSourceObjectsCount(int sourceObjectsCount) {
-    this.sourceObjectsCount = sourceObjectsCount;
-  }
-
-  public int getSourceObjectsWaitingToBeProcessed() {
-    return sourceObjectsWaitingToBeProcessed;
-  }
-
-  public void setSourceObjectsWaitingToBeProcessed(int sourceObjectsWaitingToBeProcessed) {
-    this.sourceObjectsWaitingToBeProcessed = sourceObjectsWaitingToBeProcessed;
-  }
-
-  public int getSourceObjectsBeingProcessed() {
-    return sourceObjectsBeingProcessed;
-  }
-
-  public void setSourceObjectsBeingProcessed(int sourceObjectsBeingProcessed) {
-    this.sourceObjectsBeingProcessed = sourceObjectsBeingProcessed;
-  }
-
-  public int getSourceObjectsProcessedWithSuccess() {
-    return sourceObjectsProcessedWithSuccess;
-  }
-
-  public void setSourceObjectsProcessedWithSuccess(int sourceObjectsProcessedWithSuccess) {
-    this.sourceObjectsProcessedWithSuccess = sourceObjectsProcessedWithSuccess;
-  }
-
-  public int getSourceObjectsProcessedWithFailure() {
-    return sourceObjectsProcessedWithFailure;
-  }
-
-  public void setSourceObjectsProcessedWithFailure(int sourceObjectsProcessedWithFailure) {
-    this.sourceObjectsProcessedWithFailure = sourceObjectsProcessedWithFailure;
-  }
-
-  public int getOutcomeObjectsWithManualIntervention() {
-    return outcomeObjectsWithManualIntervention;
-  }
-
-  public void setOutcomeObjectsWithManualIntervention(int outcomeObjectsWithManualIntervention) {
-    this.outcomeObjectsWithManualIntervention = outcomeObjectsWithManualIntervention;
+  public JobStats getJobStats() {
+    return jobStats;
   }
 
   public String getPlugin() {
@@ -259,14 +198,9 @@ public class Job implements IsIndexed, Serializable {
   @Override
   public String toString() {
     return "Job [id=" + id + ", name=" + name + ", username=" + username + ", startDate=" + startDate + ", endDate="
-      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", completionPercentage="
-      + completionPercentage + ", sourceObjectsCount=" + sourceObjectsCount + ", sourceObjectsWaitingToBeProcessed="
-      + sourceObjectsWaitingToBeProcessed + ", sourceObjectsBeingProcessed=" + sourceObjectsBeingProcessed
-      + ", sourceObjectsProcessedWithSuccess=" + sourceObjectsProcessedWithSuccess
-      + ", sourceObjectsProcessedWithFailure=" + sourceObjectsProcessedWithFailure
-      + ", outcomeObjectsWithManualIntervention=" + outcomeObjectsWithManualIntervention + ", plugin=" + plugin
-      + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", sourceObjects=" + sourceObjects
-      + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
+      + endDate + ", state=" + state + ", stateDetails=" + stateDetails + ", jobStats=" + jobStats + ", plugin="
+      + plugin + ", pluginType=" + pluginType + ", pluginParameters=" + pluginParameters + ", sourceObjects="
+      + sourceObjects + ", outcomeObjectsClass=" + outcomeObjectsClass + "]";
   }
 
   @JsonIgnore

@@ -56,8 +56,6 @@ public class JobsHelper {
       job.setName(job.getId());
     }
     job.setUsername(user.getName());
-
-    job.setSourceObjectsCount(job.getSourceObjectsCount());
   }
 
   private static void validateJobPluginInformation(Job job) throws RequestNotValidException {
