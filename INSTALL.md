@@ -1,6 +1,17 @@
-# Install instructions
+# Install using docker
+
+In Windows or MacOSX install docker and Kitematic. In Kitematic, search for "keeps/roda" and install the container. Click on the top-right button to open RODA (it might take a minute to initialize).
+
+On Linux, as Kitematic is not yet available, use the following instructions:
+1. Install docker for your system: https://docs.docker.com/engine/installation/
+2. Pull or update to the latest roda container, on the command line run:  `docker pull keeps/roda`
+3. Run the container: `docker run -p 8080:8080 -v ~/.roda:/root/.roda keeps/roda`
+4. Access RODA on your browser: [http://localhost:8080](http://localhost:8080)
+
+# Base install instructions
 
 ## Dependencies
+
 
 ### Java 8
 

@@ -1,21 +1,31 @@
 FROM tomcat:8.0-jre8
 MAINTAINER hsilva@keep.pt
 
-RUN rm -rf /usr/local/tomcat/webapps/ROOT
-
 # Install dependencies
-RUN curl https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
- apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
- tee -a /etc/apt/sources.list && apt-get update && \
- apt-get install clamav clamav-daemon siegfried curl supervisor -y
+RUN curl -s https://bintray.com/user/downloadSubjectPublicKey?username=bintray | \
+    apt-key add - && echo "deb http://dl.bintray.com/siegfried/debian wheezy main" | \
+    tee -a /etc/apt/sources.list && apt-get -qq update && \
+    apt-get -qq -y install clamav clamav-daemon siegfried curl supervisor zip
 
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY clamd.conf /etc/clamav/clamd.conf
-RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav
+RUN mkdir -p /var/run/clamav && chown clamav /var/run/clamav && freshclam
 
-RUN freshclam
+# Install web application
+ADD /roda-wui-* /usr/local/tomcat/webapps/ROOT.war
+RUN rm -rf /usr/local/tomcat/webapps/ROOT && \
+    unzip -q /usr/local/tomcat/webapps/ROOT.war -d /usr/local/tomcat/webapps/ROOT && \
+    rm /usr/local/tomcat/webapps/ROOT.war
 
-ADD /roda-wui-2.0.0-SNAPSHOT.war /usr/local/tomcat/webapps/ROOT.war
+# Fix configuration
+RUN unzip -q /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties && \
+    sed -i -e 's/^core.plugins.internal.virus_check.clamav/#&/' -e 's/^core.tools.siegfried.mode/#&/' config/roda-core.properties && \
+    echo "\n" >> config/roda-core.properties && \
+    echo "core.plugins.internal.virus_check.clamav.bin = /usr/bin/clamdscan" >> config/roda-core.properties && \
+    echo "core.plugins.internal.virus_check.clamav.params = -m --fdpass" >> config/roda-core.properties && \
+    echo "core.plugins.internal.virus_check.clamav.get_version = clamdscan --version" >> config/roda-core.properties && \
+    echo "core.tools.siegfried.mode = server" >> config/roda-core.properties && \
+    zip /usr/local/tomcat/webapps/ROOT/WEB-INF/lib/roda-core-*.jar config/roda-core.properties
 
 VOLUME /root/.roda
 
